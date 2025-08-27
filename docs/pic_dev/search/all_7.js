@@ -35,7 +35,7 @@ var searchData=
   ['fish_5fc_32',['fish_c',['../variables_8h.html#a0f1542afb8462493ca6e37c0285b3436',1,'SimCtx']]],
   ['fishcyl_33',['fishcyl',['../variables_8h.html#a05c02891978b9f09aff6f2f6b0a636fe',1,'SimCtx']]],
   ['flagnewcomersforlocation_34',['flagnewcomersforlocation',['../ParticleMotion_8h.html#ad247152a0dd47d07243fad4c2fd89c0a',1,'FlagNewcomersForLocation(DM swarm, PetscInt n_local_before, const PetscInt64 pids_before[]):&#160;ParticleMotion.c'],['../ParticleMotion_8c.html#ad247152a0dd47d07243fad4c2fd89c0a',1,'FlagNewcomersForLocation(DM swarm, PetscInt n_local_before, const PetscInt64 pids_before[]):&#160;ParticleMotion.c']]],
-  ['flow_35',['Data Flow',['../architecture.html#dataflow',1,'']]],
+  ['flow_35',['Detailed Program Flow',['../developer_guide.html#program_flow',1,'']]],
   ['flow_5fsolver_36',['flow_solver',['../solvers_8c.html#a2ed4825273a593f371a3d48071708255',1,'Flow_Solver(SimCtx *simCtx):&#160;solvers.c'],['../variables__old_8h.html#a606c9c7fe576cda6af28d2b458e6acdd',1,'Flow_Solver(UserMG *usermg, IBMNodes *ibm, FSInfo *fsi):&#160;variables_old.h'],['../solvers_8h.html#a2ed4825273a593f371a3d48071708255',1,'Flow_Solver(SimCtx *simCtx):&#160;solvers.c']]],
   ['flowwave_37',['flowwave',['../variables__old_8h.html#structFlowWave',1,'FlowWave'],['../variables_8h.html#a3dfec431fa23ae2d42abc44985151b6c',1,'FlowWave:&#160;variables.h']]],
   ['flux_5fin_38',['Flux_in',['../variables_8h.html#aa8f85a4a159853045094b4a018ac36dd',1,'SimCtx']]],

@@ -27,19 +27,30 @@ var NAVTREE =
   [ "PICurv", "index.html", [
     [ "🌀 PICurv: A Parallel Particle-in-Cell Solver for Curvilinear LES", "index.html", "index" ],
     [ "mainpage", "md_mainpage.html", null ],
-    [ "architecture", "md_architecture.html", null ],
-    [ "Architecture", "architecture.html", [
-      [ "Modules", "architecture.html#modules", null ],
-      [ "Data Flow", "architecture.html#dataflow", null ],
-      [ "Diagrams", "architecture.html#diagrams", null ]
+    [ "01_getting_started", "md_pages_201__getting__started.html", null ],
+    [ "Getting Started", "getting_started.html", [
+      [ "Dependencies", "getting_started.html#dependencies", null ],
+      [ "Building the Code", "getting_started.html#building", null ],
+      [ "Directory Structure", "getting_started.html#directory_structure", null ],
+      [ "Running a Simulation", "getting_started.html#first_run", null ]
     ] ],
-    [ "developer_guide", "md_developer__guide.html", null ],
-    [ "Developer Guide {#devguide}", "devguide.html", [
-      [ "Build & Toolchain", "devguide.html#build", null ],
-      [ "Coding Style", "devguide.html#style", null ],
-      [ "Testing", "devguide.html#testing", null ],
-      [ "Performance Notes", "devguide.html#perf", null ],
-      [ "Contributing", "devguide.html#contrib", null ]
+    [ "02_user_guide", "md_pages_202__user__guide.html", null ],
+    [ "User Guide", "user_guide.html", [
+      [ "Command-Line Options", "user_guide.html#cli_options", null ],
+      [ "Example Test Cases", "user_guide.html#test_cases", null ],
+      [ "Output and Checkpointing", "user_guide.html#output_files", null ]
+    ] ],
+    [ "03_theory", "md_pages_203__theory.html", null ],
+    [ "Theory and Numerics", "theory_and_numerics.html", [
+      [ "Governing Equations", "theory_and_numerics.html#governing_equations", null ],
+      [ "Numerical Methods", "theory_and_numerics.html#numerical_methods", null ]
+    ] ],
+    [ "04_developer_guide", "md_pages_204__developer__guide.html", null ],
+    [ "Developer Guide", "developer_guide.html", [
+      [ "High-Level Architecture", "developer_guide.html#arch_overview", null ],
+      [ "Detailed Program Flow", "developer_guide.html#program_flow", null ],
+      [ "Core Data Structures", "developer_guide.html#data_structures", null ],
+      [ "API Modules", "developer_guide.html#api_groups", null ]
     ] ],
     [ "Topics", "topics.html", "topics" ],
     [ "Data Structures", "annotated.html", [
@@ -68,16 +79,16 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AnalyticalSolution_8h.html",
-"cop__variables_8h.html#a63bf2824b9e784a2df2c4b6f8da12c7c",
-"grid_8c.html#a526448d3a1e34b608f7167a59f1d7e04",
-"logging_8h.html#a708710f957e5e79050260f913282f8dc",
-"variables_8h.html#a3fad79185f97288cad2fe2f7c820773e",
-"variables__old_8h.html#a0a9771638133dcba2d6819c8ee4ea7b6",
-"variables__old_8h.html#a39fb6fb65f4a9dbb49a7e89ffcb8d6e3",
-"variables__old_8h.html#a684d9086b162387634a0a87b681f40eb",
-"variables__old_8h.html#a9ae22aa9dbda22c34f18afd5d06f7d3f",
-"variables__old_8h.html#ad072ad20881f5c1762daf18415c459e2",
-"variables__old_8h.html#structBC__Param__s"
+"cop__variables_8h.html#a6c05571aff6a3758bfca517e5aa58d8d",
+"grid_8c.html#a325b9d5da4b9b2c79d278fb848215632",
+"logging_8h.html#a6c0ddc8d3a828f3ab26c557ba0aedf75",
+"variables_8h.html#a34b307d2eee4e2ab67a72a0b79ab96ba",
+"variables__old_8h.html#a0a00003814ee8095a2c39d1d5cba08faa3eaeee121cc2f3eb72936dae68db7908",
+"variables__old_8h.html#a377119b64862dfe3ec0ac531064d51e2",
+"variables__old_8h.html#a66d43c63dc568c9d34002ad7b34e2da9",
+"variables__old_8h.html#a97d71af54bbd6d215c8d3838b574d799",
+"variables__old_8h.html#acdb1a448331de8dc922c08a9653b2488",
+"variables__old_8h.html#afef259795cd298f0d543f574536e4dd7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['developer_20guide_20devguide_0',['Developer Guide {#devguide}',['../devguide.html',1,'']]],
-  ['developer_5fguide_1',['developer_guide',['../md_developer__guide.html',1,'']]],
-  ['devguide_2',['Developer Guide {#devguide}',['../devguide.html',1,'']]]
+  ['cell_20solver_20for_20curvilinear_20les_0',['🌀 PICurv: A Parallel Particle-in-Cell Solver for Curvilinear LES',['../index.html',1,'']]],
+  ['curvilinear_20les_1',['🌀 PICurv: A Parallel Particle-in-Cell Solver for Curvilinear LES',['../index.html',1,'']]]
 ];
