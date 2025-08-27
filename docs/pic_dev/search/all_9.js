@@ -5,5 +5,6 @@ var searchData=
   ['head_2',['head',['../variables__old_8h.html#a33be93b070fc9c810103ca3b646d16a5',1,'list::head'],['../variables__old_8h.html#a02a65fc528fb6c4e468c54686cde3171',1,'IBMList::head']]],
   ['head_5fang_3',['head_ang',['../variables__old_8h.html#a3c873d7c4829ae18c321a737c0577d95',1,'Cstart']]],
   ['helpers_4',['Internal Scattering Helpers',['../group__scatter__module__internal.html',1,'']]],
-  ['hydro_5',['hydro',['../variables_8h.html#acdd1a65b6f7557e023f70e782c24c202',1,'SimCtx']]]
+  ['high_20level_20architecture_5',['High-Level Architecture',['../developer_guide.html#arch_overview',1,'']]],
+  ['hydro_6',['hydro',['../variables_8h.html#acdd1a65b6f7557e023f70e782c24c202',1,'SimCtx']]]
 ];

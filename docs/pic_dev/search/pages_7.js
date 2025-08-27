@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mainpage_0',['mainpage',['../md_mainpage.html',1,'']]]
+  ['theory_20and_20numerics_0',['Theory and Numerics',['../theory_and_numerics.html',1,'index']]]
 ];

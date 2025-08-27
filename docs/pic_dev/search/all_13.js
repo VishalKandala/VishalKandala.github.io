@@ -56,7 +56,7 @@ var searchData=
   ['rstart_5fflg_53',['rstart_flg',['../variables_8h.html#a43fb110dc2ce420db6f659f6c055f086',1,'SimCtx']]],
   ['rstart_5ffsi_54',['rstart_fsi',['../variables_8h.html#a5d62bb83d782192bfb7a04b985d1b8aa',1,'SimCtx']]],
   ['rungekutta_55',['rungekutta',['../implicitsolvers_8h.html#a89ae58d48076ba82dc70438b5e389bf5',1,'RungeKutta(UserCtx *user, IBMNodes *ibm, FSInfo *fsi):&#160;implicitsolvers.c'],['../variables__old_8h.html#a89ae58d48076ba82dc70438b5e389bf5',1,'RungeKutta(UserCtx *user, IBMNodes *ibm, FSInfo *fsi):&#160;implicitsolvers.c'],['../implicitsolvers_8c.html#a89ae58d48076ba82dc70438b5e389bf5',1,'RungeKutta(UserCtx *user, IBMNodes *ibm, FSInfo *fsi):&#160;implicitsolvers.c']]],
-  ['running_20the_20code_56',['▶️ Running The Code',['../index.html#running',1,'']]],
+  ['running_20a_20simulation_56',['Running a Simulation',['../getting_started.html#first_run',1,'']]],
   ['rx_57',['rx',['../variables__old_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
   ['ry_58',['ry',['../variables__old_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
   ['rz_59',['rz',['../variables__old_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]

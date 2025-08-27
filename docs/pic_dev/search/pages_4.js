@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['guide_20devguide_0',['Developer Guide {#devguide}',['../devguide.html',1,'']]]
+  ['numerics_0',['Theory and Numerics',['../theory_and_numerics.html',1,'index']]]
 ];

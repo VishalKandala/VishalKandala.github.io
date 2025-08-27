@@ -25,22 +25,11 @@
 var NAVTREE =
 [
   [ "PICurv", "index.html", [
-    [ "🌀 PICurv: A Parallel Particle-in-Cell Solver for Curvilinear LES", "index.html", "index" ],
-    [ "mainpage", "md_mainpage.html", null ],
-    [ "architecture", "md_architecture.html", null ],
-    [ "Architecture", "architecture.html", [
-      [ "Modules", "architecture.html#modules", null ],
-      [ "Data Flow", "architecture.html#dataflow", null ],
-      [ "Diagrams", "architecture.html#diagrams", null ]
-    ] ],
-    [ "developer_guide", "md_developer__guide.html", null ],
-    [ "Developer Guide {#devguide}", "devguide.html", [
-      [ "Build & Toolchain", "devguide.html#build", null ],
-      [ "Coding Style", "devguide.html#style", null ],
-      [ "Testing", "devguide.html#testing", null ],
-      [ "Performance Notes", "devguide.html#perf", null ],
-      [ "Contributing", "devguide.html#contrib", null ]
-    ] ],
+    [ "PICurv Solver Documentation", "index.html", "index" ],
+    [ "01_getting_started", "md_pages_201__getting__started.html", null ],
+    [ "02_user_guide", "md_pages_202__user__guide.html", null ],
+    [ "03_theory", "md_pages_203__theory.html", null ],
+    [ "04_developer_guide", "md_pages_204__developer__guide.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -68,16 +57,16 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AnalyticalSolution_8h.html",
-"cop__variables_8h.html#a63bf2824b9e784a2df2c4b6f8da12c7c",
-"grid_8c.html#a526448d3a1e34b608f7167a59f1d7e04",
+"cop__variables_8h.html#a6c05571aff6a3758bfca517e5aa58d8d",
+"grid_8c.html#a325b9d5da4b9b2c79d278fb848215632",
 "logging_8h.html#a708710f957e5e79050260f913282f8dc",
-"variables_8h.html#a3fad79185f97288cad2fe2f7c820773e",
-"variables__old_8h.html#a0a9771638133dcba2d6819c8ee4ea7b6",
-"variables__old_8h.html#a39fb6fb65f4a9dbb49a7e89ffcb8d6e3",
-"variables__old_8h.html#a684d9086b162387634a0a87b681f40eb",
-"variables__old_8h.html#a9ae22aa9dbda22c34f18afd5d06f7d3f",
-"variables__old_8h.html#ad072ad20881f5c1762daf18415c459e2",
-"variables__old_8h.html#structBC__Param__s"
+"variables_8h.html#a35819a5678c9c37c2f8b55c2091a9a05",
+"variables__old_8h.html#a0a00003814ee8095a2c39d1d5cba08faa605159e8a4c32319fd69b5d151369d93",
+"variables__old_8h.html#a3791d5150655979c702ff538e0c2d0a5",
+"variables__old_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d",
+"variables__old_8h.html#a9907282cfa63172e506b7560c354d79a",
+"variables__old_8h.html#ace2eeedc863d73caaf51bb83aa993e44",
+"variables__old_8h.html#afef259795cd298f0d543f574536e4dd7a5ff970d3dd377697deacd371681babd9"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
