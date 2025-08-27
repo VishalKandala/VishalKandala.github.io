@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['getting_20started_0',['Getting Started',['../getting_started.html',1,'']]],
-  ['guide_1',['guide',['../developer_guide.html',1,'Developer Guide'],['../user_guide.html',1,'User Guide']]]
+  ['in_20cell_20solver_20for_20curvilinear_20les_0',['🌀 PICurv: A Parallel Particle-in-Cell Solver for Curvilinear LES',['../index.html',1,'']]]
 ];
