@@ -1,5 +1,8 @@
 var NAVTREEINDEX3 =
 {
+"logging_8h.html#a665f66d88010af3842e75cc7f1a00b94":[7,0,0,10,35],
+"logging_8h.html#a672ff9c400e2307306b36415d4fefcb9":[7,0,0,10,3],
+"logging_8h.html#a6c0ddc8d3a828f3ab26c557ba0aedf75":[7,0,0,10,25],
 "logging_8h.html#a708710f957e5e79050260f913282f8dc":[7,0,0,10,13],
 "logging_8h.html#a9585f583c260f40a73f2490914edc689":[7,0,0,10,17],
 "logging_8h.html#a9baaed9103be8264832b39c7dbb2ce1a":[7,0,0,10,22],
@@ -185,14 +188,14 @@ var NAVTREEINDEX3 =
 "structBoundaryCondition__s.html#aa854665838bfec5af3f14dd08c8e3496":[6,0,5,5],
 "structBoundaryCondition__s.html#ae16aef4db1ad62999b3dacb4c22cc6e2":[6,0,5,0],
 "structBoundaryCondition__s.html#ae8d30bfd4b1d6665f8c0ff825bab9cde":[6,0,5,2],
-"theory_and_numerics.html":[0,6],
-"theory_and_numerics.html#governing_equations":[0,6,0],
-"theory_and_numerics.html#numerical_methods":[0,6,1],
+"theory_and_numerics.html":[0,9],
+"theory_and_numerics.html#governing_equations":[0,9,0],
+"theory_and_numerics.html#numerical_methods":[0,9,1],
 "topics.html":[5],
-"user_guide.html":[0,4],
-"user_guide.html#cli_options":[0,4,0],
-"user_guide.html#output_files":[0,4,2],
-"user_guide.html#test_cases":[0,4,1],
+"user_guide.html":[0,7],
+"user_guide.html#cli_options":[0,7,0],
+"user_guide.html#output_files":[0,7,2],
+"user_guide.html#test_cases":[0,7,1],
 "variables_8h.html":[7,0,0,20],
 "variables_8h.html#a02fd03c4c166911f067e92b36d1820a3":[7,0,0,20,30,40],
 "variables_8h.html#a04c849d5fadc93b99bd328df1b90adce":[7,0,0,20,30,36],
@@ -246,8 +249,5 @@ var NAVTREEINDEX3 =
 "variables_8h.html#a347829443e8a679209e21f7f04f51581a339435bd0d4a842c6107333c908a5317":[7,0,0,20,66,3],
 "variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a":[7,0,0,20,66,0],
 "variables_8h.html#a347829443e8a679209e21f7f04f51581a97d609accacbcc1a41e4da5ac052f253":[7,0,0,20,66,1],
-"variables_8h.html#a347829443e8a679209e21f7f04f51581af096820742c38363e9d6c33e7c932780":[7,0,0,20,66,4],
-"variables_8h.html#a347829443e8a679209e21f7f04f51581af0c3b8144a24d2379a1580a6cd48d329":[7,0,0,20,66,2],
-"variables_8h.html#a34b307d2eee4e2ab67a72a0b79ab96ba":[7,0,0,20,29,14],
-"variables_8h.html#a34e33d9993af3306ede1e2b45093c4b9":[7,0,0,20,30,29]
+"variables_8h.html#a347829443e8a679209e21f7f04f51581af096820742c38363e9d6c33e7c932780":[7,0,0,20,66,4]
 };

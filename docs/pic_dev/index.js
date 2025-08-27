@@ -1,8 +1,11 @@
 var index =
 [
     [ "Introduction", "index.html#intro_sec", null ],
+    [ "🌀 PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport", "index.html#autotoc_md1", null ],
+    [ "Core Methodology", "index.html#methodology_sec", null ],
     [ "Key Features", "index.html#features_sec", null ],
-    [ "Quick Navigation", "index.html#nav_links", null ],
+    [ "Architecture and Program Flow", "index.html#arch_sec", null ],
+    [ "Next Steps", "index.html#nav_links", null ],
     [ "Getting Started", "getting_started.html", [
       [ "Dependencies", "getting_started.html#dependencies", null ],
       [ "Building the Code", "getting_started.html#building", null ],
