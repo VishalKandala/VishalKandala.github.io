@@ -76,7 +76,7 @@ var searchData=
   ['needs_5flocation_73',['needs_location',['../variables__old_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a',1,'NEEDS_LOCATION:&#160;variables_old.h'],['../variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a',1,'NEEDS_LOCATION:&#160;variables.h']]],
   ['neighbors_74',['neighbors',['../variables__old_8h.html#a58c51750e5a9172516dd2af41fd5fd42',1,'UserCtx']]],
   ['next_75',['next',['../variables__old_8h.html#a111a569ab2765add9b91c9f94cf9f063',1,'node::next'],['../variables__old_8h.html#ad7161aa64a7b9659180387062bf096c2',1,'list_node::next'],['../variables__old_8h.html#a5222a315981e705b07b070e49cb31f9d',1,'IBMListNode::next'],['../variables__old_8h.html#a1f49c003091a0c03ca2ca9ee905ccf98',1,'BC_Param_s::next']]],
-  ['next_20steps_76',['next steps',['../getting_started.html#next_steps_sec',1,'Next Steps'],['../index.html#nav_links',1,'Next Steps']]],
+  ['next_20steps_76',['next steps',['../user_guide.html#next_steps_sec',1,'Next Steps'],['../index.html#nav_links',1,'Next Steps']]],
   ['nf_5fx_77',['nf_x',['../variables__old_8h.html#a064b9093871501787bf412a5cab018ba',1,'IBMNodes']]],
   ['nf_5fy_78',['nf_y',['../variables__old_8h.html#a8528c1dc1d92fae68e90d355eab9ae78',1,'IBMNodes']]],
   ['nf_5fz_79',['nf_z',['../variables__old_8h.html#a9ae22aa9dbda22c34f18afd5d06f7d3f',1,'IBMNodes']]],

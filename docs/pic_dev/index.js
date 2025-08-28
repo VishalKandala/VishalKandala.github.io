@@ -18,9 +18,17 @@ var index =
       [ "Next Steps", "getting_started.html#next_steps_sec", null ]
     ] ],
     [ "User Guide", "user_guide.html", [
-      [ "Command-Line Options", "user_guide.html#cli_options", null ],
-      [ "Example Test Cases", "user_guide.html#test_cases", null ],
-      [ "Output and Checkpointing", "user_guide.html#output_files", null ]
+      [ "1. Setting Up the Run Environment", "user_guide.html#run_env_sec", null ],
+      [ "2. Directory and File Breakdown", "user_guide.html#dir_breakdown_sec", [
+        [ "The <tt>config/</tt> Directory", "user_guide.html#config_dir_sec", null ],
+        [ "The <tt>logs/</tt> Directory", "user_guide.html#logs_dir_sec", null ],
+        [ "The <tt>results/</tt> Directory", "user_guide.html#results_dir_sec", null ]
+      ] ],
+      [ "3. Running a Simulation", "user_guide.html#run_sim_sec", null ],
+      [ "4. Controlling Simulation Output", "user_guide.html#output_control_sec", [
+        [ "4.1. Log Levels", "user_guide.html#log_levels_sec", null ],
+        [ "4.2. Function Whitelist", "user_guide.html#whitelist_sec", null ]
+      ] ]
     ] ],
     [ "Developer Guide", "developer_guide.html", [
       [ "High-Level Architecture", "developer_guide.html#arch_overview", null ],

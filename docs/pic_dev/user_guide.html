@@ -93,23 +93,78 @@ $(document).ready(function(){initNavTree('user_guide.html',''); initResizable();
   <div class="headertitle"><div class="title">User Guide</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This section provides detailed information on how to configure and run simulations.</p>
-<h1><a class="anchor" id="cli_options"></a>
-Command-Line Options</h1>
-<p>The solver is configured at runtime using command-line flags. The <code><a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693" title="Allocates and populates the master SimulationContext object.">CreateSimulationContext()</a></code> function parses these options. Key options include:</p><ul>
-<li><code>-np &lt;count&gt;</code>: Number of Lagrangian particles to initialize.</li>
-<li><code>-steps_to_run &lt;count&gt;</code>: Number of time steps to execute.</li>
-<li><code>-start_step &lt;count&gt;</code>: The step number to start or restart from.</li>
-<li><code>-only_setup</code>: If present, the code will initialize everything and then exit without running the time loop. Useful for debugging setup issues.</li>
-<li>... (Add other important flags here)</li>
+<div class="textblock"><p>This guide provides practical information on how to set up the run environment, configure a simulation, and interpret the output from the PICurv solver.</p>
+<h1><a class="anchor" id="run_env_sec"></a>
+1. Setting Up the Run Environment</h1>
+<p>The PICurv solver expects a specific directory structure to run properly. It is strongly recommended to perform simulations in a separate directory outside of the source code repository.</p>
+<p>A typical run directory should look like this: </p><div class="fragment"><div class="line">my_simulation/</div>
+<div class="line">├── config/         # Contains all input and configuration files.</div>
+<div class="line">├── logs/           # Destination for runtime text logs.</div>
+<div class="line">├── results/        # Destination for binary output data.</div>
+<div class="line">└── picsolver       # Symbolic link to the solver executable.</div>
+</div><!-- fragment --><p>Here is a step-by-step guide to create this environment:</p><ol type="1">
+<li><b>Create a Run Directory:</b></li>
+<li><br  />
+ <code>bash mkdir my_simulation cd my_simulation </code></li>
+<li><p class="startli"><b>Create Subdirectories:</b> The <code>logs</code> and <code>results</code> directories must exist before starting a simulation.</p>
+<p class="startli"><code>bash mkdir logs results </code></p>
+</li>
+<li><p class="startli"><b>Copy a Configuration:</b> The easiest way to start is by using one of the examples from the <code>test/</code> directory in the source code.</p>
+<p class="startli"><code>bash @section autotoc_md5 Assuming 'my_simulation' and 'picurv' are in the same parent directory cp -r ../picurv/test/channel_flow/config ./ </code></p>
+</li>
+<li><b>Link the Executable:</b> Create a symbolic link to the <code>picsolver</code> executable that you built. <code>bash @section autotoc_md6 Adjust the relative path to your picurv installation ln -s ../picurv/bin/picsolver . </code></li>
+</ol>
+<h1><a class="anchor" id="dir_breakdown_sec"></a>
+2. Directory and File Breakdown</h1>
+<h2><a class="anchor" id="config_dir_sec"></a>
+The &lt;tt&gt;config/&lt;/tt&gt; Directory</h2>
+<p>This directory is the heart of your simulation setup. It contains all the necessary input files that define the problem. The solver will look for the following files here:</p>
+<ul>
+<li><code>control.dat</code>: The main control file. It contains essential simulation parameters like time step size, number of steps to run, I/O frequency, and flags for runtime behavior (e.g., whether to generate the grid programmatically).</li>
+<li><code>bcs.dat</code>: The boundary conditions file. It specifies the type and values of boundary conditions (e.g., inlet, outlet, wall) for all faces of the computational domain.</li>
+<li><code>grid.dat</code>: The grid file, containing the coordinates of the mesh. <b>Note:</b> This file is optional. If the grid is generated programmatically (as specified in <code>control.dat</code>), this file is not needed.</li>
+<li><code>whitelist.dat</code>: An optional file used for debugging. It contains a list of function names, one per line. If this file is present, only log messages originating from these functions will be printed to the console.</li>
 </ul>
-<h1><a class="anchor" id="test_cases"></a>
-Example Test Cases</h1>
-<p>Detailed instructions for running cases in the <code>test/</code> directory.</p>
-<h1><a class="anchor" id="output_files"></a>
-Output and Checkpointing</h1>
-<p>Description of the files generated in the <code>results/</code> directory.</p>
-<p>*/ </p>
+<h2><a class="anchor" id="logs_dir_sec"></a>
+The &lt;tt&gt;logs/&lt;/tt&gt; Directory</h2>
+<p>This directory is where the solver writes all runtime text-based output. The solver requires this directory to be present at startup. It will contain files such as:</p><ul>
+<li>Time histories of solver residuals (e.g., for momentum and pressure-Poisson equations).</li>
+<li>Continuity error metrics at each time step.</li>
+<li>Performance and profiling information.</li>
+<li>General simulation progress and informational messages.</li>
+</ul>
+<h2><a class="anchor" id="results_dir_sec"></a>
+The &lt;tt&gt;results/&lt;/tt&gt; Directory</h2>
+<p>This directory stores the binary output data from the simulation, which is used for post-processing and visualization. Each file is typically named with the field and the time step number. Examples include:</p><ul>
+<li><code>ufield_001000.bin</code>: Eulerian velocity field at step 1000.</li>
+<li><code>pfield_001000.bin</code>: Pressure field at step 1000.</li>
+<li><code>position_001000.bin</code>: Positions of all Lagrangian particles at step 1000.</li>
+<li><code>velocity_001000.bin</code>: Velocities of all Lagrangian particles at step 1000.</li>
+</ul>
+<h1><a class="anchor" id="run_sim_sec"></a>
+3. Running a Simulation</h1>
+<p>Once the run environment is set up as described above, you can execute the solver using <code>mpirun</code>.</p>
+<p>From within your run directory (<code>my_simulation/</code> in our example): </p><div class="fragment"><div class="line"># Run the solver on 4 processor cores</div>
+<div class="line">mpirun -np 4 ./picsolver</div>
+</div><!-- fragment --><p> The simulation will start, printing output to the console (as filtered by the whitelist) and writing detailed logs and binary results to their respective directories.</p>
+<h1><a class="anchor" id="output_control_sec"></a>
+4. Controlling Simulation Output</h1>
+<p>You have two primary mechanisms for controlling the verbosity of the solver's console output, which is very useful for debugging and monitoring.</p>
+<h2><a class="anchor" id="log_levels_sec"></a>
+4.1. Log Levels</h2>
+<p>The solver uses a tiered logging system. You can set a maximum log level (typically in <code>control.dat</code>) to control what gets printed. The levels are, in order of increasing verbosity:</p><ul>
+<li><code>LOG_ERROR</code>: Only critical, simulation-ending errors are shown.</li>
+<li><code>LOG_WARNING</code>: Errors and potential issues are shown.</li>
+<li><code>LOG_INFO</code>: (Default) Warnings, errors, and general high-level simulation progress.</li>
+<li><code>LOG_DEBUG</code>: Highly detailed output from deep within functions, intended for developers.</li>
+<li><code>LOG_PROFILE</code>: Messages exclusively related to performance profiling.</li>
+</ul>
+<h2><a class="anchor" id="whitelist_sec"></a>
+4.2. Function Whitelist</h2>
+<p>For highly targeted debugging, you can use the <code>whitelist.dat</code> file. If this file exists in the <code>config/</code> directory, the solver will <em>only</em> print console messages from functions whose names are listed in this file. This allows you to isolate the output from a specific part of the code you are working on without being flooded by messages from other functions.</p>
+<h1><a class="anchor" id="next_steps_sec"></a>
+Next Steps</h1>
+<p>After running a simulation, the next step is to analyze the data. Refer to the documentation for the <code>postprocessor</code> utility and any provided visualization scripts to learn how to process the binary files in the <code>results/</code> directory. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

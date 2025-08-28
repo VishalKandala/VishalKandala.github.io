@@ -61,13 +61,14 @@ var searchData=
   ['boundarysystem_5fexecutestep_5flegacy_58',['boundarysystem_executestep_legacy',['../Boundaries_8h.html#a47c050460ff0da893f9510ee9a459bfa',1,'BoundarySystem_ExecuteStep_Legacy(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a47c050460ff0da893f9510ee9a459bfa',1,'BoundarySystem_ExecuteStep_Legacy(UserCtx *user):&#160;Boundaries.c']]],
   ['boundingbox_59',['boundingbox',['../variables__old_8h.html#structBoundingBox',1,'BoundingBox'],['../variables_8h.html#a87a49c783469e6e8b255a3214f17a832',1,'BoundingBox:&#160;variables.h']]],
   ['bp_60',['BP',['../poisson_8c.html#a82b271e081de4cfb35eb87b0c13dddba',1,'poisson.c']]],
-  ['broadcastallboundingboxes_61',['broadcastallboundingboxes',['../grid_8h.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c'],['../grid_8c.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c']]],
-  ['bs_62',['BS',['../poisson_8c.html#a580a88f98668df1ac5e1683cae31c0b3',1,'poisson.c']]],
-  ['build_20tools_20and_20mpi_63',['2.1. Installing Build Tools and MPI',['../getting_started.html#install_tools_sec',1,'']]],
-  ['buildheaderstring_64',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
-  ['buildrowformatstring_65',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]],
-  ['bvel_5fu_66',['Bvel_u',['../variables__old_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
-  ['bvel_5fv_67',['Bvel_v',['../variables__old_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
-  ['bvel_5fw_68',['Bvel_w',['../variables__old_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]],
-  ['bw_69',['BW',['../poisson_8c.html#a84909b16209480034c40276c4f84f975',1,'poisson.c']]]
+  ['breakdown_61',['2. Directory and File Breakdown',['../user_guide.html#dir_breakdown_sec',1,'']]],
+  ['broadcastallboundingboxes_62',['broadcastallboundingboxes',['../grid_8h.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c'],['../grid_8c.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c']]],
+  ['bs_63',['BS',['../poisson_8c.html#a580a88f98668df1ac5e1683cae31c0b3',1,'poisson.c']]],
+  ['build_20tools_20and_20mpi_64',['2.1. Installing Build Tools and MPI',['../getting_started.html#install_tools_sec',1,'']]],
+  ['buildheaderstring_65',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
+  ['buildrowformatstring_66',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]],
+  ['bvel_5fu_67',['Bvel_u',['../variables__old_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
+  ['bvel_5fv_68',['Bvel_v',['../variables__old_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
+  ['bvel_5fw_69',['Bvel_w',['../variables__old_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]],
+  ['bw_70',['BW',['../poisson_8c.html#a84909b16209480034c40276c4f84f975',1,'poisson.c']]]
 ];
