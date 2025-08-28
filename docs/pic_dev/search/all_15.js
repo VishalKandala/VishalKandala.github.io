@@ -60,7 +60,7 @@ var searchData=
   ['pp_57',['pp',['../variables__old_8h.html#ac693e222cb5dc2d33e9394ea3bddd4dc',1,'UserCtx']]],
   ['precheckandresizeswarm_58',['precheckandresizeswarm',['../ParticleMotion_8h.html#ae0c7489fc52fda6c92cd1f22c3f50c38',1,'PreCheckAndResizeSwarm(UserCtx *user, PetscInt ti, const char *ext):&#160;ParticleMotion.c'],['../ParticleMotion_8c.html#ae0c7489fc52fda6c92cd1f22c3f50c38',1,'PreCheckAndResizeSwarm(UserCtx *user, PetscInt ti, const char *ext):&#160;ParticleMotion.c']]],
   ['prepareloadedswarmforrelocation_59',['prepareloadedswarmforrelocation',['../ParticleSwarm_8h.html#a5488e87ab4fa163467b3db9ce10233a5',1,'PrepareLoadedSwarmForRelocation(UserCtx *user):&#160;ParticleSwarm.c'],['../ParticleSwarm_8c.html#a5488e87ab4fa163467b3db9ce10233a5',1,'PrepareLoadedSwarmForRelocation(UserCtx *user):&#160;ParticleSwarm.c']]],
-  ['prerequisites_60',['1. Prerequisites',['../getting_started.html#prereqs_sec',1,'']]],
+  ['prerequisites_60',['prerequisites',['../getting_started.html#prereqs_sec',1,'1. Prerequisites'],['../getting_started.html#install_sec',1,'2. Installation and Verification of Prerequisites']]],
   ['pres_61',['pres',['../variables__old_8h.html#a951a7b307ca6f283098026ef73b65739',1,'IBMNodes']]],
   ['prestep_62',['prestep',['../structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c',1,'BoundaryCondition::PreStep'],['../structBoundaryCondition__s.html#a092d7f8c5d4a6e161b3e832a66fef181',1,'BoundaryCondition_s::PreStep']]],
   ['print_5flog_5flevel_63',['print_log_level',['../logging_8h.html#a4d4a385a6fac09d0e106eeb2dfde18ba',1,'print_log_level(void):&#160;logging.c'],['../logging_8c.html#a4d4a385a6fac09d0e106eeb2dfde18ba',1,'print_log_level(void):&#160;logging.c']]],

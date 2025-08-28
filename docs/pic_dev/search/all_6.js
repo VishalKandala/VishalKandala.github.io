@@ -24,7 +24,7 @@ var searchData=
   ['and_20mpi_21',['2.1. Installing Build Tools and MPI',['../getting_started.html#install_tools_sec',1,'']]],
   ['and_20numerics_22',['Theory and Numerics',['../theory_and_numerics.html',1,'index']]],
   ['and_20program_20flow_23',['Architecture and Program Flow',['../index.html#arch_sec',1,'']]],
-  ['and_20verification_24',['2. Installation and Verification',['../getting_started.html#install_sec',1,'']]],
+  ['and_20verification_20of_20prerequisites_24',['2. Installation and Verification of Prerequisites',['../getting_started.html#install_sec',1,'']]],
   ['angle_25',['angle',['../variables_8h.html#a1c09604af49856ddc75bb32cd1b2a836',1,'SimCtx']]],
   ['annulus_26',['ANNULUS',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa7ea5c9eb9cab9f86765ccf12e2bd0413',1,'variables.h']]],
   ['ao_27',['ao',['../variables__old_8h.html#aea94c48d31a4107860ddca95a404a81c',1,'UserCtx']]],

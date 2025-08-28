@@ -10,7 +10,7 @@ var searchData=
   ['vectorfield_7',['vectorfield',['../variables_8h.html#a688b11ccc72940aa35ca84eb6f0ec99b',1,'VTKMetaData::vectorField'],['../variables__old_8h.html#a064a37174c4b3bceadafa7a8f41d92af',1,'_n_VTKMetaData::vectorField']]],
   ['vectorfieldname_8',['vectorfieldname',['../variables__old_8h.html#abd950ce7d801a16ffba3ea58e488aa16',1,'_n_VTKMetaData::vectorFieldName'],['../variables_8h.html#a63a15e7ba17f59ff0fb668fd880f128a',1,'VTKMetaData::vectorFieldName']]],
   ['vel_9',['vel',['../variables__old_8h.html#a0dedc7a71f2bf127463d9bfd4ed41103',1,'Particle']]],
-  ['verification_10',['2. Installation and Verification',['../getting_started.html#install_sec',1,'']]],
+  ['verification_20of_20prerequisites_10',['2. Installation and Verification of Prerequisites',['../getting_started.html#install_sec',1,'']]],
   ['verifying_20the_20petsc_20installation_11',['2.3. Verifying the PETSc Installation',['../getting_started.html#verify_petsc_sec',1,'']]],
   ['vertices_12',['vertices',['../variables__old_8h.html#a994289a1b1801d93075b37b69c129e82',1,'Cell']]],
   ['viscous_13',['viscous',['../rhs_8h.html#a3e0cf2a027c25bb1f6510d4a7e5d4870',1,'Viscous(UserCtx *user, Vec Ucont, Vec Ucat, Vec Visc):&#160;rhs.c'],['../rhs_8c.html#a3e0cf2a027c25bb1f6510d4a7e5d4870',1,'Viscous(UserCtx *user, Vec Ucont, Vec Ucat, Vec Visc):&#160;rhs.c']]],

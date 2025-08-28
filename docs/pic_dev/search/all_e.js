@@ -83,7 +83,7 @@ var searchData=
   ['inletu_80',['inletU',['../variables__old_8h.html#ae92f89d2a9bd0f76888128d5ddc3f239',1,'UserCtx']]],
   ['insertnode_81',['insertnode',['../list_8h.html#af045b58df4ca4babe828ab4d56b7fec1',1,'insertnode(List *ilist, PetscInt Node):&#160;list.h'],['../variables__old_8h.html#af045b58df4ca4babe828ab4d56b7fec1',1,'insertnode(List *ilist, PetscInt Node):&#160;list.h']]],
   ['installation_82',['2.3. Verifying the PETSc Installation',['../getting_started.html#verify_petsc_sec',1,'']]],
-  ['installation_20and_20verification_83',['2. Installation and Verification',['../getting_started.html#install_sec',1,'']]],
+  ['installation_20and_20verification_20of_20prerequisites_83',['2. Installation and Verification of Prerequisites',['../getting_started.html#install_sec',1,'']]],
   ['installing_20build_20tools_20and_20mpi_84',['2.1. Installing Build Tools and MPI',['../getting_started.html#install_tools_sec',1,'']]],
   ['installing_20petsc_85',['2.2. Installing PETSc',['../getting_started.html#install_petsc_sec',1,'']]],
   ['int64tostr_86',['Int64ToStr',['../logging_8c.html#aa1977fc21fa13444d85147ec9798f76b',1,'logging.c']]],

@@ -8,7 +8,7 @@ var index =
     [ "Next Steps", "index.html#nav_links", null ],
     [ "Getting Started", "getting_started.html", [
       [ "1. Prerequisites", "getting_started.html#prereqs_sec", null ],
-      [ "2. Installation and Verification", "getting_started.html#install_sec", [
+      [ "2. Installation and Verification of Prerequisites", "getting_started.html#install_sec", [
         [ "2.1. Installing Build Tools and MPI", "getting_started.html#install_tools_sec", null ],
         [ "2.2. Installing PETSc", "getting_started.html#install_petsc_sec", null ],
         [ "2.3. Verifying the PETSc Installation", "getting_started.html#verify_petsc_sec", null ]
