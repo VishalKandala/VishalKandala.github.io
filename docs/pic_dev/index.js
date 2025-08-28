@@ -7,10 +7,15 @@ var index =
     [ "Architecture and Program Flow", "index.html#arch_sec", null ],
     [ "Next Steps", "index.html#nav_links", null ],
     [ "Getting Started", "getting_started.html", [
-      [ "Dependencies", "getting_started.html#dependencies", null ],
-      [ "Building the Code", "getting_started.html#building", null ],
-      [ "Directory Structure", "getting_started.html#directory_structure", null ],
-      [ "Running a Simulation", "getting_started.html#first_run", null ]
+      [ "1. Prerequisites", "getting_started.html#prereqs_sec", null ],
+      [ "2. Installation and Verification", "getting_started.html#install_sec", [
+        [ "2.1. Installing Build Tools and MPI", "getting_started.html#install_tools_sec", null ],
+        [ "2.2. Installing PETSc", "getting_started.html#install_petsc_sec", null ],
+        [ "2.3. Verifying the PETSc Installation", "getting_started.html#verify_petsc_sec", null ]
+      ] ],
+      [ "3. Getting the PICurv Code", "getting_started.html#get_code_sec", null ],
+      [ "4. Compiling PICurv", "getting_started.html#build_sec", null ],
+      [ "Next Steps", "getting_started.html#next_steps_sec", null ]
     ] ],
     [ "User Guide", "user_guide.html", [
       [ "Command-Line Options", "user_guide.html#cli_options", null ],

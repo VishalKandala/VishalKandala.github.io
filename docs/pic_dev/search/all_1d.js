@@ -1,17 +1,19 @@
 var searchData=
 [
-  ['y_0',['y',['../variables__old_8h.html#abfdfa452fab8c46819cf94fd12013eee',1,'Cmpnts2::y'],['../variables__old_8h.html#a567a983d2643dd40d933b55858374faa',1,'Cpt2D::y'],['../variables__old_8h.html#ad032e456f7f4b32b9ac0d94be05de204',1,'Cmpnts::y']]],
-  ['y_5fbp_1',['y_bp',['../variables__old_8h.html#ad57f70fc0d23d6543fbd98ebe6d6f89a',1,'IBMNodes::y_bp'],['../variables__old_8h.html#a17d741fdd879164aca55e8fadb476d30',1,'IBMVNodes::y_bp']]],
-  ['y_5fbp0_2',['y_bp0',['../variables__old_8h.html#a79c735475b93c39f175e9817a9dacf79',1,'IBMNodes::y_bp0'],['../variables__old_8h.html#a4b84c3b4a462add33a503bf14c2fa52d',1,'IBMVNodes::y_bp0']]],
-  ['y_5fbp_5fin_3',['y_bp_in',['../variables__old_8h.html#af135ac4bcd339e85332712456986fc67',1,'IBMNodes']]],
-  ['y_5fbp_5fo_4',['y_bp_o',['../variables__old_8h.html#af16b78cef0005281b274cc303a0278bd',1,'IBMNodes::y_bp_o'],['../variables__old_8h.html#a7144216940cfffcc3a4ea6cfd2a5aca7',1,'IBMVNodes::y_bp_o']]],
-  ['y_5fc_5',['y_c',['../variables__old_8h.html#af192b3a8bb33232a33a081c08f18f32d',1,'FSInfo::y_c'],['../variables__old_8h.html#a01bc2acbb2432c4845b03b5d1e1587ca',1,'IBMVNodes::y_c']]],
-  ['y_5fcom_6',['y_com',['../variables__old_8h.html#a234f67a093e1aa8c5bba171329a56e6b',1,'Cstart']]],
-  ['y_5fmax_7',['y_max',['../variables__old_8h.html#a720143f2539ae0ef7f6bb1488c17c210',1,'IBMNodes']]],
-  ['y_5fmidp_8',['y_midp',['../variables__old_8h.html#afe6ef22c15698fad2b0c6b6af001b3a1',1,'Cstart']]],
-  ['y_5fmin_9',['y_min',['../variables__old_8h.html#a6268b577b839220f3817e3ee4b85ade4',1,'IBMNodes']]],
-  ['ym_5fcell_10',['ym_cell',['../variables__old_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
-  ['ymax_11',['ymax',['../variables__old_8h.html#afd6d19f6a25afc18f1552f8bd3724103',1,'UserCtx::yMax'],['../variables__old_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart::ymax']]],
-  ['ymin_12',['ymin',['../variables__old_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart::ymin'],['../variables__old_8h.html#a6093bb506189aeae2e94d81491265463',1,'UserCtx::yMin']]],
-  ['ys_5fcell_13',['ys_cell',['../variables__old_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
+  ['x_0',['x',['../variables__old_8h.html#ad0e3d11b96bb6cbf3035c45023ceb317',1,'Cmpnts2::x'],['../variables__old_8h.html#a781a42e0d33e5b145d05b47f01730bda',1,'Cpt2D::x'],['../variables__old_8h.html#a1c07c24c702517add075f618194e8f82',1,'UserCtx::X'],['../variables__old_8h.html#a718a09fbedf450248eaf7019a980e139',1,'Cmpnts::x']]],
+  ['x_5fantene_5f2_1',['x_antene_2',['../cop__variables_8h.html#ad20212be1450d1e49cc9eaed17c6042b',1,'cop_variables.h']]],
+  ['x_5fbp_2',['x_bp',['../variables__old_8h.html#ac54a5efc28cf0f30fbbb1605833828e8',1,'IBMNodes::x_bp'],['../variables__old_8h.html#a199976769f9fa7620bc0e237b960be6c',1,'IBMVNodes::x_bp']]],
+  ['x_5fbp0_3',['x_bp0',['../variables__old_8h.html#aa6401400f22a49bd880fb7f6745ad49a',1,'IBMNodes::x_bp0'],['../variables__old_8h.html#a4eab7fe908c09405d2bc6ad0f2223d6f',1,'IBMVNodes::x_bp0']]],
+  ['x_5fbp_5fin_4',['x_bp_in',['../variables__old_8h.html#aa48837277ffb61a29ba1a9a686a83b67',1,'IBMNodes']]],
+  ['x_5fbp_5fo_5',['x_bp_o',['../variables__old_8h.html#a9907282cfa63172e506b7560c354d79a',1,'IBMNodes::x_bp_o'],['../variables__old_8h.html#ac5d802c999939b4e7759ff7ddba7da94',1,'IBMVNodes::x_bp_o']]],
+  ['x_5fc_6',['x_c',['../variables__old_8h.html#af38951f8e14a5ca57340a2a9391bc61d',1,'FSInfo::x_c'],['../variables__old_8h.html#a7378f41aa866944660faaf49e3998629',1,'IBMVNodes::x_c']]],
+  ['x_5fcom_7',['x_com',['../variables__old_8h.html#af63da39dea1f01eb845a57a003d4bad6',1,'Cstart']]],
+  ['x_5fmax_8',['x_max',['../variables__old_8h.html#a73d51597c7f8f691d93d3cf23240a3a1',1,'IBMNodes']]],
+  ['x_5fmidp_9',['x_midp',['../variables__old_8h.html#a9dbc4de8c7cc0989e48ca90841b586ab',1,'Cstart']]],
+  ['x_5fmin_10',['x_min',['../variables__old_8h.html#aa9168bfa15123891002ebb7fa222abb2',1,'IBMNodes']]],
+  ['x_5ftail_5f0_11',['x_tail_0',['../cop__variables_8h.html#a1f1dd12170837ba12a319345b0982274',1,'cop_variables.h']]],
+  ['xm_5fcell_12',['xm_cell',['../variables__old_8h.html#a7b338865846c21925fbb6b968cdf385f',1,'RankCellInfo']]],
+  ['xmax_13',['xmax',['../variables__old_8h.html#a3624653328a9aabb1338d4b28ec5ca32',1,'UserCtx::xMax'],['../variables__old_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart::xmax']]],
+  ['xmin_14',['xmin',['../variables__old_8h.html#af3bdfeffb10e0d450856f8eaacc0c4c0',1,'UserCtx::xMin'],['../variables__old_8h.html#a40467caea1532693e5662a0812d74c1c',1,'Cstart::xmin']]],
+  ['xs_5fcell_15',['xs_cell',['../variables__old_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]]
 ];

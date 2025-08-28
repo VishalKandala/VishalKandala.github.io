@@ -1,6 +1,6 @@
 var indexSectionsWithContent =
 {
-  0: "0123_abcdefghijklmnopqrstuvwxyz🌀",
+  0: "01234_abcdefghijklmnopqrstuvwxyz🌀",
   1: "_bcdfilmnprsuv",
   2: "0abcgilmprsvw",
   3: "abcdefgiklmnoprstuvw",

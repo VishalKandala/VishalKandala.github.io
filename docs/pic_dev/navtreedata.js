@@ -26,7 +26,6 @@ var NAVTREE =
 [
   [ "PICurv", "index.html", [
     [ "PICurv Solver Documentation", "index.html", "index" ],
-    [ "01_getting_started", "md_pages_201__getting__started.html", null ],
     [ "02_user_guide", "md_pages_202__user__guide.html", null ],
     [ "03_theory", "md_pages_203__theory.html", null ],
     [ "04_developer_guide", "md_pages_204__developer__guide.html", null ],
@@ -58,15 +57,15 @@ var NAVTREEINDEX =
 [
 "AnalyticalSolution_8h.html",
 "cop__variables_8h.html#a6c05571aff6a3758bfca517e5aa58d8d",
-"grid_8c.html#a325b9d5da4b9b2c79d278fb848215632",
-"logging_8h.html#a665f66d88010af3842e75cc7f1a00b94",
-"variables_8h.html#a347829443e8a679209e21f7f04f51581af0c3b8144a24d2379a1580a6cd48d329",
-"variables__old_8h.html#a0a00003814ee8095a2c39d1d5cba08faa266d6a7abcd7483578364c547b428f3a",
-"variables__old_8h.html#a377119b64862dfe3ec0ac531064d51e2",
-"variables__old_8h.html#a66d43c63dc568c9d34002ad7b34e2da9",
-"variables__old_8h.html#a97d71af54bbd6d215c8d3838b574d799",
-"variables__old_8h.html#acdb1a448331de8dc922c08a9653b2488",
-"variables__old_8h.html#afe83433d7e6734e63f739cbd0304988f"
+"globals_z.html",
+"logging_8h.html#a5c51f68b4c031977700cdc8d1dad38f3",
+"variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a",
+"variables__old_8h.html#a0949a51fb857ad550aee8053c1ce2df3",
+"variables__old_8h.html#a36b990cd4495ece021ee4f224b1745d5",
+"variables__old_8h.html#a663e18542c597f233fc52cd8160d1941",
+"variables__old_8h.html#a96b196e35f88ec27e59dcba134e08936",
+"variables__old_8h.html#acd99423029a666652ee1f5bf573619bc",
+"variables__old_8h.html#afe6ef22c15698fad2b0c6b6af001b3a1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
