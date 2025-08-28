@@ -1,12 +1,12 @@
 ---
 layout: page
-title: PIC Dev Docs
+title: PICurv Documentation
 permalink: /docs/
-description: API & developer docs for pic_dev (Doxygen)
+description: API & developer docs for PICurv (Doxygen)
 ---
 
 <iframe
-  src="/docs/pic_dev/index.html"
+  src="/docs/PICurv/index.html"
   style="width:100%; height:85vh; border:0;"
   loading="eager"
 ></iframe>
