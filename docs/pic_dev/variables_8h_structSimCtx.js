@@ -142,6 +142,8 @@ var variables_8h_structSimCtx =
     [ "MaxDivx", "variables_8h.html#a83e58d8ef2d285dc135be286ddc67f01", null ],
     [ "MaxDivy", "variables_8h.html#a8811a9a632140d00bca04337f2261d23", null ],
     [ "MaxDivz", "variables_8h.html#a8b2e7f4d2e2e95e4c49aa02684e2e51d", null ],
+    [ "PostprocessingControlFile", "variables_8h.html#af05e9e68e0acf99ae030d44b905e33fb", null ],
+    [ "pps", "variables_8h.html#a32874f15f12feee6d769b0521aa736bd", null ],
     [ "r", "variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5", null ],
     [ "tin", "variables_8h.html#a1cdec84f2d2f90e0169386206f8c02c1", null ],
     [ "uinr", "variables_8h.html#a50311fc2ecb8874bf329750b1f966168", null ]

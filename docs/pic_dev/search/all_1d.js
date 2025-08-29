@@ -13,7 +13,7 @@ var searchData=
   ['x_5fmin_10',['x_min',['../variables__old_8h.html#aa9168bfa15123891002ebb7fa222abb2',1,'IBMNodes']]],
   ['x_5ftail_5f0_11',['x_tail_0',['../cop__variables_8h.html#a1f1dd12170837ba12a319345b0982274',1,'cop_variables.h']]],
   ['xm_5fcell_12',['xm_cell',['../variables__old_8h.html#a7b338865846c21925fbb6b968cdf385f',1,'RankCellInfo']]],
-  ['xmax_13',['xmax',['../variables__old_8h.html#a3624653328a9aabb1338d4b28ec5ca32',1,'UserCtx::xMax'],['../variables__old_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart::xmax']]],
+  ['xmax_13',['xmax',['../variables__old_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart::xmax'],['../variables__old_8h.html#a3624653328a9aabb1338d4b28ec5ca32',1,'UserCtx::xMax']]],
   ['xmin_14',['xmin',['../variables__old_8h.html#af3bdfeffb10e0d450856f8eaacc0c4c0',1,'UserCtx::xMin'],['../variables__old_8h.html#a40467caea1532693e5662a0812d74c1c',1,'Cstart::xmin']]],
   ['xs_5fcell_15',['xs_cell',['../variables__old_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]]
 ];

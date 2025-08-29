@@ -12,7 +12,7 @@ var searchData=
   ['eulerian_20lagrangian_20framework_20for_20scalar_20transport_9',['🌀 PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['../index.html#autotoc_md1',1,'']]],
   ['eulerian_20phase_20the_20grid_10',['1. The Eulerian Phase (The Grid)',['../index.html#autotoc_md2',1,'']]],
   ['eulerianext_11',['eulerianExt',['../variables__old_8h.html#a7a84e77a3939f035f12edca094fab273',1,'PostProcessParams']]],
-  ['eulerianprefix_12',['eulerianPrefix',['../variables__old_8h.html#a864af9a6798cc160cdc8b926df038d5d',1,'PostProcessParams']]],
+  ['eulerianprefix_12',['eulerianPrefix',['../variables__old_8h.html#acf9bc6ae42de499910ee44630d7e1118',1,'PostProcessParams']]],
   ['evaluateparticleposition_13',['evaluateparticleposition',['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
   ['event_5fglobalparticlelocation_14',['event_globalparticlelocation',['../logging_8h.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c'],['../logging_8c.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c']]],
   ['event_5findividuallocation_15',['event_individuallocation',['../logging_8h.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c'],['../logging_8c.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c']]],

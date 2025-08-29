@@ -37,6 +37,8 @@ var io_8c =
     [ "ReadPositionsFromFile", "io_8c.html#abbdec83c0db92b3f9a78ccaf8ec06d60", null ],
     [ "ReadFieldDataToRank0", "io_8c.html#a9b18cb531c659ac173987ed73b1c1d24", null ],
     [ "DisplayBanner", "io_8c.html#adde32528a690c023bc98c9e56ae2f2fb", null ],
+    [ "TrimWhitespace", "io_8c.html#a0592174f7c33fa780e522ce2180877c3", null ],
+    [ "ParsePostProcessingSettings", "io_8c.html#a048b921bc98a7354369a176193c2bd62", null ],
     [ "g_nblk_from_file", "io_8c.html#a3d554435495d0536a7d8c4b1bbbeb0a6", null ],
     [ "g_IMs_from_file", "io_8c.html#a310ceb96a9cb266916fc9ec5cedb5aa2", null ],
     [ "g_JMs_from_file", "io_8c.html#ab1e9e2bb2f9a982f1f13f41d7fc0ad7b", null ],

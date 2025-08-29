@@ -11,7 +11,7 @@ var searchData=
   ['y_5fmidp_8',['y_midp',['../variables__old_8h.html#afe6ef22c15698fad2b0c6b6af001b3a1',1,'Cstart']]],
   ['y_5fmin_9',['y_min',['../variables__old_8h.html#a6268b577b839220f3817e3ee4b85ade4',1,'IBMNodes']]],
   ['ym_5fcell_10',['ym_cell',['../variables__old_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
-  ['ymax_11',['ymax',['../variables__old_8h.html#afd6d19f6a25afc18f1552f8bd3724103',1,'UserCtx::yMax'],['../variables__old_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart::ymax']]],
-  ['ymin_12',['ymin',['../variables__old_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart::ymin'],['../variables__old_8h.html#a6093bb506189aeae2e94d81491265463',1,'UserCtx::yMin']]],
+  ['ymax_11',['ymax',['../variables__old_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart::ymax'],['../variables__old_8h.html#afd6d19f6a25afc18f1552f8bd3724103',1,'UserCtx::yMax']]],
+  ['ymin_12',['ymin',['../variables__old_8h.html#a6093bb506189aeae2e94d81491265463',1,'UserCtx::yMin'],['../variables__old_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart::ymin']]],
   ['ys_5fcell_13',['ys_cell',['../variables__old_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
 ];

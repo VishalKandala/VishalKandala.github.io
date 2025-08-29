@@ -7,5 +7,6 @@ var searchData=
   ['picsolver_2ec_4',['picsolver.c',['../picsolver_8c.html',1,'']]],
   ['poisson_2ec_5',['poisson.c',['../poisson_8c.html',1,'']]],
   ['poisson_2eh_6',['poisson.h',['../poisson_8h.html',1,'']]],
-  ['postprocess_2eh_7',['postprocess.h',['../postprocess_8h.html',1,'']]]
+  ['postprocessor_2ec_7',['postprocessor.c',['../postprocessor_8c.html',1,'']]],
+  ['postprocessor_2eh_8',['postprocessor.h',['../postprocessor_8h.html',1,'']]]
 ];

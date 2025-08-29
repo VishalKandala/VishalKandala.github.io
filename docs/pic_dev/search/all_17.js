@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables__old_8h.html#a297dfd8cfa2bd6284aeb6d290f290f93',1,'FSInfo::R'],['../variables__old_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables__old_8h.html#a9cdf5dfef754056b907da42aee535f07',1,'UserCtx::r']]],
+  ['r_0',['r',['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables__old_8h.html#a9cdf5dfef754056b907da42aee535f07',1,'UserCtx::r'],['../variables__old_8h.html#a297dfd8cfa2bd6284aeb6d290f290f93',1,'FSInfo::R'],['../variables__old_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
   ['radi_1',['radi',['../variables_8h.html#a7e1de8951d5c84349bd6c0f4c15f85f3',1,'SimCtx']]],
   ['radvec_2',['radvec',['../variables__old_8h.html#ac325a6d95a4d51700b3da2777ad53eed',1,'IBMNodes']]],
   ['rank_3',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],

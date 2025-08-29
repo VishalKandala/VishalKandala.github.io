@@ -1,7 +1,7 @@
 var searchData=
 [
   ['gatherallboundingboxes_0',['gatherallboundingboxes',['../grid_8c.html#afac52c252de784d5bcd7fe7a2e642982',1,'GatherAllBoundingBoxes(UserCtx *user, BoundingBox **allBBoxes):&#160;grid.c'],['../grid_8h.html#afac52c252de784d5bcd7fe7a2e642982',1,'GatherAllBoundingBoxes(UserCtx *user, BoundingBox **allBBoxes):&#160;grid.c']]],
-  ['gatherandwritefield_1',['GatherAndWriteField',['../postprocess_8h.html#a6f6ccdb3230932ef102d9b453584d989',1,'postprocess.h']]],
+  ['gatherandwritefield_1',['GatherAndWriteField',['../postprocessor_8h.html#a6f6ccdb3230932ef102d9b453584d989',1,'postprocessor.h']]],
   ['generateandsetcoordinates_2',['GenerateAndSetCoordinates',['../grid_8c.html#ac44553fe1434663c5211cc6ac32ef004',1,'grid.c']]],
   ['get_5flog_5flevel_3',['get_log_level',['../logging_8h.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c'],['../logging_8c.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c']]],
   ['getcellcharacteristicsize_4',['getcellcharacteristicsize',['../walkingsearch_8h.html#a2ed7a27dd4de3fbd6bb46684482ce165',1,'GetCellCharacteristicSize(const Cell *cell, PetscReal *cellSize):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a2ed7a27dd4de3fbd6bb46684482ce165',1,'GetCellCharacteristicSize(const Cell *cell, PetscReal *cellSize):&#160;walkingsearch.c']]],

@@ -381,11 +381,15 @@ var variables_8h =
       [ "startTime", "variables__old_8h.html#ae3da627fc17587b06d6c2a737ff6442c", null ],
       [ "endTime", "variables__old_8h.html#a76d29089d00d89348f32bbf0e2981497", null ],
       [ "timeStep", "variables__old_8h.html#a5dca17e57a0f1464e2442f0c2452d497", null ],
+      [ "outputParticles", "variables__old_8h.html#ab954ff749a6b034b8cef53a508787b24", null ],
+      [ "process_pipeline", "variables__old_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a", null ],
+      [ "output_fields_instantaneous", "variables__old_8h.html#a835edfe1a83c23f4e7708f5134ff02fb", null ],
+      [ "output_fields_averaged", "variables__old_8h.html#a47a8b39d145cff36aa25d8588976156e", null ],
+      [ "output_prefix", "variables__old_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4", null ],
       [ "eulerianExt", "variables__old_8h.html#a7a84e77a3939f035f12edca094fab273", null ],
       [ "particleExt", "variables__old_8h.html#aea601d0f9779b5eb45a9e4eea042bf59", null ],
-      [ "eulerianPrefix", "variables__old_8h.html#a864af9a6798cc160cdc8b926df038d5d", null ],
-      [ "particlePrefix", "variables__old_8h.html#aac37bc86f4ab3541b295329556695bb8", null ],
-      [ "outputParticles", "variables__old_8h.html#ab954ff749a6b034b8cef53a508787b24", null ]
+      [ "eulerianPrefix", "variables__old_8h.html#acf9bc6ae42de499910ee44630d7e1118", null ],
+      [ "particlePrefix", "variables__old_8h.html#ac0b8f4548c362f3a64d5e3986af5eec4", null ]
     ] ],
     [ "VTKMetaData", "variables_8h.html#structVTKMetaData", [
       [ "fileType", "variables_8h.html#a7f393eb4fff178f989abb357f98b35a8", null ],
@@ -547,6 +551,8 @@ var variables_8h =
       [ "MaxDivx", "variables_8h.html#a83e58d8ef2d285dc135be286ddc67f01", null ],
       [ "MaxDivy", "variables_8h.html#a8811a9a632140d00bca04337f2261d23", null ],
       [ "MaxDivz", "variables_8h.html#a8b2e7f4d2e2e95e4c49aa02684e2e51d", null ],
+      [ "PostprocessingControlFile", "variables_8h.html#af05e9e68e0acf99ae030d44b905e33fb", null ],
+      [ "pps", "variables_8h.html#a32874f15f12feee6d769b0521aa736bd", null ],
       [ "r", "variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5", null ],
       [ "tin", "variables_8h.html#a1cdec84f2d2f90e0169386206f8c02c1", null ],
       [ "uinr", "variables_8h.html#a50311fc2ecb8874bf329750b1f966168", null ]
@@ -809,6 +815,9 @@ var variables_8h =
     ] ],
     [ "COEF_TIME_ACCURACY", "variables_8h.html#af0af02fbd08daea87f3523a3754981f0", null ],
     [ "MAX_POINT_DATA_FIELDS", "variables_8h.html#a10a62bce766452804bad64d119e127f7", null ],
+    [ "MAX_PIPELINE_LENGTH", "variables_8h.html#a483a214c827f374f6c8f8660f6935317", null ],
+    [ "MAX_FIELD_LIST_LENGTH", "variables_8h.html#a422cda8cdbf27473ba083b7fb394f025", null ],
+    [ "MAX_FILENAME_LENGTH", "variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2", null ],
     [ "SimCtx", "variables_8h.html#a74fd530dc4655170098467d1d4d5cbb3", null ],
     [ "UserCtx", "variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e", null ],
     [ "BC_Param", "variables_8h.html#a22a9148c380850b8568b82d154446340", null ],

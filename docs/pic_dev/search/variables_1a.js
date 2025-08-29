@@ -16,7 +16,7 @@ var searchData=
   ['z_5fmin_13',['z_min',['../variables__old_8h.html#af3288397d6e8bb845c98bec35ddf86ec',1,'IBMNodes']]],
   ['zet_14',['Zet',['../variables__old_8h.html#a148acf527180f13125589c3fb8f4e816',1,'UserCtx']]],
   ['zm_5fcell_15',['zm_cell',['../variables__old_8h.html#a4b91bc588672c42d8917bf335d1a754e',1,'RankCellInfo']]],
-  ['zmax_16',['zmax',['../variables__old_8h.html#ac648e2d15bfe275b3aaf59c4e7824f3c',1,'Cstart::zmax'],['../variables__old_8h.html#a9b737f614558ab58504a0db0b401d1fe',1,'UserCtx::zMax']]],
-  ['zmin_17',['zmin',['../variables__old_8h.html#a33628369387df2e86d86d6ec3c4c099b',1,'Cstart::zmin'],['../variables__old_8h.html#ab8c185469ce22d0e2749aff93a85e289',1,'UserCtx::zMin']]],
+  ['zmax_16',['zmax',['../variables__old_8h.html#a9b737f614558ab58504a0db0b401d1fe',1,'UserCtx::zMax'],['../variables__old_8h.html#ac648e2d15bfe275b3aaf59c4e7824f3c',1,'Cstart::zmax']]],
+  ['zmin_17',['zmin',['../variables__old_8h.html#ab8c185469ce22d0e2749aff93a85e289',1,'UserCtx::zMin'],['../variables__old_8h.html#a33628369387df2e86d86d6ec3c4c099b',1,'Cstart::zmin']]],
   ['zs_5fcell_18',['zs_cell',['../variables__old_8h.html#a4d6a4d14075dd0718f49111d91c61e1d',1,'RankCellInfo']]]
 ];

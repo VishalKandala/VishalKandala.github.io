@@ -15,7 +15,7 @@ var dir_d44c64559bbebec7f509842c48db8b23 =
     [ "ParticleMotion.h", "ParticleMotion_8h.html", "ParticleMotion_8h" ],
     [ "ParticleSwarm.h", "ParticleSwarm_8h.html", "ParticleSwarm_8h" ],
     [ "poisson.h", "poisson_8h.html", "poisson_8h" ],
-    [ "postprocess.h", "postprocess_8h.html", "postprocess_8h" ],
+    [ "postprocessor.h", "postprocessor_8h.html", "postprocessor_8h" ],
     [ "rhs.h", "rhs_8h.html", "rhs_8h" ],
     [ "setup.h", "setup_8h.html", "setup_8h" ],
     [ "simulation.h", "simulation_8h.html", "simulation_8h" ],
