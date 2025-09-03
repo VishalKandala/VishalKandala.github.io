@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['particlelocationstatus_0',['particlelocationstatus',['../variables_8h.html#a347829443e8a679209e21f7f04f51581',1,'ParticleLocationStatus:&#160;variables.h'],['../variables__old_8h.html#a347829443e8a679209e21f7f04f51581',1,'ParticleLocationStatus:&#160;variables_old.h']]]
+  ['loglevel_0',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['simctx_0',['SimCtx',['../variables_8h.html#structSimCtx',1,'']]],
-  ['surfelmtinfo_1',['SurfElmtInfo',['../variables__old_8h.html#structSurfElmtInfo',1,'']]]
+  ['userctx_0',['UserCtx',['../variables_8h.html#structUserCtx',1,'']]],
+  ['usermg_1',['UserMG',['../variables_8h.html#structUserMG',1,'']]]
 ];

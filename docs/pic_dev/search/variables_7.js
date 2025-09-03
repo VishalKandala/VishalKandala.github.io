@@ -7,15 +7,12 @@ var searchData=
   ['g_5fnblk_5ffrom_5ffile_4',['g_nblk_from_file',['../io_8c.html#a3d554435495d0536a7d8c4b1bbbeb0a6',1,'io.c']]],
   ['gallowedfunctions_5',['gAllowedFunctions',['../logging_8c.html#a32085a5a3e923b4619032eef946fd400',1,'logging.c']]],
   ['generate_5fgrid_6',['generate_grid',['../variables_8h.html#a98a90e3a55a0a0da6e392f44ebf50dad',1,'SimCtx']]],
-  ['gid_7',['Gid',['../variables__old_8h.html#ae6003d999d4a3b9537275c16aada5757',1,'UserCtx']]],
-  ['gidm_8',['Gidm',['../variables__old_8h.html#aee5539e762516e4d03308c3d8d901c2a',1,'UserCtx']]],
-  ['global_5fdomain_5fbbox_9',['global_domain_bbox',['../variables__old_8h.html#a1a3194ed3e85b9a28cf30368e771d3f5',1,'UserCtx']]],
-  ['global_5finflow_5fsum_10',['global_inflow_sum',['../variables__old_8h.html#a67073836fe3437c15b804e6ea630653f',1,'BCContext']]],
-  ['global_5foutflow_5fsum_11',['global_outflow_sum',['../variables__old_8h.html#abf77fc1392b5bd173bab4413c0361587',1,'BCContext']]],
-  ['gnumallowed_12',['gNumAllowed',['../logging_8c.html#a798a72f08a971879fe7d9f55985d4b07',1,'logging.c']]],
-  ['grid1d_13',['grid1d',['../variables_8h.html#a223f70881916d4d77f5f62b1faf4547f',1,'SimCtx']]],
-  ['grid_5ffile_14',['grid_file',['../variables_8h.html#a7947f7b4cd08e551b6d2a79c8b513d9c',1,'SimCtx']]],
-  ['grid_5frotation_5fangle_15',['grid_rotation_angle',['../variables_8h.html#abf0fd1ca67fe0886eb53735ec3d5ed01',1,'SimCtx']]],
-  ['gridorientation_16',['GridOrientation',['../variables__old_8h.html#accf2da0245f804c37780b4653a16f9f3',1,'UserCtx']]],
-  ['gridspace_17',['GridSpace',['../variables__old_8h.html#a0a9771638133dcba2d6819c8ee4ea7b6',1,'UserCtx']]]
+  ['global_5finflow_5fsum_7',['global_inflow_sum',['../variables_8h.html#a7ef2ee23d2a70f8ed3b2035c7148b619',1,'BCContext']]],
+  ['global_5foutflow_5fsum_8',['global_outflow_sum',['../variables_8h.html#a033b2786900e8976475fab7f5f49a4ff',1,'BCContext']]],
+  ['gnumallowed_9',['gNumAllowed',['../logging_8c.html#a798a72f08a971879fe7d9f55985d4b07',1,'logging.c']]],
+  ['grid1d_10',['grid1d',['../variables_8h.html#a223f70881916d4d77f5f62b1faf4547f',1,'SimCtx']]],
+  ['grid_5ffile_11',['grid_file',['../variables_8h.html#a7947f7b4cd08e551b6d2a79c8b513d9c',1,'SimCtx']]],
+  ['grid_5frotation_5fangle_12',['grid_rotation_angle',['../variables_8h.html#abf0fd1ca67fe0886eb53735ec3d5ed01',1,'SimCtx']]],
+  ['gridorientation_13',['GridOrientation',['../variables_8h.html#accf2da0245f804c37780b4653a16f9f3',1,'UserCtx']]],
+  ['gridspace_14',['GridSpace',['../variables_8h.html#a0a9771638133dcba2d6819c8ee4ea7b6',1,'UserCtx']]]
 ];

@@ -13,6 +13,7 @@ var variables_8h_structSimCtx =
     [ "OnlySetup", "variables_8h.html#a6bae0e92738d6c3498ac41b67ed5b7a4", null ],
     [ "logviewer", "variables_8h.html#adeb409a2b27c8f7bba53944a876cc7bc", null ],
     [ "OutputFreq", "variables_8h.html#aa002126f8760bb0f98614b78ac70e940", null ],
+    [ "exec_mode", "variables_8h.html#ae27e734d789eb2f07918d6bae3969480", null ],
     [ "immersed", "variables_8h.html#aef90766eec6fc6887cd39bd1d79cb6d2", null ],
     [ "movefsi", "variables_8h.html#a090892cd5c5a867ca95c239ee24568be", null ],
     [ "rotatefsi", "variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9", null ],
@@ -143,7 +144,7 @@ var variables_8h_structSimCtx =
     [ "MaxDivy", "variables_8h.html#a8811a9a632140d00bca04337f2261d23", null ],
     [ "MaxDivz", "variables_8h.html#a8b2e7f4d2e2e95e4c49aa02684e2e51d", null ],
     [ "PostprocessingControlFile", "variables_8h.html#af05e9e68e0acf99ae030d44b905e33fb", null ],
-    [ "pps", "variables_8h.html#a32874f15f12feee6d769b0521aa736bd", null ],
+    [ "pps", "variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995", null ],
     [ "r", "variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5", null ],
     [ "tin", "variables_8h.html#a1cdec84f2d2f90e0169386206f8c02c1", null ],
     [ "uinr", "variables_8h.html#a50311fc2ecb8874bf329750b1f966168", null ]

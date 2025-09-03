@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['rankcellinfo_0',['RankCellInfo',['../variables__old_8h.html#structRankCellInfo',1,'']]],
-  ['rankneighbors_1',['RankNeighbors',['../variables__old_8h.html#structRankNeighbors',1,'']]]
+  ['simctx_0',['SimCtx',['../variables_8h.html#structSimCtx',1,'']]],
+  ['surfelmtinfo_1',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
 ];

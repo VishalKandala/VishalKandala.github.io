@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['q_0',['q',['../variables__old_8h.html#a811944c29cb04a637d55b4a01a607a5a',1,'FSInfo']]],
-  ['q_5fr_1',['q_r',['../variables__old_8h.html#a12f9a4c96cb4503986bdedf9b32a8773',1,'FSInfo']]],
-  ['ql_2',['Ql',['../variables__old_8h.html#a9ef9f0c1489d1e09be84074649f4ad17',1,'UserCtx']]],
-  ['qnew_3',['Qnew',['../variables__old_8h.html#a51fea22f31ec3648cdfe2b88219590b6',1,'UserCtx']]],
-  ['qvec_4',['qvec',['../variables__old_8h.html#a5ff5a42371c73f38d5260e2ac21b7239',1,'IBMNodes']]]
+  ['q_0',['q',['../variables_8h.html#ab232f6df170b819e50ececfa2b842a9a',1,'FSInfo']]],
+  ['q_5fr_1',['q_r',['../variables_8h.html#a66d0d8b166d1be7674ef337250dd5299',1,'FSInfo']]],
+  ['qcrit_2',['Qcrit',['../variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a',1,'UserCtx']]],
+  ['qvec_3',['qvec',['../variables_8h.html#a60a431e3afef70dd349484124d5a561b',1,'IBMNodes']]]
 ];

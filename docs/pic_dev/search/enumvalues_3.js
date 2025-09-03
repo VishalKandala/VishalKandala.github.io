@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['farfield_0',['farfield',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa994deb5e50b841824b257d6d2d108757',1,'FARFIELD:&#160;variables.h'],['../variables__old_8h.html#a0a00003814ee8095a2c39d1d5cba08faa994deb5e50b841824b257d6d2d108757',1,'FARFIELD:&#160;variables_old.h']]],
-  ['front_1',['front',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa76bd5ec6ea9d8a1b582d8d5e43102a02',1,'FRONT:&#160;variables.h'],['../variables__old_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa76bd5ec6ea9d8a1b582d8d5e43102a02',1,'FRONT:&#160;variables_old.h']]]
+  ['exec_5fmode_5fpostprocessor_0',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
+  ['exec_5fmode_5fsolver_1',['EXEC_MODE_SOLVER',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda50cbc3562b55317ccd65fed2bd226742',1,'variables.h']]],
+  ['exec_5fmode_5funknown_2',['EXEC_MODE_UNKNOWN',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda10cefdb12245bf1e59e2ae72e2178976',1,'variables.h']]]
 ];

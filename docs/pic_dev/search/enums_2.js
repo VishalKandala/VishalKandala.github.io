@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loglevel_0',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
+  ['face_0',['Face',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294f',1,'variables.h']]]
 ];

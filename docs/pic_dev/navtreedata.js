@@ -42,7 +42,7 @@ var NAVTREE =
       [ "Globals", "globals.html", [
         [ "All", "globals.html", "globals_dup" ],
         [ "Functions", "globals_func.html", "globals_func" ],
-        [ "Variables", "globals_vars.html", "globals_vars" ],
+        [ "Variables", "globals_vars.html", null ],
         [ "Typedefs", "globals_type.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
         [ "Enumerator", "globals_eval.html", null ],
@@ -55,16 +55,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AnalyticalSolution_8h.html",
-"cop__variables_8h.html#a6c05571aff6a3758bfca517e5aa58d8d",
-"globals_z.html",
-"logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11",
-"variables_8h.html#a223f70881916d4d77f5f62b1faf4547f",
-"variables__old_8h.html#a04b7e7d757be63c56b7b26068f24dda6",
-"variables__old_8h.html#a347829443e8a679209e21f7f04f51581af096820742c38363e9d6c33e7c932780",
-"variables__old_8h.html#a60779054120e65c1c050f97f8f59691f",
-"variables__old_8h.html#a94804222fd6e45c35a8e2dfd13b110c8",
-"variables__old_8h.html#ac9199af6c5bffa86ce1ba076ee15f59a",
-"variables__old_8h.html#afa542dfd7b8528862c1b4a96db3e35c7"
+"globals_func.html",
+"logging_8c.html#ab2315d3303d45c97ca55836603a8acd3",
+"variables_8h.html#a05c02891978b9f09aff6f2f6b0a636fe",
+"variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096",
+"variables_8h.html#ab4811dc3ebc8ea1154e75c8c38639259",
+"walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

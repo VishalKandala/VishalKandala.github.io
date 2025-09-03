@@ -27,5 +27,6 @@ var io_8h =
     [ "ValidateBCHandlerForBCType", "io_8h.html#a5fe767286174b757deb2d404f2b4843f", null ],
     [ "FreeBC_ParamList", "io_8h.html#acee53553fb7d51eb948f1d4030518860", null ],
     [ "ParseAllBoundaryConditions", "io_8h.html#a5cc5e40cd538efc87ebd94ebdbb2a8e8", null ],
+    [ "TrimWhitespace", "io_8h.html#a61850e757fea41eb461a930936c34401", null ],
     [ "ParsePostProcessingSettings", "io_8h.html#a048b921bc98a7354369a176193c2bd62", null ]
 ];

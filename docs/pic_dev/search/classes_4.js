@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['flowwave_0',['FlowWave',['../variables__old_8h.html#structFlowWave',1,'']]],
-  ['fsinfo_1',['FSInfo',['../variables__old_8h.html#structFSInfo',1,'']]]
+  ['ibminfo_0',['IBMInfo',['../variables_8h.html#structIBMInfo',1,'']]],
+  ['ibmlist_1',['IBMList',['../variables_8h.html#structIBMList',1,'']]],
+  ['ibmlistnode_2',['IBMListNode',['../variables_8h.html#structIBMListNode',1,'']]],
+  ['ibmnodes_3',['IBMNodes',['../variables_8h.html#structIBMNodes',1,'']]],
+  ['ibmvnodes_4',['IBMVNodes',['../variables_8h.html#structIBMVNodes',1,'']]]
 ];

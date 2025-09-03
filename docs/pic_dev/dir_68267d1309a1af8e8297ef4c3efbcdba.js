@@ -12,6 +12,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "ParticleSwarm.c", "ParticleSwarm_8c.html", "ParticleSwarm_8c" ],
     [ "picsolver.c", "picsolver_8c.html", "picsolver_8c" ],
     [ "poisson.c", "poisson_8c.html", "poisson_8c" ],
+    [ "postprocessing_kernels.c", "postprocessing__kernels_8c.html", "postprocessing__kernels_8c" ],
     [ "postprocessor.c", "postprocessor_8c.html", "postprocessor_8c" ],
     [ "rhs.c", "rhs_8c.html", "rhs_8c" ],
     [ "setup.c", "setup_8c.html", "setup_8c" ],
