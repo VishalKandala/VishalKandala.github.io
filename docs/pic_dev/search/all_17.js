@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
+  ['r_0',['r',['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
   ['radi_1',['radi',['../variables_8h.html#a7e1de8951d5c84349bd6c0f4c15f85f3',1,'SimCtx']]],
   ['radvec_2',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_3',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
@@ -19,7 +19,7 @@ var searchData=
   ['readandsetcoordinates_16',['ReadAndSetCoordinates',['../grid_8c.html#ac693c757c4fd3cb75e6e06e05e25d775',1,'grid.c']]],
   ['readdatafiletoarray_17',['readdatafiletoarray',['../io_8c.html#a105ff5a8b90917a52aab304aefeae05a',1,'ReadDataFileToArray(const char *filename, double **data_out, PetscInt *Nout, MPI_Comm comm):&#160;io.c'],['../io_8h.html#a105ff5a8b90917a52aab304aefeae05a',1,'ReadDataFileToArray(const char *filename, double **data_out, PetscInt *Nout, MPI_Comm comm):&#160;io.c']]],
   ['readfielddata_18',['readfielddata',['../io_8c.html#a570806d7e0694b5d996e0c6018b48908',1,'ReadFieldData(UserCtx *user, const char *field_name, Vec field_vec, PetscInt ti, const char *ext):&#160;io.c'],['../io_8h.html#a570806d7e0694b5d996e0c6018b48908',1,'ReadFieldData(UserCtx *user, const char *field_name, Vec field_vec, PetscInt ti, const char *ext):&#160;io.c']]],
-  ['readfielddatatorank0_19',['readfielddatatorank0',['../io_8c.html#a9b18cb531c659ac173987ed73b1c1d24',1,'ReadFieldDataToRank0(PetscInt timeIndex, const char *fieldName, UserCtx *user, double **scalarArray, PetscInt *Nscalars):&#160;io.c'],['../io_8h.html#a9b18cb531c659ac173987ed73b1c1d24',1,'ReadFieldDataToRank0(PetscInt timeIndex, const char *fieldName, UserCtx *user, double **scalarArray, PetscInt *Nscalars):&#160;io.c']]],
+  ['readfielddatatorank0_19',['readfielddatatorank0',['../io_8h.html#a9b18cb531c659ac173987ed73b1c1d24',1,'ReadFieldDataToRank0(PetscInt timeIndex, const char *fieldName, UserCtx *user, double **scalarArray, PetscInt *Nscalars):&#160;io.c'],['../io_8c.html#a9b18cb531c659ac173987ed73b1c1d24',1,'ReadFieldDataToRank0(PetscInt timeIndex, const char *fieldName, UserCtx *user, double **scalarArray, PetscInt *Nscalars):&#160;io.c']]],
   ['readfields_20',['readFields',['../variables_8h.html#ab45ae5b28b66812e5e4b0e85a540f948',1,'SimCtx']]],
   ['readgridfile_21',['readgridfile',['../io_8c.html#a1454fbb30915c3284cbf5ecb100351d1',1,'ReadGridFile(UserCtx *user):&#160;io.c'],['../io_8h.html#a1454fbb30915c3284cbf5ecb100351d1',1,'ReadGridFile(UserCtx *user):&#160;io.c']]],
   ['readgridgenerationinputs_22',['readgridgenerationinputs',['../io_8c.html#a7dd125436244f23eba5c6b06fdd35031',1,'ReadGridGenerationInputs(UserCtx *user):&#160;io.c'],['../io_8h.html#a7dd125436244f23eba5c6b06fdd35031',1,'ReadGridGenerationInputs(UserCtx *user):&#160;io.c']]],
@@ -55,7 +55,7 @@ var searchData=
   ['run_20environment_52',['1. Setting Up the Run Environment',['../user_guide.html#run_env_sec',1,'']]],
   ['rungekutta_53',['rungekutta',['../implicitsolvers_8h.html#a89ae58d48076ba82dc70438b5e389bf5',1,'RungeKutta(UserCtx *user, IBMNodes *ibm, FSInfo *fsi):&#160;implicitsolvers.c'],['../implicitsolvers_8c.html#a89ae58d48076ba82dc70438b5e389bf5',1,'RungeKutta(UserCtx *user, IBMNodes *ibm, FSInfo *fsi):&#160;implicitsolvers.c']]],
   ['running_20a_20simulation_54',['3. Running a Simulation',['../user_guide.html#run_sim_sec',1,'']]],
-  ['runprocessingpipeline_55',['RunProcessingPipeline',['../postprocessor_8c.html#ab8612dac5ca20508787fc0ec8f20ece6',1,'postprocessor.c']]],
+  ['runprocessingpipeline_55',['runprocessingpipeline',['../postprocessor_8h.html#ab8612dac5ca20508787fc0ec8f20ece6',1,'RunProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c'],['../postprocessor_8c.html#ab8612dac5ca20508787fc0ec8f20ece6',1,'RunProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c']]],
   ['rx_56',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
   ['ry_57',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
   ['rz_58',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]

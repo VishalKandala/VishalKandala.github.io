@@ -389,22 +389,22 @@ var variables_8h =
       [ "eulerianExt", "variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3", null ],
       [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ]
     ] ],
+    [ "VTKFieldInfo", "variables_8h.html#structVTKFieldInfo", [
+      [ "name", "variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e", null ],
+      [ "num_components", "variables_8h.html#a1676e73c74586290cada1e0b922cb7fc", null ],
+      [ "data", "variables_8h.html#a877a36998969b27c4dee8db5c746b76c", null ]
+    ] ],
     [ "VTKMetaData", "variables_8h.html#structVTKMetaData", [
       [ "fileType", "variables_8h.html#a7f393eb4fff178f989abb357f98b35a8", null ],
       [ "mx", "variables_8h.html#aedca60f0134d0716305127acad94d9d1", null ],
       [ "my", "variables_8h.html#ae8abc82ec45317291825e3ffeeba80ac", null ],
       [ "mz", "variables_8h.html#acd88a3cbaf780ca17e0f8da6ef455f4f", null ],
-      [ "nnodes", "variables_8h.html#afd5de2425dd1a26c88befe95285b607f", null ],
       [ "npoints", "variables_8h.html#a1284d7ce4801cbe00fa3068be7682014", null ],
       [ "coords", "variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442", null ],
-      [ "scalarField", "variables_8h.html#a633005da0b9b59c4c0a6475d2562558a", null ],
-      [ "scalarFieldName", "variables_8h.html#a8ddb585dea9b8a24eb1428c6fb1745bb", null ],
-      [ "numScalarFields", "variables_8h.html#a490a85dfc1aa84b470a36827a9cb839d", null ],
-      [ "vectorField", "variables_8h.html#a688b11ccc72940aa35ca84eb6f0ec99b", null ],
-      [ "vectorFieldName", "variables_8h.html#a63a15e7ba17f59ff0fb668fd880f128a", null ],
-      [ "numVectorFields", "variables_8h.html#a4675755df21ac32ff4f9d13862e8bebb", null ],
+      [ "point_data_fields", "variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898", null ],
+      [ "num_point_data_fields", "variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b", null ],
       [ "connectivity", "variables_8h.html#a5517bbdee115f97374036e9d29b3b648", null ],
-      [ "offsets", "variables_8h.html#a34b307d2eee4e2ab67a72a0b79ab96ba", null ]
+      [ "offsets", "variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450", null ]
     ] ],
     [ "SimCtx", "variables_8h.html#structSimCtx", [
       [ "rank", "variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89", null ],
@@ -693,10 +693,11 @@ var variables_8h =
       [ "Qcrit", "variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a", null ]
     ] ],
     [ "COEF_TIME_ACCURACY", "variables_8h.html#af0af02fbd08daea87f3523a3754981f0", null ],
-    [ "MAX_POINT_DATA_FIELDS", "variables_8h.html#a10a62bce766452804bad64d119e127f7", null ],
     [ "MAX_PIPELINE_LENGTH", "variables_8h.html#a483a214c827f374f6c8f8660f6935317", null ],
     [ "MAX_FIELD_LIST_LENGTH", "variables_8h.html#a422cda8cdbf27473ba083b7fb394f025", null ],
     [ "MAX_FILENAME_LENGTH", "variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2", null ],
+    [ "MAX_POINT_DATA_FIELDS", "variables_8h.html#a10a62bce766452804bad64d119e127f7", null ],
+    [ "MAX_VTK_FIELD_NAME_LENGTH", "variables_8h.html#af429c472ad06c2094bc8d598231b2e0a", null ],
     [ "SimCtx", "variables_8h.html#a74fd530dc4655170098467d1d4d5cbb3", null ],
     [ "UserCtx", "variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e", null ],
     [ "BC_Param", "variables_8h.html#a22a9148c380850b8568b82d154446340", null ],
@@ -715,6 +716,7 @@ var variables_8h =
     [ "Cstart", "variables_8h.html#aee06eec51514d3eba023f8ffd5424b2a", null ],
     [ "MGCtx", "variables_8h.html#ab026875e0ebe17a1230d314a22f81a3b", null ],
     [ "PostProcessParams", "variables_8h.html#af47a6e5cf573a90ea9481773ec119f0b", null ],
+    [ "VTKFieldInfo", "variables_8h.html#a5edbfeb2b39ca8a3b6c74d6f1f3586c7", null ],
     [ "VTKMetaData", "variables_8h.html#ac41abc41e23100f2a2231147d83d2022", null ],
     [ "IBMInfo", "variables_8h.html#a72f68a05e3394dd04aa1c27df39a0dac", null ],
     [ "SurfElmtInfo", "variables_8h.html#a2b696f21d07e025e07cfe31fdcb17b25", null ],

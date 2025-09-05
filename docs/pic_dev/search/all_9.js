@@ -11,7 +11,7 @@ var searchData=
   ['da_5fprocs_5fy_8',['da_procs_y',['../variables_8h.html#a44230884a9901af3992a1faf2eebdfb1',1,'SimCtx']]],
   ['da_5fprocs_5fz_9',['da_procs_z',['../variables_8h.html#a281d10df99cab1a563bb65203f3bd823',1,'SimCtx']]],
   ['damp_10',['damp',['../variables_8h.html#a8bdc1b4d7f77ab5ac8e0b2d1997e8ced',1,'FSInfo']]],
-  ['data_11',['data',['../structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a',1,'BoundaryCondition']]],
+  ['data_11',['data',['../structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a',1,'BoundaryCondition::data'],['../variables_8h.html#a877a36998969b27c4dee8db5c746b76c',1,'VTKFieldInfo::data']]],
   ['data_20structures_12',['Core Data Structures',['../developer_guide.html#data_structures',1,'']]],
   ['deallocate3darray_13',['Deallocate3DArray',['../setup_8h.html#a22b5c669feeea4b3ad4ffd152590dcb4',1,'setup.h']]],
   ['deallocate3darrayscalar_14',['deallocate3darrayscalar',['../setup_8c.html#af73e238fa95229094a92ac66812799f7',1,'Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny):&#160;setup.c'],['../setup_8h.html#af73e238fa95229094a92ac66812799f7',1,'Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny):&#160;setup.c']]],

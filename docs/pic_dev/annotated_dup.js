@@ -32,5 +32,6 @@ var annotated_dup =
     [ "SurfElmtInfo", "variables_8h.html#structSurfElmtInfo", "variables_8h_structSurfElmtInfo" ],
     [ "UserCtx", "variables_8h.html#structUserCtx", "variables_8h_structUserCtx" ],
     [ "UserMG", "variables_8h.html#structUserMG", "variables_8h_structUserMG" ],
+    [ "VTKFieldInfo", "variables_8h.html#structVTKFieldInfo", "variables_8h_structVTKFieldInfo" ],
     [ "VTKMetaData", "variables_8h.html#structVTKMetaData", "variables_8h_structVTKMetaData" ]
 ];
