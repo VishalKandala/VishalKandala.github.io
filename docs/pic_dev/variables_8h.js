@@ -386,6 +386,10 @@ var variables_8h =
       [ "output_fields_instantaneous", "variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb", null ],
       [ "output_fields_averaged", "variables_8h.html#a47a8b39d145cff36aa25d8588976156e", null ],
       [ "output_prefix", "variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4", null ],
+      [ "particle_pipeline", "variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8", null ],
+      [ "particle_fields", "variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25", null ],
+      [ "particle_output_prefix", "variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582", null ],
+      [ "particle_output_freq", "variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a", null ],
       [ "eulerianExt", "variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3", null ],
       [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ]
     ] ],
