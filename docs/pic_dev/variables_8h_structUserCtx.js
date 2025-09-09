@@ -131,6 +131,7 @@ var variables_8h_structUserCtx =
     [ "RankCellInfoMap", "variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9", null ],
     [ "ParticleCount", "variables_8h.html#aa194db376ea0f68ec7090718804488ab", null ],
     [ "Psi", "variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b", null ],
+    [ "post_swarm", "variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5", null ],
     [ "P_nodal", "variables_8h.html#a0d09ddf5e31ea3cfcab2c6bbc59b64cd", null ],
     [ "Ucat_nodal", "variables_8h.html#a585521a5dbb55ae244e34a354ac93e3f", null ],
     [ "Qcrit", "variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a", null ]

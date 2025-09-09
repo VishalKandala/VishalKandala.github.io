@@ -2,6 +2,7 @@ var ParticleSwarm_8h =
 [
     [ "CreateParticleSwarm", "ParticleSwarm_8h.html#a063f4fd13a24b248fabd0268c49fd38c", null ],
     [ "InitializeSwarm", "ParticleSwarm_8h.html#ac3566e0b51587686bc6c1366a67c44af", null ],
+    [ "RegisterSwarmField", "ParticleSwarm_8h.html#adcaec962a8ff017ba9f859716405f51a", null ],
     [ "RegisterParticleFields", "ParticleSwarm_8h.html#aeae3fd559e91d7379302acb6ccd13011", null ],
     [ "InitializeRandomGenerators", "ParticleSwarm_8h.html#a26fa0cca0aa8b05f2705cdd0e7d37658", null ],
     [ "InitializeLogicalSpaceRNGs", "ParticleSwarm_8h.html#ab723e91906e01ec26aab97de6623000c", null ],
