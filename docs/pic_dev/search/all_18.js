@@ -75,6 +75,6 @@ var searchData=
   ['surfelmtinfo_72',['surfelmtinfo',['../variables_8h.html#a2b696f21d07e025e07cfe31fdcb17b25',1,'SurfElmtInfo:&#160;variables.h'],['../variables_8h.html#structSurfElmtInfo',1,'SurfElmtInfo']]],
   ['sw_73',['SW',['../poisson_8c.html#a4b95e941f44a20ea60512bbe2065f0b6',1,'poisson.c']]],
   ['swarm_74',['swarm',['../variables_8h.html#a1675749ea3b2429f00405a1ee3203d18',1,'UserCtx']]],
-  ['swarmfieldtoarrayonrank0_75',['swarmfieldtoarrayonrank0',['../io_8c.html#ac9ea8d5b3106437568b4bce7fd95f25c',1,'SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *out_n_global, PetscInt *out_n_components, PetscScalar **out_data_rank0):&#160;io.c'],['../io_8h.html#ac9ea8d5b3106437568b4bce7fd95f25c',1,'SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *out_n_global, PetscInt *out_n_components, PetscScalar **out_data_rank0):&#160;io.c']]],
+  ['swarmfieldtoarrayonrank0_75',['swarmfieldtoarrayonrank0',['../io_8c.html#a093c8c981643c86a2c594fea39dec0c1',1,'SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *n_total_particles, PetscInt *n_components, void **gathered_array):&#160;io.c'],['../io_8h.html#a093c8c981643c86a2c594fea39dec0c1',1,'SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *n_total_particles, PetscInt *n_components, void **gathered_array):&#160;io.c']]],
   ['symmetry_76',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
 ];

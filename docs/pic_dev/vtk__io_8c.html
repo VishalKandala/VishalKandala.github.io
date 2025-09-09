@@ -755,7 +755,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  279</span> </div>
 <div class="line"><span class="lineno">  280</span>    PetscFunctionReturn(0);</div>
 <div class="line"><span class="lineno">  281</span>}</div>
-<div class="ttc" id="aio_8h_html_aa3512c89570bb1d27f4765819fad4985"><div class="ttname"><a href="io_8h.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a></div><div class="ttdeci">PetscErrorCode VecToArrayOnRank0(Vec inVec, PetscInt *N, double **arrayOut)</div><div class="ttdoc">Gathers the contents of a distributed PETSc Vec into a single array on rank 0.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01584">io.c:1584</a></div></div>
+<div class="ttc" id="aio_8h_html_aa3512c89570bb1d27f4765819fad4985"><div class="ttname"><a href="io_8h.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a></div><div class="ttdeci">PetscErrorCode VecToArrayOnRank0(Vec inVec, PetscInt *N, double **arrayOut)</div><div class="ttdoc">Gathers the contents of a distributed PETSc Vec into a single array on rank 0.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01619">io.c:1619</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00033">logging.h:33</a></div></div>
 <div class="ttc" id="avariables_8h_html_a19aa807b9181b13618527d6c4eb6fa89"><div class="ttname"><a href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">SimCtx::rank</a></div><div class="ttdeci">PetscMPIInt rank</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00516">variables.h:516</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00628">variables.h:628</a></div></div>
@@ -985,7 +985,7 @@ Here is the caller graph for this function:</div>
 <p>The function follows a "merge-and-prepare" strategy:</p><ol type="1">
 <li>It treats <code>user-&gt;swarm</code> as the read-only source of primary data (e.g., positions, velocity) that was loaded from disk.</li>
 <li>It treats <code>user-&gt;pp_swarm</code> as the source of derived data (e.g., specific_ke) that was computed by the post-processing pipeline.</li>
-<li><b>On Rank 0 only</b>: a. It gathers the full particle coordinates from the source swarm. This determines the total number of particles before any subsampling. b. It parses the <code>pps-&gt;particle_fields</code> list. For each requested field, it determines whether to source it from <code>user-&gt;swarm</code> or <code>user-&gt;pp_swarm</code>. c. It gathers the full data for each requested field from its appropriate source. d. It performs strided subsampling on the coordinates and all gathered fields based on <code>pps-&gt;particle_output_freq</code>. e. It populates the <a class="el" href="variables_8h.html#structVTKMetaData">VTKMetaData</a> struct with the final, smaller, subsampled data arrays, making it ready for the file writer.</li>
+<li><b>On Rank 0 only</b>: a. It gathers the full particle coordinates from the source swarm. This determines the total number of particles before any subsampling. b. It parses the <code>pps-&gt;particle_fields</code> list. For each requested field, it determines whether to source it from <code>user-&gt;swarm</code> or <code>user-&gt;pp_swarm</code>. c. It gathers the full data for each requested field from its appropriate source into a generic buffer. d. It performs strided subsampling. During this step, any integer fields (like pid, CellID) are CAST to PetscScalar, so that all output arrays are of the same floating-point type. e. It populates the <a class="el" href="variables_8h.html#structVTKMetaData">VTKMetaData</a> struct with the final, subsampled, scalar-only data arrays, making it ready for the file writer.</li>
 </ol>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1007,126 +1007,146 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  427</span> </div>
 <div class="line"><span class="lineno">  428</span>    <span class="comment">// Initialize output parameters on all ranks</span></div>
 <div class="line"><span class="lineno">  429</span>    *p_n_total = 0;</div>
-<div class="line"><span class="lineno">  430</span>    ierr = PetscMemzero(meta, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structVTKMetaData">VTKMetaData</a>)); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  431</span> </div>
-<div class="line"><span class="lineno">  432</span>    <span class="comment">// --- The entire preparation process is a series of collective gathers followed by rank-0 processing ---</span></div>
-<div class="line"><span class="lineno">  433</span>    </div>
-<div class="line"><span class="lineno">  434</span>    <span class="comment">// --- Step 1: Gather Full Coordinates from SOURCE Swarm (Collective) ---</span></div>
-<div class="line"><span class="lineno">  435</span>    <span class="comment">// This establishes the ground truth for particle positions and total count.</span></div>
-<div class="line"><span class="lineno">  436</span>    PetscScalar *full_coords_arr = NULL;</div>
-<div class="line"><span class="lineno">  437</span>    ierr = <a class="code hl_function" href="io_8h.html#ac9ea8d5b3106437568b4bce7fd95f25c">SwarmFieldToArrayOnRank0</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, &amp;n_total_particles, &amp;n_components, &amp;full_coords_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  438</span>    </div>
-<div class="line"><span class="lineno">  439</span>    <span class="comment">// --- Step 2: Prepare and Subsample Data (Rank 0 Only) ---</span></div>
-<div class="line"><span class="lineno">  440</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) {</div>
-<div class="line"><span class="lineno">  441</span>        *p_n_total = n_total_particles; <span class="comment">// Report original count back to the caller.</span></div>
-<div class="line"><span class="lineno">  442</span> </div>
-<div class="line"><span class="lineno">  443</span>        <span class="keywordflow">if</span> (n_total_particles == 0) {</div>
-<div class="line"><span class="lineno">  444</span>            ierr = PetscFree(full_coords_arr); CHKERRQ(ierr); <span class="comment">// Cleanup the gathered coords array</span></div>
-<div class="line"><span class="lineno">  445</span>            PetscFunctionReturn(0); <span class="comment">// Nothing to prepare.</span></div>
-<div class="line"><span class="lineno">  446</span>        }</div>
-<div class="line"><span class="lineno">  447</span>        <span class="keywordflow">if</span> (n_components != 3) {</div>
-<div class="line"><span class="lineno">  448</span>            SETERRQ(PETSC_COMM_SELF, 1, <span class="stringliteral">&quot;Coordinate field position must have 3 components, but has %&quot;</span> PetscInt_FMT, n_components);</div>
+<div class="line"><span class="lineno">  430</span> </div>
+<div class="line"><span class="lineno">  431</span>    <span class="comment">// --- The entire preparation process is a series of collective gathers followed by rank-0 processing ---</span></div>
+<div class="line"><span class="lineno">  432</span> </div>
+<div class="line"><span class="lineno">  433</span>    <span class="comment">// --- Step 1: Gather Full Coordinates from SOURCE Swarm (Collective) ---</span></div>
+<div class="line"><span class="lineno">  434</span>    <span class="comment">// This establishes the ground truth for particle positions and total count.</span></div>
+<div class="line"><span class="lineno">  435</span>    PetscScalar *full_coords_arr = NULL;</div>
+<div class="line"><span class="lineno">  436</span>    <span class="comment">// NOTE: This assumes SwarmFieldToArrayOnRank0 exists and works for PetscScalar fields.</span></div>
+<div class="line"><span class="lineno">  437</span>    <span class="comment">// If not, it may need to be generalized like the logic below.</span></div>
+<div class="line"><span class="lineno">  438</span>    ierr = <a class="code hl_function" href="io_8h.html#a093c8c981643c86a2c594fea39dec0c1">SwarmFieldToArrayOnRank0</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, &amp;n_total_particles, &amp;n_components, &amp;full_coords_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  439</span> </div>
+<div class="line"><span class="lineno">  440</span>    <span class="comment">// --- Step 2: Prepare and Subsample Data (Rank 0 Only) ---</span></div>
+<div class="line"><span class="lineno">  441</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) {</div>
+<div class="line"><span class="lineno">  442</span>        *p_n_total = n_total_particles; <span class="comment">// Report original count back to the caller.</span></div>
+<div class="line"><span class="lineno">  443</span> </div>
+<div class="line"><span class="lineno">  444</span>        <span class="keywordflow">if</span> (n_total_particles == 0) {</div>
+<div class="line"><span class="lineno">  445</span>            <span class="keywordflow">if</span> (full_coords_arr) {</div>
+<div class="line"><span class="lineno">  446</span>                ierr = PetscFree(full_coords_arr); CHKERRQ(ierr); <span class="comment">// Cleanup the gathered coords array</span></div>
+<div class="line"><span class="lineno">  447</span>            }</div>
+<div class="line"><span class="lineno">  448</span>            PetscFunctionReturn(0); <span class="comment">// Nothing to prepare.</span></div>
 <div class="line"><span class="lineno">  449</span>        }</div>
-<div class="line"><span class="lineno">  450</span> </div>
-<div class="line"><span class="lineno">  451</span>        <span class="comment">// --- Subsampling Calculation ---</span></div>
-<div class="line"><span class="lineno">  452</span>        PetscInt stride = pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> &gt; 0 ? pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> : 1;</div>
-<div class="line"><span class="lineno">  453</span>        meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> = (n_total_particles &gt; 0) ? (n_total_particles - 1) / stride + 1 : 0;</div>
-<div class="line"><span class="lineno">  454</span>        </div>
-<div class="line"><span class="lineno">  455</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Subsampling %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; total particles with stride %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; -&gt; %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; output particles.\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  456</span>                  n_total_particles, stride, meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>);</div>
+<div class="line"><span class="lineno">  450</span>        <span class="keywordflow">if</span> (n_components != 3) {</div>
+<div class="line"><span class="lineno">  451</span>            SETERRQ(PETSC_COMM_SELF, 1, <span class="stringliteral">&quot;Coordinate field position must have 3 components, but has %&quot;</span> PetscInt_FMT, n_components);</div>
+<div class="line"><span class="lineno">  452</span>        }</div>
+<div class="line"><span class="lineno">  453</span> </div>
+<div class="line"><span class="lineno">  454</span>        <span class="comment">// --- Subsampling Calculation ---</span></div>
+<div class="line"><span class="lineno">  455</span>        PetscInt stride = pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> &gt; 0 ? pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> : 1;</div>
+<div class="line"><span class="lineno">  456</span>        meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> = (n_total_particles &gt; 0) ? (n_total_particles - 1) / stride + 1 : 0;</div>
 <div class="line"><span class="lineno">  457</span> </div>
-<div class="line"><span class="lineno">  458</span>        <span class="comment">// --- Prepare Final Coordinates Array ---</span></div>
-<div class="line"><span class="lineno">  459</span>        ierr = PetscMalloc1(3 * meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442">coords</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  460</span>        <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
-<div class="line"><span class="lineno">  461</span>            PetscInt source_idx = i * stride;</div>
-<div class="line"><span class="lineno">  462</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> d = 0; d &lt; 3; d++) meta-&gt;<a class="code hl_variable" href="variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442">coords</a>[3 * i + d] = full_coords_arr[3 * source_idx + d];</div>
-<div class="line"><span class="lineno">  463</span>        }</div>
-<div class="line"><span class="lineno">  464</span>        ierr = PetscFree(full_coords_arr); <span class="comment">// Free the temporary full array immediately after use.</span></div>
-<div class="line"><span class="lineno">  465</span> </div>
-<div class="line"><span class="lineno">  466</span> </div>
-<div class="line"><span class="lineno">  467</span>        <span class="comment">// --- Prepare Final Field Arrays (Gather -&gt; Subsample -&gt; Store) ---</span></div>
-<div class="line"><span class="lineno">  468</span>        <span class="keywordtype">char</span> *fields_copy, *field_name;</div>
-<div class="line"><span class="lineno">  469</span>        ierr = PetscStrallocpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>, &amp;fields_copy); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  470</span>        field_name = strtok(fields_copy, <span class="stringliteral">&quot;,&quot;</span>);</div>
-<div class="line"><span class="lineno">  471</span>        <span class="keywordflow">while</span> (field_name &amp;&amp; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a> &lt; <a class="code hl_define" href="variables_8h.html#a10a62bce766452804bad64d119e127f7">MAX_POINT_DATA_FIELDS</a>) {</div>
-<div class="line"><span class="lineno">  472</span>            <a class="code hl_function" href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(field_name);</div>
-<div class="line"><span class="lineno">  473</span>            <span class="keywordflow">if</span> (!*field_name || strcasecmp(field_name, <span class="stringliteral">&quot;position&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">  474</span>                field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>); <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  475</span>            }</div>
-<div class="line"><span class="lineno">  476</span> </div>
-<div class="line"><span class="lineno">  477</span>            <span class="comment">// A. Determine which swarm is the source for this field.</span></div>
-<div class="line"><span class="lineno">  478</span>            DM swarm_to_use = user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>; <span class="comment">// Default to the main solver swarm.</span></div>
-<div class="line"><span class="lineno">  479</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* internal_name = field_name; <span class="comment">// Default internal name to user-facing name.</span></div>
-<div class="line"><span class="lineno">  480</span> </div>
-<div class="line"><span class="lineno">  481</span>            <span class="comment">// Use the &quot;try-get&quot; pattern to see if the field exists on the post_swarm.</span></div>
-<div class="line"><span class="lineno">  482</span>            PetscErrorCode check_ierr;</div>
-<div class="line"><span class="lineno">  483</span>            ierr = PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  484</span>            check_ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, field_name, NULL, NULL, NULL);</div>
-<div class="line"><span class="lineno">  485</span>            ierr = PetscPopErrorHandler(); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  486</span>            <span class="keywordflow">if</span> (!check_ierr) { <span class="comment">// Success! The field exists on post_swarm.</span></div>
-<div class="line"><span class="lineno">  487</span>                swarm_to_use = user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>;</div>
-<div class="line"><span class="lineno">  488</span>                ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, field_name, NULL, NULL, NULL); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  489</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; will be sourced from the post-processing swarm.\n&quot;</span>, field_name);</div>
-<div class="line"><span class="lineno">  490</span>            } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  491</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; will be sourced from the main solver swarm.\n&quot;</span>, field_name);</div>
-<div class="line"><span class="lineno">  492</span>                <span class="comment">// Map friendly names to internal names for standard solver fields</span></div>
-<div class="line"><span class="lineno">  493</span>                <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;pid&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_pid&quot;</span>;</div>
-<div class="line"><span class="lineno">  494</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;CellID&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>;</div>
-<div class="line"><span class="lineno">  495</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Migration Status&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>;</div>
-<div class="line"><span class="lineno">  496</span>                <span class="comment">// Add other mappings if necessary...</span></div>
+<div class="line"><span class="lineno">  458</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Subsampling %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; total particles with stride %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; -&gt; %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; output particles.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  459</span>                  n_total_particles, stride, meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>);</div>
+<div class="line"><span class="lineno">  460</span> </div>
+<div class="line"><span class="lineno">  461</span>        <span class="comment">// --- Prepare Final Coordinates Array ---</span></div>
+<div class="line"><span class="lineno">  462</span>        ierr = PetscMalloc1(3 * meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442">coords</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  463</span>        <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
+<div class="line"><span class="lineno">  464</span>            PetscInt source_idx = i * stride;</div>
+<div class="line"><span class="lineno">  465</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> d = 0; d &lt; 3; d++) meta-&gt;<a class="code hl_variable" href="variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442">coords</a>[3 * i + d] = full_coords_arr[3 * source_idx + d];</div>
+<div class="line"><span class="lineno">  466</span>        }</div>
+<div class="line"><span class="lineno">  467</span>        ierr = PetscFree(full_coords_arr); <span class="comment">// Free the temporary full array immediately after use.</span></div>
+<div class="line"><span class="lineno">  468</span> </div>
+<div class="line"><span class="lineno">  469</span> </div>
+<div class="line"><span class="lineno">  470</span>        <span class="comment">// --- Prepare Final Field Arrays (Gather -&gt; Subsample -&gt; Store) ---</span></div>
+<div class="line"><span class="lineno">  471</span>        <span class="keywordtype">char</span> *fields_copy, *field_name;</div>
+<div class="line"><span class="lineno">  472</span>        ierr = PetscStrallocpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>, &amp;fields_copy); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  473</span>        field_name = strtok(fields_copy, <span class="stringliteral">&quot;,&quot;</span>);</div>
+<div class="line"><span class="lineno">  474</span>        <span class="keywordflow">while</span> (field_name &amp;&amp; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a> &lt; <a class="code hl_define" href="variables_8h.html#a10a62bce766452804bad64d119e127f7">MAX_POINT_DATA_FIELDS</a>) {</div>
+<div class="line"><span class="lineno">  475</span>            <a class="code hl_function" href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(field_name);</div>
+<div class="line"><span class="lineno">  476</span>            <span class="keywordflow">if</span> (!*field_name || strcasecmp(field_name, <span class="stringliteral">&quot;position&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  477</span>                field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>); <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  478</span>            }</div>
+<div class="line"><span class="lineno">  479</span> </div>
+<div class="line"><span class="lineno">  480</span>            <span class="comment">// A. Determine which swarm is the source for this field.</span></div>
+<div class="line"><span class="lineno">  481</span>            DM swarm_to_use = user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>; <span class="comment">// Default to the main solver swarm.</span></div>
+<div class="line"><span class="lineno">  482</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* internal_name = field_name; <span class="comment">// Default internal name to user-facing name.</span></div>
+<div class="line"><span class="lineno">  483</span> </div>
+<div class="line"><span class="lineno">  484</span>            PetscErrorCode check_ierr;</div>
+<div class="line"><span class="lineno">  485</span>            ierr = PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  486</span>            check_ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, field_name, NULL, NULL, NULL);</div>
+<div class="line"><span class="lineno">  487</span>            ierr = PetscPopErrorHandler(); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  488</span>            <span class="keywordflow">if</span> (!check_ierr) {</div>
+<div class="line"><span class="lineno">  489</span>                swarm_to_use = user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>;</div>
+<div class="line"><span class="lineno">  490</span>                ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, field_name, NULL, NULL, NULL); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  491</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; will be sourced from the post-processing swarm.\n&quot;</span>, field_name);</div>
+<div class="line"><span class="lineno">  492</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  493</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; will be sourced from the main solver swarm.\n&quot;</span>, field_name);</div>
+<div class="line"><span class="lineno">  494</span>                <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;pid&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_pid&quot;</span>;</div>
+<div class="line"><span class="lineno">  495</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;CellID&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>;</div>
+<div class="line"><span class="lineno">  496</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Migration Status&quot;</span>) == 0) internal_name = <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>;</div>
 <div class="line"><span class="lineno">  497</span>            }</div>
-<div class="line"><span class="lineno">  498</span>            </div>
+<div class="line"><span class="lineno">  498</span> </div>
 <div class="line"><span class="lineno">  499</span>            <span class="comment">// B. Gather the full data for this field from its determined source.</span></div>
-<div class="line"><span class="lineno">  500</span>            PetscScalar *full_field_arr = NULL;</div>
-<div class="line"><span class="lineno">  501</span>            PetscInt field_total_particles, field_num_components;</div>
-<div class="line"><span class="lineno">  502</span>            ierr = <a class="code hl_function" href="io_8h.html#ac9ea8d5b3106437568b4bce7fd95f25c">SwarmFieldToArrayOnRank0</a>(swarm_to_use, internal_name, &amp;field_total_particles, &amp;field_num_components, &amp;full_field_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  503</span> </div>
-<div class="line"><span class="lineno">  504</span>            <span class="keywordflow">if</span> (field_total_particles != n_total_particles) {</div>
-<div class="line"><span class="lineno">  505</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; has %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; particles, but expected %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;. Skipping.\n&quot;</span>, field_name, field_total_particles, n_total_particles);</div>
-<div class="line"><span class="lineno">  506</span>                ierr = PetscFree(full_field_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  507</span>                field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>); <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  508</span>            }</div>
-<div class="line"><span class="lineno">  509</span>            </div>
-<div class="line"><span class="lineno">  510</span>            <span class="comment">// C. Allocate final array and copy subsampled data into the meta struct.</span></div>
-<div class="line"><span class="lineno">  511</span>            <a class="code hl_struct" href="variables_8h.html#structVTKFieldInfo">VTKFieldInfo</a>* current_field = &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>];</div>
-<div class="line"><span class="lineno">  512</span>            strncpy(current_field-&gt;<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>, field_name, <a class="code hl_define" href="variables_8h.html#af429c472ad06c2094bc8d598231b2e0a">MAX_VTK_FIELD_NAME_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno">  513</span>            current_field-&gt;<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>[<a class="code hl_define" href="variables_8h.html#af429c472ad06c2094bc8d598231b2e0a">MAX_VTK_FIELD_NAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno">  514</span>            current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> = field_num_components;</div>
-<div class="line"><span class="lineno">  515</span>            ierr = PetscMalloc1(current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> * meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a877a36998969b27c4dee8db5c746b76c">data</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  516</span> </div>
-<div class="line"><span class="lineno">  517</span>            <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
-<div class="line"><span class="lineno">  518</span>                PetscInt source_idx = i * stride;</div>
-<div class="line"><span class="lineno">  519</span>                <span class="keywordflow">for</span> (PetscInt c = 0; c &lt; current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a>; c++) {</div>
-<div class="line"><span class="lineno">  520</span>                    current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a877a36998969b27c4dee8db5c746b76c">data</a>[current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> * i + c] = full_field_arr[current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> * source_idx + c];</div>
-<div class="line"><span class="lineno">  521</span>                }</div>
-<div class="line"><span class="lineno">  522</span>            }</div>
-<div class="line"><span class="lineno">  523</span>            ierr = PetscFree(full_field_arr); <span class="comment">// Free the temporary full array.</span></div>
-<div class="line"><span class="lineno">  524</span>            </div>
-<div class="line"><span class="lineno">  525</span>            meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>++;</div>
-<div class="line"><span class="lineno">  526</span>            field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>);</div>
-<div class="line"><span class="lineno">  527</span>        }</div>
-<div class="line"><span class="lineno">  528</span>        ierr = PetscFree(fields_copy); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  529</span> </div>
-<div class="line"><span class="lineno">  530</span>        <span class="comment">// --- Finalize VTK MetaData for PolyData ---</span></div>
-<div class="line"><span class="lineno">  531</span>        <span class="keywordflow">if</span> (meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> &gt; 0) {</div>
-<div class="line"><span class="lineno">  532</span>            meta-&gt;<a class="code hl_variable" href="variables_8h.html#a7f393eb4fff178f989abb357f98b35a8">fileType</a> = <a class="code hl_enumvalue" href="variables_8h.html#afef259795cd298f0d543f574536e4dd7a37bd63d1b8edab46f0e9e6e4a52dfb57">VTK_POLYDATA</a>;</div>
-<div class="line"><span class="lineno">  533</span>            ierr = PetscMalloc1(meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#a5517bbdee115f97374036e9d29b3b648">connectivity</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  534</span>            ierr = PetscMalloc1(meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450">offsets</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  535</span>            <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
-<div class="line"><span class="lineno">  536</span>                meta-&gt;<a class="code hl_variable" href="variables_8h.html#a5517bbdee115f97374036e9d29b3b648">connectivity</a>[i] = i;</div>
-<div class="line"><span class="lineno">  537</span>                meta-&gt;<a class="code hl_variable" href="variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450">offsets</a>[i] = i + 1;</div>
-<div class="line"><span class="lineno">  538</span>            }</div>
-<div class="line"><span class="lineno">  539</span>        }</div>
-<div class="line"><span class="lineno">  540</span>    } <span class="comment">// End of rank 0 block</span></div>
-<div class="line"><span class="lineno">  541</span> </div>
-<div class="line"><span class="lineno">  542</span>    <span class="comment">// A barrier is a good practice to ensure rank 0 finishes preparing before other ranks</span></div>
-<div class="line"><span class="lineno">  543</span>    <span class="comment">// potentially proceed to the next timestep where new collective calls might occur.</span></div>
-<div class="line"><span class="lineno">  544</span>    ierr = MPI_Barrier(PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  500</span>            <span class="comment">// NOTE: This assumes a generic gather function exists.</span></div>
+<div class="line"><span class="lineno">  501</span>            <span class="comment">// A simplified placeholder is used here; you may need to implement this.</span></div>
+<div class="line"><span class="lineno">  502</span>            <span class="keywordtype">void</span>* full_field_arr_void = NULL;</div>
+<div class="line"><span class="lineno">  503</span>            PetscInt field_total_particles, field_num_components;</div>
+<div class="line"><span class="lineno">  504</span> </div>
+<div class="line"><span class="lineno">  505</span>            ierr = <a class="code hl_function" href="io_8h.html#a093c8c981643c86a2c594fea39dec0c1">SwarmFieldToArrayOnRank0</a>(swarm_to_use, internal_name, &amp;field_total_particles, &amp;field_num_components, &amp;full_field_arr_void); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  506</span> </div>
+<div class="line"><span class="lineno">  507</span>            <span class="keywordflow">if</span> (field_total_particles != n_total_particles) {</div>
+<div class="line"><span class="lineno">  508</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Field &#39;%s&#39; has %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; particles, but expected %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;. Skipping.\n&quot;</span>, field_name, field_total_particles, n_total_particles);</div>
+<div class="line"><span class="lineno">  509</span>                ierr = PetscFree(full_field_arr_void); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  510</span>                field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>); <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  511</span>            }</div>
+<div class="line"><span class="lineno">  512</span> </div>
+<div class="line"><span class="lineno">  513</span>            <span class="comment">// C. Allocate final array (ALWAYS as PetscScalar) and copy/cast subsampled data.</span></div>
+<div class="line"><span class="lineno">  514</span>            <a class="code hl_struct" href="variables_8h.html#structVTKFieldInfo">VTKFieldInfo</a>* current_field = &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>];</div>
+<div class="line"><span class="lineno">  515</span>            strncpy(current_field-&gt;<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>, field_name, <a class="code hl_define" href="variables_8h.html#af429c472ad06c2094bc8d598231b2e0a">MAX_VTK_FIELD_NAME_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno">  516</span>            current_field-&gt;<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>[<a class="code hl_define" href="variables_8h.html#af429c472ad06c2094bc8d598231b2e0a">MAX_VTK_FIELD_NAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno">  517</span>            current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> = field_num_components;</div>
+<div class="line"><span class="lineno">  518</span>            ierr = PetscMalloc1(current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a> * meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, (PetscScalar**)&amp;current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a877a36998969b27c4dee8db5c746b76c">data</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  519</span> </div>
+<div class="line"><span class="lineno">  520</span>            PetscScalar* final_data_arr = (PetscScalar*)current_field-&gt;<a class="code hl_variable" href="variables_8h.html#a877a36998969b27c4dee8db5c746b76c">data</a>;</div>
+<div class="line"><span class="lineno">  521</span> </div>
+<div class="line"><span class="lineno">  522</span>            <span class="comment">// D. Perform the subsampling and potential casting</span></div>
+<div class="line"><span class="lineno">  523</span>            <span class="keywordflow">if</span> (strcasecmp(internal_name, <span class="stringliteral">&quot;DMSwarm_pid&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  524</span>                PetscInt64* source_arr = (PetscInt64*)full_field_arr_void;</div>
+<div class="line"><span class="lineno">  525</span>                <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
+<div class="line"><span class="lineno">  526</span>                    final_data_arr[i] = (PetscScalar)source_arr[i * stride];</div>
+<div class="line"><span class="lineno">  527</span>                }</div>
+<div class="line"><span class="lineno">  528</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(internal_name, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>) == 0 || strcasecmp(internal_name, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  529</span>                PetscInt* source_arr = (PetscInt*)full_field_arr_void;</div>
+<div class="line"><span class="lineno">  530</span>                <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
+<div class="line"><span class="lineno">  531</span>                    PetscInt source_idx = i * stride;</div>
+<div class="line"><span class="lineno">  532</span>                    <span class="keywordflow">for</span> (PetscInt c = 0; c &lt; current_field-&gt;num_components; c++) {</div>
+<div class="line"><span class="lineno">  533</span>                        final_data_arr[current_field-&gt;num_components * i + c] = (PetscScalar)source_arr[current_field-&gt;num_components * source_idx + c];</div>
+<div class="line"><span class="lineno">  534</span>                    }</div>
+<div class="line"><span class="lineno">  535</span>                }</div>
+<div class="line"><span class="lineno">  536</span>            } <span class="keywordflow">else</span> { <span class="comment">// Default case: The field is already PetscScalar</span></div>
+<div class="line"><span class="lineno">  537</span>                PetscScalar* source_arr = (PetscScalar*)full_field_arr_void;</div>
+<div class="line"><span class="lineno">  538</span>                <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
+<div class="line"><span class="lineno">  539</span>                    PetscInt source_idx = i * stride;</div>
+<div class="line"><span class="lineno">  540</span>                    <span class="keywordflow">for</span> (PetscInt c = 0; c &lt; current_field-&gt;num_components; c++) {</div>
+<div class="line"><span class="lineno">  541</span>                        final_data_arr[current_field-&gt;num_components * i + c] = source_arr[current_field-&gt;num_components * source_idx + c];</div>
+<div class="line"><span class="lineno">  542</span>                    }</div>
+<div class="line"><span class="lineno">  543</span>                }</div>
+<div class="line"><span class="lineno">  544</span>            }</div>
 <div class="line"><span class="lineno">  545</span> </div>
-<div class="line"><span class="lineno">  546</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  547</span>}</div>
-<div class="ttc" id="aio_8h_html_a61850e757fea41eb461a930936c34401"><div class="ttname"><a href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a></div><div class="ttdeci">void TrimWhitespace(char *str)</div><div class="ttdoc">Helper function to trim leading/trailing whitespace from a string.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01850">io.c:1850</a></div></div>
-<div class="ttc" id="aio_8h_html_ac9ea8d5b3106437568b4bce7fd95f25c"><div class="ttname"><a href="io_8h.html#ac9ea8d5b3106437568b4bce7fd95f25c">SwarmFieldToArrayOnRank0</a></div><div class="ttdeci">PetscErrorCode SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *out_n_global, PetscInt *out_n_components, PetscScalar **out_data_rank0)</div><div class="ttdoc">Gathers a distributed DMSwarm field into a single C array on rank 0.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01680">io.c:1680</a></div></div>
+<div class="line"><span class="lineno">  546</span>            ierr = PetscFree(full_field_arr_void); <span class="comment">// Free the temporary full array.</span></div>
+<div class="line"><span class="lineno">  547</span>            meta-&gt;<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>++;</div>
+<div class="line"><span class="lineno">  548</span>            field_name = strtok(NULL, <span class="stringliteral">&quot;,&quot;</span>);</div>
+<div class="line"><span class="lineno">  549</span>        }</div>
+<div class="line"><span class="lineno">  550</span>        ierr = PetscFree(fields_copy); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  551</span> </div>
+<div class="line"><span class="lineno">  552</span>        <span class="comment">// --- Finalize VTK MetaData for PolyData ---</span></div>
+<div class="line"><span class="lineno">  553</span>        <span class="keywordflow">if</span> (meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> &gt; 0) {</div>
+<div class="line"><span class="lineno">  554</span>            meta-&gt;<a class="code hl_variable" href="variables_8h.html#a7f393eb4fff178f989abb357f98b35a8">fileType</a> = <a class="code hl_enumvalue" href="variables_8h.html#afef259795cd298f0d543f574536e4dd7a37bd63d1b8edab46f0e9e6e4a52dfb57">VTK_POLYDATA</a>;</div>
+<div class="line"><span class="lineno">  555</span>            ierr = PetscMalloc1(meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#a5517bbdee115f97374036e9d29b3b648">connectivity</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  556</span>            ierr = PetscMalloc1(meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, &amp;meta-&gt;<a class="code hl_variable" href="variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450">offsets</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  557</span>            <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; meta-&gt;<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>; i++) {</div>
+<div class="line"><span class="lineno">  558</span>                meta-&gt;<a class="code hl_variable" href="variables_8h.html#a5517bbdee115f97374036e9d29b3b648">connectivity</a>[i] = i;</div>
+<div class="line"><span class="lineno">  559</span>                meta-&gt;<a class="code hl_variable" href="variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450">offsets</a>[i] = i + 1;</div>
+<div class="line"><span class="lineno">  560</span>            }</div>
+<div class="line"><span class="lineno">  561</span>        }</div>
+<div class="line"><span class="lineno">  562</span>    } <span class="comment">// End of rank 0 block</span></div>
+<div class="line"><span class="lineno">  563</span> </div>
+<div class="line"><span class="lineno">  564</span>    ierr = MPI_Barrier(PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  565</span> </div>
+<div class="line"><span class="lineno">  566</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  567</span>}</div>
+<div class="ttc" id="aio_8h_html_a093c8c981643c86a2c594fea39dec0c1"><div class="ttname"><a href="io_8h.html#a093c8c981643c86a2c594fea39dec0c1">SwarmFieldToArrayOnRank0</a></div><div class="ttdeci">PetscErrorCode SwarmFieldToArrayOnRank0(DM swarm, const char *field_name, PetscInt *n_total_particles, PetscInt *n_components, void **gathered_array)</div><div class="ttdoc">Gathers any DMSwarm field from all ranks to a single, contiguous array on rank 0.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01714">io.c:1714</a></div></div>
+<div class="ttc" id="aio_8h_html_a61850e757fea41eb461a930936c34401"><div class="ttname"><a href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a></div><div class="ttdeci">void TrimWhitespace(char *str)</div><div class="ttdoc">Helper function to trim leading/trailing whitespace from a string.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01910">io.c:1910</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3758dd5d300a594312c95bc393378df0"><div class="ttname"><a href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a></div><div class="ttdeci">#define LOCAL</div><div class="ttdoc">Logging scope definitions for controlling message output.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00044">logging.h:44</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="avariables_8h_html_a10a62bce766452804bad64d119e127f7"><div class="ttname"><a href="variables_8h.html#a10a62bce766452804bad64d119e127f7">MAX_POINT_DATA_FIELDS</a></div><div class="ttdeci">#define MAX_POINT_DATA_FIELDS</div><div class="ttdoc">Defines the maximum number of data fields for VTK point data.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00437">variables.h:437</a></div></div>
@@ -1135,7 +1155,6 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="avariables_8h_html_ab6d46fc72a3f790771bdccf0b9ee0d5a"><div class="ttname"><a href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">PostProcessParams::particle_output_freq</a></div><div class="ttdeci">PetscInt particle_output_freq</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00458">variables.h:458</a></div></div>
 <div class="ttc" id="avariables_8h_html_ab90d5feaf7cfd59b75da0132d620bf25"><div class="ttname"><a href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">PostProcessParams::particle_fields</a></div><div class="ttdeci">char particle_fields[1024]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00456">variables.h:456</a></div></div>
 <div class="ttc" id="avariables_8h_html_af429c472ad06c2094bc8d598231b2e0a"><div class="ttname"><a href="variables_8h.html#af429c472ad06c2094bc8d598231b2e0a">MAX_VTK_FIELD_NAME_LENGTH</a></div><div class="ttdeci">#define MAX_VTK_FIELD_NAME_LENGTH</div><div class="ttdoc">Maximum length for VTK field names.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00438">variables.h:438</a></div></div>
-<div class="ttc" id="avariables_8h_html_structVTKMetaData"><div class="ttname"><a href="variables_8h.html#structVTKMetaData">VTKMetaData</a></div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00481">variables.h:481</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

@@ -57,10 +57,10 @@ var NAVTREEINDEX =
 "AnalyticalSolution_8h.html",
 "globals_func.html",
 "logging_8c.html#aa28884cc21bbf93fee9f1b1a26dfed6a",
-"variables_8h.html#a024d27766dd96fc80d417e3f4556effd",
-"variables_8h.html#a4e46a0a7eb2e0ed0280df04ff25e24a8",
-"variables_8h.html#aadc4cfc6880a57f1cb68ac900e472155",
-"variables_8h.html#structRankCellInfo"
+"variables_8h.html#a0070d1b5f2f362834ec76fa50d95380a",
+"variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d",
+"variables_8h.html#aac8e0dd714804b073dbb32c0ad84b2eb",
+"variables_8h.html#structParticle"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -26,6 +26,7 @@ var logging_8c =
     [ "DualMonitorDestroy", "logging_8c.html#a26f628c9bae473d94674a1a97641b474", null ],
     [ "DualKSPMonitor", "logging_8c.html#ab0414bd7dfd804d39019da707808a819", null ],
     [ "LOG_CONTINUITY_METRICS", "logging_8c.html#ab2315d3303d45c97ca55836603a8acd3", null ],
+    [ "ParticleLocationStatusToString", "logging_8c.html#aa7faf5df9854e921411f9768319237e9", null ],
     [ "current_log_level", "logging_8c.html#a3903f35c62e68bc1cadbb294f727469c", null ],
     [ "gAllowedFunctions", "logging_8c.html#a32085a5a3e923b4619032eef946fd400", null ],
     [ "gNumAllowed", "logging_8c.html#a798a72f08a971879fe7d9f55985d4b07", null ],

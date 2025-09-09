@@ -44,6 +44,7 @@ var logging_8h =
     [ "DualKSPMonitor", "logging_8h.html#ab0414bd7dfd804d39019da707808a819", null ],
     [ "DualMonitorDestroy", "logging_8h.html#a26f628c9bae473d94674a1a97641b474", null ],
     [ "LOG_CONTINUITY_METRICS", "logging_8h.html#ab2315d3303d45c97ca55836603a8acd3", null ],
+    [ "ParticleLocationStatusToString", "logging_8h.html#aa7faf5df9854e921411f9768319237e9", null ],
     [ "EVENT_Individualwalkingsearch", "logging_8h.html#ae0b1fb7fddebe4ae6c920ef8abda967d", null ],
     [ "EVENT_walkingsearch", "logging_8h.html#a047337b712fc7dd1f728376b0fb92863", null ],
     [ "EVENT_GlobalParticleLocation", "logging_8h.html#ae09799da14fb2c60e09b1451fc30eb82", null ],

@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"variables_8h.html#structParticle":[5,0,0,19,7],
+"variables_8h.html#structPostProcessParams":[5,0,0,19,28],
 "variables_8h.html#structRankCellInfo":[5,0,0,19,9],
 "variables_8h.html#structRankNeighbors":[5,0,0,19,8],
 "variables_8h.html#structSimCtx":[5,0,0,19,31],
