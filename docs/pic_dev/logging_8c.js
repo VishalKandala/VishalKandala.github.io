@@ -1,5 +1,14 @@
 var logging_8c =
 [
+    [ "ProfiledFunction", "logging_8c.html#structProfiledFunction", [
+      [ "name", "logging_8c.html#afc958d8a55b5a07cac056b59293720c0", null ],
+      [ "total_time", "logging_8c.html#a7a4a24ad1c6a975949b9c5a093b1c066", null ],
+      [ "current_step_time", "logging_8c.html#ab8731f86c7a1ac2e7ae8bcb1bf35341b", null ],
+      [ "total_call_count", "logging_8c.html#a5200129d96f5a71c2c7767f9ecb78cd4", null ],
+      [ "current_step_call_count", "logging_8c.html#abaebe3fc2647f70c48f8883421c468de", null ],
+      [ "start_time", "logging_8c.html#aef9009dbbbf6e70231675fc0f49c1b83", null ],
+      [ "always_log", "logging_8c.html#a0c8de4413a01cd8ce3e61943ad1e5ecf", null ]
+    ] ],
     [ "TMP_BUF_SIZE", "logging_8c.html#a2e6c4948edc7d28d77ca47f0d6403d2b", null ],
     [ "__FUNCT__", "logging_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "__FUNCT__", "logging_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
@@ -27,11 +36,21 @@ var logging_8c =
     [ "DualKSPMonitor", "logging_8c.html#ab0414bd7dfd804d39019da707808a819", null ],
     [ "LOG_CONTINUITY_METRICS", "logging_8c.html#ab2315d3303d45c97ca55836603a8acd3", null ],
     [ "ParticleLocationStatusToString", "logging_8c.html#aa7faf5df9854e921411f9768319237e9", null ],
+    [ "_FindOrCreateEntry", "logging_8c.html#a8fbe318914200aec241a83c62863537a", null ],
+    [ "ProfilingInitialize", "logging_8c.html#ac4f5428199f6cd908056ad3e0ead934f", null ],
+    [ "_ProfilingStart", "logging_8c.html#af85d22d104cdcdeb5014361278b25fdb", null ],
+    [ "_ProfilingEnd", "logging_8c.html#a9c70e2531bc267a24b49832bd6683181", null ],
+    [ "ProfilingLogTimestepSummary", "logging_8c.html#af2d563ccb13b1830a29ad7d13647eecc", null ],
+    [ "_CompareProfiledFunctions", "logging_8c.html#aa9a4e120a9601e8c42c70d84d3a1c7d5", null ],
+    [ "ProfilingFinalize", "logging_8c.html#abe645d0859ed58975cd877bb3e56762c", null ],
     [ "current_log_level", "logging_8c.html#a3903f35c62e68bc1cadbb294f727469c", null ],
     [ "gAllowedFunctions", "logging_8c.html#a32085a5a3e923b4619032eef946fd400", null ],
     [ "gNumAllowed", "logging_8c.html#a798a72f08a971879fe7d9f55985d4b07", null ],
     [ "EVENT_Individualwalkingsearch", "logging_8c.html#ae0b1fb7fddebe4ae6c920ef8abda967d", null ],
     [ "EVENT_walkingsearch", "logging_8c.html#a047337b712fc7dd1f728376b0fb92863", null ],
     [ "EVENT_GlobalParticleLocation", "logging_8c.html#ae09799da14fb2c60e09b1451fc30eb82", null ],
-    [ "EVENT_IndividualLocation", "logging_8c.html#a665f66d88010af3842e75cc7f1a00b94", null ]
+    [ "EVENT_IndividualLocation", "logging_8c.html#a665f66d88010af3842e75cc7f1a00b94", null ],
+    [ "g_profiler_registry", "logging_8c.html#abf77bee3644787e3f25cbfcc9dec8411", null ],
+    [ "g_profiler_count", "logging_8c.html#a25e60d90f676ba09f58f95f790bf7979", null ],
+    [ "g_profiler_capacity", "logging_8c.html#a5ae16baa70b3a0ca30d8c6954a2910de", null ]
 ];

@@ -26,6 +26,7 @@ var annotated_dup =
     [ "node", "variables_8h.html#structnode", "variables_8h_structnode" ],
     [ "Particle", "variables_8h.html#structParticle", "variables_8h_structParticle" ],
     [ "PostProcessParams", "variables_8h.html#structPostProcessParams", "variables_8h_structPostProcessParams" ],
+    [ "ProfiledFunction", "logging_8c.html#structProfiledFunction", "logging_8c_structProfiledFunction" ],
     [ "RankCellInfo", "variables_8h.html#structRankCellInfo", "variables_8h_structRankCellInfo" ],
     [ "RankNeighbors", "variables_8h.html#structRankNeighbors", "variables_8h_structRankNeighbors" ],
     [ "SimCtx", "variables_8h.html#structSimCtx", "variables_8h_structSimCtx" ],

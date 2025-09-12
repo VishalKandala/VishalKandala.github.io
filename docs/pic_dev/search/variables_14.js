@@ -12,10 +12,12 @@ var searchData=
   ['timestep_9',['timeStep',['../variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497',1,'PostProcessParams']]],
   ['tin_10',['tin',['../variables_8h.html#a1cdec84f2d2f90e0169386206f8c02c1',1,'SimCtx']]],
   ['tiout_11',['tiout',['../variables_8h.html#a4020eb5a53d6a827a93f000bfb09cd6f',1,'SimCtx']]],
-  ['tow_5fwn_12',['Tow_wn',['../variables_8h.html#a3f14f8ea462d3febe02e72d3e19dcc46',1,'SurfElmtInfo']]],
-  ['tow_5fws_13',['Tow_ws',['../variables_8h.html#ad10a788b2dbe5b267e985bfcdccadf9e',1,'SurfElmtInfo']]],
-  ['tow_5fwt_14',['Tow_wt',['../variables_8h.html#a3c3055f7293e045b33e855aac4f4390c',1,'SurfElmtInfo']]],
-  ['turbine_15',['turbine',['../variables_8h.html#a04c849d5fadc93b99bd328df1b90adce',1,'SimCtx']]],
-  ['twod_16',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
-  ['type_17',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition']]]
+  ['total_5fcall_5fcount_12',['total_call_count',['../logging_8c.html#a5200129d96f5a71c2c7767f9ecb78cd4',1,'ProfiledFunction']]],
+  ['total_5ftime_13',['total_time',['../logging_8c.html#a7a4a24ad1c6a975949b9c5a093b1c066',1,'ProfiledFunction']]],
+  ['tow_5fwn_14',['Tow_wn',['../variables_8h.html#a3f14f8ea462d3febe02e72d3e19dcc46',1,'SurfElmtInfo']]],
+  ['tow_5fws_15',['Tow_ws',['../variables_8h.html#ad10a788b2dbe5b267e985bfcdccadf9e',1,'SurfElmtInfo']]],
+  ['tow_5fwt_16',['Tow_wt',['../variables_8h.html#a3c3055f7293e045b33e855aac4f4390c',1,'SurfElmtInfo']]],
+  ['turbine_17',['turbine',['../variables_8h.html#a04c849d5fadc93b99bd328df1b90adce',1,'SimCtx']]],
+  ['twod_18',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
+  ['type_19',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition']]]
 ];

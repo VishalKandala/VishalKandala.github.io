@@ -21,6 +21,8 @@ var poisson_8c =
     [ "TW", "poisson_8c.html#a051c83d6554c006261a198d0682d84e4", null ],
     [ "BW", "poisson_8c.html#a84909b16209480034c40276c4f84f975", null ],
     [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "Calculate_Covariant_metrics", "poisson_8c.html#a932a672b919024b4d158a3b3ba569ac5", null ],
     [ "Calculate_normal", "poisson_8c.html#aa52d855d542bca0968fd51febf43adc0", null ],
     [ "GhostNodeVelocity", "poisson_8c.html#a6046e36e2334fa29a86d652a0b8f0593", null ],

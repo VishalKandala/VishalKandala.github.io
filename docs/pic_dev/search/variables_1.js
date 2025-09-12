@@ -8,12 +8,13 @@ var searchData=
   ['allowedfile_5',['allowedFile',['../variables_8h.html#a432208fc455621e01de80448272ae582',1,'SimCtx']]],
   ['allowedfuncs_6',['allowedFuncs',['../variables_8h.html#a7b2f9183b911937f0e19f2fbd6915c3f',1,'SimCtx']]],
   ['alpha_7',['alpha',['../variables_8h.html#ae1a598acdd08a515d732d27561167aab',1,'FSInfo']]],
-  ['angle_8',['angle',['../variables_8h.html#a1c09604af49856ddc75bb32cd1b2a836',1,'SimCtx']]],
-  ['ao_9',['ao',['../variables_8h.html#aea94c48d31a4107860ddca95a404a81c',1,'UserCtx']]],
-  ['apply_10',['Apply',['../structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c',1,'BoundaryCondition']]],
-  ['areaoutsum_11',['AreaOutSum',['../variables_8h.html#aca7ff63d94b0fbd2d541734b7200b0e2',1,'SimCtx']]],
-  ['assigneda_12',['assignedA',['../variables_8h.html#a41951f47cfbe9c08def29998a76dc791',1,'UserCtx']]],
-  ['atk_13',['atk',['../variables_8h.html#a78d9c3f94b95f552e7b97557d97c8925',1,'FSInfo']]],
-  ['atk_5fo_14',['atk_o',['../variables_8h.html#af82c226d2e3807e6b8f7e9aee68080ac',1,'FSInfo']]],
-  ['averaging_15',['averaging',['../variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7',1,'SimCtx']]]
+  ['always_5flog_8',['always_log',['../logging_8c.html#a0c8de4413a01cd8ce3e61943ad1e5ecf',1,'ProfiledFunction']]],
+  ['angle_9',['angle',['../variables_8h.html#a1c09604af49856ddc75bb32cd1b2a836',1,'SimCtx']]],
+  ['ao_10',['ao',['../variables_8h.html#aea94c48d31a4107860ddca95a404a81c',1,'UserCtx']]],
+  ['apply_11',['Apply',['../structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c',1,'BoundaryCondition']]],
+  ['areaoutsum_12',['AreaOutSum',['../variables_8h.html#aca7ff63d94b0fbd2d541734b7200b0e2',1,'SimCtx']]],
+  ['assigneda_13',['assignedA',['../variables_8h.html#a41951f47cfbe9c08def29998a76dc791',1,'UserCtx']]],
+  ['atk_14',['atk',['../variables_8h.html#a78d9c3f94b95f552e7b97557d97c8925',1,'FSInfo']]],
+  ['atk_5fo_15',['atk_o',['../variables_8h.html#af82c226d2e3807e6b8f7e9aee68080ac',1,'FSInfo']]],
+  ['averaging_16',['averaging',['../variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7',1,'SimCtx']]]
 ];

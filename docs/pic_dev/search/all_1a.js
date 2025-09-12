@@ -2,7 +2,7 @@ var searchData=
 [
   ['u_0',['u',['../variables_8h.html#a86894f52deb3b0fb3cf22dc3cdf94120',1,'IBMNodes::u'],['../variables_8h.html#ade7b341bb65521be00d2eca69d283b4b',1,'IBMVNodes::u']]],
   ['u_5fbc_1',['U_bc',['../variables_8h.html#ac12eb831808e07c80a03e393a986f93f',1,'SimCtx']]],
-  ['u_5fcabot_2',['u_cabot',['../wallfunction_8c.html#aad20a76a53ecb1b953cb300203beb526',1,'u_Cabot(double nu, double y, double utau, double dpdt, double taw):&#160;wallfunction.c'],['../wallfunction_8h.html#aad20a76a53ecb1b953cb300203beb526',1,'u_Cabot(double nu, double y, double utau, double dpdt, double taw):&#160;wallfunction.c']]],
+  ['u_5fcabot_2',['u_cabot',['../wallfunction_8h.html#aad20a76a53ecb1b953cb300203beb526',1,'u_Cabot(double nu, double y, double utau, double dpdt, double taw):&#160;wallfunction.c'],['../wallfunction_8c.html#aad20a76a53ecb1b953cb300203beb526',1,'u_Cabot(double nu, double y, double utau, double dpdt, double taw):&#160;wallfunction.c']]],
   ['u_5fhydset_5froughness_3',['u_hydset_roughness',['../wallfunction_8c.html#a071e294d71e268c014aa6047acb64730',1,'u_hydset_roughness(double nu, double y, double utau, double ks):&#160;wallfunction.c'],['../wallfunction_8h.html#a071e294d71e268c014aa6047acb64730',1,'u_hydset_roughness(double nu, double y, double utau, double ks):&#160;wallfunction.c']]],
   ['u_5floglaw_4',['u_loglaw',['../wallfunction_8c.html#ada9f32e2118007897b66ecfb5ef1d256',1,'u_loglaw(double y, double utau, double roughness):&#160;wallfunction.c'],['../wallfunction_8h.html#ada9f32e2118007897b66ecfb5ef1d256',1,'u_loglaw(double y, double utau, double roughness):&#160;wallfunction.c']]],
   ['u_5fwerner_5',['u_werner',['../wallfunction_8c.html#a7ded59b6a455ad3a8db66bea549aa82d',1,'u_Werner(double nu, double y, double utau):&#160;wallfunction.c'],['../wallfunction_8h.html#a7ded59b6a455ad3a8db66bea549aa82d',1,'u_Werner(double nu, double y, double utau):&#160;wallfunction.c']]],
@@ -34,10 +34,11 @@ var searchData=
   ['updateswarmfieldvalue_31',['UpdateSwarmFieldValue',['../ParticleSwarm_8c.html#a836356591a56313ee45df507a984907d',1,'ParticleSwarm.c']]],
   ['urm1_32',['urm1',['../variables_8h.html#af9f4d9e8e8d826b857c4a29003dfb75e',1,'IBMNodes::urm1'],['../variables_8h.html#a042de1127487e0957e2d1f3f7f4daf84',1,'IBMVNodes::urm1']]],
   ['usecfg_33',['useCfg',['../variables_8h.html#ab342b9a07bb00be469836bd6974b0c93',1,'SimCtx']]],
-  ['user_34',['user',['../variables_8h.html#a7823a7fc52af3c6fe103457cf85fdcce',1,'BCContext::user'],['../variables_8h.html#a0e8eb238051c8b5f37a260a8cde481c4',1,'MGCtx::user']]],
-  ['user_20guide_35',['User Guide',['../user_guide.html',1,'index']]],
-  ['user_5fc_36',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
-  ['user_5ff_37',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
-  ['userctx_38',['userctx',['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'UserCtx:&#160;variables.h'],['../variables_8h.html#structUserCtx',1,'UserCtx']]],
-  ['usermg_39',['usermg',['../variables_8h.html#structUserMG',1,'UserMG'],['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'UserMG:&#160;variables.h'],['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx::usermg']]]
+  ['usecriticalfuncscfg_34',['useCriticalFuncsCfg',['../variables_8h.html#ab4b123a5f980ecdaa79c5f855f751999',1,'SimCtx']]],
+  ['user_35',['user',['../variables_8h.html#a7823a7fc52af3c6fe103457cf85fdcce',1,'BCContext::user'],['../variables_8h.html#a0e8eb238051c8b5f37a260a8cde481c4',1,'MGCtx::user']]],
+  ['user_20guide_36',['User Guide',['../user_guide.html',1,'index']]],
+  ['user_5fc_37',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
+  ['user_5ff_38',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
+  ['userctx_39',['userctx',['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'UserCtx:&#160;variables.h'],['../variables_8h.html#structUserCtx',1,'UserCtx']]],
+  ['usermg_40',['usermg',['../variables_8h.html#structUserMG',1,'UserMG'],['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'UserMG:&#160;variables.h'],['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx::usermg']]]
 ];
