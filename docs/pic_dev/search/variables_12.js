@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R']]],
+  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radi_1',['radi',['../variables_8h.html#a7e1de8951d5c84349bd6c0f4c15f85f3',1,'SimCtx']]],
   ['radvec_2',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_3',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
@@ -21,9 +21,8 @@ var searchData=
   ['rhs_18',['Rhs',['../variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8',1,'UserCtx']]],
   ['rotateframe_19',['rotateframe',['../variables_8h.html#aecc33b61ded0b8c01e2524094af2504a',1,'SimCtx']]],
   ['rotatefsi_20',['rotatefsi',['../variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9',1,'SimCtx']]],
-  ['rstart_5fflg_21',['rstart_flg',['../variables_8h.html#a43fb110dc2ce420db6f659f6c055f086',1,'SimCtx']]],
-  ['rstart_5ffsi_22',['rstart_fsi',['../variables_8h.html#a5d62bb83d782192bfb7a04b985d1b8aa',1,'SimCtx']]],
-  ['rx_23',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
-  ['ry_24',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
-  ['rz_25',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
+  ['rstart_5ffsi_21',['rstart_fsi',['../variables_8h.html#a5d62bb83d782192bfb7a04b985d1b8aa',1,'SimCtx']]],
+  ['rx_22',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
+  ['ry_23',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
+  ['rz_24',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
 ];

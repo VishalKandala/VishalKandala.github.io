@@ -41,6 +41,8 @@ var logging_8h =
     [ "FreeAllowedFunctions", "logging_8h.html#a4a8e656885dc6a9425a7e8819b64446a", null ],
     [ "LoadAllowedFunctionsFromFile", "logging_8h.html#a6c0ddc8d3a828f3ab26c557ba0aedf75", null ],
     [ "BCFaceToString", "logging_8h.html#a46638a78fe01e24d946d9103d5d2fde9", null ],
+    [ "FieldInitializationToString", "logging_8h.html#a266bd07f5be2795e8603a4075440ea25", null ],
+    [ "ParticleInitializationToString", "logging_8h.html#a6084910c834c11b53f96bfb8567f4cfd", null ],
     [ "BCTypeToString", "logging_8h.html#aa28884cc21bbf93fee9f1b1a26dfed6a", null ],
     [ "BCHandlerTypeToString", "logging_8h.html#a227ad490382f319c9b9e9a05dfbaab43", null ],
     [ "DualKSPMonitor", "logging_8h.html#ab0414bd7dfd804d39019da707808a819", null ],
