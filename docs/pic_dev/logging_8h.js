@@ -49,6 +49,7 @@ var logging_8h =
     [ "DualMonitorDestroy", "logging_8h.html#a26f628c9bae473d94674a1a97641b474", null ],
     [ "LOG_CONTINUITY_METRICS", "logging_8h.html#ab2315d3303d45c97ca55836603a8acd3", null ],
     [ "ParticleLocationStatusToString", "logging_8h.html#aa7faf5df9854e921411f9768319237e9", null ],
+    [ "PrintProgressBar", "logging_8h.html#a7d73ab7b1517a3c8256b2447f88b633e", null ],
     [ "ProfilingInitialize", "logging_8h.html#ac4f5428199f6cd908056ad3e0ead934f", null ],
     [ "ProfilingLogTimestepSummary", "logging_8h.html#af2d563ccb13b1830a29ad7d13647eecc", null ],
     [ "ProfilingFinalize", "logging_8h.html#abe645d0859ed58975cd877bb3e56762c", null ],

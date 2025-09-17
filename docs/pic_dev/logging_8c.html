@@ -212,6 +212,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abe645d0859ed58975cd877bb3e56762c" id="r_abe645d0859ed58975cd877bb3e56762c"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8c.html#abe645d0859ed58975cd877bb3e56762c">ProfilingFinalize</a> (void)</td></tr>
 <tr class="memdesc:abe645d0859ed58975cd877bb3e56762c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the final, cumulative performance summary and cleans up resources.  <br /></td></tr>
 <tr class="separator:abe645d0859ed58975cd877bb3e56762c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d73ab7b1517a3c8256b2447f88b633e" id="r_a7d73ab7b1517a3c8256b2447f88b633e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8c.html#a7d73ab7b1517a3c8256b2447f88b633e">PrintProgressBar</a> (PetscInt step, PetscInt startStep, PetscInt totalSteps, PetscReal currentTime)</td></tr>
+<tr class="memdesc:a7d73ab7b1517a3c8256b2447f88b633e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints a progress bar to the console.  <br /></td></tr>
+<tr class="separator:a7d73ab7b1517a3c8256b2447f88b633e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -2714,6 +2717,103 @@ Here is the call graph for this function:</div>
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><iframe scrolling="no" frameborder="0" src="logging_8c_abe645d0859ed58975cd877bb3e56762c_icgraph.svg" width="239" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
+<a id="a7d73ab7b1517a3c8256b2447f88b633e" name="a7d73ab7b1517a3c8256b2447f88b633e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d73ab7b1517a3c8256b2447f88b633e">&#9670;&#160;</a></span>PrintProgressBar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PrintProgressBar </td>
+          <td>(</td>
+          <td class="paramtype">PetscInt&#160;</td>
+          <td class="paramname"><em>step</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PetscInt&#160;</td>
+          <td class="paramname"><em>startStep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PetscInt&#160;</td>
+          <td class="paramname"><em>totalSteps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PetscReal&#160;</td>
+          <td class="paramname"><em>currentTime</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Prints a progress bar to the console. </p>
+<p>This function should only be called by the root process (rank 0). It uses a carriage return <code>\r</code> to overwrite the same line in the terminal, creating a dynamic progress bar.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">step</td><td>The current step index from the loop (e.g., from 0 to N-1). </td></tr>
+    <tr><td class="paramname">startStep</td><td>The global starting step number of the simulation. </td></tr>
+    <tr><td class="paramname">totalSteps</td><td>The total number of steps to be run in this simulation instance. </td></tr>
+    <tr><td class="paramname">currentTime</td><td>The current simulation time to display. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="logging_8c_source.html#l01161">1161</a> of file <a class="el" href="logging_8c_source.html">logging.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1162</span>{</div>
+<div class="line"><span class="lineno"> 1163</span>    <span class="keywordflow">if</span> (totalSteps &lt;= 0) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1164</span> </div>
+<div class="line"><span class="lineno"> 1165</span>    <span class="comment">// --- Configuration ---</span></div>
+<div class="line"><span class="lineno"> 1166</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> barWidth = 50;</div>
+<div class="line"><span class="lineno"> 1167</span> </div>
+<div class="line"><span class="lineno"> 1168</span>    <span class="comment">// --- Calculation ---</span></div>
+<div class="line"><span class="lineno"> 1169</span>    <span class="comment">// Calculate progress as a fraction from 0.0 to 1.0</span></div>
+<div class="line"><span class="lineno"> 1170</span>    PetscReal progress = (PetscReal)(step - startStep + 1) / totalSteps;</div>
+<div class="line"><span class="lineno"> 1171</span>    <span class="comment">// Ensure progress doesn&#39;t exceed 1.0 due to floating point inaccuracies</span></div>
+<div class="line"><span class="lineno"> 1172</span>    <span class="keywordflow">if</span> (progress &gt; 1.0) progress = 1.0;</div>
+<div class="line"><span class="lineno"> 1173</span> </div>
+<div class="line"><span class="lineno"> 1174</span>    <span class="keywordtype">int</span> pos = (int)(barWidth * progress);</div>
+<div class="line"><span class="lineno"> 1175</span> </div>
+<div class="line"><span class="lineno"> 1176</span>    <span class="comment">// --- Printing ---</span></div>
+<div class="line"><span class="lineno"> 1177</span>    <span class="comment">// Carriage return moves cursor to the beginning of the line</span></div>
+<div class="line"><span class="lineno"> 1178</span>    PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;\rProgress: [&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1179</span> </div>
+<div class="line"><span class="lineno"> 1180</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; barWidth; ++i) {</div>
+<div class="line"><span class="lineno"> 1181</span>        <span class="keywordflow">if</span> (i &lt; pos) {</div>
+<div class="line"><span class="lineno"> 1182</span>            PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;=&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1183</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (i == pos) {</div>
+<div class="line"><span class="lineno"> 1184</span>            PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;&gt;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1185</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 1186</span>            PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; &quot;</span>);</div>
+<div class="line"><span class="lineno"> 1187</span>        }</div>
+<div class="line"><span class="lineno"> 1188</span>    }</div>
+<div class="line"><span class="lineno"> 1189</span> </div>
+<div class="line"><span class="lineno"> 1190</span>    <span class="comment">// Print percentage, step count, and current time</span></div>
+<div class="line"><span class="lineno"> 1191</span>    PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;] %3d%% (Step %ld/%ld, t=%.4f)&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1192</span>                (<span class="keywordtype">int</span>)(progress * 100.0),</div>
+<div class="line"><span class="lineno"> 1193</span>                step + 1,</div>
+<div class="line"><span class="lineno"> 1194</span>                startStep + totalSteps,</div>
+<div class="line"><span class="lineno"> 1195</span>                currentTime);</div>
+<div class="line"><span class="lineno"> 1196</span> </div>
+<div class="line"><span class="lineno"> 1197</span>    <span class="comment">// Flush the output buffer to ensure the bar is displayed immediately</span></div>
+<div class="line"><span class="lineno"> 1198</span>    fflush(stdout);</div>
+<div class="line"><span class="lineno"> 1199</span>}</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8c_a7d73ab7b1517a3c8256b2447f88b633e_icgraph.svg" width="440" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

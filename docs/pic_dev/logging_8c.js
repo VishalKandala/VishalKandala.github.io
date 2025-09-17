@@ -45,6 +45,7 @@ var logging_8c =
     [ "ProfilingLogTimestepSummary", "logging_8c.html#af2d563ccb13b1830a29ad7d13647eecc", null ],
     [ "_CompareProfiledFunctions", "logging_8c.html#aa9a4e120a9601e8c42c70d84d3a1c7d5", null ],
     [ "ProfilingFinalize", "logging_8c.html#abe645d0859ed58975cd877bb3e56762c", null ],
+    [ "PrintProgressBar", "logging_8c.html#a7d73ab7b1517a3c8256b2447f88b633e", null ],
     [ "current_log_level", "logging_8c.html#a3903f35c62e68bc1cadbb294f727469c", null ],
     [ "gAllowedFunctions", "logging_8c.html#a32085a5a3e923b4619032eef946fd400", null ],
     [ "gNumAllowed", "logging_8c.html#a798a72f08a971879fe7d9f55985d4b07", null ],
