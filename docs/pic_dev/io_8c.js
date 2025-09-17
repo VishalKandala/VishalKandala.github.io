@@ -11,6 +11,7 @@ var io_8c =
     [ "ValidateBCHandlerForBCType", "io_8c.html#a5fe767286174b757deb2d404f2b4843f", null ],
     [ "ParseAllBoundaryConditions", "io_8c.html#a5cc5e40cd538efc87ebd94ebdbb2a8e8", null ],
     [ "CheckDataFile", "io_8c.html#ab7d7097c8ad047feb1d460e4694b8b4f", null ],
+    [ "ReadOptionalField", "io_8c.html#ac414e8adc74c5fb5e149b42c95baf495", null ],
     [ "ReadOptionalSwarmField", "io_8c.html#aed3ed919a52fa88c62e1201b4316b2c4", null ],
     [ "ReadFieldData", "io_8c.html#a570806d7e0694b5d996e0c6018b48908", null ],
     [ "ReadSimulationFields", "io_8c.html#a3a009dabc71ccfa59f196e1bc045de45", null ],
