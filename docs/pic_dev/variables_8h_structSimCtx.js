@@ -13,6 +13,7 @@ var variables_8h_structSimCtx =
     [ "logviewer", "variables_8h.html#adeb409a2b27c8f7bba53944a876cc7bc", null ],
     [ "OutputFreq", "variables_8h.html#aa002126f8760bb0f98614b78ac70e940", null ],
     [ "exec_mode", "variables_8h.html#ae27e734d789eb2f07918d6bae3969480", null ],
+    [ "eulerianSource", "variables_8h.html#a22578f82210005268294944e4227473e", null ],
     [ "immersed", "variables_8h.html#aef90766eec6fc6887cd39bd1d79cb6d2", null ],
     [ "movefsi", "variables_8h.html#a090892cd5c5a867ca95c239ee24568be", null ],
     [ "rotatefsi", "variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9", null ],

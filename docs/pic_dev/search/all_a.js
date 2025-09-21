@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['e_5fcoeff_0',['e_coeff',['../wallfunction_8h.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c'],['../wallfunction_8c.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c']]],
+  ['e_5fcoeff_0',['e_coeff',['../wallfunction_8c.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c'],['../wallfunction_8h.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c']]],
   ['eel_1',['eel',['../variables_8h.html#a912b5bb58c3db258fa468d66ead8d6fd',1,'SimCtx']]],
   ['elmtinfo_2',['elmtinfo',['../variables_8h.html#a4d5e8775b899743430a99dbc2a4f6bfc',1,'FSInfo']]],
   ['endtime_3',['endTime',['../variables_8h.html#a76d29089d00d89348f32bbf0e2981497',1,'PostProcessParams']]],
@@ -11,16 +11,17 @@ var searchData=
   ['eta_8',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
   ['eulerian_20lagrangian_20framework_20for_20scalar_20transport_9',['🌀 PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['../index.html#autotoc_md1',1,'']]],
   ['eulerian_20phase_20the_20grid_10',['1. The Eulerian Phase (The Grid)',['../index.html#autotoc_md2',1,'']]],
-  ['euleriandataprocessingpipeline_11',['euleriandataprocessingpipeline',['../postprocessor_8c.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c'],['../postprocessor_8h.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c']]],
+  ['euleriandataprocessingpipeline_11',['euleriandataprocessingpipeline',['../postprocessor_8h.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c'],['../postprocessor_8c.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c']]],
   ['eulerianext_12',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
-  ['evaluateparticleposition_13',['evaluateparticleposition',['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
-  ['event_5fglobalparticlelocation_14',['event_globalparticlelocation',['../logging_8h.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c'],['../logging_8c.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c']]],
-  ['event_5findividuallocation_15',['event_individuallocation',['../logging_8h.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c'],['../logging_8c.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c']]],
-  ['event_5findividualwalkingsearch_16',['event_individualwalkingsearch',['../logging_8h.html#ae0b1fb7fddebe4ae6c920ef8abda967d',1,'EVENT_Individualwalkingsearch:&#160;logging.c'],['../logging_8c.html#ae0b1fb7fddebe4ae6c920ef8abda967d',1,'EVENT_Individualwalkingsearch:&#160;logging.c']]],
-  ['event_5fwalkingsearch_17',['event_walkingsearch',['../logging_8h.html#a047337b712fc7dd1f728376b0fb92863',1,'EVENT_walkingsearch:&#160;logging.c'],['../logging_8c.html#a047337b712fc7dd1f728376b0fb92863',1,'EVENT_walkingsearch:&#160;logging.c']]],
-  ['exec_5fmode_18',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
-  ['exec_5fmode_5fpostprocessor_19',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
-  ['exec_5fmode_5fsolver_20',['EXEC_MODE_SOLVER',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda50cbc3562b55317ccd65fed2bd226742',1,'variables.h']]],
-  ['exec_5fmode_5funknown_21',['EXEC_MODE_UNKNOWN',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda10cefdb12245bf1e59e2ae72e2178976',1,'variables.h']]],
-  ['executionmode_22',['ExecutionMode',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fd',1,'variables.h']]]
+  ['euleriansource_13',['eulerianSource',['../variables_8h.html#a22578f82210005268294944e4227473e',1,'SimCtx']]],
+  ['evaluateparticleposition_14',['evaluateparticleposition',['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
+  ['event_5fglobalparticlelocation_15',['event_globalparticlelocation',['../logging_8c.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c'],['../logging_8h.html#ae09799da14fb2c60e09b1451fc30eb82',1,'EVENT_GlobalParticleLocation:&#160;logging.c']]],
+  ['event_5findividuallocation_16',['event_individuallocation',['../logging_8h.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c'],['../logging_8c.html#a665f66d88010af3842e75cc7f1a00b94',1,'EVENT_IndividualLocation:&#160;logging.c']]],
+  ['event_5findividualwalkingsearch_17',['event_individualwalkingsearch',['../logging_8h.html#ae0b1fb7fddebe4ae6c920ef8abda967d',1,'EVENT_Individualwalkingsearch:&#160;logging.c'],['../logging_8c.html#ae0b1fb7fddebe4ae6c920ef8abda967d',1,'EVENT_Individualwalkingsearch:&#160;logging.c']]],
+  ['event_5fwalkingsearch_18',['event_walkingsearch',['../logging_8h.html#a047337b712fc7dd1f728376b0fb92863',1,'EVENT_walkingsearch:&#160;logging.c'],['../logging_8c.html#a047337b712fc7dd1f728376b0fb92863',1,'EVENT_walkingsearch:&#160;logging.c']]],
+  ['exec_5fmode_19',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
+  ['exec_5fmode_5fpostprocessor_20',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
+  ['exec_5fmode_5fsolver_21',['EXEC_MODE_SOLVER',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda50cbc3562b55317ccd65fed2bd226742',1,'variables.h']]],
+  ['exec_5fmode_5funknown_22',['EXEC_MODE_UNKNOWN',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda10cefdb12245bf1e59e2ae72e2178976',1,'variables.h']]],
+  ['executionmode_23',['ExecutionMode',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fd',1,'variables.h']]]
 ];
