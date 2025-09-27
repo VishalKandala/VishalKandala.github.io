@@ -29,6 +29,7 @@ var annotated_dup =
     [ "ProfiledFunction", "logging_8c.html#structProfiledFunction", "logging_8c_structProfiledFunction" ],
     [ "RankCellInfo", "variables_8h.html#structRankCellInfo", "variables_8h_structRankCellInfo" ],
     [ "RankNeighbors", "variables_8h.html#structRankNeighbors", "variables_8h_structRankNeighbors" ],
+    [ "ScalingCtx", "variables_8h.html#structScalingCtx", "variables_8h_structScalingCtx" ],
     [ "SimCtx", "variables_8h.html#structSimCtx", "variables_8h_structSimCtx" ],
     [ "SurfElmtInfo", "variables_8h.html#structSurfElmtInfo", "variables_8h_structSurfElmtInfo" ],
     [ "UserCtx", "variables_8h.html#structUserCtx", "variables_8h_structUserCtx" ],

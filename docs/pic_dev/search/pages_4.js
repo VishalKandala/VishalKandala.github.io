@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['numerics_0',['Theory and Numerics',['../theory_and_numerics.html',1,'index']]]
+  ['getting_20started_0',['Getting Started',['../getting_started.html',1,'index']]],
+  ['guide_1',['guide',['../developer_guide.html',1,'Developer Guide'],['../user_guide.html',1,'User Guide']]]
 ];

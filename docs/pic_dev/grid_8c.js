@@ -20,5 +20,6 @@ var grid_8c =
     [ "ComputeStretchedCoord", "grid_8c.html#a54a2529affe522c9e29161aef1ca3847", null ],
     [ "ComputeLocalBoundingBox", "grid_8c.html#ae0c39bc7c78a15bedf9f1415ab1dded4", null ],
     [ "GatherAllBoundingBoxes", "grid_8c.html#afac52c252de784d5bcd7fe7a2e642982", null ],
-    [ "BroadcastAllBoundingBoxes", "grid_8c.html#a325b9d5da4b9b2c79d278fb848215632", null ]
+    [ "BroadcastAllBoundingBoxes", "grid_8c.html#a325b9d5da4b9b2c79d278fb848215632", null ],
+    [ "CalculateInletCenter", "grid_8c.html#a7a6ee72a401708711d1bfd039627b606", null ]
 ];

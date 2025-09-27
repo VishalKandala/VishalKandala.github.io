@@ -378,6 +378,7 @@ var variables_8h =
       [ "snespacker", "variables_8h.html#a2daea7c5d04c32762e3c41c7a79b7d54", null ]
     ] ],
     [ "PostProcessParams", "variables_8h.html#structPostProcessParams", [
+      [ "source_dir", "variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321", null ],
       [ "startTime", "variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c", null ],
       [ "endTime", "variables_8h.html#a76d29089d00d89348f32bbf0e2981497", null ],
       [ "timeStep", "variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497", null ],
@@ -391,7 +392,8 @@ var variables_8h =
       [ "particle_output_prefix", "variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582", null ],
       [ "particle_output_freq", "variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a", null ],
       [ "eulerianExt", "variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3", null ],
-      [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ]
+      [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ],
+      [ "reference", "variables_8h.html#a529f45c4ddf21ba85640423978d30ada", null ]
     ] ],
     [ "VTKFieldInfo", "variables_8h.html#structVTKFieldInfo", [
       [ "name", "variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e", null ],
@@ -410,6 +412,12 @@ var variables_8h =
       [ "connectivity", "variables_8h.html#a5517bbdee115f97374036e9d29b3b648", null ],
       [ "offsets", "variables_8h.html#a58031a9f370a4f28a35c5e48d65f5450", null ]
     ] ],
+    [ "ScalingCtx", "variables_8h.html#structScalingCtx", [
+      [ "L_ref", "variables_8h.html#a443db716c1f9b5d3046639bd63241a93", null ],
+      [ "U_ref", "variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92", null ],
+      [ "rho_ref", "variables_8h.html#ae416661ab9a82b299cd562940881d07d", null ],
+      [ "P_ref", "variables_8h.html#ade74d185e7611423c6126ec505309a47", null ]
+    ] ],
     [ "SimCtx", "variables_8h.html#structSimCtx", [
       [ "rank", "variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89", null ],
       [ "size", "variables_8h.html#ad09da84b8a2e17ea5eae96dcb66c38aa", null ],
@@ -425,6 +433,9 @@ var variables_8h =
       [ "OutputFreq", "variables_8h.html#aa002126f8760bb0f98614b78ac70e940", null ],
       [ "exec_mode", "variables_8h.html#ae27e734d789eb2f07918d6bae3969480", null ],
       [ "eulerianSource", "variables_8h.html#a22578f82210005268294944e4227473e", null ],
+      [ "restart_dir", "variables_8h.html#af09e3f546ff8fa1192338e746391aa22", null ],
+      [ "output_dir", "variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d", null ],
+      [ "log_dir", "variables_8h.html#a922566a9e001486fa838d96925a6f102", null ],
       [ "immersed", "variables_8h.html#aef90766eec6fc6887cd39bd1d79cb6d2", null ],
       [ "movefsi", "variables_8h.html#a090892cd5c5a867ca95c239ee24568be", null ],
       [ "rotatefsi", "variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9", null ],
@@ -481,16 +492,11 @@ var variables_8h =
       [ "NumberOfBodies", "variables_8h.html#a88c4b985c5df59d8fd0ac17910dbb85c", null ],
       [ "Flux_in", "variables_8h.html#aa8f85a4a159853045094b4a018ac36dd", null ],
       [ "angle", "variables_8h.html#a1c09604af49856ddc75bb32cd1b2a836", null ],
-      [ "L_dim", "variables_8h.html#ae7a42974df378d4117f9dd1cca3cf923", null ],
-      [ "St_exp", "variables_8h.html#a52b11d11c02783e2d8b4533758551ead", null ],
-      [ "wavelength", "variables_8h.html#a4a49c4058655daf2ad4aa24129d25e83", null ],
       [ "max_angle", "variables_8h.html#a3bd5fc05f2098708e4e8fb142161add3", null ],
       [ "CMx_c", "variables_8h.html#af76e1d38bb7cbd24474b58fa54fd7ad5", null ],
       [ "CMy_c", "variables_8h.html#a361610227b8cc6afe449d5faf982a347", null ],
       [ "CMz_c", "variables_8h.html#a97b91f798c877756e4a9aae26853bb2c", null ],
-      [ "regime", "variables_8h.html#ad8246eb8018ac4585b70e5cfe194ef8e", null ],
-      [ "radi", "variables_8h.html#a7e1de8951d5c84349bd6c0f4c15f85f3", null ],
-      [ "chact_leng", "variables_8h.html#acdbc2a7c7b946a79339474a8c05d8fdb", null ],
+      [ "scaling", "variables_8h.html#aa24a988353f69e0cf76b358d10fd374a", null ],
       [ "block_number", "variables_8h.html#a22580e0e52ca8ddccc76d24c96f00e4a", null ],
       [ "inletprofile", "variables_8h.html#a57b3c5733ac4acdef370e635e85df95f", null ],
       [ "grid1d", "variables_8h.html#a223f70881916d4d77f5f62b1faf4547f", null ],
@@ -514,6 +520,7 @@ var variables_8h =
       [ "FluxInSum", "variables_8h.html#a937a59194fd0b844bc61a175d8ae6a30", null ],
       [ "FluxOutSum", "variables_8h.html#a35819a5678c9c37c2f8b55c2091a9a05", null ],
       [ "Fluxsum", "variables_8h.html#ab6ee189c80a939393b9cfd780774966e", null ],
+      [ "AreaInSum", "variables_8h.html#aed540f6bcccf526419b3d5ec4ec6b82f", null ],
       [ "AreaOutSum", "variables_8h.html#aca7ff63d94b0fbd2d541734b7200b0e2", null ],
       [ "U_bc", "variables_8h.html#ac12eb831808e07c80a03e393a986f93f", null ],
       [ "ccc", "variables_8h.html#a64c0b8cda05b216ac96fc09da38c3c70", null ],
@@ -740,6 +747,7 @@ var variables_8h =
     [ "Node_List", "variables_8h.html#adaaacd4affdea8751e35bff19e7e5191", null ],
     [ "IBMListNode", "variables_8h.html#a4222faf080077cd7e5703d7bd83cf992", null ],
     [ "IBMList", "variables_8h.html#a48835bb3e95726270d15ae238f08a699", null ],
+    [ "ScalingCtx", "variables_8h.html#a9047d2cf27848731712703164586b3ca", null ],
     [ "ParticleLocationStatus", "variables_8h.html#a347829443e8a679209e21f7f04f51581", [
       [ "NEEDS_LOCATION", "variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a", null ],
       [ "ACTIVE_AND_LOCATED", "variables_8h.html#a347829443e8a679209e21f7f04f51581a97d609accacbcc1a41e4da5ac052f253", null ],
@@ -770,8 +778,8 @@ var variables_8h =
       [ "WALL", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faafca2faad41310c7e71ec303ef789c53a", null ],
       [ "MOVING_WALL", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa21ba3bc4a36398f4c11fba2c3db9e877", null ],
       [ "SYMMETRY", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e", null ],
-      [ "INLET", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa266d6a7abcd7483578364c547b428f3a", null ],
       [ "OUTLET", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18", null ],
+      [ "INLET", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa266d6a7abcd7483578364c547b428f3a", null ],
       [ "FARFIELD", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa994deb5e50b841824b257d6d2d108757", null ],
       [ "PERIODIC", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae4379d044711537d9ce3b3b58c575c58", null ],
       [ "CHARACTERISTIC_BC", "variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa9ee1404b18b6acf6db149de82f6d677d", null ],
@@ -790,7 +798,7 @@ var variables_8h =
       [ "BC_HANDLER_SYMMETRY_PLANE", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1ab3873aa611c29374b17b00cf17c3e59b", null ],
       [ "BC_HANDLER_INLET_PARABOLIC", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad", null ],
       [ "BC_HANDLER_INLET_CONSTANT_VELOCITY", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a25bcc12476da9fcbd880e7bd3149017d", null ],
-      [ "BC_HANDLER_INLET_PULSANTILE_FLUX", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a2283f432e972416db48600d533f23576", null ],
+      [ "BC_HANDLER_INLET_PULSATILE_FLUX", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a04dbd1b6611aa74b9492b548e2ca8db2", null ],
       [ "BC_HANDLER_INLET_DEVELOPED_PROFILE", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a562229d30c48165ba8864b067786f079", null ],
       [ "BC_HANDLER_INLET_INTERP_FROM_FILE", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1ab6bc110aae93c755fa1c0a8774e77594", null ],
       [ "BC_HANDLER_OUTLET_CONSERVATION", "variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a8efec6d0827e764925c321a471027e32", null ],

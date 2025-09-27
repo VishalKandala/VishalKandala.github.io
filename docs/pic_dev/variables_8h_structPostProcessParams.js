@@ -1,5 +1,6 @@
 var variables_8h_structPostProcessParams =
 [
+    [ "source_dir", "variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321", null ],
     [ "startTime", "variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c", null ],
     [ "endTime", "variables_8h.html#a76d29089d00d89348f32bbf0e2981497", null ],
     [ "timeStep", "variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497", null ],
@@ -13,5 +14,6 @@ var variables_8h_structPostProcessParams =
     [ "particle_output_prefix", "variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582", null ],
     [ "particle_output_freq", "variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a", null ],
     [ "eulerianExt", "variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3", null ],
-    [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ]
+    [ "particleExt", "variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0", null ],
+    [ "reference", "variables_8h.html#a529f45c4ddf21ba85640423978d30ada", null ]
 ];

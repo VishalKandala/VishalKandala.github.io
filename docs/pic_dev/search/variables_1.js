@@ -12,9 +12,10 @@ var searchData=
   ['angle_9',['angle',['../variables_8h.html#a1c09604af49856ddc75bb32cd1b2a836',1,'SimCtx']]],
   ['ao_10',['ao',['../variables_8h.html#aea94c48d31a4107860ddca95a404a81c',1,'UserCtx']]],
   ['apply_11',['Apply',['../structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c',1,'BoundaryCondition']]],
-  ['areaoutsum_12',['AreaOutSum',['../variables_8h.html#aca7ff63d94b0fbd2d541734b7200b0e2',1,'SimCtx']]],
-  ['assigneda_13',['assignedA',['../variables_8h.html#a41951f47cfbe9c08def29998a76dc791',1,'UserCtx']]],
-  ['atk_14',['atk',['../variables_8h.html#a78d9c3f94b95f552e7b97557d97c8925',1,'FSInfo']]],
-  ['atk_5fo_15',['atk_o',['../variables_8h.html#af82c226d2e3807e6b8f7e9aee68080ac',1,'FSInfo']]],
-  ['averaging_16',['averaging',['../variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7',1,'SimCtx']]]
+  ['areainsum_12',['AreaInSum',['../variables_8h.html#aed540f6bcccf526419b3d5ec4ec6b82f',1,'SimCtx']]],
+  ['areaoutsum_13',['AreaOutSum',['../variables_8h.html#aca7ff63d94b0fbd2d541734b7200b0e2',1,'SimCtx']]],
+  ['assigneda_14',['assignedA',['../variables_8h.html#a41951f47cfbe9c08def29998a76dc791',1,'UserCtx']]],
+  ['atk_15',['atk',['../variables_8h.html#a78d9c3f94b95f552e7b97557d97c8925',1,'FSInfo']]],
+  ['atk_5fo_16',['atk_o',['../variables_8h.html#af82c226d2e3807e6b8f7e9aee68080ac',1,'FSInfo']]],
+  ['averaging_17',['averaging',['../variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7',1,'SimCtx']]]
 ];

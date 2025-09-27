@@ -28,6 +28,20 @@ var NAVTREE =
     [ "PICurv Solver Documentation", "index.html", "index" ],
     [ "03_theory", "md_pages_203__theory.html", null ],
     [ "04_developer_guide", "md_pages_204__developer__guide.html", null ],
+    [ "Non-Dimensionalization Strategy in PIC-Flow", "md_pages_2non__dimensioanlization.html", [
+      [ "1. Overview", "md_pages_2non__dimensioanlization.html#autotoc_md8", null ],
+      [ "2. Characteristic Scales", "md_pages_2non__dimensioanlization.html#autotoc_md9", null ],
+      [ "3. The Non-Dimensionalization Process", "md_pages_2non__dimensioanlization.html#autotoc_md10", [
+        [ "3.1. Primary Simulation Parameters", "md_pages_2non__dimensioanlization.html#autotoc_md11", null ],
+        [ "3.2. Field and Coordinate Scaling", "md_pages_2non__dimensioanlization.html#autotoc_md12", null ],
+        [ "3.3. Grid Metrics (Internal Conversion)", "md_pages_2non__dimensioanlization.html#autotoc_md13", null ]
+      ] ],
+      [ "4. Implementation in the Code", "md_pages_2non__dimensioanlization.html#autotoc_md14", [
+        [ "<tt>pic-flow</tt> Conductor Script", "md_pages_2non__dimensioanlization.html#autotoc_md15", null ],
+        [ "C Solver (<tt>picsolver</tt>)", "md_pages_2non__dimensioanlization.html#autotoc_md16", null ],
+        [ "C Post-Processor (<tt>postprocessor</tt>)", "md_pages_2non__dimensioanlization.html#autotoc_md17", null ]
+      ] ]
+    ] ],
     [ "Topics", "topics.html", "topics" ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -55,12 +69,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AnalyticalSolution_8h.html",
-"globals_eval.html",
-"logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff",
-"simulation_8c.html#a7bc2bae7b01f179706b367c8637534c2",
-"variables_8h.html#a445822c9f8dc96cdedb865f361d60d13",
-"variables_8h.html#a97b91f798c877756e4a9aae26853bb2c",
-"variables_8h.html#af6cfdc97d987e8d90883d58a2792f17f"
+"globals_func.html",
+"logging_8c.html#a4d4a385a6fac09d0e106eeb2dfde18ba",
+"setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9",
+"variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904",
+"variables_8h.html#a908b1d341a44cb49aed881b89ccf899d",
+"variables_8h.html#aef90766eec6fc6887cd39bd1d79cb6d2"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

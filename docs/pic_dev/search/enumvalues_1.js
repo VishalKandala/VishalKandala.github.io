@@ -12,7 +12,7 @@ var searchData=
   ['bc_5fhandler_5finlet_5fdeveloped_5fprofile_9',['BC_HANDLER_INLET_DEVELOPED_PROFILE',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a562229d30c48165ba8864b067786f079',1,'variables.h']]],
   ['bc_5fhandler_5finlet_5finterp_5ffrom_5ffile_10',['BC_HANDLER_INLET_INTERP_FROM_FILE',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1ab6bc110aae93c755fa1c0a8774e77594',1,'variables.h']]],
   ['bc_5fhandler_5finlet_5fparabolic_11',['BC_HANDLER_INLET_PARABOLIC',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad',1,'variables.h']]],
-  ['bc_5fhandler_5finlet_5fpulsantile_5fflux_12',['BC_HANDLER_INLET_PULSANTILE_FLUX',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a2283f432e972416db48600d533f23576',1,'variables.h']]],
+  ['bc_5fhandler_5finlet_5fpulsatile_5fflux_12',['BC_HANDLER_INLET_PULSATILE_FLUX',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a04dbd1b6611aa74b9492b548e2ca8db2',1,'variables.h']]],
   ['bc_5fhandler_5finterface_5foverset_13',['BC_HANDLER_INTERFACE_OVERSET',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a48e8ab3e61445049929bc2664450e3b7',1,'variables.h']]],
   ['bc_5fhandler_5fnograd_5fcopy_5fghost_14',['BC_HANDLER_NOGRAD_COPY_GHOST',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a8187c46957c3b674d07ff4ab92c53f6c',1,'variables.h']]],
   ['bc_5fhandler_5foutlet_5fconservation_15',['BC_HANDLER_OUTLET_CONSERVATION',['../variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a8efec6d0827e764925c321a471027e32',1,'variables.h']]],
