@@ -18,5 +18,6 @@ var setup_8h =
     [ "SetupDomainRankInfo", "setup_8h.html#a1c08bf327e1aee897c56610a89f75814", null ],
     [ "Contra2Cart", "setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa", null ],
     [ "SetupDomainCellDecompositionMap", "setup_8h.html#aeb77337317f41972d1c75c8d80527892", null ],
-    [ "BinarySearchInt64", "setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36", null ]
+    [ "BinarySearchInt64", "setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36", null ],
+    [ "ComputeDivergence", "setup_8h.html#abab14dc7f20644674b043609950eefe2", null ]
 ];

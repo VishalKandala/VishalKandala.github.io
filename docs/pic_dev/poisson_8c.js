@@ -1,6 +1,8 @@
 var poisson_8c =
 [
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "GridInterpolation", "poisson_8c.html#a846185bb780db2d5f6e9e58c09a08819", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "CP", "poisson_8c.html#a6594e57d1fff186da0a254a3742dcff7", null ],
     [ "EP", "poisson_8c.html#adb5bf6fbe6405b09bad71e89e1da5850", null ],
     [ "WP", "poisson_8c.html#a2c73b81722187c48d6186148091162fb", null ],
@@ -23,8 +25,9 @@ var poisson_8c =
     [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
-    [ "Calculate_Covariant_metrics", "poisson_8c.html#a932a672b919024b4d158a3b3ba569ac5", null ],
-    [ "Calculate_normal", "poisson_8c.html#aa52d855d542bca0968fd51febf43adc0", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "GhostNodeVelocity", "poisson_8c.html#a6046e36e2334fa29a86d652a0b8f0593", null ],
     [ "Gidx", "poisson_8c.html#a3d538200fed5b9ee9d1ef391bb61036c", null ],
     [ "GridRestriction", "poisson_8c.html#afe58ccf2bd0a359903645f7a0ee76485", null ],

@@ -19,8 +19,6 @@ var logging_8h =
     [ "LOG_LOOP_ALLOW_EXACT", "logging_8h.html#aa987297fa072943c2409f3b2cc4e31f9", null ],
     [ "LOG_ARRAY_ELEMENT_ALLOW", "logging_8h.html#a03cd462936d033329883a69fea41c04e", null ],
     [ "LOG_ARRAY_SUBRANGE_ALLOW", "logging_8h.html#af14fcfe1241ba081134b8bdc28ecd6da", null ],
-    [ "LOG_FUNC_TIMER_BEGIN_EVENT", "logging_8h.html#a708710f957e5e79050260f913282f8dc", null ],
-    [ "LOG_FUNC_TIMER_END_EVENT", "logging_8h.html#a5c922c07e2aff193a0c312e373a0ec31", null ],
     [ "LOG_PROFILE_MSG", "logging_8h.html#aaad86d380405d27c87c9b8e265624288", null ],
     [ "PROFILE_FUNCTION_BEGIN", "logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e", null ],
     [ "PROFILE_FUNCTION_END", "logging_8h.html#a5fe7257f46131945aacf9a35e9de5874", null ],
@@ -51,12 +49,9 @@ var logging_8h =
     [ "ParticleLocationStatusToString", "logging_8h.html#aa7faf5df9854e921411f9768319237e9", null ],
     [ "PrintProgressBar", "logging_8h.html#a7d73ab7b1517a3c8256b2447f88b633e", null ],
     [ "ProfilingInitialize", "logging_8h.html#ac4f5428199f6cd908056ad3e0ead934f", null ],
+    [ "ProfilingResetTimestepCounters", "logging_8h.html#ad604697bba9914a5ece7bfcd42737657", null ],
     [ "ProfilingLogTimestepSummary", "logging_8h.html#af2d563ccb13b1830a29ad7d13647eecc", null ],
-    [ "ProfilingFinalize", "logging_8h.html#abe645d0859ed58975cd877bb3e56762c", null ],
+    [ "ProfilingFinalize", "logging_8h.html#a626ae56f8d677ce7fb2234056b47cc0a", null ],
     [ "_ProfilingStart", "logging_8h.html#af85d22d104cdcdeb5014361278b25fdb", null ],
-    [ "_ProfilingEnd", "logging_8h.html#a9c70e2531bc267a24b49832bd6683181", null ],
-    [ "EVENT_Individualwalkingsearch", "logging_8h.html#ae0b1fb7fddebe4ae6c920ef8abda967d", null ],
-    [ "EVENT_walkingsearch", "logging_8h.html#a047337b712fc7dd1f728376b0fb92863", null ],
-    [ "EVENT_GlobalParticleLocation", "logging_8h.html#ae09799da14fb2c60e09b1451fc30eb82", null ],
-    [ "EVENT_IndividualLocation", "logging_8h.html#a665f66d88010af3842e75cc7f1a00b94", null ]
+    [ "_ProfilingEnd", "logging_8h.html#a9c70e2531bc267a24b49832bd6683181", null ]
 ];

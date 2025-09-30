@@ -1,5 +1,21 @@
 var setup_8c =
 [
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
+    [ "__FUNCT__", "setup_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5", null ],
     [ "CreateSimulationContext", "setup_8c.html#a977df65dac293c1308451334cb198693", null ],
     [ "AllocateContextHierarchy", "setup_8c.html#acf739211501f0646c25ceb99a68a1163", null ],
     [ "SetupSolverParameters", "setup_8c.html#a3766d23bad255474ff61d06fbb6f63f7", null ],
@@ -20,5 +36,5 @@ var setup_8c =
     [ "SetupDomainCellDecompositionMap", "setup_8c.html#aeb77337317f41972d1c75c8d80527892", null ],
     [ "BinarySearchInt64", "setup_8c.html#acd8d87dc85f19ba3e32811a623bf5b36", null ],
     [ "Gidx", "setup_8c.html#a3d538200fed5b9ee9d1ef391bb61036c", null ],
-    [ "Divergence", "setup_8c.html#accdc3f1a3e5c7e95c6bdde11cde3b236", null ]
+    [ "ComputeDivergence", "setup_8c.html#abab14dc7f20644674b043609950eefe2", null ]
 ];

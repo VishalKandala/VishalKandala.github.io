@@ -13,6 +13,5 @@ var ParticleSwarm_8h =
     [ "UpdateSwarmFields", "ParticleSwarm_8h.html#ac52b9e4afa9d1f2ba3bf59dc45b610d1", null ],
     [ "IsParticleInsideBoundingBox", "ParticleSwarm_8h.html#a412856be59df7252e66bcbdd13cf1718", null ],
     [ "UpdateParticleWeights", "ParticleSwarm_8h.html#a0001e483238e2b600cb9aa23a6e5338c", null ],
-    [ "PrepareLoadedSwarmForRelocation", "ParticleSwarm_8h.html#a5488e87ab4fa163467b3db9ce10233a5", null ],
     [ "InitializeParticleSwarm", "ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57", null ]
 ];
