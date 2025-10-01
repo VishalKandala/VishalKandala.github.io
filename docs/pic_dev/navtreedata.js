@@ -25,57 +25,15 @@
 var NAVTREE =
 [
   [ "PICurv", "index.html", [
-    [ "PICurv Solver Documentation", "index.html", "index" ],
-    [ "03_theory", "md_pages_203__theory.html", null ],
-    [ "04_developer_guide", "md_pages_204__developer__guide.html", null ],
-    [ "Non-Dimensionalization Strategy in PIC-Flow", "md_pages_2non__dimensioanlization.html", [
-      [ "1. Overview", "md_pages_2non__dimensioanlization.html#autotoc_md8", null ],
-      [ "2. Characteristic Scales", "md_pages_2non__dimensioanlization.html#autotoc_md9", null ],
-      [ "3. The Non-Dimensionalization Process", "md_pages_2non__dimensioanlization.html#autotoc_md10", [
-        [ "3.1. Primary Simulation Parameters", "md_pages_2non__dimensioanlization.html#autotoc_md11", null ],
-        [ "3.2. Field and Coordinate Scaling", "md_pages_2non__dimensioanlization.html#autotoc_md12", null ],
-        [ "3.3. Grid Metrics (Internal Conversion)", "md_pages_2non__dimensioanlization.html#autotoc_md13", null ]
-      ] ],
-      [ "4. Implementation in the Code", "md_pages_2non__dimensioanlization.html#autotoc_md14", [
-        [ "<tt>pic-flow</tt> Conductor Script", "md_pages_2non__dimensioanlization.html#autotoc_md15", null ],
-        [ "C Solver (<tt>picsolver</tt>)", "md_pages_2non__dimensioanlization.html#autotoc_md16", null ],
-        [ "C Post-Processor (<tt>postprocessor</tt>)", "md_pages_2non__dimensioanlization.html#autotoc_md17", null ]
-      ] ]
-    ] ],
-    [ "Topics", "topics.html", "topics" ],
-    [ "Data Structures", "annotated.html", [
-      [ "Data Structures", "annotated.html", "annotated_dup" ],
-      [ "Data Structure Index", "classes.html", null ],
-      [ "Data Fields", "functions.html", [
-        [ "All", "functions.html", "functions_dup" ],
-        [ "Variables", "functions_vars.html", "functions_vars" ]
-      ] ]
-    ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ],
-      [ "Globals", "globals.html", [
-        [ "All", "globals.html", "globals_dup" ],
-        [ "Functions", "globals_func.html", "globals_func" ],
-        [ "Variables", "globals_vars.html", null ],
-        [ "Typedefs", "globals_type.html", null ],
-        [ "Enumerations", "globals_enum.html", null ],
-        [ "Enumerator", "globals_eval.html", null ],
-        [ "Macros", "globals_defs.html", "globals_defs" ]
-      ] ]
-    ] ]
+    [ "Changelog", "md_CHANGELOG.html", null ],
+    [ "File List", "files.html", null ],
+    [ "Data Structures", "annotated.html", null ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"AnalyticalSolution_8h.html",
-"functions_vars_d.html",
-"io_8c.html#a048b921bc98a7354369a176193c2bd62",
-"poisson_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5",
-"variables_8h.html#a1028f6ccb6a46dc2bae2def199996ade",
-"variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7",
-"variables_8h.html#ac12eb831808e07c80a03e393a986f93f",
-"walkingsearch_8c.html#a9aedf40cb1545b554e113ebb0863859d"
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
