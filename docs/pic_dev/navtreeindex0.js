@@ -1,5 +1,15 @@
 var NAVTREEINDEX0 =
 {
+"01_Installation.html":[2],
+"01_Installation.html#advanced_build_sec":[2,3,0],
+"01_Installation.html#build_sec":[2,3],
+"01_Installation.html#get_code_sec":[2,2],
+"01_Installation.html#install_petsc_sec":[2,1,1],
+"01_Installation.html#install_sec":[2,1],
+"01_Installation.html#install_tools_sec":[2,1,0],
+"01_Installation.html#next_steps_sec":[2,4],
+"01_Installation.html#prereqs_sec":[2,0],
+"01_Installation.html#verify_petsc_sec":[2,1,2],
 "index.html":[],
 "index.html":[0],
 "index.html#autotoc_md2":[0,1],
@@ -7,7 +17,6 @@ var NAVTREEINDEX0 =
 "index.html#get_started_main":[0,2],
 "index.html#intro_sec":[0,0],
 "index.html#methodology_sec":[0,3],
-"index.html#nav_links":[0,5],
 "md_CHANGELOG.html":[1],
 "pages.html":[]
 };

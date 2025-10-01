@@ -27,6 +27,19 @@ var NAVTREE =
   [ "PICurv", "index.html", [
     [ "PICurv Solver Documentation", "index.html", "index" ],
     [ "Changelog", "md_CHANGELOG.html", null ],
+    [ "Installation Guide", "01_Installation.html", [
+      [ "1. Prerequisites", "01_Installation.html#prereqs_sec", null ],
+      [ "2. Installing Dependencies", "01_Installation.html#install_sec", [
+        [ "2.1. Installing Build Tools, MPI, and Python", "01_Installation.html#install_tools_sec", null ],
+        [ "2.2. Installing PETSc", "01_Installation.html#install_petsc_sec", null ],
+        [ "2.3. Setting PETSc Environment Variables", "01_Installation.html#verify_petsc_sec", null ]
+      ] ],
+      [ "3. Getting the PICurv Code", "01_Installation.html#get_code_sec", null ],
+      [ "4. Compiling PICurv", "01_Installation.html#build_sec", [
+        [ "4.1. Advanced Build Options", "01_Installation.html#advanced_build_sec", null ]
+      ] ],
+      [ "5. Next Steps", "01_Installation.html#next_steps_sec", null ]
+    ] ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]
   ] ]
@@ -34,7 +47,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"index.html"
+"01_Installation.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
