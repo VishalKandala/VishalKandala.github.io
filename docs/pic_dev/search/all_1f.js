@@ -13,6 +13,10 @@ var searchData=
   ['ym_5fcell_10',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
   ['ymax_11',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
   ['ymin_12',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
-  ['your_20path_3a_13',['To Begin, Choose Your Path:',['../index.html#get_started_main',1,'']]],
-  ['ys_5fcell_14',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
+  ['your_20first_20simulation_20flat_20channel_13',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
+  ['your_20output_20files_14',['1. Understanding Your Output Files',['../04_Visualization_Tutorial.html#files_sec',1,'']]],
+  ['your_20path_3a_15',['To Begin, Choose Your Path:',['../index.html#get_started_main',1,'']]],
+  ['your_20results_16',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['your_20work_17',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],
+  ['ys_5fcell_18',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['e_5fcoeff_0',['e_coeff',['../wallfunction_8c.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c'],['../wallfunction_8h.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c']]],
+  ['e_5fcoeff_0',['e_coeff',['../wallfunction_8h.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c'],['../wallfunction_8c.html#a5a5ea51c16915866975995631c0d2923',1,'E_coeff(double utau, double ks, double nu):&#160;wallfunction.c']]],
   ['eel_1',['eel',['../variables_8h.html#a912b5bb58c3db258fa468d66ead8d6fd',1,'SimCtx']]],
   ['elmtinfo_2',['elmtinfo',['../variables_8h.html#a4d5e8775b899743430a99dbc2a4f6bfc',1,'FSInfo']]],
   ['endtime_3',['endTime',['../variables_8h.html#a76d29089d00d89348f32bbf0e2981497',1,'PostProcessParams']]],
@@ -13,10 +13,11 @@ var searchData=
   ['euleriandataprocessingpipeline_10',['euleriandataprocessingpipeline',['../postprocessor_8h.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c'],['../postprocessor_8c.html#a059ce04ba04e66a5f1ef982fdf375e80',1,'EulerianDataProcessingPipeline(UserCtx *user, PostProcessParams *pps):&#160;postprocessor.c']]],
   ['eulerianext_11',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
   ['euleriansource_12',['eulerianSource',['../variables_8h.html#a22578f82210005268294944e4227473e',1,'SimCtx']]],
-  ['evaluateparticleposition_13',['evaluateparticleposition',['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
-  ['exec_5fmode_14',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
-  ['exec_5fmode_5fpostprocessor_15',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
-  ['exec_5fmode_5fsolver_16',['EXEC_MODE_SOLVER',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda50cbc3562b55317ccd65fed2bd226742',1,'variables.h']]],
-  ['exec_5fmode_5funknown_17',['EXEC_MODE_UNKNOWN',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda10cefdb12245bf1e59e2ae72e2178976',1,'variables.h']]],
-  ['executionmode_18',['ExecutionMode',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fd',1,'variables.h']]]
+  ['evaluateparticleposition_13',['evaluateparticleposition',['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
+  ['examining_20the_20output_14',['4. Examining the Output',['../02_Tutorial_Programmatic_Grid.html#results_sec',1,'']]],
+  ['exec_5fmode_15',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
+  ['exec_5fmode_5fpostprocessor_16',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
+  ['exec_5fmode_5fsolver_17',['EXEC_MODE_SOLVER',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda50cbc3562b55317ccd65fed2bd226742',1,'variables.h']]],
+  ['exec_5fmode_5funknown_18',['EXEC_MODE_UNKNOWN',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fda10cefdb12245bf1e59e2ae72e2178976',1,'variables.h']]],
+  ['executionmode_19',['ExecutionMode',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fd',1,'variables.h']]]
 ];
