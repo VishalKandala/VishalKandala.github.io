@@ -11,7 +11,7 @@ var searchData=
   ['wallfunction_2eh_8',['wallfunction.h',['../wallfunction_8h.html',1,'']]],
   ['way_20coupling_20mechanism_9',['3. The Two-Way Coupling Mechanism',['../index.html#autotoc_md7',1,'']]],
   ['weights_10',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
-  ['what_20you_20can_20do_11',['Capabilities Summary: What You Can Do',['../10_Capabilities_Summary.html',1,'']]],
+  ['what_20you_20can_20do_11',['Capabilities Summary: What You Can Do',['../12_Capabilities_Summary.html',1,'']]],
   ['while_200_12',['} while (0)',['../logging_8h.html#autotoc_md0',1,'']]],
   ['wing_13',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]],
   ['work_14',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],

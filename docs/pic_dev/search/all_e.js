@@ -13,7 +13,7 @@ var searchData=
   ['general_20usage_10',['1. General Usage',['../05_The_Conductor_Script.html#usage_sec',1,'']]],
   ['generate_5fgrid_11',['generate_grid',['../variables_8h.html#a98a90e3a55a0a0da6e392f44ebf50dad',1,'SimCtx']]],
   ['generateandsetcoordinates_12',['GenerateAndSetCoordinates',['../grid_8c.html#ac44553fe1434663c5211cc6ac32ef004',1,'grid.c']]],
-  ['get_20detailed_20debug_20output_20from_20a_20specific_20part_20of_20the_20code_13',['3.3. How do I get detailed debug output from a specific part of the code?',['../10_User_How_To_Guides.html#ht_debug_ssec',1,'']]],
+  ['get_20detailed_20debug_20output_20from_20a_20specific_20part_20of_20the_20code_13',['3.3. How do I get detailed debug output from a specific part of the code?',['../11_User_How_To_Guides.html#ht_debug_ssec',1,'']]],
   ['get_5flog_5flevel_14',['get_log_level',['../logging_8h.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c'],['../logging_8c.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c']]],
   ['getbcparamreal_15',['getbcparamreal',['../io_8h.html#a1ac7631f5ff3a878c3f5788d6880c22c',1,'GetBCParamReal(BC_Param *params, const char *key, PetscReal *value_out, PetscBool *found):&#160;io.c'],['../io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c',1,'GetBCParamReal(BC_Param *params, const char *key, PetscReal *value_out, PetscBool *found):&#160;io.c']]],
   ['getcellcharacteristicsize_16',['getcellcharacteristicsize',['../walkingsearch_8h.html#a2ed7a27dd4de3fbd6bb46684482ce165',1,'GetCellCharacteristicSize(const Cell *cell, PetscReal *cellSize):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a2ed7a27dd4de3fbd6bb46684482ce165',1,'GetCellCharacteristicSize(const Cell *cell, PetscReal *cellSize):&#160;walkingsearch.c']]],
@@ -32,11 +32,11 @@ var searchData=
   ['glyphs_29',['3.3. Recipe: Showing Velocity Vectors (Glyphs)',['../04_Visualization_Tutorial.html#recipe_vectors_sec',1,'']]],
   ['gnumallowed_30',['gNumAllowed',['../logging_8c.html#a798a72f08a971879fe7d9f55985d4b07',1,'logging.c']]],
   ['grid_31',['1. The Eulerian Phase (The Grid)',['../index.html#autotoc_md5',1,'']]],
-  ['grid_20and_20domain_20features_32',['1. Grid and Domain Features',['../10_Capabilities_Summary.html#grid_cap_sec',1,'']]],
+  ['grid_20and_20domain_20features_32',['1. Grid and Domain Features',['../12_Capabilities_Summary.html#grid_cap_sec',1,'']]],
   ['grid_20artifacts_33',['Included Grid Artifacts',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md14',1,'']]],
   ['grid_20bent_20channel_34',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
   ['grid_20data_20tt_20vts_20tt_20files_35',['3. Recipes for Visualizing Grid Data (&lt;tt&gt;.vts&lt;/tt&gt; files)',['../04_Visualization_Tutorial.html#eulerian_recipes_sec',1,'']]],
-  ['grid_20resolution_36',['1.3. How do I change the grid resolution?',['../10_User_How_To_Guides.html#ht_resolution_ssec',1,'']]],
+  ['grid_20resolution_36',['1.3. How do I change the grid resolution?',['../11_User_How_To_Guides.html#ht_resolution_ssec',1,'']]],
   ['grid_20scattering_37',['Particle-to-Grid Scattering',['../group__scatter__module.html',1,'']]],
   ['grid_20tt_20mode_3a_20file_20tt_38',['3.2. File-Based Grid (&lt;tt&gt;mode: file&lt;/tt&gt;)',['../07_Case_Reference.html#file_ssec',1,'']]],
   ['grid_20tt_20mode_3a_20programmatic_5fc_20tt_39',['3.1. Programmatic Grid (&lt;tt&gt;mode: programmatic_c&lt;/tt&gt;)',['../07_Case_Reference.html#programmatic_ssec',1,'']]],
@@ -53,5 +53,5 @@ var searchData=
   ['guessparticleownerwithbbox_50',['GuessParticleOwnerWithBBox',['../ParticleMotion_8c.html#a1050c4075c2fb507d4579008921dd7b6',1,'ParticleMotion.c']]],
   ['guide_51',['Installation Guide',['../01_Installation.html',1,'']]],
   ['guide_20to_20visualizing_20your_20results_52',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
-  ['guides_53',['User How-To Guides',['../10_User_How_To_Guides.html',1,'']]]
+  ['guides_53',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]]
 ];

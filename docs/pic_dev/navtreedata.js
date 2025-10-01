@@ -110,45 +110,52 @@ var NAVTREE =
       ] ],
       [ "3. The <tt>profiling</tt> Section", "09_Monitor_Reference.html#profiling_sec", null ]
     ] ],
-    [ "Configuration Reference: Post-Processing Recipes (<tt>post.yml</tt>)", "09_Post_Processing_Reference.html", [
-      [ "1. Structure of a <tt>post.yml</tt> File", "09_Post_Processing_Reference.html#structure_sec", null ],
-      [ "3. The <tt>source_data</tt> Section", "09_Post_Processing_Reference.html#source_data_sec", null ],
-      [ "4. The <tt>eulerian_pipeline</tt> Section", "09_Post_Processing_Reference.html#eulerian_pipeline_sec", [
-        [ "4.1. Available Eulerian Kernels", "09_Post_Processing_Reference.html#eulerian_kernels_ssec", null ]
+    [ "Configuration Reference: Post-Processing Recipes (<tt>post.yml</tt>)", "10_Post_Processing_Reference.html", [
+      [ "1. Structure of a <tt>post.yml</tt> File", "10_Post_Processing_Reference.html#structure_sec", null ],
+      [ "3. The <tt>source_data</tt> Section", "10_Post_Processing_Reference.html#source_data_sec", null ],
+      [ "4. The <tt>eulerian_pipeline</tt> Section", "10_Post_Processing_Reference.html#eulerian_pipeline_sec", [
+        [ "4.1. Available Eulerian Kernels", "10_Post_Processing_Reference.html#eulerian_kernels_ssec", null ]
       ] ],
-      [ "5. The <tt>lagrangian_pipeline</tt> Section", "09_Post_Processing_Reference.html#lagrangian_pipeline_sec", [
-        [ "5.1. Available Lagrangian Kernels", "09_Post_Processing_Reference.html#lagrangian_kernels_ssec", null ]
+      [ "5. The <tt>lagrangian_pipeline</tt> Section", "10_Post_Processing_Reference.html#lagrangian_pipeline_sec", [
+        [ "5.1. Available Lagrangian Kernels", "10_Post_Processing_Reference.html#lagrangian_kernels_ssec", null ]
       ] ],
-      [ "6. The <tt>io</tt> Section", "09_Post_Processing_Reference.html#io_post_sec", null ]
+      [ "6. The <tt>io</tt> Section", "10_Post_Processing_Reference.html#io_post_sec", null ]
     ] ],
-    [ "User How-To Guides", "10_User_How_To_Guides.html", [
-      [ "1. Simulation Setup", "10_User_How_To_Guides.html#setup_guides_sec", [
-        [ "1.1. How do I change the Reynolds number?", "10_User_How_To_Guides.html#ht_reynolds_ssec", null ],
-        [ "1.2. How do I set up a 2D simulation?", "10_User_How_To_Guides.html#ht_2d_ssec", null ],
-        [ "1.3. How do I change the grid resolution?", "10_User_How_To_Guides.html#ht_resolution_ssec", null ],
-        [ "1.4. How do I change the simulation time and output frequency?", "10_User_How_To_Guides.html#ht_time_ssec", null ]
+    [ "User How-To Guides", "11_User_How_To_Guides.html", [
+      [ "1. Simulation Setup", "11_User_How_To_Guides.html#setup_guides_sec", [
+        [ "1.1. How do I change the Reynolds number?", "11_User_How_To_Guides.html#ht_reynolds_ssec", null ],
+        [ "1.2. How do I set up a 2D simulation?", "11_User_How_To_Guides.html#ht_2d_ssec", null ],
+        [ "1.3. How do I change the grid resolution?", "11_User_How_To_Guides.html#ht_resolution_ssec", null ],
+        [ "1.4. How do I change the simulation time and output frequency?", "11_User_How_To_Guides.html#ht_time_ssec", null ]
       ] ],
-      [ "2. Boundary Conditions", "10_User_How_To_Guides.html#bc_guides_sec", [
-        [ "2.1. How do I set up a simple boundary condition?", "10_User_How_To_Guides.html#ht_bc_ssec", null ],
-        [ "2.2. How do I set up a periodic domain?", "10_User_How_To_Guides.html#ht_periodic_ssec", null ]
+      [ "2. Boundary Conditions", "11_User_How_To_Guides.html#bc_guides_sec", [
+        [ "2.1. How do I set up a simple boundary condition?", "11_User_How_To_Guides.html#ht_bc_ssec", null ],
+        [ "2.2. How do I set up a periodic domain?", "11_User_How_To_Guides.html#ht_periodic_ssec", null ]
       ] ],
-      [ "3. Running & Monitoring", "10_User_How_To_Guides.html#run_guides_sec", [
-        [ "3.1. How do I run in parallel and specify the processor layout?", "10_User_How_To_Guides.html#ht_parallel_ssec", null ],
-        [ "3.2. How do I restart a simulation?", "10_User_How_To_Guides.html#ht_restart_ssec", null ],
-        [ "3.3. How do I get detailed debug output from a specific part of the code?", "10_User_How_To_Guides.html#ht_debug_ssec", null ]
+      [ "3. Running & Monitoring", "11_User_How_To_Guides.html#run_guides_sec", [
+        [ "3.1. How do I run in parallel and specify the processor layout?", "11_User_How_To_Guides.html#ht_parallel_ssec", null ],
+        [ "3.2. How do I restart a simulation?", "11_User_How_To_Guides.html#ht_restart_ssec", null ],
+        [ "3.3. How do I get detailed debug output from a specific part of the code?", "11_User_How_To_Guides.html#ht_debug_ssec", null ]
       ] ],
-      [ "4. Post-Processing", "10_User_How_To_Guides.html#pp_guides_sec", [
-        [ "4.1. How do I run post-processing on a finished simulation?", "10_User_How_To_Guides.html#ht_pp_ssec", null ],
-        [ "4.2. How do I calculate a new field like Q-Criterion?", "10_User_How_To_Guides.html#ht_newfield_ssec", null ]
+      [ "4. Post-Processing", "11_User_How_To_Guides.html#pp_guides_sec", [
+        [ "4.1. How do I run post-processing on a finished simulation?", "11_User_How_To_Guides.html#ht_pp_ssec", null ],
+        [ "4.2. How do I calculate a new field like Q-Criterion?", "11_User_How_To_Guides.html#ht_newfield_ssec", null ]
       ] ]
     ] ],
-    [ "12_Capabilities_Summary", "md_pages_212__Capabilities__Summary.html", null ],
-    [ "Capabilities Summary: What You Can Do", "10_Capabilities_Summary.html", [
-      [ "1. Grid and Domain Features", "10_Capabilities_Summary.html#grid_cap_sec", null ],
-      [ "2. Physics & Flow Models", "10_Capabilities_Summary.html#physics_cap_sec", null ],
-      [ "3. Numerical Scheme Control", "10_Capabilities_Summary.html#numerics_cap_sec", null ],
-      [ "4. Boundary Conditions", "10_Capabilities_Summary.html#bc_cap_sec", null ],
-      [ "5. Post-Processing Capabilities", "10_Capabilities_Summary.html#pp_cap_sec", null ]
+    [ "Capabilities Summary: What You Can Do", "12_Capabilities_Summary.html", [
+      [ "1. Grid and Domain Features", "12_Capabilities_Summary.html#grid_cap_sec", null ],
+      [ "2. Physics & Flow Models", "12_Capabilities_Summary.html#physics_cap_sec", null ],
+      [ "3. Numerical Scheme Control", "12_Capabilities_Summary.html#numerics_cap_sec", null ],
+      [ "4. Boundary Conditions", "12_Capabilities_Summary.html#bc_cap_sec", null ],
+      [ "5. Post-Processing Capabilities", "12_Capabilities_Summary.html#pp_cap_sec", null ]
+    ] ],
+    [ "Code Architecture", "13_Code_Architecture.html", [
+      [ "1. Program Flow: The Five Stages of <tt>main()</tt>", "13_Code_Architecture.html#flow_sec", null ],
+      [ "2. Core Data Structures", "13_Code_Architecture.html#data_structs_sec", [
+        [ "2.1. The Simulation Context (<tt>SimCtx</tt>)", "13_Code_Architecture.html#simctx_ssec", null ],
+        [ "2.2. The User Context (<tt>UserCtx</tt>)", "13_Code_Architecture.html#userctx_ssec", null ]
+      ] ],
+      [ "3. Code Modules Overview", "13_Code_Architecture.html#modules_sec", null ]
     ] ],
     [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
       [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md12", null ],
