@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['using_20a_20file_20based_20grid_20bent_20channel_0',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]]
+  ['of_20a_20simulation_3a_20cases_20solvers_20and_20monitors_0',['Anatomy of a Simulation: Cases, Solvers, and Monitors',['../06_Simulation_Anatomy.html',1,'']]]
 ];

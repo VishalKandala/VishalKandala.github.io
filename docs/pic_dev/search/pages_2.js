@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['changelog_0',['Changelog',['../md_CHANGELOG.html',1,'']]],
-  ['channel_1',['channel',['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)'],['../02_Tutorial_Programmatic_Grid.html',1,'Tutorial: Your First Simulation (Flat Channel)']]],
-  ['conductor_20script_3a_20tt_20pic_20flow_20tt_2',['The Conductor Script: &lt;tt&gt;pic-flow&lt;/tt&gt;',['../05_The_Conductor_Script.html',1,'']]]
+  ['based_20grid_20bent_20channel_0',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['bent_20channel_1',['bent channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'Case Template: Laminar Flow in a Bent Channel'],['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)']]]
 ];

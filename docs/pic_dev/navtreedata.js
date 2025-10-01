@@ -70,6 +70,114 @@ var NAVTREE =
       [ "3. The <tt>build</tt> Command", "05_The_Conductor_Script.html#build_command_sec", null ],
       [ "4. The <tt>run</tt> Command", "05_The_Conductor_Script.html#run_command_sec", null ]
     ] ],
+    [ "Anatomy of a Simulation: Cases, Solvers, and Monitors", "06_Simulation_Anatomy.html", [
+      [ "1. The Three Roles of Configuration Files", "06_Simulation_Anatomy.html#roles_sec", null ],
+      [ "2. The Mix-and-Match Workflow", "06_Simulation_Anatomy.html#workflow_sec", null ],
+      [ "3. The <tt>config/</tt> Library", "06_Simulation_Anatomy.html#library_sec", [
+        [ "3.1. Best Practices", "06_Simulation_Anatomy.html#best_practices_ssec", null ]
+      ] ]
+    ] ],
+    [ "Configuration Reference: The <tt>case.yml</tt> File", "07_Case_Reference.html", [
+      [ "1. The <tt>properties</tt> Section", "07_Case_Reference.html#properties_sec", [
+        [ "1.1. <tt>scaling</tt>", "07_Case_Reference.html#scaling_ssec", null ],
+        [ "1.2. <tt>fluid</tt>", "07_Case_Reference.html#fluid_ssec", null ],
+        [ "1.3. <tt>initial_conditions</tt>", "07_Case_Reference.html#ic_ssec", null ]
+      ] ],
+      [ "2. The <tt>run_control</tt> Section", "07_Case_Reference.html#run_control_sec", null ],
+      [ "3. The <tt>grid</tt> Section", "07_Case_Reference.html#grid_sec", [
+        [ "3.1. Programmatic Grid (<tt>mode: programmatic_c</tt>)", "07_Case_Reference.html#programmatic_ssec", null ],
+        [ "3.2. File-Based Grid (<tt>mode: file</tt>)", "07_Case_Reference.html#file_ssec", null ]
+      ] ],
+      [ "4. The <tt>models</tt> Section", "07_Case_Reference.html#models_sec", [
+        [ "4.1. <tt>domain</tt>", "07_Case_Reference.html#domain_ssec", null ],
+        [ "4.2. <tt>physics</tt>", "07_Case_Reference.html#physics_ssec", null ]
+      ] ],
+      [ "5. The <tt>boundary_conditions</tt> Section", "07_Case_Reference.html#bc_sec", null ]
+    ] ],
+    [ "Configuration Reference: Solver Profiles (<tt>solver.yml</tt>)", "08_Solver_Reference.html", [
+      [ "1. The <tt>strategy</tt> Section", "08_Solver_Reference.html#strategy_sec", null ],
+      [ "2. The <tt>tolerances</tt> Section", "08_Solver_Reference.html#tolerances_sec", null ],
+      [ "3. The <tt>pressure_solver</tt> Section", "08_Solver_Reference.html#pressure_solver_sec", [
+        [ "3.1. Main Settings", "08_Solver_Reference.html#p_main_ssec", null ],
+        [ "3.2. <tt>multigrid</tt> Settings", "08_Solver_Reference.html#p_mg_ssec", null ]
+      ] ],
+      [ "4. The <tt>petsc_passthrough_options</tt> Section", "08_Solver_Reference.html#petsc_sec", null ]
+    ] ],
+    [ "Configuration Reference: Monitor Profiles (<tt>monitor.yml</tt>)", "09_Monitor_Reference.html", [
+      [ "1. The <tt>io</tt> Section", "09_Monitor_Reference.html#io_sec", null ],
+      [ "2. The <tt>logging</tt> Section", "09_Monitor_Reference.html#logging_sec", [
+        [ "2.1. Log Verbosity Levels", "09_Monitor_Reference.html#log_levels_ssec", null ]
+      ] ],
+      [ "3. The <tt>profiling</tt> Section", "09_Monitor_Reference.html#profiling_sec", null ]
+    ] ],
+    [ "Configuration Reference: Post-Processing Recipes (<tt>post.yml</tt>)", "09_Post_Processing_Reference.html", [
+      [ "1. Structure of a <tt>post.yml</tt> File", "09_Post_Processing_Reference.html#structure_sec", null ],
+      [ "3. The <tt>source_data</tt> Section", "09_Post_Processing_Reference.html#source_data_sec", null ],
+      [ "4. The <tt>eulerian_pipeline</tt> Section", "09_Post_Processing_Reference.html#eulerian_pipeline_sec", [
+        [ "4.1. Available Eulerian Kernels", "09_Post_Processing_Reference.html#eulerian_kernels_ssec", null ]
+      ] ],
+      [ "5. The <tt>lagrangian_pipeline</tt> Section", "09_Post_Processing_Reference.html#lagrangian_pipeline_sec", [
+        [ "5.1. Available Lagrangian Kernels", "09_Post_Processing_Reference.html#lagrangian_kernels_ssec", null ]
+      ] ],
+      [ "6. The <tt>io</tt> Section", "09_Post_Processing_Reference.html#io_post_sec", null ]
+    ] ],
+    [ "User How-To Guides", "10_User_How_To_Guides.html", [
+      [ "1. Simulation Setup", "10_User_How_To_Guides.html#setup_guides_sec", [
+        [ "1.1. How do I change the Reynolds number?", "10_User_How_To_Guides.html#ht_reynolds_ssec", null ],
+        [ "1.2. How do I set up a 2D simulation?", "10_User_How_To_Guides.html#ht_2d_ssec", null ],
+        [ "1.3. How do I change the grid resolution?", "10_User_How_To_Guides.html#ht_resolution_ssec", null ],
+        [ "1.4. How do I change the simulation time and output frequency?", "10_User_How_To_Guides.html#ht_time_ssec", null ]
+      ] ],
+      [ "2. Boundary Conditions", "10_User_How_To_Guides.html#bc_guides_sec", [
+        [ "2.1. How do I set up a simple boundary condition?", "10_User_How_To_Guides.html#ht_bc_ssec", null ],
+        [ "2.2. How do I set up a periodic domain?", "10_User_How_To_Guides.html#ht_periodic_ssec", null ]
+      ] ],
+      [ "3. Running & Monitoring", "10_User_How_To_Guides.html#run_guides_sec", [
+        [ "3.1. How do I run in parallel and specify the processor layout?", "10_User_How_To_Guides.html#ht_parallel_ssec", null ],
+        [ "3.2. How do I restart a simulation?", "10_User_How_To_Guides.html#ht_restart_ssec", null ],
+        [ "3.3. How do I get detailed debug output from a specific part of the code?", "10_User_How_To_Guides.html#ht_debug_ssec", null ]
+      ] ],
+      [ "4. Post-Processing", "10_User_How_To_Guides.html#pp_guides_sec", [
+        [ "4.1. How do I run post-processing on a finished simulation?", "10_User_How_To_Guides.html#ht_pp_ssec", null ],
+        [ "4.2. How do I calculate a new field like Q-Criterion?", "10_User_How_To_Guides.html#ht_newfield_ssec", null ]
+      ] ]
+    ] ],
+    [ "12_Capabilities_Summary", "md_pages_212__Capabilities__Summary.html", null ],
+    [ "Capabilities Summary: What You Can Do", "10_Capabilities_Summary.html", [
+      [ "1. Grid and Domain Features", "10_Capabilities_Summary.html#grid_cap_sec", null ],
+      [ "2. Physics & Flow Models", "10_Capabilities_Summary.html#physics_cap_sec", null ],
+      [ "3. Numerical Scheme Control", "10_Capabilities_Summary.html#numerics_cap_sec", null ],
+      [ "4. Boundary Conditions", "10_Capabilities_Summary.html#bc_cap_sec", null ],
+      [ "5. Post-Processing Capabilities", "10_Capabilities_Summary.html#pp_cap_sec", null ]
+    ] ],
+    [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md12", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md13", [
+        [ "Included Grid Artifacts", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md14", null ]
+      ] ],
+      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md15", [
+        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md16", null ],
+        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md17", null ],
+        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md18", null ]
+      ] ],
+      [ "4. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md19", null ]
+    ] ],
+    [ "Case Template: Laminar Flow in a Flat Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html", [
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md21", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md22", null ],
+      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md23", [
+        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md24", null ],
+        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md25", null ],
+        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md26", null ]
+      ] ],
+      [ "4. Building a New Template from this Example", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md27", null ],
+      [ "5. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md28", null ]
+    ] ],
+    [ "PIC-Flow Master Configuration Templates", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html", [
+      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md30", null ],
+      [ "2. How to Use These Files", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md31", null ],
+      [ "3. Best Practices & Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md32", null ]
+    ] ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]
   ] ]

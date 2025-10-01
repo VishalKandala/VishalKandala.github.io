@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['walkingsearch_2ec_0',['walkingsearch.c',['../walkingsearch_8c.html',1,'']]],
-  ['walkingsearch_2eh_1',['walkingsearch.h',['../walkingsearch_8h.html',1,'']]],
-  ['wallfunction_2ec_2',['wallfunction.c',['../wallfunction_8c.html',1,'']]],
-  ['wallfunction_2eh_3',['wallfunction.h',['../wallfunction_8h.html',1,'']]]
+  ['setup_2ec_0',['setup.c',['../setup_8c.html',1,'']]],
+  ['setup_2eh_1',['setup.h',['../setup_8h.html',1,'']]],
+  ['simulation_2ec_2',['simulation.c',['../simulation_8c.html',1,'']]],
+  ['simulation_2eh_3',['simulation.h',['../simulation_8h.html',1,'']]],
+  ['solvers_2ec_4',['solvers.c',['../solvers_8c.html',1,'']]],
+  ['solvers_2eh_5',['solvers.h',['../solvers_8h.html',1,'']]]
 ];
