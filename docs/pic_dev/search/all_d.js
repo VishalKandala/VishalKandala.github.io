@@ -85,7 +85,7 @@ var searchData=
   ['interpolation_2ec_82',['interpolation.c',['../interpolation_8c.html',1,'']]],
   ['interpolation_2eh_83',['interpolation.h',['../interpolation_8h.html',1,'']]],
   ['interpolation_5fdistance_5ftolerance_84',['INTERPOLATION_DISTANCE_TOLERANCE',['../ParticleSwarm_8c.html#a3b8cd77851de92f44b3821c6d15fb725',1,'ParticleSwarm.c']]],
-  ['introduction_85',['Introduction',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#intro_sec',1,'']]],
+  ['introduction_85',['Introduction',['../index.html#intro_sec',1,'']]],
   ['inttostr_86',['IntToStr',['../logging_8c.html#ad2ca09810919ecbbd0daceb827fe330e',1,'logging.c']]],
   ['invicid_87',['invicid',['../variables_8h.html#a7af448f97fbebfd44e5989614b982a93',1,'SimCtx']]],
   ['io_2ec_88',['io.c',['../io_8c.html',1,'']]],

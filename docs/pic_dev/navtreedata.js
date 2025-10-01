@@ -25,6 +25,7 @@
 var NAVTREE =
 [
   [ "PICurv", "index.html", [
+    [ "PICurv Solver Documentation", "index.html", "index" ],
     [ "Changelog", "md_CHANGELOG.html", null ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]

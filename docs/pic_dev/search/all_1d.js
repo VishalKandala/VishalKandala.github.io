@@ -13,6 +13,6 @@ var searchData=
   ['ym_5fcell_10',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
   ['ymax_11',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
   ['ymin_12',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
-  ['your_20path_3a_13',['To Begin, Choose Your Path:',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#get_started_main',1,'']]],
+  ['your_20path_3a_13',['To Begin, Choose Your Path:',['../index.html#get_started_main',1,'']]],
   ['ys_5fcell_14',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
 ];

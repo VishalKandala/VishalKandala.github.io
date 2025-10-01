@@ -27,7 +27,7 @@ var searchData=
   ['global_5finflow_5fsum_24',['global_inflow_sum',['../variables_8h.html#a7ef2ee23d2a70f8ed3b2035c7148b619',1,'BCContext']]],
   ['global_5foutflow_5fsum_25',['global_outflow_sum',['../variables_8h.html#a033b2786900e8976475fab7f5f49a4ff',1,'BCContext']]],
   ['gnumallowed_26',['gNumAllowed',['../logging_8c.html#a798a72f08a971879fe7d9f55985d4b07',1,'logging.c']]],
-  ['grid_27',['1. The Eulerian Phase (The Grid)',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#autotoc_md5',1,'']]],
+  ['grid_27',['1. The Eulerian Phase (The Grid)',['../index.html#autotoc_md5',1,'']]],
   ['grid_20scattering_28',['Particle-to-Grid Scattering',['../group__scatter__module.html',1,'']]],
   ['grid_2ec_29',['grid.c',['../grid_8c.html',1,'']]],
   ['grid_2eh_30',['grid.h',['../grid_8h.html',1,'']]],

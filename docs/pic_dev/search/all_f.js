@@ -16,7 +16,7 @@ var searchData=
   ['kcsi_13',['KCsi',['../variables_8h.html#ada60dbb4f918fda297a992a4228b1166',1,'UserCtx']]],
   ['keta_14',['KEta',['../variables_8h.html#ac29b95b05aa4bc3539389113c408d19e',1,'UserCtx']]],
   ['key_15',['key',['../variables_8h.html#a3e5fde9b976c4b85ea13d30df8834405',1,'BC_Param_s']]],
-  ['key_20features_16',['Key Features',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#features_sec',1,'']]],
+  ['key_20features_16',['Key Features',['../index.html#features_sec',1,'']]],
   ['kk1_17',['kk1',['../variables_8h.html#aa79837cc1b7f5a58a7313b99c780d816',1,'IBMInfo']]],
   ['kk11_18',['kk11',['../variables_8h.html#ad8478f80c28f661dadf938f6f3558ac1',1,'IBMInfo']]],
   ['kk2_19',['kk2',['../variables_8h.html#a68790c5303b8382a4407461a5a397e5e',1,'IBMInfo']]],

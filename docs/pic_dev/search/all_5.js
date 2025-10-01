@@ -1,7 +1,7 @@
 var searchData=
 [
   ['a_0',['A',['../variables_8h.html#a555f83bde847a6f7bde6e372ca74dd4b',1,'UserCtx']]],
-  ['a_20hybrid_20eulerian_20lagrangian_20framework_20for_20scalar_20transport_1',['🌀 PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#autotoc_md2',1,'']]],
+  ['a_20hybrid_20eulerian_20lagrangian_20framework_20for_20scalar_20transport_1',['🌀 PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['../index.html#autotoc_md2',1,'']]],
   ['a_5fc_2',['a_c',['../variables_8h.html#ab855d42df8eae7cb8be83f0100da67e9',1,'FSInfo']]],
   ['a_5ftot_3',['A_tot',['../variables_8h.html#ad66d4a2ad50b87f8150be135c95d2c3b',1,'FSInfo']]],
   ['acc_4',['acc',['../variables_8h.html#a3c39b705d19eca0ae071c27b23778633',1,'FSInfo']]],

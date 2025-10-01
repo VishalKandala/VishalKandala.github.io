@@ -9,7 +9,7 @@ var searchData=
   ['wallfunction_6',['wallfunction',['../variables_8h.html#aa60ee4e3f8eca251ee470427f1ebac13',1,'SimCtx::wallfunction'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faac4f816c9f2b363c7e2c959807809bd94',1,'WALLFUNCTION:&#160;variables.h']]],
   ['wallfunction_2ec_7',['wallfunction.c',['../wallfunction_8c.html',1,'']]],
   ['wallfunction_2eh_8',['wallfunction.h',['../wallfunction_8h.html',1,'']]],
-  ['way_20coupling_20mechanism_9',['3. The Two-Way Coupling Mechanism',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#autotoc_md7',1,'']]],
+  ['way_20coupling_20mechanism_9',['3. The Two-Way Coupling Mechanism',['../index.html#autotoc_md7',1,'']]],
   ['weights_10',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
   ['while_200_11',['} while (0)',['../logging_8h.html#autotoc_md0',1,'']]],
   ['wing_12',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]],

@@ -39,7 +39,7 @@ var searchData=
   ['bctype_36',['bctype',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08fa',1,'BCType:&#160;variables.h'],['../variables_8h.html#ab5bb12623002e01eff7d41bb9f537054',1,'UserCtx::bctype']]],
   ['bctypetostring_37',['bctypetostring',['../logging_8c.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c'],['../logging_8h.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c']]],
   ['be_38',['BE',['../poisson_8c.html#a78add0c4a98afa82e663ee5cfb1bdc9f',1,'poisson.c']]],
-  ['begin_20choose_20your_20path_3a_39',['To Begin, Choose Your Path:',['..//home/runner/work/PICurv/PICurv/docs/mainpage.md#get_started_main',1,'']]],
+  ['begin_20choose_20your_20path_3a_39',['To Begin, Choose Your Path:',['../index.html#get_started_main',1,'']]],
   ['binarysearchint64_40',['binarysearchint64',['../setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36',1,'BinarySearchInt64(PetscInt n, const PetscInt64 arr[], PetscInt64 key, PetscBool *found):&#160;setup.c'],['../setup_8c.html#acd8d87dc85f19ba3e32811a623bf5b36',1,'BinarySearchInt64(PetscInt n, const PetscInt64 arr[], PetscInt64 key, PetscBool *found):&#160;setup.c']]],
   ['blank_41',['blank',['../variables_8h.html#af1abb750bddbd00d7149307d4c01a218',1,'SimCtx']]],
   ['blkpbc_42',['blkpbc',['../variables_8h.html#a2892b7742faefb81b542c6fdd2351e68',1,'SimCtx']]],

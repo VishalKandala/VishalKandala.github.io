@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['picurv_0',['PICurv',['../index.html',1,'']]]
+  ['documentation_0',['PICurv Solver Documentation',['../index.html',1,'']]]
 ];
