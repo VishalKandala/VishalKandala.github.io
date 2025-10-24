@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['variables_2eh_0',['variables.h',['../variables_8h.html',1,'']]],
-  ['vtk_5fio_2ec_1',['vtk_io.c',['../vtk__io_8c.html',1,'']]],
-  ['vtk_5fio_2eh_2',['vtk_io.h',['../vtk__io_8h.html',1,'']]]
+  ['setup_2ec_0',['setup.c',['../setup_8c.html',1,'']]],
+  ['setup_2eh_1',['setup.h',['../setup_8h.html',1,'']]],
+  ['simulation_2ec_2',['simulation.c',['../simulation_8c.html',1,'']]],
+  ['simulation_2eh_3',['simulation.h',['../simulation_8h.html',1,'']]],
+  ['solvers_2ec_4',['solvers.c',['../solvers_8c.html',1,'']]],
+  ['solvers_2eh_5',['solvers.h',['../solvers_8h.html',1,'']]]
 ];

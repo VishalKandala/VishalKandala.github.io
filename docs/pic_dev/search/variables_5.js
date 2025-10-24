@@ -4,7 +4,8 @@ var searchData=
   ['elmtinfo_1',['elmtinfo',['../variables_8h.html#a4d5e8775b899743430a99dbc2a4f6bfc',1,'FSInfo']]],
   ['endtime_2',['endTime',['../variables_8h.html#a76d29089d00d89348f32bbf0e2981497',1,'PostProcessParams']]],
   ['eta_3',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
-  ['eulerianext_4',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
-  ['euleriansource_5',['eulerianSource',['../variables_8h.html#a22578f82210005268294944e4227473e',1,'SimCtx']]],
-  ['exec_5fmode_6',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
+  ['euler_5fsubdir_4',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
+  ['eulerianext_5',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
+  ['euleriansource_6',['eulerianSource',['../variables_8h.html#a22578f82210005268294944e4227473e',1,'SimCtx']]],
+  ['exec_5fmode_7',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
 ];

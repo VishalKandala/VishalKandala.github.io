@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['flat_5fchannel_2emd_0',['flat_channel.md',['../flat__channel_8md.html',1,'']]]
+  ['changelog_2emd_0',['CHANGELOG.md',['../CHANGELOG_8md.html',1,'']]]
 ];

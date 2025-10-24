@@ -177,341 +177,385 @@ $(document).ready(function(){initNavTree('setup_8h_source.html',''); initResizab
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> * @return PetscErrorCode Returns 0 on success, or a non-zero PETSc error code on failure.</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> */</span></div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv, <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> **p_simCtx);</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"></span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> * @brief The main orchestrator for setting up all grid-related components.</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * This function is the high-level driver for creating the entire computational</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> * domain, including the multigrid hierarchy, PETSc DMDA and Vec objects, and</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"> * calculating all necessary grid metrics.</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment"> * @param simCtx The fully configured SimulationContext.</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * @return PetscErrorCode</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"></span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> @brief Creates and initializes all PETSc Vec objects for all fields.</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"></span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> * @brief Verifies and prepares the complete I/O environment for a simulation run.</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> * This function performs a comprehensive series of checks and setup actions to</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * ensure a valid and clean environment. It is parallel-safe; all filesystem</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> * operations and checks are performed by Rank 0, with collective error handling.</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"> * The function&#39;s responsibilities include:</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment"> * 1.  **Checking Mandatory Inputs:** Verifies existence of grid and BCs files.</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * 2.  **Checking Optional Inputs:** Warns if optional config files (whitelist, profile) are missing.</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> * 3.  **Validating Run Mode Paths:** Ensures `restart_dir` or post-processing source directories exist when needed.</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment"> * 4.  **Preparing Log Directory:** Creates the log directory and cleans it of previous logs.</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> * 5.  **Preparing Output Directories:** Creates the main output directory and its required subdirectories.</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> * @param[in] simCtx The fully configured SimulationContext object.</span></div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * This function iterates through every UserCtx in the multigrid and multi-block</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> * hierarchy. For each context, it creates the comprehensive set of global and</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> * local PETSc Vecs required by the flow solver (e.g., Ucont, P, Nvert, metrics,</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment"> * turbulence fields, etc.). Each vector is initialized to zero.</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> * @param simCtx The master SimCtx, containing the configured UserCtx hierarchy.</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> * @return PetscErrorCode</span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a47daae7d6e456ef74e75626c1c9d6c9a">CreateAndInitializeAllVectors</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"></span> </div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> * @brief Updates the local vector (including ghost points) from its corresponding global vector.</span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment"> * This function identifies the correct global vector, local vector, and DM based on the</span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment"> * provided fieldName and performs the standard PETSc DMGlobalToLocalBegin/End sequence.</span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment"> * Includes optional debugging output (max norms before/after).</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment"> * @param user       The UserCtx structure containing the vectors and DMs.</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * @param fieldName  The name of the field to update (&quot;Ucat&quot;, &quot;Ucont&quot;, &quot;P&quot;, &quot;Nvert&quot;, etc.).</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * @return PetscErrorCode Returns 0 on success, or a non-zero error code if a</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> *         mandatory file/directory is missing or a critical operation fails.</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a3ed7edc1ce3c1b4aae8e30f9a75bdce8">SetupSimulationEnvironment</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"></span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> * @brief The main orchestrator for setting up all grid-related components.</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * This function is the high-level driver for creating the entire computational</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> * domain, including the multigrid hierarchy, PETSc DMDA and Vec objects, and</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> * calculating all necessary grid metrics.</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> * @param simCtx The fully configured SimulationContext.</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment"> * @return PetscErrorCode</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"></span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> @brief Creates and initializes all PETSc Vec objects for all fields.</span></div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * @note This function assumes the global vector associated with fieldName has already</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> *       been populated with the desired data (including any boundary conditions).</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a>* user, <span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName);</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"></span> </div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment"> * @brief (Orchestrator) Sets up all boundary conditions for the simulation.</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad9f399b16547eba3244159f7136a1eb9">SetupBoundaryConditions</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"></span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * @brief Allocates a 3D array of PetscReal values using PetscCalloc.</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> * This function dynamically allocates memory for a 3D array of PetscReal values</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> * with dimensions nz (layers) x ny (rows) x nx (columns). It uses PetscCalloc1</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> * to ensure the memory is zero-initialized.</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment"> * The allocation is done in three steps:</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="comment"> *  1. Allocate an array of nz pointers (one for each layer).</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment"> *  2. Allocate a contiguous block for nz*ny row pointers and assign each layer’s row pointers.</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"> *  3. Allocate a contiguous block for all nz*ny*nx PetscReal values.</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> * This setup allows the array to be accessed as array[k][j][i], and the memory</span></div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="comment"> * for the data is contiguous, which improves cache efficiency.</span></div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment"> * @param[out] array Pointer to the 3D array to be allocated.</span></div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="comment"> * @param[in]  nz    Number of layers (z-direction).</span></div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment"> * @param[in]  ny    Number of rows (y-direction).</span></div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="comment"> * @param[in]  nx    Number of columns (x-direction).</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> PetscErrorCode <a class="code hl_function" href="setup_8h.html#a8b1b661a11ef0a0e0bb7fb92f2d211f4">Allocate3DArrayScalar</a>(PetscReal ****array, PetscInt nz, PetscInt ny, PetscInt nx);</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment"></span> </div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> * @brief Deallocates a 3D array of PetscReal values allocated by Allocate3DArrayScalar.</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * This function iterates through every UserCtx in the multigrid and multi-block</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> * hierarchy. For each context, it creates the comprehensive set of global and</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * local PETSc Vecs required by the flow solver (e.g., Ucont, P, Nvert, metrics,</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * turbulence fields, etc.). Each vector is initialized to zero.</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment"> * @param simCtx The master SimCtx, containing the configured UserCtx hierarchy.</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"> * @return PetscErrorCode</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a47daae7d6e456ef74e75626c1c9d6c9a">CreateAndInitializeAllVectors</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"></span> </div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> * @brief Updates the local vector (including ghost points) from its corresponding global vector.</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * This function identifies the correct global vector, local vector, and DM based on the</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> * provided fieldName and performs the standard PETSc DMGlobalToLocalBegin/End sequence.</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> * Includes optional debugging output (max norms before/after).</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> * @param user       The UserCtx structure containing the vectors and DMs.</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="comment"> * @param fieldName  The name of the field to update (&quot;Ucat&quot;, &quot;Ucont&quot;, &quot;P&quot;, &quot;Nvert&quot;, etc.).</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"> * @note This function assumes the global vector associated with fieldName has already</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment"> *       been populated with the desired data (including any boundary conditions).</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a>* user, <span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment"></span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="comment"> * @brief (Orchestrator) Sets up all boundary conditions for the simulation.</span></div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad9f399b16547eba3244159f7136a1eb9">SetupBoundaryConditions</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment"></span> </div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> * @brief Allocates a 3D array of PetscReal values using PetscCalloc.</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment"> * This function dynamically allocates memory for a 3D array of PetscReal values</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment"> * with dimensions nz (layers) x ny (rows) x nx (columns). It uses PetscCalloc1</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> * to ensure the memory is zero-initialized.</span></div>
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment"> * This function frees the memory allocated for a 3D array of PetscReal values.</span></div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayScalar, which allocated</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment"> * three separate memory blocks: one for the contiguous data, one for the row pointers,</span></div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"> * and one for the layer pointers.</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment"> * The allocation is done in three steps:</span></div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment"> *  1. Allocate an array of nz pointers (one for each layer).</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment"> *  2. Allocate a contiguous block for nz*ny row pointers and assign each layer’s row pointers.</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"> *  3. Allocate a contiguous block for all nz*ny*nx PetscReal values.</span></div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment"> * @param[in] nz    Number of layers (z-direction).</span></div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment"> * @param[in] ny    Number of rows (y-direction).</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#af73e238fa95229094a92ac66812799f7">Deallocate3DArrayScalar</a>(PetscReal ***array, PetscInt nz, PetscInt ny);</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="comment"></span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment"> * @brief Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</span></div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"> * This function frees the memory allocated for a 3D array of Cmpnts structures.</span></div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayVector, which created three</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="comment"> * separate memory blocks: one for the contiguous vector data, one for the row pointers,</span></div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> * and one for the layer pointers.</span></div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment"> * @param[in] nz    Number of layers in the z-direction.</span></div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> * @param[in] ny    Number of rows in the y-direction.</span></div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment"> * This setup allows the array to be accessed as array[k][j][i], and the memory</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment"> * for the data is contiguous, which improves cache efficiency.</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="comment"> * @param[out] array Pointer to the 3D array to be allocated.</span></div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="comment"> * @param[in]  nz    Number of layers (z-direction).</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment"> * @param[in]  ny    Number of rows (y-direction).</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="comment"> * @param[in]  nx    Number of columns (x-direction).</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> PetscErrorCode <a class="code hl_function" href="setup_8h.html#a8b1b661a11ef0a0e0bb7fb92f2d211f4">Allocate3DArrayScalar</a>(PetscReal ****array, PetscInt nz, PetscInt ny, PetscInt nx);</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"></span> </div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="comment"> * @brief Deallocates a 3D array of PetscReal values allocated by Allocate3DArrayScalar.</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="comment"> * This function frees the memory allocated for a 3D array of PetscReal values.</span></div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayScalar, which allocated</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment"> * three separate memory blocks: one for the contiguous data, one for the row pointers,</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> * and one for the layer pointers.</span></div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad0b5edc0d4872661a274fabbbf790019">Allocate3DArrayVector</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ****array, PetscInt nz, PetscInt ny, PetscInt nx);</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"></span> </div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment"> * @brief Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</span></div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"> * This function frees the memory allocated for a 3D array of Cmpnts structures.</span></div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayVector, which created three</span></div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * separate memory blocks: one for the contiguous vector data, one for the row pointers,</span></div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment"> * and one for the layer pointers.</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment"> * @param[in] nz    Number of layers in the z-direction.</span></div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment"> * @param[in] ny    Number of rows in the y-direction.</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment"> * @param[in] nz    Number of layers (z-direction).</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="comment"> * @param[in] ny    Number of rows (y-direction).</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#af73e238fa95229094a92ac66812799f7">Deallocate3DArrayScalar</a>(PetscReal ***array, PetscInt nz, PetscInt ny);</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"></span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * @brief Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</span></div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> * This function frees the memory allocated for a 3D array of Cmpnts structures.</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayVector, which created three</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment"> * separate memory blocks: one for the contiguous vector data, one for the row pointers,</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment"> * and one for the layer pointers.</span></div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9">Deallocate3DArrayVector</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***array, PetscInt nz, PetscInt ny);</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"></span> </div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="comment"> * @brief Determines the global starting index and number of CELLS owned by the</span></div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment"> *        current processor in a specified dimension. Ownership is defined by the</span></div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment"> *        rank owning the cell&#39;s origin node (min i,j,k corner).</span></div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="comment"> * @param[in]  info_nodes     Pointer to the DMDALocalInfo struct obtained from the NODE-based DMDA</span></div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="comment"> *                            (e.g., user-&gt;da or user-&gt;fda, assuming they have consistent nodal partitioning</span></div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="comment"> *                            for defining cell origins).</span></div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment"> * @param[in]  dim            The dimension to compute the range for (0 for x/i, 1 for y/j, 2 for z/k).</span></div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment"> * @param[out] xs_cell_global Pointer to store the starting GLOBAL CELL index owned by this process.</span></div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span><span class="comment"> *                            A cell C(i) is defined by nodes N(i) and N(i+1). Its global index is i.</span></div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="comment"> * @param[out] xm_cell_local  Pointer to store the NUMBER of CELLs owned by this process in this dimension.</span></div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a9b17552f79ebe16d0363986217a01ff3">GetOwnedCellRange</a>(<span class="keyword">const</span> DMDALocalInfo *info_nodes,</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>                                 PetscInt dim,</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>                                 PetscInt *xs_cell_global,</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>                                 PetscInt *xm_cell_local);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> * @param[in] nz    Number of layers in the z-direction.</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="comment"> * @param[in] ny    Number of rows in the y-direction.</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> PetscErrorCode <a class="code hl_function" href="setup_8h.html#ad0b5edc0d4872661a274fabbbf790019">Allocate3DArrayVector</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ****array, PetscInt nz, PetscInt ny, PetscInt nx);</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment"></span> </div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="comment"> * @brief Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="comment"> * This function frees the memory allocated for a 3D array of Cmpnts structures.</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment"> * It assumes the memory was allocated using Allocate3DArrayVector, which created three</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment"> * separate memory blocks: one for the contiguous vector data, one for the row pointers,</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span><span class="comment"> * and one for the layer pointers.</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span><span class="comment"> * @param[in] array Pointer to the 3D array to be deallocated.</span></div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="comment"> * @param[in] nz    Number of layers in the z-direction.</span></div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment"> * @param[in] ny    Number of rows in the y-direction.</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="comment"> * @return PetscErrorCode 0 on success, nonzero on failure.</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9">Deallocate3DArrayVector</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***array, PetscInt nz, PetscInt ny);</div>
 <div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span><span class="comment"></span> </div>
 <div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span><span class="comment"> * @brief Gets the global cell range for a rank, including boundary cells.</span></div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="comment"> * This function first calls GetOwnedCellRange to get the conservative range of</span></div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span><span class="comment"> * fully-contained cells. It then extends this range by applying the</span></div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="comment"> * &quot;Lower-Rank-Owns-Boundary&quot; principle. A rank claims ownership of the</span></div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment"> * boundary cells it shares with neighbors in the positive (+x, +y, +z)</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="comment"> * directions.</span></div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="comment"> * This results in a final cell range that is gap-free and suitable for building</span></div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span><span class="comment"> * the definitive particle ownership map.</span></div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="comment"> * @param[in]  info_nodes       Pointer to the DMDALocalInfo struct.</span></div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="comment"> * @param[in]  neighbors        Pointer to the RankNeighbors struct containing neighbor info.</span></div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="comment"> * @param[in]  dim              The dimension (0 for i/x, 1 for j/y, 2 for k/z).</span></div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="comment"> * @param[out] xs_cell_global_out Pointer to store the final starting cell index.</span></div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="comment"> * @param[out] xm_cell_local_out  Pointer to store the final number of cells.</span></div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="comment"> * @return PetscErrorCode 0 on success, or an error code on failure.</span></div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a25ce912d8aafa319a8c915cd350c7322">GetGhostedCellRange</a>(<span class="keyword">const</span> DMDALocalInfo *info_nodes,</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                                   <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structRankNeighbors">RankNeighbors</a> *neighbors,</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>                                   PetscInt dim,</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                                   PetscInt *xs_cell_global_out,</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>                                   PetscInt *xm_cell_local_out);</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="comment"></span> </div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="comment"> * @brief Computes and stores the Cartesian neighbor ranks for the DMDA decomposition.</span></div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span><span class="comment"> * @brief Determines the global starting index and number of CELLS owned by the</span></div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="comment"> *        current processor in a specified dimension. Ownership is defined by the</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="comment"> *        rank owning the cell&#39;s origin node (min i,j,k corner).</span></div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="comment"> * @param[in]  info_nodes     Pointer to the DMDALocalInfo struct obtained from the NODE-based DMDA</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment"> *                            (e.g., user-&gt;da or user-&gt;fda, assuming they have consistent nodal partitioning</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="comment"> *                            for defining cell origins).</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="comment"> * @param[in]  dim            The dimension to compute the range for (0 for x/i, 1 for y/j, 2 for z/k).</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="comment"> * @param[out] xs_cell_global Pointer to store the starting GLOBAL CELL index owned by this process.</span></div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span><span class="comment"> *                            A cell C(i) is defined by nodes N(i) and N(i+1). Its global index is i.</span></div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="comment"> * @param[out] xm_cell_local  Pointer to store the NUMBER of CELLs owned by this process in this dimension.</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a9b17552f79ebe16d0363986217a01ff3">GetOwnedCellRange</a>(<span class="keyword">const</span> DMDALocalInfo *info_nodes,</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>                                 PetscInt dim,</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>                                 PetscInt *xs_cell_global,</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>                                 PetscInt *xm_cell_local);</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="comment"></span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="comment"> * @brief Computes and stores the Cartesian neighbor ranks for the DMDA decomposition.</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="comment"> * This function retrieves the neighbor information from the primary DMDA (user-&gt;da)</span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="comment"> * and stores the face neighbors (xm, xp, ym, yp, zm, zp) in the user-&gt;neighbors structure.</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="comment"> * It assumes a standard PETSc ordering for the neighbors array returned by DMDAGetNeighbors.</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="comment"> * Logs warnings if the assumed indices seem incorrect (e.g., center rank mismatch).</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="comment"> * @param[in,out] user Pointer to the UserCtx structure where neighbor info will be stored.</span></div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="comment"> * This function retrieves the neighbor information from the primary DMDA (user-&gt;da)</span></div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="comment"> * and stores the face neighbors (xm, xp, ym, yp, zm, zp) in the user-&gt;neighbors structure.</span></div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span><span class="comment"> * It assumes a standard PETSc ordering for the neighbors array returned by DMDAGetNeighbors.</span></div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment"> * Logs warnings if the assumed indices seem incorrect (e.g., center rank mismatch).</span></div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="comment"> * @param[in,out] user Pointer to the UserCtx structure where neighbor info will be stored.</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a4d7b90ec69412357cf8c38ea8f4e71f6">ComputeAndStoreNeighborRanks</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment"></span> </div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="comment"> * @brief Sets the processor layout for a given DMDA based on PETSc options.</span></div>
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a4d7b90ec69412357cf8c38ea8f4e71f6">ComputeAndStoreNeighborRanks</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="comment"></span> </div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="comment"> * @brief Sets the processor layout for a given DMDA based on PETSc options.</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="comment"> * Reads the desired number of processors in x, y, and z directions using</span></div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="comment"> * PETSc options (e.g., -dm_processors_x, -dm_processors_y, -dm_processors_z).</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="comment"> * If an option is not provided for a direction, PETSC_DECIDE is used for that direction.</span></div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="comment"> * Applies the layout using DMDASetNumProcs.</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="comment"> * Also stores the retrieved/decided values in user-&gt;procs_x/y/z if user context is provided.</span></div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="comment"> * Reads the desired number of processors in x, y, and z directions using</span></div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="comment"> * PETSc options (e.g., -dm_processors_x, -dm_processors_y, -dm_processors_z).</span></div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="comment"> * If an option is not provided for a direction, PETSC_DECIDE is used for that direction.</span></div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="comment"> * Applies the layout using DMDASetNumProcs.</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="comment"> * Also stores the retrieved/decided values in user-&gt;procs_x/y/z if user context is provided.</span></div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="comment"> * @param dm   The DMDA object to configure the layout for.</span></div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="comment"> * @param user Pointer to the UserCtx structure (optional, used to store layout values).</span></div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="comment"> * @param dm   The DMDA object to configure the layout for.</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="comment"> * @param user Pointer to the UserCtx structure (optional, used to store layout values).</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead">SetDMDAProcLayout</a>(DM dm, <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="comment"></span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="comment"> * @brief Sets up the full rank communication infrastructure, including neighbor ranks and bounding box exchange.</span></div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead">SetDMDAProcLayout</a>(DM dm, <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="comment"></span> </div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="comment"> * @brief Sets up the full rank communication infrastructure, including neighbor ranks and bounding box exchange.</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="comment"> * This function orchestrates the following steps:</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment"> * 1. Compute and store the neighbor ranks in the user context.</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="comment"> * 2. Gather all local bounding boxes to rank 0.</span></div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="comment"> * 3. Broadcast the complete bounding box list to all ranks.</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="comment"> * The final result is that each rank has access to its immediate neighbors and the bounding box information of all ranks.</span></div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="comment"> * This function orchestrates the following steps:</span></div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="comment"> * 1. Compute and store the neighbor ranks in the user context.</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="comment"> * 2. Gather all local bounding boxes to rank 0.</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment"> * 3. Broadcast the complete bounding box list to all ranks.</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="comment"> * The final result is that each rank has access to its immediate neighbors and the bounding box information of all ranks.</span></div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx structure (must be initialized).</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="comment"> * @param[in,out] bboxlist  Pointer to BoundingBox array pointer; after this call, it will point to the broadcasted list.</span></div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="comment"> * @return PetscErrorCode Returns 0 on success or non-zero PETSc error code.</span></div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a1c08bf327e1aee897c56610a89f75814">SetupDomainRankInfo</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="comment"></span> </div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment"> * @brief Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="comment"> *        velocity (Ucont) defined on cell faces.</span></div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="comment"> * This function performs the transformation from a contravariant velocity representation</span></div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment"> * (which is natural on a curvilinear grid) to a Cartesian (x,y,z) representation.</span></div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="comment"> * For each interior computational cell owned by the rank, it performs the following:</span></div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="comment"> * 1.  It averages the contravariant velocity components (U¹, U², U³) from the</span></div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="comment"> *     surrounding faces to get an estimate of the contravariant velocity at the cell center.</span></div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="comment"> * 2.  It averages the metric vectors (Csi, Eta, Zet) from the surrounding faces</span></div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="comment"> *     to get an estimate of the metric tensor at the cell center. This tensor forms</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="comment"> *     the transformation matrix.</span></div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="comment"> * 3.  It solves the linear system `[MetricTensor] * [ucat] = [ucont]` for the</span></div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment"> *     Cartesian velocity vector `ucat = (u,v,w)` using Cramer&#39;s rule.</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="comment"> * 4.  The computed Cartesian velocity is stored in the global `user-&gt;Ucat` vector.</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx structure (must be initialized).</span></div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="comment"> * @param[in,out] bboxlist  Pointer to BoundingBox array pointer; after this call, it will point to the broadcasted list.</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment"> * @return PetscErrorCode Returns 0 on success or non-zero PETSc error code.</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a1c08bf327e1aee897c56610a89f75814">SetupDomainRankInfo</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"></span> </div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="comment"> * @brief Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="comment"> *        velocity (Ucont) defined on cell faces.</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment"> * This function performs the transformation from a contravariant velocity representation</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="comment"> * (which is natural on a curvilinear grid) to a Cartesian (x,y,z) representation.</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="comment"> * For each interior computational cell owned by the rank, it performs the following:</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment"> * 1.  It averages the contravariant velocity components (U¹, U², U³) from the</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="comment"> *     surrounding faces to get an estimate of the contravariant velocity at the cell center.</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="comment"> * 2.  It averages the metric vectors (Csi, Eta, Zet) from the surrounding faces</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="comment"> *     to get an estimate of the metric tensor at the cell center. This tensor forms</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment"> *     the transformation matrix.</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="comment"> * 3.  It solves the linear system `[MetricTensor] * [ucat] = [ucont]` for the</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="comment"> *     Cartesian velocity vector `ucat = (u,v,w)` using Cramer&#39;s rule.</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="comment"> * 4.  The computed Cartesian velocity is stored in the global `user-&gt;Ucat` vector.</span></div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="comment"> * The function operates on local, ghosted versions of the input vectors (`user-&gt;lUcont`,</span></div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="comment"> * `user-&gt;lCsi`, etc.) to ensure stencils are valid across processor boundaries.</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx structure. The function reads from</span></div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment"> *                          `user-&gt;lUcont`, `user-&gt;lCsi`, `user-&gt;lEta`, `user-&gt;lZet`, `user-&gt;lNvert`</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="comment"> *                          and writes to the global `user-&gt;Ucat` vector.</span></div>
 <div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment"> * The function operates on local, ghosted versions of the input vectors (`user-&gt;lUcont`,</span></div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="comment"> * `user-&gt;lCsi`, etc.) to ensure stencils are valid across processor boundaries.</span></div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx structure. The function reads from</span></div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="comment"> *                          `user-&gt;lUcont`, `user-&gt;lCsi`, `user-&gt;lEta`, `user-&gt;lZet`, `user-&gt;lNvert`</span></div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> *                          and writes to the global `user-&gt;Ucat` vector.</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="comment"> * @note</span></div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="comment"> *  - This function should be called AFTER `user-&gt;lUcont` and all local metric vectors</span></div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="comment"> *    (`user-&gt;lCsi`, etc.) have been populated with up-to-date ghost values via `UpdateLocalGhosts`.</span></div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="comment"> *  - It only computes `Ucat` for interior cells (not on physical boundaries) and for</span></div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="comment"> *    cells not marked as solid/blanked by `user-&gt;lNvert`.</span></div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="comment"> *  - The caller is responsible for subsequently applying boundary conditions to `user-&gt;Ucat`</span></div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> *    and calling `UpdateLocalGhosts(user, &quot;Ucat&quot;)` to populate `user-&gt;lUcat`.</span></div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="comment"></span> </div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="comment"> * @brief Creates and distributes a map of the domain&#39;s cell decomposition to all ranks.</span></div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="comment"> * @ingroup DomainInfo</span></div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="comment"> * This function is a critical part of the simulation setup. It determines the global</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="comment"> * cell ownership for each MPI rank and makes this information available to all</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="comment"> * other ranks. This &quot;decomposition map&quot; is essential for the robust &quot;Walk and Handoff&quot;</span></div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="comment"> * particle migration strategy, allowing any rank to quickly identify the owner of a</span></div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="comment"> * target cell.</span></div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment"> * @note</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="comment"> *  - This function should be called AFTER `user-&gt;lUcont` and all local metric vectors</span></div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="comment"> *    (`user-&gt;lCsi`, etc.) have been populated with up-to-date ghost values via `UpdateLocalGhosts`.</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> *  - It only computes `Ucat` for interior cells (not on physical boundaries) and for</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="comment"> *    cells not marked as solid/blanked by `user-&gt;lNvert`.</span></div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="comment"> *  - The caller is responsible for subsequently applying boundary conditions to `user-&gt;Ucat`</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> *    and calling `UpdateLocalGhosts(user, &quot;Ucat&quot;)` to populate `user-&gt;lUcat`.</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="comment"></span> </div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="comment"> * @brief Creates and distributes a map of the domain&#39;s cell decomposition to all ranks.</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> * @ingroup DomainInfo</span></div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="comment"> * This function is a critical part of the simulation setup. It determines the global</span></div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="comment"> * cell ownership for each MPI rank and makes this information available to all</span></div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="comment"> * other ranks. This &quot;decomposition map&quot; is essential for the robust &quot;Walk and Handoff&quot;</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="comment"> * particle migration strategy, allowing any rank to quickly identify the owner of a</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="comment"> * target cell.</span></div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="comment"> * The process involves:</span></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="comment"> * 1. Each rank gets its own node ownership information from the DMDA.</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="comment"> * 2. It converts this node information into cell ownership ranges using the</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="comment"> *    `GetOwnedCellRange` helper function.</span></div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="comment"> * 3. It participates in an `MPI_Allgather` collective operation to build a complete</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="comment"> *    array (`user-&gt;RankCellInfoMap`) containing the ownership information for every rank.</span></div>
 <div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="comment"> * The process involves:</span></div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="comment"> * 1. Each rank gets its own node ownership information from the DMDA.</span></div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="comment"> * 2. It converts this node information into cell ownership ranges using the</span></div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="comment"> *    `GetOwnedCellRange` helper function.</span></div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="comment"> * 3. It participates in an `MPI_Allgather` collective operation to build a complete</span></div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="comment"> *    array (`user-&gt;RankCellInfoMap`) containing the ownership information for every rank.</span></div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="comment"> * This function should be called once during initialization after the primary DMDA</span></div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="comment"> * (user-&gt;da) has been set up.</span></div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="comment"> * @param[in,out] user Pointer to the UserCtx structure. The function will allocate and</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="comment"> *                     populate `user-&gt;RankCellInfoMap` and set `user-&gt;num_ranks`.</span></div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="comment"> * @return PetscErrorCode 0 on success, or a non-zero PETSc error code on failure.</span></div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="comment"> *         Errors can occur if input pointers are NULL or if MPI communication fails.</span></div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#aeb77337317f41972d1c75c8d80527892">SetupDomainCellDecompositionMap</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="comment"></span> </div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="comment"> * @brief Performs a binary search for a key in a sorted array of PetscInt64.</span></div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="comment"> * This is a standard binary search algorithm implemented as a PETSc-style helper function.</span></div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="comment"> * It efficiently determines if a given `key` exists within a `sorted` array.</span></div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="comment"> * @param[in]  n      The number of elements in the array.</span></div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="comment"> * @param[in]  arr    A pointer to the sorted array of PetscInt64 values to be searched.</span></div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="comment"> * @param[in]  key    The PetscInt64 value to search for.</span></div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="comment"> * @param[out] found  A pointer to a PetscBool that will be set to PETSC_TRUE if the key</span></div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="comment"> *                    is found, and PETSC_FALSE otherwise.</span></div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><span class="comment"> * @return PetscErrorCode 0 on success, or a non-zero PETSc error code on failure.</span></div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="comment"> * @note The input array `arr` **must** be sorted in ascending order for the algorithm</span></div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="comment"> *       to work correctly.</span></div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36">BinarySearchInt64</a>(PetscInt n, <span class="keyword">const</span> PetscInt64 arr[], PetscInt64 key, PetscBool *found);</div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span> </div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span> </div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#abab14dc7f20644674b043609950eefe2">ComputeDivergence</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="preprocessor"> #endif </span><span class="comment">// SETUP_H</span></div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="comment"> * This function should be called once during initialization after the primary DMDA</span></div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="comment"> * (user-&gt;da) has been set up.</span></div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="comment"> * @param[in,out] user Pointer to the UserCtx structure. The function will allocate and</span></div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="comment"> *                     populate `user-&gt;RankCellInfoMap` and set `user-&gt;num_ranks`.</span></div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="comment"> * @return PetscErrorCode 0 on success, or a non-zero PETSc error code on failure.</span></div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="comment"> *         Errors can occur if input pointers are NULL or if MPI communication fails.</span></div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#aeb77337317f41972d1c75c8d80527892">SetupDomainCellDecompositionMap</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="comment"></span> </div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="comment"> * @brief Performs a binary search for a key in a sorted array of PetscInt64.</span></div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="comment"> * This is a standard binary search algorithm implemented as a PETSc-style helper function.</span></div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="comment"> * It efficiently determines if a given `key` exists within a `sorted` array.</span></div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="comment"> * @param[in]  n      The number of elements in the array.</span></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="comment"> * @param[in]  arr    A pointer to the sorted array of PetscInt64 values to be searched.</span></div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="comment"> * @param[in]  key    The PetscInt64 value to search for.</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="comment"> * @param[out] found  A pointer to a PetscBool that will be set to PETSC_TRUE if the key</span></div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="comment"> *                    is found, and PETSC_FALSE otherwise.</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="comment"> * @return PetscErrorCode 0 on success, or a non-zero PETSc error code on failure.</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="comment"> * @note The input array `arr` **must** be sorted in ascending order for the algorithm</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="comment"> *       to work correctly.</span></div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36">BinarySearchInt64</a>(PetscInt n, <span class="keyword">const</span> PetscInt64 arr[], PetscInt64 key, PetscBool *found);</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span> </div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span> </div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#abab14dc7f20644674b043609950eefe2">ComputeDivergence</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="comment"></span> </div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span><span class="comment"> * @brief Initializes random number generators for assigning particle properties.</span></div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span><span class="comment"> * This function creates and configures separate PETSc random number generators for the x, y, and z coordinates.</span></div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span><span class="comment"> * @param[in,out] user    Pointer to the UserCtx structure containing simulation context.</span></div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span><span class="comment"> * @param[out]    randx   Pointer to store the RNG for the x-coordinate.</span></div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="comment"> * @param[out]    randy   Pointer to store the RNG for the y-coordinate.</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><span class="comment"> * @param[out]    randz   Pointer to store the RNG for the z-coordinate.</span></div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span><span class="comment"> * @return PetscErrorCode Returns 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a26fa0cca0aa8b05f2705cdd0e7d37658">InitializeRandomGenerators</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, PetscRandom *randx, PetscRandom *randy, PetscRandom *randz);</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span><span class="comment"></span> </div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span><span class="comment"> * @brief Initializes random number generators for logical space operations [0.0, 1.0).</span></div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span><span class="comment"> * This function creates and configures three separate PETSc random number generators,</span></div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span><span class="comment"> * one for each logical dimension (i, j, k or xi, eta, zeta equivalent).</span></div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span><span class="comment"> * Each RNG is configured to produce uniformly distributed real numbers in the interval [0.0, 1.0).</span></div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span><span class="comment"> * These are typically used for selecting owned cells or generating intra-cell logical coordinates.</span></div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span><span class="comment"> * @param[out]   rand_logic_i Pointer to store the RNG for the i-logical dimension.</span></div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span><span class="comment"> * @param[out]   rand_logic_j Pointer to store the RNG for the j-logical dimension.</span></div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="comment"> * @param[out]   rand_logic_k Pointer to store the RNG for the k-logical dimension.</span></div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="comment"> * @return PetscErrorCode Returns 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#ab723e91906e01ec26aab97de6623000c">InitializeLogicalSpaceRNGs</a>(PetscRandom *rand_logic_i, PetscRandom *rand_logic_j, PetscRandom *rand_logic_k);</div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span><span class="comment"></span> </div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span><span class="comment"> * @brief Computes the derivatives of a cell-centered vector field at a specific grid point.</span></div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span><span class="comment"> * This function orchestrates the calculation of spatial derivatives. It first computes</span></div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span><span class="comment"> * the derivatives in computational space (d/dcsi, d/deta, d/dzet) using a central</span></div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span><span class="comment"> * difference scheme and then transforms them into physical space (d/dx, d/dy, d/dz).</span></div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span><span class="comment"> * @param user      The user context for the current computational block.</span></div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span><span class="comment"> * @param i, j, k   The grid indices of the cell center where derivatives are required.</span></div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span><span class="comment"> * @param field_data A 3D array pointer to the raw local data of the vector field (e.g., from lUcat).</span></div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span><span class="comment"> * @param dudx      Output: A Cmpnts struct storing [du/dx, du/dy, du/dz].</span></div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span><span class="comment"> * @param dvdx      Output: A Cmpnts struct storing [dv/dx, dv/dy, dv/dz].</span></div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span><span class="comment"> * @param dwdx      Output: A Cmpnts struct storing [dw/dx, dw/dy, dw/dz].</span></div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span><span class="comment"> * @return          PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>PetscErrorCode <a class="code hl_function" href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, PetscInt i, PetscInt j, PetscInt k, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***field_data,</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>                                             <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> *dudx, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> *dvdx, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> *dwdx);</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span> </div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span> </div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span><span class="preprocessor"> #endif </span><span class="comment">// SETUP_H</span></div>
 <div class="ttc" id="aAnalyticalSolution_8h_html"><div class="ttname"><a href="AnalyticalSolution_8h.html">AnalyticalSolution.h</a></div></div>
 <div class="ttc" id="aBoundaries_8h_html"><div class="ttname"><a href="Boundaries_8h.html">Boundaries.h</a></div></div>
-<div class="ttc" id="aParticleMotion_8h_html"><div class="ttname"><a href="ParticleMotion_8h.html">ParticleMotion.h</a></div></div>
-<div class="ttc" id="aParticleSwarm_8h_html"><div class="ttname"><a href="ParticleSwarm_8h.html">ParticleSwarm.h</a></div><div class="ttdoc">Header file for Particle Motion and migration related functions.</div></div>
+<div class="ttc" id="aParticleMotion_8h_html"><div class="ttname"><a href="ParticleMotion_8h.html">ParticleMotion.h</a></div><div class="ttdoc">Header file for Particle Motion and migration related functions.</div></div>
+<div class="ttc" id="aParticleSwarm_8h_html"><div class="ttname"><a href="ParticleSwarm_8h.html">ParticleSwarm.h</a></div><div class="ttdoc">Header file for Particle Swarm management functions.</div></div>
 <div class="ttc" id="agrid_8h_html"><div class="ttname"><a href="grid_8h.html">grid.h</a></div><div class="ttdoc">Public interface for grid, solver, and metric setup routines.</div></div>
 <div class="ttc" id="ainterpolation_8h_html"><div class="ttname"><a href="interpolation_8h.html">interpolation.h</a></div></div>
 <div class="ttc" id="aio_8h_html"><div class="ttname"><a href="io_8h.html">io.h</a></div><div class="ttdoc">Public interface for data input/output routines.</div></div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Logging utilities and macros for PETSc-based applications.</div></div>
-<div class="ttc" id="asetup_8h_html_a1c08bf327e1aee897c56610a89f75814"><div class="ttname"><a href="setup_8h.html#a1c08bf327e1aee897c56610a89f75814">SetupDomainRankInfo</a></div><div class="ttdeci">PetscErrorCode SetupDomainRankInfo(SimCtx *simCtx)</div><div class="ttdoc">Sets up the full rank communication infrastructure, including neighbor ranks and bounding box exchang...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01778">setup.c:1778</a></div></div>
-<div class="ttc" id="asetup_8h_html_a25ce912d8aafa319a8c915cd350c7322"><div class="ttname"><a href="setup_8h.html#a25ce912d8aafa319a8c915cd350c7322">GetGhostedCellRange</a></div><div class="ttdeci">PetscErrorCode GetGhostedCellRange(const DMDALocalInfo *info_nodes, const RankNeighbors *neighbors, PetscInt dim, PetscInt *xs_cell_global_out, PetscInt *xm_cell_local_out)</div><div class="ttdoc">Gets the global cell range for a rank, including boundary cells.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01522">setup.c:1522</a></div></div>
-<div class="ttc" id="asetup_8h_html_a2b52d74f346e62584fb4e91e11a850b9"><div class="ttname"><a href="setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9">Deallocate3DArrayVector</a></div><div class="ttdeci">PetscErrorCode Deallocate3DArrayVector(Cmpnts ***array, PetscInt nz, PetscInt ny)</div><div class="ttdoc">Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01308">setup.c:1308</a></div></div>
-<div class="ttc" id="asetup_8h_html_a2be2815aeb79afe9b95caf39c7b3312c"><div class="ttname"><a href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a></div><div class="ttdeci">PetscErrorCode SetupGridAndSolvers(SimCtx *simCtx)</div><div class="ttdoc">The main orchestrator for setting up all grid-related components.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00618">setup.c:618</a></div></div>
-<div class="ttc" id="asetup_8h_html_a47daae7d6e456ef74e75626c1c9d6c9a"><div class="ttname"><a href="setup_8h.html#a47daae7d6e456ef74e75626c1c9d6c9a">CreateAndInitializeAllVectors</a></div><div class="ttdeci">PetscErrorCode CreateAndInitializeAllVectors(SimCtx *simCtx)</div><div class="ttdoc">Creates and initializes all PETSc Vec objects for all fields.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00658">setup.c:658</a></div></div>
-<div class="ttc" id="asetup_8h_html_a4d7b90ec69412357cf8c38ea8f4e71f6"><div class="ttname"><a href="setup_8h.html#a4d7b90ec69412357cf8c38ea8f4e71f6">ComputeAndStoreNeighborRanks</a></div><div class="ttdeci">PetscErrorCode ComputeAndStoreNeighborRanks(UserCtx *user)</div><div class="ttdoc">Computes and stores the Cartesian neighbor ranks for the DMDA decomposition.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01567">setup.c:1567</a></div></div>
-<div class="ttc" id="asetup_8h_html_a515c9a96eb4bcac29f79e78c8882d7aa"><div class="ttname"><a href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a></div><div class="ttdeci">PetscErrorCode Contra2Cart(UserCtx *user)</div><div class="ttdoc">Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant velocity (Ucont) defined on...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01881">setup.c:1881</a></div></div>
-<div class="ttc" id="asetup_8h_html_a8b1b661a11ef0a0e0bb7fb92f2d211f4"><div class="ttname"><a href="setup_8h.html#a8b1b661a11ef0a0e0bb7fb92f2d211f4">Allocate3DArrayScalar</a></div><div class="ttdeci">PetscErrorCode Allocate3DArrayScalar(PetscReal ****array, PetscInt nz, PetscInt ny, PetscInt nx)</div><div class="ttdoc">Allocates a 3D array of PetscReal values using PetscCalloc.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01148">setup.c:1148</a></div></div>
+<div class="ttc" id="asetup_8h_html_a04347e0c9c03c23267d401270af85d79"><div class="ttname"><a href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a></div><div class="ttdeci">PetscErrorCode ComputeVectorFieldDerivatives(UserCtx *user, PetscInt i, PetscInt j, PetscInt k, Cmpnts ***field_data, Cmpnts *dudx, Cmpnts *dvdx, Cmpnts *dwdx)</div><div class="ttdoc">Computes the derivatives of a cell-centered vector field at a specific grid point.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02678">setup.c:2678</a></div></div>
+<div class="ttc" id="asetup_8h_html_a1c08bf327e1aee897c56610a89f75814"><div class="ttname"><a href="setup_8h.html#a1c08bf327e1aee897c56610a89f75814">SetupDomainRankInfo</a></div><div class="ttdeci">PetscErrorCode SetupDomainRankInfo(SimCtx *simCtx)</div><div class="ttdoc">Sets up the full rank communication infrastructure, including neighbor ranks and bounding box exchang...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01981">setup.c:1981</a></div></div>
+<div class="ttc" id="asetup_8h_html_a26fa0cca0aa8b05f2705cdd0e7d37658"><div class="ttname"><a href="setup_8h.html#a26fa0cca0aa8b05f2705cdd0e7d37658">InitializeRandomGenerators</a></div><div class="ttdeci">PetscErrorCode InitializeRandomGenerators(UserCtx *user, PetscRandom *randx, PetscRandom *randy, PetscRandom *randz)</div><div class="ttdoc">Initializes random number generators for assigning particle properties.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02549">setup.c:2549</a></div></div>
+<div class="ttc" id="asetup_8h_html_a2b52d74f346e62584fb4e91e11a850b9"><div class="ttname"><a href="setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9">Deallocate3DArrayVector</a></div><div class="ttdeci">PetscErrorCode Deallocate3DArrayVector(Cmpnts ***array, PetscInt nz, PetscInt ny)</div><div class="ttdoc">Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01571">setup.c:1571</a></div></div>
+<div class="ttc" id="asetup_8h_html_a2be2815aeb79afe9b95caf39c7b3312c"><div class="ttname"><a href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a></div><div class="ttdeci">PetscErrorCode SetupGridAndSolvers(SimCtx *simCtx)</div><div class="ttdoc">The main orchestrator for setting up all grid-related components.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00857">setup.c:857</a></div></div>
+<div class="ttc" id="asetup_8h_html_a3ed7edc1ce3c1b4aae8e30f9a75bdce8"><div class="ttname"><a href="setup_8h.html#a3ed7edc1ce3c1b4aae8e30f9a75bdce8">SetupSimulationEnvironment</a></div><div class="ttdeci">PetscErrorCode SetupSimulationEnvironment(SimCtx *simCtx)</div><div class="ttdoc">Verifies and prepares the complete I/O environment for a simulation run.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00558">setup.c:558</a></div></div>
+<div class="ttc" id="asetup_8h_html_a47daae7d6e456ef74e75626c1c9d6c9a"><div class="ttname"><a href="setup_8h.html#a47daae7d6e456ef74e75626c1c9d6c9a">CreateAndInitializeAllVectors</a></div><div class="ttdeci">PetscErrorCode CreateAndInitializeAllVectors(SimCtx *simCtx)</div><div class="ttdoc">Creates and initializes all PETSc Vec objects for all fields.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00897">setup.c:897</a></div></div>
+<div class="ttc" id="asetup_8h_html_a4d7b90ec69412357cf8c38ea8f4e71f6"><div class="ttname"><a href="setup_8h.html#a4d7b90ec69412357cf8c38ea8f4e71f6">ComputeAndStoreNeighborRanks</a></div><div class="ttdeci">PetscErrorCode ComputeAndStoreNeighborRanks(UserCtx *user)</div><div class="ttdoc">Computes and stores the Cartesian neighbor ranks for the DMDA decomposition.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01770">setup.c:1770</a></div></div>
+<div class="ttc" id="asetup_8h_html_a515c9a96eb4bcac29f79e78c8882d7aa"><div class="ttname"><a href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a></div><div class="ttdeci">PetscErrorCode Contra2Cart(UserCtx *user)</div><div class="ttdoc">Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant velocity (Ucont) defined on...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02084">setup.c:2084</a></div></div>
+<div class="ttc" id="asetup_8h_html_a8b1b661a11ef0a0e0bb7fb92f2d211f4"><div class="ttname"><a href="setup_8h.html#a8b1b661a11ef0a0e0bb7fb92f2d211f4">Allocate3DArrayScalar</a></div><div class="ttdeci">PetscErrorCode Allocate3DArrayScalar(PetscReal ****array, PetscInt nz, PetscInt ny, PetscInt nx)</div><div class="ttdoc">Allocates a 3D array of PetscReal values using PetscCalloc.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01411">setup.c:1411</a></div></div>
 <div class="ttc" id="asetup_8h_html_a977df65dac293c1308451334cb198693"><div class="ttname"><a href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></div><div class="ttdeci">PetscErrorCode CreateSimulationContext(int argc, char **argv, SimCtx **p_simCtx)</div><div class="ttdoc">Allocates and populates the master SimulationContext object.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00044">setup.c:44</a></div></div>
-<div class="ttc" id="asetup_8h_html_a9b17552f79ebe16d0363986217a01ff3"><div class="ttname"><a href="setup_8h.html#a9b17552f79ebe16d0363986217a01ff3">GetOwnedCellRange</a></div><div class="ttdeci">PetscErrorCode GetOwnedCellRange(const DMDALocalInfo *info_nodes, PetscInt dim, PetscInt *xs_cell_global, PetscInt *xm_cell_local)</div><div class="ttdoc">Determines the global starting index and number of CELLS owned by the current processor in a specifie...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01409">setup.c:1409</a></div></div>
-<div class="ttc" id="asetup_8h_html_aacf7da4f6b65d67f5d8eafa2e5fc7ead"><div class="ttname"><a href="setup_8h.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead">SetDMDAProcLayout</a></div><div class="ttdeci">PetscErrorCode SetDMDAProcLayout(DM dm, UserCtx *user)</div><div class="ttdoc">Sets the processor layout for a given DMDA based on PETSc options.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01694">setup.c:1694</a></div></div>
-<div class="ttc" id="asetup_8h_html_abab14dc7f20644674b043609950eefe2"><div class="ttname"><a href="setup_8h.html#abab14dc7f20644674b043609950eefe2">ComputeDivergence</a></div><div class="ttdeci">PetscErrorCode ComputeDivergence(UserCtx *user)</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02179">setup.c:2179</a></div></div>
-<div class="ttc" id="asetup_8h_html_acd8d87dc85f19ba3e32811a623bf5b36"><div class="ttname"><a href="setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36">BinarySearchInt64</a></div><div class="ttdeci">PetscErrorCode BinarySearchInt64(PetscInt n, const PetscInt64 arr[], PetscInt64 key, PetscBool *found)</div><div class="ttdoc">Performs a binary search for a key in a sorted array of PetscInt64.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02120">setup.c:2120</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad0b5edc0d4872661a274fabbbf790019"><div class="ttname"><a href="setup_8h.html#ad0b5edc0d4872661a274fabbbf790019">Allocate3DArrayVector</a></div><div class="ttdeci">PetscErrorCode Allocate3DArrayVector(Cmpnts ****array, PetscInt nz, PetscInt ny, PetscInt nx)</div><div class="ttdoc">Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01250">setup.c:1250</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l00832">setup.c:832</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad9f399b16547eba3244159f7136a1eb9"><div class="ttname"><a href="setup_8h.html#ad9f399b16547eba3244159f7136a1eb9">SetupBoundaryConditions</a></div><div class="ttdeci">PetscErrorCode SetupBoundaryConditions(SimCtx *simCtx)</div><div class="ttdoc">(Orchestrator) Sets up all boundary conditions for the simulation.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01091">setup.c:1091</a></div></div>
-<div class="ttc" id="asetup_8h_html_aeb77337317f41972d1c75c8d80527892"><div class="ttname"><a href="setup_8h.html#aeb77337317f41972d1c75c8d80527892">SetupDomainCellDecompositionMap</a></div><div class="ttdeci">PetscErrorCode SetupDomainCellDecompositionMap(UserCtx *user)</div><div class="ttdoc">Creates and distributes a map of the domain's cell decomposition to all ranks.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02039">setup.c:2039</a></div></div>
-<div class="ttc" id="asetup_8h_html_af73e238fa95229094a92ac66812799f7"><div class="ttname"><a href="setup_8h.html#af73e238fa95229094a92ac66812799f7">Deallocate3DArrayScalar</a></div><div class="ttdeci">PetscErrorCode Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny)</div><div class="ttdoc">Deallocates a 3D array of PetscReal values allocated by Allocate3DArrayScalar.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01193">setup.c:1193</a></div></div>
+<div class="ttc" id="asetup_8h_html_a9b17552f79ebe16d0363986217a01ff3"><div class="ttname"><a href="setup_8h.html#a9b17552f79ebe16d0363986217a01ff3">GetOwnedCellRange</a></div><div class="ttdeci">PetscErrorCode GetOwnedCellRange(const DMDALocalInfo *info_nodes, PetscInt dim, PetscInt *xs_cell_global, PetscInt *xm_cell_local)</div><div class="ttdoc">Determines the global starting index and number of CELLS owned by the current processor in a specifie...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01663">setup.c:1663</a></div></div>
+<div class="ttc" id="asetup_8h_html_aacf7da4f6b65d67f5d8eafa2e5fc7ead"><div class="ttname"><a href="setup_8h.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead">SetDMDAProcLayout</a></div><div class="ttdeci">PetscErrorCode SetDMDAProcLayout(DM dm, UserCtx *user)</div><div class="ttdoc">Sets the processor layout for a given DMDA based on PETSc options.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01897">setup.c:1897</a></div></div>
+<div class="ttc" id="asetup_8h_html_ab723e91906e01ec26aab97de6623000c"><div class="ttname"><a href="setup_8h.html#ab723e91906e01ec26aab97de6623000c">InitializeLogicalSpaceRNGs</a></div><div class="ttdeci">PetscErrorCode InitializeLogicalSpaceRNGs(PetscRandom *rand_logic_i, PetscRandom *rand_logic_j, PetscRandom *rand_logic_k)</div><div class="ttdoc">Initializes random number generators for logical space operations [0.0, 1.0).</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02600">setup.c:2600</a></div></div>
+<div class="ttc" id="asetup_8h_html_abab14dc7f20644674b043609950eefe2"><div class="ttname"><a href="setup_8h.html#abab14dc7f20644674b043609950eefe2">ComputeDivergence</a></div><div class="ttdeci">PetscErrorCode ComputeDivergence(UserCtx *user)</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02377">setup.c:2377</a></div></div>
+<div class="ttc" id="asetup_8h_html_acd8d87dc85f19ba3e32811a623bf5b36"><div class="ttname"><a href="setup_8h.html#acd8d87dc85f19ba3e32811a623bf5b36">BinarySearchInt64</a></div><div class="ttdeci">PetscErrorCode BinarySearchInt64(PetscInt n, const PetscInt64 arr[], PetscInt64 key, PetscBool *found)</div><div class="ttdoc">Performs a binary search for a key in a sorted array of PetscInt64.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02318">setup.c:2318</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad0b5edc0d4872661a274fabbbf790019"><div class="ttname"><a href="setup_8h.html#ad0b5edc0d4872661a274fabbbf790019">Allocate3DArrayVector</a></div><div class="ttdeci">PetscErrorCode Allocate3DArrayVector(Cmpnts ****array, PetscInt nz, PetscInt ny, PetscInt nx)</div><div class="ttdoc">Deallocates a 3D array of Cmpnts structures allocated by Allocate3DArrayVector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01513">setup.c:1513</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01091">setup.c:1091</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad9f399b16547eba3244159f7136a1eb9"><div class="ttname"><a href="setup_8h.html#ad9f399b16547eba3244159f7136a1eb9">SetupBoundaryConditions</a></div><div class="ttdeci">PetscErrorCode SetupBoundaryConditions(SimCtx *simCtx)</div><div class="ttdoc">(Orchestrator) Sets up all boundary conditions for the simulation.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01354">setup.c:1354</a></div></div>
+<div class="ttc" id="asetup_8h_html_aeb77337317f41972d1c75c8d80527892"><div class="ttname"><a href="setup_8h.html#aeb77337317f41972d1c75c8d80527892">SetupDomainCellDecompositionMap</a></div><div class="ttdeci">PetscErrorCode SetupDomainCellDecompositionMap(UserCtx *user)</div><div class="ttdoc">Creates and distributes a map of the domain's cell decomposition to all ranks.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02242">setup.c:2242</a></div></div>
+<div class="ttc" id="asetup_8h_html_af73e238fa95229094a92ac66812799f7"><div class="ttname"><a href="setup_8h.html#af73e238fa95229094a92ac66812799f7">Deallocate3DArrayScalar</a></div><div class="ttdeci">PetscErrorCode Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny)</div><div class="ttdoc">Deallocates a 3D array of PetscReal values allocated by Allocate3DArrayScalar.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01456">setup.c:1456</a></div></div>
 <div class="ttc" id="avariables_8h_html"><div class="ttname"><a href="variables_8h.html">variables.h</a></div><div class="ttdoc">Main header file for a complex fluid dynamics solver.</div></div>
 <div class="ttc" id="avariables_8h_html_structCmpnts"><div class="ttname"><a href="variables_8h.html#structCmpnts">Cmpnts</a></div><div class="ttdoc">A 3D point or vector with PetscScalar components.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00100">variables.h:100</a></div></div>
-<div class="ttc" id="avariables_8h_html_structRankNeighbors"><div class="ttname"><a href="variables_8h.html#structRankNeighbors">RankNeighbors</a></div><div class="ttdoc">Stores the MPI ranks of neighboring subdomains.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00176">variables.h:176</a></div></div>
 <div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00538">variables.h:538</a></div></div>
-<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00657">variables.h:657</a></div></div>
+<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00661">variables.h:661</a></div></div>
 <div class="ttc" id="awalkingsearch_8h_html"><div class="ttname"><a href="walkingsearch_8h.html">walkingsearch.h</a></div><div class="ttdoc">Header file for particle location functions using the walking search algorithm.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
