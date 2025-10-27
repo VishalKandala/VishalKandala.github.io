@@ -11,7 +11,7 @@ nav_order: 6
 AERO 670: Turbulence Modelling \
 ECEN 689: Scientific Machine Learning \
 MEEN 689: Computing Concepts \
-MEEN 610: Numerical Methods in Differential Equations \
+MAT 610: Numerical Methods in Differential Equations \
 MEEN 689: Computational Fluid Dynamics \
 MEEN 621: Fluid Mechanics \
 AERO 689: Systems Analysis \
