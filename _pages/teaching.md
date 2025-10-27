@@ -7,6 +7,40 @@ nav: true
 nav_order: 5
 ---
 
+<style>
+.syllabus-content {
+  padding-left: 1.5rem;
+  line-height: 1.8;
+}
+
+.syllabus-content ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.syllabus-content li {
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+}
+
+details {
+  margin: 1rem 0;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  user-select: none;
+}
+
+summary:hover {
+  background-color: #e9ecef;
+}
+</style>
+
 ## Teaching Philosophy
 
 My teaching approach emphasizes building intuition and understanding foundational concepts, particularly for students from diverse academic backgrounds. I believe in creating accessible learning materials that bridge theoretical concepts with practical applications, while maintaining academic rigor appropriate to the course level. In laboratory settings, I prioritize hands-on learning, safety, and the development of experimental skills critical to engineering practice.
@@ -34,22 +68,24 @@ A mandatory statistics course serving students from diverse majors and backgroun
 - Managed large-scale course logistics with diverse student population
 
 <details>
-<summary><strong>Course Syllabus (Click to expand)</strong></summary>
-
-- **Chapter 1:** Introduction to Data
-- **Chapter 2:** Exploratory Data Analysis
-- **Chapter 3:** Association and Correlation
-- **Chapter 4:** Probability and Distributions
-- **Chapter 5:** Sampling Distributions
-- **Chapter 6:** Statistical Inference
-- **Chapter 7:** Hypothesis Testing
-- **Chapter 8:** Regression
-
+<summary>Course Syllabus (Click to expand)</summary>
+<div class="syllabus-content">
+<ul>
+<li><strong>Chapter 1:</strong> Introduction to Data</li>
+<li><strong>Chapter 2:</strong> Exploratory Data Analysis</li>
+<li><strong>Chapter 3:</strong> Association and Correlation</li>
+<li><strong>Chapter 4:</strong> Probability and Distributions</li>
+<li><strong>Chapter 5:</strong> Sampling Distributions</li>
+<li><strong>Chapter 6:</strong> Statistical Inference</li>
+<li><strong>Chapter 7:</strong> Hypothesis Testing</li>
+<li><strong>Chapter 8:</strong> Regression</li>
+</ul>
+</div>
 </details>
 
 ---
 
-### Heat Transfer (MEEN 461)
+### Heat Transfer (MEEN 641)
 **Role:** Teaching Assistant | **Level:** Senior Undergraduate / Graduate
 
 An advanced technical course in thermal sciences requiring rigorous understanding of heat transfer principles and their engineering applications.
@@ -68,26 +104,28 @@ An advanced technical course in thermal sciences requiring rigorous understandin
 - Balancing theoretical foundations with engineering applications
 
 <details>
-<summary><strong>Course Syllabus (Click to expand)</strong></summary>
-
-- **Chapter 1:** Introduction to Heat Transfer - Physical origins and three modes of heat transfer, rate equation
-- **Chapter 2:** Introduction to Conduction - Conduction rate equation, boundary and initial conditions
-- **Chapter 3:** One-Dimensional, Steady-State Conduction - Plane wall, radial systems, thermal energy generation, extended surfaces
-- **Chapter 4:** Two-Dimensional, Steady-State Conduction - Shape factor, finite-difference equations, nodal network, energy balance
-- **Chapter 5:** Transient Conduction - Lumped capacitance method, spatial effects in plane wall and radial systems
-- **Chapter 6:** Introduction to Convection - Boundary layers, local and average coefficients, laminar and turbulent flow
-- **Chapter 7:** External Flow - Empirical method, flat plate in parallel flow, cylinder and sphere in cross flow
-- **Chapter 8:** Internal Flow - Hydrodynamic and thermal conditions, laminar and turbulent flow in circular tubes
-- **Chapter 9:** Free Convection - Physical considerations, laminar free convection, combined free and forced convection
-- **Chapter 10:** Heat Exchangers - Types, overall heat transfer coefficient, LMTD, effectiveness-NTU method
-- **Chapter 11:** Radiation Processes and Properties - Basic concepts, blackbody radiation, gray surface
-- **Chapter 12:** Radiation Exchange Between Surfaces - View factor, blackbody and gray surface radiation exchange
-
+<summary>Course Syllabus (Click to expand)</summary>
+<div class="syllabus-content">
+<ul>
+<li><strong>Chapter 1:</strong> Introduction to Heat Transfer - Physical origins and three modes of heat transfer, rate equation</li>
+<li><strong>Chapter 2:</strong> Introduction to Conduction - Conduction rate equation, boundary and initial conditions</li>
+<li><strong>Chapter 3:</strong> One-Dimensional, Steady-State Conduction - Plane wall, radial systems, thermal energy generation, extended surfaces</li>
+<li><strong>Chapter 4:</strong> Two-Dimensional, Steady-State Conduction - Shape factor, finite-difference equations, nodal network, energy balance</li>
+<li><strong>Chapter 5:</strong> Transient Conduction - Lumped capacitance method, spatial effects in plane wall and radial systems</li>
+<li><strong>Chapter 6:</strong> Introduction to Convection - Boundary layers, local and average coefficients, laminar and turbulent flow</li>
+<li><strong>Chapter 7:</strong> External Flow - Empirical method, flat plate in parallel flow, cylinder and sphere in cross flow</li>
+<li><strong>Chapter 8:</strong> Internal Flow - Hydrodynamic and thermal conditions, laminar and turbulent flow in circular tubes</li>
+<li><strong>Chapter 9:</strong> Free Convection - Physical considerations, laminar free convection, combined free and forced convection</li>
+<li><strong>Chapter 10:</strong> Heat Exchangers - Types, overall heat transfer coefficient, LMTD, effectiveness-NTU method</li>
+<li><strong>Chapter 11:</strong> Radiation Processes and Properties - Basic concepts, blackbody radiation, gray surface</li>
+<li><strong>Chapter 12:</strong> Radiation Exchange Between Surfaces - View factor, blackbody and gray surface radiation exchange</li>
+</ul>
+</div>
 </details>
 
 ---
 
-### Heat Transfer Laboratory (MEEN 464 Lab)
+### Heat Transfer Laboratory (MEEN 461 Lab)
 **Role:** Instructor (Independent) | **Level:** Undergraduate
 
 A hands-on laboratory course where I served as the sole instructor, with full responsibility for course delivery, safety management, and student assessment.
@@ -110,6 +148,7 @@ A hands-on laboratory course where I served as the sole instructor, with full re
 - Maintaining expensive equipment while enabling hands-on learning
 
 **Laboratory Experiments:**
+
 Experiments aligned with heat transfer theory covering:
 - Conduction experiments (steady-state and transient)
 - Convection measurements (forced and natural)
