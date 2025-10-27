@@ -24,4 +24,4 @@ AERO 640: Turbulence Processes \
 AERO 615: Computational Fluid Dynamics for Aerospace applications \
 AERO 689: Numerical Analysis \
 AERO 676: Aerothermochemistry \
-AERO 601: Advanced Aerodynamics \
+AERO 601: Advanced Aerodynamics 
