@@ -7,6 +7,8 @@ nav: false
 nav_order: 6
 ---
 *Graduate Courses:*
+
+
 \
 AERO 670: Turbulence Modelling \
 ECEN 689: Scientific Machine Learning \ 
