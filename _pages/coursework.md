@@ -8,8 +8,6 @@ nav_order: 6
 ---
 *Graduate Courses:*
 
-
-\
 AERO 670: Turbulence Modelling \
 ECEN 689: Scientific Machine Learning \
 MEEN 689: Computing Concepts \
@@ -27,4 +25,3 @@ AERO 615: Computational Fluid Dynamics for Aerospace applications \
 AERO 689: Numerical Analysis \
 AERO 676: Aerothermochemistry \
 AERO 601: Advanced Aerodynamics \
-\
