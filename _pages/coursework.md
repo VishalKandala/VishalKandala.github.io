@@ -58,11 +58,9 @@ nav_order: 6
 }
 </style>
 
-## Graduate Courses
-
 <div class="course-category">
-
-## Computational Fluid Dynamics & Numerical Methods
+  
+Computational Fluid Dynamics & Numerical Methods
 
 <div class="course-grid">
   <div class="course-card">
@@ -106,7 +104,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Turbulence & Fluid Mechanics
+Turbulence & Fluid Mechanics
 
 <div class="course-grid">
   <div class="course-card">
@@ -132,7 +130,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Combustion & Propulsion
+Combustion & Propulsion
 
 <div class="course-grid">
   <div class="course-card">
@@ -152,7 +150,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Machine Learning & Computing
+Machine Learning & Computing
 
 <div class="course-grid">
   <div class="course-card">
@@ -178,7 +176,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Systems & Dynamics
+Systems & Dynamics
 
 <div class="course-grid">
   <div class="course-card">
@@ -198,7 +196,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Aerodynamics
+Aerodynamics
 
 <div class="course-grid">
   <div class="course-card">
