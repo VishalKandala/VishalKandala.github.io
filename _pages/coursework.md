@@ -2,12 +2,14 @@
 layout: page
 title: Coursework
 permalink: /courses/
-description: A growing collection of your cool projects.
+description: A collection of relevant courses taken.
 nav: false
 nav_order: 6
 ---
 *Graduate Courses:*
 \
+AERO 670: Turbulence Modelling \
+ECEN 689: Scientific Machine Learning \ 
 MEEN 689: Computing Concepts \
 MEEN 610: Numerical Methods in Differential Equations \
 MEEN 689: Computational Fluid Dynamics \
@@ -24,4 +26,3 @@ AERO 689: Numerical Analysis \
 AERO 676: Aerothermochemistry \
 AERO 601: Advanced Aerodynamics \
 \
-*Under-Graduae Courses:*
