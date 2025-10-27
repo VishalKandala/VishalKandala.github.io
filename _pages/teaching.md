@@ -18,7 +18,7 @@ Chapter 5: Sampling Distributions \
 Chapter 6: Statistical Inference \
 Chapter 7: Hypothesis Testing \
 Chapter 8: Regression
-\
+
 
 _Heat Transfer (MEEN 641)_
 
@@ -35,5 +35,5 @@ Chapter 9: Free convection: Physical considerations, laminar free convection, co
 Chapter 10: Heat exchangers: Types, overall heat transfer coefficient, heat exchanger analysis, use of the Log Mean Temperature Difference, effectiveness-NTU method \
 Chapter 11: Radiation: Processes and properties: Basic concepts, blackbody radiation, radiation properties, gray surface. \
 Chapter 12: Radiation exchange between surfaces: View factor, blackbody radiation exchange, radiation exchange between gray surfaces.
-\
+
 
