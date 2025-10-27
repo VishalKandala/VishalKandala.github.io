@@ -62,7 +62,7 @@ nav_order: 6
 
 <div class="course-category">
 
-### Computational Fluid Dynamics & Numerical Methods
+## Computational Fluid Dynamics & Numerical Methods
 
 <div class="course-grid">
   <div class="course-card">
