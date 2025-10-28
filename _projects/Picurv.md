@@ -260,7 +260,18 @@ The development follows a staged approach:
 
 PICurv is being developed as production-quality scientific software with a focus on scalability, maintainability, and extensibility. **The current implementation establishes robust Eulerian-Lagrangian coupling for particle transport on curvilinear grids.** This foundation will support the eventual FDF framework while providing immediate capabilities for particle-laden flow simulations.
 
-```mermaid
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ 
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+      fontSize: '14px'
+    }
+  });
+</script>
+
+<div class="mermaid">
 flowchart TB
     subgraph Main["Main Driver (picsolver.c)"]
         A[Initialize PETSc] --> B[Configure Simulation]
@@ -327,7 +338,8 @@ flowchart TB
     style Eulerian fill:#e8f5e9
     style Lagrangian fill:#fce4ec
     style DataStructures fill:#fff9c4
-```
+</div>
+
 <div class="caption">
     High-level architecture of PICurv showing the modular code organization. The main driver orchestrates the setup phase and time-stepping loop. Each time step involves coupled Eulerian (flow solver) and Lagrangian (particle) updates, operating on shared data structures managed by PETSc.
 </div>
