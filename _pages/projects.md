@@ -2,10 +2,10 @@
 layout: page
 title: Projects
 permalink: /projects/
-description: A growing collection of interesting projects.
+description: Research projects and open-source software tools in computational fluid dynamics and scientific computing.
 nav: true
 nav_order: 3
-display_categories: [Research,Personal]
+display_categories: [Research, Personal]
 horizontal: false
 ---
 
@@ -56,4 +56,3 @@ horizontal: false
   {%- endif -%}
 {%- endif -%}
 </div>
-
