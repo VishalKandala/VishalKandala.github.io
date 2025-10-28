@@ -260,13 +260,76 @@ The development follows a staged approach:
 
 PICurv is being developed as production-quality scientific software with a focus on scalability, maintainability, and extensibility. **The current implementation establishes robust Eulerian-Lagrangian coupling for particle transport on curvilinear grids.** This foundation will support the eventual FDF framework while providing immediate capabilities for particle-laden flow simulations.
 
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/picurv/code_architecture.png" title="PICurv code architecture" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
+```mermaid
+flowchart TB
+    subgraph Main["Main Driver (picsolver.c)"]
+        A[Initialize PETSc] --> B[Configure Simulation]
+        B --> C[Setup Environment]
+        C --> D[Execute Simulation]
+        D --> E[Finalize]
+    end
+
+    subgraph Setup["Setup Phase (setup.c)"]
+        direction TB
+        B --> S1[Parse Control Files]
+        S1 --> S2[Create Context Hierarchy]
+        S2 --> S3[Setup Grid & Solvers]
+        S3 --> S4[Setup Boundary Conditions]
+        S4 --> S5[Initialize Fields]
+        S5 --> S6[Initialize Particles]
+    end
+
+    subgraph TimeLoop["Time Marching (simulation.c)"]
+        direction TB
+        D --> TL1[Reset Particle States]
+        TL1 --> TL2[Eulerian Solve]
+        TL2 --> TL3[Lagrangian Update]
+        TL3 --> TL4[History & I/O]
+        TL4 --> TL5{Continue?}
+        TL5 -->|Yes| TL1
+        TL5 -->|No| E
+    end
+
+    subgraph Eulerian["Flow Solver (solvers.c)"]
+        direction TB
+        TL2 --> FS1[Update Turbulence Models]
+        FS1 --> FS2[Momentum Solver]
+        FS2 --> FS3[Pressure-Poisson Solve]
+        FS3 --> FS4[Velocity Correction]
+        FS4 --> FS5[Diagnostics]
+    end
+
+    subgraph Lagrangian["Particle System"]
+        direction TB
+        TL3 --> PS1[Advect Particles]
+        PS1 --> PS2[Locate in Grid]
+        PS2 --> PS3[Migrate Across Ranks]
+        PS3 --> PS4[Interpolate Fields]
+        PS4 --> PS5[Update Properties]
+    end
+
+    subgraph DataStructures["Key Data Structures"]
+        direction LR
+        DS1[SimCtx<br/>Master Context]
+        DS2[UserCtx<br/>Per-Block Data]
+        DS3[DMSwarm<br/>Particle Data]
+        DS4[DMDA<br/>Grid Data]
+    end
+
+    Setup -.->|Initializes| DataStructures
+    TimeLoop -.->|Operates on| DataStructures
+    Eulerian -.->|Updates| DS2
+    Lagrangian -.->|Updates| DS3
+
+    style Main fill:#e1f5ff
+    style Setup fill:#fff3e0
+    style TimeLoop fill:#f3e5f5
+    style Eulerian fill:#e8f5e9
+    style Lagrangian fill:#fce4ec
+    style DataStructures fill:#fff9c4
+```
 <div class="caption">
-    Modular architecture of PICurv showing major components and data flow. [Image placeholder: Block diagram of code structure]
+    High-level architecture of PICurv showing the modular code organization. The main driver orchestrates the setup phase and time-stepping loop. Each time step involves coupled Eulerian (flow solver) and Lagrangian (particle) updates, operating on shared data structures managed by PETSc.
 </div>
 
 ### Parallel Architecture for Massive Particle Populations
