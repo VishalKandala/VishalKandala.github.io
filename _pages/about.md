@@ -5,7 +5,7 @@ permalink: /
 subtitle: <a href='https://scbl.engr.tamu.edu/'>Scientific Computing and Biofluids Lab, Texas A&M University</a>.
 profile:
   align: right
-  image: prof_pic.jpg
+  image: mainpage/prof_pic.jpg
   image_circular: false # crops the image to make it circular
   address: >
     <p>242 Spence Street</p>
