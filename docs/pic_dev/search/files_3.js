@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['analyticalsolution_2eh_0',['AnalyticalSolution.h',['../AnalyticalSolution_8h.html',1,'']]]
+  ['analyticalsolutions_2ec_0',['AnalyticalSolutions.c',['../AnalyticalSolutions_8c.html',1,'']]],
+  ['analyticalsolutions_2eh_1',['AnalyticalSolutions.h',['../AnalyticalSolutions_8h.html',1,'']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['vtk_5fpolydata_0',['VTK_POLYDATA',['../variables_8h.html#afef259795cd298f0d543f574536e4dd7a37bd63d1b8edab46f0e9e6e4a52dfb57',1,'variables.h']]],
-  ['vtk_5fstructured_1',['VTK_STRUCTURED',['../variables_8h.html#afef259795cd298f0d543f574536e4dd7a5ff970d3dd377697deacd371681babd9',1,'variables.h']]]
+  ['uninitialized_0',['UNINITIALIZED',['../variables_8h.html#a347829443e8a679209e21f7f04f51581af096820742c38363e9d6c33e7c932780',1,'variables.h']]]
 ];

@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['wallfunction_0',['wallfunction',['../variables_8h.html#aa60ee4e3f8eca251ee470427f1ebac13',1,'SimCtx']]],
-  ['weights_1',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
-  ['wing_2',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]]
+  ['wall_5froughness_5fheight_0',['wall_roughness_height',['../variables_8h.html#a9de24ab1d6a2ba8d0960a60fc70c223b',1,'SimCtx']]],
+  ['wallfunction_1',['wallfunction',['../variables_8h.html#aa60ee4e3f8eca251ee470427f1ebac13',1,'SimCtx']]],
+  ['weights_2',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
+  ['wing_3',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]]
 ];

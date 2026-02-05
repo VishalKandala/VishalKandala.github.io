@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['te_0',['TE',['../poisson_8c.html#a91c0a910ad7ea895ed9093c9286df2f2',1,'poisson.c']]],
-  ['tmp_5fbuf_5fsize_1',['TMP_BUF_SIZE',['../logging_8c.html#a2e6c4948edc7d28d77ca47f0d6403d2b',1,'logging.c']]],
-  ['tn_2',['TN',['../poisson_8c.html#adda1ea75ba8153e72cfb5c87606c55a6',1,'poisson.c']]],
-  ['tp_3',['TP',['../poisson_8c.html#af972ebfdd064fdb489daf84443a12f35',1,'poisson.c']]],
-  ['trilinearinterpolation_4',['TrilinearInterpolation',['../interpolation_8h.html#a028d693bd5e99242092b027c7e46f3a4',1,'interpolation.h']]],
-  ['ts_5',['TS',['../poisson_8c.html#aaade3232ef08cf18b4f3a20a0a2c6fb6',1,'poisson.c']]],
-  ['tw_6',['TW',['../poisson_8c.html#a051c83d6554c006261a198d0682d84e4',1,'poisson.c']]]
+  ['se_0',['SE',['../poisson_8c.html#a18bbe716f5be6adbd2150139244c0262',1,'poisson.c']]],
+  ['sp_1',['SP',['../poisson_8c.html#aecd69d9a67487cc45c38eb184c50538a',1,'poisson.c']]],
+  ['sw_2',['SW',['../poisson_8c.html#a4b95e941f44a20ea60512bbe2065f0b6',1,'poisson.c']]]
 ];

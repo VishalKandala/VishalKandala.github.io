@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['inlet_0',['INLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa266d6a7abcd7483578364c547b428f3a',1,'variables.h']]],
-  ['interface_1',['INTERFACE',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa56690e5e62dbaca19fd78dcfe5d78544',1,'variables.h']]]
+  ['farfield_0',['FARFIELD',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa994deb5e50b841824b257d6d2d108757',1,'variables.h']]],
+  ['front_1',['FRONT',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa76bd5ec6ea9d8a1b582d8d5e43102a02',1,'variables.h']]]
 ];

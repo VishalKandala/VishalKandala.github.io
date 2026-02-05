@@ -158,43 +158,43 @@ var NAVTREE =
       [ "3. Code Modules Overview", "13_Code_Architecture.html#modules_sec", null ]
     ] ],
     [ "Grid, Cell, and Variable Architecture Guide", "md_pages_220__Grid__Cell__Architecture__Guide.html", [
-      [ "1. Overview", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md12", null ],
-      [ "2. The Geometric Foundation: Nodes and Cells", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md14", null ],
-      [ "3. The Primary Variable: Face-Centered Flux (<tt>ucont</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md16", null ],
-      [ "4. The Shifted Index Architecture for Cell-Centered Variables (<tt>ucat</tt>, <tt>P</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md18", [
-        [ "4.1. How it Works at the Boundaries", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md19", null ]
+      [ "1. Overview", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md22", null ],
+      [ "2. The Geometric Foundation: Nodes and Cells", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md24", null ],
+      [ "3. The Primary Variable: Face-Centered Flux (<tt>ucont</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md26", null ],
+      [ "4. The Shifted Index Architecture for Cell-Centered Variables (<tt>ucat</tt>, <tt>P</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md28", [
+        [ "4.1. How it Works at the Boundaries", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md29", null ]
       ] ],
-      [ "5. Effective Computational Domain and Resolution", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md21", null ],
-      [ "6. Implications for Post-Processing (<tt>ComputeNodalAverage</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md23", null ],
-      [ "7. Summary Table of <tt>ucat</tt> Anatomy (i-direction)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md25", null ]
+      [ "5. Effective Computational Domain and Resolution", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md31", null ],
+      [ "6. Implications for Post-Processing (<tt>ComputeNodalAverage</tt>)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md33", null ],
+      [ "7. Summary Table of <tt>ucat</tt> Anatomy (i-direction)", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md35", null ]
     ] ],
     [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md27", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md28", [
-        [ "Included Grid Artifacts", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md29", null ]
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md37", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md38", [
+        [ "Included Grid Artifacts", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md39", null ]
       ] ],
-      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md30", [
-        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md31", null ],
-        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md32", null ],
-        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md33", null ]
+      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md40", [
+        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md41", null ],
+        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md42", null ],
+        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md43", null ]
       ] ],
-      [ "4. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md34", null ]
+      [ "4. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md44", null ]
     ] ],
     [ "Case Template: Laminar Flow in a Flat Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md36", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md37", null ],
-      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md38", [
-        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md39", null ],
-        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md40", null ],
-        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md41", null ]
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md46", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md47", null ],
+      [ "3. How to Use this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md48", [
+        [ "Step 1: Initialize a New Study", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md49", null ],
+        [ "Step 2: Customize the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md50", null ],
+        [ "Step 3: Run the Simulation", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md51", null ]
       ] ],
-      [ "4. Building a New Template from this Example", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md42", null ],
-      [ "5. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md43", null ]
+      [ "4. Building a New Template from this Example", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md52", null ],
+      [ "5. Expected Results & Visualization", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md53", null ]
     ] ],
     [ "PIC-Flow Master Configuration Templates", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html", [
-      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md45", null ],
-      [ "2. How to Use These Files", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md46", null ],
-      [ "3. Best Practices & Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md47", null ]
+      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md55", null ],
+      [ "2. How to Use These Files", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md56", null ],
+      [ "3. Best Practices & Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md57", null ]
     ] ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]

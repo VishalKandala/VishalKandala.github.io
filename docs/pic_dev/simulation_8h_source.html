@@ -121,102 +121,104 @@ $(document).ready(function(){initNavTree('simulation_8h_source.html',''); initRe
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &quot;<a class="code" href="io_8h.html">io.h</a>&quot;</span>             <span class="comment">// Data Input and Output functions</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &quot;<a class="code" href="interpolation_8h.html">interpolation.h</a>&quot;</span>  <span class="comment">// Interpolation routines</span></div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &quot;<a class="code" href="initialcondition_8h.html">initialcondition.h</a>&quot;</span> <span class="comment">// Analytical Solution for testing</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;<a class="code" href="ParticleMotion_8h.html">ParticleMotion.h</a>&quot;</span> <span class="comment">// Functions related to motion of particles</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="Boundaries_8h.html">Boundaries.h</a>&quot;</span>     <span class="comment">//  Functions related to Boundary conditions</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &quot;<a class="code" href="setup_8h.html">setup.h</a>&quot;</span>          <span class="comment">// Functions  related to setup</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &quot;<a class="code" href="solvers_8h.html">solvers.h</a>&quot;</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"></span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * @brief Copies the current time step&#39;s solution fields into history vectors</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *        (e.g., U(t_n) -&gt; U_o, U_o -&gt; U_rm1) for the next time step&#39;s calculations.</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * This function is critical for multi-step time integration schemes (like BDF2)</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * used by the legacy solver. It must be called at the end of every time step,</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * after the new solution has been fully computed.</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> * The order of operations is important to avoid overwriting data prematurely.</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment"> * @param user The UserCtx for a single block. The function modifies the history</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> *             vectors (Ucont_o, Ucont_rm1, etc.) within this context.</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a78d6ef98da860e3271d6b7277a54e642">UpdateSolverHistoryVectors</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment"></span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment"> * @brief Executes the main time-marching loop for the particle simulation.</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment"> * This version uses the new, integrated `LocateAllParticlesInGrid` orchestrator</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"> * and the `ResetAllParticleStatuses` helper for a clean, robust, and understandable workflow.</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> * For each timestep, it performs:</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment"> *  1. Sets the background fluid velocity field (Ucat) for the current step.</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> *  2. Updates particle positions using velocity from the *previous* step&#39;s interpolation.</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> *  3. Removes any particles that have left the global domain.</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> *  4. A single call to `LocateAllParticlesInGrid&#39;, which handles all</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> *     particle location and migration until the swarm is fully settled.</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> *  5. Interpolates the current fluid velocity to the newly settled particle locations.</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> *  6. Scatters particle data back to Eulerian fields.</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> *  7. Outputs data at specified intervals.</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> * @param user       Pointer to the UserCtx structure..</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"></span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * @brief Finalizes the simulation setup at t=0, ensuring a consistent state before time marching.</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> * This function is called from main() after the initial Eulerian and Lagrangian states have been</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"> * created but before the main time loop begins. Its responsibilities are:</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> * 1.  Settling the particle swarm: Migrates particles to their correct owner ranks and finds their</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> *     initial host cells. This includes handling special surface initializations.</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"> * 2.  Coupling the fields: Interpolates the initial Eulerian fields to the settled particle locations.</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"> * 3.  Preparing for the first step: Scatters particle data back to the grid.</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"> * 4.  Writing the initial output for step 0.</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> * @param simCtx Pointer to the main simulation context structure.</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"></span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment"> * @brief Finalizes the simulation state after particle and fluid data have been loaded from a restart.</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> * This helper function performs the critical sequence of operations required to ensure</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment"> * the loaded Lagrangian and Eulerian states are fully consistent and the solver is</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> * ready to proceed. This includes:</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment"> * 1. Verifying particle locations in the grid and building runtime links.</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> * 2. Synchronizing particle velocity with the authoritative grid velocity via interpolation.</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> * 3. Scattering particle source terms (e.g., volume fraction) back to the grid.</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * 4. Updating the solver&#39;s history vectors with the final, fully-coupled state.</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> * 5. Writing the complete, consistent state to output files for the restart step.</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment"> * @param simCtx The main simulation context.</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"></span> </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> * @brief Performs post-load/post-init consistency checks for a restarted simulation.</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> * This function is called from main() ONLY when a restart is being performed</span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> * (i.e., StartStep &gt; 0). It inspects the particle restart mode to determine the</span></div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment"> * correct finalization procedure for the Lagrangian swarm.</span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment"> * - If particles were loaded from a file (`mode == &quot;load&quot;`), it verifies their</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> *   locations within the grid to establish necessary runtime links.</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment"> * - If new particles were initialized into the restarted flow (`mode == &quot;init&quot;`),</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> *   it runs the full `PerformInitialSetup` sequence to migrate, locate, and</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> *   couple the new particles with the existing fluid state.</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> * @param simCtx The main simulation context.</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a7bc2bae7b01f179706b367c8637534c2">FinalizeRestartState</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">#endif  </span><span class="comment">// SIMULATION_H</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;<a class="code" href="AnalyticalSolutions_8h.html">AnalyticalSolutions.h</a>&quot;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="ParticleMotion_8h.html">ParticleMotion.h</a>&quot;</span> <span class="comment">// Functions related to motion of particles</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &quot;<a class="code" href="Boundaries_8h.html">Boundaries.h</a>&quot;</span>     <span class="comment">//  Functions related to Boundary conditions</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &quot;<a class="code" href="setup_8h.html">setup.h</a>&quot;</span>          <span class="comment">// Functions  related to setup</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &quot;<a class="code" href="solvers_8h.html">solvers.h</a>&quot;</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"></span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> * @brief Copies the current time step&#39;s solution fields into history vectors</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *        (e.g., U(t_n) -&gt; U_o, U_o -&gt; U_rm1) for the next time step&#39;s calculations.</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * This function is critical for multi-step time integration schemes (like BDF2)</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * used by the legacy solver. It must be called at the end of every time step,</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> * after the new solution has been fully computed.</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"> * The order of operations is important to avoid overwriting data prematurely.</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> * @param user The UserCtx for a single block. The function modifies the history</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> *             vectors (Ucont_o, Ucont_rm1, etc.) within this context.</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a78d6ef98da860e3271d6b7277a54e642">UpdateSolverHistoryVectors</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment"></span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment"> * @brief Executes the main time-marching loop for the particle simulation.</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"> * This version uses the new, integrated `LocateAllParticlesInGrid` orchestrator</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment"> * and the `ResetAllParticleStatuses` helper for a clean, robust, and understandable workflow.</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment"> * For each timestep, it performs:</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> *  1. Sets the background fluid velocity field (Ucat) for the current step.</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> *  2. Updates particle positions using velocity from the *previous* step&#39;s interpolation.</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> *  3. Removes any particles that have left the global domain.</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> *  4. A single call to `LocateAllParticlesInGrid&#39;, which handles all</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> *     particle location and migration until the swarm is fully settled.</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> *  5. Interpolates the current fluid velocity to the newly settled particle locations.</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> *  6. Scatters particle data back to Eulerian fields.</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> *  7. Outputs data at specified intervals.</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> * @param user       Pointer to the UserCtx structure..</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"></span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> * @brief Finalizes the simulation setup at t=0, ensuring a consistent state before time marching.</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"> * This function is called from main() after the initial Eulerian and Lagrangian states have been</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment"> * created but before the main time loop begins. Its responsibilities are:</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> * 1.  Settling the particle swarm: Migrates particles to their correct owner ranks and finds their</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"> *     initial host cells. This includes handling special surface initializations.</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"> * 2.  Coupling the fields: Interpolates the initial Eulerian fields to the settled particle locations.</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"> * 3.  Preparing for the first step: Scatters particle data back to the grid.</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> * 4.  Writing the initial output for step 0.</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> * @param simCtx Pointer to the main simulation context structure.</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * @return PetscErrorCode 0 on success, non-zero on failure.</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"></span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * @brief Finalizes the simulation state after particle and fluid data have been loaded from a restart.</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment"> * This helper function performs the critical sequence of operations required to ensure</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> * the loaded Lagrangian and Eulerian states are fully consistent and the solver is</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment"> * ready to proceed. This includes:</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> * 1. Verifying particle locations in the grid and building runtime links.</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> * 2. Synchronizing particle velocity with the authoritative grid velocity via interpolation.</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * 3. Scattering particle source terms (e.g., volume fraction) back to the grid.</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> * 4. Updating the solver&#39;s history vectors with the final, fully-coupled state.</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> * 5. Writing the complete, consistent state to output files for the restart step.</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * @param simCtx The main simulation context.</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"></span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> * @brief Performs post-load/post-init consistency checks for a restarted simulation.</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> * This function is called from main() ONLY when a restart is being performed</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment"> * (i.e., StartStep &gt; 0). It inspects the particle restart mode to determine the</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment"> * correct finalization procedure for the Lagrangian swarm.</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> * - If particles were loaded from a file (`mode == &quot;load&quot;`), it verifies their</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment"> *   locations within the grid to establish necessary runtime links.</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * - If new particles were initialized into the restarted flow (`mode == &quot;init&quot;`),</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> *   it runs the full `PerformInitialSetup` sequence to migrate, locate, and</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> *   couple the new particles with the existing fluid state.</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * @param simCtx The main simulation context.</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>PetscErrorCode <a class="code hl_function" href="simulation_8h.html#a7bc2bae7b01f179706b367c8637534c2">FinalizeRestartState</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="preprocessor">#endif  </span><span class="comment">// SIMULATION_H</span></div>
+<div class="ttc" id="aAnalyticalSolutions_8h_html"><div class="ttname"><a href="AnalyticalSolutions_8h.html">AnalyticalSolutions.h</a></div></div>
 <div class="ttc" id="aBoundaries_8h_html"><div class="ttname"><a href="Boundaries_8h.html">Boundaries.h</a></div></div>
 <div class="ttc" id="aParticleMotion_8h_html"><div class="ttname"><a href="ParticleMotion_8h.html">ParticleMotion.h</a></div><div class="ttdoc">Header file for Particle Motion and migration related functions.</div></div>
 <div class="ttc" id="aParticleSwarm_8h_html"><div class="ttname"><a href="ParticleSwarm_8h.html">ParticleSwarm.h</a></div><div class="ttdoc">Header file for Particle Swarm management functions.</div></div>
@@ -226,15 +228,15 @@ $(document).ready(function(){initNavTree('simulation_8h_source.html',''); initRe
 <div class="ttc" id="aio_8h_html"><div class="ttname"><a href="io_8h.html">io.h</a></div><div class="ttdoc">Public interface for data input/output routines.</div></div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Logging utilities and macros for PETSc-based applications.</div></div>
 <div class="ttc" id="asetup_8h_html"><div class="ttname"><a href="setup_8h.html">setup.h</a></div></div>
-<div class="ttc" id="asimulation_8h_html_a5cfb2f783604af7f20171d19f969d5d3"><div class="ttname"><a href="simulation_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a></div><div class="ttdeci">PetscErrorCode AdvanceSimulation(SimCtx *simCtx)</div><div class="ttdoc">Executes the main time-marching loop for the particle simulation.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00307">simulation.c:307</a></div></div>
+<div class="ttc" id="asimulation_8h_html_a5cfb2f783604af7f20171d19f969d5d3"><div class="ttname"><a href="simulation_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a></div><div class="ttdeci">PetscErrorCode AdvanceSimulation(SimCtx *simCtx)</div><div class="ttdoc">Executes the main time-marching loop for the particle simulation.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00323">simulation.c:323</a></div></div>
 <div class="ttc" id="asimulation_8h_html_a78d6ef98da860e3271d6b7277a54e642"><div class="ttname"><a href="simulation_8h.html#a78d6ef98da860e3271d6b7277a54e642">UpdateSolverHistoryVectors</a></div><div class="ttdeci">PetscErrorCode UpdateSolverHistoryVectors(UserCtx *user)</div><div class="ttdoc">Copies the current time step's solution fields into history vectors (e.g., U(t_n) -&gt; U_o,...</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00023">simulation.c:23</a></div></div>
-<div class="ttc" id="asimulation_8h_html_a7bc2bae7b01f179706b367c8637534c2"><div class="ttname"><a href="simulation_8h.html#a7bc2bae7b01f179706b367c8637534c2">FinalizeRestartState</a></div><div class="ttdeci">PetscErrorCode FinalizeRestartState(SimCtx *simCtx)</div><div class="ttdoc">Performs post-load/post-init consistency checks for a restarted simulation.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00242">simulation.c:242</a></div></div>
+<div class="ttc" id="asimulation_8h_html_a7bc2bae7b01f179706b367c8637534c2"><div class="ttname"><a href="simulation_8h.html#a7bc2bae7b01f179706b367c8637534c2">FinalizeRestartState</a></div><div class="ttdeci">PetscErrorCode FinalizeRestartState(SimCtx *simCtx)</div><div class="ttdoc">Performs post-load/post-init consistency checks for a restarted simulation.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00258">simulation.c:258</a></div></div>
 <div class="ttc" id="asimulation_8h_html_aa5b3c3a0cd447931b47a01267c36acdd"><div class="ttname"><a href="simulation_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a></div><div class="ttdeci">PetscErrorCode PerformInitializedParticleSetup(SimCtx *simCtx)</div><div class="ttdoc">Finalizes the simulation setup at t=0, ensuring a consistent state before time marching.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00095">simulation.c:95</a></div></div>
-<div class="ttc" id="asimulation_8h_html_ad8038ca2fcc4f0534e04d144c4ffbbef"><div class="ttname"><a href="simulation_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a></div><div class="ttdeci">PetscErrorCode PerformLoadedParticleSetup(SimCtx *simCtx)</div><div class="ttdoc">Finalizes the simulation state after particle and fluid data have been loaded from a restart.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00176">simulation.c:176</a></div></div>
+<div class="ttc" id="asimulation_8h_html_ad8038ca2fcc4f0534e04d144c4ffbbef"><div class="ttname"><a href="simulation_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a></div><div class="ttdeci">PetscErrorCode PerformLoadedParticleSetup(SimCtx *simCtx)</div><div class="ttdoc">Finalizes the simulation state after particle and fluid data have been loaded from a restart.</div><div class="ttdef"><b>Definition</b> <a href="simulation_8c_source.html#l00182">simulation.c:182</a></div></div>
 <div class="ttc" id="asolvers_8h_html"><div class="ttname"><a href="solvers_8h.html">solvers.h</a></div></div>
 <div class="ttc" id="avariables_8h_html"><div class="ttname"><a href="variables_8h.html">variables.h</a></div><div class="ttdoc">Main header file for a complex fluid dynamics solver.</div></div>
-<div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00538">variables.h:538</a></div></div>
-<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00661">variables.h:661</a></div></div>
+<div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00577">variables.h:577</a></div></div>
+<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00718">variables.h:718</a></div></div>
 <div class="ttc" id="awalkingsearch_8h_html"><div class="ttname"><a href="walkingsearch_8h.html">walkingsearch.h</a></div><div class="ttdoc">Header file for particle location functions using the walking search algorithm.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
