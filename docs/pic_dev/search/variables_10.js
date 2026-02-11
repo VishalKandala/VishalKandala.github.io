@@ -41,7 +41,7 @@ var searchData=
   ['pseudo_5fcfl_5fgrowth_5ffactor_38',['pseudo_cfl_growth_factor',['../variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5',1,'SimCtx']]],
   ['pseudo_5fcfl_5freduction_5ffactor_39',['pseudo_cfl_reduction_factor',['../variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53',1,'SimCtx']]],
   ['pseudo_5fperiodic_40',['pseudo_periodic',['../variables_8h.html#a0e447e75b801c0a9305fcadd317159a4',1,'SimCtx']]],
-  ['psi_41',['psi',['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi'],['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi']]],
+  ['psi_41',['psi',['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi'],['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi']]],
   ['psi_5fnodal_42',['Psi_nodal',['../variables_8h.html#ac0025b1b394319e0af260c6d472bd9d8',1,'UserCtx']]],
   ['pucont_43',['pUcont',['../variables_8h.html#a9f0e5575e60f124d715fc4e5b2f4d6a4',1,'UserCtx']]]
 ];

@@ -99,193 +99,223 @@ $(document).ready(function(){initNavTree('ParticlePhysics_8c_source.html',''); i
   <div class="headertitle"><div class="title">ParticlePhysics.c</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="ParticlePhysics_8c.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// ParticlePhysics.c</span></div>
+<a href="ParticlePhysics_8c.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;<a class="code" href="ParticlePhysics_8h.html">ParticlePhysics.h</a>&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="ParticlePhysics_8h.html">ParticlePhysics.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">// Define a buffer size for error messages if not already available</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#ifndef ERROR_MSG_BUFFER_SIZE</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="ParticlePhysics_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">    7</a></span><span class="preprocessor">#define ERROR_MSG_BUFFER_SIZE 256 </span><span class="comment">// Or use PETSC_MAX_PATH_LEN if appropriate</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#undef __FUNCT__</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="ParticlePhysics_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5">   11</a></span><span class="preprocessor">#define __FUNCT__ &quot;UpdateParticleField&quot;</span><span class="comment"></span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * @brief Updates a single particle&#39;s field based on its state and the specified field name.</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * This function serves as a switchboard for various particle property calculations.</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * Given a particle&#39;s data, it computes a new value for the specified field.</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * Currently supported fields:</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *  - &quot;Psi&quot;: Calculates the particle&#39;s kinetic energy (0.5 * |v|^2).</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * @param[in]     fieldName   The name of the field to update (e.g., &quot;Psi&quot;).</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * @param[in]     t           The current simulation time.</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> * @param[in]     pos         The particle&#39;s physical position.</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> * @param[in]     vel         The particle&#39;s velocity.</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * @param[in,out] psi_io      A pointer to the particle&#39;s current Psi value (used for accumulation if needed).</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> */</span><span class="preprocessor"></span></div>
-<div class="foldopen" id="foldopen00029" data-start="{" data-end="}">
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#a717393d0d2ffbe63ef7c174ef1a9f0fc">   29</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#a717393d0d2ffbe63ef7c174ef1a9f0fc">UpdateParticleField</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName,</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                                                 PetscReal t,</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                                                 <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> pos,</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                                                 <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> vel,</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                                                 PetscReal *psi_io)</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>{</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">if</span> (strcmp(fieldName, <span class="stringliteral">&quot;Psi&quot;</span>) == 0) {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="comment">// --- Calculate Kinetic Energy ---</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="comment">// Formula: Psi = 0.5 * (vx^2 + vy^2 + vz^2)</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        *psi_io = 0.5 * (vel.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * vel.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + vel.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * vel.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + vel.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * vel.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    }</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="comment">// else if (strcmp(fieldName, &quot;SomeOtherField&quot;) == 0) {</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">//     // ... logic for another field ...</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="comment">// }</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="comment">// If the field name is not recognized, we can choose to do nothing or raise an error.</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        <span class="comment">// For now, we&#39;ll just log a warning and do nothing.</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;UpdateParticleField: Field name &#39;%s&#39; not recognized. No update performed.\n&quot;</span>, fieldName);</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    }</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>}</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#ifndef ERROR_MSG_BUFFER_SIZE</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="ParticlePhysics_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">    4</a></span><span class="preprocessor">#define ERROR_MSG_BUFFER_SIZE 256</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#undef __FUNCT__</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="ParticlePhysics_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5">    8</a></span><span class="preprocessor">#define __FUNCT__ &quot;UpdateParticleField&quot;</span><span class="comment"></span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * @brief Updates a single particle&#39;s field based on its state and physics model.</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * Implements the IEM (Interaction by Exchange with the Mean) model for scalar mixing.</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * </span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * Physics: dPsi/dt = -Omega * (Psi - &lt;Psi&gt;)</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * Solution: Psi_new = &lt;Psi&gt; + (Psi_old - &lt;Psi&gt;) * exp(-Omega * dt)</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * @param[in]     fieldName   Name of the field (e.g., &quot;Psi&quot;).</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * @param[in]     dt          Time step size.</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> * @param[in,out] psi_io      Pointer to the particle&#39;s scalar value (Psi).</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * @param[in]     diffusivity Particle diffusivity (Gamma + Gamma_t).</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * @param[in]     mean_val    Local Eulerian mean value (&lt;Psi&gt;).</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * @param[in]     cell_vol    Volume of the host cell (1/Jacobian).</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> * @param[in]     C_model     Model constant (C_IEM).</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> */</span><span class="preprocessor"></span></div>
+<div class="foldopen" id="foldopen00025" data-start="{" data-end="}">
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">   25</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                                   PetscReal dt,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                                   PetscReal *psi_io,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                                   PetscReal diffusivity,</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                                   PetscReal mean_val,</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                                   PetscReal cell_vol,</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                                   PetscReal C_model)</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>{</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">if</span> (strcmp(fieldName, <span class="stringliteral">&quot;Psi&quot;</span>) == 0) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="comment">// --- IEM Mixing Model ---</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="comment">// 1. Calculate Characteristic Length Scale (Delta)</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="comment">// Delta^2 approx Volume^(2/3)</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="comment">// Safety: Ensure volume is positive</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordflow">if</span> (cell_vol &lt; 1.0e-14) cell_vol = 1.0e-14;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        PetscReal delta2 = PetscPowReal(cell_vol, 0.6666667); </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="comment">// 2. Calculate Mixing Frequency (Omega)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="comment">// Omega = C_phi * (Gamma_eff) / Delta^2</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        PetscReal omega = C_model * diffusivity / delta2;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        <span class="comment">// 3. Analytical Integration</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>        <span class="comment">// Exact solution for linear decay ODE</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        PetscReal decay = PetscExpReal(-omega * dt);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="comment">// Update Value IN-PLACE</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        PetscReal psi_old = *psi_io;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        *psi_io = mean_val + (psi_old - mean_val) * decay;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    }</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="comment">// Logic for other fields can be added here</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="comment">// e.g. Temperature might use a different C_model or source term</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    }</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>}</div>
 </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#undef __FUNCT__</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#define __FUNCT__ &quot;UpdateFieldForAllParticles&quot;</span><span class="comment"></span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> * @brief Loops over all local particles and updates a specified field.</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> * This function orchestrates the update of a single particle field across the entire</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> * local swarm. It gets access to the necessary particle data arrays and calls the</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> * `UpdateParticleField` kernel for each particle.</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx containing the swarm and simulation context.</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> * @param[in]     fieldName The name of the field to update (e.g., &quot;Psi&quot;).</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> */</span><span class="preprocessor"></span></div>
-<div class="foldopen" id="foldopen00069" data-start="{" data-end="}">
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">   69</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, <span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName)</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>{</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    PetscErrorCode ierr;</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    DM             swarm = user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>;</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    PetscInt       n_local;</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    PetscReal      current_time = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">ti</a>;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="comment">// Pointers to swarm data arrays</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keyword">const</span> PetscReal *pos_arr;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keyword">const</span> PetscReal *vel_arr;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    PetscReal       *psi_arr; <span class="comment">// This will be our target field array</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    ierr = DMSwarmGetLocalSize(swarm, &amp;n_local); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">if</span> (n_local == 0) {</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        PetscFunctionReturn(0); <span class="comment">// Nothing to do on this rank</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    }</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="comment">// Get read access to position and velocity</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    ierr = DMSwarmGetField(swarm, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    ierr = DMSwarmGetField(swarm, <span class="stringliteral">&quot;velocity&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="comment">// Get write access to the target field</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    ierr = DMSwarmGetField(swarm, fieldName, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;psi_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#undef __FUNCT__</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#define __FUNCT__ &quot;UpdateFieldForAllParticles&quot;</span><span class="comment"></span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> * @brief Loops over all local particles and updates a specified field.</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"> * Prepares necessary Eulerian and Lagrangian data structures before looping.</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> * @param[in,out] user      Pointer to the UserCtx.</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> * @param[in]     fieldName The name of the field to update (e.g., &quot;Psi&quot;).</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"> */</span><span class="preprocessor"></span></div>
+<div class="foldopen" id="foldopen00076" data-start="{" data-end="}">
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">   76</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, <span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName)</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>{</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    PetscErrorCode ierr;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    DM             swarm = user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    DM             da = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>; <span class="comment">// Scalar DM for accessing lPsi and lAj</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    PetscInt       n_local;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    PetscReal      dt = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// Model Constant (Default to 2.0 if not set)</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    PetscReal      C_IEM = 2.0;<span class="comment">//(user-&gt;simCtx-&gt;C_IEM &gt; 1.0e-6) ? user-&gt;simCtx-&gt;C_IEM : 2.0;</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="comment">// Pointers for Swarm Data</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    PetscReal       *psi_arr = NULL;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    PetscReal       *diff_arr = NULL;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    PetscInt        *cell_arr = NULL;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="comment">// Pointers for Eulerian Data (Read-Only)</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    PetscReal       ***grid_mean = NULL;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    PetscReal       ***grid_aj = NULL;</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="comment">// Loop over each local particle</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; ++p) {</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="comment">// Unpack data for the current particle</span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> current_pos = {pos_arr[3*p + 0], pos_arr[3*p + 1], pos_arr[3*p + 2]};</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> current_vel = {vel_arr[3*p + 0], vel_arr[3*p + 1], vel_arr[3*p + 2]};</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        </div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="comment">// Call the kernel to calculate and update the value in the array directly.</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="comment">// We pass the address of the specific particle&#39;s entry in the psi_arr.</span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        ierr = <a class="code hl_function" href="ParticlePhysics_8c.html#a717393d0d2ffbe63ef7c174ef1a9f0fc">UpdateParticleField</a>(fieldName, current_time, current_pos, current_vel, &amp;psi_arr[p]); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="comment">// Flags to track what we accessed (for cleanup)</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    PetscBool       accessed_eulerian = PETSC_FALSE;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    ierr = DMSwarmGetLocalSize(swarm, &amp;n_local); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordflow">if</span> (n_local == 0) {</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        PetscFunctionReturn(0); </div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    }</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="comment">// Restore all field arrays</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    ierr = DMSwarmRestoreField(swarm, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    ierr = DMSwarmRestoreField(swarm, <span class="stringliteral">&quot;velocity&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    ierr = DMSwarmRestoreField(swarm, fieldName,  NULL, NULL, (<span class="keywordtype">void</span>**)&amp;psi_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Updated particle field &#39;%s&#39; for all local particles.\n&quot;</span>, fieldName);</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>}</div>
-</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="comment">// 1. Access Target Field (Write Access)</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    ierr = DMSwarmGetField(swarm, fieldName, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;psi_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="comment">// 2. Access Auxiliary Data based on Physics Requirements</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="comment">//    For &quot;Psi&quot;, we need Diffusivity, CellID, Grid Mean, and Grid Metrics.</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">if</span> (strcmp(fieldName, <span class="stringliteral">&quot;Psi&quot;</span>) == 0) {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        </div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="comment">// --- Lagrangian Data ---</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        ierr = DMSwarmGetField(swarm, <span class="stringliteral">&quot;Diffusivity&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;diff_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        ierr = DMSwarmGetField(swarm, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;cell_arr); CHKERRQ(ierr);</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">#undef __FUNCT__</span></div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="preprocessor">#define __FUNCT__ &quot;UpdateAllParticlePhysics&quot;</span><span class="comment"></span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"> * @brief Orchestrates the update of all physical properties for particles.</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> * This function serves as the top-level entry point for updating particle-specific</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> * physical quantities after their position and the surrounding fluid velocity are known.</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * It calls a sequence of more specific update routines for each property.</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> * For example, it can be configured to update:</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> *  - Particle kinetic energy (stored in &quot;Psi&quot;)</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> *  - Particle accumulated shear stress</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="comment"> *  - Particle temperature</span></div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment"> *  - etc.</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment"> * @param[in,out] user  Pointer to the UserCtx containing the swarm and simulation context.</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> */</span><span class="preprocessor"></span></div>
-<div class="foldopen" id="foldopen00137" data-start="{" data-end="}">
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">  137</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>{</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    PetscErrorCode ierr;</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Updating all particle physical properties...\n&quot;</span>);</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span> </div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="comment">// --- Call updater for &#39;Psi&#39; field (currently calculating Kinetic Energy) ---</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    ierr = <a class="code hl_function" href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a>(user, <span class="stringliteral">&quot;Psi&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="comment">// --- FUTURE EXPANSION: Add calls for other fields here ---</span></div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="comment">/*</span></div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment">    if (simCtx-&gt;enable_temperature_solve) {</span></div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment">        ierr = UpdateFieldForAllParticles(user, &quot;Temperature&quot;); CHKERRQ(ierr);</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment">    }</span></div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment">    if (simCtx-&gt;enable_species_transport) {</span></div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="comment">        ierr = UpdateFieldForAllParticles(user, &quot;SpeciesMassFraction&quot;); CHKERRQ(ierr);</span></div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment">    }</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment">    */</span></div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;All particle physical properties updated.\n&quot;</span>);</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>}</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="comment">// --- Eulerian Data ---</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        <span class="comment">// We need Local vectors (lPsi, lAj) to handle ghost indexing safely</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">lPsi</a> || !user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>) {</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>             SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;UserCtx lPsi or lAj not initialized.&quot;</span>);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        }</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">lPsi</a>, &amp;grid_mean); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,  &amp;grid_aj);   CHKERRQ(ierr);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        accessed_eulerian = PETSC_TRUE;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    }</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="comment">// 3. Loop over particles</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; ++p) {</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="comment">// Default values for generic fields</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        PetscReal p_diff = 0.0;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        PetscReal p_mean = 0.0;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        PetscReal p_vol  = 1.0;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        <span class="keywordflow">if</span> (strcmp(fieldName, <span class="stringliteral">&quot;Psi&quot;</span>) == 0) {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>            <span class="comment">// Unpack indices</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>            PetscInt i = cell_arr[3*p + 0];</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>            PetscInt j = cell_arr[3*p + 1];</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>            PetscInt k = cell_arr[3*p + 2];</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>            <span class="comment">// Fetch Data</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            p_diff = diff_arr[p];</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>            p_mean = grid_mean[k][j][i]; <span class="comment">// Direct Lookup</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>            </div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>            <span class="comment">// Calculate Volume = 1.0 / Jacobian</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>            PetscReal jac = grid_aj[k][j][i];</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>            p_vol = (jac &gt; 1.0e-14) ? (1.0 / jac) : 1.0e-14;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        }</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <span class="comment">// Call Kernel</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        ierr = <a class="code hl_function" href="ParticlePhysics_8c.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a>(fieldName, dt, &amp;psi_arr[p], p_diff, p_mean, p_vol, C_IEM); </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        CHKERRQ(ierr);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    }</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="comment">// 4. Restore Arrays</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    ierr = DMSwarmRestoreField(swarm, fieldName, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;psi_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="keywordflow">if</span> (strcmp(fieldName, <span class="stringliteral">&quot;Psi&quot;</span>) == 0) {</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>        ierr = DMSwarmRestoreField(swarm, <span class="stringliteral">&quot;Diffusivity&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;diff_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        ierr = DMSwarmRestoreField(swarm, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;cell_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    }</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    <span class="keywordflow">if</span> (accessed_eulerian) {</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>        ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">lPsi</a>, &amp;grid_mean); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>        ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,  &amp;grid_aj);   CHKERRQ(ierr);</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    }</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Updated particle physics for field &#39;%s&#39;.\n&quot;</span>, fieldName);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>}</div>
 </div>
-<div class="ttc" id="aParticlePhysics_8c_html_a1fccaae261594eef9c4d615ac8322ccf"><div class="ttname"><a href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></div><div class="ttdeci">PetscErrorCode UpdateFieldForAllParticles(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Loops over all local particles and updates a specified field.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00069">ParticlePhysics.c:69</a></div></div>
-<div class="ttc" id="aParticlePhysics_8c_html_a717393d0d2ffbe63ef7c174ef1a9f0fc"><div class="ttname"><a href="ParticlePhysics_8c.html#a717393d0d2ffbe63ef7c174ef1a9f0fc">UpdateParticleField</a></div><div class="ttdeci">PetscErrorCode UpdateParticleField(const char *fieldName, PetscReal t, Cmpnts pos, Cmpnts vel, PetscReal *psi_io)</div><div class="ttdoc">Updates a single particle's field based on its state and the specified field name.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00029">ParticlePhysics.c:29</a></div></div>
-<div class="ttc" id="aParticlePhysics_8c_html_acabd01a68dc45f037d40c1183286df08"><div class="ttname"><a href="ParticlePhysics_8c.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></div><div class="ttdeci">PetscErrorCode UpdateAllParticleFields(UserCtx *user)</div><div class="ttdoc">Orchestrates the update of all physical properties for particles.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00137">ParticlePhysics.c:137</a></div></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="preprocessor">#undef __FUNCT__</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="preprocessor">#define __FUNCT__ &quot;UpdateAllParticleFields&quot;</span></div>
+<div class="foldopen" id="foldopen00178" data-start="{" data-end="}">
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno"><a class="line" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">  178</a></span>PetscErrorCode <a class="code hl_function" href="ParticlePhysics_8c.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>{</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    PetscErrorCode ierr;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Updating all particle physical properties...\n&quot;</span>);</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="comment">// Update Scalar Mixing (IEM)</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <span class="comment">// IMPORTANT: Ensure ScatterParticleFieldToEulerField(&quot;Psi&quot;) has been called </span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="comment">// immediately before this to populate user-&gt;lPsi with the current mean.</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    ierr = <a class="code hl_function" href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a>(user, <span class="stringliteral">&quot;Psi&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;All particle physical properties updated.\n&quot;</span>);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>}   </div>
+</div>
+<div class="ttc" id="aParticlePhysics_8c_html_a0263b7bdea401ba29b2329c8e0f31d50"><div class="ttname"><a href="ParticlePhysics_8c.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></div><div class="ttdeci">PetscErrorCode UpdateParticleField(const char *fieldName, PetscReal dt, PetscReal *psi_io, PetscReal diffusivity, PetscReal mean_val, PetscReal cell_vol, PetscReal C_model)</div><div class="ttdoc">Updates a single particle's field based on its state and physics model.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00025">ParticlePhysics.c:25</a></div></div>
+<div class="ttc" id="aParticlePhysics_8c_html_a1fccaae261594eef9c4d615ac8322ccf"><div class="ttname"><a href="ParticlePhysics_8c.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></div><div class="ttdeci">PetscErrorCode UpdateFieldForAllParticles(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Loops over all local particles and updates a specified field.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00076">ParticlePhysics.c:76</a></div></div>
+<div class="ttc" id="aParticlePhysics_8c_html_acabd01a68dc45f037d40c1183286df08"><div class="ttname"><a href="ParticlePhysics_8c.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></div><div class="ttdeci">PetscErrorCode UpdateAllParticleFields(UserCtx *user)</div><div class="ttdoc">Orchestrates the update of all physical properties for particles.</div><div class="ttdef"><b>Definition</b> <a href="ParticlePhysics_8c_source.html#l00178">ParticlePhysics.c:178</a></div></div>
 <div class="ttc" id="aParticlePhysics_8h_html"><div class="ttname"><a href="ParticlePhysics_8h.html">ParticlePhysics.h</a></div><div class="ttdoc">Header file for Particle related physics modules.</div></div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00046">logging.h:46</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00200">logging.h:200</a></div></div>
 <div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00746">logging.h:746</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
-<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
 <div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00737">logging.h:737</a></div></div>
-<div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00788">variables.h:788</a></div></div>
-<div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00721">variables.h:721</a></div></div>
-<div class="ttc" id="avariables_8h_html_a718a09fbedf450248eaf7019a980e139"><div class="ttname"><a href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">Cmpnts::x</a></div><div class="ttdeci">PetscScalar x</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00101">variables.h:101</a></div></div>
-<div class="ttc" id="avariables_8h_html_a9f0c002a2c7cde3b6ac843ab9185f4d4"><div class="ttname"><a href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">Cmpnts::z</a></div><div class="ttdeci">PetscScalar z</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00101">variables.h:101</a></div></div>
-<div class="ttc" id="avariables_8h_html_ad032e456f7f4b32b9ac0d94be05de204"><div class="ttname"><a href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">Cmpnts::y</a></div><div class="ttdeci">PetscScalar y</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00101">variables.h:101</a></div></div>
-<div class="ttc" id="avariables_8h_html_aea06dd1e5437886745d3545e2a383172"><div class="ttname"><a href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">SimCtx::ti</a></div><div class="ttdeci">PetscReal ti</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00586">variables.h:586</a></div></div>
-<div class="ttc" id="avariables_8h_html_structCmpnts"><div class="ttname"><a href="variables_8h.html#structCmpnts">Cmpnts</a></div><div class="ttdoc">A 3D point or vector with PetscScalar components.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00100">variables.h:100</a></div></div>
-<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00718">variables.h:718</a></div></div>
+<div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00789">variables.h:789</a></div></div>
+<div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00722">variables.h:722</a></div></div>
+<div class="ttc" id="avariables_8h_html_a53b044b8b0e4a4dc8c8fa05387af564c"><div class="ttname"><a href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">SimCtx::dt</a></div><div class="ttdeci">PetscReal dt</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00591">variables.h:591</a></div></div>
+<div class="ttc" id="avariables_8h_html_a5cba4fd26ff1b619d2f2b8cdd0c92372"><div class="ttname"><a href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">UserCtx::lPsi</a></div><div class="ttdeci">Vec lPsi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00792">variables.h:792</a></div></div>
+<div class="ttc" id="avariables_8h_html_acb5123619f6844033498dbbd1f46b8d0"><div class="ttname"><a href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">UserCtx::lAj</a></div><div class="ttdeci">Vec lAj</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00767">variables.h:767</a></div></div>
+<div class="ttc" id="avariables_8h_html_af031acb43b014d5ac788aa9003491e75"><div class="ttname"><a href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">UserCtx::da</a></div><div class="ttdeci">DM da</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00725">variables.h:725</a></div></div>
+<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00719">variables.h:719</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
