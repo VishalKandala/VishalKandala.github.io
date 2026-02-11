@@ -90,7 +90,7 @@ var searchData=
   ['stages_20of_20tt_20main_20tt_87',['1. Program Flow: The Five Stages of &lt;tt&gt;main()&lt;/tt&gt;',['../13_Code_Architecture.html#flow_sec',1,'']]],
   ['start_5ftime_88',['start_time',['../logging_8c.html#aef9009dbbbf6e70231675fc0f49c1b83',1,'ProfiledFunction']]],
   ['startstep_89',['StartStep',['../variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f',1,'SimCtx']]],
-  ['starttime_90',['starttime',['../variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c',1,'PostProcessParams::startTime'],['../variables_8h.html#a337c3a9a9bf061e10d71ba990aa6ed29',1,'SimCtx::StartTime']]],
+  ['starttime_90',['starttime',['../variables_8h.html#a337c3a9a9bf061e10d71ba990aa6ed29',1,'SimCtx::StartTime'],['../variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c',1,'PostProcessParams::startTime']]],
   ['step_91',['step',['../variables_8h.html#ac9684d6e871566d55c997416270b5b99',1,'SimCtx::step'],['../logging_8h.html#a64100408e773bad5a0c07581dc3ab039',1,'DualMonitorCtx::step']]],
   ['step_201_3a_20initialize_20a_20new_20study_92',['step 1: initialize a new study',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md41',1,'Step 1: Initialize a New Study'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md49',1,'Step 1: Initialize a New Study']]],
   ['step_202_3a_20customize_20the_20simulation_93',['step 2: customize the simulation',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md42',1,'Step 2: Customize the Simulation'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md50',1,'Step 2: Customize the Simulation']]],

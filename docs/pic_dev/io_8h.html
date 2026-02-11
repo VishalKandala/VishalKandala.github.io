@@ -2182,130 +2182,130 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02636">2636</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2640</span>{</div>
-<div class="line"><span class="lineno"> 2641</span>    <span class="comment">/* STEP 0: Prepare local variables &amp; log function entry */</span></div>
-<div class="line"><span class="lineno"> 2642</span>    PetscMPIInt    rank, size;</div>
-<div class="line"><span class="lineno"> 2643</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2644</span>    FILE  *fp = NULL;</div>
-<div class="line"><span class="lineno"> 2645</span>    PetscInt    N   = 0;            <span class="comment">/* number of lines/values read on rank 0 */</span></div>
-<div class="line"><span class="lineno"> 2646</span>    <span class="keywordtype">double</span> *array = NULL;      <span class="comment">/* pointer to local array on each rank */</span></div>
-<div class="line"><span class="lineno"> 2647</span>    PetscInt    fileExistsFlag = 0; <span class="comment">/* 0 = doesn&#39;t exist, 1 = does exist */</span></div>
-<div class="line"><span class="lineno"> 2648</span> </div>
-<div class="line"><span class="lineno"> 2649</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno"> 2650</span>              <span class="stringliteral">&quot;Start reading from file: %s\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2651</span>              filename);</div>
-<div class="line"><span class="lineno"> 2652</span> </div>
-<div class="line"><span class="lineno"> 2653</span>    <span class="comment">/* Basic error checking: data_out, Nout must be non-null. */</span></div>
-<div class="line"><span class="lineno"> 2654</span>    <span class="keywordflow">if</span> (!filename || !data_out || !Nout) {</div>
-<div class="line"><span class="lineno"> 2655</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno"> 2656</span>                  <span class="stringliteral">&quot;Null pointer argument provided.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2657</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno"> 2658</span>    }</div>
-<div class="line"><span class="lineno"> 2659</span> </div>
-<div class="line"><span class="lineno"> 2660</span>    <span class="comment">/* Determine rank/size for coordinating I/O. */</span></div>
-<div class="line"><span class="lineno"> 2661</span>    MPI_Comm_rank(comm, &amp;rank);</div>
-<div class="line"><span class="lineno"> 2662</span>    MPI_Comm_size(comm, &amp;size);</div>
-<div class="line"><span class="lineno"> 2663</span> </div>
-<div class="line"><span class="lineno"> 2664</span>    <span class="comment">/* STEP 1: On rank 0, check if file can be opened. */</span></div>
-<div class="line"><span class="lineno"> 2665</span>    <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno"> 2666</span>        fp = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2667</span>        <span class="keywordflow">if</span> (fp) {</div>
-<div class="line"><span class="lineno"> 2668</span>            fileExistsFlag = 1;</div>
-<div class="line"><span class="lineno"> 2669</span>            fclose(fp);</div>
-<div class="line"><span class="lineno"> 2670</span>        }</div>
-<div class="line"><span class="lineno"> 2671</span>    }</div>
-<div class="line"><span class="lineno"> 2672</span> </div>
-<div class="line"><span class="lineno"> 2673</span>    <span class="comment">/* STEP 2: Broadcast file existence to all ranks. */</span></div>
-<div class="line"><span class="lineno"> 2674</span>    <span class="comment">// In ReadDataFileToArray:</span></div>
-<div class="line"><span class="lineno"> 2675</span>    ierr = MPI_Bcast(&amp;fileExistsFlag, 1, MPI_INT, 0, comm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2676</span> </div>
-<div class="line"><span class="lineno"> 2677</span>    <span class="keywordflow">if</span> (!fileExistsFlag) {</div>
-<div class="line"><span class="lineno"> 2678</span>        <span class="comment">/* If file does not exist, log &amp; return. */</span></div>
-<div class="line"><span class="lineno"> 2679</span>        <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno"> 2680</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno"> 2681</span>                      <span class="stringliteral">&quot;File &#39;%s&#39; not found.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2682</span>                      filename);</div>
-<div class="line"><span class="lineno"> 2683</span>        }</div>
-<div class="line"><span class="lineno"> 2684</span>        <span class="keywordflow">return</span> 2;</div>
-<div class="line"><span class="lineno"> 2685</span>    }</div>
-<div class="line"><span class="lineno"> 2686</span> </div>
-<div class="line"><span class="lineno"> 2687</span>    <span class="comment">/* STEP 3: Rank 0 re-opens and reads the file, counting lines, etc. */</span></div>
-<div class="line"><span class="lineno"> 2688</span>    <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno"> 2689</span>        fp = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2690</span>        <span class="keywordflow">if</span> (!fp) {</div>
-<div class="line"><span class="lineno"> 2691</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno"> 2692</span>                      <span class="stringliteral">&quot;File &#39;%s&#39; could not be opened for reading.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2693</span>                      filename);</div>
-<div class="line"><span class="lineno"> 2694</span>            <span class="keywordflow">return</span> 3;</div>
-<div class="line"><span class="lineno"> 2695</span>        }</div>
-<div class="line"><span class="lineno"> 2696</span> </div>
-<div class="line"><span class="lineno"> 2697</span>        <span class="comment">/* (3a) Count lines first. */</span></div>
-<div class="line"><span class="lineno"> 2698</span>        {</div>
-<div class="line"><span class="lineno"> 2699</span>            <span class="keywordtype">char</span> line[256];</div>
-<div class="line"><span class="lineno"> 2700</span>            <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), fp)) {</div>
-<div class="line"><span class="lineno"> 2701</span>                N++;</div>
-<div class="line"><span class="lineno"> 2702</span>            }</div>
-<div class="line"><span class="lineno"> 2703</span>        }</div>
-<div class="line"><span class="lineno"> 2704</span> </div>
-<div class="line"><span class="lineno"> 2705</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno"> 2706</span>                  <span class="stringliteral">&quot;File &#39;%s&#39; has %d lines.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2707</span>                  filename, N);</div>
-<div class="line"><span class="lineno"> 2708</span> </div>
-<div class="line"><span class="lineno"> 2709</span>        <span class="comment">/* (3b) Allocate array on rank 0. */</span></div>
-<div class="line"><span class="lineno"> 2710</span>        array = (<span class="keywordtype">double</span>*)malloc(N * <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>));</div>
-<div class="line"><span class="lineno"> 2711</span>        <span class="keywordflow">if</span> (!array) {</div>
-<div class="line"><span class="lineno"> 2712</span>            fclose(fp);</div>
-<div class="line"><span class="lineno"> 2713</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno"> 2714</span>                      <span class="stringliteral">&quot;malloc failed for array.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2715</span>            <span class="keywordflow">return</span> 4;</div>
-<div class="line"><span class="lineno"> 2716</span>        }</div>
-<div class="line"><span class="lineno"> 2717</span> </div>
-<div class="line"><span class="lineno"> 2718</span>        <span class="comment">/* (3c) Rewind &amp; read values into array. */</span></div>
-<div class="line"><span class="lineno"> 2719</span>        rewind(fp);</div>
-<div class="line"><span class="lineno"> 2720</span>        {</div>
-<div class="line"><span class="lineno"> 2721</span>            PetscInt i = 0;</div>
-<div class="line"><span class="lineno"> 2722</span>            <span class="keywordtype">char</span> line[256];</div>
-<div class="line"><span class="lineno"> 2723</span>            <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), fp)) {</div>
-<div class="line"><span class="lineno"> 2724</span>                <span class="keywordtype">double</span> val;</div>
-<div class="line"><span class="lineno"> 2725</span>                <span class="keywordflow">if</span> (sscanf(line, <span class="stringliteral">&quot;%lf&quot;</span>, &amp;val) == 1) {</div>
-<div class="line"><span class="lineno"> 2726</span>                    array[i++] = val;</div>
-<div class="line"><span class="lineno"> 2727</span>                }</div>
-<div class="line"><span class="lineno"> 2728</span>            }</div>
-<div class="line"><span class="lineno"> 2729</span>        }</div>
-<div class="line"><span class="lineno"> 2730</span>        fclose(fp);</div>
-<div class="line"><span class="lineno"> 2731</span> </div>
-<div class="line"><span class="lineno"> 2732</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
-<div class="line"><span class="lineno"> 2733</span>                  <span class="stringliteral">&quot;Successfully read %d values from &#39;%s&#39;.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2734</span>                  N, filename);</div>
-<div class="line"><span class="lineno"> 2735</span>    }</div>
-<div class="line"><span class="lineno"> 2736</span> </div>
-<div class="line"><span class="lineno"> 2737</span>    <span class="comment">/* STEP 4: Broadcast the integer N to all ranks. */</span></div>
-<div class="line"><span class="lineno"> 2738</span>    ierr = MPI_Bcast(&amp;N, 1, MPI_INT, 0, comm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2739</span> </div>
-<div class="line"><span class="lineno"> 2740</span>    <span class="comment">/* STEP 5: Each rank allocates an array to receive the broadcast if rank&gt;0. */</span></div>
-<div class="line"><span class="lineno"> 2741</span>    <span class="keywordflow">if</span> (rank) {</div>
-<div class="line"><span class="lineno"> 2742</span>        array = (<span class="keywordtype">double</span>*)malloc(N * <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>));</div>
-<div class="line"><span class="lineno"> 2743</span>        <span class="keywordflow">if</span> (!array) {</div>
-<div class="line"><span class="lineno"> 2744</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno"> 2745</span>                      <span class="stringliteral">&quot;malloc failed on rank %d.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2746</span>                      rank);</div>
-<div class="line"><span class="lineno"> 2747</span>            <span class="keywordflow">return</span> 5;</div>
-<div class="line"><span class="lineno"> 2748</span>        }</div>
-<div class="line"><span class="lineno"> 2749</span>    }</div>
-<div class="line"><span class="lineno"> 2750</span> </div>
-<div class="line"><span class="lineno"> 2751</span>    <span class="comment">/* STEP 6: Broadcast the actual data from rank 0 to all. */</span></div>
-<div class="line"><span class="lineno"> 2752</span>    ierr = MPI_Bcast(array, N, MPI_DOUBLE, 0, comm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2753</span> </div>
-<div class="line"><span class="lineno"> 2754</span>    <span class="comment">/* STEP 7: Assign outputs on all ranks. */</span></div>
-<div class="line"><span class="lineno"> 2755</span>    *data_out = array;</div>
-<div class="line"><span class="lineno"> 2756</span>    *Nout     = N;</div>
-<div class="line"><span class="lineno"> 2757</span> </div>
-<div class="line"><span class="lineno"> 2758</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno"> 2759</span>              <span class="stringliteral">&quot;Done. Provided array of length=%d to all ranks.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2760</span>              N);</div>
-<div class="line"><span class="lineno"> 2761</span>    <span class="keywordflow">return</span> 0; <span class="comment">/* success */</span></div>
-<div class="line"><span class="lineno"> 2762</span>}</div>
+<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02642">2642</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2646</span>{</div>
+<div class="line"><span class="lineno"> 2647</span>    <span class="comment">/* STEP 0: Prepare local variables &amp; log function entry */</span></div>
+<div class="line"><span class="lineno"> 2648</span>    PetscMPIInt    rank, size;</div>
+<div class="line"><span class="lineno"> 2649</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2650</span>    FILE  *fp = NULL;</div>
+<div class="line"><span class="lineno"> 2651</span>    PetscInt    N   = 0;            <span class="comment">/* number of lines/values read on rank 0 */</span></div>
+<div class="line"><span class="lineno"> 2652</span>    <span class="keywordtype">double</span> *array = NULL;      <span class="comment">/* pointer to local array on each rank */</span></div>
+<div class="line"><span class="lineno"> 2653</span>    PetscInt    fileExistsFlag = 0; <span class="comment">/* 0 = doesn&#39;t exist, 1 = does exist */</span></div>
+<div class="line"><span class="lineno"> 2654</span> </div>
+<div class="line"><span class="lineno"> 2655</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno"> 2656</span>              <span class="stringliteral">&quot;Start reading from file: %s\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2657</span>              filename);</div>
+<div class="line"><span class="lineno"> 2658</span> </div>
+<div class="line"><span class="lineno"> 2659</span>    <span class="comment">/* Basic error checking: data_out, Nout must be non-null. */</span></div>
+<div class="line"><span class="lineno"> 2660</span>    <span class="keywordflow">if</span> (!filename || !data_out || !Nout) {</div>
+<div class="line"><span class="lineno"> 2661</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno"> 2662</span>                  <span class="stringliteral">&quot;Null pointer argument provided.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2663</span>        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno"> 2664</span>    }</div>
+<div class="line"><span class="lineno"> 2665</span> </div>
+<div class="line"><span class="lineno"> 2666</span>    <span class="comment">/* Determine rank/size for coordinating I/O. */</span></div>
+<div class="line"><span class="lineno"> 2667</span>    MPI_Comm_rank(comm, &amp;rank);</div>
+<div class="line"><span class="lineno"> 2668</span>    MPI_Comm_size(comm, &amp;size);</div>
+<div class="line"><span class="lineno"> 2669</span> </div>
+<div class="line"><span class="lineno"> 2670</span>    <span class="comment">/* STEP 1: On rank 0, check if file can be opened. */</span></div>
+<div class="line"><span class="lineno"> 2671</span>    <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno"> 2672</span>        fp = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2673</span>        <span class="keywordflow">if</span> (fp) {</div>
+<div class="line"><span class="lineno"> 2674</span>            fileExistsFlag = 1;</div>
+<div class="line"><span class="lineno"> 2675</span>            fclose(fp);</div>
+<div class="line"><span class="lineno"> 2676</span>        }</div>
+<div class="line"><span class="lineno"> 2677</span>    }</div>
+<div class="line"><span class="lineno"> 2678</span> </div>
+<div class="line"><span class="lineno"> 2679</span>    <span class="comment">/* STEP 2: Broadcast file existence to all ranks. */</span></div>
+<div class="line"><span class="lineno"> 2680</span>    <span class="comment">// In ReadDataFileToArray:</span></div>
+<div class="line"><span class="lineno"> 2681</span>    ierr = MPI_Bcast(&amp;fileExistsFlag, 1, MPI_INT, 0, comm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2682</span> </div>
+<div class="line"><span class="lineno"> 2683</span>    <span class="keywordflow">if</span> (!fileExistsFlag) {</div>
+<div class="line"><span class="lineno"> 2684</span>        <span class="comment">/* If file does not exist, log &amp; return. */</span></div>
+<div class="line"><span class="lineno"> 2685</span>        <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno"> 2686</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno"> 2687</span>                      <span class="stringliteral">&quot;File &#39;%s&#39; not found.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2688</span>                      filename);</div>
+<div class="line"><span class="lineno"> 2689</span>        }</div>
+<div class="line"><span class="lineno"> 2690</span>        <span class="keywordflow">return</span> 2;</div>
+<div class="line"><span class="lineno"> 2691</span>    }</div>
+<div class="line"><span class="lineno"> 2692</span> </div>
+<div class="line"><span class="lineno"> 2693</span>    <span class="comment">/* STEP 3: Rank 0 re-opens and reads the file, counting lines, etc. */</span></div>
+<div class="line"><span class="lineno"> 2694</span>    <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno"> 2695</span>        fp = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2696</span>        <span class="keywordflow">if</span> (!fp) {</div>
+<div class="line"><span class="lineno"> 2697</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno"> 2698</span>                      <span class="stringliteral">&quot;File &#39;%s&#39; could not be opened for reading.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2699</span>                      filename);</div>
+<div class="line"><span class="lineno"> 2700</span>            <span class="keywordflow">return</span> 3;</div>
+<div class="line"><span class="lineno"> 2701</span>        }</div>
+<div class="line"><span class="lineno"> 2702</span> </div>
+<div class="line"><span class="lineno"> 2703</span>        <span class="comment">/* (3a) Count lines first. */</span></div>
+<div class="line"><span class="lineno"> 2704</span>        {</div>
+<div class="line"><span class="lineno"> 2705</span>            <span class="keywordtype">char</span> line[256];</div>
+<div class="line"><span class="lineno"> 2706</span>            <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), fp)) {</div>
+<div class="line"><span class="lineno"> 2707</span>                N++;</div>
+<div class="line"><span class="lineno"> 2708</span>            }</div>
+<div class="line"><span class="lineno"> 2709</span>        }</div>
+<div class="line"><span class="lineno"> 2710</span> </div>
+<div class="line"><span class="lineno"> 2711</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno"> 2712</span>                  <span class="stringliteral">&quot;File &#39;%s&#39; has %d lines.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2713</span>                  filename, N);</div>
+<div class="line"><span class="lineno"> 2714</span> </div>
+<div class="line"><span class="lineno"> 2715</span>        <span class="comment">/* (3b) Allocate array on rank 0. */</span></div>
+<div class="line"><span class="lineno"> 2716</span>        array = (<span class="keywordtype">double</span>*)malloc(N * <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>));</div>
+<div class="line"><span class="lineno"> 2717</span>        <span class="keywordflow">if</span> (!array) {</div>
+<div class="line"><span class="lineno"> 2718</span>            fclose(fp);</div>
+<div class="line"><span class="lineno"> 2719</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno"> 2720</span>                      <span class="stringliteral">&quot;malloc failed for array.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2721</span>            <span class="keywordflow">return</span> 4;</div>
+<div class="line"><span class="lineno"> 2722</span>        }</div>
+<div class="line"><span class="lineno"> 2723</span> </div>
+<div class="line"><span class="lineno"> 2724</span>        <span class="comment">/* (3c) Rewind &amp; read values into array. */</span></div>
+<div class="line"><span class="lineno"> 2725</span>        rewind(fp);</div>
+<div class="line"><span class="lineno"> 2726</span>        {</div>
+<div class="line"><span class="lineno"> 2727</span>            PetscInt i = 0;</div>
+<div class="line"><span class="lineno"> 2728</span>            <span class="keywordtype">char</span> line[256];</div>
+<div class="line"><span class="lineno"> 2729</span>            <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), fp)) {</div>
+<div class="line"><span class="lineno"> 2730</span>                <span class="keywordtype">double</span> val;</div>
+<div class="line"><span class="lineno"> 2731</span>                <span class="keywordflow">if</span> (sscanf(line, <span class="stringliteral">&quot;%lf&quot;</span>, &amp;val) == 1) {</div>
+<div class="line"><span class="lineno"> 2732</span>                    array[i++] = val;</div>
+<div class="line"><span class="lineno"> 2733</span>                }</div>
+<div class="line"><span class="lineno"> 2734</span>            }</div>
+<div class="line"><span class="lineno"> 2735</span>        }</div>
+<div class="line"><span class="lineno"> 2736</span>        fclose(fp);</div>
+<div class="line"><span class="lineno"> 2737</span> </div>
+<div class="line"><span class="lineno"> 2738</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
+<div class="line"><span class="lineno"> 2739</span>                  <span class="stringliteral">&quot;Successfully read %d values from &#39;%s&#39;.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2740</span>                  N, filename);</div>
+<div class="line"><span class="lineno"> 2741</span>    }</div>
+<div class="line"><span class="lineno"> 2742</span> </div>
+<div class="line"><span class="lineno"> 2743</span>    <span class="comment">/* STEP 4: Broadcast the integer N to all ranks. */</span></div>
+<div class="line"><span class="lineno"> 2744</span>    ierr = MPI_Bcast(&amp;N, 1, MPI_INT, 0, comm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2745</span> </div>
+<div class="line"><span class="lineno"> 2746</span>    <span class="comment">/* STEP 5: Each rank allocates an array to receive the broadcast if rank&gt;0. */</span></div>
+<div class="line"><span class="lineno"> 2747</span>    <span class="keywordflow">if</span> (rank) {</div>
+<div class="line"><span class="lineno"> 2748</span>        array = (<span class="keywordtype">double</span>*)malloc(N * <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>));</div>
+<div class="line"><span class="lineno"> 2749</span>        <span class="keywordflow">if</span> (!array) {</div>
+<div class="line"><span class="lineno"> 2750</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno"> 2751</span>                      <span class="stringliteral">&quot;malloc failed on rank %d.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2752</span>                      rank);</div>
+<div class="line"><span class="lineno"> 2753</span>            <span class="keywordflow">return</span> 5;</div>
+<div class="line"><span class="lineno"> 2754</span>        }</div>
+<div class="line"><span class="lineno"> 2755</span>    }</div>
+<div class="line"><span class="lineno"> 2756</span> </div>
+<div class="line"><span class="lineno"> 2757</span>    <span class="comment">/* STEP 6: Broadcast the actual data from rank 0 to all. */</span></div>
+<div class="line"><span class="lineno"> 2758</span>    ierr = MPI_Bcast(array, N, MPI_DOUBLE, 0, comm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2759</span> </div>
+<div class="line"><span class="lineno"> 2760</span>    <span class="comment">/* STEP 7: Assign outputs on all ranks. */</span></div>
+<div class="line"><span class="lineno"> 2761</span>    *data_out = array;</div>
+<div class="line"><span class="lineno"> 2762</span>    *Nout     = N;</div>
+<div class="line"><span class="lineno"> 2763</span> </div>
+<div class="line"><span class="lineno"> 2764</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno"> 2765</span>              <span class="stringliteral">&quot;Done. Provided array of length=%d to all ranks.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2766</span>              N);</div>
+<div class="line"><span class="lineno"> 2767</span>    <span class="keywordflow">return</span> 0; <span class="comment">/* success */</span></div>
+<div class="line"><span class="lineno"> 2768</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3107,35 +3107,35 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode Returns 0 on success, or non-zero on failures. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02778">2778</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2782</span>{</div>
-<div class="line"><span class="lineno"> 2783</span>  PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2784</span> </div>
-<div class="line"><span class="lineno"> 2785</span>  PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2786</span>  Vec            coordsVec;</div>
-<div class="line"><span class="lineno"> 2787</span> </div>
-<div class="line"><span class="lineno"> 2788</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Creating coords Vec.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2789</span>  ierr = VecCreate(PETSC_COMM_WORLD, &amp;coordsVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2790</span>  ierr = VecSetFromOptions(coordsVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2791</span> </div>
-<div class="line"><span class="lineno"> 2792</span>  <span class="comment">// For example: &quot;position&quot; is the name of the coordinate data</span></div>
-<div class="line"><span class="lineno"> 2793</span>  ierr = <a class="code hl_function" href="io_8c.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>(user, <span class="stringliteral">&quot;position&quot;</span>, coordsVec, timeIndex, <span class="stringliteral">&quot;dat&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2794</span>  <span class="keywordflow">if</span> (ierr) {</div>
-<div class="line"><span class="lineno"> 2795</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
-<div class="line"><span class="lineno"> 2796</span>              <span class="stringliteral">&quot;Error reading position data (ti=%d).\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2797</span>              timeIndex);</div>
-<div class="line"><span class="lineno"> 2798</span>    PetscFunctionReturn(ierr);</div>
-<div class="line"><span class="lineno"> 2799</span>  }</div>
-<div class="line"><span class="lineno"> 2800</span> </div>
-<div class="line"><span class="lineno"> 2801</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;ReadPositions - Gathering coords Vec to rank 0.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2802</span>  ierr = <a class="code hl_function" href="io_8c.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a>(coordsVec, Ncoords, coordsArray);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2803</span> </div>
-<div class="line"><span class="lineno"> 2804</span>  ierr = VecDestroy(&amp;coordsVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2805</span> </div>
-<div class="line"><span class="lineno"> 2806</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno"> 2807</span>            <span class="stringliteral">&quot;Successfully gathered coordinates. Ncoords=%d.\n&quot;</span>, *Ncoords);</div>
-<div class="line"><span class="lineno"> 2808</span>  PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2809</span>}</div>
+<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02784">2784</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2788</span>{</div>
+<div class="line"><span class="lineno"> 2789</span>  PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2790</span> </div>
+<div class="line"><span class="lineno"> 2791</span>  PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2792</span>  Vec            coordsVec;</div>
+<div class="line"><span class="lineno"> 2793</span> </div>
+<div class="line"><span class="lineno"> 2794</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Creating coords Vec.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2795</span>  ierr = VecCreate(PETSC_COMM_WORLD, &amp;coordsVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2796</span>  ierr = VecSetFromOptions(coordsVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2797</span> </div>
+<div class="line"><span class="lineno"> 2798</span>  <span class="comment">// For example: &quot;position&quot; is the name of the coordinate data</span></div>
+<div class="line"><span class="lineno"> 2799</span>  ierr = <a class="code hl_function" href="io_8c.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>(user, <span class="stringliteral">&quot;position&quot;</span>, coordsVec, timeIndex, <span class="stringliteral">&quot;dat&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2800</span>  <span class="keywordflow">if</span> (ierr) {</div>
+<div class="line"><span class="lineno"> 2801</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
+<div class="line"><span class="lineno"> 2802</span>              <span class="stringliteral">&quot;Error reading position data (ti=%d).\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2803</span>              timeIndex);</div>
+<div class="line"><span class="lineno"> 2804</span>    PetscFunctionReturn(ierr);</div>
+<div class="line"><span class="lineno"> 2805</span>  }</div>
+<div class="line"><span class="lineno"> 2806</span> </div>
+<div class="line"><span class="lineno"> 2807</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;ReadPositions - Gathering coords Vec to rank 0.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2808</span>  ierr = <a class="code hl_function" href="io_8c.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a>(coordsVec, Ncoords, coordsArray);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2809</span> </div>
+<div class="line"><span class="lineno"> 2810</span>  ierr = VecDestroy(&amp;coordsVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2811</span> </div>
+<div class="line"><span class="lineno"> 2812</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno"> 2813</span>            <span class="stringliteral">&quot;Successfully gathered coordinates. Ncoords=%d.\n&quot;</span>, *Ncoords);</div>
+<div class="line"><span class="lineno"> 2814</span>  PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2815</span>}</div>
 <div class="ttc" id="aio_8c_html_aa3512c89570bb1d27f4765819fad4985"><div class="ttname"><a href="io_8c.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a></div><div class="ttdeci">PetscErrorCode VecToArrayOnRank0(Vec inVec, PetscInt *N, double **arrayOut)</div><div class="ttdoc">Gather a (possibly distributed) PETSc Vec onto rank 0 as a contiguous C array.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l02119">io.c:2119</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -3203,35 +3203,35 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode Returns 0 on success, or non-zero on failures. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02826">2826</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2831</span>{</div>
-<div class="line"><span class="lineno"> 2832</span>  PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2833</span> </div>
-<div class="line"><span class="lineno"> 2834</span>  PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2835</span>  Vec            fieldVec;</div>
-<div class="line"><span class="lineno"> 2836</span> </div>
-<div class="line"><span class="lineno"> 2837</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Creating field Vec.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2838</span>  ierr = VecCreate(PETSC_COMM_WORLD, &amp;fieldVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2839</span>  ierr = VecSetFromOptions(fieldVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2840</span> </div>
-<div class="line"><span class="lineno"> 2841</span>  ierr = <a class="code hl_function" href="io_8c.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>(user, fieldName, fieldVec, timeIndex, <span class="stringliteral">&quot;dat&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2842</span>  <span class="keywordflow">if</span> (ierr) {</div>
-<div class="line"><span class="lineno"> 2843</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
-<div class="line"><span class="lineno"> 2844</span>              <span class="stringliteral">&quot;Error reading field &#39;%s&#39; (ti=%d).\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2845</span>              fieldName, timeIndex);</div>
-<div class="line"><span class="lineno"> 2846</span>    PetscFunctionReturn(ierr);</div>
-<div class="line"><span class="lineno"> 2847</span>  }</div>
-<div class="line"><span class="lineno"> 2848</span> </div>
-<div class="line"><span class="lineno"> 2849</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Gathering field Vec to rank 0.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2850</span>  ierr = <a class="code hl_function" href="io_8c.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a>(fieldVec, Nscalars, scalarArray);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2851</span> </div>
-<div class="line"><span class="lineno"> 2852</span>  ierr = VecDestroy(&amp;fieldVec);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2853</span> </div>
-<div class="line"><span class="lineno"> 2854</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno"> 2855</span>            <span class="stringliteral">&quot;Successfully gathered field &#39;%s&#39;. Nscalars=%d.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2856</span>            fieldName, *Nscalars);</div>
-<div class="line"><span class="lineno"> 2857</span>  PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2858</span>}</div>
+<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02832">2832</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2837</span>{</div>
+<div class="line"><span class="lineno"> 2838</span>  PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2839</span> </div>
+<div class="line"><span class="lineno"> 2840</span>  PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2841</span>  Vec            fieldVec;</div>
+<div class="line"><span class="lineno"> 2842</span> </div>
+<div class="line"><span class="lineno"> 2843</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Creating field Vec.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2844</span>  ierr = VecCreate(PETSC_COMM_WORLD, &amp;fieldVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2845</span>  ierr = VecSetFromOptions(fieldVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2846</span> </div>
+<div class="line"><span class="lineno"> 2847</span>  ierr = <a class="code hl_function" href="io_8c.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>(user, fieldName, fieldVec, timeIndex, <span class="stringliteral">&quot;dat&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2848</span>  <span class="keywordflow">if</span> (ierr) {</div>
+<div class="line"><span class="lineno"> 2849</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
+<div class="line"><span class="lineno"> 2850</span>              <span class="stringliteral">&quot;Error reading field &#39;%s&#39; (ti=%d).\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2851</span>              fieldName, timeIndex);</div>
+<div class="line"><span class="lineno"> 2852</span>    PetscFunctionReturn(ierr);</div>
+<div class="line"><span class="lineno"> 2853</span>  }</div>
+<div class="line"><span class="lineno"> 2854</span> </div>
+<div class="line"><span class="lineno"> 2855</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Gathering field Vec to rank 0.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2856</span>  ierr = <a class="code hl_function" href="io_8c.html#aa3512c89570bb1d27f4765819fad4985">VecToArrayOnRank0</a>(fieldVec, Nscalars, scalarArray);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2857</span> </div>
+<div class="line"><span class="lineno"> 2858</span>  ierr = VecDestroy(&amp;fieldVec);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2859</span> </div>
+<div class="line"><span class="lineno"> 2860</span>  <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno"> 2861</span>            <span class="stringliteral">&quot;Successfully gathered field &#39;%s&#39;. Nscalars=%d.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2862</span>            fieldName, *Nscalars);</div>
+<div class="line"><span class="lineno"> 2863</span>  PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2864</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -3356,59 +3356,65 @@ Here is the call graph for this function:</div>
 <div class="line"><span class="lineno"> 2379</span>                        ierr = <a class="code hl_function" href="io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c">GetBCParamReal</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;vz&quot;</span>,&amp;inlet_velocity.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>,&amp;found); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno"> 2380</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s - [%.4f,%.4f,%.4f]\n&quot;</span>, </div>
 <div class="line"><span class="lineno"> 2381</span>                        face_name_width, face_str, bc_type_str, bc_handler_type_str,inlet_velocity.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>,inlet_velocity.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>,inlet_velocity.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2382</span>                        } <span class="comment">// Support for Other Inlet handlers can be added later</span></div>
-<div class="line"><span class="lineno"> 2383</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a499ad2619c29a9aee2d01e859c8942f6">handler_type</a> == <a class="code hl_enumvalue" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4">BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</a>){</div>
-<div class="line"><span class="lineno"> 2384</span>                        PetscReal flux;</div>
-<div class="line"><span class="lineno"> 2385</span>                        PetscBool trimflag,foundflux,foundtrimflag;</div>
-<div class="line"><span class="lineno"> 2386</span>                        ierr = <a class="code hl_function" href="io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c">GetBCParamReal</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;target_flux&quot;</span>,&amp;flux,&amp;foundflux); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2387</span>                        ierr = <a class="code hl_function" href="io_8c.html#acb59fa1e42df0407ae6d7578b181e7c0">GetBCParamBool</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;apply_trim&quot;</span>,&amp;trimflag,&amp;foundtrimflag); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2388</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s - [%.4f] - %s\n&quot;</span>, </div>
-<div class="line"><span class="lineno"> 2389</span>                        face_name_width, face_str, bc_type_str, bc_handler_type_str,flux,trimflag?<span class="stringliteral">&quot;Trim Ucont&quot;</span>:<span class="stringliteral">&quot;No Trim&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2390</span>                    } <span class="keywordflow">else</span>{    </div>
-<div class="line"><span class="lineno"> 2391</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s\n&quot;</span>, </div>
-<div class="line"><span class="lineno"> 2392</span>                                face_name_width, face_str, bc_type_str,bc_handler_type_str); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2393</span>                    }</div>
-<div class="line"><span class="lineno"> 2394</span>            }</div>
-<div class="line"><span class="lineno"> 2395</span>        }</div>
-<div class="line"><span class="lineno"> 2396</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;-------------------------------------------------------------\n&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2397</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Start Time                  : %.4f\n&quot;</span>, (<span class="keywordtype">double</span>)StartTime); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2398</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Timestep Size               : %.4f\n&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2399</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Starting Step               : %d\n&quot;</span>, StartStep); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2400</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Total Steps to Run          : %d\n&quot;</span>, StepsToRun); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2401</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Number of MPI Processes     : %d\n&quot;</span>, num_mpi_procs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2402</span>        ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Number of Particles         : %d\n&quot;</span>, total_num_particles); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2403</span>        <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;solve&quot;</span>)==0 || strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;load&quot;</span>)==0){</div>
-<div class="line"><span class="lineno"> 2404</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* field_init_str = <a class="code hl_function" href="logging_8h.html#a266bd07f5be2795e8603a4075440ea25">FieldInitializationToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37">FieldInitialization</a>);</div>
-<div class="line"><span class="lineno"> 2405</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* particle_init_str = <a class="code hl_function" href="logging_8h.html#a6084910c834c11b53f96bfb8567f4cfd">ParticleInitializationToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a>);</div>
-<div class="line"><span class="lineno"> 2406</span>            ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Reynolds Number             : %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2407</span>            <span class="comment">//ierr = PetscPrintf(PETSC_COMM_WORLD,&quot; Von-Neumann Number          : %le\n&quot;, simCtx-&gt;vnn); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno"> 2408</span>            ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particle Initialization Mode: %s\n&quot;</span>, particle_init_str); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2409</span>            <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;solve&quot;</span>)==0){</div>
-<div class="line"><span class="lineno"> 2410</span>                <span class="comment">//ierr = PetscPrintf(PETSC_COMM_WORLD,&quot; Stanton Number              : %le\n&quot;, simCtx-&gt;st); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno"> 2411</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Momentum Equation Solver      : %s\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#adb14a868e4ab80f5a0654d272273f91a">MomentumSolverTypeToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aedf64ecb2ee6d4a923358bbed4a738d2">mom_solver_type</a>)); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2412</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Initial Pseudo-CFL    : %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af358bcdc4d800d707f3863ac730c4ee2">pseudo_cfl</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2413</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Large Eddy Simulation Model : %s\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#ad096c5af23acf37aea2b969fbaf99aaa">LESModelToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad87ed7266a1bc272ab8d4cea4e39d4d2">les</a>)); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2414</span>            }</div>
-<div class="line"><span class="lineno"> 2415</span>            <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a> == 0 || simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a> == 3) {</div>
-<div class="line"><span class="lineno"> 2416</span>                <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a1300c167a3006a58c71fe8759ebf5ef1">inletFaceDefined</a>) {</div>
-<div class="line"><span class="lineno"> 2417</span>                    ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particles Initialized At    : %s (Enum Val: %d)\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#a46638a78fe01e24d946d9103d5d2fde9">BCFaceToString</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a27bce072860da2f1a8a54d94b2b9497f">identifiedInletBCFace</a>), user-&gt;<a class="code hl_variable" href="variables_8h.html#a27bce072860da2f1a8a54d94b2b9497f">identifiedInletBCFace</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2418</span>                } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2419</span>                    ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particles Initialized At    : --- (No INLET face identified)\n&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2420</span>                }</div>
-<div class="line"><span class="lineno"> 2421</span>            }</div>
-<div class="line"><span class="lineno"> 2422</span> </div>
-<div class="line"><span class="lineno"> 2423</span>                ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Field Initialization Mode   : %s\n&quot;</span>, field_init_str); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2424</span>            <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37">FieldInitialization</a> == 1) {</div>
-<div class="line"><span class="lineno"> 2425</span>                ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Constant Velocity           : x - %.4f, y - %.4f, z - %.4f \n&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>,(<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>,(<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> ); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2426</span>            }</div>
-<div class="line"><span class="lineno"> 2427</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;analytical&quot;</span>)==0){</div>
-<div class="line"><span class="lineno"> 2428</span>            ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Analytical Solution Type : %s\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2429</span>        }</div>
-<div class="line"><span class="lineno"> 2430</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;=============================================================\n&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2431</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;\n&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2432</span>    }</div>
-<div class="line"><span class="lineno"> 2433</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2434</span>}</div>
+<div class="line"><span class="lineno"> 2382</span>                        } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a499ad2619c29a9aee2d01e859c8942f6">handler_type</a> == <a class="code hl_enumvalue" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad">BC_HANDLER_INLET_PARABOLIC</a>){</div>
+<div class="line"><span class="lineno"> 2383</span>                        PetscReal v_max = 0.0;</div>
+<div class="line"><span class="lineno"> 2384</span>                        PetscBool found;</div>
+<div class="line"><span class="lineno"> 2385</span>                        ierr = <a class="code hl_function" href="io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c">GetBCParamReal</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;v_max&quot;</span>,&amp;v_max,&amp;found); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2386</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s - v_max=%.4f\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2387</span>                        face_name_width, face_str, bc_type_str, bc_handler_type_str, v_max); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2388</span>                        }</div>
+<div class="line"><span class="lineno"> 2389</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a499ad2619c29a9aee2d01e859c8942f6">handler_type</a> == <a class="code hl_enumvalue" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4">BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</a>){</div>
+<div class="line"><span class="lineno"> 2390</span>                        PetscReal flux;</div>
+<div class="line"><span class="lineno"> 2391</span>                        PetscBool trimflag,foundflux,foundtrimflag;</div>
+<div class="line"><span class="lineno"> 2392</span>                        ierr = <a class="code hl_function" href="io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c">GetBCParamReal</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;target_flux&quot;</span>,&amp;flux,&amp;foundflux); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2393</span>                        ierr = <a class="code hl_function" href="io_8c.html#acb59fa1e42df0407ae6d7578b181e7c0">GetBCParamBool</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[current_face].<a class="code hl_variable" href="variables_8h.html#a9a3319252101456c548a87c13881a795">params</a>,<span class="stringliteral">&quot;apply_trim&quot;</span>,&amp;trimflag,&amp;foundtrimflag); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2394</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s - [%.4f] - %s\n&quot;</span>, </div>
+<div class="line"><span class="lineno"> 2395</span>                        face_name_width, face_str, bc_type_str, bc_handler_type_str,flux,trimflag?<span class="stringliteral">&quot;Trim Ucont&quot;</span>:<span class="stringliteral">&quot;No Trim&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2396</span>                    } <span class="keywordflow">else</span>{    </div>
+<div class="line"><span class="lineno"> 2397</span>                        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Face %-*s : %s - %s\n&quot;</span>, </div>
+<div class="line"><span class="lineno"> 2398</span>                                face_name_width, face_str, bc_type_str,bc_handler_type_str); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2399</span>                    }</div>
+<div class="line"><span class="lineno"> 2400</span>            }</div>
+<div class="line"><span class="lineno"> 2401</span>        }</div>
+<div class="line"><span class="lineno"> 2402</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;-------------------------------------------------------------\n&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2403</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Start Time                  : %.4f\n&quot;</span>, (<span class="keywordtype">double</span>)StartTime); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2404</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Timestep Size               : %.4f\n&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2405</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Starting Step               : %d\n&quot;</span>, StartStep); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2406</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Total Steps to Run          : %d\n&quot;</span>, StepsToRun); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2407</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Number of MPI Processes     : %d\n&quot;</span>, num_mpi_procs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2408</span>        ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Number of Particles         : %d\n&quot;</span>, total_num_particles); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2409</span>        <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;solve&quot;</span>)==0 || strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;load&quot;</span>)==0){</div>
+<div class="line"><span class="lineno"> 2410</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* field_init_str = <a class="code hl_function" href="logging_8h.html#a266bd07f5be2795e8603a4075440ea25">FieldInitializationToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37">FieldInitialization</a>);</div>
+<div class="line"><span class="lineno"> 2411</span>            <span class="keyword">const</span> <span class="keywordtype">char</span>* particle_init_str = <a class="code hl_function" href="logging_8h.html#a6084910c834c11b53f96bfb8567f4cfd">ParticleInitializationToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a>);</div>
+<div class="line"><span class="lineno"> 2412</span>            ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Reynolds Number             : %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2413</span>            <span class="comment">//ierr = PetscPrintf(PETSC_COMM_WORLD,&quot; Von-Neumann Number          : %le\n&quot;, simCtx-&gt;vnn); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno"> 2414</span>            ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particle Initialization Mode: %s\n&quot;</span>, particle_init_str); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2415</span>            <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;solve&quot;</span>)==0){</div>
+<div class="line"><span class="lineno"> 2416</span>                <span class="comment">//ierr = PetscPrintf(PETSC_COMM_WORLD,&quot; Stanton Number              : %le\n&quot;, simCtx-&gt;st); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno"> 2417</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Momentum Equation Solver      : %s\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#adb14a868e4ab80f5a0654d272273f91a">MomentumSolverTypeToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aedf64ecb2ee6d4a923358bbed4a738d2">mom_solver_type</a>)); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2418</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Initial Pseudo-CFL    : %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af358bcdc4d800d707f3863ac730c4ee2">pseudo_cfl</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2419</span>                ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Large Eddy Simulation Model : %s\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#ad096c5af23acf37aea2b969fbaf99aaa">LESModelToString</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad87ed7266a1bc272ab8d4cea4e39d4d2">les</a>)); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2420</span>            }</div>
+<div class="line"><span class="lineno"> 2421</span>            <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a> == 0 || simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae3ce8967b15c2e6be9e829b745da4090">ParticleInitialization</a> == 3) {</div>
+<div class="line"><span class="lineno"> 2422</span>                <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a1300c167a3006a58c71fe8759ebf5ef1">inletFaceDefined</a>) {</div>
+<div class="line"><span class="lineno"> 2423</span>                    ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particles Initialized At    : %s (Enum Val: %d)\n&quot;</span>, <a class="code hl_function" href="logging_8h.html#a46638a78fe01e24d946d9103d5d2fde9">BCFaceToString</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a27bce072860da2f1a8a54d94b2b9497f">identifiedInletBCFace</a>), user-&gt;<a class="code hl_variable" href="variables_8h.html#a27bce072860da2f1a8a54d94b2b9497f">identifiedInletBCFace</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2424</span>                } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 2425</span>                    ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Particles Initialized At    : --- (No INLET face identified)\n&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2426</span>                }</div>
+<div class="line"><span class="lineno"> 2427</span>            }</div>
+<div class="line"><span class="lineno"> 2428</span> </div>
+<div class="line"><span class="lineno"> 2429</span>                ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Field Initialization Mode   : %s\n&quot;</span>, field_init_str); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2430</span>            <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37">FieldInitialization</a> == 1) {</div>
+<div class="line"><span class="lineno"> 2431</span>                ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot; Constant Velocity           : x - %.4f, y - %.4f, z - %.4f \n&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>,(<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>,(<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac503944447b87fc650e0ffa74a780b36">InitialConstantContra</a>.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> ); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2432</span>            }</div>
+<div class="line"><span class="lineno"> 2433</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d">eulerianSource</a>,<span class="stringliteral">&quot;analytical&quot;</span>)==0){</div>
+<div class="line"><span class="lineno"> 2434</span>            ierr = PetscPrintf(PETSC_COMM_WORLD,<span class="stringliteral">&quot; Analytical Solution Type : %s\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2435</span>        }</div>
+<div class="line"><span class="lineno"> 2436</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;=============================================================\n&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2437</span>        ierr = PetscPrintf(PETSC_COMM_SELF, <span class="stringliteral">&quot;\n&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2438</span>    }</div>
+<div class="line"><span class="lineno"> 2439</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2440</span>}</div>
 <div class="ttc" id="aio_8c_html_a1ac7631f5ff3a878c3f5788d6880c22c"><div class="ttname"><a href="io_8c.html#a1ac7631f5ff3a878c3f5788d6880c22c">GetBCParamReal</a></div><div class="ttdeci">PetscErrorCode GetBCParamReal(BC_Param *params, const char *key, PetscReal *value_out, PetscBool *found)</div><div class="ttdoc">Searches a BC_Param linked list for a key and returns its value as a double.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l00360">io.c:360</a></div></div>
 <div class="ttc" id="aio_8c_html_acb59fa1e42df0407ae6d7578b181e7c0"><div class="ttname"><a href="io_8c.html#acb59fa1e42df0407ae6d7578b181e7c0">GetBCParamBool</a></div><div class="ttdeci">PetscErrorCode GetBCParamBool(BC_Param *params, const char *key, PetscBool *value_out, PetscBool *found)</div><div class="ttdoc">Searches a BC_Param linked list for a key and returns its value as a bool.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l00385">io.c:385</a></div></div>
 <div class="ttc" id="alogging_8h_html_a227ad490382f319c9b9e9a05dfbaab43"><div class="ttname"><a href="logging_8h.html#a227ad490382f319c9b9e9a05dfbaab43">BCHandlerTypeToString</a></div><div class="ttdeci">const char * BCHandlerTypeToString(BCHandlerType handler_type)</div><div class="ttdoc">Converts a BCHandlerType enum to its string representation.</div><div class="ttdef"><b>Definition</b> <a href="logging_8c_source.html#l00747">logging.c:747</a></div></div>
@@ -3425,6 +3431,7 @@ Here is the call graph for this function:</div>
 <div class="ttc" id="avariables_8h_html_a27bce072860da2f1a8a54d94b2b9497f"><div class="ttname"><a href="variables_8h.html#a27bce072860da2f1a8a54d94b2b9497f">UserCtx::identifiedInletBCFace</a></div><div class="ttdeci">BCFace identifiedInletBCFace</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00739">variables.h:739</a></div></div>
 <div class="ttc" id="avariables_8h_html_a337c3a9a9bf061e10d71ba990aa6ed29"><div class="ttname"><a href="variables_8h.html#a337c3a9a9bf061e10d71ba990aa6ed29">SimCtx::StartTime</a></div><div class="ttdeci">PetscReal StartTime</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00590">variables.h:590</a></div></div>
 <div class="ttc" id="avariables_8h_html_a41a6127b3c012c516a7dcc56c3696a84"><div class="ttname"><a href="variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84">SimCtx::usermg</a></div><div class="ttdeci">UserMG usermg</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00689">variables.h:689</a></div></div>
+<div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad">BC_HANDLER_INLET_PARABOLIC</a></div><div class="ttdeci">@ BC_HANDLER_INLET_PARABOLIC</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00236">variables.h:236</a></div></div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a25bcc12476da9fcbd880e7bd3149017d"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a25bcc12476da9fcbd880e7bd3149017d">BC_HANDLER_INLET_CONSTANT_VELOCITY</a></div><div class="ttdeci">@ BC_HANDLER_INLET_CONSTANT_VELOCITY</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00235">variables.h:235</a></div></div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4">BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</a></div><div class="ttdeci">@ BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00245">variables.h:245</a></div></div>
 <div class="ttc" id="avariables_8h_html_a483945572b5ab1461a864ee1e3eb1d37"><div class="ttname"><a href="variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37">SimCtx::FieldInitialization</a></div><div class="ttdeci">PetscInt FieldInitialization</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00628">variables.h:628</a></div></div>
@@ -3637,7 +3644,6 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  324</span>    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><span class="lineno">  325</span>}</div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a189414a3a38c1a369403d6dcf932bcc0"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a189414a3a38c1a369403d6dcf932bcc0">BC_HANDLER_PERIODIC_GEOMETRIC</a></div><div class="ttdeci">@ BC_HANDLER_PERIODIC_GEOMETRIC</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00243">variables.h:243</a></div></div>
-<div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a247e4c6e2fe8ce63fa129ec7a5b1d5ad">BC_HANDLER_INLET_PARABOLIC</a></div><div class="ttdeci">@ BC_HANDLER_INLET_PARABOLIC</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00236">variables.h:236</a></div></div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a39c0e759cb55c40589433dbb7ea5d55a"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a39c0e759cb55c40589433dbb7ea5d55a">BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</a></div><div class="ttdeci">@ BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00247">variables.h:246</a></div></div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a8e4d319e69db46cfeb7c907264066f0a"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a8e4d319e69db46cfeb7c907264066f0a">BC_HANDLER_WALL_NOSLIP</a></div><div class="ttdeci">@ BC_HANDLER_WALL_NOSLIP</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
 <div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a8efec6d0827e764925c321a471027e32"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a8efec6d0827e764925c321a471027e32">BC_HANDLER_OUTLET_CONSERVATION</a></div><div class="ttdeci">@ BC_HANDLER_OUTLET_CONSERVATION</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00241">variables.h:241</a></div></div>
@@ -3830,7 +3836,7 @@ Here is the caller graph for this function:</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="io_8h_a1ac7631f5ff3a878c3f5788d6880c22c_icgraph.svg" width="100%" height="423"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="io_8h_a1ac7631f5ff3a878c3f5788d6880c22c_icgraph.svg" width="100%" height="473"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -4439,125 +4445,125 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02451">2451</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2452</span>{</div>
-<div class="line"><span class="lineno"> 2453</span>    FILE *file;</div>
-<div class="line"><span class="lineno"> 2454</span>    <span class="keywordtype">char</span> line[1024];</div>
-<div class="line"><span class="lineno"> 2455</span>    PetscBool startTimeSet, endTimeSet, timeStepSet;</div>
-<div class="line"><span class="lineno"> 2456</span> </div>
-<div class="line"><span class="lineno"> 2457</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2458</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2459</span> </div>
-<div class="line"><span class="lineno"> 2460</span>    <span class="keywordflow">if</span> (!simCtx || !simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>) {</div>
-<div class="line"><span class="lineno"> 2461</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;SimCtx or its pps member is NULL in ParsePostProcessingSettings.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2462</span>    }</div>
-<div class="line"><span class="lineno"> 2463</span> </div>
-<div class="line"><span class="lineno"> 2464</span>    <span class="keywordtype">char</span> *configFile = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af05e9e68e0acf99ae030d44b905e33fb">PostprocessingControlFile</a>;</div>
-<div class="line"><span class="lineno"> 2465</span>    <a class="code hl_struct" href="variables_8h.html#structPostProcessParams">PostProcessParams</a> *pps = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>;</div>
-<div class="line"><span class="lineno"> 2466</span> </div>
-<div class="line"><span class="lineno"> 2467</span> </div>
-<div class="line"><span class="lineno"> 2468</span>    <span class="comment">// --- 1. Set Sane Defaults First ---</span></div>
-<div class="line"><span class="lineno"> 2469</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a> = 0;</div>
-<div class="line"><span class="lineno"> 2470</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = 0;</div>
-<div class="line"><span class="lineno"> 2471</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a> = 1;</div>
-<div class="line"><span class="lineno"> 2472</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno"> 2473</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af4e8e680314f5a935c26342d6dca13c8">LoggingFrequency</a>; <span class="comment">// Default to logging frequency;</span></div>
-<div class="line"><span class="lineno"> 2474</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2475</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>, <span class="stringliteral">&quot;Ucat,P&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2476</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a47a8b39d145cff36aa25d8588976156e">output_fields_averaged</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2477</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>, <span class="stringliteral">&quot;Field&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2478</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>,<span class="stringliteral">&quot;Particle&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2479</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>,<span class="stringliteral">&quot;velocity,CellID,weight,pid&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2480</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>,<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2481</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0">particleExt</a>,<span class="stringliteral">&quot;dat&quot;</span>); <span class="comment">// The input file format for particles.</span></div>
-<div class="line"><span class="lineno"> 2482</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3">eulerianExt</a>,<span class="stringliteral">&quot;dat&quot;</span>); <span class="comment">// The input file format for Eulerian fields.</span></div>
-<div class="line"><span class="lineno"> 2483</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0] = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1] = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2] = 1;</div>
-<div class="line"><span class="lineno"> 2484</span>    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>, <span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1);</div>
-<div class="line"><span class="lineno"> 2485</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>[<span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1] = <span class="charliteral">&#39;\0&#39;</span>; <span class="comment">// Ensure null-termination</span></div>
-<div class="line"><span class="lineno"> 2486</span> </div>
-<div class="line"><span class="lineno"> 2487</span>    <span class="comment">// --- 2. Parse the Configuration File (overrides defaults) ---</span></div>
-<div class="line"><span class="lineno"> 2488</span>    file = fopen(configFile, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2489</span>    <span class="keywordflow">if</span> (file) {</div>
-<div class="line"><span class="lineno"> 2490</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Parsing post-processing config file: %s\n&quot;</span>, configFile);</div>
-<div class="line"><span class="lineno"> 2491</span>        <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), file)) {</div>
-<div class="line"><span class="lineno"> 2492</span>            <span class="keywordtype">char</span> *key, *value, *comment;</div>
-<div class="line"><span class="lineno"> 2493</span>            comment = strchr(line, <span class="charliteral">&#39;#&#39;</span>); <span class="keywordflow">if</span> (comment) *comment = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2494</span>            <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(line); <span class="keywordflow">if</span> (strlen(line) == 0) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno"> 2495</span>            key = strtok(line, <span class="stringliteral">&quot;=&quot;</span>); value = strtok(NULL, <span class="stringliteral">&quot;=&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2496</span>            <span class="keywordflow">if</span> (key &amp;&amp; value) {</div>
-<div class="line"><span class="lineno"> 2497</span>                <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(key); <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(value);</div>
-<div class="line"><span class="lineno"> 2498</span>                <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;startTime&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a> = atoi(value);</div>
-<div class="line"><span class="lineno"> 2499</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;endTime&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = atoi(value);</div>
-<div class="line"><span class="lineno"> 2500</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;timeStep&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a> = atoi(value);</div>
-<div class="line"><span class="lineno"> 2501</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;output_particles&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2502</span>                    <span class="keywordflow">if</span> (strcasecmp(value, <span class="stringliteral">&quot;true&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno"> 2503</span>                }</div>
-<div class="line"><span class="lineno"> 2504</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;process_pipeline&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2505</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>, value, <a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2506</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>[<a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>; <span class="comment">// Ensure null-termination</span></div>
-<div class="line"><span class="lineno"> 2507</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;output_fields_instantaneous&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2508</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>, value, <a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2509</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>[<a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2510</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;output_prefix&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2511</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>, value, <a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2512</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2513</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_output_prefix&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2514</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>, value, <a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2515</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2516</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_fields_instantaneous&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2517</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>, value, <a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2518</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>[<a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2519</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_pipeline&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2520</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>, value, <a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno"> 2521</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>[<a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2522</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_output_freq&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2523</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> = atoi(value);</div>
-<div class="line"><span class="lineno"> 2524</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_ip&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0] = atoi(value);</div>
-<div class="line"><span class="lineno"> 2525</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_jp&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1] = atoi(value);</div>
-<div class="line"><span class="lineno"> 2526</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_kp&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2] = atoi(value);</div>
-<div class="line"><span class="lineno"> 2527</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;source_directory&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno"> 2528</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>, value, <span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1);</div>
-<div class="line"><span class="lineno"> 2529</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>[<span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno"> 2530</span>                } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2531</span>                    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Unknown key &#39;%s&#39; in post-processing config file. Ignoring.\n&quot;</span>, key);</div>
-<div class="line"><span class="lineno"> 2532</span>                }</div>
-<div class="line"><span class="lineno"> 2533</span>                <span class="comment">// Add parsing for pipeline, fields, etc. in later phases</span></div>
-<div class="line"><span class="lineno"> 2534</span>            }</div>
-<div class="line"><span class="lineno"> 2535</span>        }</div>
-<div class="line"><span class="lineno"> 2536</span>        fclose(file);</div>
-<div class="line"><span class="lineno"> 2537</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 2538</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Could not open post-processing config file &#39;%s&#39;. Using defaults and command-line overrides.\n&quot;</span>, configFile);</div>
-<div class="line"><span class="lineno"> 2539</span>    }</div>
-<div class="line"><span class="lineno"> 2540</span> </div>
-<div class="line"><span class="lineno"> 2541</span>    <span class="comment">// --- 3. Parse Command-Line Options (overrides file settings and defaults) ---</span></div>
-<div class="line"><span class="lineno"> 2542</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-startTime&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>, &amp;startTimeSet);</div>
-<div class="line"><span class="lineno"> 2543</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-endTime&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>, &amp;endTimeSet);</div>
-<div class="line"><span class="lineno"> 2544</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-timeStep&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a>, &amp;timeStepSet);</div>
-<div class="line"><span class="lineno"> 2545</span>    PetscOptionsGetBool(NULL, NULL, <span class="stringliteral">&quot;-output_particles&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a>, NULL);</div>
+<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02457">2457</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2458</span>{</div>
+<div class="line"><span class="lineno"> 2459</span>    FILE *file;</div>
+<div class="line"><span class="lineno"> 2460</span>    <span class="keywordtype">char</span> line[1024];</div>
+<div class="line"><span class="lineno"> 2461</span>    PetscBool startTimeSet, endTimeSet, timeStepSet;</div>
+<div class="line"><span class="lineno"> 2462</span> </div>
+<div class="line"><span class="lineno"> 2463</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2464</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2465</span> </div>
+<div class="line"><span class="lineno"> 2466</span>    <span class="keywordflow">if</span> (!simCtx || !simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>) {</div>
+<div class="line"><span class="lineno"> 2467</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;SimCtx or its pps member is NULL in ParsePostProcessingSettings.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2468</span>    }</div>
+<div class="line"><span class="lineno"> 2469</span> </div>
+<div class="line"><span class="lineno"> 2470</span>    <span class="keywordtype">char</span> *configFile = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af05e9e68e0acf99ae030d44b905e33fb">PostprocessingControlFile</a>;</div>
+<div class="line"><span class="lineno"> 2471</span>    <a class="code hl_struct" href="variables_8h.html#structPostProcessParams">PostProcessParams</a> *pps = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>;</div>
+<div class="line"><span class="lineno"> 2472</span> </div>
+<div class="line"><span class="lineno"> 2473</span> </div>
+<div class="line"><span class="lineno"> 2474</span>    <span class="comment">// --- 1. Set Sane Defaults First ---</span></div>
+<div class="line"><span class="lineno"> 2475</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a> = 0;</div>
+<div class="line"><span class="lineno"> 2476</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = 0;</div>
+<div class="line"><span class="lineno"> 2477</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a> = 1;</div>
+<div class="line"><span class="lineno"> 2478</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno"> 2479</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af4e8e680314f5a935c26342d6dca13c8">LoggingFrequency</a>; <span class="comment">// Default to logging frequency;</span></div>
+<div class="line"><span class="lineno"> 2480</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2481</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>, <span class="stringliteral">&quot;Ucat,P&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2482</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a47a8b39d145cff36aa25d8588976156e">output_fields_averaged</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2483</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>, <span class="stringliteral">&quot;Field&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2484</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>,<span class="stringliteral">&quot;Particle&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2485</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>,<span class="stringliteral">&quot;velocity,CellID,weight,pid&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2486</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>,<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2487</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ad573ddfd2513e325b1e795bc81ed38a0">particleExt</a>,<span class="stringliteral">&quot;dat&quot;</span>); <span class="comment">// The input file format for particles.</span></div>
+<div class="line"><span class="lineno"> 2488</span>    strcpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3">eulerianExt</a>,<span class="stringliteral">&quot;dat&quot;</span>); <span class="comment">// The input file format for Eulerian fields.</span></div>
+<div class="line"><span class="lineno"> 2489</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0] = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1] = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2] = 1;</div>
+<div class="line"><span class="lineno"> 2490</span>    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>, <span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1);</div>
+<div class="line"><span class="lineno"> 2491</span>    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>[<span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1] = <span class="charliteral">&#39;\0&#39;</span>; <span class="comment">// Ensure null-termination</span></div>
+<div class="line"><span class="lineno"> 2492</span> </div>
+<div class="line"><span class="lineno"> 2493</span>    <span class="comment">// --- 2. Parse the Configuration File (overrides defaults) ---</span></div>
+<div class="line"><span class="lineno"> 2494</span>    file = fopen(configFile, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2495</span>    <span class="keywordflow">if</span> (file) {</div>
+<div class="line"><span class="lineno"> 2496</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Parsing post-processing config file: %s\n&quot;</span>, configFile);</div>
+<div class="line"><span class="lineno"> 2497</span>        <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), file)) {</div>
+<div class="line"><span class="lineno"> 2498</span>            <span class="keywordtype">char</span> *key, *value, *comment;</div>
+<div class="line"><span class="lineno"> 2499</span>            comment = strchr(line, <span class="charliteral">&#39;#&#39;</span>); <span class="keywordflow">if</span> (comment) *comment = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2500</span>            <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(line); <span class="keywordflow">if</span> (strlen(line) == 0) <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno"> 2501</span>            key = strtok(line, <span class="stringliteral">&quot;=&quot;</span>); value = strtok(NULL, <span class="stringliteral">&quot;=&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2502</span>            <span class="keywordflow">if</span> (key &amp;&amp; value) {</div>
+<div class="line"><span class="lineno"> 2503</span>                <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(key); <a class="code hl_function" href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(value);</div>
+<div class="line"><span class="lineno"> 2504</span>                <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;startTime&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a> = atoi(value);</div>
+<div class="line"><span class="lineno"> 2505</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;endTime&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = atoi(value);</div>
+<div class="line"><span class="lineno"> 2506</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;timeStep&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a> = atoi(value);</div>
+<div class="line"><span class="lineno"> 2507</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;output_particles&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2508</span>                    <span class="keywordflow">if</span> (strcasecmp(value, <span class="stringliteral">&quot;true&quot;</span>) == 0) pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno"> 2509</span>                }</div>
+<div class="line"><span class="lineno"> 2510</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;process_pipeline&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2511</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>, value, <a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2512</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>[<a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>; <span class="comment">// Ensure null-termination</span></div>
+<div class="line"><span class="lineno"> 2513</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;output_fields_instantaneous&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2514</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>, value, <a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2515</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>[<a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2516</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;output_prefix&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2517</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>, value, <a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2518</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2519</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_output_prefix&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2520</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>, value, <a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2521</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2522</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_fields_instantaneous&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2523</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>, value, <a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2524</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>[<a class="code hl_define" href="variables_8h.html#a422cda8cdbf27473ba083b7fb394f025">MAX_FIELD_LIST_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2525</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_pipeline&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2526</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>, value, <a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno"> 2527</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>[<a class="code hl_define" href="variables_8h.html#a483a214c827f374f6c8f8660f6935317">MAX_PIPELINE_LENGTH</a> - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2528</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;particle_output_freq&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2529</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a> = atoi(value);</div>
+<div class="line"><span class="lineno"> 2530</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_ip&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0] = atoi(value);</div>
+<div class="line"><span class="lineno"> 2531</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_jp&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1] = atoi(value);</div>
+<div class="line"><span class="lineno"> 2532</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(key, <span class="stringliteral">&quot;reference_kp&quot;</span>) == 0) {pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2] = atoi(value);</div>
+<div class="line"><span class="lineno"> 2533</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(key, <span class="stringliteral">&quot;source_directory&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno"> 2534</span>                    strncpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>, value, <span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1);</div>
+<div class="line"><span class="lineno"> 2535</span>                    pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>[<span class="keyword">sizeof</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321">source_dir</a>) - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno"> 2536</span>                } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 2537</span>                    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Unknown key &#39;%s&#39; in post-processing config file. Ignoring.\n&quot;</span>, key);</div>
+<div class="line"><span class="lineno"> 2538</span>                }</div>
+<div class="line"><span class="lineno"> 2539</span>                <span class="comment">// Add parsing for pipeline, fields, etc. in later phases</span></div>
+<div class="line"><span class="lineno"> 2540</span>            }</div>
+<div class="line"><span class="lineno"> 2541</span>        }</div>
+<div class="line"><span class="lineno"> 2542</span>        fclose(file);</div>
+<div class="line"><span class="lineno"> 2543</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 2544</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Could not open post-processing config file &#39;%s&#39;. Using defaults and command-line overrides.\n&quot;</span>, configFile);</div>
+<div class="line"><span class="lineno"> 2545</span>    }</div>
 <div class="line"><span class="lineno"> 2546</span> </div>
-<div class="line"><span class="lineno"> 2547</span>    <span class="keywordflow">if</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>==-1){</div>
-<div class="line"><span class="lineno"> 2548</span>        pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a55ce12cdec83e590169b333b5dc84009">StepsToRun</a>; <span class="comment">// Total steps if endTime is set to -1.</span></div>
-<div class="line"><span class="lineno"> 2549</span>    }</div>
-<div class="line"><span class="lineno"> 2550</span> </div>
-<div class="line"><span class="lineno"> 2551</span>    <span class="comment">// If only startTime is given on command line, run for a single step</span></div>
-<div class="line"><span class="lineno"> 2552</span>    <span class="keywordflow">if</span> (startTimeSet &amp;&amp; !endTimeSet) {</div>
-<div class="line"><span class="lineno"> 2553</span>        pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>;</div>
-<div class="line"><span class="lineno"> 2554</span>    }</div>
-<div class="line"><span class="lineno"> 2555</span> </div>
-<div class="line"><span class="lineno"> 2556</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Post-processing configured to run from t=%d to t=%d with step %d. Particle output: %s.\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2557</span>              pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> ? <span class="stringliteral">&quot;TRUE&quot;</span> : <span class="stringliteral">&quot;FALSE&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2558</span> </div>
-<div class="line"><span class="lineno"> 2559</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Process Pipeline: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>);</div>
-<div class="line"><span class="lineno"> 2560</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Instantaneous Output Fields: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>);</div>
-<div class="line"><span class="lineno"> 2561</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Output Prefix: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>);</div>
-<div class="line"><span class="lineno"> 2562</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Output Prefix: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>);</div>
-<div class="line"><span class="lineno"> 2563</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Fields: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>);</div>
-<div class="line"><span class="lineno"> 2564</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Pipeline: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>);</div>
-<div class="line"><span class="lineno"> 2565</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Output Frequency: %d\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a>);</div>
-<div class="line"><span class="lineno"> 2566</span> </div>
-<div class="line"><span class="lineno"> 2567</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2568</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2569</span>}</div>
+<div class="line"><span class="lineno"> 2547</span>    <span class="comment">// --- 3. Parse Command-Line Options (overrides file settings and defaults) ---</span></div>
+<div class="line"><span class="lineno"> 2548</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-startTime&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>, &amp;startTimeSet);</div>
+<div class="line"><span class="lineno"> 2549</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-endTime&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>, &amp;endTimeSet);</div>
+<div class="line"><span class="lineno"> 2550</span>    PetscOptionsGetInt(NULL, NULL, <span class="stringliteral">&quot;-timeStep&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a>, &amp;timeStepSet);</div>
+<div class="line"><span class="lineno"> 2551</span>    PetscOptionsGetBool(NULL, NULL, <span class="stringliteral">&quot;-output_particles&quot;</span>, &amp;pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a>, NULL);</div>
+<div class="line"><span class="lineno"> 2552</span> </div>
+<div class="line"><span class="lineno"> 2553</span>    <span class="keywordflow">if</span>(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>==-1){</div>
+<div class="line"><span class="lineno"> 2554</span>        pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a55ce12cdec83e590169b333b5dc84009">StepsToRun</a>; <span class="comment">// Total steps if endTime is set to -1.</span></div>
+<div class="line"><span class="lineno"> 2555</span>    }</div>
+<div class="line"><span class="lineno"> 2556</span> </div>
+<div class="line"><span class="lineno"> 2557</span>    <span class="comment">// If only startTime is given on command line, run for a single step</span></div>
+<div class="line"><span class="lineno"> 2558</span>    <span class="keywordflow">if</span> (startTimeSet &amp;&amp; !endTimeSet) {</div>
+<div class="line"><span class="lineno"> 2559</span>        pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a> = pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>;</div>
+<div class="line"><span class="lineno"> 2560</span>    }</div>
+<div class="line"><span class="lineno"> 2561</span> </div>
+<div class="line"><span class="lineno"> 2562</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Post-processing configured to run from t=%d to t=%d with step %d. Particle output: %s.\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2563</span>              pps-&gt;<a class="code hl_variable" href="variables_8h.html#ae3da627fc17587b06d6c2a737ff6442c">startTime</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a76d29089d00d89348f32bbf0e2981497">endTime</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a5dca17e57a0f1464e2442f0c2452d497">timeStep</a>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> ? <span class="stringliteral">&quot;TRUE&quot;</span> : <span class="stringliteral">&quot;FALSE&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2564</span> </div>
+<div class="line"><span class="lineno"> 2565</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Process Pipeline: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a">process_pipeline</a>);</div>
+<div class="line"><span class="lineno"> 2566</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Instantaneous Output Fields: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb">output_fields_instantaneous</a>);</div>
+<div class="line"><span class="lineno"> 2567</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Output Prefix: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">output_prefix</a>);</div>
+<div class="line"><span class="lineno"> 2568</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Output Prefix: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>);</div>
+<div class="line"><span class="lineno"> 2569</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Fields: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>);</div>
+<div class="line"><span class="lineno"> 2570</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Pipeline: %s\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a99bf6d0fb65651a6049015b2b4fe12a8">particle_pipeline</a>);</div>
+<div class="line"><span class="lineno"> 2571</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Output Frequency: %d\n&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab6d46fc72a3f790771bdccf0b9ee0d5a">particle_output_freq</a>);</div>
+<div class="line"><span class="lineno"> 2572</span> </div>
+<div class="line"><span class="lineno"> 2573</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2574</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2575</span>}</div>
 <div class="ttc" id="aio_8c_html_a61850e757fea41eb461a930936c34401"><div class="ttname"><a href="io_8c.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a></div><div class="ttdeci">void TrimWhitespace(char *str)</div><div class="ttdoc">Trims leading and trailing whitespace from a string in-place.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l00036">io.c:36</a></div></div>
 <div class="ttc" id="avariables_8h_html_a191105bdbbd1711ea3f5fd59b0d1b582"><div class="ttname"><a href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">PostProcessParams::particle_output_prefix</a></div><div class="ttdeci">char particle_output_prefix[256]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00508">variables.h:508</a></div></div>
 <div class="ttc" id="avariables_8h_html_a3a5ab7e0a0271c6cec0e2150f9beb1d4"><div class="ttname"><a href="variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4">PostProcessParams::output_prefix</a></div><div class="ttdeci">char output_prefix[256]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00505">variables.h:505</a></div></div>
@@ -4619,43 +4625,43 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02586">2586</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2587</span>{</div>
-<div class="line"><span class="lineno"> 2588</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2589</span>    PetscBool      flg;</div>
-<div class="line"><span class="lineno"> 2590</span> </div>
-<div class="line"><span class="lineno"> 2591</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2592</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2593</span> </div>
-<div class="line"><span class="lineno"> 2594</span>    <span class="keywordflow">if</span> (!simCtx) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;SimCtx is NULL in ParseScalingInformation&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2595</span> </div>
-<div class="line"><span class="lineno"> 2596</span>    <span class="comment">// --- 1. Set default values to 1.0 ---</span></div>
-<div class="line"><span class="lineno"> 2597</span>    <span class="comment">// This represents a purely non-dimensional run if no scaling is provided.</span></div>
-<div class="line"><span class="lineno"> 2598</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>   = 1.0;</div>
-<div class="line"><span class="lineno"> 2599</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>   = 1.0;</div>
-<div class="line"><span class="lineno"> 2600</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a> = 1.0;</div>
-<div class="line"><span class="lineno"> 2601</span>    </div>
-<div class="line"><span class="lineno"> 2602</span>    <span class="comment">// --- 2. Read overrides from the command line / control file ---</span></div>
-<div class="line"><span class="lineno"> 2603</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_L_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2604</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_U_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2605</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_rho_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2606</span>    </div>
-<div class="line"><span class="lineno"> 2607</span>    <span class="comment">// --- 3. Calculate derived scaling factors ---</span></div>
-<div class="line"><span class="lineno"> 2608</span>    <span class="comment">// Check for division by zero to be safe, though U_ref should be positive.</span></div>
-<div class="line"><span class="lineno"> 2609</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> &lt;= 0.0) {</div>
-<div class="line"><span class="lineno"> 2610</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_OUTOFRANGE, <span class="stringliteral">&quot;Reference velocity U_ref must be positive. Got %g&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>);</div>
-<div class="line"><span class="lineno"> 2611</span>    }</div>
-<div class="line"><span class="lineno"> 2612</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
-<div class="line"><span class="lineno"> 2613</span> </div>
-<div class="line"><span class="lineno"> 2614</span>    <span class="comment">// --- 4. Log the final, effective scales for verification ---</span></div>
-<div class="line"><span class="lineno"> 2615</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;---------------- Physical Scales Initialized -----------------\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2616</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  L_ref: %.4f, U_ref: %.4f, rho_ref: %.4f, P_ref: %.4f\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 2617</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a>);</div>
-<div class="line"><span class="lineno"> 2618</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--------------------------------------------------------------\n&quot;</span>);</div>
+<p class="definition">Definition at line <a class="el" href="io_8c_source.html#l02592">2592</a> of file <a class="el" href="io_8c_source.html">io.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2593</span>{</div>
+<div class="line"><span class="lineno"> 2594</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2595</span>    PetscBool      flg;</div>
+<div class="line"><span class="lineno"> 2596</span> </div>
+<div class="line"><span class="lineno"> 2597</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2598</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2599</span> </div>
+<div class="line"><span class="lineno"> 2600</span>    <span class="keywordflow">if</span> (!simCtx) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;SimCtx is NULL in ParseScalingInformation&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2601</span> </div>
+<div class="line"><span class="lineno"> 2602</span>    <span class="comment">// --- 1. Set default values to 1.0 ---</span></div>
+<div class="line"><span class="lineno"> 2603</span>    <span class="comment">// This represents a purely non-dimensional run if no scaling is provided.</span></div>
+<div class="line"><span class="lineno"> 2604</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>   = 1.0;</div>
+<div class="line"><span class="lineno"> 2605</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>   = 1.0;</div>
+<div class="line"><span class="lineno"> 2606</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a> = 1.0;</div>
+<div class="line"><span class="lineno"> 2607</span>    </div>
+<div class="line"><span class="lineno"> 2608</span>    <span class="comment">// --- 2. Read overrides from the command line / control file ---</span></div>
+<div class="line"><span class="lineno"> 2609</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_L_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2610</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_U_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2611</span>    ierr = PetscOptionsGetReal(NULL, NULL, <span class="stringliteral">&quot;-scaling_rho_ref&quot;</span>, &amp;simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a>, &amp;flg); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2612</span>    </div>
+<div class="line"><span class="lineno"> 2613</span>    <span class="comment">// --- 3. Calculate derived scaling factors ---</span></div>
+<div class="line"><span class="lineno"> 2614</span>    <span class="comment">// Check for division by zero to be safe, though U_ref should be positive.</span></div>
+<div class="line"><span class="lineno"> 2615</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> &lt;= 0.0) {</div>
+<div class="line"><span class="lineno"> 2616</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_OUTOFRANGE, <span class="stringliteral">&quot;Reference velocity U_ref must be positive. Got %g&quot;</span>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>);</div>
+<div class="line"><span class="lineno"> 2617</span>    }</div>
+<div class="line"><span class="lineno"> 2618</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
 <div class="line"><span class="lineno"> 2619</span> </div>
-<div class="line"><span class="lineno"> 2620</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2621</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2622</span>}</div>
+<div class="line"><span class="lineno"> 2620</span>    <span class="comment">// --- 4. Log the final, effective scales for verification ---</span></div>
+<div class="line"><span class="lineno"> 2621</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;---------------- Physical Scales Initialized -----------------\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2622</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  L_ref: %.4f, U_ref: %.4f, rho_ref: %.4f, P_ref: %.4f\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 2623</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ae416661ab9a82b299cd562940881d07d">rho_ref</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a>);</div>
+<div class="line"><span class="lineno"> 2624</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--------------------------------------------------------------\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2625</span> </div>
+<div class="line"><span class="lineno"> 2626</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2627</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2628</span>}</div>
 <div class="ttc" id="alogging_8h_html_a672ff9c400e2307306b36415d4fefcb9"><div class="ttname"><a href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a></div><div class="ttdeci">#define LOG(scope, level, fmt,...)</div><div class="ttdoc">Logging macro for PETSc-based applications with scope control.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00084">logging.h:84</a></div></div>
 <div class="ttc" id="avariables_8h_html_a443db716c1f9b5d3046639bd63241a93"><div class="ttname"><a href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">ScalingCtx::L_ref</a></div><div class="ttdeci">PetscReal L_ref</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00559">variables.h:559</a></div></div>
 <div class="ttc" id="avariables_8h_html_aa24a988353f69e0cf76b358d10fd374a"><div class="ttname"><a href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">SimCtx::scaling</a></div><div class="ttdeci">ScalingCtx scaling</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00635">variables.h:635</a></div></div>
