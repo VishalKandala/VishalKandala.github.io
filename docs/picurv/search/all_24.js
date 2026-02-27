@@ -11,7 +11,7 @@ var searchData=
   ['y_5fmidp_8',['y_midp',['../variables_8h.html#afe6ef22c15698fad2b0c6b6af001b3a1',1,'Cstart']]],
   ['y_5fmin_9',['y_min',['../variables_8h.html#a6268b577b839220f3817e3ee4b85ade4',1,'IBMNodes']]],
   ['yaml_10',['yaml',['../07_Case_Reference.html',1,'Configuration Reference: Case YAML'],['../09_Monitor_Reference.html',1,'Configuration Reference: Monitor YAML'],['../10_Post_Processing_Reference.html',1,'Configuration Reference: Postprocessor YAML'],['../08_Solver_Reference.html',1,'Configuration Reference: Solver YAML']]],
-  ['yaml_20contracts_11',['YAML Contracts',['../Documentation_Catalog.html#artifact_yaml_sec',1,'']]],
+  ['yaml_20contracts_20and_20ingestion_11',['2.1 YAML Contracts and Ingestion',['../Documentation_Catalog.html#artifact_yaml_sec',1,'']]],
   ['yaml_20generated_20artifacts_20runtime_12',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
   ['ym_5fcell_13',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
   ['ymax_14',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
@@ -20,8 +20,7 @@ var searchData=
   ['you_20should_20gain_17',['5. Competencies You Should Gain',['../42_User_Guide_Index.html#outcomes_sec',1,'']]],
   ['your_20first_20simulation_20flat_20channel_18',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
   ['your_20output_20files_19',['1. Understanding Your Output Files',['../04_Visualization_Tutorial.html#files_sec',1,'']]],
-  ['your_20path_20',['To Begin, Choose Your Path',['../index.html#get_started_main',1,'']]],
-  ['your_20results_21',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
-  ['your_20work_22',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],
-  ['ys_5fcell_23',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
+  ['your_20results_20',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['your_20work_21',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],
+  ['ys_5fcell_22',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
 ];

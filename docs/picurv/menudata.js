@@ -24,6 +24,10 @@
 */
 var menudata={children:[
 {text:"PICurv Home",url:"index.html"},
-{text:"Documentation",url:"pages.html"},
+{text:"Documentation Map",url:"Documentation_Catalog.html"},
+{text:"Workflow",url:"06_Simulation_Anatomy.html"},
+{text:"Config Contracts",url:"14_Config_Contract.html"},
+{text:"Methods",url:"21_Methods_Overview.html"},
+{text:"Runtime Internals",url:"46_C_Runtime_Execution_Map.html"},
 {text:"File List",url:"files.html"},
 {text:"Data Structures",url:"annotated.html"}]}

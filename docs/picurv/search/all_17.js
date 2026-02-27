@@ -32,7 +32,7 @@ var searchData=
   ['libraries_29',['4. Reusable Config Libraries',['../06_Simulation_Anatomy.html#libraries_sec',1,'']]],
   ['licsi_30',['lICsi',['../variables_8h.html#acbf784310453bd7aec02838cdef24a66',1,'UserCtx']]],
   ['lieta_31',['lIEta',['../variables_8h.html#a2276cb159119246bfadea1c234dee31b',1,'UserCtx']]],
-  ['lifecycle_20stage_32',['1. By Lifecycle Stage',['../Documentation_Catalog.html#lifecycle_axis_sec',1,'']]],
+  ['lifecycle_32',['1. Simulation Lifecycle',['../Documentation_Catalog.html#lifecycle_axis_sec',1,'']]],
   ['link_20checking_33',['6. Markdown Link Checking',['../40_Testing_and_Quality_Guide.html#linkcheck_sec',1,'']]],
   ['links_34',['2. Top-Level Guide Links',['../30_Repository_Navigation.html#top_links_sec',1,'']]],
   ['list_35',['list',['../variables_8h.html#aa89b8bc105d9a09d4e7c06e8b34078a7',1,'List:&#160;variables.h'],['../variables_8h.html#structlist',1,'list']]],
