@@ -106,6 +106,7 @@ $(document).ready(function(){initNavTree('postprocessor_8h.html',''); initResiza
 <code>#include &quot;<a class="el" href="Metric_8h_source.html">Metric.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="postprocessing__kernels_8h_source.html">postprocessing_kernels.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="vtk__io_8h_source.html">vtk_io.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="particle__statistics_8h_source.html">particle_statistics.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for postprocessor.h:</div>
 <div class="dyncontent">
@@ -959,58 +960,58 @@ Here is the caller graph for this function:</div>
 
 <p>Writes particle data to a VTP file using the Prepare-Write-Cleanup pattern. </p>
 
-<p class="definition">Definition at line <a class="el" href="postprocessor_8c_source.html#l00587">587</a> of file <a class="el" href="postprocessor_8c_source.html">postprocessor.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  588</span>{</div>
-<div class="line"><span class="lineno">  589</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  590</span>    <a class="code hl_struct" href="variables_8h.html#structVTKMetaData">VTKMetaData</a>    part_meta;</div>
-<div class="line"><span class="lineno">  591</span>    <span class="keywordtype">char</span>           filename[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a>];</div>
-<div class="line"><span class="lineno">  592</span>    PetscInt       n_total_particles_before_subsample;</div>
-<div class="line"><span class="lineno">  593</span> </div>
-<div class="line"><span class="lineno">  594</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  595</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  596</span> </div>
-<div class="line"><span class="lineno">  597</span>    <span class="comment">// These checks can be done on all ranks</span></div>
-<div class="line"><span class="lineno">  598</span>    <span class="keywordflow">if</span> (!pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> || pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>[0] == <span class="charliteral">&#39;\0&#39;</span>) {</div>
-<div class="line"><span class="lineno">  599</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  600</span>    }</div>
-<div class="line"><span class="lineno">  601</span>    PetscInt n_global;</div>
-<div class="line"><span class="lineno">  602</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_global); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  603</span>    <span class="keywordflow">if</span> (n_global == 0) {</div>
-<div class="line"><span class="lineno">  604</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Swarm is empty for ti=%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;. Skipping particle file write.\n&quot;</span>, ti);</div>
-<div class="line"><span class="lineno">  605</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  606</span>    }</div>
-<div class="line"><span class="lineno">  607</span> </div>
-<div class="line"><span class="lineno">  608</span>    ierr = PetscMemzero(&amp;part_meta, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structVTKMetaData">VTKMetaData</a>)); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  609</span> </div>
-<div class="line"><span class="lineno">  610</span>    <span class="comment">// --- 1. PREPARE (Collective Call) ---</span></div>
-<div class="line"><span class="lineno">  611</span>    ierr = <a class="code hl_function" href="vtk__io_8h.html#af1bf47e0b45318d43a97d2bdbf766888">PrepareOutputParticleData</a>(user, pps, &amp;part_meta, &amp;n_total_particles_before_subsample); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  612</span> </div>
-<div class="line"><span class="lineno">  613</span>    <span class="comment">// --- 2. WRITE and CLEANUP (Rank 0 only) ---</span></div>
-<div class="line"><span class="lineno">  614</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) {</div>
-<div class="line"><span class="lineno">  615</span>        <span class="keywordflow">if</span> (part_meta.<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> &gt; 0) {</div>
-<div class="line"><span class="lineno">  616</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Starting VTP Particle File Writing for ti = %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; (writing %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; of %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; particles) ---\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  617</span>                      ti, part_meta.<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, n_total_particles_before_subsample);</div>
-<div class="line"><span class="lineno">  618</span> </div>
-<div class="line"><span class="lineno">  619</span>            <span class="comment">/* Field summary */</span></div>
-<div class="line"><span class="lineno">  620</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Data fields to write: %d\n&quot;</span>, (<span class="keywordtype">int</span>)part_meta.<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>);</div>
-<div class="line"><span class="lineno">  621</span>            <span class="keywordflow">for</span> (PetscInt ii=0; ii&lt;part_meta.<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>; ++ii) {</div>
-<div class="line"><span class="lineno">  622</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  # %2&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;  Field Name = %s  Components = %d\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  623</span>                          ii, part_meta.<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[ii].<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>, (<span class="keywordtype">int</span>)part_meta.<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[ii].<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a>);</div>
-<div class="line"><span class="lineno">  624</span>            }</div>
-<div class="line"><span class="lineno">  625</span> </div>
-<div class="line"><span class="lineno">  626</span>            snprintf(filename, <span class="keyword">sizeof</span>(filename), <span class="stringliteral">&quot;%s_%05&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;.vtp&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>, ti);</div>
-<div class="line"><span class="lineno">  627</span>            ierr = <a class="code hl_function" href="io_8h.html#ad4eeaada0c8227f332499bf5fc4d3bc0">CreateVTKFileFromMetadata</a>(filename, &amp;part_meta, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  628</span> </div>
-<div class="line"><span class="lineno">  629</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  630</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;No particles to write at ti=%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; after subsampling. Skipping.\n&quot;</span>, ti);</div>
-<div class="line"><span class="lineno">  631</span>        }</div>
-<div class="line"><span class="lineno">  632</span> </div>
-<div class="line"><span class="lineno">  633</span>    }</div>
-<div class="line"><span class="lineno">  634</span> </div>
-<div class="line"><span class="lineno">  635</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Particle File Writing for ti = %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; Complete ---\n&quot;</span>, ti);</div>
-<div class="line"><span class="lineno">  636</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  637</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  638</span>}</div>
+<p class="definition">Definition at line <a class="el" href="postprocessor_8c_source.html#l00638">638</a> of file <a class="el" href="postprocessor_8c_source.html">postprocessor.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  639</span>{</div>
+<div class="line"><span class="lineno">  640</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  641</span>    <a class="code hl_struct" href="variables_8h.html#structVTKMetaData">VTKMetaData</a>    part_meta;</div>
+<div class="line"><span class="lineno">  642</span>    <span class="keywordtype">char</span>           filename[<a class="code hl_define" href="variables_8h.html#a6773b93f3093658c3dcb569de3b4bdb2">MAX_FILENAME_LENGTH</a>];</div>
+<div class="line"><span class="lineno">  643</span>    PetscInt       n_total_particles_before_subsample;</div>
+<div class="line"><span class="lineno">  644</span> </div>
+<div class="line"><span class="lineno">  645</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  646</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  647</span> </div>
+<div class="line"><span class="lineno">  648</span>    <span class="comment">// These checks can be done on all ranks</span></div>
+<div class="line"><span class="lineno">  649</span>    <span class="keywordflow">if</span> (!pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">outputParticles</a> || pps-&gt;<a class="code hl_variable" href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">particle_fields</a>[0] == <span class="charliteral">&#39;\0&#39;</span>) {</div>
+<div class="line"><span class="lineno">  650</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  651</span>    }</div>
+<div class="line"><span class="lineno">  652</span>    PetscInt n_global;</div>
+<div class="line"><span class="lineno">  653</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_global); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  654</span>    <span class="keywordflow">if</span> (n_global == 0) {</div>
+<div class="line"><span class="lineno">  655</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Swarm is empty for ti=%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;. Skipping particle file write.\n&quot;</span>, ti);</div>
+<div class="line"><span class="lineno">  656</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  657</span>    }</div>
+<div class="line"><span class="lineno">  658</span> </div>
+<div class="line"><span class="lineno">  659</span>    ierr = PetscMemzero(&amp;part_meta, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structVTKMetaData">VTKMetaData</a>)); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  660</span> </div>
+<div class="line"><span class="lineno">  661</span>    <span class="comment">// --- 1. PREPARE (Collective Call) ---</span></div>
+<div class="line"><span class="lineno">  662</span>    ierr = <a class="code hl_function" href="vtk__io_8h.html#af1bf47e0b45318d43a97d2bdbf766888">PrepareOutputParticleData</a>(user, pps, &amp;part_meta, &amp;n_total_particles_before_subsample); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  663</span> </div>
+<div class="line"><span class="lineno">  664</span>    <span class="comment">// --- 2. WRITE and CLEANUP (Rank 0 only) ---</span></div>
+<div class="line"><span class="lineno">  665</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) {</div>
+<div class="line"><span class="lineno">  666</span>        <span class="keywordflow">if</span> (part_meta.<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a> &gt; 0) {</div>
+<div class="line"><span class="lineno">  667</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Starting VTP Particle File Writing for ti = %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; (writing %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; of %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; particles) ---\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  668</span>                      ti, part_meta.<a class="code hl_variable" href="variables_8h.html#a1284d7ce4801cbe00fa3068be7682014">npoints</a>, n_total_particles_before_subsample);</div>
+<div class="line"><span class="lineno">  669</span> </div>
+<div class="line"><span class="lineno">  670</span>            <span class="comment">/* Field summary */</span></div>
+<div class="line"><span class="lineno">  671</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Particle Data fields to write: %d\n&quot;</span>, (<span class="keywordtype">int</span>)part_meta.<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>);</div>
+<div class="line"><span class="lineno">  672</span>            <span class="keywordflow">for</span> (PetscInt ii=0; ii&lt;part_meta.<a class="code hl_variable" href="variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b">num_point_data_fields</a>; ++ii) {</div>
+<div class="line"><span class="lineno">  673</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  # %2&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;  Field Name = %s  Components = %d\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  674</span>                          ii, part_meta.<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[ii].<a class="code hl_variable" href="variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e">name</a>, (<span class="keywordtype">int</span>)part_meta.<a class="code hl_variable" href="variables_8h.html#abaea0779cfa9cbf3b161de4eb5d49898">point_data_fields</a>[ii].<a class="code hl_variable" href="variables_8h.html#a1676e73c74586290cada1e0b922cb7fc">num_components</a>);</div>
+<div class="line"><span class="lineno">  675</span>            }</div>
+<div class="line"><span class="lineno">  676</span> </div>
+<div class="line"><span class="lineno">  677</span>            snprintf(filename, <span class="keyword">sizeof</span>(filename), <span class="stringliteral">&quot;%s_%05&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;.vtp&quot;</span>, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">particle_output_prefix</a>, ti);</div>
+<div class="line"><span class="lineno">  678</span>            ierr = <a class="code hl_function" href="io_8h.html#ad4eeaada0c8227f332499bf5fc4d3bc0">CreateVTKFileFromMetadata</a>(filename, &amp;part_meta, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  679</span> </div>
+<div class="line"><span class="lineno">  680</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  681</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;No particles to write at ti=%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; after subsampling. Skipping.\n&quot;</span>, ti);</div>
+<div class="line"><span class="lineno">  682</span>        }</div>
+<div class="line"><span class="lineno">  683</span> </div>
+<div class="line"><span class="lineno">  684</span>    }</div>
+<div class="line"><span class="lineno">  685</span> </div>
+<div class="line"><span class="lineno">  686</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Particle File Writing for ti = %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot; Complete ---\n&quot;</span>, ti);</div>
+<div class="line"><span class="lineno">  687</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  688</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  689</span>}</div>
 <div class="ttc" id="avariables_8h_html_a191105bdbbd1711ea3f5fd59b0d1b582"><div class="ttname"><a href="variables_8h.html#a191105bdbbd1711ea3f5fd59b0d1b582">PostProcessParams::particle_output_prefix</a></div><div class="ttdeci">char particle_output_prefix[256]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00516">variables.h:516</a></div></div>
 <div class="ttc" id="avariables_8h_html_ab90d5feaf7cfd59b75da0132d620bf25"><div class="ttname"><a href="variables_8h.html#ab90d5feaf7cfd59b75da0132d620bf25">PostProcessParams::particle_fields</a></div><div class="ttdeci">char particle_fields[1024]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00515">variables.h:515</a></div></div>
 <div class="ttc" id="avariables_8h_html_ab954ff749a6b034b8cef53a508787b24"><div class="ttname"><a href="variables_8h.html#ab954ff749a6b034b8cef53a508787b24">PostProcessParams::outputParticles</a></div><div class="ttdeci">PetscBool outputParticles</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00507">variables.h:507</a></div></div>
@@ -1070,7 +1071,63 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode</dd></dl>
+<p>Executes the global statistics pipeline, computing aggregate reductions over all particles.</p>
+<p>Parses pps-&gt;statistics_pipeline (semicolon-delimited) and dispatches to the appropriate kernel in <a class="el" href="particle__statistics_8c.html" title="Global statistical reduction kernels for the Statistics Pipeline.">particle_statistics.c</a>. Each kernel does its own MPI_Allreduce, appends to its own CSV file, and logs a one-line summary. This function is a no-op if the statistics_pipeline string is empty. </p>
+
+<p class="definition">Definition at line <a class="el" href="postprocessor_8c_source.html#l00592">592</a> of file <a class="el" href="postprocessor_8c_source.html">postprocessor.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  593</span>{</div>
+<div class="line"><span class="lineno">  594</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  595</span>    <span class="keywordtype">char</span> *pipeline_copy, *step_token, *step_saveptr;</div>
+<div class="line"><span class="lineno">  596</span> </div>
+<div class="line"><span class="lineno">  597</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  598</span> </div>
+<div class="line"><span class="lineno">  599</span>    <span class="keywordflow">if</span> (pps-&gt;<a class="code hl_variable" href="variables_8h.html#a7b479999a17f6ee81158cc074ec6193f">statistics_pipeline</a>[0] == <span class="charliteral">&#39;\0&#39;</span>) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  600</span> </div>
+<div class="line"><span class="lineno">  601</span>    PetscInt n_global;</div>
+<div class="line"><span class="lineno">  602</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_global); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  603</span>    <span class="keywordflow">if</span> (n_global == 0) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  604</span> </div>
+<div class="line"><span class="lineno">  605</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Starting Global Statistics Pipeline ---\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  606</span> </div>
+<div class="line"><span class="lineno">  607</span>    ierr = PetscStrallocpy(pps-&gt;<a class="code hl_variable" href="variables_8h.html#a7b479999a17f6ee81158cc074ec6193f">statistics_pipeline</a>, &amp;pipeline_copy); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  608</span>    step_token = strtok_r(pipeline_copy, <span class="stringliteral">&quot;;&quot;</span>, &amp;step_saveptr);</div>
+<div class="line"><span class="lineno">  609</span>    <span class="keywordflow">while</span> (step_token) {</div>
+<div class="line"><span class="lineno">  610</span>        <a class="code hl_function" href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(step_token);</div>
+<div class="line"><span class="lineno">  611</span>        <span class="keywordflow">if</span> (strlen(step_token) == 0) {</div>
+<div class="line"><span class="lineno">  612</span>            step_token = strtok_r(NULL, <span class="stringliteral">&quot;;&quot;</span>, &amp;step_saveptr); <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  613</span>        }</div>
+<div class="line"><span class="lineno">  614</span>        <span class="keywordtype">char</span> *keyword = strtok(step_token, <span class="stringliteral">&quot;:&quot;</span>);</div>
+<div class="line"><span class="lineno">  615</span>        <a class="code hl_function" href="io_8h.html#a61850e757fea41eb461a930936c34401">TrimWhitespace</a>(keyword);</div>
+<div class="line"><span class="lineno">  616</span> </div>
+<div class="line"><span class="lineno">  617</span>        <span class="keywordflow">if</span> (strcasecmp(keyword, <span class="stringliteral">&quot;ComputeMSD&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  618</span>            ierr = <a class="code hl_function" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a>(user, pps-&gt;<a class="code hl_variable" href="variables_8h.html#a08e66ab63514af87f312d46142a32364">statistics_output_prefix</a>, ti); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  619</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  620</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  621</span>                      <span class="stringliteral">&quot;Unknown statistics keyword &#39;%s&#39;. Skipping.\n&quot;</span>, keyword);</div>
+<div class="line"><span class="lineno">  622</span>        }</div>
+<div class="line"><span class="lineno">  623</span>        <span class="comment">/* Future kernels: add else-if blocks here */</span></div>
+<div class="line"><span class="lineno">  624</span> </div>
+<div class="line"><span class="lineno">  625</span>        step_token = strtok_r(NULL, <span class="stringliteral">&quot;;&quot;</span>, &amp;step_saveptr);</div>
+<div class="line"><span class="lineno">  626</span>    }</div>
+<div class="line"><span class="lineno">  627</span>    ierr = PetscFree(pipeline_copy); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  628</span> </div>
+<div class="line"><span class="lineno">  629</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Global Statistics Pipeline Complete ---\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  630</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  631</span>}</div>
+<div class="ttc" id="aparticle__statistics_8h_html_acfb130aeba6e6d430c0ca599b34e38d4"><div class="ttname"><a href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></div><div class="ttdeci">PetscErrorCode ComputeParticleMSD(UserCtx *user, const char *stats_prefix, PetscInt ti)</div><div class="ttdoc">Computes the mean-squared displacement (MSD) of a particle cloud.</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00038">particle_statistics.c:38</a></div></div>
+<div class="ttc" id="avariables_8h_html_a08e66ab63514af87f312d46142a32364"><div class="ttname"><a href="variables_8h.html#a08e66ab63514af87f312d46142a32364">PostProcessParams::statistics_output_prefix</a></div><div class="ttdeci">char statistics_output_prefix[256]</div><div class="ttdoc">basename for CSV output, e.g.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00521">variables.h:521</a></div></div>
+<div class="ttc" id="avariables_8h_html_a7b479999a17f6ee81158cc074ec6193f"><div class="ttname"><a href="variables_8h.html#a7b479999a17f6ee81158cc074ec6193f">PostProcessParams::statistics_pipeline</a></div><div class="ttdeci">char statistics_pipeline[1024]</div><div class="ttdoc">e.g.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00520">variables.h:520</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessor_8h_a329c60bf9b166bf417ebf99e0071e7c4_cgraph.svg" width="394" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessor_8h_a329c60bf9b166bf417ebf99e0071e7c4_icgraph.svg" width="290" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
 
 </div>
 </div>
