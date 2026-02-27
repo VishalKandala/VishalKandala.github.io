@@ -24,6 +24,7 @@
 */
 var menudata={children:[
 {text:"PICurv Home",url:"index.html"},
+{text:"Back to Projects",url:"/projects/"},
 {text:"Documentation Map",url:"Documentation_Catalog.html"},
 {text:"Workflow",url:"06_Simulation_Anatomy.html"},
 {text:"Config Contracts",url:"14_Config_Contract.html"},

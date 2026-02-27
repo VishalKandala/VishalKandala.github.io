@@ -26,6 +26,7 @@ var NAVTREE =
 [
   [ "PICurv", "index.html", [
     [ "PICurv Solver Documentation", "index.html", null ],
+    [ "Back to Projects", "/projects/", null ],
     [ "Documentation Map", "Documentation_Catalog.html", null ],
     [ "Workflow", "06_Simulation_Anatomy.html", null ],
     [ "Config Contracts", "14_Config_Contract.html", null ],
@@ -38,7 +39,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"06_Simulation_Anatomy.html"
+"/projects/"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
