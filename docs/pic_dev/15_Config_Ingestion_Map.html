@@ -97,8 +97,9 @@ $(document).ready(function(){initNavTree('15_Config_Ingestion_Map.html',''); ini
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#pipeline_sec">1. End-to-End Flow</a></li>
 <li class="level1"><a href="#map_sec">2. Mapping Matrix</a></li>
-<li class="level1"><a href="#exceptions_sec">3. Important Exceptions</a></li>
-<li class="level1"><a href="#maintenance_sec">4. Drift Prevention</a></li>
+<li class="level1"><a href="#python_only_sec">3. Python-Only Orchestration Mapping (No C Ingestion)</a></li>
+<li class="level1"><a href="#exceptions_sec">4. Important Exceptions</a></li>
+<li class="level1"><a href="#maintenance_sec">5. Drift Prevention</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page maps configuration flow from YAML schema to generated artifacts and C ingestion/use sites.</p>
@@ -153,24 +154,52 @@ $(document).ready(function(){initNavTree('15_Config_Ingestion_Map.html',''); ini
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>post.statistics_pipeline.*</code>   </td><td class="markdownTableBodyLeft"><code>statistics_pipeline</code>, <code>statistics_output_prefix</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>   </td><td class="markdownTableBodyLeft"><code>GlobalStatisticsPipeline</code> dispatch   </td></tr>
 </table>
+<h1><a class="anchor" id="python_only_sec"></a>
+3. Python-Only Orchestration Mapping (No C Ingestion)</h1>
+<p>These keys are consumed by <code>pic.flow</code> orchestration only:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">YAML / Source Key   </th><th class="markdownTableHeadLeft">Generated Artifact Key   </th><th class="markdownTableHeadLeft">Ingestion Site   </th><th class="markdownTableHeadLeft">Runtime Consumer    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>cluster.scheduler.type</code>   </td><td class="markdownTableBodyLeft">scheduler selector   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> (<code>validate_cluster_config</code>)   </td><td class="markdownTableBodyLeft"><code>run</code>/<code>sweep</code> scheduler dispatch    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>cluster.resources.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH</code> directives   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> (Slurm renderers)   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>cluster.notifications.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH --mail-*</code>   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>cluster.execution.module_setup</code>   </td><td class="markdownTableBodyLeft">pre-launch shell lines in <code>*.sbatch</code>   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code>   </td><td class="markdownTableBodyLeft">batch script runtime env    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>cluster.execution.launcher*</code>   </td><td class="markdownTableBodyLeft">launch command (<code>srun</code>/<code>mpirun</code>)   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code>   </td><td class="markdownTableBodyLeft">solver/post executable launch    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>study.base_configs.*</code>   </td><td class="markdownTableBodyLeft">per-case config materialization   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> (<code>sweep_workflow</code>)   </td><td class="markdownTableBodyLeft">case generation pipeline    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>study.parameters</code>   </td><td class="markdownTableBodyLeft">case matrix expansion   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> (<code>expand_parameter_matrix</code>)   </td><td class="markdownTableBodyLeft">study case synthesis    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>study.execution.max_concurrent_array_tasks</code>   </td><td class="markdownTableBodyLeft">Slurm array <code>N</code> throttle   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>study.metrics</code>   </td><td class="markdownTableBodyLeft"><code>metrics_table.csv</code> extraction contract   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> metric extractors   </td><td class="markdownTableBodyLeft">study aggregation/reporting    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>study.plotting</code>   </td><td class="markdownTableBodyLeft"><code>results/plots/*</code> output controls   </td><td class="markdownTableBodyLeft"><code>scripts/pic.flow</code> plotting pipeline   </td><td class="markdownTableBodyLeft">study reporting   </td></tr>
+</table>
 <h1><a class="anchor" id="exceptions_sec"></a>
-3. Important Exceptions</h1>
+4. Important Exceptions</h1>
 <ul>
 <li>PETSc runtime option consumption is not only explicit <code>PetscOptionsGet*</code>.</li>
 <li><code>KSPSetFromOptions</code> in <code><a class="el" href="poisson_8c.html">src/poisson.c</a></code> ingests prefixed PETSc options dynamically.</li>
 <li><code>LOG_LEVEL</code> is environment-driven (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) and intentionally outside control-file parsing.</li>
 </ul>
 <h1><a class="anchor" id="maintenance_sec"></a>
-4. Drift Prevention</h1>
+5. Drift Prevention</h1>
 <ul>
 <li>Use <code>scripts/audit_ingress.py</code> to compare PETSc option ingress in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a>/io.c</code> with the maintained manifest.</li>
 <li>Keep this map and the manifest updated whenever new options are introduced.</li>
 <li>Run manually with:<ul>
 <li><code>python3 scripts/audit_ingress.py</code></li>
-<li>or <code>make audit-ingress</code> </li>
+<li>or <code>make audit-ingress</code></li>
 </ul>
 </li>
 </ul>
+<p>For roadmap-oriented workflow extensions built on this contract, see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['initialcondition_2ec_0',['initialcondition.c',['../initialcondition_8c.html',1,'']]],
-  ['initialcondition_2eh_1',['initialcondition.h',['../initialcondition_8h.html',1,'']]],
-  ['interpolation_2ec_2',['interpolation.c',['../interpolation_8c.html',1,'']]],
-  ['interpolation_2eh_3',['interpolation.h',['../interpolation_8h.html',1,'']]],
-  ['io_2ec_4',['io.c',['../io_8c.html',1,'']]],
-  ['io_2eh_5',['io.h',['../io_8h.html',1,'']]]
+  ['examples_2fbent_5fchannel_2fguide_2emd_0',['guide.md',['../examples_2bent__channel_2guide_8md.html',1,'']]],
+  ['examples_2fflat_5fchannel_2fguide_2emd_1',['guide.md',['../examples_2flat__channel_2guide_8md.html',1,'']]],
+  ['examples_2fguide_2emd_2',['guide.md',['../examples_2guide_8md.html',1,'']]],
+  ['examples_2fmaster_5ftemplate_2fguide_2emd_3',['guide.md',['../examples_2master__template_2guide_8md.html',1,'']]]
 ];

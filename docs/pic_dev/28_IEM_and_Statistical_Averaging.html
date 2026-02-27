@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Changelog</title>
+<title>PICurv: IEM Mixing and Statistical Averaging</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -65,7 +65,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('md_CHANGELOG.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('28_IEM_and_Statistical_Averaging.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -91,36 +91,44 @@ $(document).ready(function(){initNavTree('md_CHANGELOG.html',''); initResizable(
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Changelog</div></div>
+  <div class="headertitle"><div class="title">IEM Mixing and Statistical Averaging</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md11"></a></p><ul>
-<li>Unreleased<ul>
-<li>Initial Doxygen docs scaffold, architecture &amp; dev guide pages.</li>
-<li>Hardened YAML-&gt;C config contract across case/solver/monitor/post:<ul>
-<li>Scalar-only <code>da_processors_*</code> contract with validation.</li>
-<li>Structured mappings for analytical type and monitor subdirectories.</li>
-<li>Post input extension keys and statistics pipeline wiring.</li>
+<div class="toc"><h3>Table of Contents</h3>
+<ul><li class="level1"><a href="#iem_sec">1. IEM Particle Mixing</a></li>
+<li class="level1"><a href="#avg_sec">2. Averaging Paths</a></li>
+<li class="level1"><a href="#note_sec">3. Terminology Note</a></li>
 </ul>
-</li>
-<li>Added config contract documentation set:<ul>
-<li><code><a class="el" href="14__Config__Contract_8md.html">14_Config_Contract.md</a></code></li>
-<li><code><a class="el" href="15__Config__Ingestion__Map_8md.html">15_Config_Ingestion_Map.md</a></code></li>
-<li><code><a class="el" href="16__Config__Extension__Playbook_8md.html">16_Config_Extension_Playbook.md</a></code></li>
+</div>
+<div class="textblock"><p>This page summarizes two related model/analysis paths: particle scalar mixing via IEM and flow/statistics averaging utilities.</p>
+<h1><a class="anchor" id="iem_sec"></a>
+1. IEM Particle Mixing</h1>
+<p>PICurv includes an IEM-style particle scalar update path where particle scalar state relaxes toward a local/ensemble mean with model-controlled rate.</p>
+<p>Code touchpoints:</p><ul>
+<li><a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
+<li><a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
+<li><a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
 </ul>
-</li>
-<li>Added ingress drift guard:<ul>
-<li><code>scripts/audit_ingress.py</code></li>
-<li><code>scripts/audit_ingress_manifest.json</code></li>
+<p>Config touchpoints:</p><ul>
+<li>particle model controls through case/solver ingestion (current model constants are C-side managed, extensible via schema additions).</li>
 </ul>
-</li>
-<li>Added explicit documentation note on data-driven particle-closure expansion:<ul>
-<li>Offline workflows supported now via solver/post artifacts.</li>
-<li>Tightly coupled inference requires runtime-selectable closure interface extension. </li>
+<h1><a class="anchor" id="avg_sec"></a>
+2. Averaging Paths</h1>
+<ul>
+<li>Solver-side statistical averaging toggles (<code>simCtx-&gt;averaging</code>) write/read dedicated statistical fields.</li>
+<li>Postprocessing statistics pipeline supports reduction kernels such as MSD.</li>
 </ul>
-</li>
+<p>Code touchpoints:</p><ul>
+<li>Post statistics kernel: <a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
+<li>Particle-grid averaging helper path: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
 </ul>
-</li>
+<h1><a class="anchor" id="note_sec"></a>
+3. Terminology Note</h1>
+<p>The codebase currently uses "averaging" for several contexts (time/statistical fields, particle-to-grid normalization, post reductions). Configure these explicitly by workflow stage (<code>solver.yml</code>/<code>monitor.yml</code>/<code>post.yml</code>).</p>
+<h1><a class="anchor" id="refs_sec"></a>
+1. Reference Scales</h1>
+<ul>
+<li>IEM model overview (combustion/mixing context): <a href="https://en.wikipedia.org/wiki/Probability_density_function_(turbulence)#Micromixing_models">https://en.wikipedia.org/wiki/Probability_density_function_(turbulence)#Micromixing_models</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

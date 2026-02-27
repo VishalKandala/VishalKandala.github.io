@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Configuration Reference: Solver Profiles (&lt;tt&gt;solver.yml&lt;/tt&gt;)</title>
+<title>PICurv: Configuration Reference: &lt;tt&gt;solver.yml&lt;/tt&gt;</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -91,160 +91,104 @@ $(document).ready(function(){initNavTree('08_Solver_Reference.html',''); initRes
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Configuration Reference: Solver Profiles (&lt;tt&gt;solver.yml&lt;/tt&gt;)</div></div>
+  <div class="headertitle"><div class="title">Configuration Reference: &lt;tt&gt;solver.yml&lt;/tt&gt;</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#operation_mode_sec">1. The &lt;tt&gt;operation_mode&lt;/tt&gt; Section</a></li>
-<li class="level1"><a href="#strategy_sec">2. The &lt;tt&gt;strategy&lt;/tt&gt; Section</a></li>
-<li class="level1"><a href="#tolerances_sec">3. The &lt;tt&gt;tolerances&lt;/tt&gt; Section</a></li>
-<li class="level1"><a href="#momentum_solver_sec">3.1. The &lt;tt&gt;momentum_solver&lt;/tt&gt; Section (Advanced)</a></li>
-<li class="level1"><a href="#pressure_solver_sec">4. The &lt;tt&gt;pressure_solver&lt;/tt&gt; Section</a><ul><li class="level2"><a href="#p_main_ssec">3.1. Main Settings</a></li>
-<li class="level2"><a href="#p_mg_ssec">3.2. &lt;tt&gt;multigrid&lt;/tt&gt; Settings</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#petsc_sec">5. The &lt;tt&gt;petsc_passthrough_options&lt;/tt&gt; Section</a></li>
+<ul><li class="level1"><a href="#opmode_sec">1. &lt;tt&gt;operation_mode&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#strategy_sec">2. &lt;tt&gt;strategy&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#tol_sec">3. &lt;tt&gt;tolerances&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#msolver_sec">4. &lt;tt&gt;momentum_solver&lt;/tt&gt; (Solver-Specific Block)</a></li>
+<li class="level1"><a href="#pressure_sec">5. &lt;tt&gt;pressure_solver&lt;/tt&gt;</a></li>
 </ul>
 </div>
-<div class="textblock"><p>For a complete, heavily commented reference file showing every possible option, please see the master template:</p>
-<pre class="fragment"></pre><p>A <b>Solver Profile</b> is a <code>.yml</code> file that defines the complete numerical strategy for the C-solver. It controls everything from the core time-stepping scheme to the fine-grained tolerances of the linear solvers.</p>
-<p>The PICurv platform is designed to be modular: you can combine any <code>case.yml</code> with any <code>solver.yml</code> at runtime. This allows you to test different numerical methods on the same physical problem without ever changing the case definition.</p>
-<p>This document serves as a reference for all available sections and parameters within a <code>solver.yml</code> file.</p>
-<h1><a class="anchor" id="operation_mode_sec"></a>
-1. The &lt;tt&gt;operation_mode&lt;/tt&gt; Section</h1>
-<p>This section controls how Eulerian fields are sourced and, for analytical mode, which analytical family is requested.</p>
+<div class="textblock"><p>For the full commented template, see:</p>
+<pre class="fragment"></pre><p><code>solver.yml</code> controls numerical strategy and solver internals.</p>
+<h1><a class="anchor" id="opmode_sec"></a>
+1. &lt;tt&gt;operation_mode&lt;/tt&gt;</h1>
 <div class="fragment"><div class="line">operation_mode:</div>
 <div class="line">  eulerian_field_source: &quot;solve&quot;</div>
 <div class="line">  analytical_type: &quot;TGV3D&quot;</div>
-</div><!-- fragment --><table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>eulerian_field_source</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Selects Eulerian source mode. Common values: <code>"solve"</code>, <code>"load"</code>, <code>"analytical"</code>.   </td><td class="markdownTableBodyLeft"><code>-euler_field_source</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>analytical_type</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Analytical solution selector used when <code>eulerian_field_source</code> is analytical.   </td><td class="markdownTableBodyLeft"><code>-analytical_type</code>   </td></tr>
-</table>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>eulerian_field_source</code> -&gt; <code>-euler_field_source</code> (<code>solve</code>, <code>load</code>, <code>analytical</code>)</li>
+<li><code>analytical_type</code> -&gt; <code>-analytical_type</code></li>
+</ul>
 <h1><a class="anchor" id="strategy_sec"></a>
-2. The &lt;tt&gt;strategy&lt;/tt&gt; Section</h1>
-<p>This section controls the high-level numerical scheme for the momentum equations.</p>
+2. &lt;tt&gt;strategy&lt;/tt&gt;</h1>
 <div class="fragment"><div class="line">strategy:</div>
 <div class="line">  momentum_solver: &quot;Dual Time Picard RK4&quot;</div>
 <div class="line">  central_diff: false</div>
-</div><!-- fragment --><table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>momentum_solver</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Preferred momentum solver selector. User-friendly values like <code>"Explicit RK4"</code> and <code>"Dual Time Picard RK4"</code> are translated by <code>pic-flow</code> to C enum strings.   </td><td class="markdownTableBodyLeft"><code>-mom_solver_type</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>central_diff</code>   </td><td class="markdownTableBodyLeft">Boolean   </td><td class="markdownTableBodyLeft">If <code>true</code>, uses a central differencing scheme for the convective term. If <code>false</code> (default), uses a higher-order QUICK scheme.   </td><td class="markdownTableBodyLeft"><code>-central</code>   </td></tr>
-</table>
-<h1><a class="anchor" id="tolerances_sec"></a>
-3. The &lt;tt&gt;tolerances&lt;/tt&gt; Section</h1>
-<p>This section configures momentum-solver convergence controls (primarily used by dual-time solvers).</p>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>momentum_solver</code> -&gt; <code>-mom_solver_type</code> (normalized by <code>pic.flow</code>)</li>
+<li><code>central_diff</code> -&gt; <code>-central</code></li>
+</ul>
+<p>Named solver values are preferred over legacy boolean toggles.</p>
+<h1><a class="anchor" id="tol_sec"></a>
+3. &lt;tt&gt;tolerances&lt;/tt&gt;</h1>
 <div class="fragment"><div class="line">tolerances:</div>
 <div class="line">  max_iterations: 50</div>
 <div class="line">  absolute_tol: 1.0e-7</div>
 <div class="line">  relative_tol: 1.0e-4</div>
 <div class="line">  step_tol: 1.0e-8</div>
-</div><!-- fragment --><table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>max_iterations</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The maximum number of pseudo-time iterations for the momentum solver per time step.   </td><td class="markdownTableBodyLeft"><code>-mom_max_pseudo_steps</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>absolute_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">The absolute tolerance for the momentum update norm.   </td><td class="markdownTableBodyLeft"><code>-mom_atol</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>relative_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">The relative tolerance for the momentum update norm.   </td><td class="markdownTableBodyLeft"><code>-mom_rtol</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>step_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">The step tolerance. The solver converges if the norm of the solution update is smaller than this value.   </td><td class="markdownTableBodyLeft"><code>-imp_stol</code>   </td></tr>
-</table>
-<h1><a class="anchor" id="momentum_solver_sec"></a>
-3.1. The &lt;tt&gt;momentum_solver&lt;/tt&gt; Section (Advanced)</h1>
-<p>This optional section exposes solver-specific controls directly in YAML.</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>type</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Optional canonical enum fallback (<code>DUALTIME_PICARD_RK4</code>, <code>EXPLICIT_RK</code>, etc.) if <code>strategy.momentum_solver</code> is omitted.   </td><td class="markdownTableBodyLeft"><code>-mom_solver_type</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.max_pseudo_steps</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">Maximum pseudo-time iterations per physical step.   </td><td class="markdownTableBodyLeft"><code>-mom_max_pseudo_steps</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.absolute_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Absolute pseudo-time convergence threshold.   </td><td class="markdownTableBodyLeft"><code>-mom_atol</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.relative_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Relative pseudo-time convergence threshold.   </td><td class="markdownTableBodyLeft"><code>-mom_rtol</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.step_tol</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Step-size convergence threshold.   </td><td class="markdownTableBodyLeft"><code>-imp_stol</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.pseudo_cfl.initial</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Initial pseudo-CFL at the start of each physical step.   </td><td class="markdownTableBodyLeft"><code>-pseudo_cfl</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.pseudo_cfl.minimum</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Lower bound for adaptive pseudo-CFL.   </td><td class="markdownTableBodyLeft"><code>-min_pseudo_cfl</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.pseudo_cfl.maximum</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Upper bound for adaptive pseudo-CFL.   </td><td class="markdownTableBodyLeft"><code>-max_pseudo_cfl</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.pseudo_cfl.growth_factor</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Growth factor used when convergence is healthy.   </td><td class="markdownTableBodyLeft"><code>-pseudo_cfl_growth_factor</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.pseudo_cfl.reduction_factor</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Reduction factor used when convergence degrades.   </td><td class="markdownTableBodyLeft"><code>-pseudo_cfl_reduction_factor</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>dual_time_picard_rk4.rk4_residual_noise_allowance_factor</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">Noise threshold for RK4 residual-based divergence detection.   </td><td class="markdownTableBodyLeft"><code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code>   </td></tr>
-</table>
-<h1><a class="anchor" id="pressure_solver_sec"></a>
-4. The &lt;tt&gt;pressure_solver&lt;/tt&gt; Section</h1>
-<p>This section provides detailed control over the linear solver used for the pressure-Poisson equation, which is often the most computationally expensive part of the simulation.</p>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>max_iterations</code> -&gt; <code>-mom_max_pseudo_steps</code></li>
+<li><code>absolute_tol</code> -&gt; <code>-mom_atol</code></li>
+<li><code>relative_tol</code> -&gt; <code>-mom_rtol</code></li>
+<li><code>step_tol</code> -&gt; <code>-imp_stol</code></li>
+</ul>
+<h1><a class="anchor" id="msolver_sec"></a>
+4. &lt;tt&gt;momentum_solver&lt;/tt&gt; (Solver-Specific Block)</h1>
+<div class="fragment"><div class="line">momentum_solver:</div>
+<div class="line">  dual_time_picard_rk4:</div>
+<div class="line">    max_pseudo_steps: 50</div>
+<div class="line">    absolute_tol: 1.0e-8</div>
+<div class="line">    relative_tol: 1.0e-5</div>
+<div class="line">    step_tol: 1.0e-8</div>
+<div class="line">    pseudo_cfl:</div>
+<div class="line">      initial: 0.1</div>
+<div class="line">      minimum: 0.001</div>
+<div class="line">      maximum: 1.0</div>
+<div class="line">      growth_factor: 1.0</div>
+<div class="line">      reduction_factor: 1.0</div>
+<div class="line">    rk4_residual_noise_allowance_factor: 1.05</div>
+</div><!-- fragment --><p>Mappings include:</p><ul>
+<li><code>-pseudo_cfl</code>, <code>-min_pseudo_cfl</code>, <code>-max_pseudo_cfl</code></li>
+<li><code>-pseudo_cfl_growth_factor</code>, <code>-pseudo_cfl_reduction_factor</code></li>
+<li><code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
+</ul>
+<p>Rule: solver-specific blocks must match selected momentum solver type.</p>
+<h1><a class="anchor" id="pressure_sec"></a>
+5. &lt;tt&gt;pressure_solver&lt;/tt&gt;</h1>
 <div class="fragment"><div class="line">pressure_solver:</div>
 <div class="line">  tolerance: 5.0e-9</div>
 <div class="line">  multigrid:</div>
 <div class="line">    levels: 3</div>
 <div class="line">    pre_sweeps: 1</div>
 <div class="line">    post_sweeps: 1</div>
-<div class="line">    # ... etc. ...</div>
-</div><!-- fragment --><h2><a class="anchor" id="p_main_ssec"></a>
-3.1. Main Settings</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>tolerance</code>   </td><td class="markdownTableBodyLeft">Real   </td><td class="markdownTableBodyLeft">The relative convergence tolerance for the pressure-Poisson linear solve.   </td><td class="markdownTableBodyLeft"><code>-poisson_tol</code>   </td></tr>
-</table>
-<h2><a class="anchor" id="p_mg_ssec"></a>
-3.2. &lt;tt&gt;multigrid&lt;/tt&gt; Settings</h2>
-<p>These parameters configure the geometric multigrid (PCMG) preconditioner.</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">C-Solver Flag    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>levels</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The total number of grid levels to use in the V-cycle (including the finest).   </td><td class="markdownTableBodyLeft"><code>-mg_level</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>pre_sweeps</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The number of smoothing iterations to perform before restricting to a coarser grid.   </td><td class="markdownTableBodyLeft"><code>-mg_pre_it</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>post_sweeps</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The number of smoothing iterations to perform after interpolating from a coarser grid.   </td><td class="markdownTableBodyLeft"><code>-mg_post_it</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>semi_coarsening.i</code>   </td><td class="markdownTableBodyLeft">Bool Array   </td><td class="markdownTableBodyLeft">An array of booleans (one per block) specifying whether to disable coarsening in the i-direction.   </td><td class="markdownTableBodyLeft"><code>-mg_i_semi</code>    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>semi_coarsening.j</code>   </td><td class="markdownTableBodyLeft">Bool Array   </td><td class="markdownTableBodyLeft">An array of booleans (one per block) specifying whether to disable coarsening in the j-direction.   </td><td class="markdownTableBodyLeft"><code>-mg_j_semi</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>semi_coarsening.k</code>   </td><td class="markdownTableBodyLeft">Bool Array   </td><td class="markdownTableBodyLeft">An array of booleans (one per block) specifying whether to disable coarsening in the k-direction.   </td><td class="markdownTableBodyLeft"><code>-mg_k_semi</code>   </td></tr>
-</table>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>tolerance</code> -&gt; <code>-poisson_tol</code></li>
+<li><code>multigrid.levels</code> -&gt; <code>-mg_level</code></li>
+<li><code>multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
+<li><code>multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
+<li><code>multigrid.semi_coarsening.i/j/k</code> -&gt; <code>-mg_i_semi/-mg_j_semi/-mg_k_semi</code></li>
+</ul>
 <h1><a class="anchor" id="petsc_sec"></a>
-5. The &lt;tt&gt;petsc_passthrough_options&lt;/tt&gt; Section</h1>
-<p>This is an advanced section that allows you to pass any command-line option directly to the underlying PETSc library. This gives you complete control over the linear solvers (KSP) and preconditioners (PC).</p>
-<p>The key is the PETSc option prefix. For the main pressure solver, the prefix is **<code>-ps_</code>**.</p>
-<p><b>Example:</b> To change the main KSP solver to GMRES and its preconditioner to ILU on all multigrid levels: </p><div class="fragment"><div class="line">petsc_passthrough_options:</div>
+3. Install PETSc</h1>
+<p>Advanced escape hatch for raw PETSc flags:</p>
+<div class="fragment"><div class="line">petsc_passthrough_options:</div>
 <div class="line">  -ps_ksp_type: &quot;gmres&quot;</div>
 <div class="line">  -ps_pc_type: &quot;ilu&quot;</div>
-</div><!-- fragment --><p><b>Example:</b> To configure the solver on a specific multigrid level, use the <code>-ps_mg_levels_&lt;level_num&gt;_</code> prefix. This is useful for setting a direct solver (LU) on the coarsest grid: </p><div class="fragment"><div class="line">petsc_passthrough_options:</div>
-<div class="line">  # Set the coarsest level (level 0) to use a direct LU solver</div>
-<div class="line">  -ps_mg_levels_0_ksp_type: &quot;preonly&quot;</div>
-<div class="line">  -ps_mg_levels_0_pc_type: &quot;lu&quot;</div>
-<div class="line">  # Set the smoother on all finer levels to be 2 iterations of SOR</div>
-<div class="line">  -ps_mg_levels_ksp_type: &quot;richardson&quot;</div>
-<div class="line">  -ps_mg_levels_ksp_max_it: 2</div>
-<div class="line">  -ps_mg_levels_pc_type: &quot;sor&quot;</div>
-</div><!-- fragment --><p> For a full list of PETSc options, please refer to the <a href="https://petsc.org/release/docs/manual/">PETSc Users Manual</a>.</p>
+</div><!-- fragment --><p>These are passed into PETSc options DB and consumed by runtime calls like <code>KSPSetFromOptions</code>.</p>
 <h1><a class="anchor" id="next_steps_sec"></a>
-5. Next Steps</h1>
-<p>You now know how to define the physics of a problem (<code>case.yml</code>) and control the numerical strategy used to solve it (<code>solver.yml</code>). The next step is to learn how to manage the simulation's output and runtime monitoring.</p>
-<p>Proceed to the <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor Profiles (<code>monitor.yml</code>)</a></b> to learn about all the parameters available in the <code>monitor.yml</code> file.</p>
-<p>For end-to-end mapping and extension workflow, see <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b> and <b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b>. </p>
+7. Next Steps</h1>
+<p>Proceed to <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: <code>monitor.yml</code></a></b>.</p>
+<p>For mapping and extension workflows:</p><ul>
+<li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
+<li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
+<li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
+<li><b><a class="el" href="24_Dual_Time_Picard_RK4.html">Dual-Time Picard RK4 Momentum Solver</a></b></li>
+<li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -1,9 +1,12 @@
 var searchData=
 [
   ['generated_20artifacts_20runtime_0',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['grid_20cell_20and_20variable_20architecture_20guide_2',['Grid, Cell, and Variable Architecture Guide',['../md_pages_220__Grid__Cell__Architecture__Guide.html',1,'']]],
-  ['guide_3',['guide',['../md_pages_220__Grid__Cell__Architecture__Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../01_Installation.html',1,'Installation Guide']]],
-  ['guide_20to_20visualizing_20your_20results_4',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
-  ['guides_5',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]]
+  ['gmres_20and_20multigrid_1',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['grid_20bent_20channel_2',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['grid_20cell_20and_20variable_20architecture_20guide_3',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['grid_20projection_4',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['guide_5',['guide',['../md_assets_2guide.html',1,'Assets Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html',1,'Bent Channel Example Guide'],['../md_guide.html',1,'Docs Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2guide.html',1,'Examples Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2guide.html',1,'Flat Channel Example Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2include_2guide.html',1,'Include Guide'],['../01_Installation.html',1,'Installation Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2guide.html',1,'Master Template Guide'],['../md_pages_2guide.html',1,'Pages Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2scripts_2guide.html',1,'Scripts Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2src_2guide.html',1,'Source Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
+  ['guide_20slurm_6',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['guide_20to_20visualizing_20your_20results_7',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['guides_8',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
 ];

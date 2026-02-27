@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Capabilities Summary: What You Can Do</title>
+<title>PICurv: Capabilities Summary</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -91,134 +91,141 @@ $(document).ready(function(){initNavTree('12_Capabilities_Summary.html',''); ini
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Capabilities Summary: What You Can Do</div></div>
+  <div class="headertitle"><div class="title">Capabilities Summary</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#grid_cap_sec">1. Grid and Domain Features</a></li>
-<li class="level1"><a href="#physics_cap_sec">2. Physics &amp; Flow Models</a></li>
-<li class="level1"><a href="#numerics_cap_sec">3. Numerical Scheme Control</a></li>
-<li class="level1"><a href="#bc_cap_sec">4. Boundary Conditions</a></li>
-<li class="level1"><a href="#pp_cap_sec">5. Post-Processing Capabilities</a></li>
-<li class="level1"><a href="#data_driven_cap_sec">6. Data-Driven Closure Readiness (Particle Physics)</a></li>
+<ul><li class="level1"><a href="#flow_sec">2. Flow and Particle Physics</a></li>
+<li class="level1"><a href="#numerics_sec">3. Numerics and Solvers</a></li>
+<li class="level1"><a href="#data_driven_sec">7. Data-Driven Closure Readiness</a></li>
+<li class="level1"><a href="#orchestration_sec">8. Cluster and Study Orchestration</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page provides a high-level summary of the features and models currently implemented in PICurv that are fully configurable through the <code>pic-flow</code> workflow and <code>.yml</code> files. This is the scope of what you can achieve as a user, without needing to modify the C source code.</p>
-<h1><a class="anchor" id="grid_cap_sec"></a>
-1. Grid and Domain Features</h1>
+<div class="textblock"><p>This page summarizes what is currently available through YAML + <code>pic.flow</code> without editing C source.</p>
+<h1><a class="anchor" id="grid_sec"></a>
+3. &lt;tt&gt;grid&lt;/tt&gt;</h1>
 <ul>
-<li><b>Grid Generation:</b><ul>
-<li><b>Programmatic:</b> Generate stretched Cartesian grids for simple domains. You control the resolution, physical dimensions, and geometric stretching ratio in each direction.</li>
-<li><b>File-Based:</b> Import complex, single-block or multi-block curvilinear grids from an external file (<code>.picgrid</code> format).</li>
+<li>Grid modes:<ul>
+<li><code>programmatic_c</code> (C-side structured generation)</li>
+<li><code>file</code> (external <code>.picgrid</code> ingestion with validation and scaling)</li>
+<li><code>grid_gen</code> (pre-run Python grid generation orchestration)</li>
 </ul>
 </li>
-<li><b>Domain Topology:</b><ul>
-<li><b>Multi-Block:</b> Configure simulations with multiple stitched grid blocks, each with its own boundary conditions.</li>
-<li><b>Periodicity:</b> Enable periodic boundary conditions in any of the i, j, or k logical directions.</li>
+<li>Domain topology:<ul>
+<li>single- and multi-block support</li>
+<li>per-direction periodic flags</li>
+</ul>
+</li>
+<li>Programmatic grid controls:<ul>
+<li>per-block geometry arrays (<code>im/jm/km</code>, bounds, stretching)</li>
+<li>global DMDA partition hints (<code>da_processors_x/y/z</code>, scalar only)</li>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="physics_cap_sec"></a>
-2. Physics &amp; Flow Models</h1>
+<h1><a class="anchor" id="flow_sec"></a>
+2. Flow and Particle Physics</h1>
 <ul>
-<li><b>Flow Regime:</b><ul>
-<li><b>Incompressible Flow:</b> The solver is built on the incompressible Navier-Stokes equations.</li>
-<li><b>Laminar or Turbulent:</b> Simulate both laminar flows and turbulent flows using the implemented turbulence model.</li>
+<li>Incompressible Navier-Stokes flow</li>
+<li>2D/3D selection</li>
+<li>LES toggle</li>
+<li>Eulerian source modes:<ul>
+<li><code>solve</code></li>
+<li><code>load</code></li>
+<li><code>analytical</code> + <code>analytical_type</code></li>
 </ul>
 </li>
-<li><b>Dimensionality:</b><ul>
-<li>Configure simulations to run in full <b>3D</b> or simplified <b>2D</b>.</li>
-</ul>
-</li>
-<li><b>Turbulence Modeling:</b><ul>
-<li><b>Large Eddy Simulation (LES):</b> An LES model with a dynamic Smagorinsky sub-grid scale model is available.</li>
-</ul>
-</li>
-<li><b>Lagrangian <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Transport:</b><ul>
-<li><b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Seeding:</b> Add a specified number of massless Lagrangian particles to the domain.</li>
-<li><b>Initialization:</b> Initialize particles either randomly throughout the entire volume or specifically on the surface of the primary inlet.</li>
+<li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> controls:<ul>
+<li>particle count</li>
+<li>init modes (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>, <code>SurfaceEdges</code>)</li>
+<li>restart mode (<code>init</code>, <code>load</code>)</li>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="numerics_cap_sec"></a>
-3. Numerical Scheme Control</h1>
+<h1><a class="anchor" id="numerics_sec"></a>
+3. Numerics and Solvers</h1>
 <ul>
-<li><b>Time Integration:</b><ul>
-<li><b>Explicit (Runge-Kutta):</b> A fast, explicit time-stepping scheme suitable for flows with a moderate time-step restriction.</li>
-<li><b>Implicit:</b> A more robust implicit scheme that allows for larger time steps, suitable for stiff or complex problems.</li>
-</ul>
-</li>
-<li><b>Convection Scheme:</b><ul>
-<li><b>QUICK:</b> A third-order upwind scheme (default).</li>
-<li><b>Central Differencing:</b> A second-order central difference scheme.</li>
-</ul>
-</li>
-<li><b>Pressure-Poisson Solver:</b><ul>
-<li><b>Geometric Multigrid:</b> A highly configurable geometric multigrid (PCMG) preconditioner is the default. You can control the number of levels, sweeps, and cycle types.</li>
-<li><b>Advanced PETSc Control:</b> Pass-through any valid PETSc KSP (solver) or PC (preconditioner) option to fully customize the linear algebra strategy.</li>
+<li>Named momentum solver selection (extensible string selector)</li>
+<li>Solver-specific option blocks (<code>momentum_solver.dual_time_picard_rk4</code>)</li>
+<li>Pseudo-CFL and convergence tuning for dual-time method</li>
+<li>Pressure Poisson control:<ul>
+<li>multigrid levels/sweeps/semi-coarsening</li>
+<li>PETSc passthrough options and monitors</li>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="bc_cap_sec"></a>
-4. Boundary Conditions</h1>
-<p>The following physical boundary conditions are available through the <code>boundary_conditions</code> section of <code>case.yml</code>:</p>
+<h1><a class="anchor" id="bc_sec"></a>
+5. &lt;tt&gt;boundary_conditions&lt;/tt&gt;</h1>
+<p>Supported combinations include:</p><ul>
+<li><code>INLET</code>: <code>constant_velocity</code>, <code>parabolic</code></li>
+<li><code>OUTLET</code>: <code>conservation</code></li>
+<li><code>WALL</code>: <code>noslip</code></li>
+<li><code>PERIODIC</code>: <code>geometric</code>, <code>constant_flux</code></li>
+</ul>
+<p><code>pic.flow</code> validates face completeness, type-handler compatibility, and periodic pair consistency.</p>
+<h1><a class="anchor" id="io_sec"></a>
+1. &lt;tt&gt;io&lt;/tt&gt;</h1>
 <ul>
-<li><b>Inlets:</b><ul>
-<li><code>constant_velocity</code>: Uniform velocity profile.</li>
-<li><code>parabolic</code>: Parabolic (Poiseuille) profile for developed flow.</li>
+<li>Output/restart/log root directory controls</li>
+<li>Eulerian/particle subdirectory controls</li>
+<li>Function whitelist logging and critical-function profiling files</li>
+<li>Raw PETSc monitor passthrough from monitor profile</li>
 </ul>
-</li>
-<li><b>Outlets:</b><ul>
-<li><code>conservation</code>: A zero-gradient condition that enforces mass conservation.</li>
-</ul>
-</li>
-<li><b>Walls:</b><ul>
-<li><code>noslip</code>: Standard no-slip wall condition.</li>
-</ul>
-</li>
-<li><b>Other:</b><ul>
-<li><code>geometric</code>: Periodic geometric coupling.</li>
-<li><code>constant_flux</code>: Periodic driven-flow handler with a target flux and optional trim control.</li>
-</ul>
-</li>
-</ul>
-<h1><a class="anchor" id="pp_cap_sec"></a>
-5. Post-Processing Capabilities</h1>
-<p>The built-in post-processor allows you to perform the following analyses without external tools:</p>
+<h1><a class="anchor" id="post_sec"></a>
+4. Post-Processing</h1>
 <ul>
-<li><b>Data Conversion:</b><ul>
-<li>Convert cell-centered data to node-centered data (<code>CellToNodeAverage</code>), which is ideal for smooth contour plots in visualization software.</li>
-<li>Convert all non-dimensional solver output back to physical, dimensional units.</li>
+<li>Eulerian pipeline tasks:<ul>
+<li>dimensionalize</li>
+<li>nodal averaging</li>
+<li>Q-criterion</li>
+<li>relative field normalization</li>
 </ul>
 </li>
-<li><b>Derived Quantities (Eulerian):</b><ul>
-<li>Calculate the <b>Q-Criterion</b> (<code>ComputeQCriterion</code>) to identify vortex structures.</li>
-<li>Normalize fields relative to a reference point (<code>NormalizeRelativeField</code>).</li>
+<li>Lagrangian pipeline tasks:<ul>
+<li>specific kinetic energy</li>
 </ul>
 </li>
-<li><b>Derived Quantities (Lagrangian):</b><ul>
-<li>Calculate the <b>Specific Kinetic Energy</b> (<code>specific_ke</code>) of each particle.</li>
+<li>Statistics pipeline:<ul>
+<li>MSD (<code>ComputeMSD</code>) with configurable output prefix</li>
 </ul>
 </li>
+<li>Configurable post input extensions (<code>eulerianExt</code>, <code>particleExt</code>)</li>
 </ul>
-<h1><a class="anchor" id="data_driven_cap_sec"></a>
-6. Data-Driven Closure Readiness (Particle Physics)</h1>
+<h1><a class="anchor" id="data_driven_sec"></a>
+7. Data-Driven Closure Readiness</h1>
 <ul>
-<li><b>Offline workflows are currently well-supported:</b><ul>
-<li>Use solver/post output directories as data sources and run separate Python ML training/inference scripts outside the solver binary.</li>
-<li>Use post-processing pipelines and statistics outputs as stable feature/target extraction paths.</li>
+<li>Offline ML workflows are supported today via stable solver/post outputs.</li>
+<li>Tightly coupled in-solver inference requires extension work (documented in playbook).</li>
+</ul>
+<h1><a class="anchor" id="orchestration_sec"></a>
+8. Cluster and Study Orchestration</h1>
+<ul>
+<li>Slurm single-run orchestration from <code>pic.flow run --cluster ...</code><ul>
+<li>solver/post script generation</li>
+<li>optional direct submission</li>
+<li>dependency chaining (<code>post</code> after <code>solve</code>)</li>
+<li>per-run submission and manifest metadata</li>
 </ul>
 </li>
-<li><b>Tightly coupled in-solver inference is intentionally extension-only today:</b><ul>
-<li>The current particle physics update path is model-specific and must be extended to add a runtime-selectable closure model interface.</li>
-<li>Recommended implementation route is documented in the extension playbook.</li>
+<li>Slurm study sweeps from <code>pic.flow sweep</code><ul>
+<li>parameter matrix expansion</li>
+<li>solver/post array script generation</li>
+<li>metrics aggregation from CSV/log outputs</li>
+<li>convergence/sensitivity plot generation (matplotlib-enabled environments)</li>
 </ul>
 </li>
 </ul>
 <h1><a class="anchor" id="next_steps_sec"></a>
-5. Next Steps</h1>
-<p>If your research requires a feature not listed above—such as a new turbulence model, a custom boundary condition, or a new post-processing kernel—you will need to extend the C source code.</p>
-<p>Please proceed to the <b><a class="el" href="13_Code_Architecture.html">Developer Portal</a></b> to learn about the code's structure and how to contribute new features. </p>
+7. Next Steps</h1>
+<p>Proceed to <b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b>.</p>
+<p>For extension and maintenance details:</p><ul>
+<li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
+<li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
+<li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
+<li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
+<li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
+<li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
+<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

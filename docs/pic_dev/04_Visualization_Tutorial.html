@@ -107,16 +107,18 @@ $(document).ready(function(){initNavTree('04_Visualization_Tutorial.html',''); i
 </li>
 <li class="level1"><a href="#lagrangian_recipes_sec">4. Recipes for Visualizing Particle Data (&lt;tt&gt;.vtp&lt;/tt&gt; files)</a></li>
 <li class="level1"><a href="#export_sec">5. Saving Your Work</a></li>
+<li class="level1"><a href="#practical_notes_sec">5.1 Practical Notes</a></li>
 </ul>
 </div>
 <div class="textblock"><p>The previous tutorials showed you specific steps to visualize the <code>flat_channel</code> and <code>bent_channel</code> cases. This guide provides a more general introduction to <b>ParaView</b>, the recommended tool for analyzing PICurv's output.</p>
 <p>Here, you will learn the fundamental skills needed to explore <em>any</em> simulation result you generate, from inspecting data fields to creating publication-quality images and animations.</p>
 <h1><a class="anchor" id="files_sec"></a>
 1. Understanding Your Output Files</h1>
-<p>After a successful run, the post-processor generates visualization files in the <code>runs/your_run_name/viz/</code> directory. You will typically find two types of files:</p>
+<p>After a successful run, the post-processor generates visualization files in the run output directory configured by <code>post.yml -&gt; io.output_directory</code> (commonly <code>viz/</code>).</p>
+<p>You will typically find:</p>
 <ul>
 <li>**Eulerian Grid Data (<code>.vts</code> files):** These are VTK Structured Grid files (e.g., <code>Field_000100.vts</code>). They contain the computational mesh and any data fields that live on that grid, such as velocity and pressure. When you open them in ParaView, they will be grouped as a time series.</li>
-<li>**Lagrangian <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Data (<code>.vtp</code> files):** These are VTK PolyData files (e.g., <code>Particle_000100.vtp</code>). They contain only the coordinates of the Lagrangian particles and any data fields associated with them.</li>
+<li>**Lagrangian <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Data (<code>.vtp</code> files):** These are VTK PolyData files (e.g., <code>Particle_000100.vtp</code>). They contain particle coordinates and particle fields. These files exist only when <code>post.yml -&gt; io.output_particles: true</code>.</li>
 </ul>
 <h2><a class="anchor" id="datafields_sec"></a>
 1.1. Common Data Fields</h2>
@@ -128,11 +130,7 @@ $(document).ready(function(){initNavTree('04_Visualization_Tutorial.html',''); i
 </ul>
 <h1><a class="anchor" id="paraview_basics_sec"></a>
 2. The ParaView Interface</h1>
-<p>ParaView's interface has three key areas you will interact with constantly:</p>
-<div class="image">
-<img src="paraview_interface.png" alt="" width="800px"/>
-<div class="caption">
-The ParaView Interface: 1. Pipeline Browser, 2. Properties Panel, 3. 3D View, 4. Toolbar</div></div>
+<p>ParaView's interface has four key areas you will interact with constantly:</p>
 <ol type="1">
 <li><b>Pipeline Browser (Top Left):</b> This shows your data and any "filters" you've applied. You click on an item here to make it active.</li>
 <li><b>Properties Panel (Bottom Left):</b> This is where you configure the selected data or filter. <b>You must click the green "Apply" button</b> in this panel after making changes.</li>
@@ -182,7 +180,7 @@ The ParaView Interface: 1. Pipeline Browser, 2. Properties Panel, 3. 3D View, 4.
 </ol>
 <h1><a class="anchor" id="lagrangian_recipes_sec"></a>
 4. Recipes for Visualizing Particle Data (&lt;tt&gt;.vtp&lt;/tt&gt; files)</h1>
-<p>Load your <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a>..vtp</code> time series to visualize the Lagrangian particles.</p>
+<p>Load your <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a>..vtp</code> time series (if present) to visualize the Lagrangian particles.</p>
 <ol type="1">
 <li><b>Change Representation:</b> In the Properties panel, find the <b>Representation</b> dropdown. Change it from "Surface" to <b>Point Gaussian</b>. This will render the particles as spheres. You can adjust the <b>Gaussian Radius</b> to change their size.</li>
 <li><b>Color by Velocity:</b> Use the Coloring dropdown in the toolbar to color the particles by <code>velocity</code> and <code>Magnitude</code>.</li>
@@ -193,8 +191,19 @@ The ParaView Interface: 1. Pipeline Browser, 2. Properties Panel, 3. 3D View, 4.
 <li><b>To save an image:</b> Go to <code>File -&gt; Save Screenshot</code>.</li>
 <li><b>To save a video:</b> Go to <code>File -&gt; Save Animation</code>. Choose your resolution and frame rate, and ParaView will generate a video file by playing through all the timesteps.</li>
 </ul>
+<h1><a class="anchor" id="practical_notes_sec"></a>
+5.1 Practical Notes</h1>
+<ul>
+<li>File prefixes are configurable in <code>post.yml</code> (<code>output_filename_prefix</code>, <code>particle_filename_prefix</code>), so your series may not always be named <code>Field_*</code> and <code>Particle_*</code>.</li>
+<li>If particles were disabled in solver or post (<code>output_particles: false</code>), absence of <code>.vtp</code> files is expected.</li>
+<li>Statistics pipeline outputs (e.g., MSD CSV) are analysis files, not ParaView geometry files.</li>
+</ul>
+<div class="image">
+<img src="paraview_flat_channel.png" alt="" width="700px"/>
+<div class="caption">
+Example ParaView output from a channel case</div></div>
 <h1><a class="anchor" id="next_steps_sec"></a>
-5. Next Steps</h1>
+7. Next Steps</h1>
 <p>You are now equipped with the basic skills to install, run, and analyze any simulation in PICurv.</p>
 <p>The "Getting Started" section is complete. You are ready to become a <b>Power User</b>. Proceed to the <b><a class="el" href="05_The_Conductor_Script.html">User Guide</a></b> to begin learning how to create your own custom simulations from scratch. </p>
 </div></div><!-- contents -->

@@ -94,90 +94,49 @@ $(document).ready(function(){initNavTree('03_Tutorial_File-Based_Grid.html','');
   <div class="headertitle"><div class="title">Tutorial: Using a File-Based Grid (Bent Channel)</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#overview_sec">1. Case Overview: Laminar Flow in a Bend</a></li>
-</ul>
-</div>
-<div class="textblock"><p>In the previous tutorial, we ran a simulation where the grid was generated automatically. For complex, real-world geometries, you will typically use a dedicated meshing tool to create a grid and provide it to the solver as a file.</p>
-<p>This tutorial will guide you through running the <code>bent_channel</code> example, which demonstrates how to use a pre-computed curvilinear grid file.</p>
-<h1><a class="anchor" id="overview_sec"></a>
-1. Case Overview: Laminar Flow in a Bend</h1>
-<p>This template simulates incompressible laminar flow through a 90-degree bent channel. The key feature is that the grid is <b>read from a file</b>, demonstrating the workflow for non-trivial geometries.</p>
-<p><b>Physics:</b></p><ul>
-<li><b>Flow Type:</b> Laminar</li>
-<li><b>Reynolds Number (Re):</b> 200</li>
-<li><b>Geometry:</b> 90-Degree Bent Square Duct</li>
-</ul>
-<div class="image">
-<img src="bent_channel_grid.png" alt="" width="600px"/>
-<div class="caption">
-Visualization of the bent channel grid file in ParaView.</div></div>
+<div class="textblock"><p>This tutorial demonstrates <code>grid.mode: file</code> using the <code>bent_channel</code> template.</p>
 <h1><a class="anchor" id="init_sec"></a>
-1. Initializing the Study Directory</h1>
-<p>Just like before, we use the <code>pic.flow init</code> command to create our study directory.</p>
-<ol type="1">
-<li>Navigate to the root of your <code>PICurv</code> project directory.</li>
-<li><p class="startli">Run the following command:</p>
-<p class="startli"><code>bash ./bin/pic-flow init bent_channel --dest my_bent_channel_run </code></p>
-</li>
-</ol>
-<p>This copies the <code>bent_channel</code> template into a new <code>my_bent_channel_run</code> directory. If you look inside, you will see a new set of files:</p>
+1. Initialize a Study Directory</h1>
+<div class="fragment"><div class="line">./scripts/pic.flow init bent_channel --dest my_bent_channel_run</div>
+</div><!-- fragment --><p>Expected files:</p>
 <div class="fragment"><div class="line">my_bent_channel_run/</div>
-<div class="line">├── bent_channel.yml</div>
-<div class="line">├── Imp-MG-Standard.yml</div>
-<div class="line">├── Standard_Output.yml</div>
-<div class="line">├── standard_analysis.yml</div>
-<div class="line">├── bent_channel_coarse.picgrid  &lt;-- The grid coordinate file</div>
-<div class="line">├── bent_channel_coarse.vts      &lt;-- A VTK file for visualizing the grid</div>
-<div class="line">└── bent_channel_coarse.info     &lt;-- Grid quality metrics (for reference)</div>
+<div class="line">|- bent_channel.yml</div>
+<div class="line">|- Imp-MG-Standard.yml</div>
+<div class="line">|- Standard_Output.yml</div>
+<div class="line">|- standard_analysis.yml</div>
+<div class="line">|- bent_channel_coarse.picgrid</div>
+<div class="line">|- bent_channel_coarse.vts</div>
+<div class="line">`- bent_channel_coarse.info</div>
 </div><!-- fragment --><h1><a class="anchor" id="config_sec"></a>
-2. Understanding the Configuration Files</h1>
-<p>Open the <code>my_bent_channel_run/bent_channel.yml</code> file and look at the <code>grid</code> section. It's different from the previous tutorial:</p>
+2. What Each File Does</h1>
+<p>In <code>bent_channel.yml</code>:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>
 <div class="line">  source_file: bent_channel_coarse.picgrid</div>
-</div><!-- fragment --><ul>
-<li>**<code>mode: file</code>**: This tells <code>pic.flow</code> that the C-solver should not generate its own grid.</li>
-<li>**<code>source_file: ...</code>**: This provides the path to the coordinate file (<code>.picgrid</code>) that the solver should use.</li>
+</div><!-- fragment --><p>Behavior:</p><ul>
+<li><code>pic.flow</code> validates the source grid file exists.</li>
+<li>Coordinates are non-dimensionalized before C execution using <code>properties.scaling.length_ref</code>.</li>
+<li>Generated normalized grid is staged into run config artifacts.</li>
 </ul>
-<p>Notice that the <code>Imp-MG-Standard.yml</code> and <code>Standard_Output.yml</code> files are identical to the ones from the <code>flat_channel</code> example. This highlights a core design principle of PICurv: <b>physical cases, numerical solvers, and monitoring are modular and interchangeable.</b></p>
 <h1><a class="anchor" id="run_sec"></a>
-3. Running the Simulation</h1>
-<p>The run command is almost identical to the previous tutorial. We just point the <code>--case</code> flag to our new <code>bent_channel.yml</code> file.</p>
+3. Run Solver + Postprocessor</h1>
+<div class="fragment"><div class="line">./scripts/pic.flow run \</div>
+<div class="line">    --case my_bent_channel_run/bent_channel.yml \</div>
+<div class="line">    --solver my_bent_channel_run/Imp-MG-Standard.yml \</div>
+<div class="line">    --monitor my_bent_channel_run/Standard_Output.yml \</div>
+<div class="line">    --post my_bent_channel_run/standard_analysis.yml \</div>
+<div class="line">    -n 4 --solve --post-process</div>
+</div><!-- fragment --><h1><a class="anchor" id="viz_sec"></a>
+5. Visualize in ParaView</h1>
 <ol type="1">
-<li><p class="startli">From the project root directory, execute the <code>run</code> command:</p>
-<p class="startli"><code>bash ./bin/pic-flow run \ --case my_bent_channel_run/bent_channel.yml \ --solver my_bent_channel_run/Imp-MG-Standard.yml \ --monitor my_bent_channel_run/Standard_Output.yml \ --post my_bent_channel_run/standard_analysis.yml \ -n 4 --solve --post-process </code></p>
-</li>
-<li>The solver will start, read the grid file, and run the simulation.</li>
+<li>Open <code>runs/&lt;run_id&gt;/viz/Field_*.vts</code>.</li>
+<li>Use <code>Stream Tracer</code> seeded near inlet.</li>
+<li>Color by <code>Ucat_nodal</code> magnitude.</li>
 </ol>
-<h1><a class="anchor" id="viz_sec"></a>
-5. Visualizing the Results</h1>
-<p>The output will again be in a timestamped directory inside <code>runs/</code>, with the final visualization files in the <code>viz/</code> subdirectory.</p>
-<ol type="1">
-<li><b>Open the File Series in ParaView:</b><ul>
-<li>Go to <code>File -&gt; Open</code> and select the <code>Field..vts</code> series from the <code>viz/</code> directory.</li>
-<li>Click <b>Apply</b>.</li>
-</ul>
-</li>
-<li><b>Visualize the Flow Path:</b><ul>
-<li>The best way to see the flow in a bend is with a <b>Stream Tracer</b>.</li>
-<li>With <code>Field..vts</code> selected, click the Stream Tracer filter icon in the toolbar.</li>
-<li>The "Seed" for the tracer is a point or line where streamlines will start. By default, it's a line. Drag the line so it is positioned at the inlet of your channel.</li>
-<li>In the Properties panel, increase the number of "Resolution" points on the line to generate more streamlines.</li>
-<li>Click <b>Apply</b>.</li>
-<li>Color the resulting streamlines by the <code>U_nodal</code> vector field magnitude.</li>
-</ul>
-</li>
-</ol>
-<p>You will see the flow navigating the bend, with higher velocities on the inner wall and lower velocities on the outer wall, which is the expected physical result.</p>
-<div class="image">
-<img src="paraview_bent_channel.png" alt="" width="700px"/>
-<div class="caption">
-Example of streamlines in the bent channel, colored by velocity magnitude.</div></div>
+<p>This provides a fast sanity check of bend-flow behavior.</p>
 <h1><a class="anchor" id="next_steps_sec"></a>
-5. Next Steps</h1>
-<p>You have now successfully run a simulation using both a programmatic grid and a file-based grid. You understand the core user workflow of PICurv.Before moving on to create your own cases, it's essential to learn the fundamentals of visualizing and analyzing your results.</p>
-<p>Please proceed to the final introductory tutorial: <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b>. </p>
+7. Next Steps</h1>
+<p>Proceed to <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

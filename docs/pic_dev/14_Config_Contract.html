@@ -96,28 +96,29 @@ $(document).ready(function(){initNavTree('14_Config_Contract.html',''); initResi
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#inputs_sec">1. Required Input Roles</a></li>
-<li class="level1"><a href="#artifacts_sec">2. Generated Artifacts</a></li>
 <li class="level1"><a href="#case_sec">3. Case Contract Highlights</a></li>
 <li class="level1"><a href="#solver_sec">4. Solver Contract Highlights</a></li>
 <li class="level1"><a href="#monitor_sec">5. Monitor Contract Highlights</a></li>
-<li class="level1"><a href="#post_sec">6. Post Contract Highlights</a></li>
-<li class="level1"><a href="#passthrough_sec">7. Escape Hatches and Defaults</a></li>
+<li class="level1"><a href="#cluster_sec">7. Cluster Contract Highlights (&lt;tt&gt;cluster.yml&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#study_sec">8. Study Contract Highlights (&lt;tt&gt;study.yml&lt;/tt&gt;)</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code>pic.flow</code>.</p>
 <h1><a class="anchor" id="inputs_sec"></a>
 1. Required Input Roles</h1>
-<p>PIC-flow composes a run from five logical inputs:</p>
+<p><code>pic.flow</code> composes a standard single-run workflow from five logical inputs, with two additional files for cluster/sweep modes:</p>
 <ol type="1">
 <li><code>case.yml</code>: physics, grid, BC definitions, run control.</li>
 <li><code>solver.yml</code>: numerical strategy and solver parameters.</li>
 <li><code>monitor.yml</code>: I/O and logging/profiling controls.</li>
 <li><code>post.yml</code>: post-processing recipe.</li>
 <li>MPI launch settings (<code>-n</code>, executable stage selection).</li>
+<li>(Cluster mode) <code>cluster.yml</code>: scheduler/resource/launcher contract.</li>
+<li>(Sweep mode) <code>study.yml</code>: parameter matrix + metrics/plot contract.</li>
 </ol>
 <p>You can name files however you want. File names are not hardcoded on the C side; <code>pic.flow</code> resolves paths and emits generated artifacts.</p>
 <h1><a class="anchor" id="artifacts_sec"></a>
-2. Generated Artifacts</h1>
+4. Generated Runtime Artifacts</h1>
 <p>For each run, <code>pic.flow</code> generates:</p>
 <ul>
 <li><code>&lt;run_id&gt;.control</code>: master PETSc/control flags for solver/post setup.</li>
@@ -154,7 +155,7 @@ $(document).ready(function(){initNavTree('14_Config_Contract.html',''); initResi
 <li><code>solver_monitoring</code> maps raw flags directly into control output.</li>
 </ul>
 <h1><a class="anchor" id="post_sec"></a>
-6. Post Contract Highlights</h1>
+4. Post-Processing</h1>
 <ul>
 <li>Pipelines are serialized into semicolon-delimited C pipeline strings.</li>
 <li><code>io.eulerian_fields</code> -&gt; <code>output_fields_instantaneous</code></li>
@@ -163,8 +164,53 @@ $(document).ready(function(){initNavTree('14_Config_Contract.html',''); initResi
 <li><code>io.input_extensions.eulerian/particle</code> -&gt; <code>eulerianExt/particleExt</code> for post input readers</li>
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
 </ul>
+<h1><a class="anchor" id="cluster_sec"></a>
+7. Cluster Contract Highlights (&lt;tt&gt;cluster.yml&lt;/tt&gt;)</h1>
+<ul>
+<li><code>scheduler.type</code> currently supports <code>slurm</code> only.</li>
+<li><code>resources.account/nodes/ntasks_per_node/mem/time</code> are required.</li>
+<li><code>resources.partition</code> is optional.</li>
+<li><code>notifications.mail_user/mail_type</code> are optional; email is validated when provided.</li>
+<li><code>execution.module_setup</code> injects shell lines before launch.</li>
+<li><code>execution.launcher</code> controls launch style (<code>srun</code>, <code>mpirun</code>, custom).</li>
+<li><code>execution.launcher_args</code> provides site-specific launch flags.</li>
+<li><code>execution.extra_sbatch</code> supports scheduler-specific pass-through flags.</li>
+</ul>
+<p><code>pic.flow run --cluster ...</code> generates:</p><ul>
+<li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code></li>
+<li><code>runs/&lt;run_id&gt;/scheduler/post.sbatch</code></li>
+<li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code></li>
+</ul>
+<h1><a class="anchor" id="study_sec"></a>
+8. Study Contract Highlights (&lt;tt&gt;study.yml&lt;/tt&gt;)</h1>
+<ul>
+<li><code>base_configs</code> provides case/solver/monitor/post template paths.</li>
+<li><code>study_type</code> is one of:<ul>
+<li><code>grid_independence</code></li>
+<li><code>timestep_independence</code></li>
+<li><code>sensitivity</code></li>
+</ul>
+</li>
+<li><code>parameters</code> defines cartesian-product sweeps using keys of form:<ul>
+<li><code>case.&lt;yaml.path&gt;</code></li>
+<li><code>solver.&lt;yaml.path&gt;</code></li>
+<li><code>monitor.&lt;yaml.path&gt;</code></li>
+<li><code>post.&lt;yaml.path&gt;</code></li>
+</ul>
+</li>
+<li><code>metrics</code> defines CSV/log extractors for aggregate tables.</li>
+<li><code>plotting</code> controls whether plots are generated and output format.</li>
+<li><code>execution.max_concurrent_array_tasks</code> maps to Slurm array throttling <code>N</code>.</li>
+</ul>
+<p><code>pic.flow sweep --study ... --cluster ...</code> generates:</p><ul>
+<li><code>studies/&lt;study_id&gt;/scheduler/case_index.tsv</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/solver_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
+<li><code>studies/&lt;study_id&gt;/results/plots/*</code></li>
+</ul>
 <h1><a class="anchor" id="passthrough_sec"></a>
-7. Escape Hatches and Defaults</h1>
+6. &lt;tt&gt;solver_parameters&lt;/tt&gt; (Advanced)</h1>
 <ul>
 <li>Escape hatches stay supported:<ul>
 <li><code>case.solver_parameters</code></li>
@@ -173,8 +219,9 @@ $(document).ready(function(){initNavTree('14_Config_Contract.html',''); initResi
 </ul>
 </li>
 <li>Default post input/output extension is <code>dat</code> unless overridden.</li>
-<li>Missing optional keys preserve existing C defaults. </li>
+<li>Missing optional keys preserve existing C defaults.</li>
 </ul>
+<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_3a_20the_20l_5finf_20norm_20of_20the_20total_20residual_20rhs_0',[': the l_inf norm of the total residual rhs',['../momentumsolvers_8h.html#autotoc_md5',1,'resid_norm        : The L_inf norm of the Total Residual (RHS).'],['../momentumsolvers_8c.html#autotoc_md10',1,'resid_norm        : The L_inf norm of the Total Residual (RHS).']]]
+  ['8_20cluster_20and_20study_20orchestration_0',['8. Cluster and Study Orchestration',['../17_Workflow_Extensibility.html#orchestration_sec',1,'']]],
+  ['8_20study_20contract_20highlights_20tt_20study_20yml_20tt_1',['8. Study Contract Highlights (&lt;tt&gt;study.yml&lt;/tt&gt;)',['../14_Config_Contract.html#study_sec',1,'']]]
 ];

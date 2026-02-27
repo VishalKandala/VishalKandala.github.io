@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['les_2ec_0',['les.c',['../les_8c.html',1,'']]],
-  ['les_2eh_1',['les.h',['../les_8h.html',1,'']]],
-  ['logging_2ec_2',['logging.c',['../logging_8c.html',1,'']]],
-  ['logging_2eh_3',['logging.h',['../logging_8h.html',1,'']]]
+  ['filter_2ec_0',['Filter.c',['../Filter_8c.html',1,'']]],
+  ['filter_2eh_1',['Filter.h',['../Filter_8h.html',1,'']]],
+  ['flat_5fchannel_2emd_2',['flat_channel.md',['../flat__channel_8md.html',1,'']]]
 ];

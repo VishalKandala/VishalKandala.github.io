@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: The Conductor Script: &lt;tt&gt;pic-flow&lt;/tt&gt;</title>
+<title>PICurv: The Conductor Script: &lt;tt&gt;pic.flow&lt;/tt&gt;</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -91,86 +91,107 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">The Conductor Script: &lt;tt&gt;pic-flow&lt;/tt&gt;</div></div>
+  <div class="headertitle"><div class="title">The Conductor Script: &lt;tt&gt;pic.flow&lt;/tt&gt;</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#usage_sec">1. General Usage</a></li>
-<li class="level1"><a href="#init_command_sec">2. The &lt;tt&gt;init&lt;/tt&gt; Command</a></li>
-<li class="level1"><a href="#build_command_sec">3. The &lt;tt&gt;build&lt;/tt&gt; Command</a></li>
-<li class="level1"><a href="#run_command_sec">4. The &lt;tt&gt;run&lt;/tt&gt; Command</a></li>
+<li class="level1"><a href="#sweep_sec">3. &lt;tt&gt;sweep&lt;/tt&gt;: Parameter Study via Slurm Arrays</a></li>
+<li class="level1"><a href="#artifacts_sec">4. Generated Runtime Artifacts</a></li>
 </ul>
 </div>
-<div class="textblock"><p>The <code>pic-flow</code> script is the primary user interface for the PICurv platform. It is a powerful Python-based "conductor" that automates the entire simulation workflow, from building the source code to launching simulations and post-processing results.</p>
-<p>This guide serves as the main reference for all of its commands and command-line arguments. All commands are run from the root directory of your PICurv project.</p>
+<div class="textblock"><p><code>pic.flow</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages.</p>
 <h1><a class="anchor" id="usage_sec"></a>
 1. General Usage</h1>
-<p>The script is invoked via <code>./bin/pic-flow</code> and uses a command-based structure, similar to <code>git</code>.</p>
-<div class="fragment"><div class="line">./bin/pic-flow [COMMAND] [ARGUMENTS...]</div>
-</div><!-- fragment --><p>There are three main commands:</p><ul>
-<li>**<code>init</code>**: Creates a new study directory from a template.</li>
-<li>**<code>build</code>**: Compiles the C solver and other tools.</li>
-<li>**<code>run</code>**: Executes a simulation or post-processing workflow.</li>
+<div class="fragment"><div class="line">python3 scripts/pic.flow [COMMAND] [ARGS...]</div>
+</div><!-- fragment --><p>Primary commands:</p><ul>
+<li><code>init</code></li>
+<li><code>build</code></li>
+<li><code>run</code></li>
+<li><code>sweep</code></li>
 </ul>
-<p>You can get help at any time by running: </p><div class="fragment"><div class="line">./bin/pic-flow --help</div>
-<div class="line">./bin/pic-flow run --help</div>
-</div><!-- fragment --><h1><a class="anchor" id="init_command_sec"></a>
-2. The &lt;tt&gt;init&lt;/tt&gt; Command</h1>
-<p>The <code>init</code> command is used to bootstrap a new simulation study by copying a pre-configured template.</p>
-<p><b>Usage:</b> </p><div class="fragment"><div class="line">./bin/pic-flow init &lt;template_name&gt; [OPTIONS]</div>
-</div><!-- fragment --><p><b>Arguments:</b></p><ul>
-<li><code>&lt;template_name&gt;</code>: (Required) The name of a template directory located in <code>examples/</code>. Common choices are <code>flat_channel</code> or <code>bent_channel</code>.</li>
+<p>Help: </p><div class="fragment"><div class="line">python3 scripts/pic.flow --help</div>
+<div class="line">python3 scripts/pic.flow run --help</div>
+<div class="line">python3 scripts/pic.flow sweep --help</div>
+</div><!-- fragment --><h1><a class="anchor" id="run_sec"></a>
+3. Run Solver + Postprocessor</h1>
+<div class="fragment"><div class="line">python3 scripts/pic.flow run [STAGES] [INPUTS] [OPTIONS]</div>
+</div><!-- fragment --><p>Stages:</p><ul>
+<li><code>--solve</code></li>
+<li><code>--post-process</code></li>
 </ul>
-<p><b>Options:</b></p><ul>
-<li><code>--dest &lt;new_directory_name&gt;</code>: Specifies a name for the new study directory. If omitted, the directory will be named after the template.</li>
-<li><code>--copy-binaries</code>: If this flag is present, the C executables (<code>picsolver</code>, <code>postprocessor</code>) will be physically copied into the new study directory. This creates a fully portable, self-contained study. By default, symbolic links are created instead.</li>
+<p>Inputs for <code>--solve</code>:</p><ul>
+<li><code>--case &lt;case.yml&gt;</code></li>
+<li><code>--solver &lt;solver.yml&gt;</code></li>
+<li><code>--monitor &lt;monitor.yml&gt;</code></li>
 </ul>
-<p><b>Example:</b> </p><div class="fragment"><div class="line"># Create a new study named &quot;my_channel_case&quot; from the &quot;flat_channel&quot; template.</div>
-<div class="line">./bin/pic-flow init flat_channel --dest my_channel_case</div>
-</div><!-- fragment --><h1><a class="anchor" id="build_command_sec"></a>
-3. The &lt;tt&gt;build&lt;/tt&gt; Command</h1>
-<p>The <code>build</code> command is a wrapper around the project's <code>Makefile</code>. It is used to compile all C source code.</p>
-<p><b>Usage:</b> </p><div class="fragment"><div class="line">./bin/pic-flow build [make_arguments...]</div>
-</div><!-- fragment --><p>Any arguments provided after <code>build</code> are passed directly to the <code>make</code> command.</p>
-<p><b>Examples:</b> </p><div class="fragment"><div class="line"># Compile all executables (equivalent to &#39;make all&#39;)</div>
-<div class="line">./bin/pic-flow build</div>
-<div class="line"> </div>
-<div class="line"># Build only the postprocessor</div>
-<div class="line">./bin/pic-flow build postprocessor</div>
-<div class="line"> </div>
-<div class="line"># Clean the entire project of all build artifacts</div>
-<div class="line">./bin/pic-flow build clean-project</div>
-<div class="line"> </div>
-<div class="line"># Build using a specific system configuration for a cluster</div>
-<div class="line">./bin/pic-flow build SYSTEM=cluster</div>
-</div><!-- fragment --><h1><a class="anchor" id="run_command_sec"></a>
-4. The &lt;tt&gt;run&lt;/tt&gt; Command</h1>
-<p>The <code>run</code> command is the most powerful command. It orchestrates the execution of the C-solver and post-processor based on the provided YAML configuration files.</p>
-<p><b>Usage:</b> </p><div class="fragment"><div class="line">./bin/pic-flow run [STAGES] [INPUTS] [OPTIONS]</div>
-</div><!-- fragment --><p><b>Workflow Stages:</b> You must specify at least one of the following stages:</p><ul>
-<li><code>--solve</code>: Executes the <code>picsolver</code> executable. This will create a new, timestamped output directory inside the <code>runs/</code> folder.</li>
-<li><code>--post-process</code>: Executes the <code>postprocessor</code> executable. This can be run on the results of a <code>--solve</code> stage in the same command, or on a previously completed run directory using the <code>--run-dir</code> flag.</li>
+<p>Inputs for <code>--post-process</code>:</p><ul>
+<li><code>--post &lt;post.yml&gt;</code></li>
+<li>either same invocation with <code>--solve</code>, or <code>--run-dir &lt;existing_run_dir&gt;</code></li>
 </ul>
-<p><b>Input Files:</b></p><ul>
-<li><code>--case &lt;path/to/case.yml&gt;</code>: (Required for <code>--solve</code>) Path to the case definition file, which specifies the physics and geometry.</li>
-<li><code>--solver &lt;path/to/solver.yml&gt;</code>: (Required for <code>--solve</code>) Path to the solver profile, which specifies the numerical strategy.</li>
-<li><code>--monitor &lt;path/to/monitor.yml&gt;</code>: (Required for <code>--solve</code>) Path to the monitor profile, which controls I/O and logging.</li>
-<li><code>--post &lt;path/to/post.yml&gt;</code>: (Required for <code>--post-process</code>) Path to the post-processing recipe file.</li>
-<li><code>--run-dir &lt;path/to/run_directory&gt;</code>: (Required for standalone <code>--post-process</code>) Specifies an existing run directory (e.g., <code>runs/flat_channel_...</code>) to post-process. Not needed if running <code>--solve</code> and <code>--post-process</code> together.</li>
+<p>MPI/local options:</p><ul>
+<li><code>-n, --num-procs</code></li>
 </ul>
-<p><b>Execution Options:</b></p><ul>
-<li><code>-n, --num-procs &lt;integer&gt;</code>: The number of MPI processes to use for the simulation. Defaults to <code>1</code> (serial execution).</li>
+<p>Cluster/Slurm options:</p><ul>
+<li><code>--cluster &lt;cluster.yml&gt;</code></li>
+<li><code>--scheduler slurm</code> (optional explicit selector)</li>
+<li><code>--no-submit</code> (generate scripts/manifests only)</li>
 </ul>
-<p><b>Examples:</b></p>
-<ol type="1">
-<li><b>Run a solver simulation on 8 cores:</b> <code>bash ./bin/pic-flow run --solve -n 8 \ --case my_studies/case.yml \ --solver my_studies/solver.yml \ --monitor my_studies/monitor.yml </code></li>
-<li><b>Run a solver simulation and immediately post-process the results:</b> <code>bash ./bin/pic-flow run --solve --post-process -n 8 \ --case my_studies/case.yml \ --solver my_studies/solver.yml \ --monitor my_studies/monitor.yml \ --post my_studies/post-recipe.yml </code></li>
-<li><b>Run post-processing on an existing simulation directory:</b> <code>bash ./bin/pic-flow run --post-process \ --run-dir runs/flat_channel_20240401-153000 \ --post my_studies/another-post-recipe.yml </code></li>
-</ol>
+<p>Local example: </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process -n 8 \</div>
+<div class="line">  --case my_case/case.yml \</div>
+<div class="line">  --solver my_case/solver.yml \</div>
+<div class="line">  --monitor my_case/monitor.yml \</div>
+<div class="line">  --post my_case/post.yml</div>
+</div><!-- fragment --><p>Slurm example (generate + submit): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+<div class="line">  --case my_case/case.yml \</div>
+<div class="line">  --solver my_case/solver.yml \</div>
+<div class="line">  --monitor my_case/monitor.yml \</div>
+<div class="line">  --post my_case/post.yml \</div>
+<div class="line">  --cluster my_case/cluster.yml</div>
+</div><!-- fragment --><p>Slurm example (generate only): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+<div class="line">  --case my_case/case.yml \</div>
+<div class="line">  --solver my_case/solver.yml \</div>
+<div class="line">  --monitor my_case/monitor.yml \</div>
+<div class="line">  --post my_case/post.yml \</div>
+<div class="line">  --cluster my_case/cluster.yml \</div>
+<div class="line">  --no-submit</div>
+</div><!-- fragment --><h1><a class="anchor" id="sweep_sec"></a>
+3. &lt;tt&gt;sweep&lt;/tt&gt;: Parameter Study via Slurm Arrays</h1>
+<div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
+<div class="line">  --study my_study/study.yml \</div>
+<div class="line">  --cluster my_study/cluster.yml [--no-submit]</div>
+</div><!-- fragment --><p>Behavior:</p><ul>
+<li>expands parameter matrix from <code>study.yml</code></li>
+<li>materializes case directories under <code>studies/&lt;study_id&gt;/cases/</code></li>
+<li>generates <code>solver_array.sbatch</code> and <code>post_array.sbatch</code></li>
+<li>submits post array with <code>afterok:&lt;solver_jobid&gt;</code> dependency (unless <code>--no-submit</code>)</li>
+<li>aggregates metrics and emits plots in <code>studies/&lt;study_id&gt;/results/</code></li>
+</ul>
+<h1><a class="anchor" id="artifacts_sec"></a>
+4. Generated Runtime Artifacts</h1>
+<p>Single run (<code>run</code>):</p><ul>
+<li><code>runs/&lt;run_id&gt;/config/*.control</code>, <code>bcs*.run</code>, <code>whitelist.run</code>, <code>profile.run</code>, <code>post.run</code></li>
+<li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code>, <code>post.sbatch</code> (cluster mode)</li>
+<li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code> (cluster mode)</li>
+<li><code>runs/&lt;run_id&gt;/manifest.json</code></li>
+</ul>
+<p>Sweep (<code>sweep</code>):</p><ul>
+<li><code>studies/&lt;study_id&gt;/cases/&lt;case_i&gt;/...</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/case_index.tsv</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/solver_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/submission.json</code></li>
+<li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
+<li><code>studies/&lt;study_id&gt;/results/plots/*.png</code> (if plotting enabled and matplotlib available)</li>
+<li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
+</ul>
 <h1><a class="anchor" id="next_steps_sec"></a>
-5. Next Steps</h1>
-<p>Now that you understand how to use the <code>pic-flow</code> conductor, the next step is to learn the details of the configuration files it consumes.</p>
-<p>Proceed to the <b><a class="el" href="06_Simulation_Anatomy.html">Anatomy of a Simulation: Cases, Solvers, and Monitors</a></b> to learn about the modularity and versatility of the PICurv which helps you get up and running quickly and enables various experiments. </p>
+7. Next Steps</h1>
+<ul>
+<li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
+<li>Extensibility: <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
