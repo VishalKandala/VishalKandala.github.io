@@ -2,7 +2,7 @@
 layout: page
 title: Projects
 permalink: /projects/
-description: Research projects and open-source software tools in computational fluid dynamics and scientific computing.
+description: Research projects and open-source repositories with technical context, validation notes, and implementation details.
 nav: true
 nav_order: 4
 display_categories: [Research, Personal]

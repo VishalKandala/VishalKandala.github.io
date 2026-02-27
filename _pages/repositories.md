@@ -3,8 +3,7 @@ layout: page
 permalink: /repositories/
 title: Repositories
 description: A collection of Projects both past and current that have been posted on GitHub.
-nav: true
-nav_order: 6
+nav: false
 ---
 
 ## GitHub users

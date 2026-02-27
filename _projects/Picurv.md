@@ -562,7 +562,7 @@ Each phase builds on the previous, with immediate scientific value while progres
 - Open-source release planned upon publication
 
 **Documentation:**
-- [Developer Documentation](https://vishalkandala.me/docs/pic_dev/)
+- [PICurv Documentation Portal](https://vishalkandala.me/picurv-docs/)
 - API reference, build instructions, usage examples
 
 **Presentations:**
