@@ -14,6 +14,7 @@ profile:
 news: true  # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
+nav: false
 ---
 
 I'm a Ph.D. student in Mechanical Engineering at Texas A&M University, working with <a href='https://engineering.tamu.edu/mechanical/profiles/borazjani-iman.html'>Dr. Iman Borazjani</a>. My research centers on computational fluid dynamics, with current focus on turbulence modeling and developing high-fidelity methods for complex flows involving turbulence, scalar transport, and fluid-structure interaction.
