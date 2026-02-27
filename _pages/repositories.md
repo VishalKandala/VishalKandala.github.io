@@ -1,29 +1,22 @@
 ---
-layout: page
+layout: none
 permalink: /repositories/
 title: Repositories
-description: A collection of Projects both past and current that have been posted on GitHub.
+description: Legacy route redirected to Projects.
 nav: false
 ---
-
-## GitHub users
-
-{% if site.data.repositories.github_users %}
-<div class="repositories d-flex flex-wrap flex-md-row flex-column justify-content-between align-items-center">
-  {% for user in site.data.repositories.github_users %}
-    {% include repository/repo_user.html username=user %}
-  {% endfor %}
-</div>
-{% endif %}
-
----
-
-## GitHub Repositories
-
-{% if site.data.repositories.github_repos %}
-<div class="repositories d-flex flex-wrap flex-md-row flex-column justify-content-between align-items-center">
-  {% for repo in site.data.repositories.github_repos %}
-    {% include repository/repo.html repository=repo %}
-  {% endfor %}
-</div>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="refresh" content="0; url={{ '/projects/' | relative_url }}" />
+  <title>Redirecting to Projects</title>
+  <script>
+    window.location.replace("{{ '/projects/' | relative_url }}");
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="{{ '/projects/' | relative_url }}">Projects</a>...</p>
+</body>
+</html>
