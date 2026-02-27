@@ -4,7 +4,7 @@ title: Projects
 permalink: /projects/
 description: Research projects and open-source software tools in computational fluid dynamics and scientific computing.
 nav: true
-nav_order: 3
+nav_order: 4
 display_categories: [Research, Personal]
 horizontal: false
 ---

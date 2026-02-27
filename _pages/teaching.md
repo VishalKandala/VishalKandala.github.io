@@ -3,8 +3,7 @@ layout: page
 permalink: /teaching/
 title: Teaching
 description: An overview of my teaching experience at Texas A&M University
-nav: true
-nav_order: 5
+nav: false
 ---
 
 <style>

@@ -1,20 +1,23 @@
 ---
-layout: page
+layout: none
 title: PICurv Docs
 permalink: /picurv-docs/
 nav: true
-nav_order: 8
+nav_order: 3
 description: PICurv solver documentation (Doxygen)
 ---
-
-<div class="mb-3">
-  This page keeps the al-folio navigation/theme shell and embeds the generated Doxygen site.
-  For full-page view, open:
-  <a href="{{ '/docs/picurv/index.html' | relative_url }}">/docs/picurv/index.html</a>.
-</div>
-
-<iframe src="{{ '/docs/picurv/index.html' | relative_url }}"
-        style="width: 100%; min-height: 82vh; border: 0; border-radius: 6px;"
-        loading="lazy"
-        title="PICurv Doxygen Documentation">
-</iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="refresh" content="0; url={{ '/docs/picurv/index.html' | relative_url }}" />
+  <title>Redirecting to PICurv Docs</title>
+  <script>
+    window.location.replace("{{ '/docs/picurv/index.html' | relative_url }}");
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="{{ '/docs/picurv/index.html' | relative_url }}">PICurv documentation</a>...</p>
+</body>
+</html>
