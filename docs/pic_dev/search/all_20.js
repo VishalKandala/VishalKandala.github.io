@@ -51,12 +51,13 @@ var searchData=
   ['usecfg_48',['useCfg',['../variables_8h.html#ab342b9a07bb00be469836bd6974b0c93',1,'SimCtx']]],
   ['usecriticalfuncscfg_49',['useCriticalFuncsCfg',['../variables_8h.html#ab4b123a5f980ecdaa79c5f855f751999',1,'SimCtx']]],
   ['user_50',['user',['../variables_8h.html#a0e8eb238051c8b5f37a260a8cde481c4',1,'MGCtx::user'],['../variables_8h.html#a7823a7fc52af3c6fe103457cf85fdcce',1,'BCContext::user']]],
-  ['user_20guide_51',['User Guide',['../42_User_Guide_Index.html',1,'']]],
-  ['user_20how_20to_20guides_52',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]],
-  ['user_5fc_53',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
-  ['user_5ff_54',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
-  ['userctx_55',['userctx',['../13_Code_Architecture.html#userctx_ssec',1,'4.2 UserCtx'],['../variables_8h.html#structUserCtx',1,'UserCtx'],['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'UserCtx:&#160;variables.h']]],
-  ['usermg_56',['usermg',['../variables_8h.html#structUserMG',1,'UserMG'],['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx::usermg'],['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'UserMG:&#160;variables.h']]],
-  ['users_57',['4. What This Means For Users',['../42_User_Guide_Index.html#practical_sec',1,'']]],
-  ['using_20a_20file_20based_20grid_20bent_20channel_58',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]]
+  ['user_20facing_20combinations_20tt_20pic_20flow_20tt_51',['2. Supported User-Facing Combinations (&lt;tt&gt;pic.flow&lt;/tt&gt;)',['../44_Boundary_Conditions_Guide.html#supported_sec',1,'']]],
+  ['user_20guide_52',['User Guide',['../42_User_Guide_Index.html',1,'']]],
+  ['user_20how_20to_20guides_53',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]],
+  ['user_5fc_54',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
+  ['user_5ff_55',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
+  ['userctx_56',['userctx',['../13_Code_Architecture.html#userctx_ssec',1,'4.2 UserCtx'],['../variables_8h.html#structUserCtx',1,'UserCtx'],['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'UserCtx:&#160;variables.h']]],
+  ['usermg_57',['usermg',['../variables_8h.html#structUserMG',1,'UserMG'],['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx::usermg'],['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'UserMG:&#160;variables.h']]],
+  ['users_58',['4. What This Means For Users',['../42_User_Guide_Index.html#practical_sec',1,'']]],
+  ['using_20a_20file_20based_20grid_20bent_20channel_59',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]]
 ];

@@ -250,8 +250,12 @@ var NAVTREE =
       [ "5. Particle Consistency", "32_Analytical_Solutions.html#particles_sec", null ]
     ] ],
     [ "Initial Condition Modes", "33_Initial_Conditions.html", [
-      [ "1. Eulerian Initialization", "33_Initial_Conditions.html#euler_sec", null ],
-      [ "2. Contravariant Initialization Note", "33_Initial_Conditions.html#euler_formula_sec", null ]
+      [ "1. Where Initialization Happens", "33_Initial_Conditions.html#overview_sec", null ],
+      [ "2. Eulerian Field Initialization (<tt>properties.initial_conditions</tt>)", "33_Initial_Conditions.html#euler_sec", null ],
+      [ "3. Eulerian Mode Details", "33_Initial_Conditions.html#euler_modes_sec", null ],
+      [ "4. Contravariant Initialization Note", "33_Initial_Conditions.html#euler_formula_sec", null ],
+      [ "5. Eulerian Restart Branches", "33_Initial_Conditions.html#restart_modes_sec", null ],
+      [ "6. Particle Initialization Relation", "33_Initial_Conditions.html#particle_link_sec", null ]
     ] ],
     [ "Particle Model and Coupling Overview", "34_Particle_Model_Overview.html", [
       [ "1. Per-Step Particle Pipeline", "34_Particle_Model_Overview.html#loop_sec", null ],
@@ -308,6 +312,30 @@ var NAVTREE =
       [ "4. Suggested Contributor Read Path", "43_Developer_Portal_Index.html#contribution_flow_sec", null ],
       [ "5. Expected Outcomes", "43_Developer_Portal_Index.html#developer_outcomes_sec", null ]
     ] ],
+    [ "Boundary Conditions Guide", "44_Boundary_Conditions_Guide.html", [
+      [ "1. Boundary-Condition Grammar", "44_Boundary_Conditions_Guide.html#grammar_sec", null ],
+      [ "2. Supported User-Facing Combinations (<tt>pic.flow</tt>)", "44_Boundary_Conditions_Guide.html#supported_sec", null ],
+      [ "3. Non-Dimensionalization Before C Input", "44_Boundary_Conditions_Guide.html#nondim_sec", null ],
+      [ "4. Periodicity Consistency Rules", "44_Boundary_Conditions_Guide.html#periodic_rules_sec", null ],
+      [ "5. C-Side Parsing and Dispatch", "44_Boundary_Conditions_Guide.html#c_pipeline_sec", null ],
+      [ "6. Exposed vs Latent Options", "44_Boundary_Conditions_Guide.html#c_gap_sec", null ],
+      [ "7. Authoring Examples", "44_Boundary_Conditions_Guide.html#examples_sec", null ],
+      [ "8. Common Failure Modes", "44_Boundary_Conditions_Guide.html#troubleshoot_sec", null ]
+    ] ],
+    [ "Particle Initialization and Restart Guide", "45_Particle_Initialization_and_Restart.html", [
+      [ "2. Accepted <tt>init_mode</tt> Aliases", "45_Particle_Initialization_and_Restart.html#mode_alias_sec", null ],
+      [ "3. Mode Behavior in C", "45_Particle_Initialization_and_Restart.html#mode_behavior_sec", null ],
+      [ "4. Restart Behavior Matrix", "45_Particle_Initialization_and_Restart.html#restart_matrix_sec", null ],
+      [ "5. Early-Step Settlement and Coupling", "45_Particle_Initialization_and_Restart.html#settle_sec", null ],
+      [ "7. Diagnostics and Sanity Checks", "45_Particle_Initialization_and_Restart.html#diagnostics_sec", null ]
+    ] ],
+    [ "C Runtime Execution Map", "46_C_Runtime_Execution_Map.html", [
+      [ "1. Solver Startup Order (<tt>src/picsolver.c</tt>)", "46_C_Runtime_Execution_Map.html#startup_sec", null ],
+      [ "3. Core Runtime Structs", "46_C_Runtime_Execution_Map.html#core_structs_sec", null ],
+      [ "4. Initialization Branches", "46_C_Runtime_Execution_Map.html#init_branches_sec", null ],
+      [ "6. Boundary System Runtime Hooks", "46_C_Runtime_Execution_Map.html#boundaries_sec", null ],
+      [ "8. Debugging Entry Points", "46_C_Runtime_Execution_Map.html#debug_sec", null ]
+    ] ],
     [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
       [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md29", null ],
       [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md30", null ],
@@ -338,7 +366,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "01_Installation.html",
-"md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md39"
+"46_C_Runtime_Execution_Map.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

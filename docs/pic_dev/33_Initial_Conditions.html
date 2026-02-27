@@ -102,34 +102,70 @@ $(document).ready(function(){initNavTree('33_Initial_Conditions.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#euler_sec">1. Eulerian Initialization</a></li>
-<li class="level1"><a href="#euler_formula_sec">2. Contravariant Initialization Note</a></li>
+<ul><li class="level1"><a href="#overview_sec">1. Where Initialization Happens</a></li>
+<li class="level1"><a href="#euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#euler_modes_sec">3. Eulerian Mode Details</a></li>
+<li class="level1"><a href="#euler_formula_sec">4. Contravariant Initialization Note</a></li>
+<li class="level1"><a href="#restart_modes_sec">5. Eulerian Restart Branches</a></li>
+<li class="level1"><a href="#particle_link_sec">6. Particle Initialization Relation</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents the currently implemented Eulerian and particle initialization paths, including their CLI mappings.</p>
+<div class="textblock"><p>This page documents how PICurv initializes Eulerian velocity fields and particles at startup. It covers both user-facing YAML inputs and the C implementation path that applies them.</p>
+<h1><a class="anchor" id="overview_sec"></a>
+1. Where Initialization Happens</h1>
+<p>Startup sequence:</p>
+<ol type="1">
+<li><code>scripts/pic.flow</code> converts YAML to control flags (<code>-finit</code>, <code>-ucont_*</code>, <code>-pinit</code>, etc.).</li>
+<li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a> chooses fresh-start, load, or analytical branch.</li>
+<li>For fresh starts, <a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a> initializes interior <code>Ucont</code>.</li>
+<li>Boundary handlers then enforce face values and ghost-cell consistency.</li>
+<li>If particles are enabled, <a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a> runs independently after Eulerian setup.</li>
+</ol>
 <h1><a class="anchor" id="euler_sec"></a>
-1. Eulerian Initialization</h1>
-<p>Main initialization entry:</p>
+2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</h1>
+<p>YAML:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    mode: &quot;Constant&quot;   # Zero | Constant | Poiseuille</div>
+<div class="line">    u_physical: 1.5</div>
+<div class="line">    v_physical: 0.0</div>
+<div class="line">    w_physical: 0.0</div>
+</div><!-- fragment --><p><code>pic.flow</code> mapping:</p>
+<ul>
+<li><code>mode</code> -&gt; <code>-finit</code> via <code>normalize_field_init_mode</code>:<ul>
+<li><code>Zero</code> (or <code>0</code>) -&gt; <code>0</code></li>
+<li><code>Constant</code> (or <code>1</code>) -&gt; <code>1</code></li>
+<li><code>Poiseuille</code> (or <code>2</code>) -&gt; <code>2</code></li>
+</ul>
+</li>
+<li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code> after non-dimensionalization by <code>U_ref</code>.</li>
+</ul>
+<p>C-side entry points:</p>
 <ul>
 <li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a></li>
-</ul>
-<p>Interior field initializer:</p>
-<ul>
 <li><a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></li>
-</ul>
-<p>Current <code>-finit</code> mappings:</p>
-<ul>
-<li><code>0</code>: zero velocity</li>
-<li><code>1</code>: constant normal velocity</li>
-<li><code>2</code>: Poiseuille-like normal profile</li>
-</ul>
-<p>Human-readable mapping helper:</p>
-<ul>
 <li><a class="el" href="logging_8h.html#a266bd07f5be2795e8603a4075440ea25">FieldInitializationToString</a></li>
 </ul>
-<p>For the Poiseuille-like profile, code uses index-space normalized coordinates and applies a separable parabolic form in cross-stream directions.</p>
+<h1><a class="anchor" id="euler_modes_sec"></a>
+3. Eulerian Mode Details</h1>
+<p><code>-finit = 0</code> (Zero):</p>
+<ul>
+<li>sets interior contravariant velocity to zero.</li>
+</ul>
+<p><code>-finit = 1</code> (Constant Normal Velocity):</p>
+<ul>
+<li>uses inlet-face orientation to select the normal component,</li>
+<li>uses <code>InitialConstantContra</code> as target normal speed,</li>
+<li>applies sign according to inlet on min or max face.</li>
+</ul>
+<p><code>-finit = 2</code> (Poiseuille-like Normal Velocity):</p>
+<ul>
+<li>computes a separable parabolic profile using index-space normalized cross-stream coordinates,</li>
+<li>applies profile in the two cross-stream directions,</li>
+<li>clamps small negative roundoff to zero.</li>
+</ul>
 <h1><a class="anchor" id="euler_formula_sec"></a>
-2. Contravariant Initialization Note</h1>
+4. Contravariant Initialization Note</h1>
 <p>Initialization is applied to contravariant velocity components, scaled by face-area metrics:</p>
 <p class="formulaDsp">
 \[
@@ -138,39 +174,51 @@ U_n = v_n\,A_n,
 </p>
 <p>where face areas are derived from metric vectors (<code>Csi</code>, <code>Eta</code>, <code>Zet</code>) and sign is aligned with inlet face orientation.</p>
 <p>This is why equivalent physical inflow speed can map to different <code>Ucont</code> magnitudes on stretched/curved meshes.</p>
-<h1><a class="anchor" id="particle_sec"></a>
-3. ParticlePhysics Extension Checklist</h1>
-<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> swarm entry:</p>
+<h1><a class="anchor" id="restart_modes_sec"></a>
+5. Eulerian Restart Branches</h1>
+<p>In InitializeEulerianState:</p>
 <ul>
-<li><a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a></li>
+<li><code>StartStep == 0</code>:<ul>
+<li><code>eulerian_field_source=solve</code>: fresh initialization path.</li>
+<li><code>eulerian_field_source=load</code>: reads initial fields from restart files.</li>
+<li><code>eulerian_field_source=analytical</code>: uses analytical initializer.</li>
 </ul>
-<p><code>-pinit</code> / <code>ParticleInitializationType</code> modes:</p>
+</li>
+<li><code>StartStep &gt; 0</code>:<ul>
+<li><code>load</code> source reloads restart fields for the requested step.</li>
+<li><code>analytical</code> source regenerates analytical field at current <code>(t, step)</code>.</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="particle_link_sec"></a>
+6. Particle Initialization Relation</h1>
+<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> initialization is configured in <code>case.yml -&gt; models.physics.particles</code>, but executed by a separate subsystem.</p>
+<p>For full particle mode and restart details, use:</p>
 <ul>
-<li><code>0</code>: <code>PARTICLE_INIT_SURFACE_RANDOM</code></li>
-<li><code>1</code>: <code>PARTICLE_INIT_VOLUME</code></li>
-<li><code>2</code>: <code>PARTICLE_INIT_POINT_SOURCE</code></li>
-<li><code>3</code>: <code>PARTICLE_INIT_SURFACE_EDGES</code></li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
+<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 </ul>
-<p>Human-readable mapping helper:</p>
+<h1><a class="anchor" id="checks_sec"></a>
+7. First Validation Checks</h1>
+<p>After startup, confirm:</p>
 <ul>
-<li><a class="el" href="logging_8h.html#af6a49ace337712dba2527fbaeece4138">ParticleInitializationToString</a></li>
+<li>banner line shows expected field initialization mode,</li>
+<li>no warnings about missing inlet face (for inlet-driven setups),</li>
+<li>first output step has non-empty <code>Ucat</code>/<code>Ucont</code> fields.</li>
 </ul>
-<p>Inlet refresh helper:</p>
+<p>Common pitfalls:</p>
 <ul>
-<li><a class="el" href="ParticleMotion_8h.html#abb62172d12ae65122070a3674196c8e2">ReinitializeParticlesOnInletSurface</a></li>
+<li>using <code>Poiseuille</code> in strongly non-rectangular topology and expecting textbook cylindrical profile,</li>
+<li>forgetting that initialization sets interior only; boundary handlers then overwrite face behavior,</li>
+<li>comparing <code>u_physical</code> directly to <code>Ucont</code> without accounting for metric-face scaling.</li>
 </ul>
-<h1><a class="anchor" id="restart_sec"></a>
-4. Restart Path Specifics</h1>
-<p><code>-particle_restart_mode</code> currently accepts:</p>
-<ul>
-<li><code>load</code></li>
-<li><code>init</code></li>
-</ul>
-<p>For restart files with valid cell IDs, migration can use fast ownership-based path via <a class="el" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a> before full walking-search fallback.</p>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
+<li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
+<li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
