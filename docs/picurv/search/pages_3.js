@@ -5,7 +5,7 @@ var searchData=
   ['dimensionalization_20model_2',['Non-Dimensionalization Model',['../19_Nondimensionalization.html',1,'']]],
   ['directory_20guides_3',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],
   ['documentation_4',['PICurv Solver Documentation',['../index.html',1,'']]],
-  ['documentation_20catalog_5',['Documentation Catalog',['../Documentation_Catalog.html',1,'43_Developer_Portal_Index']]],
+  ['documentation_20map_5',['Documentation Map',['../Documentation_Map.html',1,'43_Developer_Portal_Index']]],
   ['documentation_20status_6',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
   ['dual_20time_20picard_20rk4_20momentum_20solver_7',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]]
 ];

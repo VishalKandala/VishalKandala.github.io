@@ -23,12 +23,12 @@
  @licend  The above is the entire license notice for the JavaScript code in this file
 */
 var menudata={children:[
-{text:"PICurv Home",url:"index.html"},
-{text:"Back to Projects",url:"/projects/"},
-{text:"Documentation Map",url:"Documentation_Catalog.html"},
+{text:"Main Page",url:"index.html"},
+{text:"Documentation Map",url:"Documentation_Map.html"},
 {text:"Workflow",url:"06_Simulation_Anatomy.html"},
 {text:"Config Contracts",url:"14_Config_Contract.html"},
 {text:"Methods",url:"21_Methods_Overview.html"},
 {text:"Runtime Internals",url:"46_C_Runtime_Execution_Map.html"},
-{text:"File List",url:"files.html"},
-{text:"Data Structures",url:"annotated.html"}]}
+{text:"File List",url:"files_structured.html"},
+{text:"Data Structures",url:"annotated_structured.html"},
+{text:"Projects Home",url:"/projects/"}]}
