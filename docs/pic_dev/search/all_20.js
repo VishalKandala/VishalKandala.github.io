@@ -16,7 +16,7 @@ var searchData=
   ['while_200_13',['} while (0)',['../logging_8h.html#autotoc_md0',1,'']]],
   ['wing_14',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]],
   ['work_15',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],
-  ['workflow_16',['workflow',['../06_Simulation_Anatomy.html#workflow_sec',1,'2. The Mix-and-Match Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md57',1,'3. Best Practices &amp; Workflow']]],
+  ['workflow_16',['workflow',['../16_Config_Extension_Playbook.html#workflow_sec',1,'2. The Mix-and-Match Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md57',1,'3. Best Practices &amp; Workflow']]],
   ['works_20at_20the_20boundaries_17',['4.1. How it Works at the Boundaries',['../md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md29',1,'']]],
   ['wp_18',['WP',['../poisson_8c.html#a2c73b81722187c48d6186148091162fb',1,'poisson.c']]],
   ['writeallswarmfields_19',['writeallswarmfields',['../io_8h.html#a07b0fa84e3d8c749c5e337aba7c0366a',1,'WriteAllSwarmFields(UserCtx *user):&#160;io.c'],['../io_8c.html#a07b0fa84e3d8c749c5e337aba7c0366a',1,'WriteAllSwarmFields(UserCtx *user):&#160;io.c']]],

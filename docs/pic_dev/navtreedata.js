@@ -95,20 +95,23 @@ var NAVTREE =
       [ "5. The <tt>boundary_conditions</tt> Section", "07_Case_Reference.html#bc_sec", null ]
     ] ],
     [ "Configuration Reference: Solver Profiles (<tt>solver.yml</tt>)", "08_Solver_Reference.html", [
-      [ "1. The <tt>strategy</tt> Section", "08_Solver_Reference.html#strategy_sec", null ],
-      [ "2. The <tt>tolerances</tt> Section", "08_Solver_Reference.html#tolerances_sec", null ],
-      [ "3. The <tt>pressure_solver</tt> Section", "08_Solver_Reference.html#pressure_solver_sec", [
+      [ "1. The <tt>operation_mode</tt> Section", "08_Solver_Reference.html#operation_mode_sec", null ],
+      [ "2. The <tt>strategy</tt> Section", "08_Solver_Reference.html#strategy_sec", null ],
+      [ "3. The <tt>tolerances</tt> Section", "08_Solver_Reference.html#tolerances_sec", null ],
+      [ "3.1. The <tt>momentum_solver</tt> Section (Advanced)", "08_Solver_Reference.html#momentum_solver_sec", null ],
+      [ "4. The <tt>pressure_solver</tt> Section", "08_Solver_Reference.html#pressure_solver_sec", [
         [ "3.1. Main Settings", "08_Solver_Reference.html#p_main_ssec", null ],
         [ "3.2. <tt>multigrid</tt> Settings", "08_Solver_Reference.html#p_mg_ssec", null ]
       ] ],
-      [ "4. The <tt>petsc_passthrough_options</tt> Section", "08_Solver_Reference.html#petsc_sec", null ]
+      [ "5. The <tt>petsc_passthrough_options</tt> Section", "08_Solver_Reference.html#petsc_sec", null ]
     ] ],
     [ "Configuration Reference: Monitor Profiles (<tt>monitor.yml</tt>)", "09_Monitor_Reference.html", [
       [ "1. The <tt>io</tt> Section", "09_Monitor_Reference.html#io_sec", null ],
       [ "2. The <tt>logging</tt> Section", "09_Monitor_Reference.html#logging_sec", [
         [ "2.1. Log Verbosity Levels", "09_Monitor_Reference.html#log_levels_ssec", null ]
       ] ],
-      [ "3. The <tt>profiling</tt> Section", "09_Monitor_Reference.html#profiling_sec", null ]
+      [ "3. The <tt>profiling</tt> Section", "09_Monitor_Reference.html#profiling_sec", null ],
+      [ "4. The <tt>solver_monitoring</tt> Section", "09_Monitor_Reference.html#solver_monitoring_sec", null ]
     ] ],
     [ "Configuration Reference: Post-Processing Recipes (<tt>post.yml</tt>)", "10_Post_Processing_Reference.html", [
       [ "1. Structure of a <tt>post.yml</tt> File", "10_Post_Processing_Reference.html#structure_sec", null ],
@@ -147,7 +150,8 @@ var NAVTREE =
       [ "2. Physics & Flow Models", "12_Capabilities_Summary.html#physics_cap_sec", null ],
       [ "3. Numerical Scheme Control", "12_Capabilities_Summary.html#numerics_cap_sec", null ],
       [ "4. Boundary Conditions", "12_Capabilities_Summary.html#bc_cap_sec", null ],
-      [ "5. Post-Processing Capabilities", "12_Capabilities_Summary.html#pp_cap_sec", null ]
+      [ "5. Post-Processing Capabilities", "12_Capabilities_Summary.html#pp_cap_sec", null ],
+      [ "6. Data-Driven Closure Readiness (Particle Physics)", "12_Capabilities_Summary.html#data_driven_cap_sec", null ]
     ] ],
     [ "Code Architecture", "13_Code_Architecture.html", [
       [ "1. Program Flow: The Five Stages of <tt>main()</tt>", "13_Code_Architecture.html#flow_sec", null ],
@@ -156,6 +160,27 @@ var NAVTREE =
         [ "2.2. The User Context (<tt>UserCtx</tt>)", "13_Code_Architecture.html#userctx_ssec", null ]
       ] ],
       [ "3. Code Modules Overview", "13_Code_Architecture.html#modules_sec", null ]
+    ] ],
+    [ "Configuration Contract (YAML -> Generated Artifacts -> Runtime)", "14_Config_Contract.html", [
+      [ "1. Required Input Roles", "14_Config_Contract.html#inputs_sec", null ],
+      [ "2. Generated Artifacts", "14_Config_Contract.html#artifacts_sec", null ],
+      [ "3. Case Contract Highlights", "14_Config_Contract.html#case_sec", null ],
+      [ "4. Solver Contract Highlights", "14_Config_Contract.html#solver_sec", null ],
+      [ "5. Monitor Contract Highlights", "14_Config_Contract.html#monitor_sec", null ],
+      [ "6. Post Contract Highlights", "14_Config_Contract.html#post_sec", null ],
+      [ "7. Escape Hatches and Defaults", "14_Config_Contract.html#passthrough_sec", null ]
+    ] ],
+    [ "Developer Ingestion Map", "15_Config_Ingestion_Map.html", [
+      [ "1. End-to-End Flow", "15_Config_Ingestion_Map.html#pipeline_sec", null ],
+      [ "2. Mapping Matrix", "15_Config_Ingestion_Map.html#map_sec", null ],
+      [ "3. Important Exceptions", "15_Config_Ingestion_Map.html#exceptions_sec", null ],
+      [ "4. Drift Prevention", "15_Config_Ingestion_Map.html#maintenance_sec", null ]
+    ] ],
+    [ "Configuration Extension Playbook", "16_Config_Extension_Playbook.html", [
+      [ "2. Design Rules", "16_Config_Extension_Playbook.html#design_sec", null ],
+      [ "3. ParticlePhysics Extension Checklist", "16_Config_Extension_Playbook.html#particle_sec", null ],
+      [ "4. Data-Driven Closure Model Note", "16_Config_Extension_Playbook.html#data_driven_sec", null ],
+      [ "5. Verification Checklist", "16_Config_Extension_Playbook.html#verification_sec", null ]
     ] ],
     [ "Grid, Cell, and Variable Architecture Guide", "md_pages_220__Grid__Cell__Architecture__Guide.html", [
       [ "1. Overview", "md_pages_220__Grid__Cell__Architecture__Guide.html#autotoc_md22", null ],
@@ -194,7 +219,8 @@ var NAVTREE =
     [ "PIC-Flow Master Configuration Templates", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html", [
       [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md55", null ],
       [ "2. How to Use These Files", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md56", null ],
-      [ "3. Best Practices & Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md57", null ]
+      [ "3. Best Practices & Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md57", null ],
+      [ "4. Contract and Developer Maps", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md58", null ]
     ] ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]

@@ -9,5 +9,6 @@ var searchData=
   ['and_20monitors_6',['Anatomy of a Simulation: Cases, Solvers, and Monitors',['../06_Simulation_Anatomy.html',1,'']]],
   ['and_20variable_20architecture_20guide_7',['Grid, Cell, and Variable Architecture Guide',['../md_pages_220__Grid__Cell__Architecture__Guide.html',1,'']]],
   ['architecture_8',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
-  ['architecture_20guide_9',['Grid, Cell, and Variable Architecture Guide',['../md_pages_220__Grid__Cell__Architecture__Guide.html',1,'']]]
+  ['architecture_20guide_9',['Grid, Cell, and Variable Architecture Guide',['../md_pages_220__Grid__Cell__Architecture__Guide.html',1,'']]],
+  ['artifacts_20runtime_10',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]]
 ];

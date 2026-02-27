@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['master_20configuration_20templates_0',['PIC-Flow Master Configuration Templates',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html',1,'']]],
-  ['monitor_20profiles_20tt_20monitor_20yml_20tt_1',['Configuration Reference: Monitor Profiles (&lt;tt&gt;monitor.yml&lt;/tt&gt;)',['../09_Monitor_Reference.html',1,'']]],
-  ['monitors_2',['Anatomy of a Simulation: Cases, Solvers, and Monitors',['../06_Simulation_Anatomy.html',1,'']]]
+  ['laminar_20flow_20in_20a_20bent_20channel_0',['Case Template: Laminar Flow in a Bent Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'']]],
+  ['laminar_20flow_20in_20a_20flat_20channel_1',['Case Template: Laminar Flow in a Flat Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'']]]
 ];

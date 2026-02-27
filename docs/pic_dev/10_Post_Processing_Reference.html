@@ -114,18 +114,18 @@ $(document).ready(function(){initNavTree('10_Post_Processing_Reference.html','')
 <p>A <code>post.yml</code> file is organized into sections that control the time range, data sources, processing steps, and output format.</p>
 <div class="fragment"><div class="line"># Example post.yml</div>
 <div class="line">run_control:</div>
-<div class="line">  startTime: 100</div>
-<div class="line">  endTime: 1000</div>
-<div class="line">  timeStep: 100</div>
+<div class="line">  start_step: 100</div>
+<div class="line">  end_step: 1000</div>
+<div class="line">  step_interval: 100</div>
 <div class="line"> </div>
 <div class="line">source_data:</div>
 <div class="line">  directory: &quot;&lt;solver_output_dir&gt;&quot;</div>
 <div class="line"> </div>
 <div class="line">eulerian_pipeline:</div>
-<div class="line">  - task: CellToNodeAverage</div>
+<div class="line">  - task: nodal_average</div>
 <div class="line">    input_field: Ucat</div>
 <div class="line">    output_field: Ucat_nodal</div>
-<div class="line">  - task: ComputeQCriterion</div>
+<div class="line">  - task: q_criterion</div>
 <div class="line"> </div>
 <div class="line">lagrangian_pipeline:</div>
 <div class="line">  - task: specific_ke</div>
@@ -150,11 +150,11 @@ $(document).ready(function(){initNavTree('10_Post_Processing_Reference.html','')
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">Parameter   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>startTime</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The first time step to process.    </td></tr>
+<td class="markdownTableBodyLeft"><code>start_step</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The first time step to process.    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>endTime</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The last time step to process.    </td></tr>
+<td class="markdownTableBodyLeft"><code>end_step</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The last time step to process.    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>timeStep</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The interval between processed time steps.   </td></tr>
+<td class="markdownTableBodyLeft"><code>step_interval</code>   </td><td class="markdownTableBodyLeft">Integer   </td><td class="markdownTableBodyLeft">The interval between processed time steps.   </td></tr>
 </table>
 <h1><a class="anchor" id="source_data_sec"></a>
 3. The &lt;tt&gt;source_data&lt;/tt&gt; Section</h1>
@@ -174,12 +174,12 @@ $(document).ready(function(){initNavTree('10_Post_Processing_Reference.html','')
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft"><code>task</code> Name   </th><th class="markdownTableHeadLeft">Description   </th><th class="markdownTableHeadLeft">Parameters    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>CellToNodeAverage</code>   </td><td class="markdownTableBodyLeft">Averages a cell-centered field to the grid nodes. This is essential for creating smooth visualizations.   </td><td class="markdownTableBodyLeft"><code>input_field</code>: Name of the cell-centered field (e.g., "Ucat", "P").<br  />
+<td class="markdownTableBodyLeft"><code>nodal_average</code>   </td><td class="markdownTableBodyLeft">Averages a cell-centered field to the grid nodes. This is essential for creating smooth visualizations.   </td><td class="markdownTableBodyLeft"><code>input_field</code>: Name of the cell-centered field (e.g., "Ucat", "P").<br  />
 <code>output_field</code>: Name for the new node-centered field (e.g., "Ucat_nodal", "P_nodal").    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>ComputeQCriterion</code>   </td><td class="markdownTableBodyLeft">Computes the Q-criterion, a scalar field used to identify vortices. This creates a new field named <code>Qcrit</code>.   </td><td class="markdownTableBodyLeft"><em>None</em>    </td></tr>
+<td class="markdownTableBodyLeft"><code>q_criterion</code>   </td><td class="markdownTableBodyLeft">Computes the Q-criterion, a scalar field used to identify vortices. This creates a new field named <code>Qcrit</code>.   </td><td class="markdownTableBodyLeft"><em>None</em>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>NormalizeRelativeField</code>   </td><td class="markdownTableBodyLeft">Normalizes a scalar field (like pressure) by subtracting the value at a reference point.   </td><td class="markdownTableBodyLeft"><code>field</code>: The name of the field to normalize (e.g., "P").<br  />
+<td class="markdownTableBodyLeft"><code>normalize_field</code>   </td><td class="markdownTableBodyLeft">Normalizes a scalar field (like pressure) by subtracting the value at a reference point.   </td><td class="markdownTableBodyLeft"><code>field</code>: The name of the field to normalize (e.g., "P").<br  />
 <code>reference_point</code>: A list of 3 integers <code>[i, j, k]</code> for the reference grid index.    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>DimensionalizeAllLoadedFields</code>   </td><td class="markdownTableBodyLeft">(Implicitly available) Converts all loaded non-dimensional fields to dimensional units using the scaling factors from the original <code>case.yml</code>. This is usually run automatically.   </td><td class="markdownTableBodyLeft"><em>None</em>   </td></tr>
@@ -210,12 +210,19 @@ $(document).ready(function(){initNavTree('10_Post_Processing_Reference.html','')
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>eulerian_fields</code>   </td><td class="markdownTableBodyLeft">String List   </td><td class="markdownTableBodyLeft">A list of the final grid-based fields to include in the output <code>.vts</code> files. These can be fields loaded from the solver or new fields created by the pipeline.    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>particle_fields</code>   </td><td class="markdownTableBodyLeft">String List   </td><td class="markdownTableBodyLeft">A list of the final particle-based fields to include in the output <code>.vtp</code> files.   </td></tr>
+<td class="markdownTableBodyLeft"><code>eulerian_fields_averaged</code>   </td><td class="markdownTableBodyLeft">String List   </td><td class="markdownTableBodyLeft">Reserved passthrough for averaged Eulerian output field names (<code>post.run</code> key: <code>output_fields_averaged</code>).    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>particle_fields</code>   </td><td class="markdownTableBodyLeft">String List   </td><td class="markdownTableBodyLeft">A list of the final particle-based fields to include in the output <code>.vtp</code> files.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><code>input_extensions.eulerian</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Input extension for Eulerian data files read by postprocessor (maps to <code>eulerianExt</code>).    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><code>input_extensions.particle</code>   </td><td class="markdownTableBodyLeft">String   </td><td class="markdownTableBodyLeft">Input extension for particle data files read by postprocessor (maps to <code>particleExt</code>).   </td></tr>
 </table>
 <h1><a class="anchor" id="next_steps_sec"></a>
 5. Next Steps</h1>
 <p>You have now completed the reference guides for all the core configuration files in the PICurv user workflow. The next step is to explore a collection of practical examples.</p>
-<p>Proceed to the <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> for a list of quick, goal-oriented recipes for common simulation tasks. logical step is to create the "How-To Guides" page that consolidates answers to common user questions. Ready to proceed? </p>
+<p>Proceed to the <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> for a list of quick, goal-oriented recipes for common simulation tasks.</p>
+<p>For schema-to-C mapping and extension guidance, see <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b> and <b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
