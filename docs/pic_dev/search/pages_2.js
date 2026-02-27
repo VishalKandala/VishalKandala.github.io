@@ -1,25 +1,7 @@
 var searchData=
 [
-  ['capabilities_20summary_0',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['case_20template_3a_20laminar_20flow_20in_20a_20bent_20channel_1',['Case Template: Laminar Flow in a Bent Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'']]],
-  ['case_20template_3a_20laminar_20flow_20in_20a_20flat_20channel_2',['Case Template: Laminar Flow in a Flat Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'']]],
-  ['case_20yml_20tt_3',['Configuration Reference: &lt;tt&gt;case.yml&lt;/tt&gt;',['../07_Case_Reference.html',1,'']]],
-  ['cell_20and_20variable_20architecture_20guide_4',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['changelog_5',['Changelog',['../18_Changelog.html',1,'']]],
-  ['channel_6',['channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'Case Template: Laminar Flow in a Bent Channel'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'Case Template: Laminar Flow in a Flat Channel'],['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)'],['../02_Tutorial_Programmatic_Grid.html',1,'Tutorial: Your First Simulation (Flat Channel)']]],
-  ['channel_20example_20guide_7',['channel example guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html',1,'Bent Channel Example Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2guide.html',1,'Flat Channel Example Guide']]],
-  ['cluster_20run_20guide_20slurm_8',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['code_20architecture_9',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
-  ['condition_20modes_10',['Initial Condition Modes',['../33_Initial_Conditions.html',1,'']]],
-  ['conductor_20script_3a_20tt_20pic_20flow_20tt_11',['The Conductor Script: &lt;tt&gt;pic.flow&lt;/tt&gt;',['../05_The_Conductor_Script.html',1,'']]],
-  ['configuration_20contract_20yaml_20generated_20artifacts_20runtime_12',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['configuration_20extension_20playbook_13',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
-  ['configuration_20reference_3a_20tt_20case_20yml_20tt_14',['Configuration Reference: &lt;tt&gt;case.yml&lt;/tt&gt;',['../07_Case_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20tt_20monitor_20yml_20tt_15',['Configuration Reference: &lt;tt&gt;monitor.yml&lt;/tt&gt;',['../09_Monitor_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20tt_20post_20yml_20tt_16',['Configuration Reference: &lt;tt&gt;post.yml&lt;/tt&gt;',['../10_Post_Processing_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20tt_20solver_20yml_20tt_17',['Configuration Reference: &lt;tt&gt;solver.yml&lt;/tt&gt;',['../08_Solver_Reference.html',1,'']]],
-  ['configuration_20templates_18',['PIC-Flow Master Configuration Templates',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html',1,'']]],
-  ['contract_20yaml_20generated_20artifacts_20runtime_19',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['coupling_20overview_20',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
-  ['curvib_20method_20overview_21',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
+  ['backlog_20and_20low_20priority_20fixes_0',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
+  ['based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['bent_20channel_2',['bent channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'Case Template: Laminar Flow in a Bent Channel'],['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)']]],
+  ['bent_20channel_20example_20guide_3',['Bent Channel Example Guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html',1,'']]]
 ];

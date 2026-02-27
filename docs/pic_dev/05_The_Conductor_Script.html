@@ -97,7 +97,8 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#usage_sec">1. General Usage</a></li>
 <li class="level1"><a href="#sweep_sec">3. &lt;tt&gt;sweep&lt;/tt&gt;: Parameter Study via Slurm Arrays</a></li>
-<li class="level1"><a href="#artifacts_sec">4. Generated Runtime Artifacts</a></li>
+<li class="level1"><a href="#validate_sec">4. &lt;tt&gt;validate&lt;/tt&gt;: Config-Only Checks</a></li>
+<li class="level1"><a href="#artifacts_sec">5. Generated Runtime Artifacts</a></li>
 </ul>
 </div>
 <div class="textblock"><p><code>pic.flow</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages.</p>
@@ -109,10 +110,12 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <li><code>build</code></li>
 <li><code>run</code></li>
 <li><code>sweep</code></li>
+<li><code>validate</code></li>
 </ul>
 <p>Help: </p><div class="fragment"><div class="line">python3 scripts/pic.flow --help</div>
 <div class="line">python3 scripts/pic.flow run --help</div>
 <div class="line">python3 scripts/pic.flow sweep --help</div>
+<div class="line">python3 scripts/pic.flow validate --help</div>
 </div><!-- fragment --><h1><a class="anchor" id="run_sec"></a>
 3. Run Solver + Postprocessor</h1>
 <div class="fragment"><div class="line">python3 scripts/pic.flow run [STAGES] [INPUTS] [OPTIONS]</div>
@@ -137,6 +140,10 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <li><code>--scheduler slurm</code> (optional explicit selector)</li>
 <li><code>--no-submit</code> (generate scripts/manifests only)</li>
 </ul>
+<p>Preflight options:</p><ul>
+<li><code>--dry-run</code> (resolve and print launch/artifact plan only)</li>
+<li><code>--format json</code> (machine-readable output for <code>--dry-run</code>)</li>
+</ul>
 <p>Local example: </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process -n 8 \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -155,6 +162,12 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
+</div><!-- fragment --><p>Dry-run example (no file writes): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+<div class="line">  --case my_case/case.yml \</div>
+<div class="line">  --solver my_case/solver.yml \</div>
+<div class="line">  --monitor my_case/monitor.yml \</div>
+<div class="line">  --post my_case/post.yml \</div>
+<div class="line">  --dry-run --format json</div>
 </div><!-- fragment --><h1><a class="anchor" id="sweep_sec"></a>
 3. &lt;tt&gt;sweep&lt;/tt&gt;: Parameter Study via Slurm Arrays</h1>
 <div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
@@ -167,8 +180,16 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <li>submits post array with <code>afterok:&lt;solver_jobid&gt;</code> dependency (unless <code>--no-submit</code>)</li>
 <li>aggregates metrics and emits plots in <code>studies/&lt;study_id&gt;/results/</code></li>
 </ul>
+<h1><a class="anchor" id="validate_sec"></a>
+4. &lt;tt&gt;validate&lt;/tt&gt;: Config-Only Checks</h1>
+<div class="fragment"><div class="line">python3 scripts/pic.flow validate \</div>
+<div class="line">  --case my_case/case.yml \</div>
+<div class="line">  --solver my_case/solver.yml \</div>
+<div class="line">  --monitor my_case/monitor.yml \</div>
+<div class="line">  --post my_case/post.yml</div>
+</div><!-- fragment --><p><code>validate</code> does not launch solver/post and does not create run/study artifacts.</p>
 <h1><a class="anchor" id="artifacts_sec"></a>
-4. Generated Runtime Artifacts</h1>
+5. Generated Runtime Artifacts</h1>
 <p>Single run (<code>run</code>):</p><ul>
 <li><code>runs/&lt;run_id&gt;/config/*.control</code>, <code>bcs*.run</code>, <code>whitelist.run</code>, <code>profile.run</code>, <code>post.run</code></li>
 <li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code>, <code>post.sbatch</code> (cluster mode)</li>
@@ -190,7 +211,9 @@ $(document).ready(function(){initNavTree('05_The_Conductor_Script.html',''); ini
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
-<li>Extensibility: <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b> </li>
+<li>Extensibility: <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
+<li>First-run path: <b><a class="el" href="38_Start_Here_10_Minutes.html">Start Here in 10 Minutes</a></b></li>
+<li>Troubleshooting map: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

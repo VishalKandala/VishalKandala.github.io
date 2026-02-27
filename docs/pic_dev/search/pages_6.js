@@ -1,12 +1,15 @@
 var searchData=
 [
-  ['generated_20artifacts_20runtime_0',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['gmres_20and_20multigrid_1',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
-  ['grid_20bent_20channel_2',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['grid_20cell_20and_20variable_20architecture_20guide_3',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['grid_20projection_4',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['guide_5',['guide',['../md_assets_2guide.html',1,'Assets Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html',1,'Bent Channel Example Guide'],['../md_guide.html',1,'Docs Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2guide.html',1,'Examples Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2guide.html',1,'Flat Channel Example Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2include_2guide.html',1,'Include Guide'],['../01_Installation.html',1,'Installation Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2guide.html',1,'Master Template Guide'],['../md_pages_2guide.html',1,'Pages Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2scripts_2guide.html',1,'Scripts Guide'],['../md__2home_2runner_2work_2PICurv_2PICurv_2src_2guide.html',1,'Source Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
-  ['guide_20slurm_6',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['guide_20to_20visualizing_20your_20results_7',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
-  ['guides_8',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
+  ['fatal_20errors_20and_20fixes_0',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
+  ['file_20based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['first_20simulation_20flat_20channel_2',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
+  ['fixes_3',['fixes',['../39_Common_Fatal_Errors.html',1,'Common Fatal Errors and Fixes'],['../29_Maintenance_Backlog.html',1,'Maintenance Backlog and Low-Priority Fixes']]],
+  ['flat_20channel_4',['flat channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'Case Template: Laminar Flow in a Flat Channel'],['../02_Tutorial_Programmatic_Grid.html',1,'Tutorial: Your First Simulation (Flat Channel)']]],
+  ['flat_20channel_20example_20guide_5',['Flat Channel Example Guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2guide.html',1,'']]],
+  ['flow_20in_20a_20bent_20channel_6',['Case Template: Laminar Flow in a Bent Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'']]],
+  ['flow_20in_20a_20flat_20channel_7',['Case Template: Laminar Flow in a Flat Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'']]],
+  ['flow_20master_20configuration_20templates_8',['PIC-Flow Master Configuration Templates',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html',1,'']]],
+  ['flow_20tt_9',['The Conductor Script: &lt;tt&gt;pic.flow&lt;/tt&gt;',['../05_The_Conductor_Script.html',1,'']]],
+  ['for_20particle_20location_10',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
+  ['fractional_20step_20projection_20method_11',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]]
 ];

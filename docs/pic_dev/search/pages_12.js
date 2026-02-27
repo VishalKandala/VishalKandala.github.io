@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['variable_20architecture_20guide_0',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['visualizing_20your_20results_1',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]]
+  ['user_20how_20to_20guides_0',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]],
+  ['using_20a_20file_20based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]]
 ];

@@ -22,7 +22,7 @@ var searchData=
   ['wing_19',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]],
   ['with_20tt_20pic_20flow_20tt_20',['5. Build with &lt;tt&gt;pic.flow&lt;/tt&gt;',['../01_Installation.html#build_sec',1,'']]],
   ['work_21',['5. Saving Your Work',['../04_Visualization_Tutorial.html#export_sec',1,'']]],
-  ['workflow_22',['workflow',['../35_API_Documentation_Status.html#workflow_sec',1,'1. Standard Extension Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md44',1,'3. Typical Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md36',1,'3. Typical Workflow']]],
+  ['workflow_22',['workflow',['../39_Common_Fatal_Errors.html#workflow_sec',1,'1. Standard Extension Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md44',1,'3. Typical Workflow'],['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md36',1,'3. Typical Workflow']]],
   ['workflow_20extensibility_20guide_23',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
   ['works_20at_20the_20boundaries_24',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md25',1,'']]],
   ['wp_25',['WP',['../poisson_8c.html#a2c73b81722187c48d6186148091162fb',1,'poisson.c']]],

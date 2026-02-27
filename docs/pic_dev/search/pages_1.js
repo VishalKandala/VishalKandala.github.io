@@ -1,7 +1,26 @@
 var searchData=
 [
-  ['backlog_20and_20low_20priority_20fixes_0',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
-  ['based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['bent_20channel_2',['bent channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'Case Template: Laminar Flow in a Bent Channel'],['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)']]],
-  ['bent_20channel_20example_20guide_3',['Bent Channel Example Guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html',1,'']]]
+  ['a_20bent_20channel_0',['Case Template: Laminar Flow in a Bent Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'']]],
+  ['a_20file_20based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['a_20flat_20channel_2',['Case Template: Laminar Flow in a Flat Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'']]],
+  ['a_20guide_20to_20visualizing_20your_20results_3',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['a_20simulation_4',['Anatomy of a Simulation',['../06_Simulation_Anatomy.html',1,'']]],
+  ['analytical_20solution_20modes_5',['Analytical Solution Modes',['../32_Analytical_Solutions.html',1,'']]],
+  ['anatomy_20of_20a_20simulation_6',['Anatomy of a Simulation',['../06_Simulation_Anatomy.html',1,'']]],
+  ['and_20coupling_20overview_7',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
+  ['and_20directory_20guides_8',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],
+  ['and_20fixes_9',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
+  ['and_20low_20priority_20fixes_10',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
+  ['and_20models_20overview_11',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
+  ['and_20multigrid_12',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['and_20particle_20grid_20projection_13',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['and_20statistical_20averaging_14',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
+  ['and_20study_20guide_15',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['and_20variable_20architecture_20guide_16',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['api_20documentation_20status_17',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
+  ['architecture_18',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
+  ['architecture_20guide_19',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['artifacts_20runtime_20',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['assets_20guide_21',['Assets Guide',['../md_assets_2guide.html',1,'']]],
+  ['averaging_22',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];

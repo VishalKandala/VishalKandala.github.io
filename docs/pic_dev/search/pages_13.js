@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['walking_20search_20for_20particle_20location_0',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
-  ['workflow_20extensibility_20guide_1',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]]
+  ['variable_20architecture_20guide_0',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['visualizing_20your_20results_1',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]]
 ];

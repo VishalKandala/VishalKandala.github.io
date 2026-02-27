@@ -70,7 +70,8 @@ var NAVTREE =
     [ "The Conductor Script: <tt>pic.flow</tt>", "05_The_Conductor_Script.html", [
       [ "1. General Usage", "05_The_Conductor_Script.html#usage_sec", null ],
       [ "3. <tt>sweep</tt>: Parameter Study via Slurm Arrays", "05_The_Conductor_Script.html#sweep_sec", null ],
-      [ "4. Generated Runtime Artifacts", "05_The_Conductor_Script.html#artifacts_sec", null ]
+      [ "4. <tt>validate</tt>: Config-Only Checks", "05_The_Conductor_Script.html#validate_sec", null ],
+      [ "5. Generated Runtime Artifacts", "05_The_Conductor_Script.html#artifacts_sec", null ]
     ] ],
     [ "Anatomy of a Simulation", "06_Simulation_Anatomy.html", [
       [ "1. Logical Inputs", "06_Simulation_Anatomy.html#roles_sec", null ],
@@ -256,6 +257,19 @@ var NAVTREE =
       [ "3. Study Contract", "37_Sweep_Studies_Guide.html#sweep_contract_sec", null ],
       [ "4. Outputs", "37_Sweep_Studies_Guide.html#sweep_outputs_sec", null ],
       [ "5. Notes", "37_Sweep_Studies_Guide.html#sweep_notes_sec", null ]
+    ] ],
+    [ "Start Here in 10 Minutes", "38_Start_Here_10_Minutes.html", [
+      [ "1. Install Prerequisites", "38_Start_Here_10_Minutes.html#step1_sec", null ],
+      [ "2. Build Binaries", "38_Start_Here_10_Minutes.html#step2_sec", null ],
+      [ "3. Initialize a Template Case", "38_Start_Here_10_Minutes.html#step3_sec", null ],
+      [ "4. Validate Configs (No Run Yet)", "38_Start_Here_10_Minutes.html#step4_sec", null ],
+      [ "5. Run Solver + Post", "38_Start_Here_10_Minutes.html#step5_sec", null ],
+      [ "6. Inspect Outputs", "38_Start_Here_10_Minutes.html#step6_sec", null ],
+      [ "7. First Troubleshooting Actions", "38_Start_Here_10_Minutes.html#step7_sec", null ]
+    ] ],
+    [ "Common Fatal Errors and Fixes", "39_Common_Fatal_Errors.html", [
+      [ "1. Structured Validation Errors (<tt>ERROR <CODE></tt>)", "39_Common_Fatal_Errors.html#structured_sec", null ],
+      [ "2. High-Frequency Fatal Messages (Runtime Paths)", "39_Common_Fatal_Errors.html#legacy_sec", null ]
     ] ],
     [ "Pages Guide", "md_pages_2guide.html", null ],
     [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
