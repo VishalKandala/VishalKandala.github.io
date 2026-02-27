@@ -14,13 +14,14 @@ var searchData=
   ['and_20models_20overview_11',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
   ['and_20multigrid_12',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
   ['and_20particle_20grid_20projection_13',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['and_20statistical_20averaging_14',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
-  ['and_20study_20guide_15',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['and_20variable_20architecture_20guide_16',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['api_20documentation_20status_17',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
-  ['architecture_18',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
-  ['architecture_20guide_19',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['artifacts_20runtime_20',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['assets_20guide_21',['Assets Guide',['../md_assets_2guide.html',1,'']]],
-  ['averaging_22',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['and_20quality_20gates_20guide_14',['Testing, Smoke, and Quality Gates Guide',['../40_Testing_and_Quality_Guide.html',1,'']]],
+  ['and_20statistical_20averaging_15',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
+  ['and_20study_20guide_16',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['and_20variable_20architecture_20guide_17',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['api_20documentation_20status_18',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
+  ['architecture_19',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
+  ['architecture_20guide_20',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['artifacts_20runtime_21',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['assets_20guide_22',['Assets Guide',['../md_assets_2guide.html',1,'']]],
+  ['averaging_23',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];

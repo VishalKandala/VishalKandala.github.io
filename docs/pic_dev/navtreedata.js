@@ -28,10 +28,14 @@ var NAVTREE =
     [ "PICurv Solver Documentation", "index.html", "index" ],
     [ "Include Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2include_2guide.html", null ],
     [ "Source Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2src_2guide.html", null ],
-    [ "Assets Guide", "md_assets_2guide.html", null ],
+    [ "Assets Guide", "md_assets_2guide.html", [
+      [ "Usage", "md_assets_2guide.html#autotoc_md14", null ],
+      [ "Current Primary Assets", "md_assets_2guide.html#autotoc_md15", null ],
+      [ "Maintenance", "md_assets_2guide.html#autotoc_md16", null ]
+    ] ],
     [ "Changelog", "18_Changelog.html", [
-      [ "Changelog", "18_Changelog.html#autotoc_md14", [
-        [ "Unreleased", "18_Changelog.html#autotoc_md15", null ]
+      [ "Changelog", "18_Changelog.html#autotoc_md17", [
+        [ "Unreleased", "18_Changelog.html#autotoc_md18", null ]
       ] ]
     ] ],
     [ "Docs Guide", "md_guide.html", null ],
@@ -184,36 +188,48 @@ var NAVTREE =
     ] ],
     [ "Grid, Cell, and Variable Architecture Guide", "20_Grid_Cell_Architecture_Guide.html", null ],
     [ "Methods and Models Overview", "21_Methods_Overview.html", [
-      [ "2. Scope Note", "21_Methods_Overview.html#scope_sec", null ]
+      [ "1. Governing Model Snapshot", "21_Methods_Overview.html#governing_sec", null ],
+      [ "2. Runtime Execution Order", "21_Methods_Overview.html#runtime_map_sec", null ],
+      [ "3. Method Map", "21_Methods_Overview.html#method_map_sec", null ]
     ] ],
     [ "CurvIB Method Overview", "22_CURVIB_Method.html", [
-      [ "1. Core Concepts", "22_CURVIB_Method.html#concepts_sec", null ],
-      [ "2. Main Code Touchpoints", "22_CURVIB_Method.html#code_sec", null ],
-      [ "3. Practical Interpretation", "22_CURVIB_Method.html#practical_sec", null ]
+      [ "1. Curvilinear Formulation Context", "22_CURVIB_Method.html#formulation_sec", null ],
+      [ "3. Immersed-Boundary Role In Current Code", "22_CURVIB_Method.html#ibm_sec", null ],
+      [ "4. What This Means For Users", "22_CURVIB_Method.html#practical_sec", null ]
     ] ],
     [ "Fractional-Step (Projection) Method", "23_Fractional_Step_Method.html", [
-      [ "1. High-Level Algorithm", "23_Fractional_Step_Method.html#model_sec", null ]
+      [ "1. Discrete Method Skeleton", "23_Fractional_Step_Method.html#equations_sec", null ],
+      [ "2. Code Path In PICurv", "23_Fractional_Step_Method.html#implementation_sec", null ],
+      [ "3. Boundary and Geometry Handling", "23_Fractional_Step_Method.html#boundary_sec", null ],
+      [ "4. Diagnostics To Watch", "23_Fractional_Step_Method.html#runtime_sec", null ]
     ] ],
     [ "Dual-Time Picard RK4 Momentum Solver", "24_Dual_Time_Picard_RK4.html", [
-      [ "1. Core Idea", "24_Dual_Time_Picard_RK4.html#algorithm_sec", null ],
-      [ "2. User-Facing Controls", "24_Dual_Time_Picard_RK4.html#cfg_sec", null ]
+      [ "1. Algorithmic Model", "24_Dual_Time_Picard_RK4.html#model_sec", null ],
+      [ "2. Convergence and Backtracking", "24_Dual_Time_Picard_RK4.html#convergence_sec", null ],
+      [ "4. Core Code Touchpoints", "24_Dual_Time_Picard_RK4.html#touchpoints_sec", null ]
     ] ],
     [ "Pressure-Poisson, GMRES, and Multigrid", "25_Pressure_Poisson_GMRES_Multigrid.html", [
-      [ "1. Solver Stack", "25_Pressure_Poisson_GMRES_Multigrid.html#stack_sec", null ]
+      [ "1. Pressure-Correction Equation", "25_Pressure_Poisson_GMRES_Multigrid.html#equation_sec", null ],
+      [ "2. Multigrid/KSP Stack In Code", "25_Pressure_Poisson_GMRES_Multigrid.html#mg_sec", null ],
+      [ "4. Robustness Characteristics", "25_Pressure_Poisson_GMRES_Multigrid.html#robustness_sec", null ]
     ] ],
     [ "Walking Search for Particle Location", "26_Walking_Search_Method.html", [
-      [ "1. Why Walking Search", "26_Walking_Search_Method.html#purpose_sec", null ]
+      [ "1. Core Search Concept", "26_Walking_Search_Method.html#concept_sec", null ],
+      [ "2. Settlement Status Model", "26_Walking_Search_Method.html#statuses_sec", null ],
+      [ "4. Restart Path Specifics", "26_Walking_Search_Method.html#restart_sec", null ]
     ] ],
     [ "Trilinear Interpolation and Particle-Grid Projection", "27_Trilinear_Interpolation_and_Projection.html", [
       [ "1. Grid -> Particle Interpolation", "27_Trilinear_Interpolation_and_Projection.html#g2p_sec", null ],
-      [ "2. Particle -> Grid Projection (Scatter/Averaging)", "27_Trilinear_Interpolation_and_Projection.html#p2g_sec", null ]
+      [ "2. Particle -> Grid Scatter and Normalization", "27_Trilinear_Interpolation_and_Projection.html#p2g_sec", null ],
+      [ "3. Accuracy and Stability Considerations", "27_Trilinear_Interpolation_and_Projection.html#coupling_sec", null ]
     ] ],
     [ "IEM Mixing and Statistical Averaging", "28_IEM_and_Statistical_Averaging.html", [
-      [ "1. IEM Particle Mixing", "28_IEM_and_Statistical_Averaging.html#iem_sec", null ],
-      [ "2. Averaging Paths", "28_IEM_and_Statistical_Averaging.html#avg_sec", null ],
-      [ "3. Terminology Note", "28_IEM_and_Statistical_Averaging.html#note_sec", null ]
+      [ "1. IEM Mixing Update In Current Code", "28_IEM_and_Statistical_Averaging.html#iem_sec", null ],
+      [ "2. Required Dataflow For IEM", "28_IEM_and_Statistical_Averaging.html#dataflow_sec", null ],
+      [ "4. Averaging Terminology In PICurv", "28_IEM_and_Statistical_Averaging.html#terminology_sec", null ]
     ] ],
     [ "Maintenance Backlog and Low-Priority Fixes", "29_Maintenance_Backlog.html", [
+      [ "1. Purpose", "29_Maintenance_Backlog.html#purpose_sec", null ],
       [ "3. Warning Cleanup Categories", "29_Maintenance_Backlog.html#categories_sec", null ],
       [ "5. Prioritization Policy", "29_Maintenance_Backlog.html#policy_sec", null ],
       [ "6. Sandbox Policy", "29_Maintenance_Backlog.html#sandbox_sec", null ]
@@ -224,39 +240,37 @@ var NAVTREE =
       [ "3. Documentation Subdirectories", "30_Repository_Navigation.html#docs_nav_sec", null ]
     ] ],
     [ "Momentum Solver Implementations", "31_Momentum_Solvers.html", [
-      [ "1. Current Runtime Selection", "31_Momentum_Solvers.html#current_impl_sec", null ],
-      [ "2. Implemented Solvers", "31_Momentum_Solvers.html#implemented_sec", null ],
-      [ "3. Key Code Touchpoints", "31_Momentum_Solvers.html#touchpoints_sec", null ]
+      [ "1. Selection and Dispatch", "31_Momentum_Solvers.html#selection_sec", null ],
+      [ "2. Implementation Status Matrix", "31_Momentum_Solvers.html#status_sec", null ],
+      [ "3. Numerical Controls In Use", "31_Momentum_Solvers.html#controls_sec", null ]
     ] ],
     [ "Analytical Solution Modes", "32_Analytical_Solutions.html", [
-      [ "1. Available Analytical Types", "32_Analytical_Solutions.html#available_sec", null ],
-      [ "2. Grid/Geometry Behavior", "32_Analytical_Solutions.html#behavior_sec", null ]
+      [ "1. Activation Path", "32_Analytical_Solutions.html#activation_sec", null ],
+      [ "2. Supported Types In Current Code", "32_Analytical_Solutions.html#types_sec", null ],
+      [ "3. TGV3D Details", "32_Analytical_Solutions.html#tgv_sec", null ],
+      [ "4. ZERO_FLOW Details", "32_Analytical_Solutions.html#zero_sec", null ],
+      [ "5. Particle Consistency", "32_Analytical_Solutions.html#particles_sec", null ]
     ] ],
     [ "Initial Condition Modes", "33_Initial_Conditions.html", [
-      [ "1. Eulerian Initial Conditions", "33_Initial_Conditions.html#euler_ic_sec", null ],
-      [ "2. Particle Initialization Modes", "33_Initial_Conditions.html#particle_ic_sec", null ],
-      [ "3. Restart Coupling", "33_Initial_Conditions.html#restart_sec", null ]
+      [ "1. Eulerian Initialization", "33_Initial_Conditions.html#euler_sec", null ],
+      [ "2. Contravariant Initialization Note", "33_Initial_Conditions.html#euler_formula_sec", null ]
     ] ],
     [ "Particle Model and Coupling Overview", "34_Particle_Model_Overview.html", [
-      [ "2. Current Particle Physics", "34_Particle_Model_Overview.html#physics_sec", null ]
+      [ "1. Per-Step Particle Pipeline", "34_Particle_Model_Overview.html#loop_sec", null ],
+      [ "3. Current Built-In Physics", "34_Particle_Model_Overview.html#physics_sec", null ],
+      [ "4. Statistics and Diagnostics", "34_Particle_Model_Overview.html#statistics_sec", null ]
     ] ],
     [ "API Documentation Status", "35_API_Documentation_Status.html", [
-      [ "1. Current Status", "35_API_Documentation_Status.html#status_sec", null ],
-      [ "2. Warning Log Location", "35_API_Documentation_Status.html#warning_log_sec", null ],
-      [ "4. Practical Quality Gate", "35_API_Documentation_Status.html#quality_gate_sec", null ]
+      [ "2. Warning Log and Build Path", "35_API_Documentation_Status.html#warning_sec", null ],
+      [ "3. Expected Standard For New APIs", "35_API_Documentation_Status.html#expected_sec", null ]
     ] ],
     [ "Cluster Run Guide (Slurm)", "36_Cluster_Run_Guide.html", [
-      [ "1. Inputs", "36_Cluster_Run_Guide.html#cluster_inputs_sec", null ],
-      [ "2. Commands", "36_Cluster_Run_Guide.html#cluster_run_sec", null ],
-      [ "3. Outputs", "36_Cluster_Run_Guide.html#cluster_outputs_sec", null ],
-      [ "4. Notes", "36_Cluster_Run_Guide.html#cluster_notes_sec", null ]
+      [ "2. Core Command Patterns", "36_Cluster_Run_Guide.html#command_sec", null ]
     ] ],
     [ "Sweep and Study Guide", "37_Sweep_Studies_Guide.html", [
-      [ "1. Inputs", "37_Sweep_Studies_Guide.html#sweep_inputs_sec", null ],
-      [ "2. Command", "37_Sweep_Studies_Guide.html#sweep_cmd_sec", null ],
-      [ "3. Study Contract", "37_Sweep_Studies_Guide.html#sweep_contract_sec", null ],
-      [ "4. Outputs", "37_Sweep_Studies_Guide.html#sweep_outputs_sec", null ],
-      [ "5. Notes", "37_Sweep_Studies_Guide.html#sweep_notes_sec", null ]
+      [ "3. Study Contract Essentials", "37_Sweep_Studies_Guide.html#contract_sec", null ],
+      [ "4. Outputs and Aggregates", "37_Sweep_Studies_Guide.html#outputs_sec", null ],
+      [ "5. Operational Workflow", "37_Sweep_Studies_Guide.html#operations_sec", null ]
     ] ],
     [ "Start Here in 10 Minutes", "38_Start_Here_10_Minutes.html", [
       [ "1. Install Prerequisites", "38_Start_Here_10_Minutes.html#step1_sec", null ],
@@ -271,32 +285,50 @@ var NAVTREE =
       [ "1. Structured Validation Errors (<tt>ERROR <CODE></tt>)", "39_Common_Fatal_Errors.html#structured_sec", null ],
       [ "2. High-Frequency Fatal Messages (Runtime Paths)", "39_Common_Fatal_Errors.html#legacy_sec", null ]
     ] ],
-    [ "Pages Guide", "md_pages_2guide.html", null ],
+    [ "Testing, Smoke, and Quality Gates Guide", "40_Testing_and_Quality_Guide.html", [
+      [ "1. What This Guide Covers", "40_Testing_and_Quality_Guide.html#scope_sec", null ],
+      [ "2. Quick Smoke Matrix (Manual)", "40_Testing_and_Quality_Guide.html#quick_smoke_sec", [
+        [ "2.1 Command Discovery Smoke", "40_Testing_and_Quality_Guide.html#help_smoke_ssec", null ],
+        [ "2.2 Config-Only Validation Smoke", "40_Testing_and_Quality_Guide.html#validate_smoke_ssec", null ],
+        [ "2.3 Dry-Run Smoke (No File Writes)", "40_Testing_and_Quality_Guide.html#dryrun_smoke_ssec", null ]
+      ] ],
+      [ "3. Code Map (Where Behavior Lives)", "40_Testing_and_Quality_Guide.html#code_map_sec", null ],
+      [ "4. Automated Smoke Tests", "40_Testing_and_Quality_Guide.html#automated_sec", null ],
+      [ "5. CI Quality Gate Behavior", "40_Testing_and_Quality_Guide.html#ci_sec", null ],
+      [ "6. Markdown Link Checking", "40_Testing_and_Quality_Guide.html#linkcheck_sec", null ],
+      [ "7. How to Extend Smoke Coverage", "40_Testing_and_Quality_Guide.html#extend_sec", null ],
+      [ "8. Local Troubleshooting", "40_Testing_and_Quality_Guide.html#troubleshooting_sec", null ]
+    ] ],
+    [ "Pages Guide", "md_pages_2guide.html", [
+      [ "Authoring Rules", "md_pages_2guide.html#autotoc_md36", null ],
+      [ "Navigation Wiring", "md_pages_2guide.html#autotoc_md37", null ],
+      [ "Link Hygiene", "md_pages_2guide.html#autotoc_md38", null ]
+    ] ],
     [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md34", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md35", null ],
-      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md36", null ],
-      [ "4. Changing Geometry", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md37", null ],
-      [ "5. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md38", null ],
-      [ "6. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md39", null ]
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md40", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md41", null ],
+      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md42", null ],
+      [ "4. Changing Geometry", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md43", null ],
+      [ "5. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md44", null ],
+      [ "6. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md45", null ]
     ] ],
     [ "Bent Channel Example Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2guide.html", null ],
     [ "Case Template: Laminar Flow in a Flat Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md42", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md43", null ],
-      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md44", null ],
-      [ "4. Common Edits", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md45", null ],
-      [ "5. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md46", null ],
-      [ "6. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md47", null ]
+      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md48", null ],
+      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md49", null ],
+      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md50", null ],
+      [ "4. Common Edits", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md51", null ],
+      [ "5. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md52", null ],
+      [ "6. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md53", null ]
     ] ],
     [ "Flat Channel Example Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2guide.html", null ],
     [ "Examples Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2guide.html", null ],
     [ "Master Template Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2guide.html", null ],
     [ "PIC-Flow Master Configuration Templates", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html", [
-      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md52", null ],
-      [ "2. Recommended Usage", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md53", null ],
-      [ "3. Best Practices", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md54", null ],
-      [ "4. Contract and Mapping Docs", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md55", null ]
+      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md58", null ],
+      [ "2. Recommended Usage", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md59", null ],
+      [ "3. Best Practices", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md60", null ],
+      [ "4. Contract and Mapping Docs", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md61", null ]
     ] ],
     [ "Scripts Guide", "md__2home_2runner_2work_2PICurv_2PICurv_2scripts_2guide.html", null ],
     [ "File List", "files.html", null ],
@@ -306,7 +338,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"01_Installation.html"
+"01_Installation.html",
+"md__2home_2runner_2work_2PICurv_2PICurv_2scripts_2guide.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

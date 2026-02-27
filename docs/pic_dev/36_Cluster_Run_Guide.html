@@ -95,50 +95,65 @@ $(document).ready(function(){initNavTree('36_Cluster_Run_Guide.html',''); initRe
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#cluster_inputs_sec">1. Inputs</a></li>
-<li class="level1"><a href="#cluster_run_sec">2. Commands</a></li>
-<li class="level1"><a href="#cluster_outputs_sec">3. Outputs</a></li>
-<li class="level1"><a href="#cluster_notes_sec">4. Notes</a></li>
+<ul><li class="level1"><a href="#command_sec">2. Core Command Patterns</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents single-case cluster execution using <code>pic.flow run</code>.</p>
-<h1><a class="anchor" id="cluster_inputs_sec"></a>
-1. Inputs</h1>
-<p>Required files:</p><ul>
+<div class="textblock"><p>This guide documents how <code>pic.flow</code> converts case configs into scheduler artifacts for cluster execution.</p>
+<h1><a class="anchor" id="inputs_sec"></a>
+1. Required Input Roles</h1>
+<p>Typical cluster-enabled run uses:</p>
+<ul>
 <li><code>case.yml</code></li>
 <li><code>solver.yml</code></li>
 <li><code>monitor.yml</code></li>
-<li><code>post.yml</code> (if <code>--post-process</code>)</li>
-<li><code>cluster.yml</code></li>
+<li><code>post.yml</code></li>
+<li><code>cluster.yml</code> (scheduler contract)</li>
 </ul>
-<p>Reference template:</p><ul>
-<li><code>examples/master_template/master_cluster.yml</code></li>
-</ul>
-<h1><a class="anchor" id="cluster_run_sec"></a>
-2. Commands</h1>
-<p>Generate + submit: </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
-<div class="line">  --case case.yml --solver solver.yml --monitor monitor.yml --post post.yml \</div>
-<div class="line">  --cluster cluster.yml</div>
-</div><!-- fragment --><p>Generate only: </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
-<div class="line">  --case case.yml --solver solver.yml --monitor monitor.yml --post post.yml \</div>
-<div class="line">  --cluster cluster.yml --no-submit</div>
-</div><!-- fragment --><h1><a class="anchor" id="cluster_outputs_sec"></a>
-3. Outputs</h1>
-<p>In <code>runs/&lt;run_id&gt;/scheduler/</code>:</p><ul>
+<p>Initialize templates from examples, then customize per cluster/account policy.</p>
+<h1><a class="anchor" id="command_sec"></a>
+2. Core Command Patterns</h1>
+<p>Generate and submit:</p>
+<div class="fragment"><div class="line">./scripts/pic.flow run \</div>
+<div class="line">  --case &lt;case.yml&gt; \</div>
+<div class="line">  --solver &lt;solver.yml&gt; \</div>
+<div class="line">  --monitor &lt;monitor.yml&gt; \</div>
+<div class="line">  --post &lt;post.yml&gt; \</div>
+<div class="line">  --cluster &lt;cluster.yml&gt; \</div>
+<div class="line">  --scheduler slurm</div>
+</div><!-- fragment --><p>Generate only (no submission):</p>
+<div class="fragment"><div class="line">./scripts/pic.flow run ... --scheduler slurm --no-submit</div>
+</div><!-- fragment --><h1><a class="anchor" id="artifacts_sec"></a>
+5. Generated Runtime Artifacts</h1>
+<p>In run directory, scheduler generation typically produces:</p>
+<ul>
 <li><code>solver.sbatch</code></li>
 <li><code>post.sbatch</code></li>
-<li><code>submission.json</code></li>
-</ul>
-<p>In <code>runs/&lt;run_id&gt;/</code>:</p><ul>
 <li><code>manifest.json</code></li>
+<li><code>submission.json</code> (when submitted)</li>
 </ul>
-<p><code>post.sbatch</code> is submitted with <code>afterok:&lt;solver_jobid&gt;</code> dependency when both stages are requested and submission is enabled.</p>
-<h1><a class="anchor" id="cluster_notes_sec"></a>
-4. Notes</h1>
+<p>These coexist with standard runtime control artifacts used by solver/postprocessor binaries.</p>
+<h1><a class="anchor" id="flow_sec"></a>
+2. Flow and Particle Physics</h1>
+<ol type="1">
+<li>YAML validation and contract checks,</li>
+<li>run directory + control artifact generation,</li>
+<li>sbatch script rendering from scheduler settings,</li>
+<li>optional solver submission,</li>
+<li>optional post job with dependency linkage.</li>
+</ol>
+<p>This allows consistent local dry-run and cluster production flow from the same inputs.</p>
+<h1><a class="anchor" id="notes_sec"></a>
+5. Practical Notes</h1>
 <ul>
-<li>Slurm is the only scheduler supported in v1.</li>
-<li>Cluster mode uses <code>nodes * ntasks_per_node</code> from <code>cluster.yml</code> as effective MPI task count.</li>
-<li><code>--no-submit</code> is useful for site review and manual <code>sbatch</code> execution. </li>
+<li>Prefer <code>--no-submit</code> first when validating new scheduler settings.</li>
+<li>Keep cluster defaults in reusable templates (<code>examples/master_template/master_cluster.yml</code>).</li>
+<li>If queue policies differ by partition/account, encode them in <code>cluster.yml</code> instead of editing generated scripts manually.</li>
+</ul>
+<p>See also:</p>
+<ul>
+<li><b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b></li>
+<li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: <code>pic.flow</code></a></b></li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

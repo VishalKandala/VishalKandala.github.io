@@ -95,33 +95,64 @@ $(document).ready(function(){initNavTree('23_Fractional_Step_Method.html',''); i
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#model_sec">1. High-Level Algorithm</a></li>
+<ul><li class="level1"><a href="#equations_sec">1. Discrete Method Skeleton</a></li>
+<li class="level1"><a href="#implementation_sec">2. Code Path In PICurv</a></li>
+<li class="level1"><a href="#boundary_sec">3. Boundary and Geometry Handling</a></li>
+<li class="level1"><a href="#runtime_sec">4. Diagnostics To Watch</a></li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv uses a predictor-corrector style incompressible update: predict momentum, solve pressure-Poisson, project velocity to divergence-free space.</p>
-<h1><a class="anchor" id="model_sec"></a>
-1. High-Level Algorithm</h1>
-<p>Per physical timestep:</p>
-<ol type="1">
-<li>Compute momentum predictor (provisional velocity).</li>
-<li>Solve pressure-Poisson equation from continuity constraint.</li>
-<li>Correct velocity with pressure gradient (projection step).</li>
-<li>Apply boundary/refresh operations and proceed.</li>
-</ol>
-<p>This enforces incompressibility through the projection/correction stage.</p>
-<h1><a class="anchor" id="code_sec"></a>
-2. Main Code Touchpoints</h1>
+<div class="textblock"><p>PICurv uses a projection-style incompressible update: momentum predictor, pressure correction, velocity projection.</p>
+<h1><a class="anchor" id="equations_sec"></a>
+1. Discrete Method Skeleton</h1>
+<p>Given velocity <picture><source srcset="form_7_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$\mathbf{u}^n$" src="form_7.png"/></picture>, the solver computes a provisional field <picture><source srcset="form_8_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$\mathbf{u}^*$" src="form_8.png"/></picture> from momentum terms, then solves pressure correction:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\nabla^2 \phi = \frac{1}{\Delta t}\nabla\cdot\mathbf{u}^*,
+\]" src="form_9.png"/></picture>
+</p>
+<p>followed by:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_10_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\mathbf{u}^{n+1} = \mathbf{u}^* - \Delta t\nabla\phi,
+\qquad
+p^{n+1}=p^n+\phi.
+\]" src="form_10.png"/></picture>
+</p>
+<p>In curvilinear form, gradient components use metric terms (<code>ICsi/IEta/IZet</code>, etc.) and Jacobian inverses in the projection kernel.</p>
+<h1><a class="anchor" id="implementation_sec"></a>
+2. Code Path In PICurv</h1>
 <ul>
-<li>High-level step orchestration: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
-<li>Momentum RHS assembly: <a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8">ComputeRHS</a></li>
-<li>Pressure solve stage: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
-<li>Pressure/velocity correction: <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a>, <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
+<li>stage orchestrator: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
+<li>momentum residual assembly: <a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8">ComputeRHS</a></li>
+<li>pressure solve (MG/KSP): <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
+<li>pressure update: <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a></li>
+<li>velocity projection: <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
 </ul>
+<p><code>@ref Projection</code> explicitly uses boundary-aware stencils and periodic-edge correction logic before final ghost updates and <code>Contra2Cart</code> conversion.</p>
+<h1><a class="anchor" id="boundary_sec"></a>
+3. Boundary and Geometry Handling</h1>
+<p>Key implementation details:</p>
+<ul>
+<li>one-sided derivative stencils are used when centered stencils touch solids (<code>Nvert</code> checks),</li>
+<li>periodic edges are corrected in dedicated boundary loops,</li>
+<li>driven-periodic channel cases call the flux-profile corrector in projection path.</li>
+</ul>
+<p>These are part of why projection behavior in PICurv differs from simplified textbook pseudocode.</p>
+<h1><a class="anchor" id="runtime_sec"></a>
+4. Diagnostics To Watch</h1>
+<p>For projection health, monitor:</p>
+<ul>
+<li>continuity/divergence diagnostics after correction,</li>
+<li>Poisson KSP convergence history logs,</li>
+<li>step-to-step stability of pressure and corrected velocity.</li>
+</ul>
+<p>Persistent divergence or noisy pressure correction usually indicates a Poisson tuning, grid-quality, or BC consistency issue.</p>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
-<li>Chorin projection-method background: <a href="https://en.wikipedia.org/wiki/Projection_method_(fluid_dynamics)">https://en.wikipedia.org/wiki/Projection_method_(fluid_dynamics)</a></li>
-<li>PETSc KSP manual: <a href="https://petsc.org/release/manual/ksp/">https://petsc.org/release/manual/ksp/</a> </li>
+<li><b><a class="el" href="24_Dual_Time_Picard_RK4.html">Dual-Time Picard RK4 Momentum Solver</a></b></li>
+<li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b></li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

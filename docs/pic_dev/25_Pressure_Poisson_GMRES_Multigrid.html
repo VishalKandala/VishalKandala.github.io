@@ -95,46 +95,76 @@ $(document).ready(function(){initNavTree('25_Pressure_Poisson_GMRES_Multigrid.ht
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#stack_sec">1. Solver Stack</a></li>
+<ul><li class="level1"><a href="#equation_sec">1. Pressure-Correction Equation</a></li>
+<li class="level1"><a href="#mg_sec">2. Multigrid/KSP Stack In Code</a></li>
+<li class="level1"><a href="#robustness_sec">4. Robustness Characteristics</a></li>
 </ul>
 </div>
-<div class="textblock"><p>The pressure solve is the key linear system in the projection step. PICurv configures this through PETSc <code>KSP</code> with geometric multigrid support.</p>
-<h1><a class="anchor" id="stack_sec"></a>
-1. Solver Stack</h1>
+<div class="textblock"><p>This page describes the pressure-correction solve path used by projection in PICurv.</p>
+<h1><a class="anchor" id="equation_sec"></a>
+1. Pressure-Correction Equation</h1>
+<p>The correction solve enforces incompressibility through:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_15_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\nabla^2 \phi = \frac{1}{\Delta t}\nabla\cdot\mathbf{u}^*.
+\]" src="form_15.png"/></picture>
+</p>
+<p>In code terms:</p>
 <ul>
-<li>Build pressure linear system from continuity/projection formulation.</li>
-<li>Use PETSc <code>KSP</code> for linear iterations.</li>
-<li>Apply multigrid preconditioning (<code>PCMG</code>) across geometric levels.</li>
-<li>Use level-specific smoothers and coarse-level strategy through PETSc options.</li>
+<li>RHS assembly: divergence source in <a class="el" href="poisson_8h.html#a9340445ae2c0a3c7be290e2a1aea3d67">PoissonRHS</a></li>
+<li>LHS assembly: metric-aware operator in <a class="el" href="poisson_8h.html#a26f0e6321b7ace56b3b105e1eb10475e">PoissonLHSNew</a></li>
+<li>solve orchestration: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
 </ul>
-<h1><a class="anchor" id="cfg_sec"></a>
-2. User-Facing Controls</h1>
-<p>From <code>solver.yml</code>:</p><ul>
-<li><code>pressure_solver.tolerance</code></li>
-<li><code>pressure_solver.multigrid.levels/pre_sweeps/post_sweeps</code></li>
-<li><code>pressure_solver.multigrid.semi_coarsening.*</code></li>
-<li><code>petsc_passthrough_options</code> (advanced PETSc tuning)</li>
-</ul>
-<h1><a class="anchor" id="code_sec"></a>
-2. Main Code Touchpoints</h1>
+<p>Null-space handling is explicitly configured for Neumann-like pressure systems via function <a class="el" href="poisson_8h.html#a2648a0c6cafb7916a706cd757e5b92f5">PoissonNullSpaceFunction</a> in the Poisson module.</p>
+<h1><a class="anchor" id="mg_sec"></a>
+2. Multigrid/KSP Stack In Code</h1>
+<p><a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a> currently:</p>
+<ol type="1">
+<li>assembles per-level operators,</li>
+<li>configures <code>KSP</code> + <code>PCMG</code>,</li>
+<li>sets restriction/interpolation operators (<a class="el" href="poisson_8h.html#a5fa351d4c691fef0d76cedf5cc5cbb72">MyRestriction</a> and <a class="el" href="poisson_8h.html#aa2fc17959230252f30b2278d81a16caf">MyInterpolation</a> plus solid-aware variants),</li>
+<li>applies level smoothers/coarse solve,</li>
+<li>solves finest-level system for <code>Phi</code>.</li>
+</ol>
+<p>After Poisson solve:</p>
 <ul>
-<li>Multigrid pressure solve entry: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
-<li>Matrix/RHS assembly: <a class="el" href="poisson_8h.html#a26f0e6321b7ace56b3b105e1eb10475e">PoissonLHSNew</a>, <a class="el" href="poisson_8h.html#a9340445ae2c0a3c7be290e2a1aea3d67">PoissonRHS</a></li>
-<li>Correction/projection: <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a>, <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
-<li>MG transfer helpers: <a class="el" href="poisson_8h.html#a5fa351d4c691fef0d76cedf5cc5cbb72">MyRestriction</a>, <a class="el" href="poisson_8h.html#aa2fc17959230252f30b2278d81a16caf">MyInterpolation</a></li>
-<li>Config ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
+<li>pressure is updated by <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a></li>
+<li>velocity is projected by <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
 </ul>
-<h1><a class="anchor" id="notes_sec"></a>
-5. Practical Notes</h1>
+<h1><a class="anchor" id="config_sec"></a>
+2. What Each File Does</h1>
+<p>From <code>solver.yml</code> via <code>scripts/pic.flow</code>:</p>
 <ul>
-<li>The default profile uses robust settings; advanced PETSc tuning is optional.</li>
-<li>Coarse/fine smoother behavior is one of the most impactful performance knobs.</li>
+<li><code>pressure_solver.tolerance</code> -&gt; <code>-poisson_tol</code></li>
+<li><code>pressure_solver.multigrid.levels</code> -&gt; <code>-mg_level</code></li>
+<li><code>pressure_solver.multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
+<li><code>pressure_solver.multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
+<li><code>pressure_solver.multigrid.semi_coarsening.{i,j,k}</code> -&gt; <code>-mg_i_semi</code>, <code>-mg_j_semi</code>, <code>-mg_k_semi</code></li>
+<li>optional level solver keys -&gt; <code>-ps_mg_levels_*</code></li>
+<li><code>petsc_passthrough_options</code> -&gt; raw PETSc flags</li>
 </ul>
+<p>Final option parsing happens in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during context creation.</p>
+<h1><a class="anchor" id="robustness_sec"></a>
+4. Robustness Characteristics</h1>
+<p>Current implementation includes:</p>
+<ul>
+<li>periodic-boundary pressure synchronization,</li>
+<li>immersed-boundary-aware treatment paths (<code>Nvert</code>/solid checks),</li>
+<li>optional Poisson monitor logging (<code>-ps_ksp_pic_monitor_true_residual</code>).</li>
+</ul>
+<p>If pressure solve quality degrades, check first:</p>
+<ol type="1">
+<li>BC consistency,</li>
+<li>MG level/smoother settings,</li>
+<li>grid metrics/orientation quality,</li>
+<li>solver tolerances vs timestep.</li>
+</ol>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
-<li>PETSc KSP guide: <a href="https://petsc.org/release/manual/ksp/">https://petsc.org/release/manual/ksp/</a></li>
-<li>PETSc multigrid notes: <a href="https://petsc.org/release/manual/ksp/#multigrid-methods">https://petsc.org/release/manual/ksp/#multigrid-methods</a> </li>
+<li><b><a class="el" href="23_Fractional_Step_Method.html">Fractional-Step (Projection) Method</a></b></li>
+<li><b><a class="el" href="24_Dual_Time_Picard_RK4.html">Dual-Time Picard RK4 Momentum Solver</a></b></li>
+<li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

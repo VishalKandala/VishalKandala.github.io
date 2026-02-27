@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['filter_2ec_0',['Filter.c',['../Filter_8c.html',1,'']]],
-  ['filter_2eh_1',['Filter.h',['../Filter_8h.html',1,'']]],
-  ['flat_5fchannel_2emd_2',['flat_channel.md',['../flat__channel_8md.html',1,'']]]
+  ['examples_2fbent_5fchannel_2fguide_2emd_0',['guide.md',['../examples_2bent__channel_2guide_8md.html',1,'']]],
+  ['examples_2fflat_5fchannel_2fguide_2emd_1',['guide.md',['../examples_2flat__channel_2guide_8md.html',1,'']]],
+  ['examples_2fguide_2emd_2',['guide.md',['../examples_2guide_8md.html',1,'']]],
+  ['examples_2fmaster_5ftemplate_2fguide_2emd_3',['guide.md',['../examples_2master__template_2guide_8md.html',1,'']]]
 ];

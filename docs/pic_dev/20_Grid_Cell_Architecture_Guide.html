@@ -94,13 +94,13 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
   <div class="headertitle"><div class="title">Grid, Cell, and Variable Architecture Guide</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="autotoc_md18"></a>
+<div class="textblock"><h2><a class="anchor" id="autotoc_md21"></a>
 1. Overview</h2>
 <p>This document provides a detailed explanation of the solver's grid and variable architecture. A clear understanding of this architecture is critical for correctly implementing new physics, boundary conditions, or post-processing routines.</p>
 <p>The solver employs a structured curvilinear grid system managed by PETSc's <code>DMDA</code>. The core variables are defined on a staggered grid, with face-centered fluxes (<code>ucont</code>) and cell-centered quantities (<code>ucat</code>, <code>P</code>).</p>
 <p>The most important architectural feature to understand is the <b>Shifted Index Architecture</b> for cell-centered data. In this design, the physical value for a geometric cell at index <code>i</code> is stored in the corresponding array at index <code>i+1</code>. This seemingly simple offset creates a clean, symmetric, and robust system for handling boundary conditions, resolving what might otherwise appear to be bugs or asymmetries in the code.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 2. The Geometric Foundation: Nodes and Cells</h2>
 <p>The grid is defined by a set of nodes with physical coordinates. The space between nodes forms the computational cells (or control volumes).</p>
 <ul>
@@ -117,7 +117,7 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
 <li><b>Geometric Reality:</b> The simulation space contains <code>(IM-1) x (JM-1) x (KM-1)</code> physical cells.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md22"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 3. The Primary Variable: Face-Centered Flux (&lt;tt&gt;ucont&lt;/tt&gt;)</h2>
 <p>The solver's fundamental fluid dynamics variable is <code>ucont</code>, the contravariant flux, which is physically located on the faces of the cells. Its mapping is direct and intuitive.</p>
 <ul>
@@ -134,14 +134,14 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
 <div class="line"> </div>
 <div class="line">Cells:     [ Cell 0 ]  [ Cell 1 ]  [ Cell 2 ]          [ Cell IM-2 ]</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 4. The Shifted Index Architecture for Cell-Centered Variables (&lt;tt&gt;ucat&lt;/tt&gt;, &lt;tt&gt;P&lt;/tt&gt;)</h2>
 <p>The Cartesian velocity (<code>ucat</code>) and pressure (<code>P</code>) are cell-centered variables. The key to this architecture is understanding their mapping:</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>The physical value for <code><a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> i</code> is stored in the array at index <code>i+1</code>.</b> </p>
 </blockquote>
 <p>This means there is a one-to-one correspondence between the <code>IM-1</code> physical cells and <code>IM-1</code> physical <code>ucat</code> values, but with a simple offset. The first and last elements of the array (<code>ucat[0]</code> and <code>ucat[IM]</code>) are reserved for ghost values.</p>
-<h3><a class="anchor" id="autotoc_md25"></a>
+<h3><a class="anchor" id="autotoc_md28"></a>
 4.1. How it Works at the Boundaries</h3>
 <p>This shifted index system creates a clean and symmetric ghost-cell framework.</p>
 <p><b>At the "-Xi" Boundary (Min Boundary):</b></p><ul>
@@ -168,7 +168,7 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
 <div class="line">     ucat[IM-2]        ucat[IM-1]      | &lt;-- Physical Values</div>
 <div class="line">                                   ucat[IM]  &lt;-- Ghost Value for Cell IM-2</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md30"></a>
 5. Effective Computational Domain and Resolution</h2>
 <p>This architecture means there is <b>no loss of resolution</b>. The effective computational domain for cell-centered variables matches the geometric domain.</p>
 <ul>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
 <li><b>Geometric and Effective <code>ucat</code>/<code>P</code> Resolution:</b> <code>(IM-1) x (JM-1) x (KM-1)</code> cells.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 6. Implications for Post-Processing (&lt;tt&gt;ComputeNodalAverage&lt;/tt&gt;)</h2>
 <p>This understanding is critical for validating post-processing functions. The <code>ComputeNodalAverage</code> function interpolates cell values to the nodes.</p>
 <ul>
@@ -192,7 +192,7 @@ $(document).ready(function(){initNavTree('20_Grid_Cell_Architecture_Guide.html',
 <li><b>Validation:</b> The <code>ComputeNodalAverage</code> function, by sampling <code>ucat[IM-1]</code> and <code>ucat[IM]</code>, is correctly averaging the last physical cell with its proper ghost value. For a wall where <code>ucat[IM] = -ucat[IM-1]</code>, the average will be near zero, correctly representing the no-slip condition at the node. <b>The post-processing code is therefore correctly implemented for this architecture.</b></li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md31"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)</h2>
 <p>This table provides a quick reference for the mapping.</p>
 <table class="markdownTable">

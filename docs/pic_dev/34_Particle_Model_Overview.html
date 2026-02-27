@@ -95,41 +95,66 @@ $(document).ready(function(){initNavTree('34_Particle_Model_Overview.html',''); 
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#physics_sec">2. Current Particle Physics</a></li>
+<ul><li class="level1"><a href="#loop_sec">1. Per-Step Particle Pipeline</a></li>
+<li class="level1"><a href="#physics_sec">3. Current Built-In Physics</a></li>
+<li class="level1"><a href="#statistics_sec">4. Statistics and Diagnostics</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page maps the particle pipeline: motion, location, coupling, physics update, and statistics.</p>
-<h1><a class="anchor" id="pipeline_sec"></a>
-1. End-to-End Flow</h1>
-<p>Typical per-step flow:</p><ol type="1">
-<li>Interpolate Eulerian fields to particles: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
-<li>Move particles: <a class="el" href="ParticleMotion_8h.html#a74bec635d0f085bd2e8aef6c61aac629">UpdateAllParticlePositions</a></li>
-<li>Locate/migrate particles: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
-<li>Update particle physics fields: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
-<li>Scatter particle data back to Eulerian fields: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
+<div class="textblock"><p>This page documents the particle pipeline exactly as orchestrated in the current solver flow.</p>
+<h1><a class="anchor" id="loop_sec"></a>
+1. Per-Step Particle Pipeline</h1>
+<p>Typical order inside coupled step:</p>
+<ol type="1">
+<li>interpolate Eulerian fields to swarm: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
+<li>advance particle positions: <a class="el" href="ParticleMotion_8h.html#a74bec635d0f085bd2e8aef6c61aac629">UpdateAllParticlePositions</a></li>
+<li>locate/migrate particles: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
+<li>update particle physics fields: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
+<li>scatter particle fields back to Eulerian storage: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
 </ol>
-<h1><a class="anchor" id="physics_sec"></a>
-2. Current Particle Physics</h1>
-<p>Current scalar-mixing update is implemented through:</p><ul>
-<li><a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
-<li><a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
-<li><a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
+<p>Each stage relies on valid <code>DMSwarm_CellID</code>, interpolation weights, and synchronized ghost data.</p>
+<h1><a class="anchor" id="fields_sec"></a>
+3. Field/Coordinate Scaling Conventions</h1>
+<p>Commonly used swarm fields include:</p>
+<ul>
+<li>position (<code>position</code>)</li>
+<li>velocity (<code>velocity</code>)</li>
+<li>cell ID (<code>DMSwarm_CellID</code>)</li>
+<li>location status (<code>DMSwarm_location_status</code>)</li>
+<li>diffusivity and scalar (<code>Diffusivity</code>, <code>Psi</code>)</li>
 </ul>
-<p>The present built-in model is IEM-style relaxation for <code>Psi</code>.</p>
-<h1><a class="anchor" id="stats_sec"></a>
-5. Statistics Pipeline</h1>
-<p>Post statistics kernel entry currently includes:</p><ul>
+<p>Status transitions (<code>NEEDS_LOCATION</code>, <code>ACTIVE_AND_LOCATED</code>, <code>MIGRATING_OUT</code>, <code>LOST</code>) determine whether particles are walked, migrated, or skipped in settlement passes.</p>
+<h1><a class="anchor" id="physics_sec"></a>
+3. Current Built-In Physics</h1>
+<p>Current scalar model path:</p>
+<ul>
+<li>kernel: <a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
+<li>batch loop: <a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
+<li>orchestrator: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
+</ul>
+<p>This presently implements IEM-style relaxation for <code>Psi</code>, with model constants sourced from runtime context.</p>
+<h1><a class="anchor" id="statistics_sec"></a>
+4. Statistics and Diagnostics</h1>
+<p>Post statistics currently include global kernels such as:</p>
+<ul>
 <li><a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
 </ul>
-<p>Statistics are emitted as CSV outputs from postprocessing paths.</p>
+<p>Additional health indicators are available from migration counters and settlement-pass counts stored in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> fields updated by location logic.</p>
 <h1><a class="anchor" id="extension_sec"></a>
 7. Where to Extend</h1>
-<p>For future data-driven closures:</p><ol type="1">
-<li>Add a model selector in schema + control generation.</li>
-<li>Add runtime dispatch in particle physics update path.</li>
-<li>Keep feature extraction and model I/O isolated from motion/location kernels.</li>
-<li>For tightly coupled inference, treat model invocation as a pluggable kernel behind the same <code>UpdateFieldForAllParticles</code> entry. </li>
+<p>Recommended extension pattern:</p>
+<ol type="1">
+<li>add particle model selector to YAML/flags,</li>
+<li>branch inside particle physics orchestrator,</li>
+<li>isolate model-specific kernels from motion/location kernels,</li>
+<li>keep scatter/interpolation interfaces unchanged,</li>
+<li>validate with smoke tests and deterministic small cases.</li>
 </ol>
+<p>For configuration contract changes, update:</p>
+<ul>
+<li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing, Smoke, and Quality Gates Guide</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -95,62 +95,62 @@ $(document).ready(function(){initNavTree('37_Sweep_Studies_Guide.html',''); init
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#sweep_inputs_sec">1. Inputs</a></li>
-<li class="level1"><a href="#sweep_cmd_sec">2. Command</a></li>
-<li class="level1"><a href="#sweep_contract_sec">3. Study Contract</a></li>
-<li class="level1"><a href="#sweep_outputs_sec">4. Outputs</a></li>
-<li class="level1"><a href="#sweep_notes_sec">5. Notes</a></li>
+<ul><li class="level1"><a href="#contract_sec">3. Study Contract Essentials</a></li>
+<li class="level1"><a href="#outputs_sec">4. Outputs and Aggregates</a></li>
+<li class="level1"><a href="#operations_sec">5. Operational Workflow</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents Slurm array studies using <code>pic.flow sweep</code>.</p>
-<h1><a class="anchor" id="sweep_inputs_sec"></a>
-1. Inputs</h1>
-<p>Required:</p><ul>
-<li><code>study.yml</code></li>
-<li><code>cluster.yml</code></li>
-</ul>
-<p>Reference templates:</p><ul>
-<li><code>examples/master_template/master_study.yml</code></li>
-<li><code>examples/master_template/master_cluster.yml</code></li>
-</ul>
-<h1><a class="anchor" id="sweep_cmd_sec"></a>
-2. Command</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
-<div class="line">  --study study.yml \</div>
-<div class="line">  --cluster cluster.yml</div>
-</div><!-- fragment --><p>Generate only:</p>
-<div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
-<div class="line">  --study study.yml \</div>
-<div class="line">  --cluster cluster.yml \</div>
-<div class="line">  --no-submit</div>
-</div><!-- fragment --><h1><a class="anchor" id="sweep_contract_sec"></a>
-3. Study Contract</h1>
+<div class="textblock"><p><code>pic.flow sweep</code> orchestrates parameter studies with generated run variants, scheduler arrays, and aggregate metrics.</p>
+<h1><a class="anchor" id="inputs_sec"></a>
+1. Required Input Roles</h1>
+<p>A sweep/study commonly uses:</p>
 <ul>
-<li><code>base_configs</code> defines base case/solver/monitor/post files.</li>
-<li><code>parameters</code> expands as a cartesian matrix.</li>
-<li>keys use <code>&lt;target&gt;.&lt;yaml.path&gt;</code> where target is <code>case|solver|monitor|post</code>.</li>
-<li><code>metrics</code> defines file-based extractors (CSV/log).</li>
-<li><code>plotting</code> controls plot generation.</li>
-<li><code>execution.max_concurrent_array_tasks</code> maps to Slurm <code>N</code> array throttling.</li>
+<li>base case/solver/monitor/post templates,</li>
+<li><code>study.yml</code> defining parameter combinations and metrics,</li>
+<li>optional cluster scheduler settings for array submission.</li>
 </ul>
-<h1><a class="anchor" id="sweep_outputs_sec"></a>
-4. Outputs</h1>
-<p><code>studies/&lt;study_id&gt;/</code> contains:</p><ul>
-<li><code>cases/&lt;case_i&gt;/...</code> materialized run trees</li>
-<li><code>scheduler/case_index.tsv</code></li>
-<li><code>scheduler/solver_array.sbatch</code></li>
-<li><code>scheduler/post_array.sbatch</code></li>
-<li><code>scheduler/submission.json</code></li>
-<li><code>results/metrics_table.csv</code></li>
-<li><code>results/plots/*</code> (when plottable metrics are available)</li>
-<li><code>study_manifest.json</code></li>
-</ul>
-<h1><a class="anchor" id="sweep_notes_sec"></a>
-5. Notes</h1>
+<p>Starter templates are available under <code>examples/*/*study*.yml</code> and <code>examples/master_template/</code>.</p>
+<h1><a class="anchor" id="command_sec"></a>
+2. Core Command Patterns</h1>
+<div class="fragment"><div class="line">./scripts/pic.flow sweep --study &lt;study.yml&gt; --scheduler slurm</div>
+</div><!-- fragment --><p>Typical optional flags include dry-run or no-submit behaviors depending on workflow stage.</p>
+<h1><a class="anchor" id="contract_sec"></a>
+3. Study Contract Essentials</h1>
+<p>A study definition usually specifies:</p>
 <ul>
-<li>Post array is submitted with <code>afterok:&lt;solver_array_jobid&gt;</code>.</li>
-<li>Metrics/plots rely on existing post/stat outputs (no C-side changes required in v1).</li>
-<li>If files are not available yet at generation time, aggregation may produce sparse metrics. </li>
+<li>parameter space (explicit lists/ranges),</li>
+<li>mapping from parameter key -&gt; YAML target path,</li>
+<li>execution controls,</li>
+<li>metric extraction definitions.</li>
+</ul>
+<p>Each combination yields a generated run with fully materialized config set.</p>
+<h1><a class="anchor" id="outputs_sec"></a>
+4. Outputs and Aggregates</h1>
+<p>Expected study outputs include:</p>
+<ul>
+<li>per-combination run directories,</li>
+<li>aggregate table (for example <code>metrics_table.csv</code>),</li>
+<li>summary metadata (for example <code>summary.json</code>),</li>
+<li>optional plot outputs in results/plots.</li>
+</ul>
+<p>This keeps raw run data and comparative study diagnostics in one reproducible structure.</p>
+<h1><a class="anchor" id="operations_sec"></a>
+5. Operational Workflow</h1>
+<p>Recommended workflow:</p>
+<ol type="1">
+<li>run a tiny subset locally or with <code>--no-submit</code>,</li>
+<li>verify parameter substitution and metric extraction,</li>
+<li>launch full array,</li>
+<li>inspect aggregate outputs,</li>
+<li>archive the exact study file with results for reproducibility.</li>
+</ol>
+<p>For fragile metrics, add smoke tests or fixture-based validation before large queue submissions.</p>
+<h1><a class="anchor" id="refs_sec"></a>
+1. Reference Scales</h1>
+<ul>
+<li><b><a class="el" href="36_Cluster_Run_Guide.html">Cluster Run Guide (Slurm)</a></b></li>
+<li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: <code>post.yml</code></a></b></li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing, Smoke, and Quality Gates Guide</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

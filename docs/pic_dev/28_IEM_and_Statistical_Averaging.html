@@ -95,40 +95,75 @@ $(document).ready(function(){initNavTree('28_IEM_and_Statistical_Averaging.html'
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#iem_sec">1. IEM Particle Mixing</a></li>
-<li class="level1"><a href="#avg_sec">2. Averaging Paths</a></li>
-<li class="level1"><a href="#note_sec">3. Terminology Note</a></li>
+<ul><li class="level1"><a href="#iem_sec">1. IEM Mixing Update In Current Code</a></li>
+<li class="level1"><a href="#dataflow_sec">2. Required Dataflow For IEM</a></li>
+<li class="level1"><a href="#terminology_sec">4. Averaging Terminology In PICurv</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page summarizes two related model/analysis paths: particle scalar mixing via IEM and flow/statistics averaging utilities.</p>
+<div class="textblock"><p>PICurv currently couples a particle scalar micromixing model (IEM-style) with separate statistics/averaging utilities in solver and post-processing stages.</p>
 <h1><a class="anchor" id="iem_sec"></a>
-1. IEM Particle Mixing</h1>
-<p>PICurv includes an IEM-style particle scalar update path where particle scalar state relaxes toward a local/ensemble mean with model-controlled rate.</p>
-<p>Code touchpoints:</p><ul>
-<li><a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
-<li><a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
-<li><a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
-</ul>
-<p>Config touchpoints:</p><ul>
-<li>particle model controls through case/solver ingestion (current model constants are C-side managed, extensible via schema additions).</li>
-</ul>
-<h1><a class="anchor" id="avg_sec"></a>
-2. Averaging Paths</h1>
+1. IEM Mixing Update In Current Code</h1>
+<p>For <code>Psi</code>, <a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a> uses:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_19_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\frac{d\Psi}{dt} = -\Omega(\Psi-\langle\Psi\rangle),
+\qquad
+\Omega = C_{IEM}\,\frac{\Gamma_{eff}}{\Delta^2},
+\qquad
+\Delta^2\approx V^{2/3}.
+\]" src="form_19.png"/></picture>
+</p>
+<p>Closed-form update implemented in code:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_20_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\Psi^{n+1}=\langle\Psi\rangle + (\Psi^n-\langle\Psi\rangle)e^{-\Omega\Delta t}.
+\]" src="form_20.png"/></picture>
+</p>
+<p>Code touchpoints:</p>
 <ul>
-<li>Solver-side statistical averaging toggles (<code>simCtx-&gt;averaging</code>) write/read dedicated statistical fields.</li>
-<li>Postprocessing statistics pipeline supports reduction kernels such as MSD.</li>
+<li>particle kernel: <a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
+<li>per-field particle loop: <a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
+<li>stage wrapper: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
 </ul>
-<p>Code touchpoints:</p><ul>
-<li>Post statistics kernel: <a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
-<li>Particle-grid averaging helper path: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
+<h1><a class="anchor" id="dataflow_sec"></a>
+2. Required Dataflow For IEM</h1>
+<p>IEM update requires:</p>
+<ul>
+<li>per-particle diffusivity from swarm fields,</li>
+<li>host-cell IDs for indexing,</li>
+<li>Eulerian mean field (<code>user-&gt;lPsi</code>) and Jacobian (<code>user-&gt;lAj</code>) for volume scaling.</li>
 </ul>
-<h1><a class="anchor" id="note_sec"></a>
-3. Terminology Note</h1>
-<p>The codebase currently uses "averaging" for several contexts (time/statistical fields, particle-to-grid normalization, post reductions). Configure these explicitly by workflow stage (<code>solver.yml</code>/<code>monitor.yml</code>/<code>post.yml</code>).</p>
+<p>This means scatter/interpolation order matters: stale Eulerian means produce stale IEM forcing.</p>
+<h1><a class="anchor" id="stats_sec"></a>
+5. Statistics Pipeline</h1>
+<p>Current primary reduction kernel:</p>
+<ul>
+<li><a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
+</ul>
+<p>Implemented MSD physics includes:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_21_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+D = \frac{1}{Re\,Sc},
+\qquad
+r_{theory} = \sqrt{6Dt},
+\]" src="form_21.png"/></picture>
+</p>
+<p>with global MPI reductions and CSV output per statistics call.</p>
+<h1><a class="anchor" id="terminology_sec"></a>
+4. Averaging Terminology In PICurv</h1>
+<p>"Averaging" appears in multiple contexts:</p>
+<ul>
+<li>particle-&gt;grid count-normalized scatter,</li>
+<li>solver-side optional field averaging toggles,</li>
+<li>postprocessing global statistical reductions.</li>
+</ul>
+<p>Treat these as distinct workflows with different configuration points.</p>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
-<li>IEM model overview (combustion/mixing context): <a href="https://en.wikipedia.org/wiki/Probability_density_function_(turbulence)#Micromixing_models">https://en.wikipedia.org/wiki/Probability_density_function_(turbulence)#Micromixing_models</a> </li>
+<li><b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b></li>
+<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
+<li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: <code>post.yml</code></a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -96,37 +96,63 @@ $(document).ready(function(){initNavTree('27_Trilinear_Interpolation_and_Project
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#g2p_sec">1. Grid -&gt; Particle Interpolation</a></li>
-<li class="level1"><a href="#p2g_sec">2. Particle -&gt; Grid Projection (Scatter/Averaging)</a></li>
+<li class="level1"><a href="#p2g_sec">2. Particle -&gt; Grid Scatter and Normalization</a></li>
+<li class="level1"><a href="#coupling_sec">3. Accuracy and Stability Considerations</a></li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv performs bidirectional coupling between Eulerian and Lagrangian representations.</p>
+<div class="textblock"><p>Eulerian-Lagrangian coupling in PICurv is built from interpolation (grid -&gt; particle) and scatter/normalization (particle -&gt; grid).</p>
 <h1><a class="anchor" id="g2p_sec"></a>
 1. Grid -&gt; Particle Interpolation</h1>
+<p>For a particle inside a host cell with local coordinates <picture><source srcset="form_16_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$(a_1,a_2,a_3)\in[0,1]^3$" src="form_16.png"/></picture>, trilinear interpolation uses 8 corner weights:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_17_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\phi_p = \sum_{m=1}^{8} w_m(a_1,a_2,a_3)\,\phi_m,
+\qquad
+\sum_m w_m = 1.
+\]" src="form_17.png"/></picture>
+</p>
+<p>Code touchpoints:</p>
 <ul>
-<li>Corner/ghost-aware interpolation paths are used to evaluate fields at particle locations.</li>
-<li>Trilinear interpolation with eight-corner weights is the primary path for velocity/field transfer.</li>
+<li>scalar kernel: <a class="el" href="interpolation_8h.html#a703c00f6badf5c3f0558df315a340579">TrilinearInterpolation_Scalar</a></li>
+<li>vector kernel: <a class="el" href="interpolation_8h.html#a4373b52d08a935bb4cf8465228effe63">TrilinearInterpolation_Vector</a></li>
+<li>field-by-field wrapper: <a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a></li>
+<li>stage wrapper: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
 </ul>
-<p>Code touchpoints:</p><ul>
-<li><a class="el" href="interpolation_8h.html#a703c00f6badf5c3f0558df315a340579">TrilinearInterpolation_Scalar</a></li>
-<li><a class="el" href="interpolation_8h.html#a4373b52d08a935bb4cf8465228effe63">TrilinearInterpolation_Vector</a></li>
-<li><a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a></li>
-<li><a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
-</ul>
+<p>Implementation note: interpolation path includes center-to-corner staging before final particle evaluation.</p>
 <h1><a class="anchor" id="p2g_sec"></a>
-2. Particle -&gt; Grid Projection (Scatter/Averaging)</h1>
+2. Particle -&gt; Grid Scatter and Normalization</h1>
+<p>Scatter computes per-cell sums, then normalizes by particle count:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_18_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\bar{\phi}_{i,j,k} =
+\begin{cases}
+\dfrac{\sum_{p\in cell(i,j,k)} \phi_p}{N_{i,j,k}}, &amp; N_{i,j,k}&gt;0, \\
+0, &amp; N_{i,j,k}=0.
+\end{cases}
+\]" src="form_18.png"/></picture>
+</p>
+<p>Code touchpoints:</p>
 <ul>
-<li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> fields are accumulated to Eulerian storage.</li>
-<li>Per-cell normalization/averaging yields physically usable grid fields.</li>
-<li>This supports reconstructed Eulerian particle statistics and diagnostics.</li>
+<li>particle count accumulation: <a class="el" href="group__scatter__module.html#ga81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a></li>
+<li>scatter orchestrator: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
 </ul>
-<p>Code touchpoints:</p><ul>
-<li>Particle-to-grid scatter entry: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
-<li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> count accumulation: <a class="el" href="group__scatter__module.html#ga81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a></li>
+<p>Current standard scatter path actively maps particle <code>Psi</code> to Eulerian <code>Psi</code>; additional fields are scaffolded and can be enabled with matching vector/DM contracts.</p>
+<h1><a class="anchor" id="coupling_sec"></a>
+3. Accuracy and Stability Considerations</h1>
+<p>Coupling quality depends on:</p>
+<ul>
+<li>accurate host-cell IDs and interpolation weights,</li>
+<li>ghost synchronization before interpolation/scatter,</li>
+<li>consistent field DOF/DM association,</li>
+<li>avoiding stale particle-count vectors between scatter calls.</li>
 </ul>
+<p>Inconsistency in any of these usually appears as noisy particle statistics or nonphysical reconstructed Eulerian fields.</p>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
-<li>Trilinear interpolation background: <a href="https://en.wikipedia.org/wiki/Trilinear_interpolation">https://en.wikipedia.org/wiki/Trilinear_interpolation</a> </li>
+<li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b></li>
+<li><b><a class="el" href="28_IEM_and_Statistical_Averaging.html">IEM Mixing and Statistical Averaging</a></b></li>
+<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

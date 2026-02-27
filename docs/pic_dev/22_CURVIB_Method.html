@@ -95,39 +95,62 @@ $(document).ready(function(){initNavTree('22_CURVIB_Method.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#concepts_sec">1. Core Concepts</a></li>
-<li class="level1"><a href="#code_sec">2. Main Code Touchpoints</a></li>
-<li class="level1"><a href="#practical_sec">3. Practical Interpretation</a></li>
+<ul><li class="level1"><a href="#formulation_sec">1. Curvilinear Formulation Context</a></li>
+<li class="level1"><a href="#ibm_sec">3. Immersed-Boundary Role In Current Code</a></li>
+<li class="level1"><a href="#practical_sec">4. What This Means For Users</a></li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv follows a curvilinear immersed-boundary (CurvIB-style) workflow where flow variables evolve on structured curvilinear grids and immersed-body effects are applied through dedicated IBM hooks.</p>
-<h1><a class="anchor" id="concepts_sec"></a>
-1. Core Concepts</h1>
+<div class="textblock"><p>PICurv solves flow on structured curvilinear grids and applies immersed-boundary-aware logic in metric, pressure, and projection stages.</p>
+<h1><a class="anchor" id="formulation_sec"></a>
+1. Curvilinear Formulation Context</h1>
+<p>The code evolves contravariant flux-like velocity components (<code>Ucont</code>) and derives Cartesian velocity (<code>Ucat</code>) as needed. Curvilinear metrics map physical derivatives to computational coordinates:</p>
+<p class="formulaDsp">
+<picture><source srcset="form_6_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaDsp" alt="\[
+\nabla \phi = \phi_{\xi}\,\mathbf{\xi} + \phi_{\eta}\,\mathbf{\eta} + \phi_{\zeta}\,\mathbf{\zeta},
+\qquad
+J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
+\]" src="form_6.png"/></picture>
+</p>
+<p>Face and cell metric tensors are precomputed and reused by RHS, Poisson, and projection stages.</p>
+<h1><a class="anchor" id="setup_sec"></a>
+1. Setup and Physics</h1>
+<p>Main setup touchpoints:</p>
 <ul>
-<li>Structured curvilinear geometry and metrics are managed per block (<code>DMDA</code> + metric vectors/Jacobians).</li>
-<li>Momentum and pressure updates occur in grid-aligned computational space.</li>
-<li>Immersed-boundary corrections are injected conditionally when IBM is active.</li>
+<li>grid dimensions and decomposition: <a class="el" href="grid_8h.html#a04f0887f08166a2a8d01411f39fa1a40">DefineAllGridDimensions</a></li>
+<li>DM creation per block and level: <a class="el" href="grid_8h.html#aa0b95ab3ac28c8df985e38b888c9bb52">InitializeAllGridDMs</a></li>
+<li>coordinate assignment: <a class="el" href="grid_8h.html#ab2aef4bb6fc2d2223a52ff6a45c7c600">AssignAllGridCoordinates</a></li>
+<li>face metrics: <a class="el" href="Metric_8h.html#a6f0dfb324211e230a387501f93cfd316">ComputeFaceMetrics</a></li>
+<li>cell-centered Jacobian inverse: <a class="el" href="Metric_8h.html#a92d28e2f14645b0eb563144f4ccf2b49">ComputeCellCenteredJacobianInverse</a></li>
+<li>orientation checks/fixups: <a class="el" href="Metric_8h.html#a436bb94905ee06971f632571f5bc8cbb">CheckAndFixGridOrientation</a></li>
 </ul>
-<h1><a class="anchor" id="code_sec"></a>
-2. Main Code Touchpoints</h1>
+<p>Useful geometric helper for BC and flux logic:</p>
 <ul>
-<li>Grid dimensions and DM setup: <a class="el" href="grid_8h.html#a04f0887f08166a2a8d01411f39fa1a40">DefineAllGridDimensions</a>, <a class="el" href="grid_8h.html#aa0b95ab3ac28c8df985e38b888c9bb52">InitializeAllGridDMs</a>, <a class="el" href="grid_8h.html#ab2aef4bb6fc2d2223a52ff6a45c7c600">AssignAllGridCoordinates</a></li>
-<li>Metric construction: <a class="el" href="Metric_8h.html#a6f0dfb324211e230a387501f93cfd316">ComputeFaceMetrics</a>, <a class="el" href="Metric_8h.html#a92d28e2f14645b0eb563144f4ccf2b49">ComputeCellCenteredJacobianInverse</a>, <a class="el" href="Metric_8h.html#a436bb94905ee06971f632571f5bc8cbb">CheckAndFixGridOrientation</a></li>
-<li>Flow-step orchestration: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
-<li>Boundary geometry helpers used by setup/BC layers: <a class="el" href="grid_8h.html#a88c33dce12bae2e53bd7370f57548a76">CalculateFaceCenterAndArea</a></li>
+<li><a class="el" href="grid_8h.html#a88c33dce12bae2e53bd7370f57548a76">CalculateFaceCenterAndArea</a></li>
+</ul>
+<h1><a class="anchor" id="ibm_sec"></a>
+3. Immersed-Boundary Role In Current Code</h1>
+<p>The current branch keeps immersed-boundary hooks in solver paths, while several IBM-specific calls are conditional or currently inactive in default runs. In practice:</p>
+<ul>
+<li>geometry masking uses <code>Nvert</code>/solid markers in key kernels,</li>
+<li>Poisson and projection stencils include boundary-aware logic,</li>
+<li>IBM-specific interpolation hooks remain extension points for fully active IBM runs.</li>
 </ul>
 <h1><a class="anchor" id="practical_sec"></a>
-3. Practical Interpretation</h1>
-<p>For users, this mostly appears as:</p><ul>
-<li>grid choice (<code>programmatic_c</code>, <code>file</code>, <code>grid_gen</code>),</li>
-<li>boundary-condition/physics configuration,</li>
-<li>optional immersed-mode flags in advanced settings.</li>
+4. What This Means For Users</h1>
+<p>You mainly control CurvIB behavior through:</p>
+<ul>
+<li>grid generation/ingestion choice,</li>
+<li>boundary-condition handlers,</li>
+<li>solver settings that influence projection/Poisson robustness,</li>
+<li>case geometry and decomposition settings.</li>
 </ul>
+<p>Even when users never interact with metric tensors directly, they govern stability, pressure correction quality, and particle coupling accuracy.</p>
 <h1><a class="anchor" id="refs_sec"></a>
 1. Reference Scales</h1>
 <ul>
-<li>Curvilinear immersed-boundary literature surveys (general background)</li>
-<li>PETSc DMDA overview: <a href="https://petsc.org/release/manualpages/DMDA/">https://petsc.org/release/manualpages/DMDA/</a> </li>
+<li><b><a class="el" href="20_Grid_Cell_Architecture_Guide.html">Grid, Cell, and Variable Architecture Guide</a></b></li>
+<li><b><a class="el" href="23_Fractional_Step_Method.html">Fractional-Step (Projection) Method</a></b></li>
+<li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

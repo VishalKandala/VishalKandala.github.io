@@ -95,38 +95,58 @@ $(document).ready(function(){initNavTree('26_Walking_Search_Method.html',''); in
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#purpose_sec">1. Why Walking Search</a></li>
+<ul><li class="level1"><a href="#concept_sec">1. Core Search Concept</a></li>
+<li class="level1"><a href="#statuses_sec">2. Settlement Status Model</a></li>
+<li class="level1"><a href="#restart_sec">4. Restart Path Specifics</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> tracking requires robustly determining each particle’s host cell on distributed curvilinear grids. PICurv uses a walking-search based location strategy with migration support.</p>
-<h1><a class="anchor" id="purpose_sec"></a>
-1. Why Walking Search</h1>
+<div class="textblock"><p>PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell (or is explicitly marked lost).</p>
+<h1><a class="anchor" id="concept_sec"></a>
+1. Core Search Concept</h1>
+<p>A particle is tested against candidate cell faces using signed distances. Search starts from prior cell information when available, then walks to neighboring cells by face-crossing logic until a terminal status is reached.</p>
+<p>This avoids expensive global brute-force lookup and is suitable for distributed curvilinear grids.</p>
+<h1><a class="anchor" id="statuses_sec"></a>
+2. Settlement Status Model</h1>
+<p>Location/migration logic uses <code>ParticleLocationStatus</code>:</p>
 <ul>
-<li>Particles move continuously while mesh ownership is discrete by rank/block/cell.</li>
-<li>A local walk from prior host-cell state is more efficient than global brute-force scans.</li>
-<li>The method supports migration decisions when particles leave local ownership.</li>
+<li><code>NEEDS_LOCATION</code></li>
+<li><code>ACTIVE_AND_LOCATED</code></li>
+<li><code>MIGRATING_OUT</code></li>
+<li><code>LOST</code></li>
+<li><code>UNINITIALIZED</code></li>
 </ul>
-<h1><a class="anchor" id="code_sec"></a>
-2. Main Code Touchpoints</h1>
+<p>These statuses drive the iterative migration passes in the orchestrator.</p>
+<h1><a class="anchor" id="implementation_sec"></a>
+2. Code Path In PICurv</h1>
 <ul>
-<li>Single-particle locator: <a class="el" href="walkingsearch_8h.html#aab2bd86e92a9adc67d49622e20a03dbf">LocateParticleInGrid</a></li>
-<li>Multi-particle settlement orchestrator: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
-<li>Migration helpers in motion layer: <a class="el" href="ParticleMotion_8h.html#af68865be3bc987bdf1be2c5c7a1903fa">PerformMigration</a>, <a class="el" href="ParticleMotion_8h.html#ab2eeab12258446f697695ebdaef3f011">PerformSingleParticleMigrationCycle</a></li>
-<li>Restart-cell migration path: <a class="el" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a></li>
+<li>single-particle walking search: <a class="el" href="walkingsearch_8h.html#aab2bd86e92a9adc67d49622e20a03dbf">LocateParticleInGrid</a></li>
+<li>robust locate-or-migrate decision: <code>LocateParticleOrFindMigrationTarget</code> (walking-search module)</li>
+<li>global orchestrator: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
+<li>rank migration communication: <a class="el" href="ParticleMotion_8h.html#af68865be3bc987bdf1be2c5c7a1903fa">PerformMigration</a></li>
+<li>per-particle migration cycle helper: <a class="el" href="ParticleMotion_8h.html#ab2eeab12258446f697695ebdaef3f011">PerformSingleParticleMigrationCycle</a></li>
+<li>restart fast-path migration: <a class="el" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a></li>
 </ul>
-<h1><a class="anchor" id="workflow_sec"></a>
-1. Standard Extension Workflow</h1>
+<p>The current orchestrator includes:</p>
 <ol type="1">
-<li>Predict new particle position.</li>
-<li>Attempt local walking search from previous cell.</li>
-<li>If local ownership fails, determine migration target rank/block.</li>
-<li>Migrate, then re-locate and refresh interpolation weights.</li>
+<li>PID snapshot,</li>
+<li>per-particle locate/guess/verify,</li>
+<li>migration,</li>
+<li>newcomer flagging,</li>
+<li>repeat until no global migrations remain (or safety pass cap).</li>
 </ol>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="restart_sec"></a>
+4. Restart Path Specifics</h1>
+<p>For restart-loaded particles with valid <code>CellID</code>, PICurv can skip full walking search and directly resolve owner rank via cell ownership map before migration. This is usually much cheaper than full re-location on first restart step.</p>
+<h1><a class="anchor" id="practical_sec"></a>
+4. What This Means For Users</h1>
+<p>Watch for:</p>
 <ul>
-<li>PETSc DMSwarm background: <a href="https://petsc.org/release/manualpages/DMSWARM/">https://petsc.org/release/manualpages/DMSWARM/</a> </li>
+<li>excessive migration pass counts,</li>
+<li>repeated <code>LOST</code> particles,</li>
+<li>non-convergence of settlement loop.</li>
 </ul>
+<p>These usually indicate domain-decomposition mismatch, bounding-box mismatch, or invalid particle coordinates.</p>
+<p>See <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for troubleshooting commands. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
