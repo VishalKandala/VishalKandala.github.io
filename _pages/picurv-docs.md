@@ -7,11 +7,14 @@ nav_order: 8
 description: PICurv solver documentation (Doxygen)
 ---
 
-<iframe src="{{ '/docs/pic_dev/index.html' | relative_url }}"
-        style="width: 100%; min-height: 82vh; border: 0;"
+<div class="mb-3">
+  This page keeps the al-folio navigation/theme shell and embeds the generated Doxygen site.
+  For full-page view, open:
+  <a href="{{ '/docs/picurv/index.html' | relative_url }}">/docs/picurv/index.html</a>.
+</div>
+
+<iframe src="{{ '/docs/picurv/index.html' | relative_url }}"
+        style="width: 100%; min-height: 82vh; border: 0; border-radius: 6px;"
         loading="lazy"
         title="PICurv Doxygen Documentation">
 </iframe>
-
-If the embedded view does not load, open the standalone docs:
-[PICurv Doxygen Documentation]({{ '/docs/pic_dev/index.html' | relative_url }}).
