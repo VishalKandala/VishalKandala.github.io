@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -98,80 +105,107 @@ $(document).ready(function(){initNavTree('01_Installation.html',''); initResizab
 <ul><li class="level1"><a href="#prereqs_sec">1. Prerequisites</a></li>
 <li class="level1"><a href="#install_tools_sec">2. Install Base Toolchain</a></li>
 <li class="level1"><a href="#petsc_sec">3. Install PETSc</a></li>
-<li class="level1"><a href="#clone_sec">4. Clone PICurv</a></li>
-<li class="level1"><a href="#build_sec">5. Build with &lt;tt&gt;pic.flow&lt;/tt&gt;</a></li>
-<li class="level1"><a href="#verify_sec">6. Quick Sanity Checks</a></li>
-<li class="level1"><a href="#next_steps_sec">7. Next Steps</a></li>
+<li class="level1"><a href="#env_sec">4. Configure Environment Variables</a></li>
+<li class="level1"><a href="#clone_sec">5. Clone PICurv</a></li>
+<li class="level1"><a href="#build_sec">6. Build with pic.flow</a></li>
+<li class="level1"><a href="#verify_sec">7. Verify Installation</a></li>
+<li class="level1"><a href="#common_sec">8. Common Installation Failures</a></li>
+<li class="level1"><a href="#next_steps_sec">9. Next Steps</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This guide covers environment setup, dependency installation, and building PICurv with the <code>pic.flow</code> conductor.</p>
+<div class="textblock"><p>This guide covers dependency setup, PETSc configuration, and binary build verification for PICurv.</p>
 <h1><a class="anchor" id="prereqs_sec"></a>
 1. Prerequisites</h1>
-<p>Install the following first:</p>
+<p>Install these first:</p>
 <ul>
 <li>C compiler (<code>gcc</code> or <code>clang</code>)</li>
 <li>MPI implementation (<code>mpich</code> or <code>openmpi</code>)</li>
 <li>GNU Make</li>
-<li>Python 3</li>
+<li>Python 3 + pip</li>
 <li>Git</li>
-<li>PETSc (3.20.3 or newer, with <code>DMSwarm</code> support)</li>
+<li>PETSc 3.20.3+ with <code>DMSwarm</code> support</li>
 </ul>
 <h1><a class="anchor" id="install_tools_sec"></a>
 2. Install Base Toolchain</h1>
-<p>For Debian/Ubuntu: </p><div class="fragment"><div class="line">sudo apt-get update</div>
+<p>Debian/Ubuntu:</p>
+<div class="fragment"><div class="line">sudo apt-get update</div>
 <div class="line">sudo apt-get install -y build-essential gfortran mpich python3 python3-pip git</div>
 <div class="line">python3 -m pip install --user pyyaml numpy</div>
-</div><!-- fragment --><p>For RHEL/CentOS/Fedora: </p><div class="fragment"><div class="line">sudo yum groupinstall -y &quot;Development Tools&quot;</div>
+</div><!-- fragment --><p>RHEL/CentOS/Fedora:</p>
+<div class="fragment"><div class="line">sudo yum groupinstall -y &quot;Development Tools&quot;</div>
 <div class="line">sudo yum install -y mpich-devel python3 python3-pip git</div>
 <div class="line">python3 -m pip install --user pyyaml numpy</div>
-<div class="line"> </div>
-<div class="line">Optional (for sweep plot generation):</div>
-</div><!-- fragment --><p> bash python3 -m pip install &ndash;user matplotlib </p><div class="fragment"></div><!-- fragment --><h1><a class="anchor" id="petsc_sec"></a>
+</div><!-- fragment --><p>Optional (study plot generation):</p>
+<div class="fragment"><div class="line">python3 -m pip install --user matplotlib</div>
+</div><!-- fragment --><h1><a class="anchor" id="petsc_sec"></a>
 3. Install PETSc</h1>
-<p>Recommended from source: </p><div class="fragment"><div class="line">git clone -b v3.20.3 https://gitlab.com/petsc/petsc.git</div>
+<p>Recommended source install:</p>
+<div class="fragment"><div class="line">git clone -b v3.20.3 https://gitlab.com/petsc/petsc.git</div>
 <div class="line">cd petsc</div>
-</div><!-- fragment --><p>Debug build example: </p><div class="fragment"><div class="line">./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \</div>
+</div><!-- fragment --><p>Debug build example:</p>
+<div class="fragment"><div class="line">./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \</div>
 <div class="line">            --download-fblaslapack --download-metis --download-parmetis \</div>
 <div class="line">            --with-dmswarm=1 --with-debugging=1</div>
 <div class="line">make all</div>
 <div class="line">make check</div>
-</div><!-- fragment --><p>Official PETSc install documentation:</p><ul>
-<li><a href="https://petsc.org/release/install/">https://petsc.org/release/install/</a></li>
-<li><a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
-</ul>
-<p>Optimized build example: </p><div class="fragment"><div class="line">./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \</div>
+</div><!-- fragment --><p>Optimized build example:</p>
+<div class="fragment"><div class="line">./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 \</div>
 <div class="line">            --download-fblaslapack --download-metis --download-parmetis \</div>
 <div class="line">            --with-dmswarm=1 --with-debugging=0 \</div>
 <div class="line">            --COPTFLAGS=&#39;-O3&#39; --CXXOPTFLAGS=&#39;-O3&#39; --FOPTFLAGS=&#39;-O3&#39;</div>
 <div class="line">make all</div>
 <div class="line">make check</div>
-</div><!-- fragment --><p>Set environment variables (<code>~/.bashrc</code> or equivalent): </p><div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
+</div><!-- fragment --><p>Official references:</p>
+<ul>
+<li><a href="https://petsc.org/release/install/">https://petsc.org/release/install/</a></li>
+<li><a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
+</ul>
+<h1><a class="anchor" id="env_sec"></a>
+4. Configure Environment Variables</h1>
+<p>Add to your shell profile (<code>~/.bashrc</code> or equivalent):</p>
+<div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
 <div class="line">export PETSC_ARCH=arch-linux-c-debug</div>
-</div><!-- fragment --><p>Reload shell and verify: </p><div class="fragment"><div class="line">source ~/.bashrc</div>
+</div><!-- fragment --><p>Reload and verify:</p>
+<div class="fragment"><div class="line">source ~/.bashrc</div>
 <div class="line">echo &quot;$PETSC_DIR&quot;</div>
 <div class="line">echo &quot;$PETSC_ARCH&quot;</div>
 </div><!-- fragment --><h1><a class="anchor" id="clone_sec"></a>
-4. Clone PICurv</h1>
+5. Clone PICurv</h1>
 <div class="fragment"><div class="line">git clone https://github.com/VishalKandala/PICurv.git</div>
 <div class="line">cd PICurv</div>
 </div><!-- fragment --><h1><a class="anchor" id="build_sec"></a>
-5. Build with &lt;tt&gt;pic.flow&lt;/tt&gt;</h1>
+6. Build with pic.flow</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow build</div>
-</div><!-- fragment --><p>Expected artifacts:</p><ul>
+</div><!-- fragment --><p>Expected binaries:</p>
+<ul>
 <li><code>bin/picsolver</code></li>
 <li><code>bin/postprocessor</code></li>
 </ul>
-<p>Useful variants: </p><div class="fragment"><div class="line">./scripts/pic.flow build clean-project</div>
+<p>Useful variants:</p>
+<div class="fragment"><div class="line">./scripts/pic.flow build clean-project</div>
 <div class="line">./scripts/pic.flow build SYSTEM=cluster</div>
 </div><!-- fragment --><h1><a class="anchor" id="verify_sec"></a>
-6. Quick Sanity Checks</h1>
+7. Verify Installation</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow --help</div>
 <div class="line">./scripts/pic.flow run --help</div>
 <div class="line">./scripts/pic.flow sweep --help</div>
 <div class="line">./scripts/pic.flow validate --help</div>
-</div><!-- fragment --><h1><a class="anchor" id="next_steps_sec"></a>
-7. Next Steps</h1>
-<p>Proceed to <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b> to run your first simulation. </p>
+</div><!-- fragment --><p>If these commands work and binaries exist, your installation is ready.</p>
+<h1><a class="anchor" id="common_sec"></a>
+8. Common Installation Failures</h1>
+<ul>
+<li><code>PETSC_DIR</code>/<code>PETSC_ARCH</code> unset or mismatched with built arch.</li>
+<li>MPI compiler wrappers unavailable in PATH.</li>
+<li>PETSc configured without required downloaded dependencies.</li>
+<li>stale object files after toolchain changes (use <code>clean-project</code>).</li>
+</ul>
+<p>For runtime-level failures after successful build, see <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b>.</p>
+<h1><a class="anchor" id="next_steps_sec"></a>
+9. Next Steps</h1>
+<ul>
+<li>Quick path: <b><a class="el" href="38_Start_Here_10_Minutes.html">Start Here in 10 Minutes</a></b></li>
+<li>Full first simulation: <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

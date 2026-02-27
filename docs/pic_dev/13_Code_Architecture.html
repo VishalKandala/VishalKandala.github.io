@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -96,15 +103,14 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#entry_sec">1. Executable Entry Points</a></li>
-<li class="level1"><a href="#solver_flow_sec">2. Solver Runtime Flow (&lt;tt&gt;picsolver.c&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#post_flow_sec">3. Postprocessor Runtime Flow (&lt;tt&gt;postprocessor.c&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#contexts_sec">4. Core Context Objects</a><ul><li class="level2"><a href="#simctx_ssec">4.1 &lt;tt&gt;SimCtx&lt;/tt&gt;</a></li>
-<li class="level2"><a href="#userctx_ssec">4.2 &lt;tt&gt;UserCtx&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#solver_flow_sec">2. Solver Runtime Flow (picsolver.c)</a></li>
+<li class="level1"><a href="#post_flow_sec">3. Postprocessor Runtime Flow (postprocessor.c)</a></li>
+<li class="level1"><a href="#contexts_sec">4. Core Context Objects</a><ul><li class="level2"><a href="#simctx_ssec">4.1 SimCtx</a></li>
+<li class="level2"><a href="#userctx_ssec">4.2 UserCtx</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#modules_sec">5. Module Responsibilities</a></li>
 <li class="level1"><a href="#ingestion_sec">6. Configuration Ingestion Boundaries</a></li>
-<li class="level1"><a href="#extension_sec">7. Where to Extend</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page is the developer-oriented map of the current PICurv C codebase.</p>
@@ -116,7 +122,7 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 </ul>
 <p>Both rely on shared setup/context infrastructure from <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, and <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">variables.h</a></code>.</p>
 <h1><a class="anchor" id="solver_flow_sec"></a>
-2. Solver Runtime Flow (&lt;tt&gt;picsolver.c&lt;/tt&gt;)</h1>
+2. Solver Runtime Flow (picsolver.c)</h1>
 <p>High-level stages:</p>
 <ol type="1">
 <li><code>PetscInitialize</code></li>
@@ -134,7 +140,7 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 <li>Finalization via profiling teardown + <code>FinalizeSimulation</code> + <code>PetscFinalize</code></li>
 </ol>
 <h1><a class="anchor" id="post_flow_sec"></a>
-3. Postprocessor Runtime Flow (&lt;tt&gt;postprocessor.c&lt;/tt&gt;)</h1>
+3. Postprocessor Runtime Flow (postprocessor.c)</h1>
 <ul>
 <li>Parse post recipe (<code>post.run</code>) into <code><a class="el" href="variables_8h.html#structPostProcessParams" title="Holds all configuration parameters for a post-processing run.">PostProcessParams</a></code></li>
 <li>Load requested Eulerian/particle fields by timestep</li>
@@ -144,14 +150,14 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 <h1><a class="anchor" id="contexts_sec"></a>
 4. Core Context Objects</h1>
 <h2><a class="anchor" id="simctx_ssec"></a>
-4.1 &lt;tt&gt;SimCtx&lt;/tt&gt;</h2>
+4.1 SimCtx</h2>
 <ul>
 <li>Declared in <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">include/variables.h</a></code></li>
 <li>Holds global run configuration and top-level handles</li>
 <li>Populated mainly in <code>CreateSimulationContext</code></li>
 </ul>
 <h2><a class="anchor" id="userctx_ssec"></a>
-4.2 &lt;tt&gt;UserCtx&lt;/tt&gt;</h2>
+4.2 UserCtx</h2>
 <ul>
 <li>Block/grid-level state container (<code>DM</code>, vectors, metrics, block-local geometry)</li>
 <li>Used throughout grid, solver, BC, and post kernels</li>
@@ -206,7 +212,7 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 </ul>
 <p>Not all option consumption is explicit <code>PetscOptionsGet*</code>; PETSc dynamic ingestion also occurs through calls like <code>KSPSetFromOptions</code> in <code><a class="el" href="poisson_8c.html">poisson.c</a></code>.</p>
 <h1><a class="anchor" id="extension_sec"></a>
-7. Where to Extend</h1>
+7. Extensibility Status</h1>
 <ul>
 <li>New user-visible config key:<ol type="1">
 <li>add schema/template key</li>
@@ -229,7 +235,7 @@ $(document).ready(function(){initNavTree('13_Code_Architecture.html',''); initRe
 </li>
 </ul>
 <h1><a class="anchor" id="next_steps_sec"></a>
-7. Next Steps</h1>
+9. Next Steps</h1>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>Ingestion map: <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>

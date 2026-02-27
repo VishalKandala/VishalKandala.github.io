@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -95,17 +102,30 @@ $(document).ready(function(){initNavTree('02_Tutorial_Programmatic_Grid.html',''
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#init_sec">1. Initialize a Study Directory</a></li>
-<li class="level1"><a href="#config_sec">2. What Each File Does</a></li>
-<li class="level1"><a href="#run_sec">3. Run Solver + Postprocessor</a></li>
-<li class="level1"><a href="#output_sec">4. Inspect Output Layout</a></li>
-<li class="level1"><a href="#viz_sec">5. Visualize in ParaView</a></li>
+<ul><li class="level1"><a href="#goal_sec">1. Tutorial Goal</a></li>
+<li class="level1"><a href="#init_sec">2. Initialize the Study Directory</a></li>
+<li class="level1"><a href="#roles_sec">3. Understand File Roles</a></li>
+<li class="level1"><a href="#validate_sec">4. Validate Inputs Before Launch</a></li>
+<li class="level1"><a href="#run_sec">5. Run Solver and Postprocessor</a></li>
+<li class="level1"><a href="#artifacts_sec">6. Inspect Generated Artifacts</a></li>
+<li class="level1"><a href="#checks_sec">7. First Validation Checks</a></li>
+<li class="level1"><a href="#viz_sec">8. Visualize in ParaView</a></li>
+<li class="level1"><a href="#troubleshooting_sec">9. Common First-Run Issues</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This tutorial runs the <code>flat_channel</code> example end-to-end with the current YAML pipeline.</p>
+<div class="textblock"><p>This is the complete first simulation walkthrough for PICurv using the <code>flat_channel</code> template. Compared to <b><a class="el" href="38_Start_Here_10_Minutes.html">Start Here in 10 Minutes</a></b>, this page explains what each step does and how to verify outcomes.</p>
+<h1><a class="anchor" id="goal_sec"></a>
+1. Tutorial Goal</h1>
+<p>By the end of this tutorial you will have:</p>
+<ul>
+<li>generated a run directory from YAML,</li>
+<li>executed a solver step pipeline,</li>
+<li>produced postprocessed VTK output,</li>
+<li>understood where each configuration file is used.</li>
+</ul>
 <h1><a class="anchor" id="init_sec"></a>
-1. Initialize a Study Directory</h1>
-<p>From project root:</p>
+2. Initialize the Study Directory</h1>
+<p>From repository root:</p>
 <div class="fragment"><div class="line">./scripts/pic.flow init flat_channel --dest my_first_run</div>
 </div><!-- fragment --><p>Expected files:</p>
 <div class="fragment"><div class="line">my_first_run/</div>
@@ -113,62 +133,91 @@ $(document).ready(function(){initNavTree('02_Tutorial_Programmatic_Grid.html',''
 <div class="line">|- Imp-MG-Standard.yml</div>
 <div class="line">|- Standard_Output.yml</div>
 <div class="line">`- standard_analysis.yml</div>
-</div><!-- fragment --><h1><a class="anchor" id="config_sec"></a>
-2. What Each File Does</h1>
+</div><!-- fragment --><h1><a class="anchor" id="roles_sec"></a>
+3. Understand File Roles</h1>
 <ul>
-<li><code>flat_channel.yml</code>: case physics, grid, BCs, runtime control</li>
-<li><code>Imp-MG-Standard.yml</code>: solver strategy and numerics</li>
-<li><code>Standard_Output.yml</code>: I/O, logging, profiling, monitoring</li>
-<li><code>standard_analysis.yml</code>: post-processing pipeline recipe</li>
+<li><code>flat_channel.yml</code> case physics, scaling, grid, BC handlers, model flags.</li>
+<li><code>Imp-MG-Standard.yml</code> momentum strategy, tolerances, pressure multigrid controls.</li>
+<li><code>Standard_Output.yml</code> logging verbosity, profiling, output directories, monitor flags.</li>
+<li><code>standard_analysis.yml</code> postprocessing pipeline tasks and VTK/statistics output settings.</li>
 </ul>
+<h1><a class="anchor" id="validate_sec"></a>
+4. Validate Inputs Before Launch</h1>
+<div class="fragment"><div class="line">./scripts/pic.flow validate \</div>
+<div class="line">  --case my_first_run/flat_channel.yml \</div>
+<div class="line">  --solver my_first_run/Imp-MG-Standard.yml \</div>
+<div class="line">  --monitor my_first_run/Standard_Output.yml \</div>
+<div class="line">  --post my_first_run/standard_analysis.yml</div>
+</div><!-- fragment --><p>Validation confirms the YAML-to-runtime contract and catches mis-typed keys before execution.</p>
 <h1><a class="anchor" id="run_sec"></a>
-3. Run Solver + Postprocessor</h1>
+5. Run Solver and Postprocessor</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow run \</div>
-<div class="line">    --case my_first_run/flat_channel.yml \</div>
-<div class="line">    --solver my_first_run/Imp-MG-Standard.yml \</div>
-<div class="line">    --monitor my_first_run/Standard_Output.yml \</div>
-<div class="line">    --post my_first_run/standard_analysis.yml \</div>
-<div class="line">    -n 4 --solve --post-process</div>
-</div><!-- fragment --><p>What <code>pic.flow</code> does:</p>
+<div class="line">  --case my_first_run/flat_channel.yml \</div>
+<div class="line">  --solver my_first_run/Imp-MG-Standard.yml \</div>
+<div class="line">  --monitor my_first_run/Standard_Output.yml \</div>
+<div class="line">  --post my_first_run/standard_analysis.yml \</div>
+<div class="line">  -n 4 --solve --post-process</div>
+</div><!-- fragment --><p>What happens internally:</p>
 <ol type="1">
-<li>Validates YAML files.</li>
-<li>Creates <code>runs/&lt;run_id&gt;/</code>.</li>
-<li>Generates C-consumed config artifacts:<ul>
-<li><code>&lt;run_id&gt;.control</code></li>
-<li><code>bcs.run</code> (or <code>bcs_block*.run</code>)</li>
-<li><code>whitelist.run</code></li>
-<li><code>profile.run</code></li>
-<li><code>post.run</code></li>
-</ul>
-</li>
-<li>Launches <code>bin/picsolver</code>.</li>
-<li>Launches <code>bin/postprocessor</code> (because <code>--post-process</code> was set).</li>
+<li>all input files are loaded and validated,</li>
+<li>run ID directory is created under <code>runs/</code>,</li>
+<li>C-consumed artifacts are generated (<code>*.control</code>, <code>bcs*.run</code>, <code>whitelist.run</code>, <code>profile.run</code>, <code>post.run</code>),</li>
+<li><code>bin/picsolver</code> is launched,</li>
+<li><code>bin/postprocessor</code> is launched.</li>
 </ol>
-<h1><a class="anchor" id="output_sec"></a>
-4. Inspect Output Layout</h1>
+<h1><a class="anchor" id="artifacts_sec"></a>
+6. Inspect Generated Artifacts</h1>
+<p>Typical output structure:</p>
 <div class="fragment"><div class="line">runs/</div>
 <div class="line">`- flat_channel_YYYYMMDD-HHMMSS/</div>
 <div class="line">   |- config/</div>
 <div class="line">   |- logs/</div>
 <div class="line">   |- results/</div>
 <div class="line">   `- viz/</div>
-</div><!-- fragment --><ul>
-<li><code>config/</code>: generated runtime artifacts and copied input YAMLs</li>
-<li><code>results/</code>: solver binary field dumps</li>
-<li><code>viz/</code>: postprocessed <code>.vts</code> / <code>.vtp</code></li>
+</div><!-- fragment --><p>Interpretation:</p>
+<ul>
+<li><code>config/</code>: exact runtime artifact snapshot for reproducibility,</li>
+<li><code>logs/</code>: function-level and solver monitor traces,</li>
+<li><code>results/</code>: solver field outputs,</li>
+<li><code>viz/</code>: postprocessed VTK files for ParaView.</li>
 </ul>
+<h1><a class="anchor" id="checks_sec"></a>
+7. First Validation Checks</h1>
+<p>After run completion, verify:</p>
+<ul>
+<li>no fatal errors in <code>runs/&lt;run_id&gt;/logs/</code>,</li>
+<li>non-empty VTK outputs in visualization directory,</li>
+<li>expected time sequence naming (<code>Field_*.vts</code>, optionally <code>Particle_*.vtp</code>).</li>
+</ul>
+<p>If results are missing, check <code>post.yml</code> output toggles and directory settings first.</p>
 <h1><a class="anchor" id="viz_sec"></a>
-5. Visualize in ParaView</h1>
+8. Visualize in ParaView</h1>
 <ol type="1">
-<li>Open <code>runs/&lt;run_id&gt;/viz/Field_*.vts</code> as a time series.</li>
+<li>Open <code>Field_*.vts</code> time series.</li>
 <li>Click <code>Apply</code>.</li>
-<li>Add a <code>Slice</code> filter.</li>
-<li>Color by <code>Ucat_nodal</code> and select the flow-direction component.</li>
+<li>Add <code>Slice</code> filter.</li>
+<li>Color by <code>Ucat_nodal</code> magnitude or streamwise component.</li>
+<li>Optionally add <code>Stream Tracer</code> from inlet region.</li>
 </ol>
-<p>You should observe the expected Poiseuille profile development.</p>
+<p>Expected behavior: smooth channel flow with profile development consistent with setup.</p>
+<h1><a class="anchor" id="troubleshooting_sec"></a>
+9. Common First-Run Issues</h1>
+<ul>
+<li>Missing binary: rerun <code>./scripts/pic.flow build</code> and check PETSc vars.</li>
+<li>Validation failure: compare key paths against examples and <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b>.</li>
+<li>Empty post output: verify <code>--post-process</code> flag and <code>post.yml</code> output settings.</li>
+</ul>
+<p>Mapped error guide:</p>
+<ul>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
+</ul>
 <h1><a class="anchor" id="next_steps_sec"></a>
-7. Next Steps</h1>
-<p>Proceed to <b><a class="el" href="03_Tutorial_File-Based_Grid.html">Tutorial: Using a File-Based Grid (Bent Channel)</a></b> for file-based grid input workflow. </p>
+9. Next Steps</h1>
+<ul>
+<li>File-grid workflow: <b><a class="el" href="03_Tutorial_File-Based_Grid.html">Tutorial: Using a File-Based Grid (Bent Channel)</a></b></li>
+<li>Visualization details: <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b></li>
+<li>Operational recipes: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

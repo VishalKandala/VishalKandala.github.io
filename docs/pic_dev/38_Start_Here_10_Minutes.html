@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -95,73 +102,114 @@ $(document).ready(function(){initNavTree('38_Start_Here_10_Minutes.html',''); in
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#step1_sec">1. Install Prerequisites</a></li>
-<li class="level1"><a href="#step2_sec">2. Build Binaries</a></li>
-<li class="level1"><a href="#step3_sec">3. Initialize a Template Case</a></li>
-<li class="level1"><a href="#step4_sec">4. Validate Configs (No Run Yet)</a></li>
-<li class="level1"><a href="#step5_sec">5. Run Solver + Post</a></li>
-<li class="level1"><a href="#step6_sec">6. Inspect Outputs</a></li>
-<li class="level1"><a href="#step7_sec">7. First Troubleshooting Actions</a></li>
+<ul><li class="level1"><a href="#intent_sec">1. What This Quickstart Covers</a></li>
+<li class="level1"><a href="#prereq_sec">2. Minimal Prerequisites</a></li>
+<li class="level1"><a href="#check_sec">7. Confirm Success</a></li>
+<li class="level1"><a href="#next_sec">8. Continue With Full Guidance</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This is the fastest path from clone to first solver+post output.</p>
-<h1><a class="anchor" id="step1_sec"></a>
-1. Install Prerequisites</h1>
-<p>Follow <b><a class="el" href="01_Installation.html">Installation Guide</a></b> for full setup details. For quick local runs you need:</p><ul>
-<li>PETSc environment (<code>PETSC_DIR</code>, <code>PETSC_ARCH</code>)</li>
-<li>MPI, Make, Python 3</li>
+<div class="textblock"><p>This page is the shortest reliable path from repository clone to a successful solver and post-processing run. It intentionally mirrors the beginning of <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b>. Use this page when you want speed; use the tutorial page when you want deeper explanation.</p>
+<h1><a class="anchor" id="intent_sec"></a>
+1. What This Quickstart Covers</h1>
+<p>In one pass you will:</p>
+<ol type="1">
+<li>build binaries,</li>
+<li>create a runnable case directory,</li>
+<li>validate all YAML files before launch,</li>
+<li>run solver and postprocessor,</li>
+<li>confirm expected output structure.</li>
+</ol>
+<h1><a class="anchor" id="prereq_sec"></a>
+2. Minimal Prerequisites</h1>
+<p>You need:</p>
+<ul>
+<li>PETSc configured (<code>PETSC_DIR</code>, <code>PETSC_ARCH</code>),</li>
+<li>MPI runtime,</li>
+<li>Python 3.</li>
 </ul>
-<h1><a class="anchor" id="step2_sec"></a>
-2. Build Binaries</h1>
+<p>If any of these are missing, follow <b><a class="el" href="01_Installation.html">Installation Guide</a></b> first.</p>
+<h1><a class="anchor" id="build_sec"></a>
+6. Build with pic.flow</h1>
 <p>From repository root:</p>
 <div class="fragment"><div class="line">./scripts/pic.flow build</div>
-</div><!-- fragment --><p>Expected artifacts:</p><ul>
+</div><!-- fragment --><p>Expected binaries:</p>
+<ul>
 <li><code>bin/picsolver</code></li>
 <li><code>bin/postprocessor</code></li>
 </ul>
-<h1><a class="anchor" id="step3_sec"></a>
-3. Initialize a Template Case</h1>
+<p>If build fails, go to <b><a class="el" href="01_Installation.html">Installation Guide</a></b> and verify PETSc/MPI toolchain setup.</p>
+<h1><a class="anchor" id="init_sec"></a>
+2. Initialize the Study Directory</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow init flat_channel --dest my_case</div>
-</div><!-- fragment --><h1><a class="anchor" id="step4_sec"></a>
-4. Validate Configs (No Run Yet)</h1>
+</div><!-- fragment --><p>You should get:</p>
+<div class="fragment"><div class="line">my_case/</div>
+<div class="line">|- flat_channel.yml</div>
+<div class="line">|- Imp-MG-Standard.yml</div>
+<div class="line">|- Standard_Output.yml</div>
+<div class="line">`- standard_analysis.yml</div>
+</div><!-- fragment --><p>These are the four runtime roles:</p>
+<ul>
+<li>case physics and grid,</li>
+<li>solver numerics,</li>
+<li>monitor/logging controls,</li>
+<li>post-processing pipeline.</li>
+</ul>
+<h1><a class="anchor" id="validate_sec"></a>
+4. Validate Inputs Before Launch</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow validate \</div>
 <div class="line">  --case my_case/flat_channel.yml \</div>
 <div class="line">  --solver my_case/Imp-MG-Standard.yml \</div>
 <div class="line">  --monitor my_case/Standard_Output.yml \</div>
 <div class="line">  --post my_case/standard_analysis.yml</div>
-</div><!-- fragment --><p>Optional launch preview (no files created):</p>
+</div><!-- fragment --><p>Why this matters:</p>
+<ul>
+<li>catches schema and contract errors early,</li>
+<li>avoids wasting cluster/local runtime on bad config,</li>
+<li>produces structured error messages with key and file context.</li>
+</ul>
+<p>Optional launch preview with no execution:</p>
 <div class="fragment"><div class="line">./scripts/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/flat_channel.yml \</div>
 <div class="line">  --solver my_case/Imp-MG-Standard.yml \</div>
 <div class="line">  --monitor my_case/Standard_Output.yml \</div>
 <div class="line">  --post my_case/standard_analysis.yml \</div>
 <div class="line">  --dry-run</div>
-</div><!-- fragment --><h1><a class="anchor" id="step5_sec"></a>
-5. Run Solver + Post</h1>
+</div><!-- fragment --><h1><a class="anchor" id="run_sec"></a>
+5. Run Solver and Postprocessor</h1>
 <div class="fragment"><div class="line">./scripts/pic.flow run --solve --post-process -n 4 \</div>
 <div class="line">  --case my_case/flat_channel.yml \</div>
 <div class="line">  --solver my_case/Imp-MG-Standard.yml \</div>
 <div class="line">  --monitor my_case/Standard_Output.yml \</div>
 <div class="line">  --post my_case/standard_analysis.yml</div>
-</div><!-- fragment --><h1><a class="anchor" id="step6_sec"></a>
-6. Inspect Outputs</h1>
-<p>Check generated directories:</p><ul>
-<li><code>runs/&lt;run_id&gt;/config/</code></li>
-<li><code>runs/&lt;run_id&gt;/logs/</code></li>
-<li>solver output path from <code>monitor.yml</code> (typically <code>results/</code>)</li>
-<li>post output path from <code>post.yml</code> (<code>io.output_directory</code>)</li>
-</ul>
-<h1><a class="anchor" id="step7_sec"></a>
-7. First Troubleshooting Actions</h1>
-<p>If validation or run fails:</p><ol type="1">
-<li>Re-run <code>pic.flow validate ...</code> for the same files.</li>
-<li>Check structured error lines (<code>ERROR &lt;CODE&gt; | key=... | file=...</code>).</li>
-<li>Compare against <code>examples/master_template/*.yml</code>.</li>
-<li>Use <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for mapped fixes.</li>
+</div><!-- fragment --><p>This command does:</p>
+<ol type="1">
+<li>validate + normalize config,</li>
+<li>create <code>runs/&lt;run_id&gt;/config/</code> artifacts,</li>
+<li>launch <code>picsolver</code>,</li>
+<li>launch <code>postprocessor</code>.</li>
 </ol>
-<p>Next:</p><ul>
-<li><b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
-<li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: <code>pic.flow</code></a></b> </li>
+<h1><a class="anchor" id="check_sec"></a>
+7. Confirm Success</h1>
+<p>Check these locations:</p>
+<ul>
+<li><code>runs/&lt;run_id&gt;/config/</code> (generated control artifacts)</li>
+<li><code>runs/&lt;run_id&gt;/logs/</code> (run logs)</li>
+<li><code>results/</code> (solver outputs, if configured)</li>
+<li><code>viz/</code> or configured post output directory (VTK files)</li>
+</ul>
+<p>Quick sanity check in ParaView:</p>
+<ul>
+<li>open <code>Field_*.vts</code>,</li>
+<li>add <code>Slice</code>,</li>
+<li>color by <code>Ucat_nodal</code>.</li>
+</ul>
+<h1><a class="anchor" id="next_sec"></a>
+8. Continue With Full Guidance</h1>
+<ul>
+<li>Full walkthrough with deeper explanation: <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b></li>
+<li>File-based-grid tutorial: <b><a class="el" href="03_Tutorial_File-Based_Grid.html">Tutorial: Using a File-Based Grid (Bent Channel)</a></b></li>
+<li>Command/reference guide for orchestration: <b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: pic.flow</a></b></li>
+<li>Troubleshooting map: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['script_3a_20tt_20pic_20flow_20tt_0',['The Conductor Script: &lt;tt&gt;pic.flow&lt;/tt&gt;',['../05_The_Conductor_Script.html',1,'']]],
+  ['script_3a_20pic_20flow_0',['The Conductor Script: pic.flow',['../05_The_Conductor_Script.html',1,'']]],
   ['scripts_20guide_1',['Scripts Guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2scripts_2guide.html',1,'']]],
   ['search_20for_20particle_20location_2',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
   ['simulation_3',['Anatomy of a Simulation',['../06_Simulation_Anatomy.html',1,'']]],
@@ -11,13 +11,14 @@ var searchData=
   ['solver_8',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]],
   ['solver_20documentation_9',['PICurv Solver Documentation',['../index.html',1,'']]],
   ['solver_20implementations_10',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['solver_20yml_20tt_11',['Configuration Reference: &lt;tt&gt;solver.yml&lt;/tt&gt;',['../08_Solver_Reference.html',1,'']]],
+  ['solver_20yml_11',['Configuration Reference: solver.yml',['../08_Solver_Reference.html',1,'']]],
   ['source_20guide_12',['Source Guide',['../md__2home_2runner_2work_2PICurv_2PICurv_2src_2guide.html',1,'']]],
   ['start_20here_20in_2010_20minutes_13',['Start Here in 10 Minutes',['../38_Start_Here_10_Minutes.html',1,'']]],
-  ['statistical_20averaging_14',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
-  ['status_15',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
-  ['step_20projection_20method_16',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['study_20guide_17',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['summary_18',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['sweep_20and_20study_20guide_19',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
+  ['started_14',['Getting Started',['../41_Getting_Started_Index.html',1,'']]],
+  ['statistical_20averaging_15',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
+  ['status_16',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
+  ['step_20projection_20method_17',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
+  ['study_20guide_18',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['summary_19',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
+  ['sweep_20and_20study_20guide_20',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
 ];

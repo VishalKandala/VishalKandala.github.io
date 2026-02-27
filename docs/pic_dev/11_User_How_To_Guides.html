@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -98,27 +105,27 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <ul><li class="level1"><a href="#setup_sec">1. Setup and Physics</a><ul><li class="level2"><a href="#reynolds_ssec">1.1 Change Reynolds Number</a></li>
 <li class="level2"><a href="#twod_ssec">1.2 Run in 2D</a></li>
 <li class="level2"><a href="#gridres_ssec">1.3 Increase Grid Resolution</a></li>
-<li class="level2"><a href="#bc_simple_ssec">2.1 Set a Basic Inlet + Wall</a></li>
-<li class="level2"><a href="#bc_periodic_ssec">2.2 Set a Periodic Direction</a></li>
-<li class="level2"><a href="#mpi_ssec">3.1 Run in Parallel and Set DMDA Layout</a></li>
-<li class="level2"><a href="#cluster_run_ssec">3.2 Run on Slurm (Generate + Submit)</a></li>
+<li class="level2"><a href="#bc_simple_ssec">2.1 Set a Constant-Velocity Inlet and Walls</a></li>
+<li class="level2"><a href="#bc_periodic_ssec">2.2 Enable Periodicity in One Direction</a></li>
+<li class="level2"><a href="#mpi_ssec">3.1 Run in Parallel and Control DMDA Layout</a></li>
+<li class="level2"><a href="#cluster_run_ssec">3.2 Run on Slurm (Generate and Submit)</a></li>
 <li class="level2"><a href="#restart_ssec">3.3 Restart from a Saved Step</a></li>
-<li class="level2"><a href="#logging_ssec">3.4 Targeted Debug Logging</a></li>
+<li class="level2"><a href="#logging_ssec">3.4 Enable Targeted Debug Logging</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#post_sec">4. Post-Processing</a><ul><li class="level2"><a href="#post_existing_ssec">4.1 Postprocess an Existing Run</a></li>
-<li class="level2"><a href="#qcrit_ssec">4.2 Add Q-Criterion</a></li>
+<li class="level1"><a href="#post_sec">4. Post-Processing Recipes</a><ul><li class="level2"><a href="#post_existing_ssec">4.1 Postprocess an Existing Run</a></li>
+<li class="level2"><a href="#qcrit_ssec">4.2 Add Q-Criterion to Eulerian Pipeline</a></li>
 <li class="level2"><a href="#stats_ssec">4.3 Enable Statistics Output (MSD)</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<div class="textblock"><p>Quick recipes for common PICurv tasks.</p>
+<div class="textblock"><p>This page provides operational recipes for common PICurv tasks. Each recipe includes what to change, why it matters, and a quick verification action.</p>
 <h1><a class="anchor" id="setup_sec"></a>
 1. Setup and Physics</h1>
 <h2><a class="anchor" id="reynolds_ssec"></a>
 1.1 Change Reynolds Number</h2>
-<p>Edit <code>case.yml -&gt; properties</code> values used by <code>Re = rho * U * L / mu</code>:</p>
+<p>What to change (in <code>case.yml</code>):</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  scaling:</div>
 <div class="line">    length_ref: 0.1</div>
@@ -126,7 +133,19 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <div class="line">  fluid:</div>
 <div class="line">    density: 1000.0</div>
 <div class="line">    viscosity: 0.001</div>
-</div><!-- fragment --><h2><a class="anchor" id="twod_ssec"></a>
+</div><!-- fragment --><p>Why:</p>
+<p class="formulaDsp">
+\[
+Re = \frac{\rho U L}{\mu}
+\]
+</p>
+<p>These values set the non-dimensional operating point consumed by solver controls.</p>
+<p>Quick check:</p>
+<ul>
+<li>rerun <code>pic.flow validate ...</code>,</li>
+<li>inspect generated <code>.control</code> file for updated values.</li>
+</ul>
+<h2><a class="anchor" id="twod_ssec"></a>
 1.2 Run in 2D</h2>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  physics:</div>
@@ -136,13 +155,30 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <div class="line">  mode: programmatic_c</div>
 <div class="line">  programmatic_settings:</div>
 <div class="line">    km: [3]</div>
-</div><!-- fragment --><h2><a class="anchor" id="gridres_ssec"></a>
+</div><!-- fragment --><p>Why:</p>
+<ul>
+<li>2D mode still uses a thin third dimension for structured-grid machinery,</li>
+<li>small <code>km</code> is typically enough for planar scenarios.</li>
+</ul>
+<p>Quick check:</p>
+<ul>
+<li>confirm generated run uses expected Z resolution.</li>
+</ul>
+<h2><a class="anchor" id="gridres_ssec"></a>
 1.3 Increase Grid Resolution</h2>
-<p>For <code>programmatic_c</code>, adjust <code>im/jm/km</code>. For <code>file</code>, provide a finer external grid and update <code>source_file</code>. For <code>grid_gen</code>, increase generator resolution controls in <code>grid.generator.cli_args</code> or config.</p>
+<ul>
+<li><code>programmatic_c</code>: increase <code>im/jm/km</code> arrays,</li>
+<li><code>file</code>: use finer <code>.picgrid</code>,</li>
+<li><code>grid_gen</code>: increase generator resolution args.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>compare runtime memory/cost and key output metrics across resolutions.</li>
+</ul>
 <h1><a class="anchor" id="bc_sec"></a>
-5. &lt;tt&gt;boundary_conditions&lt;/tt&gt;</h1>
+5. boundary_conditions</h1>
 <h2><a class="anchor" id="bc_simple_ssec"></a>
-2.1 Set a Basic Inlet + Wall</h2>
+2.1 Set a Constant-Velocity Inlet and Walls</h2>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
 <div class="line">    type: &quot;INLET&quot;</div>
@@ -151,38 +187,52 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <div class="line">  - face: &quot;-Eta&quot;</div>
 <div class="line">    type: &quot;WALL&quot;</div>
 <div class="line">    handler: &quot;noslip&quot;</div>
-<div class="line">  # ... include all remaining faces ...</div>
-</div><!-- fragment --><h2><a class="anchor" id="bc_periodic_ssec"></a>
-2.2 Set a Periodic Direction</h2>
+<div class="line">  # define all remaining faces explicitly</div>
+</div><!-- fragment --><p>Why:</p>
+<ul>
+<li>handler/type compatibility is validated,</li>
+<li>all faces must be covered for each block.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>use <code>validate</code> first and check BC generation files under <code>runs/&lt;run_id&gt;/config/</code>.</li>
+</ul>
+<h2><a class="anchor" id="bc_periodic_ssec"></a>
+2.2 Enable Periodicity in One Direction</h2>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  domain:</div>
 <div class="line">    i_periodic: true</div>
-</div><!-- fragment --><p>Use <code>PERIODIC</code> type on both paired faces (<code>-Xi</code> and <code>+Xi</code>) with supported handlers:</p><ul>
+</div><!-- fragment --><p>Use <code>PERIODIC</code> BC type on both paired faces with supported handlers:</p>
+<ul>
 <li><code>geometric</code></li>
 <li><code>constant_flux</code> (requires <code>target_flux</code>)</li>
 </ul>
+<p>Verification:</p>
+<ul>
+<li>confirm paired-face consistency in validation output.</li>
+</ul>
 <h1><a class="anchor" id="run_sec"></a>
-3. Run Solver + Postprocessor</h1>
+5. Run Solver and Postprocessor</h1>
 <h2><a class="anchor" id="mpi_ssec"></a>
-3.1 Run in Parallel and Set DMDA Layout</h2>
+3.1 Run in Parallel and Control DMDA Layout</h2>
 <div class="fragment"><div class="line">./scripts/pic.flow run -n 16 --solve ...</div>
-</div><!-- fragment --><p>Optional global layout hint:</p>
+</div><!-- fragment --><p>Optional partition hints:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: programmatic_c</div>
 <div class="line">  programmatic_settings:</div>
 <div class="line">    da_processors_x: 4</div>
 <div class="line">    da_processors_y: 2</div>
 <div class="line">    da_processors_z: 2</div>
-</div><!-- fragment --><p><code>da_processors_*</code> are scalar globals, not per-block arrays.</p>
+</div><!-- fragment --><p>Note: <code>da_processors_*</code> are scalar globals, not per-block vectors.</p>
 <h2><a class="anchor" id="cluster_run_ssec"></a>
-3.2 Run on Slurm (Generate + Submit)</h2>
+3.2 Run on Slurm (Generate and Submit)</h2>
 <div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml</div>
-</div><!-- fragment --><p>To only generate scripts/configs:</p>
+</div><!-- fragment --><p>Generate-only mode:</p>
 <div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -190,28 +240,41 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
-</div><!-- fragment --><h2><a class="anchor" id="restart_ssec"></a>
+</div><!-- fragment --><p>Verification:</p>
+<ul>
+<li>inspect <code>scheduler/*.sbatch</code> and <code>submission.json</code> in run directory.</li>
+</ul>
+<h2><a class="anchor" id="restart_ssec"></a>
 3.3 Restart from a Saved Step</h2>
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  start_step: 1000</div>
 <div class="line">  total_steps: 2000</div>
-</div><!-- fragment --><p>This advances from step 1000 to 3000.</p>
+</div><!-- fragment --><p>Meaning:</p>
+<ul>
+<li>run resumes from step 1000 and advances 2000 additional steps.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>confirm restart directory and step indices in run logs.</li>
+</ul>
 <h2><a class="anchor" id="logging_ssec"></a>
-3.4 Targeted Debug Logging</h2>
+3.4 Enable Targeted Debug Logging</h2>
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;DEBUG&quot;</div>
 <div class="line">  enabled_functions:</div>
 <div class="line">    - Projection</div>
 <div class="line">    - UpdatePressure</div>
-</div><!-- fragment --><h1><a class="anchor" id="post_sec"></a>
-4. Post-Processing</h1>
+</div><!-- fragment --><p>Use this for local diagnosis of instability or boundary anomalies. Prefer narrow function lists to keep logs manageable.</p>
+<h1><a class="anchor" id="post_sec"></a>
+4. Post-Processing Recipes</h1>
 <h2><a class="anchor" id="post_existing_ssec"></a>
 4.1 Postprocess an Existing Run</h2>
 <div class="fragment"><div class="line">./scripts/pic.flow run --post-process \</div>
 <div class="line">  --run-dir runs/flat_channel_20240401-153000 \</div>
 <div class="line">  --post my_study/standard_analysis.yml</div>
-</div><!-- fragment --><h2><a class="anchor" id="qcrit_ssec"></a>
-4.2 Add Q-Criterion</h2>
+</div><!-- fragment --><p>Use when solver outputs already exist and you are iterating only on analysis pipeline.</p>
+<h2><a class="anchor" id="qcrit_ssec"></a>
+4.2 Add Q-Criterion to Eulerian Pipeline</h2>
 <div class="fragment"><div class="line">eulerian_pipeline:</div>
 <div class="line">  - task: nodal_average</div>
 <div class="line">    input_field: Ucat</div>
@@ -222,31 +285,39 @@ $(document).ready(function(){initNavTree('11_User_How_To_Guides.html',''); initR
 <div class="line">  eulerian_fields:</div>
 <div class="line">    - Ucat_nodal</div>
 <div class="line">    - Qcrit</div>
-</div><!-- fragment --><h2><a class="anchor" id="stats_ssec"></a>
+</div><!-- fragment --><p>Verification:</p>
+<ul>
+<li>open VTK output and confirm <code>Qcrit</code> field is present.</li>
+</ul>
+<h2><a class="anchor" id="stats_ssec"></a>
 4.3 Enable Statistics Output (MSD)</h2>
 <div class="fragment"><div class="line">statistics_pipeline:</div>
 <div class="line">  output_prefix: &quot;Stats&quot;</div>
 <div class="line">  tasks:</div>
 <div class="line">    - task: msd</div>
-</div><!-- fragment --><h1><a class="anchor" id="sweep_sec"></a>
-3. &lt;tt&gt;sweep&lt;/tt&gt;: Parameter Study via Slurm Arrays</h1>
+</div><!-- fragment --><p>Verification:</p>
+<ul>
+<li>check <code>Stats_msd.csv</code> in configured output location.</li>
+</ul>
+<h1><a class="anchor" id="sweep_sec"></a>
+3. sweep: Parameter Study via Slurm Arrays</h1>
 <div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml</div>
-</div><!-- fragment --><p>This creates <code>studies/&lt;study_id&gt;/...</code>, submits solver/post array jobs with dependency chaining, and writes aggregated metrics/plots.</p>
+</div><!-- fragment --><p>What you get:</p>
+<ul>
+<li>expanded case matrix,</li>
+<li>scheduler array scripts,</li>
+<li>aggregated metrics table,</li>
+<li>optional plots.</li>
+</ul>
+<p>See <b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b> for full contract details.</p>
 <h1><a class="anchor" id="next_steps_sec"></a>
-7. Next Steps</h1>
-<p>Proceed to <b><a class="el" href="12_Capabilities_Summary.html">Capabilities Summary</a></b>.</p>
-<p>For full option reference, also see:</p><ul>
-<li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: <code>case.yml</code></a></b></li>
-<li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: <code>solver.yml</code></a></b></li>
-<li><b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: <code>monitor.yml</code></a></b></li>
-<li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: <code>post.yml</code></a></b></li>
-<li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
-<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
-<li><b><a class="el" href="38_Start_Here_10_Minutes.html">Start Here in 10 Minutes</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing, Smoke, and Quality Gates Guide</a></b> </li>
+9. Next Steps</h1>
+<ul>
+<li>Full capability map: <b><a class="el" href="12_Capabilities_Summary.html">Capabilities Summary</a></b></li>
+<li>Config references: <b><a class="el" href="07_Case_Reference.html">Configuration Reference: case.yml</a></b>, <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: solver.yml</a></b>, <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: monitor.yml</a></b>, <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: post.yml</a></b></li>
+<li>Troubleshooting and quality: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b>, <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing, Smoke, and Quality Gates Guide</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

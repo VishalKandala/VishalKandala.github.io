@@ -16,6 +16,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/SVG"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -95,137 +102,116 @@ $(document).ready(function(){initNavTree('12_Capabilities_Summary.html',''); ini
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#flow_sec">2. Flow and Particle Physics</a></li>
-<li class="level1"><a href="#numerics_sec">3. Numerics and Solvers</a></li>
-<li class="level1"><a href="#data_driven_sec">7. Data-Driven Closure Readiness</a></li>
-<li class="level1"><a href="#orchestration_sec">8. Cluster and Study Orchestration</a></li>
+<ul><li class="level1"><a href="#ingest_sec">1. Input and Grid Capabilities</a></li>
+<li class="level1"><a href="#physics_sec">2. Physics and Model Selection</a></li>
+<li class="level1"><a href="#solver_sec">3. Numerical Solver Stack</a></li>
+<li class="level1"><a href="#orchestration_sec">6. Cluster and Study Orchestration</a></li>
+<li class="level1"><a href="#extension_sec">7. Extensibility Status</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page summarizes what is currently available through YAML + <code>pic.flow</code> without editing C source.</p>
-<h1><a class="anchor" id="grid_sec"></a>
-3. &lt;tt&gt;grid&lt;/tt&gt;</h1>
+<div class="textblock"><p>This page summarizes current capabilities from YAML + <code>pic.flow</code> without editing C source. It is organized by workflow stage rather than just a feature bullet list.</p>
+<h1><a class="anchor" id="ingest_sec"></a>
+1. Input and Grid Capabilities</h1>
+<p>PICurv currently supports three grid ingestion modes:</p>
 <ul>
-<li>Grid modes:<ul>
-<li><code>programmatic_c</code> (C-side structured generation)</li>
-<li><code>file</code> (external <code>.picgrid</code> ingestion with validation and scaling)</li>
-<li><code>grid_gen</code> (pre-run Python grid generation orchestration)</li>
+<li><code>programmatic_c</code>: C-side structured grid generation,</li>
+<li><code>file</code>: external <code>.picgrid</code> read path with scaling/validation,</li>
+<li><code>grid_gen</code>: pre-run Python generator orchestration.</li>
 </ul>
-</li>
-<li>Domain topology:<ul>
-<li>single- and multi-block support</li>
-<li>per-direction periodic flags</li>
-</ul>
-</li>
-<li>Programmatic grid controls:<ul>
-<li>per-block geometry arrays (<code>im/jm/km</code>, bounds, stretching)</li>
-<li>global DMDA partition hints (<code>da_processors_x/y/z</code>, scalar only)</li>
-</ul>
-</li>
-</ul>
-<h1><a class="anchor" id="flow_sec"></a>
-2. Flow and Particle Physics</h1>
+<p>Domain controls include:</p>
 <ul>
-<li>Incompressible Navier-Stokes flow</li>
-<li>2D/3D selection</li>
-<li>LES toggle</li>
-<li>Eulerian source modes:<ul>
-<li><code>solve</code></li>
-<li><code>load</code></li>
-<li><code>analytical</code> + <code>analytical_type</code></li>
+<li>single- and multi-block support,</li>
+<li>per-direction periodicity,</li>
+<li>optional DMDA partition hints (<code>da_processors_x/y/z</code>).</li>
 </ul>
-</li>
-<li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> controls:<ul>
-<li>particle count</li>
-<li>init modes (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>, <code>SurfaceEdges</code>)</li>
-<li>restart mode (<code>init</code>, <code>load</code>)</li>
-</ul>
-</li>
-</ul>
-<h1><a class="anchor" id="numerics_sec"></a>
-3. Numerics and Solvers</h1>
+<h1><a class="anchor" id="physics_sec"></a>
+2. Physics and Model Selection</h1>
+<p>Supported high-level operation modes:</p>
 <ul>
-<li>Named momentum solver selection (extensible string selector)</li>
-<li>Solver-specific option blocks (<code>momentum_solver.dual_time_picard_rk4</code>)</li>
-<li>Pseudo-CFL and convergence tuning for dual-time method</li>
-<li>Pressure Poisson control:<ul>
-<li>multigrid levels/sweeps/semi-coarsening</li>
-<li>PETSc passthrough options and monitors</li>
+<li>solve from numerically evolved Eulerian fields,</li>
+<li>load/restart from prior field outputs,</li>
+<li>analytical Eulerian field modes (<code>TGV3D</code>, <code>ZERO_FLOW</code>).</li>
 </ul>
-</li>
+<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> controls include:</p>
+<ul>
+<li>particle count,</li>
+<li>initialization modes (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>, <code>SurfaceEdges</code>),</li>
+<li>restart modes (<code>init</code>, <code>load</code>),</li>
+<li>scalar micromixing update path (IEM-style <code>Psi</code> model).</li>
 </ul>
+<h1><a class="anchor" id="solver_sec"></a>
+3. Numerical Solver Stack</h1>
+<p>Momentum:</p>
+<ul>
+<li>named momentum strategy selection,</li>
+<li>active implementations: explicit RK and dual-time Picard RK4,</li>
+<li>tunable tolerances and pseudo-CFL controls.</li>
+</ul>
+<p>Pressure:</p>
+<ul>
+<li>multigrid Poisson workflow,</li>
+<li>level/sweep/semi-coarsening controls,</li>
+<li>PETSc passthrough flags for advanced tuning.</li>
+</ul>
+<p>See method details in <b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b>.</p>
 <h1><a class="anchor" id="bc_sec"></a>
-5. &lt;tt&gt;boundary_conditions&lt;/tt&gt;</h1>
-<p>Supported combinations include:</p><ul>
-<li><code>INLET</code>: <code>constant_velocity</code>, <code>parabolic</code></li>
-<li><code>OUTLET</code>: <code>conservation</code></li>
-<li><code>WALL</code>: <code>noslip</code></li>
-<li><code>PERIODIC</code>: <code>geometric</code>, <code>constant_flux</code></li>
-</ul>
-<p><code>pic.flow</code> validates face completeness, type-handler compatibility, and periodic pair consistency.</p>
-<h1><a class="anchor" id="io_sec"></a>
-1. &lt;tt&gt;io&lt;/tt&gt;</h1>
+5. boundary_conditions</h1>
+<p>Boundary capabilities include validated type-handler pairings across inlet/outlet/wall/periodic classes. Runtime controls include:</p>
 <ul>
-<li>Output/restart/log root directory controls</li>
-<li>Eulerian/particle subdirectory controls</li>
-<li>Function whitelist logging and critical-function profiling files</li>
-<li>Raw PETSc monitor passthrough from monitor profile</li>
+<li>output/restart/log directory selection,</li>
+<li>function-level logging allowlists,</li>
+<li>profiling critical function lists,</li>
+<li>monitor verbosity and cadence controls.</li>
 </ul>
 <h1><a class="anchor" id="post_sec"></a>
-4. Post-Processing</h1>
+4. Post-Processing Recipes</h1>
+<p>Pipeline capabilities include:</p>
 <ul>
-<li>Eulerian pipeline tasks:<ul>
-<li>dimensionalize</li>
-<li>nodal averaging</li>
-<li>Q-criterion</li>
-<li>relative field normalization</li>
-</ul>
-</li>
-<li>Lagrangian pipeline tasks:<ul>
-<li>specific kinetic energy</li>
-</ul>
-</li>
-<li>Statistics pipeline:<ul>
-<li>MSD (<code>ComputeMSD</code>) with configurable output prefix</li>
-</ul>
-</li>
-<li>Configurable post input extensions (<code>eulerianExt</code>, <code>particleExt</code>)</li>
-</ul>
-<h1><a class="anchor" id="data_driven_sec"></a>
-7. Data-Driven Closure Readiness</h1>
-<ul>
-<li>Offline ML workflows are supported today via stable solver/post outputs.</li>
-<li>Tightly coupled in-solver inference requires extension work (documented in playbook).</li>
+<li>Eulerian transforms (dimensionalization, nodal averaging, Q-criterion, normalization),</li>
+<li>Lagrangian particle tasks,</li>
+<li>statistics reduction pipeline (currently MSD family),</li>
+<li>configurable input extensions and output field selection.</li>
 </ul>
 <h1><a class="anchor" id="orchestration_sec"></a>
-8. Cluster and Study Orchestration</h1>
+6. Cluster and Study Orchestration</h1>
+<p>Single-run cluster flow (<code>run --cluster ...</code>):</p>
 <ul>
-<li>Slurm single-run orchestration from <code>pic.flow run --cluster ...</code><ul>
-<li>solver/post script generation</li>
-<li>optional direct submission</li>
-<li>dependency chaining (<code>post</code> after <code>solve</code>)</li>
-<li>per-run submission and manifest metadata</li>
+<li>scheduler script generation,</li>
+<li>optional submission,</li>
+<li>solver/post dependency chaining,</li>
+<li>run manifests.</li>
 </ul>
-</li>
-<li>Slurm study sweeps from <code>pic.flow sweep</code><ul>
-<li>parameter matrix expansion</li>
-<li>solver/post array script generation</li>
-<li>metrics aggregation from CSV/log outputs</li>
-<li>convergence/sensitivity plot generation (matplotlib-enabled environments)</li>
+<p>Study flow (<code>sweep</code>):</p>
+<ul>
+<li>parameter matrix expansion,</li>
+<li>array script generation,</li>
+<li>metric aggregation and optional plots,</li>
+<li>study manifest and reproducible directory structure.</li>
 </ul>
-</li>
+<h1><a class="anchor" id="extension_sec"></a>
+7. Extensibility Status</h1>
+<p>Current extension pathways are documented and active for:</p>
+<ul>
+<li>YAML contract extension,</li>
+<li>ingestion mapping updates,</li>
+<li>workflow orchestration growth,</li>
+<li>method-level and model-level solver extension.</li>
 </ul>
-<h1><a class="anchor" id="next_steps_sec"></a>
-7. Next Steps</h1>
-<p>Proceed to <b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b>.</p>
-<p>For extension and maintenance details:</p><ul>
+<p>Reference pages:</p>
+<ul>
+<li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
+</ul>
+<h1><a class="anchor" id="next_steps_sec"></a>
+9. Next Steps</h1>
+<ol type="1">
+<li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
 <li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
-<li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
-<li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b> </li>
-</ul>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

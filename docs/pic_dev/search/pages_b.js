@@ -15,6 +15,6 @@ var searchData=
   ['modes_12',['modes',['../32_Analytical_Solutions.html',1,'Analytical Solution Modes'],['../33_Initial_Conditions.html',1,'Initial Condition Modes']]],
   ['momentum_20solver_13',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]],
   ['momentum_20solver_20implementations_14',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['monitor_20yml_20tt_15',['Configuration Reference: &lt;tt&gt;monitor.yml&lt;/tt&gt;',['../09_Monitor_Reference.html',1,'']]],
+  ['monitor_20yml_15',['Configuration Reference: monitor.yml',['../09_Monitor_Reference.html',1,'']]],
   ['multigrid_16',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];
