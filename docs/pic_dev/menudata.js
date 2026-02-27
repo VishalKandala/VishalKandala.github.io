@@ -24,6 +24,6 @@
 */
 var menudata={children:[
 {text:"PICurv Home",url:"index.html"},
-{text:"Getting Started",url:"41_Getting_Started_Index.html"},
-{text:"User Guide",url:"42_User_Guide_Index.html"},
-{text:"Developer Portal",url:"43_Developer_Portal_Index.html"}]}
+{text:"Documentation",url:"pages.html"},
+{text:"File List",url:"files.html"},
+{text:"Data Structures",url:"annotated.html"}]}

@@ -22,6 +22,5 @@ var searchData=
   ['architecture_19',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
   ['architecture_20guide_20',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
   ['artifacts_20runtime_21',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['assets_20guide_22',['Assets Guide',['../md_assets_2guide.html',1,'']]],
-  ['averaging_23',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['averaging_22',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];

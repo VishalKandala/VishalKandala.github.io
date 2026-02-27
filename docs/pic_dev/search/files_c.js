@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['include_2fguide_2emd_0',['guide.md',['../include_2guide_8md.html',1,'']]],
-  ['initialcondition_2ec_1',['initialcondition.c',['../initialcondition_8c.html',1,'']]],
-  ['initialcondition_2eh_2',['initialcondition.h',['../initialcondition_8h.html',1,'']]],
-  ['interpolation_2ec_3',['interpolation.c',['../interpolation_8c.html',1,'']]],
-  ['interpolation_2eh_4',['interpolation.h',['../interpolation_8h.html',1,'']]],
-  ['io_2ec_5',['io.c',['../io_8c.html',1,'']]],
-  ['io_2eh_6',['io.h',['../io_8h.html',1,'']]]
+  ['mainpage_2emd_0',['mainpage.md',['../mainpage_8md.html',1,'']]],
+  ['master_5ftemplate_2emd_1',['master_template.md',['../master__template_8md.html',1,'']]],
+  ['metric_2ec_2',['Metric.c',['../Metric_8c.html',1,'']]],
+  ['metric_2eh_3',['Metric.h',['../Metric_8h.html',1,'']]],
+  ['momentumsolvers_2ec_4',['momentumsolvers.c',['../momentumsolvers_8c.html',1,'']]],
+  ['momentumsolvers_2eh_5',['momentumsolvers.h',['../momentumsolvers_8h.html',1,'']]]
 ];
