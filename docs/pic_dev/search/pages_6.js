@@ -1,14 +1,14 @@
 var searchData=
 [
-  ['fatal_20errors_20and_20fixes_0',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
-  ['file_20based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['first_20simulation_20flat_20channel_2',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
-  ['fixes_3',['fixes',['../39_Common_Fatal_Errors.html',1,'Common Fatal Errors and Fixes'],['../29_Maintenance_Backlog.html',1,'Maintenance Backlog and Low-Priority Fixes']]],
-  ['flat_20channel_4',['flat channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'Case Template: Laminar Flow in a Flat Channel'],['../02_Tutorial_Programmatic_Grid.html',1,'Tutorial: Your First Simulation (Flat Channel)']]],
-  ['flow_5',['The Conductor Script: pic.flow',['../05_The_Conductor_Script.html',1,'']]],
-  ['flow_20in_20a_20bent_20channel_6',['Case Template: Laminar Flow in a Bent Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html',1,'']]],
-  ['flow_20in_20a_20flat_20channel_7',['Case Template: Laminar Flow in a Flat Channel',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html',1,'']]],
-  ['flow_20master_20configuration_20templates_8',['PIC-Flow Master Configuration Templates',['../md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html',1,'']]],
-  ['for_20particle_20location_9',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
-  ['fractional_20step_20projection_20method_10',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]]
+  ['gates_20guide_0',['Testing, Smoke, and Quality Gates Guide',['../40_Testing_and_Quality_Guide.html',1,'']]],
+  ['generated_20artifacts_20runtime_1',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['getting_20started_2',['Getting Started',['../41_Getting_Started_Index.html',1,'']]],
+  ['gmres_20and_20multigrid_3',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['grid_20bent_20channel_4',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['grid_20cell_20and_20variable_20architecture_20guide_5',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['grid_20projection_6',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['guide_7',['guide',['../44_Boundary_Conditions_Guide.html',1,'Boundary Conditions Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../01_Installation.html',1,'Installation Guide'],['../45_Particle_Initialization_and_Restart.html',1,'Particle Initialization and Restart Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../40_Testing_and_Quality_Guide.html',1,'Testing, Smoke, and Quality Gates Guide'],['../42_User_Guide_Index.html',1,'User Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
+  ['guide_20slurm_8',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['guide_20to_20visualizing_20your_20results_9',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['guides_10',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
 ];

@@ -9,7 +9,5 @@ var searchData=
   ['quantities_6',['2. Primary Converted Quantities',['../19_Nondimensionalization.html#primary_sec',1,'']]],
   ['quick_20preview_7',['Quick Preview',['../index.html#preview_sec',1,'']]],
   ['quick_20smoke_20matrix_20manual_8',['2. Quick Smoke Matrix (Manual)',['../40_Testing_and_Quality_Guide.html#quick_smoke_sec',1,'']]],
-  ['quickstart_20covers_9',['1. What This Quickstart Covers',['../38_Start_Here_10_Minutes.html#intent_sec',1,'']]],
-  ['quickstart_20vs_20first_20simulation_10',['2. Quickstart vs First Simulation',['../41_Getting_Started_Index.html#distinction_sec',1,'']]],
-  ['qvec_11',['qvec',['../variables_8h.html#a60a431e3afef70dd349484124d5a561b',1,'IBMNodes']]]
+  ['qvec_9',['qvec',['../variables_8h.html#a60a431e3afef70dd349484124d5a561b',1,'IBMNodes']]]
 ];

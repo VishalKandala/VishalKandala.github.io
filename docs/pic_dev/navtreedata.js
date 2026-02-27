@@ -274,12 +274,6 @@ var NAVTREE =
       [ "4. Outputs and Aggregates", "37_Sweep_Studies_Guide.html#outputs_sec", null ],
       [ "5. Operational Workflow", "37_Sweep_Studies_Guide.html#operations_sec", null ]
     ] ],
-    [ "Start Here in 10 Minutes", "38_Start_Here_10_Minutes.html", [
-      [ "1. What This Quickstart Covers", "38_Start_Here_10_Minutes.html#intent_sec", null ],
-      [ "2. Minimal Prerequisites", "38_Start_Here_10_Minutes.html#prereq_sec", null ],
-      [ "7. Confirm Success", "38_Start_Here_10_Minutes.html#check_sec", null ],
-      [ "8. Continue With Full Guidance", "38_Start_Here_10_Minutes.html#next_sec", null ]
-    ] ],
     [ "Common Fatal Errors and Fixes", "39_Common_Fatal_Errors.html", [
       [ "1. Structured Validation Errors (ERROR <CODE>)", "39_Common_Fatal_Errors.html#structured_sec", null ],
       [ "2. High-Frequency Fatal Messages (Runtime Paths)", "39_Common_Fatal_Errors.html#legacy_sec", null ]
@@ -299,18 +293,61 @@ var NAVTREE =
     ] ],
     [ "Getting Started", "41_Getting_Started_Index.html", [
       [ "1. When to Use This Section", "41_Getting_Started_Index.html#when_sec", null ],
-      [ "2. Quickstart vs First Simulation", "41_Getting_Started_Index.html#distinction_sec", null ],
-      [ "3. Recommended Read Order", "41_Getting_Started_Index.html#path_sec", null ]
+      [ "2. First Simulation Entry", "41_Getting_Started_Index.html#distinction_sec", null ],
+      [ "3. Recommended Read Order", "41_Getting_Started_Index.html#path_sec", null ],
+      [ "5. Where to Go Next", "41_Getting_Started_Index.html#next_sec", null ],
+      [ "Documentation Catalog", "Documentation_Catalog.html", [
+        [ "1. By Lifecycle Stage", "Documentation_Catalog.html#lifecycle_axis_sec", [
+          [ "Design and Setup", "Documentation_Catalog.html#lifecycle_design_sec", null ],
+          [ "Run and Monitor", "Documentation_Catalog.html#lifecycle_run_sec", null ],
+          [ "Debug and Validate", "Documentation_Catalog.html#lifecycle_debug_sec", null ]
+        ] ],
+        [ "2. By Artifact Type", "Documentation_Catalog.html#artifact_axis_sec", [
+          [ "YAML Contracts", "Documentation_Catalog.html#artifact_yaml_sec", null ],
+          [ "Numerical and Model References", "Documentation_Catalog.html#artifact_methods_sec", null ],
+          [ "Code and Runtime Internals", "Documentation_Catalog.html#artifact_code_sec", null ]
+        ] ],
+        [ "3. Audience Portals (Existing Axis)", "Documentation_Catalog.html#portal_axis_sec", null ],
+        [ "4. Repository Orientation", "Documentation_Catalog.html#repo_axis_sec", null ]
+      ] ]
     ] ],
     [ "User Guide", "42_User_Guide_Index.html", [
       [ "4. Repository Orientation", "42_User_Guide_Index.html#support_sec", null ],
-      [ "5. Competencies You Should Gain", "42_User_Guide_Index.html#outcomes_sec", null ]
+      [ "5. Competencies You Should Gain", "42_User_Guide_Index.html#outcomes_sec", null ],
+      [ "Documentation Catalog", "Documentation_Catalog.html", [
+        [ "1. By Lifecycle Stage", "Documentation_Catalog.html#lifecycle_axis_sec", [
+          [ "Design and Setup", "Documentation_Catalog.html#lifecycle_design_sec", null ],
+          [ "Run and Monitor", "Documentation_Catalog.html#lifecycle_run_sec", null ],
+          [ "Debug and Validate", "Documentation_Catalog.html#lifecycle_debug_sec", null ]
+        ] ],
+        [ "2. By Artifact Type", "Documentation_Catalog.html#artifact_axis_sec", [
+          [ "YAML Contracts", "Documentation_Catalog.html#artifact_yaml_sec", null ],
+          [ "Numerical and Model References", "Documentation_Catalog.html#artifact_methods_sec", null ],
+          [ "Code and Runtime Internals", "Documentation_Catalog.html#artifact_code_sec", null ]
+        ] ],
+        [ "3. Audience Portals (Existing Axis)", "Documentation_Catalog.html#portal_axis_sec", null ],
+        [ "4. Repository Orientation", "Documentation_Catalog.html#repo_axis_sec", null ]
+      ] ]
     ] ],
     [ "Developer Portal", "43_Developer_Portal_Index.html", [
       [ "1. Architecture and Contracts", "43_Developer_Portal_Index.html#architecture_sec", null ],
       [ "2. Numerical Methods and Models", "43_Developer_Portal_Index.html#methods_sec", null ],
       [ "4. Suggested Contributor Read Path", "43_Developer_Portal_Index.html#contribution_flow_sec", null ],
-      [ "5. Expected Outcomes", "43_Developer_Portal_Index.html#developer_outcomes_sec", null ]
+      [ "5. Expected Outcomes", "43_Developer_Portal_Index.html#developer_outcomes_sec", null ],
+      [ "Documentation Catalog", "Documentation_Catalog.html", [
+        [ "1. By Lifecycle Stage", "Documentation_Catalog.html#lifecycle_axis_sec", [
+          [ "Design and Setup", "Documentation_Catalog.html#lifecycle_design_sec", null ],
+          [ "Run and Monitor", "Documentation_Catalog.html#lifecycle_run_sec", null ],
+          [ "Debug and Validate", "Documentation_Catalog.html#lifecycle_debug_sec", null ]
+        ] ],
+        [ "2. By Artifact Type", "Documentation_Catalog.html#artifact_axis_sec", [
+          [ "YAML Contracts", "Documentation_Catalog.html#artifact_yaml_sec", null ],
+          [ "Numerical and Model References", "Documentation_Catalog.html#artifact_methods_sec", null ],
+          [ "Code and Runtime Internals", "Documentation_Catalog.html#artifact_code_sec", null ]
+        ] ],
+        [ "3. Audience Portals (Existing Axis)", "Documentation_Catalog.html#portal_axis_sec", null ],
+        [ "4. Repository Orientation", "Documentation_Catalog.html#repo_axis_sec", null ]
+      ] ]
     ] ],
     [ "Boundary Conditions Guide", "44_Boundary_Conditions_Guide.html", [
       [ "1. Boundary-Condition Grammar", "44_Boundary_Conditions_Guide.html#grammar_sec", null ],
@@ -336,28 +373,6 @@ var NAVTREE =
       [ "6. Boundary System Runtime Hooks", "46_C_Runtime_Execution_Map.html#boundaries_sec", null ],
       [ "8. Debugging Entry Points", "46_C_Runtime_Execution_Map.html#debug_sec", null ]
     ] ],
-    [ "Case Template: Laminar Flow in a Bent Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md29", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md30", null ],
-      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md31", null ],
-      [ "4. Changing Geometry", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md32", null ],
-      [ "5. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md33", null ],
-      [ "6. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2bent__channel_2bent__channel.html#autotoc_md34", null ]
-    ] ],
-    [ "Case Template: Laminar Flow in a Flat Channel", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html", [
-      [ "1. Description", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md36", null ],
-      [ "2. Files in this Template", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md37", null ],
-      [ "3. Typical Workflow", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md38", null ],
-      [ "4. Common Edits", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md39", null ],
-      [ "5. Cluster and Sweep Examples", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md40", null ],
-      [ "6. Output Check", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2flat__channel_2flat__channel.html#autotoc_md41", null ]
-    ] ],
-    [ "PIC-Flow Master Configuration Templates", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html", [
-      [ "1. Overview", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md43", null ],
-      [ "2. Recommended Usage", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md44", null ],
-      [ "3. Best Practices", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md45", null ],
-      [ "4. Contract and Mapping Docs", "md__2home_2runner_2work_2PICurv_2PICurv_2examples_2master__template_2master__template.html#autotoc_md46", null ]
-    ] ],
     [ "File List", "files.html", null ],
     [ "Data Structures", "annotated.html", null ]
   ] ]
@@ -366,7 +381,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "01_Installation.html",
-"46_C_Runtime_Execution_Map.html"
+"46_C_Runtime_Execution_Map.html#init_branches_sec"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
