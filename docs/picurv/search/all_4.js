@@ -23,7 +23,7 @@ var searchData=
   ['4_20initialization_20branches_20',['4. Initialization Branches',['../46_C_Runtime_Execution_Map.html#init_branches_sec',1,'']]],
   ['4_20models_21',['4. models',['../07_Case_Reference.html#models_sec',1,'']]],
   ['4_20momentum_5fsolver_20solver_20specific_20block_22',['4. momentum_solver (Solver-Specific Block)',['../08_Solver_Reference.html#msolver_sec',1,'']]],
-  ['4_20outputs_20and_20aggregates_23',['4. Outputs and Aggregates',['../41_Getting_Started_Index.html#outputs_sec',1,'']]],
+  ['4_20outputs_20and_20aggregates_23',['4. Outputs and Aggregates',['../48_Grid_Generator_Guide.html#outputs_sec',1,'']]],
   ['4_20periodicity_20consistency_20rules_24',['4. Periodicity Consistency Rules',['../44_Boundary_Conditions_Guide.html#periodic_rules_sec',1,'']]],
   ['4_20post_20processing_20recipes_25',['4. Post-Processing Recipes',['../14_Config_Contract.html#post_sec',1,'']]],
   ['4_20processing_20pipelines_26',['4. Processing Pipelines',['../10_Post_Processing_Reference.html#pipelines_sec',1,'']]],
@@ -50,5 +50,7 @@ var searchData=
   ['44_5fboundary_5fconditions_5fguide_2emd_47',['44_Boundary_Conditions_Guide.md',['../44__Boundary__Conditions__Guide_8md.html',1,'']]],
   ['45_5fparticle_5finitialization_5fand_5frestart_2emd_48',['45_Particle_Initialization_and_Restart.md',['../45__Particle__Initialization__and__Restart_8md.html',1,'']]],
   ['46_5fc_5fruntime_5fexecution_5fmap_2emd_49',['46_C_Runtime_Execution_Map.md',['../46__C__Runtime__Execution__Map_8md.html',1,'']]],
-  ['47_5fdocumentation_5fcatalog_2emd_50',['47_Documentation_Catalog.md',['../47__Documentation__Catalog_8md.html',1,'']]]
+  ['47_5fdocumentation_5fcatalog_2emd_50',['47_Documentation_Catalog.md',['../47__Documentation__Catalog_8md.html',1,'']]],
+  ['48_5fgrid_5fgenerator_5fguide_2emd_51',['48_Grid_Generator_Guide.md',['../48__Grid__Generator__Guide_8md.html',1,'']]],
+  ['49_5fworkflow_5frecipes_5fand_5fconfig_5fcookbook_2emd_52',['49_Workflow_Recipes_and_Config_Cookbook.md',['../49__Workflow__Recipes__and__Config__Cookbook_8md.html',1,'']]]
 ];

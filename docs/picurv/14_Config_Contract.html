@@ -90,7 +90,7 @@ $(function() {
 <li class="level1"><a href="#study_sec">8. Study Contract Highlights (study.yml)</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code><a class="el" href="pic_8flow.html">pic.flow</a></code>.</p>
+<div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code><a class="el" href="pic_8flow.html">pic.flow</a></code>. It describes the launcher-level contract, which may be stricter or more explicit than the raw C defaults because <code><a class="el" href="pic_8flow.html">pic.flow</a></code> validates and normalizes inputs before runtime.</p>
 <h1><a class="anchor" id="inputs_sec"></a>
 1. Required Input Roles</h1>
 <p><code><a class="el" href="pic_8flow.html">pic.flow</a></code> composes a standard single-run workflow from five logical inputs, with two additional files for cluster/sweep modes:</p>
@@ -108,6 +108,14 @@ $(function() {
 <li>(Sweep mode) <code>study.yml</code>: parameter matrix + metrics/plot contract.</li>
 </ol>
 <p>You can name files however you want. File names are not hardcoded on the C side; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> resolves paths and emits generated artifacts.</p>
+<p>These roles are intentionally modular:</p>
+<ul>
+<li><code>case.yml</code> describes physical setup and geometry contract.</li>
+<li><code>solver.yml</code> describes numerical strategy.</li>
+<li><code>monitor.yml</code> describes logging and I/O behavior.</li>
+<li><code>post.yml</code> describes post-processing outputs.</li>
+</ul>
+<p>In normal use, you reuse and mix these files instead of cloning one monolithic config for every run.</p>
 <h1><a class="anchor" id="artifacts_sec"></a>
 6. Inspect Generated Artifacts</h1>
 <p>For each run, <code><a class="el" href="pic_8flow.html">pic.flow</a></code> generates:</p>
@@ -126,6 +134,13 @@ $(function() {
 <li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block MPI decomposition is not currently supported.</li>
 <li><code>boundary_conditions</code> supports single-block list or multi-block list-of-lists.</li>
 <li><code>solver_parameters</code> is an advanced passthrough map for raw flags not yet modeled in schema.</li>
+<li><code>properties.initial_conditions.mode</code> is required explicitly by the launcher.</li>
+<li><code>properties.initial_conditions.mode: Zero</code> may omit velocity components.</li>
+<li><code>properties.initial_conditions.mode: Poiseuille</code> supports:<ul>
+<li><code>peak_velocity_physical</code> (preferred scalar centerline speed), or</li>
+<li><code>u_physical/v_physical/w_physical</code> (legacy explicit component form).</li>
+</ul>
+</li>
 </ul>
 <h1><a class="anchor" id="solver_sec"></a>
 3. Numerical Solver Stack</h1>
@@ -135,6 +150,11 @@ $(function() {
 <li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code> via normalized names.</li>
 <li>Solver-specific block support currently includes <code>momentum_solver.dual_time_picard_rk4</code>.</li>
 <li><code>petsc_passthrough_options</code> remains the escape hatch for advanced PETSc/C flags.</li>
+</ul>
+<p>Analytical-mode compatibility rule:</p>
+<ul>
+<li>when <code>operation_mode.eulerian_field_source: analytical</code> is selected, the current launcher contract requires <code>case.yml -&gt; grid.mode: programmatic_c</code>.</li>
+<li>this reflects the current C analytical ingestion path, which does not consume <code>file</code>/<code>grid_gen</code> geometry in the standard way.</li>
 </ul>
 <h1><a class="anchor" id="monitor_sec"></a>
 5. Monitor Contract Highlights</h1>
@@ -210,9 +230,20 @@ $(function() {
 </ul>
 </li>
 <li>Default post input/output extension is <code>dat</code> unless overridden.</li>
-<li>Missing optional keys preserve existing C defaults.</li>
 </ul>
-<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. </p>
+<p>Launcher defaults vs C defaults:</p>
+<ul>
+<li>some omitted keys intentionally preserve C defaults,</li>
+<li>some omitted keys are now rejected because the launcher requires explicit selection,</li>
+<li>some omissions produce warnings because the launcher knows the downstream C fallback is important.</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>omitting <code>properties.initial_conditions.mode</code> is rejected at the launcher level,</li>
+<li>omitting velocity components for <code>mode: Zero</code> is accepted and defaults to zero,</li>
+<li>omitting <code>models.physics.particles.restart_mode</code> on a particle restart emits a warning that C will default to <code>load</code>.</li>
+</ul>
+<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

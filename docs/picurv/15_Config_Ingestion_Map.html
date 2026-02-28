@@ -87,7 +87,8 @@ $(function() {
 <li class="level1"><a href="#map_sec">2. Mapping Matrix</a></li>
 <li class="level1"><a href="#python_only_sec">3. Python-Only Orchestration Mapping (No C Ingestion)</a></li>
 <li class="level1"><a href="#exceptions_sec">4. Important Exceptions</a></li>
-<li class="level1"><a href="#maintenance_sec">5. Drift Prevention</a></li>
+<li class="level1"><a href="#mode_dependent_sec">5. Mode-Dependent Normalization in &lt;tt&gt;pic.flow&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#maintenance_sec">6. Drift Prevention</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page maps configuration flow from YAML schema to generated artifacts and C ingestion/use sites.</p>
@@ -176,8 +177,19 @@ $(function() {
 <li><code>KSPSetFromOptions</code> in <code><a class="el" href="poisson_8c.html">src/poisson.c</a></code> ingests prefixed PETSc options dynamically.</li>
 <li><code>LOG_LEVEL</code> is environment-driven (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) and intentionally outside control-file parsing.</li>
 </ul>
+<h1><a class="anchor" id="mode_dependent_sec"></a>
+5. Mode-Dependent Normalization in &lt;tt&gt;pic.flow&lt;/tt&gt;</h1>
+<p>Some launcher behaviors depend on other config selections before values ever reach C:</p>
+<ul>
+<li><code>case.properties.initial_conditions.mode: Zero</code> allows <code>u_physical</code>, <code>v_physical</code>, and <code>w_physical</code> to be omitted; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> writes zeros.</li>
+<li><code>case.properties.initial_conditions.mode: Poiseuille</code> accepts <code>peak_velocity_physical</code> as the preferred YAML input and maps it to the inlet-aligned <code>-ucont_*</code> component that C later interprets as <code>Vmax</code>.</li>
+<li><code>solver.operation_mode.eulerian_field_source: analytical</code> currently requires <code>case.grid.mode: programmatic_c</code> at launcher validation time because the active C ingestion path for analytical runs does not consume file/grid-gen geometry in the same way as standard solve mode.</li>
+<li><code>case.properties.initial_conditions.mode</code> is now an explicit launcher requirement even though raw C has its own internal default.</li>
+</ul>
+<p>This means the YAML contract is intentionally stricter than "whatever C would do with missing
+options" in several places.</p>
 <h1><a class="anchor" id="maintenance_sec"></a>
-5. Drift Prevention</h1>
+6. Drift Prevention</h1>
 <ul>
 <li>Use <code><a class="el" href="audit__ingress_8py.html">scripts/audit_ingress.py</a></code> to compare PETSc option ingress in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a>/io.c</code> with the maintained manifest.</li>
 <li>Keep this map and the manifest updated whenever new options are introduced.</li>

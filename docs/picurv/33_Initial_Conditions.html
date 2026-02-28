@@ -111,6 +111,11 @@ $(function() {
 <div class="line">    u_physical: 1.5</div>
 <div class="line">    v_physical: 0.0</div>
 <div class="line">    w_physical: 0.0</div>
+</div><!-- fragment --><p>Preferred Poiseuille form:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    mode: &quot;Poiseuille&quot;</div>
+<div class="line">    peak_velocity_physical: 1.5</div>
 </div><!-- fragment --><p><code><a class="el" href="pic_8flow.html">pic.flow</a></code> mapping:</p>
 <ul>
 <li><code>mode</code> -&gt; <code>-finit</code> via <code>normalize_field_init_mode</code>:<ul>
@@ -120,6 +125,18 @@ $(function() {
 </ul>
 </li>
 <li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code> after non-dimensionalization by <code>U_ref</code>.</li>
+<li><code>peak_velocity_physical</code> (Poiseuille only) -&gt; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> infers the unique inlet axis from <code>boundary_conditions</code> and maps the scalar peak speed onto the matching <code>-ucont_*</code> component.</li>
+</ul>
+<p>Launcher-side contract:</p>
+<ul>
+<li><code>mode</code> should be set explicitly.</li>
+<li>for <code>Zero</code>, velocity components may be omitted and default to zero.</li>
+<li>for <code>Constant</code>, explicit component values are required.</li>
+<li>for <code>Poiseuille</code>, use either:<ul>
+<li><code>peak_velocity_physical</code>, or</li>
+<li><code>u_physical/v_physical/w_physical</code> but not both in the same block.</li>
+</ul>
+</li>
 </ul>
 <p>C-side entry points:</p>
 <ul>
@@ -144,7 +161,9 @@ $(function() {
 <li>computes a separable parabolic profile using index-space normalized cross-stream coordinates,</li>
 <li>applies profile in the two cross-stream directions,</li>
 <li>clamps small negative roundoff to zero.</li>
+<li>treats the inlet-aligned input component as the profile peak (<code>Vmax</code> / centerline speed), not bulk-average velocity.</li>
 </ul>
+<p>This means <code>peak_velocity_physical</code> is the clearest user-facing representation for Poiseuille mode.</p>
 <h1><a class="anchor" id="euler_formula_sec"></a>
 4. Contravariant Initialization Note</h1>
 <p>Initialization is applied to contravariant velocity components, scaled by face-area metrics:</p>
@@ -190,6 +209,7 @@ U_n = v_n\,A_n,
 <p>Common pitfalls:</p>
 <ul>
 <li>using <code>Poiseuille</code> in strongly non-rectangular topology and expecting textbook cylindrical profile,</li>
+<li>supplying a bulk/mean velocity to Poiseuille mode when the current implementation expects <code>Vmax</code>,</li>
 <li>forgetting that initialization sets interior only; boundary handlers then overwrite face behavior,</li>
 <li>comparing <code>u_physical</code> directly to <code>Ucont</code> without accounting for metric-face scaling.</li>
 </ul>
@@ -197,7 +217,9 @@ U_n = v_n\,A_n,
 1. Reference Scales</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
+<li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
+<li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>

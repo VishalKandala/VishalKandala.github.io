@@ -9,7 +9,7 @@ var searchData=
   ['header_5fsuffixes_6',['HEADER_SUFFIXES',['../namespacegenerate__doxygen__fallback__indexes.html#a4f6c199c3c48cde5d36bb0993fd1a33d',1,'generate_doxygen_fallback_indexes']]],
   ['helpers_7',['Internal Scattering Helpers',['../group__scatter__module__internal.html',1,'']]],
   ['high_20frequency_20fatal_20messages_20runtime_20paths_8',['2. High-Frequency Fatal Messages (Runtime Paths)',['../39_Common_Fatal_Errors.html#legacy_sec',1,'']]],
-  ['highlights_9',['highlights',['../14_Config_Contract.html#case_sec',1,'3. Case Contract Highlights'],['../14_Config_Contract.html#monitor_sec',1,'5. Monitor Contract Highlights']]],
+  ['highlights_9',['highlights',['../48_Grid_Generator_Guide.html#case_sec',1,'3. Case Contract Highlights'],['../14_Config_Contract.html#monitor_sec',1,'5. Monitor Contract Highlights']]],
   ['highlights_20cluster_20yml_10',['7. Cluster Contract Highlights (cluster.yml)',['../14_Config_Contract.html#cluster_sec',1,'']]],
   ['highlights_20study_20yml_11',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#study_sec',1,'']]],
   ['hooks_12',['6. Boundary System Runtime Hooks',['../46_C_Runtime_Execution_Map.html#boundaries_sec',1,'']]],

@@ -96,7 +96,7 @@ $(function() {
 </ul>
 </div>
 <div class="textblock"><p>For the full commented template, see:</p>
-<pre class="fragment"></pre><p><code>case.yml</code> defines physical setup, grid source, domain topology, and boundary conditions.</p>
+<pre class="fragment"></pre><p><code>case.yml</code> defines physical setup, grid source, domain topology, and boundary conditions. It is intentionally modular: the same <code>case.yml</code> can be paired with different <code>solver.yml</code>, <code>monitor.yml</code>, and <code>post.yml</code> profiles when the combination remains contract-compatible.</p>
 <h1><a class="anchor" id="properties_sec"></a>
 1. properties</h1>
 <div class="fragment"><div class="line">properties:</div>
@@ -117,8 +117,20 @@ $(function() {
 <li><code>fluid.density</code> and <code>fluid.viscosity</code> are used by <code><a class="el" href="pic_8flow.html">pic.flow</a></code> to compute Reynolds number -&gt; <code>-ren</code></li>
 <li><code>initial_conditions.mode</code> -&gt; <code>-finit</code> (<code>Zero</code>, <code>Constant</code>, <code>Poiseuille</code>)</li>
 <li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code></li>
+<li><code>peak_velocity_physical</code> (Poiseuille only) -&gt; mapped by <code><a class="el" href="pic_8flow.html">pic.flow</a></code> to the inlet-aligned <code>-ucont_*</code> component</li>
 </ul>
 <p>For the scaling model and conversion logic, see <b><a class="el" href="19_Nondimensionalization.html">Non-Dimensionalization Model</a></b>. For detailed startup behavior of field initialization modes, see <b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b>.</p>
+<p>Practical contract notes:</p>
+<ul>
+<li><code>initial_conditions.mode</code> should be set explicitly. The launcher now requires the choice instead of silently inferring it.</li>
+<li><code>mode: "Zero"</code> may omit velocity components entirely.</li>
+<li><code>mode: "Constant"</code> requires explicit <code>u_physical/v_physical/w_physical</code>.</li>
+<li><code>mode: "Poiseuille"</code> may use either:<ul>
+<li><code>peak_velocity_physical</code> for the preferred scalar centerline-speed input, or</li>
+<li><code>u_physical/v_physical/w_physical</code> for legacy explicit-component form.</li>
+</ul>
+</li>
+</ul>
 <h1><a class="anchor" id="run_control_sec"></a>
 2. run_control</h1>
 <div class="fragment"><div class="line">run_control:</div>
@@ -136,6 +148,11 @@ $(function() {
 <li><code>programmatic_c</code></li>
 <li><code>file</code></li>
 <li><code>grid_gen</code></li>
+</ul>
+<p>Mode compatibility note:</p>
+<ul>
+<li>for normal <code>solve</code> and <code>load</code> workflows, all three grid modes are supported.</li>
+<li>for <code>solver.yml -&gt; operation_mode.eulerian_field_source: analytical</code>, the current contract requires <code>grid.mode: programmatic_c</code>.</li>
 </ul>
 <h2><a class="anchor" id="grid_prog_ssec"></a>
 3.1 mode: programmatic_c</h2>
@@ -162,6 +179,7 @@ $(function() {
 <div class="line">    grid_type: cpipe</div>
 <div class="line">    cli_args: [&quot;--ncells-i&quot;, &quot;96&quot;, &quot;--ncells-j&quot;, &quot;96&quot;]</div>
 </div><!-- fragment --><p>This runs <code>scripts/grid.gen</code> before solver launch and stages generated grid artifacts into the run config.</p>
+<p>For direct <code>grid.gen</code> usage, generator types, and config-file structure, see <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b>.</p>
 <h1><a class="anchor" id="models_sec"></a>
 4. models</h1>
 <div class="fragment"><div class="line">models:</div>
@@ -188,6 +206,10 @@ $(function() {
 <li><code>physics.particles.restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
 <li>point source coordinates -&gt; <code>-psrc_x/-psrc_y/-psrc_z</code></li>
 </ul>
+<p>Restart note:</p>
+<ul>
+<li>if <code>run_control.start_step &gt; 0</code>, particles are enabled, and <code>restart_mode</code> is omitted, <code><a class="el" href="pic_8flow.html">pic.flow</a></code> warns that C will default to <code>load</code>.</li>
+</ul>
 <p>For mode-specific particle behavior and restart flow, see <b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b>.</p>
 <h1><a class="anchor" id="bc_sec"></a>
 5. boundary_conditions</h1>
@@ -211,12 +233,25 @@ $(function() {
 <div class="line">  -read_fields: true</div>
 <div class="line">  -some_new_flag: 123</div>
 </div><!-- fragment --><p>Use sparingly and prefer structured keys when available.</p>
+<h1><a class="anchor" id="modular_sec"></a>
+7. Modular Profile Strategy</h1>
+<p><code>case.yml</code> is designed to be combined with reusable profiles for the other config roles.</p>
+<p>Common patterns:</p>
+<ul>
+<li>one <code>case.yml</code> + multiple <code>monitor.yml</code> files (debug vs production output),</li>
+<li>one <code>case.yml</code> + multiple <code>post.yml</code> recipes (quick scalar check vs heavy VTK/statistics),</li>
+<li>one <code>solver.yml</code> reused across many <code>case.yml</code> files,</li>
+<li>one <code>cluster.yml</code> reused across many runs and sweeps.</li>
+</ul>
+<p>For worked combinations, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>.</p>
 <h1><a class="anchor" id="next_steps_sec"></a>
 9. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b>.</p>
 <p>Cross-file contract/mapping:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
+<li><b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b></li>
+<li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>

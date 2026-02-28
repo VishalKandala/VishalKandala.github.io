@@ -34,7 +34,7 @@ var searchData=
   ['eulerianext_31',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
   ['euleriansource_32',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
   ['evaluateparticleposition_33',['evaluateparticleposition',['../walkingsearch_8h.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a556871801ba0b3214285a2ca1fe622ac',1,'EvaluateParticlePosition(const Cell *cell, PetscReal *d, const Cmpnts p, PetscInt *position, const PetscReal threshold):&#160;walkingsearch.c']]],
-  ['examples_34',['7. Authoring Examples',['../44_Boundary_Conditions_Guide.html#examples_sec',1,'']]],
+  ['examples_34',['7. Authoring Examples',['../49_Workflow_Recipes_and_Config_Cookbook.html#examples_sec',1,'']]],
   ['exceptions_35',['4. Important Exceptions',['../15_Config_Ingestion_Map.html#exceptions_sec',1,'']]],
   ['exec_5fmode_36',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
   ['exec_5fmode_5fpostprocessor_37',['EXEC_MODE_POSTPROCESSOR',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fdabc2af4413f44e1c8a92f2f9e99649e1f',1,'variables.h']]],
