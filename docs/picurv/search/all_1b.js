@@ -180,7 +180,7 @@ var searchData=
   ['programmatic_5fc_177',['3.1 mode: programmatic_c',['../07_Case_Reference.html#grid_prog_ssec',1,'']]],
   ['projection_178',['projection',['../poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc',1,'Projection(UserCtx *user):&#160;poisson.c'],['../poisson_8c.html#a34a113dcc9ca606d914c3d021a4d85fc',1,'Projection(UserCtx *user):&#160;poisson.c'],['../27_Trilinear_Interpolation_and_Projection.html',1,'Trilinear Interpolation and Particle-Grid Projection']]],
   ['projection_20method_179',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['propagateboundaryconfigtocoarserlevels_180',['propagateboundaryconfigtocoarserlevels',['../Boundaries_8c.html#a35c8150f4f241ba021d5007626ca710f',1,'PropagateBoundaryConfigToCoarserLevels(SimCtx *simCtx):&#160;Boundaries.c'],['../Boundaries_8h.html#a35c8150f4f241ba021d5007626ca710f',1,'PropagateBoundaryConfigToCoarserLevels(SimCtx *simCtx):&#160;Boundaries.c']]],
+  ['propagateboundaryconfigtocoarserlevels_180',['propagateboundaryconfigtocoarserlevels',['../Boundaries_8h.html#a35c8150f4f241ba021d5007626ca710f',1,'PropagateBoundaryConfigToCoarserLevels(SimCtx *simCtx):&#160;Boundaries.c'],['../Boundaries_8c.html#a35c8150f4f241ba021d5007626ca710f',1,'PropagateBoundaryConfigToCoarserLevels(SimCtx *simCtx):&#160;Boundaries.c']]],
   ['properties_181',['1. properties',['../07_Case_Reference.html#properties_sec',1,'']]],
   ['properties_20initial_5fconditions_20tt_182',['2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)',['../33_Initial_Conditions.html#euler_sec',1,'']]],
   ['ps_5fksp_5fpic_5fmonitor_5ftrue_5fresidual_183',['ps_ksp_pic_monitor_true_residual',['../variables_8h.html#ad6a8878c906a69464f0780b361fdd5cd',1,'SimCtx']]],
@@ -188,7 +188,7 @@ var searchData=
   ['pseudo_5fcfl_5fgrowth_5ffactor_185',['pseudo_cfl_growth_factor',['../variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5',1,'SimCtx']]],
   ['pseudo_5fcfl_5freduction_5ffactor_186',['pseudo_cfl_reduction_factor',['../variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53',1,'SimCtx']]],
   ['pseudo_5fperiodic_187',['pseudo_periodic',['../variables_8h.html#a0e447e75b801c0a9305fcadd317159a4',1,'SimCtx']]],
-  ['psi_188',['psi',['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi'],['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi']]],
+  ['psi_188',['psi',['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi'],['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi']]],
   ['psi_5fnodal_189',['Psi_nodal',['../variables_8h.html#ac0025b1b394319e0af260c6d472bd9d8',1,'UserCtx']]],
   ['psrc_5fx_190',['psrc_x',['../variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322',1,'SimCtx']]],
   ['psrc_5fy_191',['psrc_y',['../variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad',1,'SimCtx']]],
@@ -196,5 +196,7 @@ var searchData=
   ['pucont_193',['pUcont',['../variables_8h.html#a9f0e5575e60f124d715fc4e5b2f4d6a4',1,'UserCtx']]],
   ['pull_20source_20status_20source_194',['3b. sync-binaries / sync-config / pull-source / status-source',['../05_The_Conductor_Script.html#sync_sec',1,'']]],
   ['purpose_195',['1. Purpose',['../29_Maintenance_Backlog.html#purpose_sec',1,'']]],
-  ['python_20only_20orchestration_20mapping_20no_20c_20ingestion_196',['3. Python-Only Orchestration Mapping (No C Ingestion)',['../15_Config_Ingestion_Map.html#python_only_sec',1,'']]]
+  ['python_20only_20orchestration_20mapping_20no_20c_20ingestion_196',['3. Python-Only Orchestration Mapping (No C Ingestion)',['../15_Config_Ingestion_Map.html#python_only_sec',1,'']]],
+  ['python_20suite_20tt_20test_20python_20tt_197',['3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)',['../40_Testing_and_Quality_Guide.html#python_sec',1,'']]],
+  ['python_20tt_198',['3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)',['../40_Testing_and_Quality_Guide.html#python_sec',1,'']]]
 ];

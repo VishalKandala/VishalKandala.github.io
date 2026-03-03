@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Testing, Smoke, and Quality Gates Guide</title>
+<title>PICurv: Testing and Validation Guide</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,202 +79,191 @@ $(function() {
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">Testing, Smoke, and Quality Gates Guide</div></div>
+  <div class="headertitle"><div class="title">Testing and Validation Guide</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#scope_sec">1. What This Guide Covers</a></li>
-<li class="level1"><a href="#quick_smoke_sec">2. Quick Smoke Matrix (Manual)</a><ul><li class="level2"><a href="#help_smoke_ssec">2.1 Command Discovery Smoke</a></li>
-<li class="level2"><a href="#validate_smoke_ssec">2.2 Config-Only Validation Smoke</a></li>
-<li class="level2"><a href="#dryrun_smoke_ssec">2.3 Dry-Run Smoke (No File Writes)</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#code_map_sec">3. Code Map (Where Behavior Lives)</a></li>
-<li class="level1"><a href="#automated_sec">4. Automated Smoke Tests</a></li>
-<li class="level1"><a href="#ci_sec">5. CI Quality Gate Behavior</a></li>
-<li class="level1"><a href="#linkcheck_sec">6. Markdown Link Checking</a></li>
-<li class="level1"><a href="#extend_sec">7. How to Extend Smoke Coverage</a></li>
+<ul><li class="level1"><a href="#taxonomy_sec">1. Testing Taxonomy</a></li>
+<li class="level1"><a href="#quickstart_sec">2. Quick Start</a></li>
+<li class="level1"><a href="#python_sec">3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#doctor_sec">4. Installation Validation (&lt;tt&gt;doctor&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#unit_sec">5. Isolated C Unit Suites (&lt;tt&gt;unit-*&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#smoke_sec">6. Executable Smoke (&lt;tt&gt;smoke&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#aggregate_sec">7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#extend_sec">9. Extending The Test Suite</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page explains how to verify the Iteration A CLI features end-to-end, how the smoke tests are structured, and how CI enforces quality gates.</p>
-<h1><a class="anchor" id="scope_sec"></a>
-1. What This Guide Covers</h1>
-<p>Iteration A introduced:</p><ul>
-<li><code>picurv validate</code></li>
-<li><code>picurv run --dry-run</code> and <code>--format json</code></li>
-<li>standardized error envelope:<ul>
-<li><code>ERROR &lt;CODE&gt; | key=&lt;...&gt; | file=&lt;...&gt; | message=&lt;...&gt; | hint=&lt;...&gt;</code></li>
-</ul>
-</li>
-<li>CI workflow for CLI smoke tests and markdown link checks</li>
-</ul>
-<p>This guide documents:</p><ol type="1">
-<li>manual smoke commands for users and maintainers,</li>
-<li>automated smoke tests in <code>tests/test_cli_smoke.py</code>,</li>
-<li>workflow behavior in <code>.github/workflows/quality.yml</code>,</li>
-<li>extension patterns when adding future CLI features.</li>
+<div class="textblock"><p>This page documents PICurv's local testing model. The suite is intentionally split by intent so users can choose the smallest command that answers the question they actually have.</p>
+<h1><a class="anchor" id="taxonomy_sec"></a>
+1. Testing Taxonomy</h1>
+<p>PICurv exposes four validation layers plus one aggregate target:</p>
+<ol type="1">
+<li>Python/control-plane validation</li>
+<li>installation and PETSc provisioning validation</li>
+<li>isolated C unit/component validation</li>
+<li>executable entrypoint smoke validation</li>
+<li>full local validation sweep</li>
 </ol>
-<h1><a class="anchor" id="quick_smoke_sec"></a>
-2. Quick Smoke Matrix (Manual)</h1>
-<p>Run from repository root.</p>
-<h2><a class="anchor" id="help_smoke_ssec"></a>
-2.1 Command Discovery Smoke</h2>
-<div class="fragment"><div class="line">./bin/picurv --help</div>
-<div class="line">./bin/picurv run --help</div>
-<div class="line">./bin/picurv validate --help</div>
-</div><!-- fragment --><p>Expected:</p><ul>
-<li>top-level help lists <code>validate</code>,</li>
-<li>run help lists <code>--dry-run</code> and <code>--format {text,json}</code>,</li>
-<li>validate help lists file-role flags and <code>--strict</code>.</li>
+<p>Canonical commands:</p>
+<ul>
+<li><code>make test-python</code></li>
+<li><code>make doctor</code></li>
+<li><code>make unit</code></li>
+<li><code>make unit-geometry</code></li>
+<li><code>make unit-solver</code></li>
+<li><code>make unit-particles</code></li>
+<li><code>make unit-io</code></li>
+<li><code>make unit-post</code></li>
+<li><code>make smoke</code></li>
+<li><code>make check</code></li>
 </ul>
-<h2><a class="anchor" id="validate_smoke_ssec"></a>
-2.2 Config-Only Validation Smoke</h2>
-<p>Valid fixture set:</p>
-<div class="fragment"><div class="line">./bin/picurv validate \</div>
-<div class="line">  --case tests/fixtures/valid/case.yml \</div>
-<div class="line">  --solver tests/fixtures/valid/solver.yml \</div>
-<div class="line">  --monitor tests/fixtures/valid/monitor.yml \</div>
-<div class="line">  --post tests/fixtures/valid/post.yml \</div>
-<div class="line">  --cluster tests/fixtures/valid/cluster.yml \</div>
-<div class="line">  --study tests/fixtures/valid/study.yml</div>
-</div><!-- fragment --><p>Expected:</p><ul>
-<li>exit code <code>0</code>,</li>
-<li><code>[SUCCESS] Validation completed for ... file(s)</code>.</li>
+<p>Compatibility aliases remain available:</p>
+<ul>
+<li><code>make test</code> -&gt; <code>make test-python</code></li>
+<li><code>make install-check</code> -&gt; <code>make doctor</code></li>
+<li><code>make ctest*</code> -&gt; <code>make unit*</code></li>
 </ul>
-<p>Invalid fixture example:</p>
-<div class="fragment"><div class="line">./bin/picurv validate \</div>
-<div class="line">  --case tests/fixtures/invalid/case_missing_properties.yml \</div>
-<div class="line">  --solver tests/fixtures/valid/solver.yml \</div>
-<div class="line">  --monitor tests/fixtures/valid/monitor.yml</div>
-</div><!-- fragment --><p>Expected:</p><ul>
-<li>exit code <code>1</code>,</li>
-<li>at least one structured error line with <code>ERROR CFG_MISSING_SECTION</code>.</li>
+<h1><a class="anchor" id="quickstart_sec"></a>
+2. Quick Start</h1>
+<p>Fast local checks:</p>
+<div class="fragment"><div class="line">make test</div>
+<div class="line">make doctor</div>
+<div class="line">make unit-io</div>
+<div class="line">make smoke</div>
+<div class="line">make check</div>
+</div><!-- fragment --><p>Guidance:</p>
+<ul>
+<li>Use <code>make test</code> when working on <code>scripts/picurv</code>, schemas, or repository metadata.</li>
+<li>Use <code>make doctor</code> after provisioning PETSc on a new machine.</li>
+<li>Use <code>make unit-&lt;area&gt;</code> while changing a subsystem in isolation.</li>
+<li>Use <code>make smoke</code> after building binaries to confirm the entrypoints still launch.</li>
+<li>Use <code>make check</code> at the end of a development cycle.</li>
 </ul>
-<h2><a class="anchor" id="dryrun_smoke_ssec"></a>
-2.3 Dry-Run Smoke (No File Writes)</h2>
-<p>Human-readable plan:</p>
-<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
-<div class="line">  --case tests/fixtures/valid/case.yml \</div>
-<div class="line">  --solver tests/fixtures/valid/solver.yml \</div>
-<div class="line">  --monitor tests/fixtures/valid/monitor.yml \</div>
-<div class="line">  --post tests/fixtures/valid/post.yml \</div>
-<div class="line">  --dry-run</div>
-</div><!-- fragment --><p>Machine-readable plan:</p>
-<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
-<div class="line">  --case tests/fixtures/valid/case.yml \</div>
-<div class="line">  --solver tests/fixtures/valid/solver.yml \</div>
-<div class="line">  --monitor tests/fixtures/valid/monitor.yml \</div>
-<div class="line">  --post tests/fixtures/valid/post.yml \</div>
-<div class="line">  --dry-run --format json</div>
-</div><!-- fragment --><p>Expected:</p><ul>
-<li>no new run directories/files are created,</li>
-<li>JSON output parses cleanly and includes <code>mode</code>, <code>launch_mode</code>, <code>stages</code>, and <code>artifacts</code>.</li>
+<h1><a class="anchor" id="python_sec"></a>
+3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</h1>
+<p>Purpose:</p>
+<ul>
+<li>validate <code>scripts/picurv</code></li>
+<li>validate config translation and contract behavior</li>
+<li>validate repository-level regression checks</li>
 </ul>
-<h1><a class="anchor" id="code_map_sec"></a>
-3. Code Map (Where Behavior Lives)</h1>
-<p>Primary implementation in <code>scripts/picurv</code>:</p><ul>
-<li>standardized error emitter: <code>emit_structured_error(...)</code></li>
-<li>CLI usage failure exit code (<code>2</code>): <code>fail_cli_usage(...)</code></li>
-<li>dry-run plan builder: <code>build_run_dry_plan(args)</code></li>
-<li>dry-run renderer (text/json): <code>render_run_dry_plan(plan, output_format=...)</code></li>
-<li>validate command implementation: <code>validate_workflow(args)</code></li>
-<li>parser composition: <code>build_main_parser()</code></li>
-<li>dispatch and argument combination checks: <code>dispatch_command(args)</code></li>
+<p>This suite is implemented with <code>pytest</code> and does not require PETSc.</p>
+<p>Current coverage includes:</p>
+<ul>
+<li>CLI help/validate/dry-run smoke</li>
+<li>config regression checks</li>
+<li>case maintenance regressions</li>
+<li>repository consistency scans</li>
 </ul>
-<p>Related docs:</p><ul>
-<li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<p>Run locally:</p>
+<div class="fragment"><div class="line">make test-python</div>
+</div><!-- fragment --><h1><a class="anchor" id="doctor_sec"></a>
+4. Installation Validation (&lt;tt&gt;doctor&lt;/tt&gt;)</h1>
+<p>Purpose:</p>
+<ul>
+<li>confirm <code>PETSC_DIR</code> is present and usable</li>
+<li>confirm the configured toolchain can compile against PETSc</li>
+<li>confirm a minimal PETSc-backed binary can initialize and create core PETSc objects</li>
 </ul>
-<h1><a class="anchor" id="automated_sec"></a>
-4. Automated Smoke Tests</h1>
-<p>Automated smoke tests live in:</p><ul>
-<li><code>tests/test_cli_smoke.py</code></li>
+<p>The <code>doctor</code> target builds and runs a small C smoke binary under <code>tests/c/test_install_check.c</code>.</p>
+<p>It validates:</p>
+<ul>
+<li>environment visibility for <code>PETSC_DIR</code></li>
+<li><code>PetscInitialize</code></li>
+<li><code>DMDA</code> creation</li>
+<li><code>Vec</code> creation</li>
+<li><code>DMSwarm</code> creation</li>
+<li><code>PetscFinalize</code></li>
 </ul>
-<p>Fixture packs:</p><ul>
-<li>valid configs: <code>tests/fixtures/valid/</code></li>
-<li>invalid configs: <code>tests/fixtures/invalid/</code></li>
+<p>This target answers: "Is this machine set up correctly for PICurv development?"</p>
+<p>Run locally:</p>
+<div class="fragment"><div class="line">make doctor</div>
+</div><!-- fragment --><h1><a class="anchor" id="unit_sec"></a>
+5. Isolated C Unit Suites (&lt;tt&gt;unit-*&lt;/tt&gt;)</h1>
+<p>Purpose:</p>
+<ul>
+<li>support kernel and component development in isolation</li>
+<li>reduce the blast radius while changing numerical code</li>
 </ul>
-<p>Current test categories:</p><ol type="1">
-<li>help output smoke,</li>
-<li>validate pass/fail behavior,</li>
-<li>structured error presence for invalid inputs,</li>
-<li>dry-run no-write guarantee,</li>
-<li>dry-run JSON schema sanity,</li>
-<li>markdown link checker pass.</li>
+<p>Current suites:</p>
+<ul>
+<li><code>make unit-geometry</code></li>
+<li><code>make unit-solver</code></li>
+<li><code>make unit-particles</code></li>
+<li><code>make unit-io</code></li>
+<li><code>make unit-post</code></li>
+<li><code>make unit</code> (all of the above)</li>
+</ul>
+<p>The phase-1 suite focuses on representative coverage:</p>
+<ul>
+<li>geometry and interpolation invariants</li>
+<li>solver utility kernels</li>
+<li>particle location helpers</li>
+<li>I/O pathing and field round-trips</li>
+<li>post-processing/statistics kernels</li>
+</ul>
+<p>These tests use real PETSc objects and run single-rank by default.</p>
+<h1><a class="anchor" id="smoke_sec"></a>
+6. Executable Smoke (&lt;tt&gt;smoke&lt;/tt&gt;)</h1>
+<p>Purpose:</p>
+<ul>
+<li>confirm the compiled binaries still launch successfully</li>
+<li>catch integration breakage that isolated unit tests may miss</li>
+</ul>
+<p>The current phase-1 smoke runner verifies:</p>
+<ul>
+<li><code>bin/simulator</code> launches and responds to <code>-help</code></li>
+<li><code>bin/postprocessor</code> launches and responds to <code>-help</code></li>
+</ul>
+<p>This is intentionally lightweight and fast. The reserved fixture tree under <code>tests/smoke/</code> allows future evolution into true tiny case-level runtime smoke tests.</p>
+<p>Run locally:</p>
+<div class="fragment"><div class="line">make smoke</div>
+</div><!-- fragment --><h1><a class="anchor" id="aggregate_sec"></a>
+7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)</h1>
+<p><code>make check</code> is the top-level local validation sweep.</p>
+<p>It runs, in order:</p>
+<ol type="1">
+<li><code>make test-python</code></li>
+<li><code>make doctor</code></li>
+<li><code>make unit</code></li>
+<li><code>make smoke</code></li>
 </ol>
-<p>Run locally (when <code>pytest</code> is available):</p>
-<div class="fragment"><div class="line">pytest -q</div>
-</div><!-- fragment --><h1><a class="anchor" id="ci_sec"></a>
-5. CI Quality Gate Behavior</h1>
-<p>Workflow file:</p><ul>
-<li><code>.github/workflows/quality.yml</code></li>
-</ul>
-<p>Pipeline steps:</p><ol type="1">
-<li>checkout,</li>
-<li>setup Python,</li>
-<li>install <code>pytest</code>, <code>pyyaml</code>, <code>numpy</code>,</li>
-<li>run <code>pytest -q</code>,</li>
-<li>run <code>python <a class="el" href="check__markdown__links_8py.html">scripts/check_markdown_links.py</a></code>.</li>
-</ol>
-<p>If either step fails, the workflow fails and blocks merge (for repositories using required checks).</p>
-<p>Separate docs build/mirror workflow:</p><ul>
-<li><code>.github/workflows/docs.yml</code></li>
-<li>handles Doxygen generation and docs artifact mirroring.</li>
-</ul>
-<h1><a class="anchor" id="linkcheck_sec"></a>
-6. Markdown Link Checking</h1>
-<p>Link checker script:</p><ul>
-<li><code><a class="el" href="check__markdown__links_8py.html">scripts/check_markdown_links.py</a></code></li>
-</ul>
-<p>Coverage:</p><ul>
-<li><code>README.md</code></li>
-<li><code>docs/**/*.md</code> (excluding generated <code>docs_build/</code>)</li>
-</ul>
-<p>It checks local relative links only and intentionally skips:</p><ul>
-<li><code><a href="http://..">http://..</a>.</code></li>
-<li><code><a href="https://..">https://..</a>.</code></li>
-<li><code>mailto:...</code></li>
-<li>in-page anchors (<code>#...</code>)</li>
-</ul>
-<h1><a class="anchor" id="extend_sec"></a>
-7. How to Extend Smoke Coverage</h1>
-<p>When adding a new CLI option or subcommand:</p><ol type="1">
-<li>add a help-output assertion in <code>tests/test_cli_smoke.py</code>,</li>
-<li>add one success-path and one failure-path test,</li>
-<li>add/update fixtures under <code>tests/fixtures/</code>,</li>
-<li>document user-facing behavior in <b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b>,</li>
-<li>update this page’s smoke matrix if the command is user-critical.</li>
-</ol>
-<p>When adding new docs pages:</p><ol type="1">
-<li>add nav entries in <code>docs/DoxygenLayout.xml</code>,</li>
-<li>run <code>python <a class="el" href="check__markdown__links_8py.html">scripts/check_markdown_links.py</a></code>,</li>
-<li>ensure links from at least one entry page (<code>mainpage</code>/conductor/how-to).</li>
-</ol>
+<p>Use it when you want maximum local confidence before ending a development cycle.</p>
 <h1><a class="anchor" id="troubleshooting_sec"></a>
 9. Common First-Run Issues</h1>
-<p>Common local issues:</p><ul>
-<li><code>pytest: command not found</code>:<ul>
-<li>install pytest in your local Python environment,</li>
-<li>or run tests in CI where dependencies are provisioned.</li>
-</ul>
-</li>
-<li><code>No module named pytest</code>:<ul>
-<li>use the Python interpreter/environment intended for development.</li>
-</ul>
-</li>
-<li>network-restricted environments:<ul>
-<li>local package install may fail; rely on CI run for authoritative smoke status.</li>
-</ul>
-</li>
-</ul>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<p>Common issues:</p>
 <ul>
-<li>Pytest docs: <a href="https://docs.pytest.org/">https://docs.pytest.org/</a></li>
-<li>GitHub Actions workflow syntax: <a href="https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions">https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions</a></li>
-<li>CommonMark link syntax reference: <a href="https://spec.commonmark.org/">https://spec.commonmark.org/</a> </li>
+<li><code>PETSC_DIR</code> is unset:<ul>
+<li><code>make doctor</code>, <code>make unit*</code>, <code>make smoke</code>, and <code>make check</code> will fail.</li>
 </ul>
+</li>
+<li><code>PETSC_ARCH</code> points to the wrong build:<ul>
+<li>compilation may fail while including PETSc make variables.</li>
+</ul>
+</li>
+<li><code>mpicc</code> or MPI runtime wrappers are missing:<ul>
+<li>PETSc-backed builds may fail even if Python tests still pass.</li>
+</ul>
+</li>
+<li>a unit test fails after writing temporary files:<ul>
+<li>inspect <code>/tmp/picurv-test-*</code> for preserved intermediate artifacts.</li>
+</ul>
+</li>
+<li><code>pytest</code> is unavailable:<ul>
+<li>only the Python suite is blocked; PETSc-backed C tests are separate.</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="extend_sec"></a>
+9. Extending The Test Suite</h1>
+<p>When adding new tests:</p>
+<ol type="1">
+<li>choose the narrowest valid layer (<code>test-python</code>, <code>doctor</code>, <code>unit-*</code>, or <code>smoke</code>)</li>
+<li>reuse <code>tests/c/test_support.*</code> for PETSc-backed fixtures</li>
+<li>keep temporary artifacts under <code>/tmp</code></li>
+<li>document new user-facing targets or workflows in the README and this guide</li>
+</ol>
+<p>For detailed C test maintenance guidance, see <b><a class="el" href="51_C_Test_Suite_Developer_Guide.html">C Test Suite Developer Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
