@@ -116,7 +116,7 @@ var searchData=
   ['source_5fsuffixes_113',['SOURCE_SUFFIXES',['../namespacegenerate__doxygen__fallback__indexes.html#a68c5252e987166fe5eb8893de208768a',1,'generate_doxygen_fallback_indexes']]],
   ['sp_114',['SP',['../poisson_8c.html#aecd69d9a67487cc45c38eb184c50538a',1,'poisson.c']]],
   ['specific_20block_115',['4. momentum_solver (Solver-Specific Block)',['../08_Solver_Reference.html#msolver_sec',1,'']]],
-  ['specifics_116',['4. Restart Path Specifics',['../26_Walking_Search_Method.html#restart_sec',1,'']]],
+  ['specifics_116',['4. Restart Path Specifics',['../39_Common_Fatal_Errors.html#restart_sec',1,'']]],
   ['src_20picsolver_20c_20tt_117',['1. Solver Startup Order (&lt;tt&gt;src/picsolver.c&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#startup_sec',1,'']]],
   ['ssmode_118',['ssmode',['../variables_8h.html#a1028f6ccb6a46dc2bae2def199996ade',1,'IBMInfo']]],
   ['st1_119',['st1',['../variables_8h.html#a546705d9094e8812085572a69ccd4d59',1,'Cstart']]],

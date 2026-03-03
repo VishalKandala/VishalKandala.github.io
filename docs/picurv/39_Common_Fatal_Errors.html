@@ -127,6 +127,20 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">&lsquo;[FATAL] Unsupported scheduler &rsquo;&lt;x&gt;'. Only Slurm is supported in v1.<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt;</code>cluster.yml<code>has unsupported scheduler type \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Set</code>cluster.yml -&gt; scheduler.type: slurm<code>. \ilinebr &lt;/td&gt; &lt;/tr&gt; &lt;tr class="markdownTableRowOdd"&gt; &lt;td class="markdownTableBodyNone"&gt;</code>[FATAL] In cluster mode, &ndash;num-procs applies to the solver stage and must be 1 (auto) or exactly nodes*ntasks_per_node (...)<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Solver MPI count mismatch against cluster resources \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Set</code>-n 1<code>or set solver</code>-n<code>to</code>nodes * ntasks_per_node`.   </td></tr>
 </table>
+<h1><a class="anchor" id="restart_sec"></a>
+4. Restart Path Specifics</h1>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Mistake   </th><th class="markdownTableHeadNone">Likely result   </th><th class="markdownTableHeadNone">Fix    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Set <code>start_step: 501</code> after a run that ended at <code>500</code>   </td><td class="markdownTableBodyNone">Off-by-one mismatch against the saved restart state   </td><td class="markdownTableBodyNone">Set <code>start_step: 500</code>; the first new step will be <code>501</code>.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Leave <code>eulerian_field_source</code> as <code>solve</code> for a restart   </td><td class="markdownTableBodyNone">Fresh solve path instead of loading saved fields   </td><td class="markdownTableBodyNone">Set <code>solver.yml -&gt; operation_mode.eulerian_field_source: load</code>.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Omit or mis-set <code>particles.restart_mode</code>   </td><td class="markdownTableBodyNone">Unexpected particle reseed/load behavior or warning-driven behavior   </td><td class="markdownTableBodyNone">Set <code>restart_mode: load</code> or <code>restart_mode: init</code> explicitly.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Choose a <code>start_step</code> that was never written   </td><td class="markdownTableBodyNone">Runtime file-not-found or missing-data restart failure   </td><td class="markdownTableBodyNone">Verify the requested restart step exists in the saved output/restart files.   </td></tr>
+</table>
 <h1><a class="anchor" id="workflow_sec"></a>
 1. Standard Extension Workflow</h1>
 <ol type="1">

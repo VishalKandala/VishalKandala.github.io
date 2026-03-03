@@ -31,7 +31,7 @@ var searchData=
   ['4_20recipes_20for_20visualizing_20particle_20data_20vtp_20files_28',['4. Recipes for Visualizing Particle Data (.vtp files)',['../04_Visualization_Tutorial.html#lagrangian_recipes_sec',1,'']]],
   ['4_20repository_20orientation_29',['4. Repository Orientation',['../42_User_Guide_Index.html#support_sec',1,'']]],
   ['4_20restart_20behavior_20matrix_30',['4. Restart Behavior Matrix',['../45_Particle_Initialization_and_Restart.html#restart_matrix_sec',1,'']]],
-  ['4_20restart_20path_20specifics_31',['4. Restart Path Specifics',['../26_Walking_Search_Method.html#restart_sec',1,'']]],
+  ['4_20restart_20path_20specifics_31',['4. Restart Path Specifics',['../39_Common_Fatal_Errors.html#restart_sec',1,'']]],
   ['4_20reusable_20config_20libraries_32',['4. Reusable Config Libraries',['../06_Simulation_Anatomy.html#libraries_sec',1,'']]],
   ['4_20robustness_20characteristics_33',['4. Robustness Characteristics',['../25_Pressure_Poisson_GMRES_Multigrid.html#robustness_sec',1,'']]],
   ['4_20runtime_20and_20source_20architecture_34',['4. Runtime and Source Architecture',['../Documentation_Map.html#runtime_axis_sec',1,'']]],

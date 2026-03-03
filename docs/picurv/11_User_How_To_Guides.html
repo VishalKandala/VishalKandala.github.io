@@ -228,15 +228,77 @@ Re = \frac{\rho U L}{\mu}
 <h2><a class="anchor" id="restart_ssec"></a>
 3.3 Restart from a Saved Step</h2>
 <div class="fragment"><div class="line">run_control:</div>
-<div class="line">  start_step: 1000</div>
-<div class="line">  total_steps: 2000</div>
+<div class="line">  start_step: 500</div>
+<div class="line">  total_steps: 1000</div>
 </div><!-- fragment --><p>Meaning:</p>
 <ul>
-<li>run resumes from step 1000 and advances 2000 additional steps.</li>
+<li>If a run has completed through step 500, set <code>start_step: 500</code>.</li>
+<li>The next run loads the saved state at step 500.</li>
+<li>The first new step advanced is step 501.</li>
+<li><code>total_steps</code> is the number of additional steps to run.</li>
+<li>In this example, the restarted run advances from step 501 through step 1500.</li>
+</ul>
+<p>Typical full field restart (<code>solver.yml</code>):</p>
+<div class="fragment"><div class="line">operation_mode:</div>
+<div class="line">  eulerian_field_source: &quot;load&quot;</div>
+</div><!-- fragment --><p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> restart choices (<code>case.yml</code>):</p>
+<p>Full restart of the existing particle swarm:</p>
+<div class="fragment"><div class="line">models:</div>
+<div class="line">  physics:</div>
+<div class="line">    particles:</div>
+<div class="line">      restart_mode: &quot;load&quot;</div>
+</div><!-- fragment --><p>Restart the flow field but reseed particles from scratch:</p>
+<div class="fragment"><div class="line">models:</div>
+<div class="line">  physics:</div>
+<div class="line">    particles:</div>
+<div class="line">      restart_mode: &quot;init&quot;</div>
+</div><!-- fragment --><p>Common combinations:</p>
+<ul>
+<li>Full restart: <code>start_step &gt; 0</code>, <code>eulerian_field_source: load</code>, <code>restart_mode: load</code></li>
+<li>Flow restart + fresh particles: <code>start_step &gt; 0</code>, <code>eulerian_field_source: load</code>, <code>restart_mode: init</code></li>
+<li>Analytical mode is different: <code>eulerian_field_source: analytical</code> regenerates the analytical field at the requested <code>(t, step)</code> instead of loading restart files.</li>
+</ul>
+<p>Command example:</p>
+<div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
+<div class="line">  --case restart_case/case.yml \</div>
+<div class="line">  --solver restart_case/solver.yml \</div>
+<div class="line">  --monitor restart_case/monitor.yml \</div>
+<div class="line">  --post restart_case/post.yml</div>
+</div><!-- fragment --><p>How to think about this workflow:</p>
+<ul>
+<li>restart uses the normal <code>run --solve</code> path; there is no separate restart command,</li>
+<li>the new run directory is a fresh run artifact,</li>
+<li>the saved field state is loaded from existing restart/output files referenced by the current restart path contract,</li>
+<li>the old run directory is not mutated in place by <code><a class="el" href="pic_8flow.html">pic.flow</a></code>.</li>
+</ul>
+<p>Before launching a restart, verify:</p>
+<ul>
+<li>the previous run actually wrote solver outputs for the target <code>start_step</code>,</li>
+<li><code>monitor.yml -&gt; io.directories.restart</code> points to the intended restart directory name,</li>
+<li><code>monitor.yml -&gt; io.directories.output</code> matches where the prior run wrote field data,</li>
+<li>restart source files for the requested step exist,</li>
+<li><code>start_step</code> matches an actual saved timestep, not just a desired number.</li>
+</ul>
+<p>Common restart mistakes:</p>
+<ul>
+<li>Setting <code>start_step: 501</code> after a run that ended at 500. Use <code>start_step: 500</code>.</li>
+<li>Forgetting <code>solver.yml -&gt; operation_mode.eulerian_field_source: load</code> for a true field restart.</li>
+<li>Forgetting to choose <code>particles.restart_mode: load</code> or <code>init</code> explicitly.</li>
+<li>Trying to restart from a step that was never written to disk.</li>
 </ul>
 <p>Verification:</p>
 <ul>
-<li>confirm restart directory and step indices in run logs.</li>
+<li>confirm restart directory and step indices in run logs,</li>
+<li>confirm the banner/load path shows the expected restart step,</li>
+<li>if particles are enabled, confirm the log shows the intended particle restart mode.</li>
+</ul>
+<p>See also:</p>
+<ul>
+<li><b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b></li>
+<li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
+<li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 </ul>
 <h2><a class="anchor" id="logging_ssec"></a>
 3.4 Enable Targeted Debug Logging</h2>

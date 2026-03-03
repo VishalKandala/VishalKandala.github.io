@@ -83,7 +83,7 @@ var searchData=
   ['restart_20branches_80',['5. Eulerian Restart Branches',['../33_Initial_Conditions.html#restart_modes_sec',1,'']]],
   ['restart_20from_20a_20saved_20step_81',['3.3 Restart from a Saved Step',['../11_User_How_To_Guides.html#restart_ssec',1,'']]],
   ['restart_20guide_82',['Particle Initialization and Restart Guide',['../45_Particle_Initialization_and_Restart.html',1,'']]],
-  ['restart_20path_20specifics_83',['4. Restart Path Specifics',['../26_Walking_Search_Method.html#restart_sec',1,'']]],
+  ['restart_20path_20specifics_83',['4. Restart Path Specifics',['../39_Common_Fatal_Errors.html#restart_sec',1,'']]],
   ['restart_5fdir_84',['restart_dir',['../variables_8h.html#af09e3f546ff8fa1192338e746391aa22',1,'SimCtx']]],
   ['restrictcoordinates_85',['RestrictCoordinates',['../grid_8c.html#a5b5fe86ae6791885769361fca4ad6b2f',1,'grid.c']]],
   ['restrictresidual_5fsolidaware_86',['RestrictResidual_SolidAware',['../poisson_8c.html#a85e1eff3b6e34605b863323d6336eecd',1,'poisson.c']]],

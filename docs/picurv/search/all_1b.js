@@ -62,7 +62,7 @@ var searchData=
   ['particleswarm_2eh_59',['ParticleSwarm.h',['../ParticleSwarm_8h.html',1,'']]],
   ['path_60',['path',['../32_Analytical_Solutions.html#activation_sec',1,'1. Activation Path'],['../35_API_Documentation_Status.html#warning_sec',1,'2. Warning Log and Build Path'],['../43_Developer_Portal_Index.html#contribution_flow_sec',1,'4. Suggested Contributor Read Path'],['../49_Workflow_Recipes_and_Config_Cookbook.html#choose_sec',1,'7. When To Use Which Grid Path']]],
   ['path_20in_20picurv_61',['2. Code Path In PICurv',['../26_Walking_Search_Method.html#implementation_sec',1,'']]],
-  ['path_20specifics_62',['4. Restart Path Specifics',['../26_Walking_Search_Method.html#restart_sec',1,'']]],
+  ['path_20specifics_62',['4. Restart Path Specifics',['../39_Common_Fatal_Errors.html#restart_sec',1,'']]],
   ['paths_63',['2. High-Frequency Fatal Messages (Runtime Paths)',['../39_Common_Fatal_Errors.html#legacy_sec',1,'']]],
   ['paths_20streamlines_64',['3.4. Recipe: Tracing Flow Paths (Streamlines)',['../04_Visualization_Tutorial.html#recipe_streams_sec',1,'']]],
   ['patterns_65',['patterns',['../49_Workflow_Recipes_and_Config_Cookbook.html#combos_sec',1,'2. Common Mix-and-Match Patterns'],['../37_Sweep_Studies_Guide.html#command_sec',1,'2. Core Command Patterns']]],
