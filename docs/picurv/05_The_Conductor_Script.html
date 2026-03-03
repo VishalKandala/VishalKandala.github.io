@@ -84,6 +84,7 @@ $(function() {
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#usage_sec">1. General Usage</a></li>
+<li class="level1"><a href="#sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#sweep_sec">5. sweep: Parameter Study via Slurm Arrays</a></li>
 <li class="level1"><a href="#modular_sec">7. Modular Profile Strategy</a></li>
 </ul>
@@ -96,6 +97,10 @@ $(function() {
 <p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
+<li><code>sync-binaries</code></li>
+<li><code>sync-config</code></li>
+<li><code>pull-source</code></li>
+<li><code>status-source</code></li>
 <li><code>run</code></li>
 <li><code>sweep</code></li>
 <li><code>validate</code></li>
@@ -110,6 +115,10 @@ $(function() {
 <p>Help: </p><div class="fragment"><div class="line">./bin/picurv --help</div>
 <div class="line">./bin/picurv init --help</div>
 <div class="line">./scripts/picurv build --help</div>
+<div class="line">./bin/picurv sync-binaries --help</div>
+<div class="line">./bin/picurv sync-config --help</div>
+<div class="line">./bin/picurv pull-source --help</div>
+<div class="line">./bin/picurv status-source --help</div>
 <div class="line">./bin/picurv run --help</div>
 <div class="line">./bin/picurv sweep --help</div>
 <div class="line">./bin/picurv validate --help</div>
@@ -120,9 +129,10 @@ $(function() {
 <ul>
 <li>copies <code>examples/&lt;template_name&gt;/</code> into a new working directory,</li>
 <li>optionally renames the destination via <code>--dest</code>,</li>
+<li>writes <code>.picurv-origin.json</code> with the source repo path and template name,</li>
 <li>copies the full executable set from <code>bin/</code> into the new case directory so the case is self-contained,</li>
 <li>includes <code>picurv</code>, <code>simulator</code>, and <code>postprocessor</code> when they exist in <code>bin/</code>,</li>
-<li>always copies the built executables into the new case directory.</li>
+<li>copies built executables when they exist in the source repo <code>bin/</code>.</li>
 </ul>
 <p>Examples:</p>
 <div class="fragment"><div class="line">./bin/picurv init flat_channel --dest my_first_case</div>
@@ -130,11 +140,13 @@ $(function() {
 </div><!-- fragment --><p>Use <code>init</code> when you want a runnable starting point that you can <code>cd</code> into and launch with <code>./picurv ...</code>. Use reusable profile libraries directly when you already have your own case directory layout.</p>
 <h1><a class="anchor" id="build_sec"></a>
 6. Build with picurv</h1>
-<div class="fragment"><div class="line">./scripts/picurv build [MAKE_ARGS...]</div>
+<div class="fragment"><div class="line">./scripts/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>calls the top-level <code>build.sh</code>,</li>
+<li>resolves the source repo from <code>.picurv-origin.json</code> when run from an initialized case,</li>
 <li>passes any trailing arguments directly through to the Make/build layer,</li>
+<li>can rebuild or clean the source repo without leaving a copied case directory,</li>
 <li>is the recommended command for normal users instead of calling build scripts manually.</li>
 </ul>
 <p>Examples:</p>
@@ -142,7 +154,26 @@ $(function() {
 <div class="line">./scripts/picurv build clean-project</div>
 <div class="line">./scripts/picurv build SYSTEM=cluster</div>
 <div class="line">./scripts/picurv build postprocessor</div>
-</div><!-- fragment --><h1><a class="anchor" id="run_sec"></a>
+<div class="line">./my_case/picurv build clean-project</div>
+</div><!-- fragment --><h1><a class="anchor" id="sync_sec"></a>
+3b. sync-binaries / sync-config / pull-source / status-source</h1>
+<p>These commands are intended for self-contained case directories created by <code>init</code>.</p>
+<p><code>sync-binaries</code> refreshes the case-local copies of <code>picurv</code>, <code>simulator</code>, and <code>postprocessor</code> from the source repo <code>bin/</code>:</p>
+<div class="fragment"><div class="line">./my_case/picurv sync-binaries</div>
+</div><!-- fragment --><p><code>sync-config</code> refreshes files from <code>examples/&lt;template_name&gt;/</code> into the case directory. By default it preserves user-modified files and only copies missing files:</p>
+<div class="fragment"><div class="line">./my_case/picurv sync-config</div>
+<div class="line">./my_case/picurv sync-config --overwrite</div>
+<div class="line">./my_case/picurv sync-config --prune</div>
+</div><!-- fragment --><p><code>--prune</code> is conservative: it removes only files previously recorded as template-managed that no longer exist in the source template. User-created case files are not pruned.</p>
+<p><code>pull-source</code> runs <code>git pull --rebase</code> in the original source repo so you can update code without leaving the case directory:</p>
+<div class="fragment"><div class="line">./my_case/picurv pull-source</div>
+<div class="line">./my_case/picurv pull-source --no-rebase</div>
+<div class="line">./my_case/picurv pull-source --remote origin --branch main</div>
+</div><!-- fragment --><p><code>status-source</code> inspects source commit drift, copied binary drift, and template-file drift before you decide what to sync:</p>
+<div class="fragment"><div class="line">./my_case/picurv status-source</div>
+<div class="line">./my_case/picurv status-source --format json</div>
+</div><!-- fragment --><p>For older cases that do not yet have <code>.picurv-origin.json</code>, pass <code>--source-root /path/to/PICurv</code>. For <code>sync-config</code>, also pass <code>--template-name &lt;example_name&gt;</code> if the template cannot be inferred.</p>
+<h1><a class="anchor" id="run_sec"></a>
 5. Run Solver and Postprocessor</h1>
 <div class="fragment"><div class="line">./bin/picurv run [STAGES] [INPUTS] [OPTIONS]</div>
 </div><!-- fragment --><p>Stages:</p><ul>

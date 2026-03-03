@@ -55,5 +55,6 @@ var searchData=
   ['35_5fapi_5fdocumentation_5fstatus_2emd_52',['35_API_Documentation_Status.md',['../35__API__Documentation__Status_8md.html',1,'']]],
   ['36_5fcluster_5frun_5fguide_2emd_53',['36_Cluster_Run_Guide.md',['../36__Cluster__Run__Guide_8md.html',1,'']]],
   ['37_5fsweep_5fstudies_5fguide_2emd_54',['37_Sweep_Studies_Guide.md',['../37__Sweep__Studies__Guide_8md.html',1,'']]],
-  ['39_5fcommon_5ffatal_5ferrors_2emd_55',['39_Common_Fatal_Errors.md',['../39__Common__Fatal__Errors_8md.html',1,'']]]
+  ['39_5fcommon_5ffatal_5ferrors_2emd_55',['39_Common_Fatal_Errors.md',['../39__Common__Fatal__Errors_8md.html',1,'']]],
+  ['3b_20sync_20binaries_20sync_20config_20pull_20source_20status_20source_56',['3b. sync-binaries / sync-config / pull-source / status-source',['../05_The_Conductor_Script.html#sync_sec',1,'']]]
 ];
