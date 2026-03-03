@@ -91,8 +91,9 @@ $(function() {
 <div class="textblock"><p><code><a class="el" href="pic_8flow.html">pic.flow</a></code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages. It is also the primary user-facing contract layer: many defaults, aliases, and compatibility rules are enforced here before the C solver starts.</p>
 <h1><a class="anchor" id="usage_sec"></a>
 1. General Usage</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow [COMMAND] [ARGS...]</div>
-</div><!-- fragment --><p>Primary commands:</p><ul>
+<div class="fragment"><div class="line">./bin/pic.flow [COMMAND] [ARGS...]</div>
+</div><!-- fragment --><p>If <code>bin/pic.flow</code> does not exist yet, use <code>./scripts/pic.flow build</code> once to install it.</p>
+<p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
 <li><code>run</code></li>
@@ -106,15 +107,15 @@ $(function() {
 <li>In normal use, you mix and match a case definition with reusable solver, monitor, and post profiles as long as the combination is contract-compatible.</li>
 <li>Example: the same <code>case.yml</code> can be paired with a quieter <code>monitor.yml</code>, a different solver strategy, or a different post recipe without changing the physical setup file.</li>
 </ul>
-<p>Help: </p><div class="fragment"><div class="line">python3 scripts/pic.flow --help</div>
-<div class="line">python3 scripts/pic.flow init --help</div>
-<div class="line">python3 scripts/pic.flow build --help</div>
-<div class="line">python3 scripts/pic.flow run --help</div>
-<div class="line">python3 scripts/pic.flow sweep --help</div>
-<div class="line">python3 scripts/pic.flow validate --help</div>
+<p>Help: </p><div class="fragment"><div class="line">./bin/pic.flow --help</div>
+<div class="line">./bin/pic.flow init --help</div>
+<div class="line">./scripts/pic.flow build --help</div>
+<div class="line">./bin/pic.flow run --help</div>
+<div class="line">./bin/pic.flow sweep --help</div>
+<div class="line">./bin/pic.flow validate --help</div>
 </div><!-- fragment --><h1><a class="anchor" id="init_sec"></a>
 2. Initialize the Study Directory</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow init &lt;template_name&gt; [--dest &lt;new_dir&gt;] [--copy-binaries]</div>
+<div class="fragment"><div class="line">./bin/pic.flow init &lt;template_name&gt; [--dest &lt;new_dir&gt;] [--copy-binaries]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>copies <code>examples/&lt;template_name&gt;/</code> into a new working directory,</li>
@@ -123,12 +124,12 @@ $(function() {
 <li>with <code>--copy-binaries</code>, copies solver executables into the new case for a more portable snapshot.</li>
 </ul>
 <p>Examples:</p>
-<div class="fragment"><div class="line">python3 scripts/pic.flow init flat_channel --dest my_first_case</div>
-<div class="line">python3 scripts/pic.flow init bent_channel --dest my_bent_case --copy-binaries</div>
+<div class="fragment"><div class="line">./bin/pic.flow init flat_channel --dest my_first_case</div>
+<div class="line">./bin/pic.flow init bent_channel --dest my_bent_case --copy-binaries</div>
 </div><!-- fragment --><p>Use <code>init</code> when you want a runnable starting point. Use reusable profile libraries directly when you already have your own case directory layout.</p>
 <h1><a class="anchor" id="build_sec"></a>
 6. Build with pic.flow</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow build [MAKE_ARGS...]</div>
+<div class="fragment"><div class="line">./scripts/pic.flow build [MAKE_ARGS...]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>calls the top-level <code>build.sh</code>,</li>
@@ -136,13 +137,13 @@ $(function() {
 <li>is the recommended command for normal users instead of calling build scripts manually.</li>
 </ul>
 <p>Examples:</p>
-<div class="fragment"><div class="line">python3 scripts/pic.flow build</div>
-<div class="line">python3 scripts/pic.flow build clean-project</div>
-<div class="line">python3 scripts/pic.flow build SYSTEM=cluster</div>
-<div class="line">python3 scripts/pic.flow build postprocessor</div>
+<div class="fragment"><div class="line">./scripts/pic.flow build</div>
+<div class="line">./scripts/pic.flow build clean-project</div>
+<div class="line">./scripts/pic.flow build SYSTEM=cluster</div>
+<div class="line">./scripts/pic.flow build postprocessor</div>
 </div><!-- fragment --><h1><a class="anchor" id="run_sec"></a>
 5. Run Solver and Postprocessor</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow run [STAGES] [INPUTS] [OPTIONS]</div>
+<div class="fragment"><div class="line">./bin/pic.flow run [STAGES] [INPUTS] [OPTIONS]</div>
 </div><!-- fragment --><p>Stages:</p><ul>
 <li><code>--solve</code></li>
 <li><code>--post-process</code></li>
@@ -172,26 +173,26 @@ $(function() {
 <li><code>--dry-run</code> (resolve and print launch/artifact plan only)</li>
 <li><code>--format json</code> (machine-readable output for <code>--dry-run</code>)</li>
 </ul>
-<p>Local example: </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process -n 8 \</div>
+<p>Local example: </p><div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process -n 8 \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml</div>
 </div><!-- fragment --><p> In this command, solver runs with 8 ranks; post-processing still defaults to 1 rank.</p>
-<p>Slurm example (generate + submit): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+<p>Slurm example (generate + submit): </p><div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml</div>
-</div><!-- fragment --><p>Slurm example (generate only): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+</div><!-- fragment --><p>Slurm example (generate only): </p><div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
-</div><!-- fragment --><p>Dry-run example (no file writes): </p><div class="fragment"><div class="line">python3 scripts/pic.flow run --solve --post-process \</div>
+</div><!-- fragment --><p>Dry-run example (no file writes): </p><div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
@@ -207,7 +208,7 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="sweep_sec"></a>
 5. sweep: Parameter Study via Slurm Arrays</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow sweep \</div>
+<div class="fragment"><div class="line">./bin/pic.flow sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml [--no-submit]</div>
 </div><!-- fragment --><p>Behavior:</p><ul>
@@ -219,7 +220,7 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="validate_sec"></a>
 4. Validate Inputs Before Launch</h1>
-<div class="fragment"><div class="line">python3 scripts/pic.flow validate \</div>
+<div class="fragment"><div class="line">./bin/pic.flow validate \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
