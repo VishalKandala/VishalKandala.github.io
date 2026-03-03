@@ -90,10 +90,10 @@ $(function() {
 <li class="level1"><a href="#study_sec">8. Study Contract Highlights (study.yml)</a></li>
 </ul>
 </div>
-<div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code><a class="el" href="pic_8flow.html">pic.flow</a></code>. It describes the launcher-level contract, which may be stricter or more explicit than the raw C defaults because <code><a class="el" href="pic_8flow.html">pic.flow</a></code> validates and normalizes inputs before runtime.</p>
+<div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code>picurv</code>. It describes the launcher-level contract, which may be stricter or more explicit than the raw C defaults because <code>picurv</code> validates and normalizes inputs before runtime.</p>
 <h1><a class="anchor" id="inputs_sec"></a>
 1. Required Input Roles</h1>
-<p><code><a class="el" href="pic_8flow.html">pic.flow</a></code> composes a standard single-run workflow from five logical inputs, with two additional files for cluster/sweep modes:</p>
+<p><code>picurv</code> composes a standard single-run workflow from five logical inputs, with two additional files for cluster/sweep modes:</p>
 <ol type="1">
 <li><code>case.yml</code>: physics, grid, BC definitions, run control.</li>
 <li><code>solver.yml</code>: numerical strategy and solver parameters.</li>
@@ -107,7 +107,7 @@ $(function() {
 <li>(Cluster mode) <code>cluster.yml</code>: scheduler/resource/launcher contract.</li>
 <li>(Sweep mode) <code>study.yml</code>: parameter matrix + metrics/plot contract.</li>
 </ol>
-<p>You can name files however you want. File names are not hardcoded on the C side; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> resolves paths and emits generated artifacts.</p>
+<p>You can name files however you want. File names are not hardcoded on the C side; <code>picurv</code> resolves paths and emits generated artifacts.</p>
 <p>These roles are intentionally modular:</p>
 <ul>
 <li><code>case.yml</code> describes physical setup and geometry contract.</li>
@@ -118,12 +118,12 @@ $(function() {
 <p>In normal use, you reuse and mix these files instead of cloning one monolithic config for every run.</p>
 <h1><a class="anchor" id="artifacts_sec"></a>
 6. Inspect Generated Artifacts</h1>
-<p>For each run, <code><a class="el" href="pic_8flow.html">pic.flow</a></code> generates:</p>
+<p>For each run, <code>picurv</code> generates:</p>
 <ul>
 <li><code>&lt;run_id&gt;.control</code>: master PETSc/control flags for solver/post setup.</li>
 <li><code>bcs.run</code> or <code>bcs_block*.run</code>: boundary condition definitions.</li>
 <li><code>whitelist.run</code>: logging function allow-list.</li>
-<li><code>profile.run</code>: profiling critical-function list.</li>
+<li><code>profile.run</code>: selected per-step profiling function list (only when <code>profiling.timestep_output.mode: selected</code>).</li>
 <li><code>post.run</code>: key=value post-processing recipe consumed by C post parser.</li>
 </ul>
 <h1><a class="anchor" id="case_sec"></a>
@@ -131,7 +131,7 @@ $(function() {
 <ul>
 <li><code>grid.mode</code> supports: <code>file</code>, <code>programmatic_c</code>, <code>grid_gen</code>.</li>
 <li>For <code>programmatic_c</code>, per-block arrays are supported for geometry (<code>im/jm/km</code>, bounds, stretching).</li>
-<li><code>programmatic_c.im/jm/km</code> are cell counts in YAML; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> converts them to node counts before writing <code>-im/-jm/-km</code>.</li>
+<li><code>programmatic_c.im/jm/km</code> are cell counts in YAML; <code>picurv</code> converts them to node counts before writing <code>-im/-jm/-km</code>.</li>
 <li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block MPI decomposition is not currently supported.</li>
 <li>For <code>grid_gen</code>, <code>grid.generator.config_file</code> is required today. <code>grid.gen</code> consumes cell counts and writes node counts into <code>.picgrid</code>.</li>
 <li><code>boundary_conditions</code> supports single-block list or multi-block list-of-lists.</li>
@@ -139,8 +139,8 @@ $(function() {
 <li><code>properties.initial_conditions.mode</code> is required explicitly by the launcher.</li>
 <li><code>properties.initial_conditions.mode: Zero</code> may omit velocity components.</li>
 <li><code>properties.initial_conditions.mode: Poiseuille</code> supports:<ul>
-<li><code>peak_velocity_physical</code> (preferred scalar centerline speed), or</li>
-<li><code>u_physical/v_physical/w_physical</code> (legacy explicit component form).</li>
+<li><code>peak_velocity_physical</code> (scalar centerline speed), or</li>
+<li><code>u_physical/v_physical/w_physical</code> (explicit component override).</li>
 </ul>
 </li>
 </ul>
@@ -162,6 +162,7 @@ $(function() {
 5. Monitor Contract Highlights</h1>
 <ul>
 <li><code>io.data_output_frequency</code> -&gt; <code>-tio</code></li>
+<li><code>io.particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code> (defaults to <code>data_output_frequency</code> when omitted)</li>
 <li><code>io.particle_log_interval</code> -&gt; <code>-logfreq</code></li>
 <li><code>io.directories.output/restart/log</code> -&gt; <code>-output_dir/-restart_dir/-log_dir</code></li>
 <li><code>io.directories.eulerian_subdir/particle_subdir</code> -&gt; <code>-euler_subdir/-particle_subdir</code></li>
@@ -189,7 +190,7 @@ $(function() {
 <li><code>execution.launcher_args</code> provides site-specific launch flags.</li>
 <li><code>execution.extra_sbatch</code> supports scheduler-specific pass-through flags.</li>
 </ul>
-<p><code><a class="el" href="pic_8flow.html">pic.flow</a> run --cluster ...</code> generates:</p><ul>
+<p><code>picurv run --cluster ...</code> generates:</p><ul>
 <li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code></li>
 <li><code>runs/&lt;run_id&gt;/scheduler/post.sbatch</code></li>
 <li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code></li>
@@ -215,7 +216,7 @@ $(function() {
 <li><code>plotting</code> controls whether plots are generated and output format.</li>
 <li><code>execution.max_concurrent_array_tasks</code> maps to Slurm array throttling <code>N</code>.</li>
 </ul>
-<p><code><a class="el" href="pic_8flow.html">pic.flow</a> sweep --study ... --cluster ...</code> generates:</p><ul>
+<p><code>picurv sweep --study ... --cluster ...</code> generates:</p><ul>
 <li><code>studies/&lt;study_id&gt;/scheduler/case_index.tsv</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/solver_array.sbatch</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
@@ -245,7 +246,7 @@ $(function() {
 <li>omitting velocity components for <code>mode: Zero</code> is accepted and defaults to zero,</li>
 <li>omitting <code>models.physics.particles.restart_mode</code> on a particle restart emits a warning that C will default to <code>load</code>.</li>
 </ul>
-<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. </p>
+<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

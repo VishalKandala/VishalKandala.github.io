@@ -123,7 +123,7 @@ Re = \frac{\rho U L}{\mu}
 <p>These values set the non-dimensional operating point consumed by solver controls.</p>
 <p>Quick check:</p>
 <ul>
-<li>rerun <code><a class="el" href="pic_8flow.html">pic.flow</a> validate ...</code>,</li>
+<li>rerun <code>picurv validate ...</code>,</li>
 <li>inspect generated <code>.control</code> file for updated values.</li>
 </ul>
 <h2><a class="anchor" id="twod_ssec"></a>
@@ -196,7 +196,7 @@ Re = \frac{\rho U L}{\mu}
 5. Run Solver and Postprocessor</h1>
 <h2><a class="anchor" id="mpi_ssec"></a>
 3.1 Run in Parallel and Control DMDA Layout</h2>
-<div class="fragment"><div class="line">./bin/pic.flow run -n 16 --solve ...</div>
+<div class="fragment"><div class="line">./bin/picurv run -n 16 --solve ...</div>
 </div><!-- fragment --><p>Optional partition hints:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: programmatic_c</div>
@@ -207,14 +207,14 @@ Re = \frac{\rho U L}{\mu}
 </div><!-- fragment --><p>Note: <code>da_processors_*</code> are scalar globals, not per-block vectors.</p>
 <h2><a class="anchor" id="cluster_run_ssec"></a>
 3.2 Run on Slurm (Generate and Submit)</h2>
-<div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
+<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml</div>
 </div><!-- fragment --><p>Generate-only mode:</p>
-<div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
+<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
@@ -230,6 +230,7 @@ Re = \frac{\rho U L}{\mu}
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  start_step: 500</div>
 <div class="line">  total_steps: 1000</div>
+<div class="line">  restart_from_run_dir: &quot;../runs/flat_channel_20260303-120000&quot;</div>
 </div><!-- fragment --><p>Meaning:</p>
 <ul>
 <li>If a run has completed through step 500, set <code>start_step: 500</code>.</li>
@@ -237,6 +238,7 @@ Re = \frac{\rho U L}{\mu}
 <li>The first new step advanced is step 501.</li>
 <li><code>total_steps</code> is the number of additional steps to run.</li>
 <li>In this example, the restarted run advances from step 501 through step 1500.</li>
+<li>If <code>restart_from_run_dir</code> is set, <code>picurv</code> automatically resolves the previous run's restart directory from that run's <code>config/monitor.yml</code> and injects the correct <code>-restart_dir</code> into the new control file.</li>
 </ul>
 <p>Typical full field restart (<code>solver.yml</code>):</p>
 <div class="fragment"><div class="line">operation_mode:</div>
@@ -259,7 +261,7 @@ Re = \frac{\rho U L}{\mu}
 <li>Analytical mode is different: <code>eulerian_field_source: analytical</code> regenerates the analytical field at the requested <code>(t, step)</code> instead of loading restart files.</li>
 </ul>
 <p>Command example:</p>
-<div class="fragment"><div class="line">./bin/pic.flow run --solve --post-process \</div>
+<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case restart_case/case.yml \</div>
 <div class="line">  --solver restart_case/solver.yml \</div>
 <div class="line">  --monitor restart_case/monitor.yml \</div>
@@ -269,11 +271,13 @@ Re = \frac{\rho U L}{\mu}
 <li>restart uses the normal <code>run --solve</code> path; there is no separate restart command,</li>
 <li>the new run directory is a fresh run artifact,</li>
 <li>the saved field state is loaded from existing restart/output files referenced by the current restart path contract,</li>
-<li>the old run directory is not mutated in place by <code><a class="el" href="pic_8flow.html">pic.flow</a></code>.</li>
+<li><code>run_control.restart_from_run_dir</code> is the preferred way to point <code>picurv</code> at the old run automatically,</li>
+<li>the old run directory is not mutated in place by <code>picurv</code>.</li>
 </ul>
 <p>Before launching a restart, verify:</p>
 <ul>
 <li>the previous run actually wrote solver outputs for the target <code>start_step</code>,</li>
+<li><code>run_control.restart_from_run_dir</code> points to the intended previous run directory (if you use automated restart resolution),</li>
 <li><code>monitor.yml -&gt; io.directories.restart</code> points to the intended restart directory name,</li>
 <li><code>monitor.yml -&gt; io.directories.output</code> matches where the prior run wrote field data,</li>
 <li>restart source files for the requested step exist,</li>
@@ -312,7 +316,7 @@ Re = \frac{\rho U L}{\mu}
 4. Post-Processing Recipes</h1>
 <h2><a class="anchor" id="post_existing_ssec"></a>
 4.1 Postprocess an Existing Run</h2>
-<div class="fragment"><div class="line">./bin/pic.flow run --post-process \</div>
+<div class="fragment"><div class="line">./bin/picurv run --post-process \</div>
 <div class="line">  --run-dir runs/flat_channel_20240401-153000 \</div>
 <div class="line">  --post my_study/standard_analysis.yml</div>
 </div><!-- fragment --><p>Use when solver outputs already exist and you are iterating only on analysis pipeline.</p>
@@ -344,7 +348,7 @@ Re = \frac{\rho U L}{\mu}
 </ul>
 <h1><a class="anchor" id="sweep_sec"></a>
 5. sweep: Parameter Study via Slurm Arrays</h1>
-<div class="fragment"><div class="line">./bin/pic.flow sweep \</div>
+<div class="fragment"><div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml</div>
 </div><!-- fragment --><p>What you get:</p>

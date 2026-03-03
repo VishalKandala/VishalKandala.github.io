@@ -95,6 +95,7 @@ $(function() {
 1. io</h1>
 <div class="fragment"><div class="line">io:</div>
 <div class="line">  data_output_frequency: 100</div>
+<div class="line">  particle_console_output_frequency: 100</div>
 <div class="line">  particle_log_interval: 10</div>
 <div class="line">  directories:</div>
 <div class="line">    output: &quot;results&quot;</div>
@@ -104,12 +105,20 @@ $(function() {
 <div class="line">    particle_subdir: &quot;particles&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>data_output_frequency</code> -&gt; <code>-tio</code></li>
+<li><code>particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code></li>
 <li><code>particle_log_interval</code> -&gt; <code>-logfreq</code></li>
 <li><code>directories.output</code> -&gt; <code>-output_dir</code></li>
 <li><code>directories.restart</code> -&gt; <code>-restart_dir</code></li>
 <li><code>directories.log</code> -&gt; <code>-log_dir</code></li>
 <li><code>directories.eulerian_subdir</code> -&gt; <code>-euler_subdir</code></li>
 <li><code>directories.particle_subdir</code> -&gt; <code>-particle_subdir</code></li>
+</ul>
+<p>Semantics:</p><ul>
+<li><code>data_output_frequency</code> controls file/restart output cadence.</li>
+<li><code>particle_console_output_frequency</code> controls how often particle snapshots are printed to the main log.</li>
+<li><code>particle_log_interval</code> controls row subsampling within each particle snapshot.</li>
+<li>If <code>particle_console_output_frequency</code> is omitted, <code>picurv</code> defaults it to <code>data_output_frequency</code>.</li>
+<li>If <code>particle_console_output_frequency</code> is <code>0</code>, periodic particle console snapshots are disabled.</li>
 </ul>
 <h1><a class="anchor" id="logging_sec"></a>
 2. logging</h1>
@@ -118,13 +127,14 @@ $(function() {
 <div class="line">  enabled_functions:</div>
 <div class="line">    - AdvanceSimulation</div>
 </div><!-- fragment --><ul>
-<li><code>verbosity</code> maps to environment variable <code>LOG_LEVEL</code> via <code><a class="el" href="pic_8flow.html">pic.flow</a></code> launcher.</li>
-<li><code>enabled_functions</code> is serialized into <code>whitelist.run</code> and loaded by C logging filters.</li>
+<li><code>verbosity</code> maps to environment variable <code>LOG_LEVEL</code> via <code>picurv</code> launcher.</li>
+<li><code>enabled_functions</code> is serialized into <code>whitelist.run</code> only when non-empty.</li>
+<li>If <code>enabled_functions</code> is empty, <code>picurv</code> omits <code>whitelist.run</code> and the C runtime falls back to its default allow-list.</li>
+<li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 </ul>
 <p>Supported verbosity strings:</p><ul>
 <li><code>ERROR</code></li>
 <li><code>WARNING</code></li>
-<li><code>PROFILE</code></li>
 <li><code>INFO</code></li>
 <li><code>DEBUG</code></li>
 <li><code>TRACE</code></li>
@@ -133,10 +143,25 @@ $(function() {
 <h1><a class="anchor" id="profiling_sec"></a>
 3. profiling</h1>
 <div class="fragment"><div class="line">profiling:</div>
-<div class="line">  critical_functions:</div>
-<div class="line">    - Flow_Solver</div>
-<div class="line">    - AdvanceSimulation</div>
-</div><!-- fragment --><p>This list is serialized into <code>profile.run</code> for critical-path profiling summaries.</p>
+<div class="line">  timestep_output:</div>
+<div class="line">    mode: &quot;selected&quot;</div>
+<div class="line">    functions:</div>
+<div class="line">      - Flow_Solver</div>
+<div class="line">      - AdvanceSimulation</div>
+<div class="line">    file: &quot;Profiling_Timestep_Summary.csv&quot;</div>
+<div class="line">  final_summary:</div>
+<div class="line">    enabled: true</div>
+</div><!-- fragment --><p>Rules:</p><ul>
+<li><code>timestep_output.mode</code>:<ul>
+<li><code>off</code>: disable per-step profiling output</li>
+<li><code>selected</code>: write only the listed functions each timestep</li>
+<li><code>all</code>: write all instrumented functions seen in a timestep</li>
+</ul>
+</li>
+<li><code>timestep_output.functions</code> is required only when <code>mode: selected</code></li>
+<li><code>timestep_output.file</code> sets the filename written under the run <code>logs/</code> directory</li>
+<li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
+</ul>
 <h1><a class="anchor" id="solver_monitoring_sec"></a>
 4. solver_monitoring</h1>
 <p>Raw flag passthrough for PETSc monitors/debug options:</p>
@@ -154,7 +179,8 @@ $(function() {
 <p>Proceed to <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b>.</p>
 <p>Also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
-<li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b> </li>
+<li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -10,8 +10,9 @@ var searchData=
   ['model_20and_20coupling_20overview_7',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
   ['models_20overview_8',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
   ['modes_9',['modes',['../32_Analytical_Solutions.html',1,'Analytical Solution Modes'],['../33_Initial_Conditions.html',1,'Initial Condition Modes']]],
-  ['momentum_20solver_10',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]],
-  ['momentum_20solver_20implementations_11',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['monitor_20yaml_12',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['multigrid_13',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
+  ['modular_20selector_20extension_20guide_10',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
+  ['momentum_20solver_11',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]],
+  ['momentum_20solver_20implementations_12',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
+  ['monitor_20yaml_13',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
+  ['multigrid_14',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];

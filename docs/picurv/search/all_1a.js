@@ -21,7 +21,7 @@ var searchData=
   ['orchestration_18',['6. Cluster and Study Orchestration',['../17_Workflow_Extensibility.html#orchestration_sec',1,'']]],
   ['orchestration_20mapping_20no_20c_20ingestion_19',['3. Python-Only Orchestration Mapping (No C Ingestion)',['../15_Config_Ingestion_Map.html#python_only_sec',1,'']]],
   ['order_20',['order',['../21_Methods_Overview.html#runtime_map_sec',1,'2. Runtime Execution Order'],['../41_Getting_Started_Index.html#path_sec',1,'3. Recommended Read Order']]],
-  ['order_20tt_20src_20picsolver_20c_20tt_21',['1. Solver Startup Order (&lt;tt&gt;src/picsolver.c&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#startup_sec',1,'']]],
+  ['order_20tt_20src_20simulator_20c_20tt_21',['1. Solver Startup Order (&lt;tt&gt;src/simulator.c&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#startup_sec',1,'']]],
   ['orientation_22',['4. Repository Orientation',['../42_User_Guide_Index.html#support_sec',1,'']]],
   ['outcomes_23',['5. Expected Outcomes',['../43_Developer_Portal_Index.html#developer_outcomes_sec',1,'']]],
   ['outlet_24',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]],
@@ -31,8 +31,7 @@ var searchData=
   ['output_5ffields_5faveraged_28',['output_fields_averaged',['../variables_8h.html#a47a8b39d145cff36aa25d8588976156e',1,'PostProcessParams']]],
   ['output_5ffields_5finstantaneous_29',['output_fields_instantaneous',['../variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb',1,'PostProcessParams']]],
   ['output_5fprefix_30',['output_prefix',['../variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4',1,'PostProcessParams']]],
-  ['outputfreq_31',['OutputFreq',['../variables_8h.html#aa002126f8760bb0f98614b78ac70e940',1,'SimCtx']]],
-  ['outputparticles_32',['outputParticles',['../variables_8h.html#ab954ff749a6b034b8cef53a508787b24',1,'PostProcessParams']]],
-  ['outputs_20and_20aggregates_33',['4. Outputs and Aggregates',['../48_Grid_Generator_Guide.html#outputs_sec',1,'']]],
-  ['overview_34',['overview',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md14',1,'1. Overview'],['../22_CURVIB_Method.html',1,'CurvIB Method Overview'],['../21_Methods_Overview.html',1,'Methods and Models Overview'],['../34_Particle_Model_Overview.html',1,'Particle Model and Coupling Overview']]]
+  ['outputparticles_31',['outputParticles',['../variables_8h.html#ab954ff749a6b034b8cef53a508787b24',1,'PostProcessParams']]],
+  ['outputs_20and_20aggregates_32',['4. Outputs and Aggregates',['../48_Grid_Generator_Guide.html#outputs_sec',1,'']]],
+  ['overview_33',['overview',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md14',1,'1. Overview'],['../22_CURVIB_Method.html',1,'CurvIB Method Overview'],['../21_Methods_Overview.html',1,'Methods and Models Overview'],['../34_Particle_Model_Overview.html',1,'Particle Model and Coupling Overview']]]
 ];

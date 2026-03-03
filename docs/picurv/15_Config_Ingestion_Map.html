@@ -87,7 +87,7 @@ $(function() {
 <li class="level1"><a href="#map_sec">2. Mapping Matrix</a></li>
 <li class="level1"><a href="#python_only_sec">3. Python-Only Orchestration Mapping (No C Ingestion)</a></li>
 <li class="level1"><a href="#exceptions_sec">4. Important Exceptions</a></li>
-<li class="level1"><a href="#mode_dependent_sec">5. Mode-Dependent Normalization in &lt;tt&gt;pic.flow&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#mode_dependent_sec">5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</a></li>
 <li class="level1"><a href="#maintenance_sec">6. Drift Prevention</a></li>
 </ul>
 </div>
@@ -95,8 +95,8 @@ $(function() {
 <h1><a class="anchor" id="pipeline_sec"></a>
 1. End-to-End Flow</h1>
 <ol type="1">
-<li><code><a class="el" href="pic_8flow.html">pic.flow</a></code> validates YAML inputs.</li>
-<li><code><a class="el" href="pic_8flow.html">pic.flow</a></code> generates <code>*.control</code>, <code>bcs*.run</code>, <code>whitelist.run</code>, <code>profile.run</code>, <code>post.run</code>.</li>
+<li><code>picurv</code> validates YAML inputs.</li>
+<li><code>picurv</code> generates <code>*.control</code>, <code>bcs*.run</code>, and <code>post.run</code>, plus optional <code>whitelist.run</code> / <code>profile.run</code> sidecars when those features are enabled.</li>
 <li><code><a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693" title="Allocates and populates the master SimulationContext object.">CreateSimulationContext()</a></code> in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> loads <code>-control_file</code> and ingests options.</li>
 <li>Secondary file parsers ingest BC/post/logging profile inputs.</li>
 <li>Runtime modules consume parsed values during setup, solve, and postprocess.</li>
@@ -107,7 +107,7 @@ $(function() {
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">YAML / Source Key   </th><th class="markdownTableHeadLeft">Generated Artifact Key   </th><th class="markdownTableHeadLeft">C Ingestion Site   </th><th class="markdownTableHeadLeft">Primary Runtime Consumers    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>case.run_control.*</code>   </td><td class="markdownTableBodyLeft"><code>-start_step</code>, <code>-totalsteps</code>, <code>-dt</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> (<code>CreateSimulationContext</code>)   </td><td class="markdownTableBodyLeft"><code><a class="el" href="simulation_8c.html" title="// code for simulation loop">src/simulation.c</a></code>, setup/timestep logic    </td></tr>
+<td class="markdownTableBodyLeft"><code>case.run_control.*</code>   </td><td class="markdownTableBodyLeft"><code>-start_step</code>, <code>-totalsteps</code>, <code>-dt</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> (<code>CreateSimulationContext</code>)   </td><td class="markdownTableBodyLeft"><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>, setup/timestep logic    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>case.grid.programmatic_settings.im/jm/km/...</code>   </td><td class="markdownTableBodyLeft"><code>-im/-jm/-km</code>, bounds, stretch (<code>im/jm/km</code> translated from YAML cell counts to C node counts)   </td><td class="markdownTableBodyLeft"><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code> (<code>ReadGridGenerationInputs</code>, <code>PopulateFinestUserGridResolutionFromOptions</code>)   </td><td class="markdownTableBodyLeft"><code><a class="el" href="grid_8c.html">src/grid.c</a></code>, analytical geometry setup    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -127,11 +127,11 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>solver.petsc_passthrough_options</code>   </td><td class="markdownTableBodyLeft">raw flags in control   </td><td class="markdownTableBodyLeft">PETSc options db   </td><td class="markdownTableBodyLeft">PETSc KSP/PC stack, mostly in <code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>monitor.io.*</code>   </td><td class="markdownTableBodyLeft"><code>-tio</code>, <code>-logfreq</code>, <code>-output_dir</code>, <code>-restart_dir</code>, <code>-log_dir</code>, <code>-euler_subdir</code>, <code>-particle_subdir</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>, <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> env setup    </td></tr>
+<td class="markdownTableBodyLeft"><code>monitor.io.*</code>   </td><td class="markdownTableBodyLeft"><code>-tio</code>, <code>-particle_console_output_freq</code>, <code>-logfreq</code>, <code>-output_dir</code>, <code>-restart_dir</code>, <code>-log_dir</code>, <code>-euler_subdir</code>, <code>-particle_subdir</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>, <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>, <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>monitor.logging.*</code>   </td><td class="markdownTableBodyLeft"><code>whitelist.run</code>, <code>LOG_LEVEL</code> env   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> + <code><a class="el" href="logging_8c.html">src/logging.c</a></code>   </td><td class="markdownTableBodyLeft">logging macros/system    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>monitor.profiling.*</code>   </td><td class="markdownTableBodyLeft"><code>profile.run</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> + profiling init   </td><td class="markdownTableBodyLeft">profiler summaries    </td></tr>
+<td class="markdownTableBodyLeft"><code>monitor.profiling.*</code>   </td><td class="markdownTableBodyLeft"><code>profile.run</code> (selected-mode only) + explicit profiling flags in <code>*.control</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> + profiling init   </td><td class="markdownTableBodyLeft">profiler summaries    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>monitor.solver_monitoring</code>   </td><td class="markdownTableBodyLeft">raw flags in control   </td><td class="markdownTableBodyLeft">PETSc options db   </td><td class="markdownTableBodyLeft">PETSc monitors/convergence output    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -145,30 +145,30 @@ $(function() {
 </table>
 <h1><a class="anchor" id="python_only_sec"></a>
 3. Python-Only Orchestration Mapping (No C Ingestion)</h1>
-<p>These keys are consumed by <code><a class="el" href="pic_8flow.html">pic.flow</a></code> orchestration only:</p>
+<p>These keys are consumed by <code>picurv</code> orchestration only:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">YAML / Source Key   </th><th class="markdownTableHeadLeft">Generated Artifact Key   </th><th class="markdownTableHeadLeft">Ingestion Site   </th><th class="markdownTableHeadLeft">Runtime Consumer    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>cluster.scheduler.type</code>   </td><td class="markdownTableBodyLeft">scheduler selector   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> (<code>validate_cluster_config</code>)   </td><td class="markdownTableBodyLeft"><code>run</code>/<code>sweep</code> scheduler dispatch    </td></tr>
+<td class="markdownTableBodyLeft"><code>cluster.scheduler.type</code>   </td><td class="markdownTableBodyLeft">scheduler selector   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> (<code>validate_cluster_config</code>)   </td><td class="markdownTableBodyLeft"><code>run</code>/<code>sweep</code> scheduler dispatch    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>cluster.resources.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH</code> directives   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> (Slurm renderers)   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<td class="markdownTableBodyLeft"><code>cluster.resources.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH</code> directives   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> (Slurm renderers)   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>cluster.notifications.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH --mail-*</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<td class="markdownTableBodyLeft"><code>cluster.notifications.*</code>   </td><td class="markdownTableBodyLeft"><code>#SBATCH --mail-*</code>   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>cluster.execution.module_setup</code>   </td><td class="markdownTableBodyLeft">pre-launch shell lines in <code>*.sbatch</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code>   </td><td class="markdownTableBodyLeft">batch script runtime env    </td></tr>
+<td class="markdownTableBodyLeft"><code>cluster.execution.module_setup</code>   </td><td class="markdownTableBodyLeft">pre-launch shell lines in <code>*.sbatch</code>   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code>   </td><td class="markdownTableBodyLeft">batch script runtime env    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>cluster.execution.launcher*</code>   </td><td class="markdownTableBodyLeft">launch command (<code>srun</code>/<code>mpirun</code>)   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code>   </td><td class="markdownTableBodyLeft">solver/post executable launch    </td></tr>
+<td class="markdownTableBodyLeft"><code>cluster.execution.launcher*</code>   </td><td class="markdownTableBodyLeft">launch command (<code>srun</code>/<code>mpirun</code>)   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code>   </td><td class="markdownTableBodyLeft">solver/post executable launch    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>study.base_configs.*</code>   </td><td class="markdownTableBodyLeft">per-case config materialization   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> (<code>sweep_workflow</code>)   </td><td class="markdownTableBodyLeft">case generation pipeline    </td></tr>
+<td class="markdownTableBodyLeft"><code>study.base_configs.*</code>   </td><td class="markdownTableBodyLeft">per-case config materialization   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> (<code>sweep_workflow</code>)   </td><td class="markdownTableBodyLeft">case generation pipeline    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>study.parameters</code>   </td><td class="markdownTableBodyLeft">case matrix expansion   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> (<code>expand_parameter_matrix</code>)   </td><td class="markdownTableBodyLeft">study case synthesis    </td></tr>
+<td class="markdownTableBodyLeft"><code>study.parameters</code>   </td><td class="markdownTableBodyLeft">case matrix expansion   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> (<code>expand_parameter_matrix</code>)   </td><td class="markdownTableBodyLeft">study case synthesis    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>study.execution.max_concurrent_array_tasks</code>   </td><td class="markdownTableBodyLeft">Slurm array <code>N</code> throttle   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
+<td class="markdownTableBodyLeft"><code>study.execution.max_concurrent_array_tasks</code>   </td><td class="markdownTableBodyLeft">Slurm array <code>N</code> throttle   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code>   </td><td class="markdownTableBodyLeft">Slurm scheduler    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code>study.metrics</code>   </td><td class="markdownTableBodyLeft"><code>metrics_table.csv</code> extraction contract   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> metric extractors   </td><td class="markdownTableBodyLeft">study aggregation/reporting    </td></tr>
+<td class="markdownTableBodyLeft"><code>study.metrics</code>   </td><td class="markdownTableBodyLeft"><code>metrics_table.csv</code> extraction contract   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> metric extractors   </td><td class="markdownTableBodyLeft">study aggregation/reporting    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>study.plotting</code>   </td><td class="markdownTableBodyLeft"><code>results/plots/*</code> output controls   </td><td class="markdownTableBodyLeft"><code><a class="el" href="pic_8flow.html">scripts/pic.flow</a></code> plotting pipeline   </td><td class="markdownTableBodyLeft">study reporting   </td></tr>
+<td class="markdownTableBodyLeft"><code>study.plotting</code>   </td><td class="markdownTableBodyLeft"><code>results/plots/*</code> output controls   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> plotting pipeline   </td><td class="markdownTableBodyLeft">study reporting   </td></tr>
 </table>
 <h1><a class="anchor" id="exceptions_sec"></a>
 4. Important Exceptions</h1>
@@ -178,10 +178,10 @@ $(function() {
 <li><code>LOG_LEVEL</code> is environment-driven (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) and intentionally outside control-file parsing.</li>
 </ul>
 <h1><a class="anchor" id="mode_dependent_sec"></a>
-5. Mode-Dependent Normalization in &lt;tt&gt;pic.flow&lt;/tt&gt;</h1>
+5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</h1>
 <p>Some launcher behaviors depend on other config selections before values ever reach C:</p>
 <ul>
-<li><code>case.properties.initial_conditions.mode: Zero</code> allows <code>u_physical</code>, <code>v_physical</code>, and <code>w_physical</code> to be omitted; <code><a class="el" href="pic_8flow.html">pic.flow</a></code> writes zeros.</li>
+<li><code>case.properties.initial_conditions.mode: Zero</code> allows <code>u_physical</code>, <code>v_physical</code>, and <code>w_physical</code> to be omitted; <code>picurv</code> writes zeros.</li>
 <li><code>case.properties.initial_conditions.mode: Poiseuille</code> accepts <code>peak_velocity_physical</code> as the preferred YAML input and maps it to the inlet-aligned <code>-ucont_*</code> component that C later interprets as <code>Vmax</code>.</li>
 <li><code>solver.operation_mode.eulerian_field_source: analytical</code> currently requires <code>case.grid.mode: programmatic_c</code> at launcher validation time because the active C ingestion path for analytical runs does not consume file/grid-gen geometry in the same way as standard solve mode.</li>
 <li><code>case.properties.initial_conditions.mode</code> is now an explicit launcher requirement even though raw C has its own internal default.</li>
@@ -199,7 +199,7 @@ options" in several places.</p>
 </ul>
 </li>
 </ul>
-<p>For roadmap-oriented workflow extensions built on this contract, see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. </p>
+<p>For roadmap-oriented workflow extensions built on this contract, see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
