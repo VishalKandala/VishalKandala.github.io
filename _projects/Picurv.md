@@ -83,16 +83,57 @@ where $$\langle \cdot | \psi \rangle$$ denotes conditional expectation given $$\
 
 ### Paradigm Shift: Traditional LES vs FDF-LES
 
-| Aspect | Traditional LES | FDF-LES |
-|--------|----------------|---------|
-| **Primary Variable** | Filtered mean scalars $$\bar{\phi}$$ | Filtered density function $$\tilde{P}(\psi)$$ |
-| **SGS Scalar Flux** | $$\tau_j^{\phi}$$ requires closure (gradient diffusion, dynamic models) | $$\langle u_j'' \| \psi \rangle \tilde{P}$$ requires closure (mixing models) |
-| **Chemical Source Term** | $$\overline{S(\phi)}$$ requires closure (assumed PDFs, flamelet tables, conditional moment closure) | $$\langle S(\psi) \| \psi \rangle \tilde{P}$$ = $$S(\psi) \tilde{P}$$ **closed exactly** |
-| **SGS Mixing** | Implicitly handled through scalar diffusion model | Explicitly modeled (IEM, EMST, Curl) |
-| **PDF Information** | Not directly available; requires assumptions | Full PDF available; all moments computed consistently |
-| **Computational Cost** | Lower (Eulerian scalars only) | Higher (Lagrangian particles + Eulerian flow) |
-| **Advantages** | Computationally efficient, well-established | Exact chemistry closure, unified statistics, no PDF assumptions |
-| **Challenges** | Source term modeling errors accumulate | Requires particle management, mixing model uncertainties |
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>Traditional LES</th>
+      <th>FDF-LES</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Primary Variable</strong></td>
+      <td>Filtered mean scalars $$\bar{\phi}$$</td>
+      <td>Filtered density function $$\tilde{P}(\psi)$$</td>
+    </tr>
+    <tr>
+      <td><strong>SGS Scalar Flux</strong></td>
+      <td>$$\tau_j^{\phi}$$ requires closure (gradient diffusion, dynamic models)</td>
+      <td>$$\langle u_j'' \mid \psi \rangle \tilde{P}$$ requires closure (mixing models)</td>
+    </tr>
+    <tr>
+      <td><strong>Chemical Source Term</strong></td>
+      <td>$$\overline{S(\phi)}$$ requires closure (assumed PDFs, flamelet tables, conditional moment closure)</td>
+      <td>$$\langle S(\psi) \mid \psi \rangle \tilde{P} = S(\psi) \tilde{P}$$ <strong>closed exactly</strong></td>
+    </tr>
+    <tr>
+      <td><strong>SGS Mixing</strong></td>
+      <td>Implicitly handled through scalar diffusion model</td>
+      <td>Explicitly modeled (IEM, EMST, Curl)</td>
+    </tr>
+    <tr>
+      <td><strong>PDF Information</strong></td>
+      <td>Not directly available; requires assumptions</td>
+      <td>Full PDF available; all moments computed consistently</td>
+    </tr>
+    <tr>
+      <td><strong>Computational Cost</strong></td>
+      <td>Lower (Eulerian scalars only)</td>
+      <td>Higher (Lagrangian particles + Eulerian flow)</td>
+    </tr>
+    <tr>
+      <td><strong>Advantages</strong></td>
+      <td>Computationally efficient, well-established</td>
+      <td>Exact chemistry closure, unified statistics, no PDF assumptions</td>
+    </tr>
+    <tr>
+      <td><strong>Challenges</strong></td>
+      <td>Source term modeling errors accumulate</td>
+      <td>Requires particle management, mixing model uncertainties</td>
+    </tr>
+  </tbody>
+</table>
 
 **Key Insight:** FDF-LES trades the **chemical source term modeling problem** for a **transport/mixing modeling problem**. Since chemistry is often more sensitive and complex than mixing, this is frequently a favorable trade-off, especially for combustion applications.
 
@@ -103,8 +144,6 @@ where $$\langle \cdot | \psi \rangle$$ denotes conditional expectation given $$\
 While the FDF transport equation can theoretically be solved on an Eulerian mesh, this approach faces severe computational challenges:
 
 ### The Grid-Lock Problem
-
-While the FDF transport equation can theoretically be solved on an Eulerian mesh, this approach faces severe computational challenges:
 
 | Challenge | Description | Impact |
 |-----------|-------------|--------|
@@ -263,6 +302,7 @@ PICurv is being developed as production-quality scientific software with a focus
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.html path="assets/img/picurv/PICurv-Schematic.png" title="Schematic Diagram of the PICurv codebase" class="img-fluid rounded z-depth-1" %}
     </div>
+</div>
 <div class="caption">
     High-level architecture of PICurv showing the modular code organization. The main driver orchestrates the setup phase and time-stepping loop. Each time step involves coupled Eulerian (flow solver) and Lagrangian (particle) updates, operating on shared data structures managed by PETSc.
 </div>
@@ -458,10 +498,9 @@ Current validation focuses on particle tracking in canonical turbulent flows whe
 - 90° square cross-section bend
 - Reynolds number Re = 200 (based on bulk velocity and channel height)
 - Massless tracer particles
-- Tests particle behavior in complex flow regions:
-  - Strong pressure gradients around bend
-  - Secondary flow development (Dean vortices)
-  - Curved boundaries on body-fitted curvilinear grid
+- Tests particle behavior in complex flow regions with strong pressure gradients around the bend
+- Captures secondary flow development (Dean vortices)
+- Exercises curved boundaries on a body-fitted curvilinear grid
 
 **Validation Focus:**
 - Particle dispersion in complex geometry
@@ -566,8 +605,8 @@ Each phase builds on the previous, with immediate scientific value while progres
 - API reference, build instructions, usage examples
 
 **Presentations:**
-- [APS DFD 2025 Houston] - "A Parallel Particle-In-Cell (PIC) Solver on Curvilinear Grids for Turbulent Flow Simulation" (Accepted)
-- [APS DFD 2023 Washington DC] - "High Resolution Numerical Simulations of LVAD Outflow Graft Haemodynamics"
+- APS DFD 2025 (Houston) - "A Parallel Particle-In-Cell (PIC) Solver on Curvilinear Grids for Turbulent Flow Simulation" (Accepted)
+- APS DFD 2023 (Washington, DC) - "High Resolution Numerical Simulations of LVAD Outflow Graft Haemodynamics"
 
 **Contact:**
 For questions about PICurv or potential collaborations, reach out via [email](mailto:vishalkandala@tamu.edu).
