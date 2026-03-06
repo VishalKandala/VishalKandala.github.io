@@ -30,5 +30,6 @@ var searchData=
   ['resolve_5fdoxygen_5ffile_5fhref_27',['resolve_doxygen_file_href',['../namespacegenerate__doxygen__fallback__indexes.html#aa0ea9de953d5bedb54d032ed371530a2',1,'generate_doxygen_fallback_indexes']]],
   ['restrictcoordinates_28',['RestrictCoordinates',['../grid_8c.html#a5b5fe86ae6791885769361fca4ad6b2f',1,'grid.c']]],
   ['restrictresidual_5fsolidaware_29',['RestrictResidual_SolidAware',['../poisson_8c.html#a85e1eff3b6e34605b863323d6336eecd',1,'poisson.c']]],
-  ['retrievecurrentcell_30',['retrievecurrentcell',['../walkingsearch_8h.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c'],['../walkingsearch_8c.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c']]]
+  ['retrievecurrentcell_30',['retrievecurrentcell',['../walkingsearch_8h.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c'],['../walkingsearch_8c.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c']]],
+  ['run_5fgcov_31',['run_gcov',['../namespacec__coverage__gate.html#a8b7de40a935b8c0c4dfcbcf013160ed7',1,'c_coverage_gate']]]
 ];

@@ -92,6 +92,7 @@ $(function() {
 <li class="level1"><a href="#aggregate_sec">7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)</a></li>
 <li class="level1"><a href="#extend_sec">9. Extending The Test Suite</a></li>
 <li class="level1"><a href="#runtime_coverage_sec">10. Runtime Coverage Map</a></li>
+<li class="level1"><a href="#exhaustive_backlog_sec">11. Exhaustive-Readiness Backlog</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page documents PICurv's local testing model. The suite is intentionally split by intent so users can choose the smallest command that answers the question they actually have.</p>
@@ -108,6 +109,9 @@ $(function() {
 <p>Canonical commands:</p>
 <ul>
 <li><code>make test-python</code></li>
+<li><code>make coverage-python</code></li>
+<li><code>make coverage-c</code></li>
+<li><code>make coverage</code></li>
 <li><code>make doctor</code></li>
 <li><code>make unit</code></li>
 <li><code>make unit-geometry</code></li>
@@ -120,8 +124,13 @@ $(function() {
 <li><code>make unit-boundaries</code></li>
 <li><code>make unit-poisson-rhs</code></li>
 <li><code>make unit-runtime</code></li>
+<li><code>make unit-mpi</code></li>
 <li><code>make smoke</code></li>
+<li><code>make smoke-mpi</code></li>
+<li><code>make smoke-mpi-matrix</code></li>
 <li><code>make check</code></li>
+<li><code>make check-mpi</code></li>
+<li><code>make check-mpi-matrix</code></li>
 </ul>
 <p>Compatibility aliases remain available:</p>
 <ul>
@@ -133,9 +142,11 @@ $(function() {
 2. Quick Start</h1>
 <p>Fast local checks:</p>
 <div class="fragment"><div class="line">make test</div>
+<div class="line">make coverage-python</div>
 <div class="line">make doctor</div>
 <div class="line">make unit-io</div>
 <div class="line">make unit-runtime</div>
+<div class="line">make unit-mpi</div>
 <div class="line">make smoke</div>
 <div class="line">make check</div>
 </div><!-- fragment --><p>Guidance:</p>
@@ -144,7 +155,10 @@ $(function() {
 <li>Use <code>make doctor</code> after provisioning PETSc on a new machine.</li>
 <li>Use <code>make unit-&lt;area&gt;</code> while changing a subsystem in isolation.</li>
 <li>Use <code>make smoke</code> after building binaries to execute tiny real solve/post/restart workflows.</li>
+<li>Use <code>make smoke-mpi-matrix</code> when you need a rank-sweep MPI runtime sanity check.</li>
+<li>Use <code>make coverage</code> to enforce line-coverage floors for core Python scripts and C sources.</li>
 <li>Use <code>make check</code> as the pre-merge gate at the end of a development cycle.</li>
+<li>Use <code>make check-mpi</code> when multi-rank MPI behavior is in scope.</li>
 </ul>
 <h1><a class="anchor" id="python_sec"></a>
 3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</h1>
@@ -204,6 +218,7 @@ $(function() {
 <li><code>make unit-boundaries</code></li>
 <li><code>make unit-poisson-rhs</code></li>
 <li><code>make unit-runtime</code></li>
+<li><code>make unit-mpi</code></li>
 <li><code>make unit</code> (all of the above)</li>
 </ul>
 <p>Suite focus areas:</p>
@@ -219,7 +234,7 @@ $(function() {
 <li>Poisson/RHS and diffusivity kernels</li>
 <li>runtime helper kernels (initialization, particle helpers, wall models)</li>
 </ul>
-<p>These tests use real PETSc objects and run single-rank by default.</p>
+<p>These tests use real PETSc objects and run single-rank by default. <code>unit-mpi</code> is the dedicated multi-rank suite (default <code>TEST_MPI_NPROCS=2</code>).</p>
 <h1><a class="anchor" id="smoke_sec"></a>
 6. Executable Smoke (&lt;tt&gt;smoke&lt;/tt&gt;)</h1>
 <p>Purpose:</p>
@@ -232,16 +247,24 @@ $(function() {
 <li><code>bin/simulator</code> launches and responds to <code>-help</code></li>
 <li><code>bin/postprocessor</code> launches and responds to <code>-help</code></li>
 <li><code>bin/picurv init</code> creates a self-contained case with copied binaries + origin metadata</li>
+<li>template matrix init/validate/dry-run checks across <code>flat_channel</code>, <code>bent_channel</code>, and <code>brownian_motion</code></li>
 <li><code>picurv run --dry-run --format json</code> emits a valid solve/post execution plan</li>
 <li>restart dry-run planning resolves <code>run_control.restart_from_run_dir</code> into the expected restart source directory</li>
 <li>tiny end-to-end solve + post run (flat channel)</li>
+<li>tiny end-to-end solve + post run (bent channel)</li>
 <li>tiny end-to-end particle solve + post run (flat channel)</li>
 <li>restart execution with both particle modes (<code>load</code> and <code>init</code>)</li>
+<li>restart-equivalence check for flat channel (continuous tiny run vs split restart tiny run continuity metric agreement)</li>
 <li>tiny end-to-end analytical Brownian run with particle VTP + MSD CSV output</li>
+<li>multi-rank tiny solve + post runs for flat and bent channels (<code>make smoke-mpi</code>)</li>
+<li>multi-rank flat particle runtime + restart (<code>load</code>/<code>init</code>) runs (<code>make smoke-mpi</code>)</li>
+<li>rank-matrix MPI runtime sweep across flat+bent+flat-particle-restart (<code>make smoke-mpi-matrix</code>)</li>
 </ul>
 <p>These checks are intentionally tiny but execute real solver/postprocessor runtime paths.</p>
 <p>Run locally:</p>
 <div class="fragment"><div class="line">make smoke</div>
+<div class="line">make smoke-mpi</div>
+<div class="line">make smoke-mpi-matrix</div>
 </div><!-- fragment --><h1><a class="anchor" id="aggregate_sec"></a>
 7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)</h1>
 <p><code>make check</code> is the top-level local validation sweep.</p>
@@ -253,6 +276,8 @@ $(function() {
 <li><code>make smoke</code></li>
 </ol>
 <p>Use it when you want maximum local confidence before ending a development cycle.</p>
+<p><code>make check-mpi</code> extends this sweep by running <code>make smoke-mpi</code> and <code>make unit-mpi</code> afterward.</p>
+<p><code>make check-mpi-matrix</code> extends this sweep by running <code>make smoke-mpi-matrix</code> and <code>make unit-mpi</code>.</p>
 <h1><a class="anchor" id="troubleshooting_sec"></a>
 9. Common First-Run Issues</h1>
 <p>Common issues:</p>
@@ -277,6 +302,10 @@ $(function() {
 <li>only the Python suite is blocked; PETSc-backed C tests are separate.</li>
 </ul>
 </li>
+<li><code>gcov</code> is unavailable:<ul>
+<li><code>make coverage-c</code> cannot produce C line-coverage reports.</li>
+</ul>
+</li>
 </ul>
 <h1><a class="anchor" id="extend_sec"></a>
 9. Extending The Test Suite</h1>
@@ -292,41 +321,69 @@ $(function() {
 10. Runtime Coverage Map</h1>
 <p>The smoke suite uses these named runtime sequences:</p>
 <ul>
+<li><code>S0</code>: template matrix init/validate/dry-run across <code>flat_channel</code>, <code>bent_channel</code>, and <code>brownian_motion</code></li>
 <li><code>S1</code>: tiny flat-channel solve+post run</li>
+<li><code>S1b</code>: tiny bent-channel solve+post run</li>
 <li><code>S2</code>: tiny flat-channel solve+post with particles enabled</li>
 <li><code>S3</code>: tiny restart runs from <code>S2</code> with <code>particle_restart_mode=load</code> and <code>particle_restart_mode=init</code></li>
 <li><code>S4</code>: tiny Brownian analytical solve+post with particle outputs and MSD statistics</li>
+<li><code>S5</code>: multi-rank tiny solve+post runs for flat and bent channels, plus flat particle base/restart (<code>load</code> and <code>init</code>) branches</li>
+<li><code>S6</code>: restart-equivalence run for flat channel (continuous vs split restart continuity metric agreement)</li>
 </ul>
 <p>Runtime file coverage map (unit targets + runtime sequences):</p>
 <ul>
 <li><code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code>: <code>unit-solver</code>, <code>S4</code></li>
-<li><code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>: <code>unit-boundaries</code>, <code>unit-runtime</code>, <code>S1</code>, <code>S2</code>, <code>S3</code></li>
+<li><code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>: <code>unit-boundaries</code>, <code>unit-runtime</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>: <code>unit-solver</code>, <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>S1</code>, <code>S2</code>, <code>S3</code></li>
+<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">src/Filter.c</a></code>: <code>unit-solver</code></li>
-<li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code>: <code>unit-metric</code>, <code>unit-grid</code>, <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="ParticleSwarm_8c.html">src/ParticleSwarm.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="grid_8c.html">src/grid.c</a></code>: <code>unit-grid</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
-<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code>: <code>unit-runtime</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
-<li><code><a class="el" href="interpolation_8c.html" title="Main program for DMSwarm interpolation using the fdf-curvIB method.">src/interpolation.c</a></code>: <code>unit-geometry</code>, <code>unit-particles</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>: <code>unit-io</code>, <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code>: <code>unit-metric</code>, <code>unit-grid</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
+<li><code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
+<li><code><a class="el" href="ParticleSwarm_8c.html">src/ParticleSwarm.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
+<li><code><a class="el" href="grid_8c.html">src/grid.c</a></code>: <code>unit-grid</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code>: <code>unit-runtime</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="interpolation_8c.html" title="Main program for DMSwarm interpolation using the fdf-curvIB method.">src/interpolation.c</a></code>: <code>unit-geometry</code>, <code>unit-particles</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
+<li><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>: <code>unit-io</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) turbulence models.">src/les.c</a></code>: <code>unit-runtime</code></li>
-<li><code><a class="el" href="logging_8c.html">src/logging.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="momentumsolvers_8c.html">src/momentumsolvers.c</a></code>: <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="logging_8c.html">src/logging.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="momentumsolvers_8c.html">src/momentumsolvers.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="particle__statistics_8c.html" title="Global statistical reduction kernels for the Statistics Pipeline.">src/particle_statistics.c</a></code>: <code>unit-post</code>, <code>S4</code></li>
-<li><code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="postprocessing__kernels_8c.html">src/postprocessing_kernels.c</a></code>: <code>unit-post</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
-<li><code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="rhs_8c.html">src/rhs.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">src/simulator.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="solvers_8c.html">src/solvers.c</a></code>: <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="vtk__io_8c.html">src/vtk_io.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="postprocessing__kernels_8c.html">src/postprocessing_kernels.c</a></code>: <code>unit-post</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="rhs_8c.html">src/rhs.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">src/simulator.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="solvers_8c.html">src/solvers.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
+<li><code><a class="el" href="vtk__io_8c.html">src/vtk_io.c</a></code>: <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="walkingsearch_8c.html">src/walkingsearch.c</a></code>: <code>unit-geometry</code>, <code>unit-particles</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
-<li><code><a class="el" href="wallfunction_8c.html" title="Wall function implementations for near-wall turbulence modeling.">src/wallfunction.c</a></code>: <code>unit-runtime</code> </li>
+<li><code><a class="el" href="wallfunction_8c.html" title="Wall function implementations for near-wall turbulence modeling.">src/wallfunction.c</a></code>: <code>unit-runtime</code></li>
+</ul>
+<h1><a class="anchor" id="exhaustive_backlog_sec"></a>
+11. Exhaustive-Readiness Backlog</h1>
+<p>P0 (implemented):</p>
+<ul>
+<li>coverage gates: <code>make coverage-python</code>, <code>make coverage-c</code>, <code>make coverage</code></li>
+<li>restart-equivalence runtime smoke (<code>S6</code>)</li>
+<li>rank-sweep MPI runtime smoke (<code>make smoke-mpi-matrix</code>)</li>
+</ul>
+<p>P1 (implemented):</p>
+<ul>
+<li>broadened MPI matrix to particle/restart branches</li>
+<li>dedicated setup/runloop orchestration branch tests in <code>unit-runtime</code></li>
+<li>boundary-condition matrix expansion for handler/face/orientation combinations in <code>unit-boundaries</code></li>
+</ul>
+<p>P1 (next):</p>
+<ul>
+<li>broaden the MPI rank matrix to larger optional decompositions (for example <code>SMOKE_MPI_MATRIX_NPROCS="2 3 4 6"</code>) in CI/nightly profiles</li>
+</ul>
+<p>P2 (deeper hardening):</p>
+<ul>
+<li>long-duration nightly/weekly stability suites (beyond tiny smoke budgets)</li>
+<li>numerical oracle/golden-output tolerance checks for more physical scenarios</li>
+<li>performance regression gates (runtime/memory envelopes) </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

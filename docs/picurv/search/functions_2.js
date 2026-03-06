@@ -11,6 +11,7 @@ var searchData=
   ['boundarysystem_5frefreshubcs_8',['boundarysystem_refreshubcs',['../Boundaries_8h.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c']]],
   ['boundarysystem_5fvalidate_9',['boundarysystem_validate',['../Boundaries_8h.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c']]],
   ['broadcastallboundingboxes_10',['broadcastallboundingboxes',['../grid_8h.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c'],['../grid_8c.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c']]],
-  ['buildheaderstring_11',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
-  ['buildrowformatstring_12',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]]
+  ['build_5ftrace_5fignoredirs_11',['build_trace_ignoredirs',['../namespacepython__coverage__gate.html#a531a48a4398058f2638ddc59f1c4be05',1,'python_coverage_gate']]],
+  ['buildheaderstring_12',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
+  ['buildrowformatstring_13',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]]
 ];
