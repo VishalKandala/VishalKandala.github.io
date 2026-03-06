@@ -84,14 +84,15 @@ $(function() {
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#prereqs_sec">1. Prerequisites</a></li>
-<li class="level1"><a href="#install_tools_sec">2. Install Base Toolchain</a></li>
-<li class="level1"><a href="#petsc_sec">3. Install PETSc</a></li>
-<li class="level1"><a href="#env_sec">4. Configure Environment Variables</a></li>
-<li class="level1"><a href="#clone_sec">5. Clone PICurv</a></li>
-<li class="level1"><a href="#build_sec">6. Build with picurv</a></li>
-<li class="level1"><a href="#verify_sec">7. Verify Installation</a></li>
-<li class="level1"><a href="#common_sec">8. Common Installation Failures</a></li>
-<li class="level1"><a href="#next_steps_sec">9. Next Steps</a></li>
+<li class="level1"><a href="#automated_sec">2. Automated Install (Recommended)</a></li>
+<li class="level1"><a href="#install_tools_sec">3. Install Base Toolchain (Manual Path)</a></li>
+<li class="level1"><a href="#petsc_sec">4. Install PETSc</a></li>
+<li class="level1"><a href="#env_sec">5. Configure Environment Variables</a></li>
+<li class="level1"><a href="#clone_sec">6. Clone PICurv</a></li>
+<li class="level1"><a href="#build_sec">7. Build with picurv</a></li>
+<li class="level1"><a href="#verify_sec">8. Verify Installation</a></li>
+<li class="level1"><a href="#common_sec">9. Common Installation Failures</a></li>
+<li class="level1"><a href="#next_steps_sec">10. Next Steps</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This guide covers dependency setup, PETSc configuration, and binary build verification for PICurv.</p>
@@ -102,15 +103,30 @@ $(function() {
 <li>C compiler (<code>gcc</code> or <code>clang</code>)</li>
 <li>MPI implementation (<code>mpich</code> or <code>openmpi</code>)</li>
 <li>GNU Make</li>
-<li>Python 3 + pip</li>
+<li>Python 3.10+ + pip</li>
 <li>Git</li>
 <li>PETSc 3.20.3+ with <code>DMSwarm</code> support</li>
 </ul>
+<h1><a class="anchor" id="automated_sec"></a>
+2. Automated Install (Recommended)</h1>
+<p>From the PICurv repo root:</p>
+<div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
+<div class="line">export PETSC_ARCH=arch-linux-c-debug</div>
+<div class="line">./scripts/bootstrap_install.sh</div>
+</div><!-- fragment --><p>If PETSc is not installed yet, let the script build it:</p>
+<div class="fragment"><div class="line">./scripts/bootstrap_install.sh --install-petsc</div>
+</div><!-- fragment --><p>The script installs system and Python dependencies, verifies PETSc/DMSwarm visibility, then builds:</p>
+<ul>
+<li><code>bin/simulator</code></li>
+<li><code>bin/postprocessor</code></li>
+<li><code>bin/picurv</code></li>
+</ul>
 <h1><a class="anchor" id="install_tools_sec"></a>
-2. Install Base Toolchain</h1>
+3. Install Base Toolchain (Manual Path)</h1>
 <p>Debian/Ubuntu:</p>
 <div class="fragment"><div class="line">sudo apt-get update</div>
-<div class="line">sudo apt-get install -y build-essential gfortran mpich python3 python3-pip git</div>
+<div class="line">sudo apt-get install -y build-essential gfortran mpich git make pkg-config libx11-dev python3 python3-pip python3-venv</div>
+<div class="line">python3 -m pip install --upgrade pip</div>
 <div class="line">python3 -m pip install --user pyyaml numpy</div>
 </div><!-- fragment --><p>RHEL/CentOS/Fedora:</p>
 <div class="fragment"><div class="line">sudo yum groupinstall -y &quot;Development Tools&quot;</div>
@@ -119,7 +135,7 @@ $(function() {
 </div><!-- fragment --><p>Optional (study plot generation):</p>
 <div class="fragment"><div class="line">python3 -m pip install --user matplotlib</div>
 </div><!-- fragment --><h1><a class="anchor" id="petsc_sec"></a>
-3. Install PETSc</h1>
+4. Install PETSc</h1>
 <p>Recommended source install:</p>
 <div class="fragment"><div class="line">git clone -b v3.20.3 https://gitlab.com/petsc/petsc.git</div>
 <div class="line">cd petsc</div>
@@ -142,7 +158,7 @@ $(function() {
 <li><a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
 </ul>
 <h1><a class="anchor" id="env_sec"></a>
-4. Configure Environment Variables</h1>
+5. Configure Environment Variables</h1>
 <p>Add to your shell profile (<code>~/.bashrc</code> or equivalent):</p>
 <div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
 <div class="line">export PETSC_ARCH=arch-linux-c-debug</div>
@@ -150,12 +166,15 @@ $(function() {
 <div class="fragment"><div class="line">source ~/.bashrc</div>
 <div class="line">echo &quot;$PETSC_DIR&quot;</div>
 <div class="line">echo &quot;$PETSC_ARCH&quot;</div>
+</div><!-- fragment --><p>Verify PETSc has DMSwarm headers:</p>
+<div class="fragment"><div class="line">test -f &quot;$PETSC_DIR/include/petscdmswarm.h&quot; &amp;&amp; echo &quot;DMSwarm header found&quot;</div>
+<div class="line">test -f &quot;$PETSC_DIR/$PETSC_ARCH/include/petscconf.h&quot; &amp;&amp; echo &quot;PETSc arch config found&quot;</div>
 </div><!-- fragment --><h1><a class="anchor" id="clone_sec"></a>
-5. Clone PICurv</h1>
+6. Clone PICurv</h1>
 <div class="fragment"><div class="line">git clone https://github.com/VishalKandala/PICurv.git</div>
 <div class="line">cd PICurv</div>
 </div><!-- fragment --><h1><a class="anchor" id="build_sec"></a>
-6. Build with picurv</h1>
+7. Build with picurv</h1>
 <div class="fragment"><div class="line">./scripts/picurv build</div>
 </div><!-- fragment --><p>Expected binaries:</p>
 <ul>
@@ -167,7 +186,7 @@ $(function() {
 <div class="line">./scripts/picurv build SYSTEM=cluster</div>
 </div><!-- fragment --><p>After the build creates <code>bin/picurv</code>, prefer <code>./bin/picurv</code> for normal help, validation, and run commands.</p>
 <h1><a class="anchor" id="verify_sec"></a>
-7. Verify Installation</h1>
+8. Verify Installation</h1>
 <div class="fragment"><div class="line">make doctor</div>
 </div><!-- fragment --><p>Recommended sequence after a successful build:</p>
 <ol type="1">
@@ -187,17 +206,19 @@ $(function() {
 <li>it does not replace case-specific validation or convergence testing</li>
 </ul>
 <h1><a class="anchor" id="common_sec"></a>
-8. Common Installation Failures</h1>
+9. Common Installation Failures</h1>
 <ul>
 <li><code>PETSC_DIR</code>/<code>PETSC_ARCH</code> unset or mismatched with built arch.</li>
 <li>MPI compiler wrappers unavailable in PATH.</li>
+<li>Python interpreter too old (PICurv expects Python 3.10+).</li>
 <li>PETSc configured without required downloaded dependencies.</li>
+<li>missing X11 dev library at link time (<code>cannot find -lX11</code> on Linux; install <code>libx11-dev</code>).</li>
 <li>stale object files after toolchain changes (use <code>clean-project</code>).</li>
 </ul>
 <p>For runtime-level failures after successful build, see <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b>.</p>
 <p>For the full testing model after installation, see <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b>.</p>
 <h1><a class="anchor" id="next_steps_sec"></a>
-9. Next Steps</h1>
+10. Next Steps</h1>
 <ul>
 <li>First simulation walkthrough: <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b> </li>
 </ul>

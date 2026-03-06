@@ -24,7 +24,7 @@ var searchData=
   ['generated_20reference_20views_21',['7. Generated Reference Views',['../Documentation_Map.html#ref_axis_sec',1,'']]],
   ['generategaussiannoise_22',['generategaussiannoise',['../ParticleMotion_8h.html#a18df057a95d638d89c27aad9823f721f',1,'GenerateGaussianNoise(PetscRandom rnd, PetscReal *n1, PetscReal *n2):&#160;ParticleMotion.c'],['../ParticleMotion_8c.html#a18df057a95d638d89c27aad9823f721f',1,'GenerateGaussianNoise(PetscRandom rnd, PetscReal *n1, PetscReal *n2):&#160;ParticleMotion.c']]],
   ['generator_20guide_3a_20scripts_20grid_20gen_23',['Grid Generator Guide: scripts/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
-  ['geometric_20foundation_3a_20nodes_20and_20cells_24',['2. The Geometric Foundation: Nodes and Cells',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md16',1,'']]],
+  ['geometric_20foundation_3a_20nodes_20and_20cells_24',['2. The Geometric Foundation: Nodes and Cells',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md21',1,'']]],
   ['geometry_20handling_25',['3. Boundary and Geometry Handling',['../23_Fractional_Step_Method.html#boundary_sec',1,'']]],
   ['get_5flog_5flevel_26',['get_log_level',['../logging_8h.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c'],['../logging_8c.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c']]],
   ['getbcparambool_27',['getbcparambool',['../io_8h.html#acb59fa1e42df0407ae6d7578b181e7c0',1,'GetBCParamBool(BC_Param *params, const char *key, PetscBool *value_out, PetscBool *found):&#160;io.c'],['../io_8c.html#acb59fa1e42df0407ae6d7578b181e7c0',1,'GetBCParamBool(BC_Param *params, const char *key, PetscBool *value_out, PetscBool *found):&#160;io.c']]],
