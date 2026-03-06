@@ -24,9 +24,10 @@ var searchData=
   ['kk3_21',['kk3',['../variables_8h.html#ad0b918df35726143ee09371e5346b048',1,'IBMInfo']]],
   ['kk33_22',['kk33',['../variables_8h.html#ad60bebfd1b92202cb065487e3ba11fc7',1,'IBMInfo']]],
   ['km_23',['KM',['../variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904',1,'UserCtx']]],
-  ['ksc_24',['ksc',['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc'],['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc']]],
-  ['kske_25',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
-  ['ksp_26',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
-  ['ksp_20stack_20in_20code_27',['2. Multigrid/KSP Stack In Code',['../25_Pressure_Poisson_GMRES_Multigrid.html#mg_sec',1,'']]],
-  ['kzet_28',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
+  ['knobs_24',['6.1 Useful Smoke Knobs',['../40_Testing_and_Quality_Guide.html#p40_smoke_knobs_ssec',1,'']]],
+  ['ksc_25',['ksc',['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc'],['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc']]],
+  ['kske_26',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
+  ['ksp_27',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
+  ['ksp_20stack_20in_20code_28',['2. Multigrid/KSP Stack In Code',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_mg_sec',1,'']]],
+  ['kzet_29',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
 ];

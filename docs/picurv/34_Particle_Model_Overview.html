@@ -83,12 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#loop_sec">1. Per-Step Particle Pipeline</a></li>
-<li class="level1"><a href="#statistics_sec">4. Statistics and Diagnostics</a></li>
+<ul><li class="level1"><a href="#p34_loop_sec">1. Per-Step Particle Pipeline</a></li>
+<li class="level1"><a href="#p34_fields_sec">2. Core Particle Fields In Use</a></li>
+<li class="level1"><a href="#p34_physics_sec">3. Current Built-In Physics</a></li>
+<li class="level1"><a href="#p34_statistics_sec">4. Statistics and Diagnostics</a></li>
+<li class="level1"><a href="#p34_extension_sec">5. Extending To New Closures</a></li>
+<li class="level1"><a href="#p34_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md118">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md119">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md120">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents the particle pipeline exactly as orchestrated in the current solver flow.</p>
-<h1><a class="anchor" id="loop_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Particle_Model_Overview"></a> This page documents the particle pipeline exactly as orchestrated in the current solver flow.</p>
+<h1><a class="anchor" id="p34_loop_sec"></a>
 1. Per-Step Particle Pipeline</h1>
 <p>Typical order inside coupled step:</p>
 <ol type="1">
@@ -99,8 +108,8 @@ $(function() {
 <li>scatter particle fields back to Eulerian storage: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
 </ol>
 <p>Each stage relies on valid <code>DMSwarm_CellID</code>, interpolation weights, and synchronized ghost data.</p>
-<h1><a class="anchor" id="fields_sec"></a>
-3. Field/Coordinate Scaling Conventions</h1>
+<h1><a class="anchor" id="p34_fields_sec"></a>
+2. Core Particle Fields In Use</h1>
 <p>Commonly used swarm fields include:</p>
 <ul>
 <li>position (<code>position</code>)</li>
@@ -110,8 +119,8 @@ $(function() {
 <li>diffusivity and scalar (<code>Diffusivity</code>, <code>Psi</code>)</li>
 </ul>
 <p>Status transitions (<code>NEEDS_LOCATION</code>, <code>ACTIVE_AND_LOCATED</code>, <code>MIGRATING_OUT</code>, <code>LOST</code>) determine whether particles are walked, migrated, or skipped in settlement passes.</p>
-<h1><a class="anchor" id="physics_sec"></a>
-2. Physics and Model Selection</h1>
+<h1><a class="anchor" id="p34_physics_sec"></a>
+3. Current Built-In Physics</h1>
 <p>Current scalar model path:</p>
 <ul>
 <li>kernel: <a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a></li>
@@ -119,15 +128,15 @@ $(function() {
 <li>orchestrator: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
 </ul>
 <p>This presently implements IEM-style relaxation for <code>Psi</code>, with model constants sourced from runtime context.</p>
-<h1><a class="anchor" id="statistics_sec"></a>
+<h1><a class="anchor" id="p34_statistics_sec"></a>
 4. Statistics and Diagnostics</h1>
 <p>Post statistics currently include global kernels such as:</p>
 <ul>
 <li><a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
 </ul>
 <p>Additional health indicators are available from migration counters and settlement-pass counts stored in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> fields updated by location logic.</p>
-<h1><a class="anchor" id="extension_sec"></a>
-7. Extensibility Status</h1>
+<h1><a class="anchor" id="p34_extension_sec"></a>
+5. Extending To New Closures</h1>
 <p>Recommended extension pattern:</p>
 <ol type="1">
 <li>add particle model selector to YAML/flags,</li>
@@ -142,13 +151,33 @@ $(function() {
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p34_refs_sec"></a>
+6. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
-<li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b> </li>
+<li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md118"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Model and Coupling Overview</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md119"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md120"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

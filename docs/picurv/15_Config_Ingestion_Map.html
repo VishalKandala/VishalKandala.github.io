@@ -83,16 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#pipeline_sec">1. End-to-End Flow</a></li>
-<li class="level1"><a href="#map_sec">2. Mapping Matrix</a></li>
-<li class="level1"><a href="#python_only_sec">3. Python-Only Orchestration Mapping (No C Ingestion)</a></li>
-<li class="level1"><a href="#exceptions_sec">4. Important Exceptions</a></li>
-<li class="level1"><a href="#mode_dependent_sec">5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</a></li>
-<li class="level1"><a href="#maintenance_sec">6. Drift Prevention</a></li>
+<ul><li class="level1"><a href="#p15_pipeline_sec">1. End-to-End Flow</a></li>
+<li class="level1"><a href="#p15_map_sec">2. Mapping Matrix</a></li>
+<li class="level1"><a href="#p15_python_only_sec">3. Python-Only Orchestration Mapping (No C Ingestion)</a></li>
+<li class="level1"><a href="#p15_exceptions_sec">4. Important Exceptions</a></li>
+<li class="level1"><a href="#p15_mode_dependent_sec">5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#p15_maintenance_sec">6. Drift Prevention</a><ul><li class="level2"><a href="#autotoc_md50">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md51">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md52">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page maps configuration flow from YAML schema to generated artifacts and C ingestion/use sites.</p>
-<h1><a class="anchor" id="pipeline_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Config_Ingestion_Map"></a> This page maps configuration flow from YAML schema to generated artifacts and C ingestion/use sites.</p>
+<h1><a class="anchor" id="p15_pipeline_sec"></a>
 1. End-to-End Flow</h1>
 <ol type="1">
 <li><code>picurv</code> validates YAML inputs.</li>
@@ -101,7 +106,7 @@ $(function() {
 <li>Secondary file parsers ingest BC/post/logging profile inputs.</li>
 <li>Runtime modules consume parsed values during setup, solve, and postprocess.</li>
 </ol>
-<h1><a class="anchor" id="map_sec"></a>
+<h1><a class="anchor" id="p15_map_sec"></a>
 2. Mapping Matrix</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -149,7 +154,7 @@ $(function() {
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>post.statistics_pipeline.*</code>   </td><td class="markdownTableBodyLeft"><code>statistics_pipeline</code>, <code>statistics_output_prefix</code>   </td><td class="markdownTableBodyLeft"><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>   </td><td class="markdownTableBodyLeft"><code>GlobalStatisticsPipeline</code> dispatch   </td></tr>
 </table>
-<h1><a class="anchor" id="python_only_sec"></a>
+<h1><a class="anchor" id="p15_python_only_sec"></a>
 3. Python-Only Orchestration Mapping (No C Ingestion)</h1>
 <p>These keys are consumed by <code>picurv</code> orchestration only:</p>
 <table class="markdownTable">
@@ -176,14 +181,14 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>study.plotting</code>   </td><td class="markdownTableBodyLeft"><code>results/plots/*</code> output controls   </td><td class="markdownTableBodyLeft"><code>scripts/picurv</code> plotting pipeline   </td><td class="markdownTableBodyLeft">study reporting   </td></tr>
 </table>
-<h1><a class="anchor" id="exceptions_sec"></a>
+<h1><a class="anchor" id="p15_exceptions_sec"></a>
 4. Important Exceptions</h1>
 <ul>
 <li>PETSc runtime option consumption is not only explicit <code>PetscOptionsGet*</code>.</li>
 <li><code>KSPSetFromOptions</code> in <code><a class="el" href="poisson_8c.html">src/poisson.c</a></code> ingests prefixed PETSc options dynamically.</li>
 <li><code>LOG_LEVEL</code> is environment-driven (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) and intentionally outside control-file parsing.</li>
 </ul>
-<h1><a class="anchor" id="mode_dependent_sec"></a>
+<h1><a class="anchor" id="p15_mode_dependent_sec"></a>
 5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</h1>
 <p>Some launcher behaviors depend on other config selections before values ever reach C:</p>
 <ul>
@@ -194,7 +199,7 @@ $(function() {
 </ul>
 <p>This means the YAML contract is intentionally stricter than "whatever C would do with missing
 options" in several places.</p>
-<h1><a class="anchor" id="maintenance_sec"></a>
+<h1><a class="anchor" id="p15_maintenance_sec"></a>
 6. Drift Prevention</h1>
 <ul>
 <li>Use <code><a class="el" href="audit__ingress_8py.html">scripts/audit_ingress.py</a></code> to compare PETSc option ingress in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a>/io.c</code> with the maintained manifest.</li>
@@ -205,7 +210,27 @@ options" in several places.</p>
 </ul>
 </li>
 </ul>
-<p>For roadmap-oriented workflow extensions built on this contract, see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
+<p>For roadmap-oriented workflow extensions built on this contract, see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
+<h2><a class="anchor" id="autotoc_md50"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Developer Ingestion Map</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md51"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md52"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

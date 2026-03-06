@@ -83,21 +83,28 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#structured_sec">1. Structured Validation Errors (ERROR &lt;CODE&gt;)</a></li>
-<li class="level1"><a href="#legacy_sec">2. High-Frequency Fatal Messages (Runtime Paths)</a></li>
+<ul><li class="level1"><a href="#p39_structured_sec">1. Structured Validation Errors (ERROR &lt;CODE&gt;)</a></li>
+<li class="level1"><a href="#p39_legacy_sec">2. High-Frequency Fatal Messages (Runtime Paths)</a></li>
+<li class="level1"><a href="#p39_restart_sec">3. Restart Mistakes To Check First</a></li>
+<li class="level1"><a href="#p39_workflow_sec">4. Recommended Debug Workflow</a><ul><li class="level2"><a href="#autotoc_md130">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md131">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md132">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>Use this page to map error output to concrete fix steps.</p>
-<h1><a class="anchor" id="structured_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Common_Fatal_Errors"></a> Use this page to map error output to concrete fix steps.</p>
+<h1><a class="anchor" id="p39_structured_sec"></a>
 1. Structured Validation Errors (ERROR &lt;CODE&gt;)</h1>
 <p>Validation and CLI-combination failures use:</p>
-<p><code>ERROR &lt;CODE&gt; | key=&lt;yaml.path or -&gt; | file=&lt;path[:line] or -&gt; | message=&lt;...&gt; | hint=&lt;...&gt;</code></p>
+<p><code>ERROR &amp;lt;CODE&amp;gt; | key=&amp;lt;yaml.path or -&amp;gt; | file=&amp;lt;path[:line] or -&amp;gt; | message=&amp;lt;...&amp;gt; | hint=&amp;lt;...&amp;gt;</code></p>
 <p>Code reference:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Code   </th><th class="markdownTableHeadNone">Meaning   </th><th class="markdownTableHeadNone">Typical Fix    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>CLI_USAGE_INVALID</code>   </td><td class="markdownTableBodyNone">Invalid argument combination   </td><td class="markdownTableBodyNone">Run <code>picurv &lt;command&gt; --help</code> and follow required flag groups.    </td></tr>
+<td class="markdownTableBodyNone"><code>CLI_USAGE_INVALID</code>   </td><td class="markdownTableBodyNone">Invalid argument combination   </td><td class="markdownTableBodyNone">Run <code>picurv &amp;lt;command&amp;gt; --help</code> and follow required flag groups.    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>CFG_MISSING_SECTION</code>   </td><td class="markdownTableBodyNone">Required YAML section missing   </td><td class="markdownTableBodyNone">Add section from <code>examples/master_template/*.yml</code>.    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -113,22 +120,24 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>CFG_INCONSISTENT_COMBO</code>   </td><td class="markdownTableBodyNone">Conflicting options/keys   </td><td class="markdownTableBodyNone">Align related flags/keys (periodic pairs, scheduler, process counts).   </td></tr>
 </table>
-<h1><a class="anchor" id="legacy_sec"></a>
+<h1><a class="anchor" id="p39_legacy_sec"></a>
 2. High-Frequency Fatal Messages (Runtime Paths)</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Message fragment   </th><th class="markdownTableHeadNone">Likely cause   </th><th class="markdownTableHeadNone">Fix command(s)    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>[FATAL] --post-process requires --run-dir when not used with --solve.</code>   </td><td class="markdownTableBodyNone">Post-only run missing input run directory   </td><td class="markdownTableBodyNone"><code>picurv run --post-process --run-dir runs/&lt;run_id&gt; --post post.yml</code>    </td></tr>
+<td class="markdownTableBodyNone">[FATAL] &ndash;post-process requires &ndash;run-dir when not used with &ndash;solve.   </td><td class="markdownTableBodyNone">Post-only run missing input run directory   </td><td class="markdownTableBodyNone">picurv run &ndash;post-process &ndash;run-dir runs/&lt;run_id&gt; &ndash;post post.yml    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>[FATAL] Could not automatically identify required config files in &lt;run&gt;/config</code>   </td><td class="markdownTableBodyNone">Missing/renamed <code>case.yml</code>, <code>monitor.yml</code>, or <code>*.control</code>   </td><td class="markdownTableBodyNone">Re-run solve stage or restore expected files under <code>runs/&lt;run_id&gt;/config/</code>.    </td></tr>
+<td class="markdownTableBodyNone">[FATAL] Could not automatically identify required config files in &lt;run&gt;/config   </td><td class="markdownTableBodyNone">Missing/renamed case.yml, monitor.yml, or *.control   </td><td class="markdownTableBodyNone">Re-run solve stage or restore expected files under runs/&lt;run_id&gt;/config/.    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>[FATAL] Source data directory for post-processing not found or empty</code>   </td><td class="markdownTableBodyNone">Post source data path points to missing/empty solver output   </td><td class="markdownTableBodyNone">Verify monitor output directory and existing solver output files.    </td></tr>
+<td class="markdownTableBodyNone">[FATAL] Source data directory for post-processing not found or empty   </td><td class="markdownTableBodyNone">Post source data path points to missing/empty solver output   </td><td class="markdownTableBodyNone">Verify monitor output directory and existing solver output files.    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">&lsquo;[FATAL] Unsupported scheduler &rsquo;&lt;x&gt;'. Only Slurm is supported in v1.<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt;</code>cluster.yml<code>has unsupported scheduler type \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Set</code>cluster.yml -&gt; scheduler.type: slurm<code>. \ilinebr &lt;/td&gt; &lt;/tr&gt; &lt;tr class="markdownTableRowOdd"&gt; &lt;td class="markdownTableBodyNone"&gt;</code>[FATAL] In cluster mode, &ndash;num-procs applies to the solver stage and must be 1 (auto) or exactly nodes*ntasks_per_node (...)<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Solver MPI count mismatch against cluster resources \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Set</code>-n 1<code>or set solver</code>-n<code>to</code>nodes * ntasks_per_node`.   </td></tr>
+<td class="markdownTableBodyNone">[FATAL] Unsupported scheduler '&lt;x&gt;'. Only Slurm is supported in v1.   </td><td class="markdownTableBodyNone">cluster.yml has unsupported scheduler type   </td><td class="markdownTableBodyNone">Set cluster.yml -&gt; scheduler.type: slurm.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">[FATAL] In cluster mode, &ndash;num-procs applies to the solver stage and must be 1 (auto) or exactly nodes*ntasks_per_node (...)   </td><td class="markdownTableBodyNone">Solver MPI count mismatch against cluster resources   </td><td class="markdownTableBodyNone">Set -n 1 or set solver -n to nodes * ntasks_per_node.   </td></tr>
 </table>
-<h1><a class="anchor" id="restart_sec"></a>
-4. Restart Path Specifics</h1>
+<h1><a class="anchor" id="p39_restart_sec"></a>
+3. Restart Mistakes To Check First</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Mistake   </th><th class="markdownTableHeadNone">Likely result   </th><th class="markdownTableHeadNone">Fix    </th></tr>
@@ -141,8 +150,8 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Choose a <code>start_step</code> that was never written   </td><td class="markdownTableBodyNone">Runtime file-not-found or missing-data restart failure   </td><td class="markdownTableBodyNone">Verify the requested restart step exists in the saved output/restart files.   </td></tr>
 </table>
-<h1><a class="anchor" id="workflow_sec"></a>
-1. Standard Extension Workflow</h1>
+<h1><a class="anchor" id="p39_workflow_sec"></a>
+4. Recommended Debug Workflow</h1>
 <ol type="1">
 <li>Run config-only checks first:</li>
 </ol>
@@ -159,8 +168,28 @@ $(function() {
 <li><b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md130"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Common Fatal Errors and Fixes</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&amp;lt;run_id&amp;gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md131"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md132"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -83,26 +83,36 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#entry_sec">1. Executable Entry Points</a></li>
-<li class="level1"><a href="#solver_flow_sec">2. Solver Runtime Flow (simulator.c)</a></li>
-<li class="level1"><a href="#post_flow_sec">3. Postprocessor Runtime Flow (postprocessor.c)</a></li>
-<li class="level1"><a href="#contexts_sec">4. Core Context Objects</a><ul><li class="level2"><a href="#simctx_ssec">4.1 SimCtx</a></li>
-<li class="level2"><a href="#userctx_ssec">4.2 UserCtx</a></li>
+<ul><li class="level1"><a href="#p13_entry_sec">1. Executable Entry Points</a></li>
+<li class="level1"><a href="#p13_solver_flow_sec">2. Solver Runtime Flow (simulator.c)</a></li>
+<li class="level1"><a href="#p13_post_flow_sec">3. Postprocessor Runtime Flow (postprocessor.c)</a></li>
+<li class="level1"><a href="#p13_contexts_sec">4. Core Context Objects</a><ul><li class="level2"><a href="#p13_simctx_ssec">4.1 SimCtx</a></li>
+<li class="level2"><a href="#p13_userctx_ssec">4.2 UserCtx</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#modules_sec">5. Module Responsibilities</a></li>
-<li class="level1"><a href="#ingestion_sec">6. Configuration Ingestion Boundaries</a></li>
+<li class="level1"><a href="#p13_modules_sec">5. Module Responsibilities</a><ul><li class="level2"><a href="#p13_module_api_matrix_ssec">5.1 File-Level API Entry Points</a></li>
+<li class="level2"><a href="#p13_source_to_tests_ssec">5.2 Source-to-Test Coverage Lens</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p13_ingestion_sec">6. Configuration Ingestion Boundaries</a></li>
+<li class="level1"><a href="#p13_extension_sec">7. Where to Extend</a></li>
+<li class="level1"><a href="#p13_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md44">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md45">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md46">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page is the developer-oriented map of the current PICurv C codebase.</p>
-<h1><a class="anchor" id="entry_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Code_Architecture"></a> This page is the developer-oriented map of the current PICurv C codebase.</p>
+<h1><a class="anchor" id="p13_entry_sec"></a>
 1. Executable Entry Points</h1>
 <ul>
 <li>Solver executable entry: <code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">src/simulator.c</a></code></li>
 <li>Postprocessor executable entry: <code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code></li>
 </ul>
 <p>Both rely on shared setup/context infrastructure from <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, and <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">variables.h</a></code>.</p>
-<h1><a class="anchor" id="solver_flow_sec"></a>
+<h1><a class="anchor" id="p13_solver_flow_sec"></a>
 2. Solver Runtime Flow (simulator.c)</h1>
 <p>High-level stages:</p>
 <ol type="1">
@@ -120,7 +130,7 @@ $(function() {
 <li>Time integration via <code>AdvanceSimulation</code></li>
 <li>Finalization via profiling teardown + <code>FinalizeSimulation</code> + <code>PetscFinalize</code></li>
 </ol>
-<h1><a class="anchor" id="post_flow_sec"></a>
+<h1><a class="anchor" id="p13_post_flow_sec"></a>
 3. Postprocessor Runtime Flow (postprocessor.c)</h1>
 <ul>
 <li>Parse post recipe (<code>post.run</code>) into <code><a class="el" href="variables_8h.html#structPostProcessParams" title="Holds all configuration parameters for a post-processing run.">PostProcessParams</a></code></li>
@@ -128,23 +138,23 @@ $(function() {
 <li>Execute configured Eulerian/Lagrangian/statistics pipelines</li>
 <li>Write VTK outputs (<code>.vts</code>, <code>.vtp</code>) and statistics CSV outputs</li>
 </ul>
-<h1><a class="anchor" id="contexts_sec"></a>
+<h1><a class="anchor" id="p13_contexts_sec"></a>
 4. Core Context Objects</h1>
-<h2><a class="anchor" id="simctx_ssec"></a>
+<h2><a class="anchor" id="p13_simctx_ssec"></a>
 4.1 SimCtx</h2>
 <ul>
 <li>Declared in <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">include/variables.h</a></code></li>
 <li>Holds global run configuration and top-level handles</li>
 <li>Populated mainly in <code>CreateSimulationContext</code></li>
 </ul>
-<h2><a class="anchor" id="userctx_ssec"></a>
+<h2><a class="anchor" id="p13_userctx_ssec"></a>
 4.2 UserCtx</h2>
 <ul>
 <li>Block/grid-level state container (<code>DM</code>, vectors, metrics, block-local geometry)</li>
 <li>Used throughout grid, solver, BC, and post kernels</li>
 <li>Finest-level block arrays are central runtime work objects</li>
 </ul>
-<h1><a class="anchor" id="modules_sec"></a>
+<h1><a class="anchor" id="p13_modules_sec"></a>
 5. Module Responsibilities</h1>
 <ul>
 <li>Setup/config ingestion:<ul>
@@ -184,7 +194,66 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="ingestion_sec"></a>
+<h2><a class="anchor" id="p13_module_api_matrix_ssec"></a>
+5.1 File-Level API Entry Points</h2>
+<p>For contributor orientation, the table below lists high-value public entry points per subsystem. Function names come from <code>include/*.h</code> and represent the safest integration seams.</p>
+<ul>
+<li>startup/context:<ul>
+<li>files: <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">simulator.c</a></code></li>
+<li>APIs: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a>, <a class="el" href="setup_8h.html#a3ed7edc1ce3c1b4aae8e30f9a75bdce8">SetupSimulationEnvironment</a>, <a class="el" href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a>, <a class="el" href="setup_8h.html#af138b6bc4bee9b2ac33881372691b90e">FinalizeSimulation</a></li>
+</ul>
+</li>
+<li>runtime loop:<ul>
+<li>files: <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">runloop.c</a></code>, <code><a class="el" href="solvers_8c.html">solvers.c</a></code></li>
+<li>APIs: <a class="el" href="runloop_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a>, <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a>, <a class="el" href="runloop_8h.html#a78d6ef98da860e3271d6b7277a54e642">UpdateSolverHistoryVectors</a></li>
+</ul>
+</li>
+<li>pressure/projection/rhs:<ul>
+<li>files: <code><a class="el" href="poisson_8c.html">poisson.c</a></code>, <code><a class="el" href="rhs_8c.html">rhs.c</a></code>, <code><a class="el" href="momentumsolvers_8c.html">momentumsolvers.c</a></code>, <code><a class="el" href="BodyForces_8c.html">BodyForces.c</a></code></li>
+<li>APIs: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a>, <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a>, <a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8">ComputeRHS</a>, <a class="el" href="momentumsolvers_8h.html#a6c666dcadf0a165bf35bec15662d7072">MomentumSolver_DualTime_Picard_RK4</a></li>
+</ul>
+</li>
+<li>grid/metrics:<ul>
+<li>files: <code><a class="el" href="grid_8c.html">grid.c</a></code>, <code><a class="el" href="Metric_8c.html">Metric.c</a></code></li>
+<li>APIs: <a class="el" href="grid_8h.html#a04f0887f08166a2a8d01411f39fa1a40">DefineAllGridDimensions</a>, <a class="el" href="grid_8h.html#aa0b95ab3ac28c8df985e38b888c9bb52">InitializeAllGridDMs</a>, <a class="el" href="grid_8h.html#ab2aef4bb6fc2d2223a52ff6a45c7c600">AssignAllGridCoordinates</a>, <a class="el" href="Metric_8h.html#a063043da47b68702c78c7e0769325b36">CalculateAllGridMetrics</a></li>
+</ul>
+</li>
+<li>boundary system:<ul>
+<li>files: <code><a class="el" href="Boundaries_8c.html">Boundaries.c</a></code>, <code><a class="el" href="BC__Handlers_8c.html">BC_Handlers.c</a></code>, <code><a class="el" href="wallfunction_8c.html" title="Wall function implementations for near-wall turbulence modeling.">wallfunction.c</a></code></li>
+<li>APIs: <a class="el" href="Boundaries_8h.html#a0e31d96fd68e70d568d4d12ddc4da619">BoundarySystem_Initialize</a>, <a class="el" href="Boundaries_8h.html#aa6465ccb79293d6d9e1724d39d11af41">BoundaryCondition_Create</a>, <a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>, <a class="el" href="BC__Handlers_8h.html#a698f5291a04df2f949a39d4909c8088f">Validate_DrivenFlowConfiguration</a></li>
+</ul>
+</li>
+<li>particle stack:<ul>
+<li>files: <code><a class="el" href="ParticleSwarm_8c.html">ParticleSwarm.c</a></code>, <code><a class="el" href="ParticleMotion_8c.html">ParticleMotion.c</a></code>, <code><a class="el" href="ParticlePhysics_8c.html">ParticlePhysics.c</a></code>, <code><a class="el" href="walkingsearch_8c.html">walkingsearch.c</a></code>, <code><a class="el" href="interpolation_8c.html" title="Main program for DMSwarm interpolation using the fdf-curvIB method.">interpolation.c</a></code></li>
+<li>APIs: <a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a>, <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a>, <a class="el" href="ParticleMotion_8h.html#af68865be3bc987bdf1be2c5c7a1903fa">PerformMigration</a>, <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a>, <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
+</ul>
+</li>
+<li>I/O and post:<ul>
+<li>files: <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, <code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">postprocessor.c</a></code>, <code><a class="el" href="postprocessing__kernels_8c.html">postprocessing_kernels.c</a></code>, <code><a class="el" href="particle__statistics_8c.html" title="Global statistical reduction kernels for the Statistics Pipeline.">particle_statistics.c</a></code>, <code><a class="el" href="vtk__io_8c.html">vtk_io.c</a></code></li>
+<li>APIs: <a class="el" href="io_8h.html#a3a009dabc71ccfa59f196e1bc045de45">ReadSimulationFields</a>, <a class="el" href="io_8h.html#a6228caf497c8e6134362aab6ba62828c">WriteSimulationFields</a>, <a class="el" href="io_8h.html#a048b921bc98a7354369a176193c2bd62">ParsePostProcessingSettings</a>, <a class="el" href="postprocessor_8h.html#a059ce04ba04e66a5f1ef982fdf375e80">EulerianDataProcessingPipeline</a>, <a class="el" href="postprocessor_8h.html#a329c60bf9b166bf417ebf99e0071e7c4">GlobalStatisticsPipeline</a></li>
+</ul>
+</li>
+<li>analytical/init:<ul>
+<li>files: <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">AnalyticalSolutions.c</a></code>, <code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">initialcondition.c</a></code></li>
+<li>APIs: <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a>, <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>, <a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="p13_source_to_tests_ssec"></a>
+5.2 Source-to-Test Coverage Lens</h2>
+<p>Current tests cover all <code>src/*.c</code> files at least at module level (unit suites and/or smoke). Coverage depth is intentionally uneven:</p>
+<ul>
+<li>orchestration-heavy files (<code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">runloop.c</a></code>, <code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">postprocessor.c</a></code>) are mainly covered by smoke and Python orchestration tests.</li>
+<li>math-kernel-heavy files (<code><a class="el" href="Metric_8c.html">Metric.c</a></code>, <code><a class="el" href="rhs_8c.html">rhs.c</a></code>, <code><a class="el" href="poisson_8c.html">poisson.c</a></code>, post kernels) are covered by targeted C unit suites plus smoke.</li>
+<li>utility-heavy files (<code><a class="el" href="walkingsearch_8c.html">walkingsearch.c</a></code>, <code><a class="el" href="wallfunction_8c.html" title="Wall function implementations for near-wall turbulence modeling.">wallfunction.c</a></code>, <code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">Filter.c</a></code>) are covered by specific unit cases but still benefit from deeper function-level API prose.</li>
+</ul>
+<p>When adding docs, prioritize:</p>
+<ol type="1">
+<li>explicit call-sequence narratives for orchestration modules</li>
+<li>contract/units/assumptions for numerical kernels</li>
+<li>failure signals and diagnostics for runtime-heavy paths</li>
+</ol>
+<h1><a class="anchor" id="p13_ingestion_sec"></a>
 6. Configuration Ingestion Boundaries</h1>
 <p>Primary ingestion sites:</p><ul>
 <li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>: PETSc option parsing for solver/post shared runtime controls</li>
@@ -192,8 +261,8 @@ $(function() {
 <li>logging path includes environment variable ingress (<code>LOG_LEVEL</code>)</li>
 </ul>
 <p>Not all option consumption is explicit <code>PetscOptionsGet*</code>; PETSc dynamic ingestion also occurs through calls like <code>KSPSetFromOptions</code> in <code><a class="el" href="poisson_8c.html">poisson.c</a></code>.</p>
-<h1><a class="anchor" id="extension_sec"></a>
-7. Extensibility Status</h1>
+<h1><a class="anchor" id="p13_extension_sec"></a>
+7. Where to Extend</h1>
 <ul>
 <li>New user-visible config key:<ol type="1">
 <li>add schema/template key</li>
@@ -215,8 +284,8 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p13_next_steps_sec"></a>
+8. Next Steps</h1>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>Ingestion map: <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
@@ -229,8 +298,28 @@ $(function() {
 <li>Initial-condition index: <b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li>Particle-model index: <b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li>API docs quality status: <b><a class="el" href="35_API_Documentation_Status.html">API Documentation Status</a></b></li>
-<li>Low-priority fix queue: <b><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a></b> </li>
+<li>Low-priority fix queue: <b><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md44"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Code Architecture</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md45"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md46"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

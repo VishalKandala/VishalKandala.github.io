@@ -185,107 +185,109 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success, or a PETSc error code on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success, or a PETSc error code on failure.</dd></dl>
+<p>Sets the grid domain and resolution for analytical solution cases.</p>
+<p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00070">70</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   71</span>{</div>
-<div class="line"><span class="lineno">   72</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">   73</span>    PetscInt       nblk = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a22580e0e52ca8ddccc76d24c96f00e4a">block_number</a>;</div>
-<div class="line"><span class="lineno">   74</span>    PetscInt       block_index = user-&gt;<a class="code hl_variable" href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">_this</a>;</div>
+<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00057">57</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   58</span>{</div>
+<div class="line"><span class="lineno">   59</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">   60</span>    PetscInt       nblk = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a22580e0e52ca8ddccc76d24c96f00e4a">block_number</a>;</div>
+<div class="line"><span class="lineno">   61</span>    PetscInt       block_index = user-&gt;<a class="code hl_variable" href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">_this</a>;</div>
+<div class="line"><span class="lineno">   62</span> </div>
+<div class="line"><span class="lineno">   63</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">   64</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">   65</span> </div>
+<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="AnalyticalSolutions_8c.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>)) {</div>
+<div class="line"><span class="lineno">   67</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE,</div>
+<div class="line"><span class="lineno">   68</span>                 <span class="stringliteral">&quot;SetAnalyticalGridInfo called for analytical type &#39;%s&#39; that does not require custom geometry.&quot;</span>,</div>
+<div class="line"><span class="lineno">   69</span>                 simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
+<div class="line"><span class="lineno">   70</span>    }</div>
+<div class="line"><span class="lineno">   71</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> &lt;= 0 || user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a> &lt;= 0 || user-&gt;<a class="code hl_variable" href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">KM</a> &lt;= 0) {</div>
+<div class="line"><span class="lineno">   72</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE,</div>
+<div class="line"><span class="lineno">   73</span>                <span class="stringliteral">&quot;Analytical grid resolution is not initialized. Ensure IM/JM/KM are preloaded before SetAnalyticalGridInfo.&quot;</span>);</div>
+<div class="line"><span class="lineno">   74</span>    }</div>
 <div class="line"><span class="lineno">   75</span> </div>
-<div class="line"><span class="lineno">   76</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">   77</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   77</span>        <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Configuring grid for TGV3D analytical solution, block %d.\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index);</div>
 <div class="line"><span class="lineno">   78</span> </div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="AnalyticalSolutions_8c.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>)) {</div>
-<div class="line"><span class="lineno">   80</span>        SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE,</div>
-<div class="line"><span class="lineno">   81</span>                 <span class="stringliteral">&quot;SetAnalyticalGridInfo called for analytical type &#39;%s&#39; that does not require custom geometry.&quot;</span>,</div>
-<div class="line"><span class="lineno">   82</span>                 simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
-<div class="line"><span class="lineno">   83</span>    }</div>
-<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> &lt;= 0 || user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a> &lt;= 0 || user-&gt;<a class="code hl_variable" href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">KM</a> &lt;= 0) {</div>
-<div class="line"><span class="lineno">   85</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE,</div>
-<div class="line"><span class="lineno">   86</span>                <span class="stringliteral">&quot;Analytical grid resolution is not initialized. Ensure IM/JM/KM are preloaded before SetAnalyticalGridInfo.&quot;</span>);</div>
-<div class="line"><span class="lineno">   87</span>    }</div>
-<div class="line"><span class="lineno">   88</span> </div>
-<div class="line"><span class="lineno">   89</span>    <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   90</span>        <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Configuring grid for TGV3D analytical solution, block %d.\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index);</div>
-<div class="line"><span class="lineno">   91</span> </div>
-<div class="line"><span class="lineno">   92</span>        <span class="keywordflow">if</span> (nblk == 1) {</div>
-<div class="line"><span class="lineno">   93</span>            <span class="comment">// --- Single Block Case ---</span></div>
-<div class="line"><span class="lineno">   94</span>            <span class="keywordflow">if</span> (block_index == 0) {</div>
-<div class="line"><span class="lineno">   95</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Single block detected. Setting domain to [0, 2*PI].\n&quot;</span>);</div>
-<div class="line"><span class="lineno">   96</span>            }</div>
-<div class="line"><span class="lineno">   97</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a> = 2.0 * PETSC_PI;</div>
-<div class="line"><span class="lineno">   98</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a> = 2.0 * PETSC_PI;</div>
-<div class="line"><span class="lineno">   99</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a> = 0.2 * PETSC_PI; <span class="comment">//2.0 * PETSC_PI;</span></div>
-<div class="line"><span class="lineno">  100</span> </div>
-<div class="line"><span class="lineno">  101</span>        } <span class="keywordflow">else</span> { <span class="comment">// --- Multi-Block Case ---</span></div>
-<div class="line"><span class="lineno">  102</span>            PetscReal s = sqrt((PetscReal)nblk);</div>
-<div class="line"><span class="lineno">  103</span>            </div>
-<div class="line"><span class="lineno">  104</span>            <span class="comment">// Validate that nblk is a perfect square.</span></div>
-<div class="line"><span class="lineno">  105</span>            <span class="keywordflow">if</span> (fabs(s - floor(s)) &gt; 1e-9) {</div>
-<div class="line"><span class="lineno">  106</span>                SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_ARG_INCOMP,</div>
-<div class="line"><span class="lineno">  107</span>                         <span class="stringliteral">&quot;\n\n*** CONFIGURATION ERROR FOR TGV3D ***\n&quot;</span></div>
-<div class="line"><span class="lineno">  108</span>                         <span class="stringliteral">&quot;For multi-block TGV3D cases, the number of blocks must be a perfect square (e.g., 4, 9, 16).\n&quot;</span></div>
-<div class="line"><span class="lineno">  109</span>                         <span class="stringliteral">&quot;You have specified %d blocks. Please adjust `-block_number`.\n&quot;</span>, nblk);</div>
-<div class="line"><span class="lineno">  110</span>            }</div>
-<div class="line"><span class="lineno">  111</span>            PetscInt blocks_per_dim = (PetscInt)s;</div>
-<div class="line"><span class="lineno">  112</span> </div>
-<div class="line"><span class="lineno">  113</span>            <span class="keywordflow">if</span> (block_index == 0) {</div>
-<div class="line"><span class="lineno">  114</span>                 <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;%d blocks detected. Decomposing domain into a %d x %d grid in the X-Y plane.\n&quot;</span>, nblk, blocks_per_dim, blocks_per_dim);</div>
-<div class="line"><span class="lineno">  115</span>            }</div>
-<div class="line"><span class="lineno">  116</span> </div>
-<div class="line"><span class="lineno">  117</span>            <span class="comment">// Determine the (row, col) position of this block in the 2D decomposition</span></div>
-<div class="line"><span class="lineno">  118</span>            PetscInt row = block_index / blocks_per_dim;</div>
-<div class="line"><span class="lineno">  119</span>            PetscInt col = block_index % blocks_per_dim;</div>
-<div class="line"><span class="lineno">  120</span> </div>
-<div class="line"><span class="lineno">  121</span>            <span class="comment">// Calculate the width/height of each sub-domain</span></div>
-<div class="line"><span class="lineno">  122</span>            PetscReal block_width  = (2.0 * PETSC_PI) / (PetscReal)blocks_per_dim;</div>
-<div class="line"><span class="lineno">  123</span>            PetscReal block_height = (2.0 * PETSC_PI) / (PetscReal)blocks_per_dim;</div>
-<div class="line"><span class="lineno">  124</span>            </div>
-<div class="line"><span class="lineno">  125</span>            <span class="comment">// Assign this block its specific sub-domain</span></div>
-<div class="line"><span class="lineno">  126</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a> = col * block_width;</div>
-<div class="line"><span class="lineno">  127</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a> = (col + 1) * block_width;</div>
-<div class="line"><span class="lineno">  128</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a> = row * block_height;</div>
-<div class="line"><span class="lineno">  129</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a> = (row + 1) * block_height;</div>
-<div class="line"><span class="lineno">  130</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a> = 0.0;</div>
-<div class="line"><span class="lineno">  131</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a> = 2.0 * PETSC_PI; <span class="comment">// Z-domain is not decomposed</span></div>
-<div class="line"><span class="lineno">  132</span>        }</div>
+<div class="line"><span class="lineno">   79</span>        <span class="keywordflow">if</span> (nblk == 1) {</div>
+<div class="line"><span class="lineno">   80</span>            <span class="comment">// --- Single Block Case ---</span></div>
+<div class="line"><span class="lineno">   81</span>            <span class="keywordflow">if</span> (block_index == 0) {</div>
+<div class="line"><span class="lineno">   82</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Single block detected. Setting domain to [0, 2*PI].\n&quot;</span>);</div>
+<div class="line"><span class="lineno">   83</span>            }</div>
+<div class="line"><span class="lineno">   84</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a> = 2.0 * PETSC_PI;</div>
+<div class="line"><span class="lineno">   85</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a> = 2.0 * PETSC_PI;</div>
+<div class="line"><span class="lineno">   86</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a> = 0.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a> = 0.2 * PETSC_PI; <span class="comment">//2.0 * PETSC_PI;</span></div>
+<div class="line"><span class="lineno">   87</span> </div>
+<div class="line"><span class="lineno">   88</span>        } <span class="keywordflow">else</span> { <span class="comment">// --- Multi-Block Case ---</span></div>
+<div class="line"><span class="lineno">   89</span>            PetscReal s = sqrt((PetscReal)nblk);</div>
+<div class="line"><span class="lineno">   90</span>            </div>
+<div class="line"><span class="lineno">   91</span>            <span class="comment">// Validate that nblk is a perfect square.</span></div>
+<div class="line"><span class="lineno">   92</span>            <span class="keywordflow">if</span> (fabs(s - floor(s)) &gt; 1e-9) {</div>
+<div class="line"><span class="lineno">   93</span>                SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_INCOMP,</div>
+<div class="line"><span class="lineno">   94</span>                         <span class="stringliteral">&quot;\n\n*** CONFIGURATION ERROR FOR TGV3D ***\n&quot;</span></div>
+<div class="line"><span class="lineno">   95</span>                         <span class="stringliteral">&quot;For multi-block TGV3D cases, the number of blocks must be a perfect square (e.g., 4, 9, 16).\n&quot;</span></div>
+<div class="line"><span class="lineno">   96</span>                         <span class="stringliteral">&quot;You have specified %d blocks. Please adjust `-block_number`.\n&quot;</span>, nblk);</div>
+<div class="line"><span class="lineno">   97</span>            }</div>
+<div class="line"><span class="lineno">   98</span>            PetscInt blocks_per_dim = (PetscInt)s;</div>
+<div class="line"><span class="lineno">   99</span> </div>
+<div class="line"><span class="lineno">  100</span>            <span class="keywordflow">if</span> (block_index == 0) {</div>
+<div class="line"><span class="lineno">  101</span>                 <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;%d blocks detected. Decomposing domain into a %d x %d grid in the X-Y plane.\n&quot;</span>, nblk, blocks_per_dim, blocks_per_dim);</div>
+<div class="line"><span class="lineno">  102</span>            }</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>            <span class="comment">// Determine the (row, col) position of this block in the 2D decomposition</span></div>
+<div class="line"><span class="lineno">  105</span>            PetscInt row = block_index / blocks_per_dim;</div>
+<div class="line"><span class="lineno">  106</span>            PetscInt col = block_index % blocks_per_dim;</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>            <span class="comment">// Calculate the width/height of each sub-domain</span></div>
+<div class="line"><span class="lineno">  109</span>            PetscReal block_width  = (2.0 * PETSC_PI) / (PetscReal)blocks_per_dim;</div>
+<div class="line"><span class="lineno">  110</span>            PetscReal block_height = (2.0 * PETSC_PI) / (PetscReal)blocks_per_dim;</div>
+<div class="line"><span class="lineno">  111</span>            </div>
+<div class="line"><span class="lineno">  112</span>            <span class="comment">// Assign this block its specific sub-domain</span></div>
+<div class="line"><span class="lineno">  113</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a> = col * block_width;</div>
+<div class="line"><span class="lineno">  114</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a> = (col + 1) * block_width;</div>
+<div class="line"><span class="lineno">  115</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a> = row * block_height;</div>
+<div class="line"><span class="lineno">  116</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a> = (row + 1) * block_height;</div>
+<div class="line"><span class="lineno">  117</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a> = 0.0;</div>
+<div class="line"><span class="lineno">  118</span>            user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a> = 2.0 * PETSC_PI; <span class="comment">// Z-domain is not decomposed</span></div>
+<div class="line"><span class="lineno">  119</span>        }</div>
+<div class="line"><span class="lineno">  120</span>    }</div>
+<div class="line"><span class="lineno">  121</span>    <span class="comment">/*</span></div>
+<div class="line"><span class="lineno">  122</span><span class="comment">     * --- EXTENSIBILITY HOOK ---</span></div>
+<div class="line"><span class="lineno">  123</span><span class="comment">     * To add another analytical case with special grid requirements:</span></div>
+<div class="line"><span class="lineno">  124</span><span class="comment">     *</span></div>
+<div class="line"><span class="lineno">  125</span><span class="comment">     * else if (strcmp(simCtx-&gt;AnalyticalSolutionType, &quot;ChannelFlow&quot;) == 0) {</span></div>
+<div class="line"><span class="lineno">  126</span><span class="comment">     *     // ... implement logic to set domain for ChannelFlow case ...</span></div>
+<div class="line"><span class="lineno">  127</span><span class="comment">     * }</span></div>
+<div class="line"><span class="lineno">  128</span><span class="comment">     */</span></div>
+<div class="line"><span class="lineno">  129</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  130</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_UNKNOWN_TYPE,</div>
+<div class="line"><span class="lineno">  131</span>                 <span class="stringliteral">&quot;Analytical type &#39;%s&#39; has no custom geometry implementation.&quot;</span>,</div>
+<div class="line"><span class="lineno">  132</span>                 simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
 <div class="line"><span class="lineno">  133</span>    }</div>
-<div class="line"><span class="lineno">  134</span>    <span class="comment">/*</span></div>
-<div class="line"><span class="lineno">  135</span><span class="comment">     * --- EXTENSIBILITY HOOK ---</span></div>
-<div class="line"><span class="lineno">  136</span><span class="comment">     * To add another analytical case with special grid requirements:</span></div>
-<div class="line"><span class="lineno">  137</span><span class="comment">     *</span></div>
-<div class="line"><span class="lineno">  138</span><span class="comment">     * else if (strcmp(simCtx-&gt;AnalyticalSolutionType, &quot;ChannelFlow&quot;) == 0) {</span></div>
-<div class="line"><span class="lineno">  139</span><span class="comment">     *     // ... implement logic to set domain for ChannelFlow case ...</span></div>
-<div class="line"><span class="lineno">  140</span><span class="comment">     * }</span></div>
-<div class="line"><span class="lineno">  141</span><span class="comment">     */</span></div>
-<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  143</span>        SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_ARG_UNKNOWN_TYPE,</div>
-<div class="line"><span class="lineno">  144</span>                 <span class="stringliteral">&quot;Analytical type &#39;%s&#39; has no custom geometry implementation.&quot;</span>,</div>
-<div class="line"><span class="lineno">  145</span>                 simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
-<div class="line"><span class="lineno">  146</span>    }</div>
-<div class="line"><span class="lineno">  147</span> </div>
-<div class="line"><span class="lineno">  148</span>    <span class="comment">// We can also read stretching ratios, as they are independent of the domain size</span></div>
-<div class="line"><span class="lineno">  149</span>    <span class="comment">// For simplicity, we assume uniform grid unless specified.</span></div>
-<div class="line"><span class="lineno">  150</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#ade80a8abea8047bfe4b83bd9363df589">rx</a> = 1.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096">ry</a> = 1.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6">rz</a> = 1.0;</div>
-<div class="line"><span class="lineno">  151</span>    </div>
-<div class="line"><span class="lineno">  152</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Block %d grid resolution set: IM=%d, JM=%d, KM=%d\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  153</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">KM</a>);</div>
-<div class="line"><span class="lineno">  154</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Block %d final bounds: X=[%.4f, %.4f], Y=[%.4f, %.4f], Z=[%.4f, %.4f]\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  155</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index, user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a>);</div>
-<div class="line"><span class="lineno">  156</span> </div>
-<div class="line"><span class="lineno">  157</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  158</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  159</span>}</div>
-<div class="ttc" id="aAnalyticalSolutions_8c_html_a5978038d775b2b6333c1abe6f895f30c"><div class="ttname"><a href="AnalyticalSolutions_8c.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a></div><div class="ttdeci">PetscBool AnalyticalTypeRequiresCustomGeometry(const char *analytical_type)</div><div class="ttdoc">Reports whether an analytical type requires custom geometry/decomposition logic.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00038">AnalyticalSolutions.c:38</a></div></div>
-<div class="ttc" id="alogging_8h_html_a2ebe7667b52c478f7ff365f296d4c8ae"><div class="ttname"><a href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a></div><div class="ttdeci">#define LOG_ALLOW_SYNC(scope, level, fmt,...)</div><div class="ttdoc">----— DEBUG ---------------------------------------— #define LOG_ALLOW(scope, level,...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00266">logging.h:266</a></div></div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>    <span class="comment">// We can also read stretching ratios, as they are independent of the domain size</span></div>
+<div class="line"><span class="lineno">  136</span>    <span class="comment">// For simplicity, we assume uniform grid unless specified.</span></div>
+<div class="line"><span class="lineno">  137</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#ade80a8abea8047bfe4b83bd9363df589">rx</a> = 1.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096">ry</a> = 1.0; user-&gt;<a class="code hl_variable" href="variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6">rz</a> = 1.0;</div>
+<div class="line"><span class="lineno">  138</span>    </div>
+<div class="line"><span class="lineno">  139</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Block %d grid resolution set: IM=%d, JM=%d, KM=%d\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  140</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">KM</a>);</div>
+<div class="line"><span class="lineno">  141</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d: Block %d final bounds: X=[%.4f, %.4f], Y=[%.4f, %.4f], Z=[%.4f, %.4f]\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  142</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, block_index, user-&gt;<a class="code hl_variable" href="variables_8h.html#a3c5226c112cabe2fc24230877bf7cc3c">Min_X</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac3ea6849d6d1556f240ace7a6d9a3347">Max_X</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac6633daab270004cd266f6e6ac05f588">Min_Y</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a60bfc6b6d761a90da39b0f053bebcb31">Max_Y</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d">Min_Z</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aecbc2de7a281e906efe25a773b76866c">Max_Z</a>);</div>
+<div class="line"><span class="lineno">  143</span> </div>
+<div class="line"><span class="lineno">  144</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  145</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  146</span>}</div>
+<div class="ttc" id="aAnalyticalSolutions_8c_html_a5978038d775b2b6333c1abe6f895f30c"><div class="ttname"><a href="AnalyticalSolutions_8c.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a></div><div class="ttdeci">PetscBool AnalyticalTypeRequiresCustomGeometry(const char *analytical_type)</div><div class="ttdoc">Implementation of AnalyticalTypeRequiresCustomGeometry().</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00045">AnalyticalSolutions.c:45</a></div></div>
+<div class="ttc" id="alogging_8h_html_a2ebe7667b52c478f7ff365f296d4c8ae"><div class="ttname"><a href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a></div><div class="ttdeci">#define LOG_ALLOW_SYNC(scope, level, fmt,...)</div><div class="ttdoc">Synchronized logging macro that checks both the log level and whether the calling function is in the ...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00252">logging.h:252</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3758dd5d300a594312c95bc393378df0"><div class="ttname"><a href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a></div><div class="ttdeci">#define LOCAL</div><div class="ttdoc">Logging scope definitions for controlling message output.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00044">logging.h:44</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
-<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00761">logging.h:761</a></div></div>
+<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00758">logging.h:758</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
-<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00752">logging.h:752</a></div></div>
+<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00749">logging.h:749</a></div></div>
 <div class="ttc" id="avariables_8h_html_a19aa807b9181b13618527d6c4eb6fa89"><div class="ttname"><a href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">SimCtx::rank</a></div><div class="ttdeci">PetscMPIInt rank</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00594">variables.h:594</a></div></div>
 <div class="ttc" id="avariables_8h_html_a22580e0e52ca8ddccc76d24c96f00e4a"><div class="ttname"><a href="variables_8h.html#a22580e0e52ca8ddccc76d24c96f00e4a">SimCtx::block_number</a></div><div class="ttdeci">PetscInt block_number</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00656">variables.h:656</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00741">variables.h:741</a></div></div>
@@ -312,7 +314,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="AnalyticalSolutions_8h_ae25959d8a54d4be970967fcec062d28f_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="AnalyticalSolutions_8h_ae25959d8a54d4be970967fcec062d28f_icgraph.svg" width="100%" height="364"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -341,17 +343,19 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PETSC_TRUE if custom geometry is required, PETSC_FALSE otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PETSC_TRUE if custom geometry is required, PETSC_FALSE otherwise.</dd></dl>
+<p>Reports whether an analytical type requires custom geometry/decomposition logic.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="AnalyticalSolutions_8h.html">include/AnalyticalSolutions.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="AnalyticalSolutions_8h.html#a5978038d775b2b6333c1abe6f895f30c" title="Reports whether an analytical type requires custom geometry/decomposition logic.">AnalyticalTypeRequiresCustomGeometry()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00038">38</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   39</span>{</div>
-<div class="line"><span class="lineno">   40</span>    <span class="keywordflow">if</span> (!analytical_type) <span class="keywordflow">return</span> PETSC_FALSE;</div>
-<div class="line"><span class="lineno">   41</span>    <span class="keywordflow">return</span> (strcmp(analytical_type, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) ? PETSC_TRUE : PETSC_FALSE;</div>
-<div class="line"><span class="lineno">   42</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00045">45</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   46</span>{</div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">if</span> (!analytical_type) <span class="keywordflow">return</span> PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   48</span>    <span class="keywordflow">return</span> (strcmp(analytical_type, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) ? PETSC_TRUE : PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   49</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="AnalyticalSolutions_8h_a5978038d775b2b6333c1abe6f895f30c_icgraph.svg" width="100%" height="384"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="AnalyticalSolutions_8h_a5978038d775b2b6333c1abe6f895f30c_icgraph.svg" width="100%" height="403"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -381,56 +385,50 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success.</dd></dl>
-<p>This function acts as a router. It reads the <code>AnalyticalSolutionType</code> string from the simulation context and calls the corresponding private implementation function (e.g., for Taylor-Green Vortex). This design keeps the main simulation code clean and makes it easy to add new analytical test cases.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simCtx</td><td>The main simulation context, containing all configuration and state. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success, or a PETSc error code on failure. </dd></dl>
+<p>Dispatches to the appropriate analytical solution function based on simulation settings.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="AnalyticalSolutions_8h.html">include/AnalyticalSolutions.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608" title="Dispatches to the appropriate analytical solution function based on simulation settings.">AnalyticalSolutionEngine()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00179">179</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  180</span>{</div>
-<div class="line"><span class="lineno">  181</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  182</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  183</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  184</span> </div>
-<div class="line"><span class="lineno">  185</span>    <span class="comment">// -- Before any operation, here is defensive test to ensure that the Corner-&gt;Center Interpolation method works</span></div>
-<div class="line"><span class="lineno">  186</span>    <span class="comment">//ierr = TestCornerToCenterInterpolation(&amp;(simCtx-&gt;usermg.mgctx[simCtx-&gt;usermg.mglevels - 1]-&gt;user[0])); </span></div>
-<div class="line"><span class="lineno">  187</span> </div>
-<div class="line"><span class="lineno">  188</span>    <span class="comment">// --- Dispatch based on the string provided by the user ---</span></div>
-<div class="line"><span class="lineno">  189</span>    <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">  190</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Applying Analytical Solution: 3D Taylor-Green Vortex (TGV3D).\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  191</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#acf425c0d1325a81a7020d40c6c825796">SetAnalyticalSolution_TGV3D</a>(simCtx); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  192</span>    }</div>
-<div class="line"><span class="lineno">  193</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;ZERO_FLOW&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">  194</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Applying Analytical Solution: Zero Background Flow (ZERO_FLOW).\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  195</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#a0e6c82425547a2f212758d552c2c2d86">SetAnalyticalSolution_ZeroFlow</a>(simCtx); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  196</span>    }</div>
-<div class="line"><span class="lineno">  197</span>    <span class="comment">/*</span></div>
-<div class="line"><span class="lineno">  198</span><span class="comment">     * --- EXTENSIBILITY HOOK ---</span></div>
-<div class="line"><span class="lineno">  199</span><span class="comment">     * To add a new analytical solution (e.g., &quot;ChannelFlow&quot;):</span></div>
-<div class="line"><span class="lineno">  200</span><span class="comment">     * 1. Add an `else if` block here:</span></div>
-<div class="line"><span class="lineno">  201</span><span class="comment">     *</span></div>
-<div class="line"><span class="lineno">  202</span><span class="comment">     *    else if (strcmp(simCtx-&gt;AnalyticalSolutionType, &quot;ChannelFlow&quot;) == 0) {</span></div>
-<div class="line"><span class="lineno">  203</span><span class="comment">     *        LOG_ALLOW(GLOBAL, LOG_DEBUG, &quot;Applying Analytical Solution: Channel Flow.\n&quot;);</span></div>
-<div class="line"><span class="lineno">  204</span><span class="comment">     *        ierr = SetAnalyticalSolution_ChannelFlow(simCtx); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  205</span><span class="comment">     *    }</span></div>
-<div class="line"><span class="lineno">  206</span><span class="comment">     *</span></div>
-<div class="line"><span class="lineno">  207</span><span class="comment">     * 2. Implement the static function `SetAnalyticalSolution_ChannelFlow(SimCtx *simCtx)`</span></div>
-<div class="line"><span class="lineno">  208</span><span class="comment">     *    below, following the TGV3D pattern.</span></div>
-<div class="line"><span class="lineno">  209</span><span class="comment">     */</span></div>
-<div class="line"><span class="lineno">  210</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  211</span>        <span class="comment">// If the type is unknown, raise a fatal error to prevent silent failures.</span></div>
-<div class="line"><span class="lineno">  212</span>        SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_ARG_UNKNOWN_TYPE, <span class="stringliteral">&quot;Unknown AnalyticalSolutionType specified: &#39;%s&#39;&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
-<div class="line"><span class="lineno">  213</span>    }</div>
-<div class="line"><span class="lineno">  214</span> </div>
-<div class="line"><span class="lineno">  215</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  216</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  217</span>}</div>
-<div class="ttc" id="aAnalyticalSolutions_8c_html_a0e6c82425547a2f212758d552c2c2d86"><div class="ttname"><a href="AnalyticalSolutions_8c.html#a0e6c82425547a2f212758d552c2c2d86">SetAnalyticalSolution_ZeroFlow</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolution_ZeroFlow(SimCtx *simCtx)</div><div class="ttdoc">Sets all fluid fields to zero for a quiescent (zero-flow) background.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00398">AnalyticalSolutions.c:398</a></div></div>
-<div class="ttc" id="aAnalyticalSolutions_8c_html_acf425c0d1325a81a7020d40c6c825796"><div class="ttname"><a href="AnalyticalSolutions_8c.html#acf425c0d1325a81a7020d40c6c825796">SetAnalyticalSolution_TGV3D</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolution_TGV3D(SimCtx *simCtx)</div><div class="ttdoc">Sets the non-dimensional velocity and pressure fields to the 3D Taylor-Green Vortex solution.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00250">AnalyticalSolutions.c:250</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00161">161</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  162</span>{</div>
+<div class="line"><span class="lineno">  163</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  164</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  165</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  166</span> </div>
+<div class="line"><span class="lineno">  167</span>    <span class="comment">// -- Before any operation, here is defensive test to ensure that the Corner-&gt;Center Interpolation method works</span></div>
+<div class="line"><span class="lineno">  168</span>    <span class="comment">//ierr = TestCornerToCenterInterpolation(&amp;(simCtx-&gt;usermg.mgctx[simCtx-&gt;usermg.mglevels - 1]-&gt;user[0])); </span></div>
+<div class="line"><span class="lineno">  169</span> </div>
+<div class="line"><span class="lineno">  170</span>    <span class="comment">// --- Dispatch based on the string provided by the user ---</span></div>
+<div class="line"><span class="lineno">  171</span>    <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  172</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Applying Analytical Solution: 3D Taylor-Green Vortex (TGV3D).\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  173</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#acf425c0d1325a81a7020d40c6c825796">SetAnalyticalSolution_TGV3D</a>(simCtx); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  174</span>    }</div>
+<div class="line"><span class="lineno">  175</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;ZERO_FLOW&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  176</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Applying Analytical Solution: Zero Background Flow (ZERO_FLOW).\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  177</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#a0e6c82425547a2f212758d552c2c2d86">SetAnalyticalSolution_ZeroFlow</a>(simCtx); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  178</span>    }</div>
+<div class="line"><span class="lineno">  179</span>    <span class="comment">/*</span></div>
+<div class="line"><span class="lineno">  180</span><span class="comment">     * --- EXTENSIBILITY HOOK ---</span></div>
+<div class="line"><span class="lineno">  181</span><span class="comment">     * To add a new analytical solution (e.g., &quot;ChannelFlow&quot;):</span></div>
+<div class="line"><span class="lineno">  182</span><span class="comment">     * 1. Add an `else if` block here:</span></div>
+<div class="line"><span class="lineno">  183</span><span class="comment">     *</span></div>
+<div class="line"><span class="lineno">  184</span><span class="comment">     *    else if (strcmp(simCtx-&gt;AnalyticalSolutionType, &quot;ChannelFlow&quot;) == 0) {</span></div>
+<div class="line"><span class="lineno">  185</span><span class="comment">     *        LOG_ALLOW(GLOBAL, LOG_DEBUG, &quot;Applying Analytical Solution: Channel Flow.\n&quot;);</span></div>
+<div class="line"><span class="lineno">  186</span><span class="comment">     *        ierr = SetAnalyticalSolution_ChannelFlow(simCtx); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno">  187</span><span class="comment">     *    }</span></div>
+<div class="line"><span class="lineno">  188</span><span class="comment">     *</span></div>
+<div class="line"><span class="lineno">  189</span><span class="comment">     * 2. Implement the static function `SetAnalyticalSolution_ChannelFlow(SimCtx *simCtx)`</span></div>
+<div class="line"><span class="lineno">  190</span><span class="comment">     *    below, following the TGV3D pattern.</span></div>
+<div class="line"><span class="lineno">  191</span><span class="comment">     */</span></div>
+<div class="line"><span class="lineno">  192</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  193</span>        <span class="comment">// If the type is unknown, raise a fatal error to prevent silent failures.</span></div>
+<div class="line"><span class="lineno">  194</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_UNKNOWN_TYPE, <span class="stringliteral">&quot;Unknown AnalyticalSolutionType specified: &#39;%s&#39;&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>);</div>
+<div class="line"><span class="lineno">  195</span>    }</div>
+<div class="line"><span class="lineno">  196</span> </div>
+<div class="line"><span class="lineno">  197</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  198</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  199</span>}</div>
+<div class="ttc" id="aAnalyticalSolutions_8c_html_a0e6c82425547a2f212758d552c2c2d86"><div class="ttname"><a href="AnalyticalSolutions_8c.html#a0e6c82425547a2f212758d552c2c2d86">SetAnalyticalSolution_ZeroFlow</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolution_ZeroFlow(SimCtx *simCtx)</div><div class="ttdoc">Internal helper implementation: SetAnalyticalSolution_ZeroFlow().</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00353">AnalyticalSolutions.c:353</a></div></div>
+<div class="ttc" id="aAnalyticalSolutions_8c_html_acf425c0d1325a81a7020d40c6c825796"><div class="ttname"><a href="AnalyticalSolutions_8c.html#acf425c0d1325a81a7020d40c6c825796">SetAnalyticalSolution_TGV3D</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolution_TGV3D(SimCtx *simCtx)</div><div class="ttdoc">Internal helper implementation: SetAnalyticalSolution_TGV3D().</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00212">AnalyticalSolutions.c:212</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -479,31 +477,29 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode Returns 0 on success. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode Returns 0 on success.</dd></dl>
+<p>Applies the analytical solution to particle velocity vector.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="AnalyticalSolutions_8h.html">include/AnalyticalSolutions.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d" title="Applies the analytical solution to particle velocity vector.">SetAnalyticalSolutionForParticles()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00485">485</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  486</span>{</div>
-<div class="line"><span class="lineno">  487</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  488</span>    PetscInt nLocal;</div>
-<div class="line"><span class="lineno">  489</span>    PetscReal *vels;</div>
-<div class="line"><span class="lineno">  490</span> </div>
-<div class="line"><span class="lineno">  491</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  492</span>    </div>
-<div class="line"><span class="lineno">  493</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Type: %s\n&quot;</span>, </div>
-<div class="line"><span class="lineno">  494</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> : <span class="stringliteral">&quot;default&quot;</span>);</div>
-<div class="line"><span class="lineno">  495</span>    </div>
-<div class="line"><span class="lineno">  496</span>    <span class="comment">// Check for specific analytical solution types</span></div>
-<div class="line"><span class="lineno">  497</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> &amp;&amp; strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">  498</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Using TGV3D solution.\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  499</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#ae3943c2ae3da96af143ac11ae1cae520">SetAnalyticalSolutionForParticles_TGV3D</a>(tempVec, simCtx); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  500</span>        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  501</span>    }</div>
-<div class="line"><span class="lineno">  502</span>        </div>
-<div class="line"><span class="lineno">  503</span>    ierr = VecRestoreArray(tempVec, &amp;vels); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  504</span>    </div>
-<div class="line"><span class="lineno">  505</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  506</span>}</div>
-<div class="ttc" id="aAnalyticalSolutions_8c_html_ae3943c2ae3da96af143ac11ae1cae520"><div class="ttname"><a href="AnalyticalSolutions_8c.html#ae3943c2ae3da96af143ac11ae1cae520">SetAnalyticalSolutionForParticles_TGV3D</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolutionForParticles_TGV3D(Vec tempVec, SimCtx *simCtx)</div><div class="ttdoc">Sets the TGV3D analytical velocity solution for particles.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00436">AnalyticalSolutions.c:436</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AnalyticalSolutions_8c_source.html#l00430">430</a> of file <a class="el" href="AnalyticalSolutions_8c_source.html">AnalyticalSolutions.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  431</span>{</div>
+<div class="line"><span class="lineno">  432</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  433</span> </div>
+<div class="line"><span class="lineno">  434</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  435</span>    </div>
+<div class="line"><span class="lineno">  436</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Type: %s\n&quot;</span>, </div>
+<div class="line"><span class="lineno">  437</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> : <span class="stringliteral">&quot;default&quot;</span>);</div>
+<div class="line"><span class="lineno">  438</span>    </div>
+<div class="line"><span class="lineno">  439</span>    <span class="comment">// Check for specific analytical solution types</span></div>
+<div class="line"><span class="lineno">  440</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a> &amp;&amp; strcmp(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac010719e538fb74809e801b4607d77b7">AnalyticalSolutionType</a>, <span class="stringliteral">&quot;TGV3D&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  441</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Using TGV3D solution.\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  442</span>        ierr = <a class="code hl_function" href="AnalyticalSolutions_8c.html#ae3943c2ae3da96af143ac11ae1cae520">SetAnalyticalSolutionForParticles_TGV3D</a>(tempVec, simCtx); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  443</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  444</span>    }</div>
+<div class="line"><span class="lineno">  445</span>    </div>
+<div class="line"><span class="lineno">  446</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  447</span>}</div>
+<div class="ttc" id="aAnalyticalSolutions_8c_html_ae3943c2ae3da96af143ac11ae1cae520"><div class="ttname"><a href="AnalyticalSolutions_8c.html#ae3943c2ae3da96af143ac11ae1cae520">SetAnalyticalSolutionForParticles_TGV3D</a></div><div class="ttdeci">static PetscErrorCode SetAnalyticalSolutionForParticles_TGV3D(Vec tempVec, SimCtx *simCtx)</div><div class="ttdoc">Internal helper implementation: SetAnalyticalSolutionForParticles_TGV3D().</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00385">AnalyticalSolutions.c:385</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

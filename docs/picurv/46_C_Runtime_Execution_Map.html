@@ -83,15 +83,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#startup_sec">1. Solver Startup Order (&lt;tt&gt;src/simulator.c&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#core_structs_sec">3. Core Runtime Structs</a></li>
-<li class="level1"><a href="#init_branches_sec">4. Initialization Branches</a></li>
-<li class="level1"><a href="#boundaries_sec">6. Boundary System Runtime Hooks</a></li>
-<li class="level1"><a href="#debug_sec">8. Debugging Entry Points</a></li>
+<ul><li class="level1"><a href="#p46_startup_sec">1. Solver Startup Order (&lt;tt&gt;src/simulator.c&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p46_ingestion_sec">2. Python-to-C Configuration Boundary</a></li>
+<li class="level1"><a href="#p46_core_structs_sec">3. Core Runtime Structs</a></li>
+<li class="level1"><a href="#p46_init_branches_sec">4. Initialization Branches</a></li>
+<li class="level1"><a href="#p46_loop_sec">5. Timestep Loop (&lt;tt&gt;AdvanceSimulation&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p46_boundaries_sec">6. Boundary System Runtime Hooks</a></li>
+<li class="level1"><a href="#p46_extension_sec">7. Safe Extension Workflow (C Side)</a></li>
+<li class="level1"><a href="#p46_debug_sec">8. Debugging Entry Points</a></li>
+<li class="level1"><a href="#p46_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md151">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md152">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md153">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page is a contributor-oriented map of how the C solver executes from process start to timestep loop. Use it as a practical companion to architecture and methods pages when modifying solver behavior.</p>
-<h1><a class="anchor" id="startup_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_C_Runtime_Execution_Map"></a> This page is a contributor-oriented map of how the C solver executes from process start to timestep loop. Use it as a practical companion to architecture and methods pages when modifying solver behavior.</p>
+<h1><a class="anchor" id="p46_startup_sec"></a>
 1. Solver Startup Order (&lt;tt&gt;src/simulator.c&lt;/tt&gt;)</h1>
 <p>High-level startup sequence:</p>
 <ol type="1">
@@ -107,8 +116,24 @@ $(function() {
 <li>initial settlement/restart finalization</li>
 <li><a class="el" href="runloop_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a></li>
 </ol>
-<h1><a class="anchor" id="ingestion_sec"></a>
-6. Configuration Ingestion Boundaries</h1>
+<p>Startup branch details:</p>
+<ul>
+<li>if <code>StartStep == 0</code>:<ul>
+<li>particles enabled: <a class="el" href="runloop_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a></li>
+<li>particles disabled: initial Eulerian field write path</li>
+</ul>
+</li>
+<li>if <code>StartStep &gt; 0</code>:<ul>
+<li><a class="el" href="runloop_8h.html#a7bc2bae7b01f179706b367c8637534c2">FinalizeRestartState</a> dispatches by particle restart mode:<ul>
+<li><code>load</code> -&gt; <a class="el" href="runloop_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a></li>
+<li><code>init</code> -&gt; <a class="el" href="runloop_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="p46_ingestion_sec"></a>
+2. Python-to-C Configuration Boundary</h1>
 <p><code>scripts/picurv</code> is the control-plane generator. It writes normalized runtime artifacts under <code>runs/&lt;run_id&gt;/config/</code> and launches C binaries with <code>-control_file</code>.</p>
 <p>Core generated files consumed by C:</p>
 <ul>
@@ -118,7 +143,7 @@ $(function() {
 <li><code>grid.run</code> (for file/grid_gen paths),</li>
 <li><code>post.run</code> (postprocessor path).</li>
 </ul>
-<h1><a class="anchor" id="core_structs_sec"></a>
+<h1><a class="anchor" id="p46_core_structs_sec"></a>
 3. Core Runtime Structs</h1>
 <p>Most solver-wide state flows through:</p>
 <ul>
@@ -127,7 +152,12 @@ $(function() {
 <li><code><a class="el" href="variables_8h.html#structBoundaryFaceConfig" title="Holds the complete configuration for one of the six boundary faces.">BoundaryFaceConfig</a></code>: per-face mathematical type + handler + param list.</li>
 <li>swarm particle records and DMSwarm fields (<code>position</code>, <code>DMSwarm_CellID</code>, status fields, etc.).</li>
 </ul>
-<h1><a class="anchor" id="init_branches_sec"></a>
+<p>Related ownership note:</p>
+<ul>
+<li>most numerics run at finest level <code>simCtx-&gt;usermg.mgctx[simCtx-&gt;usermg.mglevels-1].user[*]</code></li>
+<li>multiblock loops (<code>for bi in block_number</code>) are common in setup, IO, and update stages</li>
+</ul>
+<h1><a class="anchor" id="p46_init_branches_sec"></a>
 4. Initialization Branches</h1>
 <p>Eulerian:</p>
 <ul>
@@ -139,8 +169,8 @@ $(function() {
 <li>fresh path uses random/deterministic placement logic depending on <code>-pinit</code>.</li>
 <li>load path may use <a class="el" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a> for direct ownership migration.</li>
 </ul>
-<h1><a class="anchor" id="loop_sec"></a>
-1. Per-Step Particle Pipeline</h1>
+<h1><a class="anchor" id="p46_loop_sec"></a>
+5. Timestep Loop (&lt;tt&gt;AdvanceSimulation&lt;/tt&gt;)</h1>
 <p>Per-step sequence:</p>
 <ol type="1">
 <li>update <code>step</code> and <code>time</code>,</li>
@@ -155,7 +185,7 @@ $(function() {
 <li><a class="el" href="ParticleMotion_8h.html#acb793f591b8baf11864bb85040730b28">CheckAndRemoveLostParticles</a>,</li>
 <li><a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a>,</li>
 <li><a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a>,</li>
-<li><a class="el" href="group__scatter__module.html#ga81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a> and <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a>,</li>
+<li><a class="el" href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a> and <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a>,</li>
 </ul>
 </li>
 <li>update history vectors,</li>
@@ -167,7 +197,13 @@ $(function() {
 <li><a class="el" href="io_8h.html#a07b0fa84e3d8c749c5e337aba7c0366a">WriteAllSwarmFields</a></li>
 <li><a class="el" href="logging_8h.html#a978573fa0efe93903add0890fb1ccb08">ProfilingLogTimestepSummary</a></li>
 </ul>
-<h1><a class="anchor" id="boundaries_sec"></a>
+<p>Loop-time branch notes:</p>
+<ul>
+<li>Eulerian source mode is selected once per step (<code>solve</code>, <code>load</code>, or <code>analytical</code>), then particle coupling follows.</li>
+<li>particle migration is iterative with global settlement passes and explicit lost-particle handling.</li>
+<li>periodic particle console snapshots are controlled by monitor/profiling settings and rank-aware logging helpers.</li>
+</ul>
+<h1><a class="anchor" id="p46_boundaries_sec"></a>
 6. Boundary System Runtime Hooks</h1>
 <p>Boundary lifecycle is object-style (function pointers per handler):</p>
 <ol type="1">
@@ -183,8 +219,8 @@ $(function() {
 <li><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a></li>
 <li><a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a></li>
 </ul>
-<h1><a class="anchor" id="extension_sec"></a>
-7. Extensibility Status</h1>
+<h1><a class="anchor" id="p46_extension_sec"></a>
+7. Safe Extension Workflow (C Side)</h1>
 <p>When adding or changing physics behavior:</p>
 <ol type="1">
 <li>identify owning module (<code><a class="el" href="solvers_8c.html">solvers.c</a></code>, <code><a class="el" href="rhs_8c.html">rhs.c</a></code>, <code><a class="el" href="poisson_8c.html">poisson.c</a></code>, <code>Particle*</code>, <code>Boundaries*</code>),</li>
@@ -193,7 +229,16 @@ $(function() {
 <li>update logging labels and diagnostics,</li>
 <li>update Python ingestion path so YAML and C flags remain consistent.</li>
 </ol>
-<h1><a class="anchor" id="debug_sec"></a>
+<p>Cross-layer reminder:</p>
+<ul>
+<li>changes in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code> / <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code> option ingestion should also update:<ul>
+<li><code>scripts/audit_ingress_manifest.json</code></li>
+<li><code><a class="el" href="15__Config__Ingestion__Map_8md.html">docs/pages/15_Config_Ingestion_Map.md</a></code></li>
+<li>relevant Python regression tests (<code>test_config_regressions.py</code> / <code>test_cli_smoke.py</code>)</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="p46_debug_sec"></a>
 8. Debugging Entry Points</h1>
 <p>High-value checks during development:</p>
 <ul>
@@ -202,15 +247,41 @@ $(function() {
 <li>particle metrics and location/migration counters,</li>
 <li>strict YAML validation through <code>picurv validate</code> before solver execution.</li>
 </ul>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<p>Additional fast diagnostics:</p>
+<ul>
+<li>compare <code>manifest.json</code> + generated <code>config/*.control</code> against expected YAML role settings</li>
+<li>run <code>picurv run --dry-run --format json</code> to verify launch-mode/rank assumptions before expensive runs</li>
+<li>for restart issues, verify <code>restart_from_run_dir</code> resolution and generated <code>-restart_dir</code> in control artifacts</li>
+</ul>
+<h1><a class="anchor" id="p46_refs_sec"></a>
+9. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
-<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b> </li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md151"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>C Runtime Execution Map</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md152"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md153"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

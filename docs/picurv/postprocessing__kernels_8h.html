@@ -99,7 +99,7 @@ Include dependency graph for postprocessing_kernels.h:</div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h__dep__incl.svg" width="344" height="183"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h__dep__incl.svg" width="532" height="183"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="postprocessing__kernels_8h_source.html">Go to the source code of this file.</a></p>
@@ -107,13 +107,13 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ad5b0c0f1721b13944b83a57f2471cd02" id="r_ad5b0c0f1721b13944b83a57f2471cd02"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="postprocessing__kernels_8h.html#ad5b0c0f1721b13944b83a57f2471cd02">ComputeNodalAverage</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user, const char *in_field_name, const char *out_field_name)</td></tr>
-<tr class="memdesc:ad5b0c0f1721b13944b83a57f2471cd02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes node-centered data by averaging 8 surrounding cell-centered values, exactly replicating the legacy code's indexing and boundary handling.  <br /></td></tr>
+<tr class="memdesc:ad5b0c0f1721b13944b83a57f2471cd02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolates a cell-centered field to nodal locations using local stencil averaging.  <br /></td></tr>
 <tr class="separator:ad5b0c0f1721b13944b83a57f2471cd02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a303c5afb89d6fdaab3e40f9371d8f1b2" id="r_a303c5afb89d6fdaab3e40f9371d8f1b2"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="postprocessing__kernels_8h.html#a303c5afb89d6fdaab3e40f9371d8f1b2">ComputeQCriterion</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</td></tr>
-<tr class="memdesc:a303c5afb89d6fdaab3e40f9371d8f1b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the Q-Criterion, a scalar value identifying vortex cores.  <br /></td></tr>
+<tr class="memdesc:a303c5afb89d6fdaab3e40f9371d8f1b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the Q-criterion diagnostic from the local velocity-gradient tensor.  <br /></td></tr>
 <tr class="separator:a303c5afb89d6fdaab3e40f9371d8f1b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86d13bca79c1355ce808509a999a1d88" id="r_a86d13bca79c1355ce808509a999a1d88"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="postprocessing__kernels_8h.html#a86d13bca79c1355ce808509a999a1d88">NormalizeRelativeField</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user, const char *relative_field_name)</td></tr>
-<tr class="memdesc:a86d13bca79c1355ce808509a999a1d88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normalizes a relative field by subtracting a reference value.  <br /></td></tr>
+<tr class="memdesc:a86d13bca79c1355ce808509a999a1d88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normalizes a relative scalar field using the configured reference pressure scale.  <br /></td></tr>
 <tr class="separator:a86d13bca79c1355ce808509a999a1d88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab72ef98f3a415dddd8e609e95a1aeac6" id="r_ab72ef98f3a415dddd8e609e95a1aeac6"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="postprocessing__kernels_8h.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user, const char *field_name)</td></tr>
 <tr class="memdesc:ab72ef98f3a415dddd8e609e95a1aeac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scales a specified field from non-dimensional to dimensional units in-place.  <br /></td></tr>
@@ -161,108 +161,110 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes node-centered data by averaging 8 surrounding cell-centered values, exactly replicating the legacy code's indexing and boundary handling. </p>
-<p>This kernel uses a stencil that averages the 8 cells from the corner (i,j,k) to (i+1, j+1, k+1) and stores the result at the output node (i,j,k). This matches the legacy code's behavior. It operates on the full range of output nodes necessary for the subsampled grid, preventing zero-padding at the boundaries.</p>
+<p>Interpolates a cell-centered field to nodal locations using local stencil averaging. </p>
+<p>The kernel reads the input field by name, computes nodal values, and stores the output in the named destination field. Both fields must already exist in the current <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">user</td><td>The <a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a>, providing access to DMs and Vecs. </td></tr>
-    <tr><td class="paramname">in_field_name</td><td>The string name of the source Vec (e.g., "P", "Ucat"). </td></tr>
-    <tr><td class="paramname">out_field_name</td><td>The string name of the destination Vec (e.g., "P_nodal"). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">user</td><td>Block-level context that owns the source and destination vectors. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_field_name</td><td>Name of the input field to sample. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">out_field_name</td><td>Name of the output field to populate. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success.</dd></dl>
+<p>Interpolates a cell-centered field to nodal locations using local stencil averaging.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="postprocessing__kernels_8h.html">include/postprocessing_kernels.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="postprocessing__kernels_8h.html#ad5b0c0f1721b13944b83a57f2471cd02" title="Interpolates a cell-centered field to nodal locations using local stencil averaging.">ComputeNodalAverage()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00166">166</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  167</span>{</div>
-<div class="line"><span class="lineno">  168</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  169</span>    Vec            in_vec_local = NULL, out_vec_global = NULL;</div>
-<div class="line"><span class="lineno">  170</span>    DM             dm_in = NULL, dm_out = NULL;</div>
-<div class="line"><span class="lineno">  171</span>    PetscInt       dof = 0;</div>
-<div class="line"><span class="lineno">  172</span> </div>
-<div class="line"><span class="lineno">  173</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  174</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  175</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeNodalAverage on &#39;%s&#39; -&gt; &#39;%s&#39;.\n&quot;</span>, in_field_name, out_field_name);</div>
-<div class="line"><span class="lineno">  176</span> </div>
-<div class="line"><span class="lineno">  177</span>    <span class="comment">// --- 1. Map string names to PETSc objects ---</span></div>
-<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0)             { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>;         dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>;   dof = 1; }</div>
-<div class="line"><span class="lineno">  179</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;Ucat&quot;</span>) == 0)    { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>;      dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;  dof = 3; }</div>
-<div class="line"><span class="lineno">  180</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;Psi&quot;</span>) == 0)     { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">lPsi</a>;       dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>;   dof = 1; }</div>
-<div class="line"><span class="lineno">  181</span>    <span class="comment">// ... (add other fields as needed) ...</span></div>
-<div class="line"><span class="lineno">  182</span>    <span class="keywordflow">else</span> SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG, <span class="stringliteral">&quot;Unknown input field name for nodal averaging: %s&quot;</span>, in_field_name);</div>
-<div class="line"><span class="lineno">  183</span> </div>
-<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;P_nodal&quot;</span>) == 0)      { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#a0d09ddf5e31ea3cfcab2c6bbc59b64cd">P_nodal</a>;    dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>; }</div>
-<div class="line"><span class="lineno">  185</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;Ucat_nodal&quot;</span>) == 0) { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#a585521a5dbb55ae244e34a354ac93e3f">Ucat_nodal</a>; dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>; }</div>
-<div class="line"><span class="lineno">  186</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;Psi_nodal&quot;</span>) == 0)   { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#ac0025b1b394319e0af260c6d472bd9d8">Psi_nodal</a>;  dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>; }</div>
-<div class="line"><span class="lineno">  187</span>    <span class="comment">// ... (add other fields as needed) ...</span></div>
-<div class="line"><span class="lineno">  188</span>    <span class="keywordflow">else</span> SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG, <span class="stringliteral">&quot;Unknown output field name for nodal averaging: %s&quot;</span>, out_field_name);</div>
-<div class="line"><span class="lineno">  189</span> </div>
-<div class="line"><span class="lineno">  190</span>    <span class="comment">// --- 2. Ensure Input Data Ghosts are Up-to-Date ---</span></div>
-<div class="line"><span class="lineno">  191</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, in_field_name); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  192</span> </div>
-<div class="line"><span class="lineno">  193</span>    <span class="comment">// --- 3. Get DMDA info and array pointers ---</span></div>
-<div class="line"><span class="lineno">  194</span>    DMDALocalInfo info;</div>
-<div class="line"><span class="lineno">  195</span>    ierr = DMDAGetLocalInfo(dm_out, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  196</span> </div>
-<div class="line"><span class="lineno">  197</span>    <span class="keywordflow">if</span> (dof == 1) { <span class="comment">// --- Scalar Field Averaging ---</span></div>
-<div class="line"><span class="lineno">  198</span>        <span class="keyword">const</span> PetscReal ***l_in_arr;</div>
-<div class="line"><span class="lineno">  199</span>        PetscReal       ***g_out_arr;</div>
-<div class="line"><span class="lineno">  200</span>        ierr = DMDAVecGetArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  201</span>        ierr = DMDAVecGetArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  202</span> </div>
-<div class="line"><span class="lineno">  203</span>        <span class="comment">// Loop over the output NODE locations. The loop bounds match the required</span></div>
-<div class="line"><span class="lineno">  204</span>        <span class="comment">// size of the final subsampled grid.</span></div>
-<div class="line"><span class="lineno">  205</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm - 1; k++) {</div>
-<div class="line"><span class="lineno">  206</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym - 1; j++) {</div>
-<div class="line"><span class="lineno">  207</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm - 1; i++) {</div>
-<div class="line"><span class="lineno">  208</span>                    g_out_arr[k][j][i] = 0.125 * (l_in_arr[k][j][i]     + l_in_arr[k][j][i+1] +</div>
-<div class="line"><span class="lineno">  209</span>                                                  l_in_arr[k][j+1][i]   + l_in_arr[k][j+1][i+1] +</div>
-<div class="line"><span class="lineno">  210</span>                                                  l_in_arr[k+1][j][i]   + l_in_arr[k+1][j][i+1] +</div>
-<div class="line"><span class="lineno">  211</span>                                                  l_in_arr[k+1][j+1][i] + l_in_arr[k+1][j+1][i+1]);</div>
-<div class="line"><span class="lineno">  212</span>                }</div>
-<div class="line"><span class="lineno">  213</span>            }</div>
-<div class="line"><span class="lineno">  214</span>        }</div>
-<div class="line"><span class="lineno">  215</span>        ierr = DMDAVecRestoreArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  216</span>        ierr = DMDAVecRestoreArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  217</span> </div>
-<div class="line"><span class="lineno">  218</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (dof == 3) { <span class="comment">// --- Vector Field Averaging ---</span></div>
-<div class="line"><span class="lineno">  219</span>        <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***l_in_arr;</div>
-<div class="line"><span class="lineno">  220</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>       ***g_out_arr;</div>
-<div class="line"><span class="lineno">  221</span>        ierr = DMDAVecGetArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  222</span>        ierr = DMDAVecGetArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  223</span> </div>
-<div class="line"><span class="lineno">  224</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm - 1; k++) {</div>
-<div class="line"><span class="lineno">  225</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym - 1; j++) {</div>
-<div class="line"><span class="lineno">  226</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm - 1; i++) {</div>
-<div class="line"><span class="lineno">  227</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
-<div class="line"><span class="lineno">  228</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
-<div class="line"><span class="lineno">  229</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
-<div class="line"><span class="lineno">  230</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><span class="lineno">  231</span> </div>
-<div class="line"><span class="lineno">  232</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
-<div class="line"><span class="lineno">  233</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
-<div class="line"><span class="lineno">  234</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
-<div class="line"><span class="lineno">  235</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><span class="lineno">  236</span> </div>
-<div class="line"><span class="lineno">  237</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
-<div class="line"><span class="lineno">  238</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
-<div class="line"><span class="lineno">  239</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
-<div class="line"><span class="lineno">  240</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
-<div class="line"><span class="lineno">  241</span>                }</div>
-<div class="line"><span class="lineno">  242</span>            }</div>
-<div class="line"><span class="lineno">  243</span>        }</div>
-<div class="line"><span class="lineno">  244</span>        ierr = DMDAVecRestoreArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  245</span>        ierr = DMDAVecRestoreArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  246</span>    }</div>
-<div class="line"><span class="lineno">  247</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  248</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  249</span>}</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00143">143</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  144</span>{</div>
+<div class="line"><span class="lineno">  145</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  146</span>    Vec            in_vec_local = NULL, out_vec_global = NULL;</div>
+<div class="line"><span class="lineno">  147</span>    DM             dm_in = NULL, dm_out = NULL;</div>
+<div class="line"><span class="lineno">  148</span>    PetscInt       dof = 0;</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  151</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  152</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeNodalAverage on &#39;%s&#39; -&gt; &#39;%s&#39;.\n&quot;</span>, in_field_name, out_field_name);</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span>    <span class="comment">// --- 1. Map string names to PETSc objects ---</span></div>
+<div class="line"><span class="lineno">  155</span>    <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0)             { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>;         dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>;   dof = 1; }</div>
+<div class="line"><span class="lineno">  156</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;Ucat&quot;</span>) == 0)    { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>;      dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;  dof = 3; }</div>
+<div class="line"><span class="lineno">  157</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(in_field_name, <span class="stringliteral">&quot;Psi&quot;</span>) == 0)     { in_vec_local = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">lPsi</a>;       dm_in = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>;   dof = 1; }</div>
+<div class="line"><span class="lineno">  158</span>    <span class="comment">// ... (add other fields as needed) ...</span></div>
+<div class="line"><span class="lineno">  159</span>    <span class="keywordflow">else</span> SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG, <span class="stringliteral">&quot;Unknown input field name for nodal averaging: %s&quot;</span>, in_field_name);</div>
+<div class="line"><span class="lineno">  160</span> </div>
+<div class="line"><span class="lineno">  161</span>    <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;P_nodal&quot;</span>) == 0)      { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#a0d09ddf5e31ea3cfcab2c6bbc59b64cd">P_nodal</a>;    dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>; }</div>
+<div class="line"><span class="lineno">  162</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;Ucat_nodal&quot;</span>) == 0) { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#a585521a5dbb55ae244e34a354ac93e3f">Ucat_nodal</a>; dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>; }</div>
+<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(out_field_name, <span class="stringliteral">&quot;Psi_nodal&quot;</span>) == 0)   { out_vec_global = user-&gt;<a class="code hl_variable" href="variables_8h.html#ac0025b1b394319e0af260c6d472bd9d8">Psi_nodal</a>;  dm_out = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>; }</div>
+<div class="line"><span class="lineno">  164</span>    <span class="comment">// ... (add other fields as needed) ...</span></div>
+<div class="line"><span class="lineno">  165</span>    <span class="keywordflow">else</span> SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG, <span class="stringliteral">&quot;Unknown output field name for nodal averaging: %s&quot;</span>, out_field_name);</div>
+<div class="line"><span class="lineno">  166</span> </div>
+<div class="line"><span class="lineno">  167</span>    <span class="comment">// --- 2. Ensure Input Data Ghosts are Up-to-Date ---</span></div>
+<div class="line"><span class="lineno">  168</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, in_field_name); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  169</span> </div>
+<div class="line"><span class="lineno">  170</span>    <span class="comment">// --- 3. Get DMDA info and array pointers ---</span></div>
+<div class="line"><span class="lineno">  171</span>    DMDALocalInfo info;</div>
+<div class="line"><span class="lineno">  172</span>    ierr = DMDAGetLocalInfo(dm_out, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  173</span> </div>
+<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">if</span> (dof == 1) { <span class="comment">// --- Scalar Field Averaging ---</span></div>
+<div class="line"><span class="lineno">  175</span>        <span class="keyword">const</span> PetscReal ***l_in_arr;</div>
+<div class="line"><span class="lineno">  176</span>        PetscReal       ***g_out_arr;</div>
+<div class="line"><span class="lineno">  177</span>        ierr = DMDAVecGetArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  178</span>        ierr = DMDAVecGetArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  179</span> </div>
+<div class="line"><span class="lineno">  180</span>        <span class="comment">// Loop over the output NODE locations. The loop bounds match the required</span></div>
+<div class="line"><span class="lineno">  181</span>        <span class="comment">// size of the final subsampled grid.</span></div>
+<div class="line"><span class="lineno">  182</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm - 1; k++) {</div>
+<div class="line"><span class="lineno">  183</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym - 1; j++) {</div>
+<div class="line"><span class="lineno">  184</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm - 1; i++) {</div>
+<div class="line"><span class="lineno">  185</span>                    g_out_arr[k][j][i] = 0.125 * (l_in_arr[k][j][i]     + l_in_arr[k][j][i+1] +</div>
+<div class="line"><span class="lineno">  186</span>                                                  l_in_arr[k][j+1][i]   + l_in_arr[k][j+1][i+1] +</div>
+<div class="line"><span class="lineno">  187</span>                                                  l_in_arr[k+1][j][i]   + l_in_arr[k+1][j][i+1] +</div>
+<div class="line"><span class="lineno">  188</span>                                                  l_in_arr[k+1][j+1][i] + l_in_arr[k+1][j+1][i+1]);</div>
+<div class="line"><span class="lineno">  189</span>                }</div>
+<div class="line"><span class="lineno">  190</span>            }</div>
+<div class="line"><span class="lineno">  191</span>        }</div>
+<div class="line"><span class="lineno">  192</span>        ierr = DMDAVecRestoreArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  193</span>        ierr = DMDAVecRestoreArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  194</span> </div>
+<div class="line"><span class="lineno">  195</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (dof == 3) { <span class="comment">// --- Vector Field Averaging ---</span></div>
+<div class="line"><span class="lineno">  196</span>        <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***l_in_arr;</div>
+<div class="line"><span class="lineno">  197</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>       ***g_out_arr;</div>
+<div class="line"><span class="lineno">  198</span>        ierr = DMDAVecGetArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  199</span>        ierr = DMDAVecGetArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  200</span> </div>
+<div class="line"><span class="lineno">  201</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm - 1; k++) {</div>
+<div class="line"><span class="lineno">  202</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym - 1; j++) {</div>
+<div class="line"><span class="lineno">  203</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm - 1; i++) {</div>
+<div class="line"><span class="lineno">  204</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
+<div class="line"><span class="lineno">  205</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
+<div class="line"><span class="lineno">  206</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> +</div>
+<div class="line"><span class="lineno">  207</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><span class="lineno">  208</span> </div>
+<div class="line"><span class="lineno">  209</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
+<div class="line"><span class="lineno">  210</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
+<div class="line"><span class="lineno">  211</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> +</div>
+<div class="line"><span class="lineno">  212</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><span class="lineno">  213</span> </div>
+<div class="line"><span class="lineno">  214</span>                    g_out_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = 0.125 * (l_in_arr[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
+<div class="line"><span class="lineno">  215</span>                                                    l_in_arr[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
+<div class="line"><span class="lineno">  216</span>                                                    l_in_arr[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> +</div>
+<div class="line"><span class="lineno">  217</span>                                                    l_in_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + l_in_arr[k+1][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
+<div class="line"><span class="lineno">  218</span>                }</div>
+<div class="line"><span class="lineno">  219</span>            }</div>
+<div class="line"><span class="lineno">  220</span>        }</div>
+<div class="line"><span class="lineno">  221</span>        ierr = DMDAVecRestoreArrayRead(dm_in,in_vec_local, (<span class="keywordtype">void</span>*)&amp;l_in_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  222</span>        ierr = DMDAVecRestoreArray(dm_out,out_vec_global, (<span class="keywordtype">void</span>*)&amp;g_out_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  223</span>    }</div>
+<div class="line"><span class="lineno">  224</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  225</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  226</span>}</div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
-<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00761">logging.h:761</a></div></div>
+<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00758">logging.h:758</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
-<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00752">logging.h:752</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01193">setup.c:1193</a></div></div>
+<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00749">logging.h:749</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01118">setup.c:1118</a></div></div>
 <div class="ttc" id="avariables_8h_html_a0d09ddf5e31ea3cfcab2c6bbc59b64cd"><div class="ttname"><a href="variables_8h.html#a0d09ddf5e31ea3cfcab2c6bbc59b64cd">UserCtx::P_nodal</a></div><div class="ttdeci">Vec P_nodal</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00814">variables.h:814</a></div></div>
 <div class="ttc" id="avariables_8h_html_a585521a5dbb55ae244e34a354ac93e3f"><div class="ttname"><a href="variables_8h.html#a585521a5dbb55ae244e34a354ac93e3f">UserCtx::Ucat_nodal</a></div><div class="ttdeci">Vec Ucat_nodal</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00815">variables.h:815</a></div></div>
 <div class="ttc" id="avariables_8h_html_a5cba4fd26ff1b619d2f2b8cdd0c92372"><div class="ttname"><a href="variables_8h.html#a5cba4fd26ff1b619d2f2b8cdd0c92372">UserCtx::lPsi</a></div><div class="ttdeci">Vec lPsi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00810">variables.h:810</a></div></div>
@@ -283,7 +285,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_ad5b0c0f1721b13944b83a57f2471cd02_icgraph.svg" width="562" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_ad5b0c0f1721b13944b83a57f2471cd02_icgraph.svg" width="100%" height="413"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -304,137 +306,139 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the Q-Criterion, a scalar value identifying vortex cores. </p>
-<p>This function is self-contained. It ensures all its required input data (Ucat and grid metrics) have up-to-date ghost values before proceeding with the calculation. The result is stored in the global vector user-&gt;Qcrit.</p>
+<p>Computes the Q-criterion diagnostic from the local velocity-gradient tensor. </p>
+<p>This kernel evaluates rotational versus strain-rate dominance and writes the result into the configured Q-criterion output vector for visualization and flow feature identification.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">user</td><td>The <a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a>, providing access to all necessary data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">user</td><td>Block-level context containing velocity fields and target output storage. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success.</dd></dl>
+<p>Computes the Q-criterion diagnostic from the local velocity-gradient tensor.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="postprocessing__kernels_8h.html">include/postprocessing_kernels.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="postprocessing__kernels_8h.html#a303c5afb89d6fdaab3e40f9371d8f1b2" title="Computes the Q-criterion diagnostic from the local velocity-gradient tensor.">ComputeQCriterion()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00264">264</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  265</span>{</div>
-<div class="line"><span class="lineno">  266</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  267</span>    DMDALocalInfo  info;</div>
-<div class="line"><span class="lineno">  268</span>    <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>   ***lucat, ***lcsi, ***leta, ***lzet;</div>
-<div class="line"><span class="lineno">  269</span>    <span class="keyword">const</span> PetscReal***laj, ***lnvert;</div>
-<div class="line"><span class="lineno">  270</span>    PetscReal      ***gq;</div>
-<div class="line"><span class="lineno">  271</span> </div>
-<div class="line"><span class="lineno">  272</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  273</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  274</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeQCriterion.\n&quot;</span>);</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00237">237</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  238</span>{</div>
+<div class="line"><span class="lineno">  239</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  240</span>    DMDALocalInfo  info;</div>
+<div class="line"><span class="lineno">  241</span>    <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>   ***lucat, ***lcsi, ***leta, ***lzet;</div>
+<div class="line"><span class="lineno">  242</span>    <span class="keyword">const</span> PetscReal***laj, ***lnvert;</div>
+<div class="line"><span class="lineno">  243</span>    PetscReal      ***gq;</div>
+<div class="line"><span class="lineno">  244</span> </div>
+<div class="line"><span class="lineno">  245</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  246</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  247</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeQCriterion.\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>    <span class="comment">// --- 1. Ensure all required ghost values are up-to-date ---</span></div>
+<div class="line"><span class="lineno">  250</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Ucat&quot;</span>);  CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  251</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Csi&quot;</span>);   CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  252</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Eta&quot;</span>);   CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  253</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Zet&quot;</span>);   CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  254</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Aj&quot;</span>);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  255</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Nvert&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  256</span> </div>
+<div class="line"><span class="lineno">  257</span>    <span class="comment">// --- 2. Get DMDA info and array pointers ---</span></div>
+<div class="line"><span class="lineno">  258</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  259</span>    </div>
+<div class="line"><span class="lineno">  260</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>,  (<span class="keywordtype">void</span>*)&amp;lucat);   CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  261</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>,   (<span class="keywordtype">void</span>*)&amp;lcsi);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  262</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>,   (<span class="keywordtype">void</span>*)&amp;leta);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  263</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>,   (<span class="keywordtype">void</span>*)&amp;lzet);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  264</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,    (<span class="keywordtype">void</span>*)&amp;laj);     CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  265</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keywordtype">void</span>*)&amp;lnvert);  CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  266</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a">Qcrit</a>, (<span class="keywordtype">void</span>*)&amp;gq);       CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  267</span> </div>
+<div class="line"><span class="lineno">  268</span>    <span class="comment">// --- 3. Define Loop Bounds for INTERIOR Cells ---</span></div>
+<div class="line"><span class="lineno">  269</span>    PetscInt i_start = (info.xs == 0) ? 1 : info.xs;</div>
+<div class="line"><span class="lineno">  270</span>    PetscInt i_end   = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
+<div class="line"><span class="lineno">  271</span>    PetscInt j_start = (info.ys == 0) ? 1 : info.ys;</div>
+<div class="line"><span class="lineno">  272</span>    PetscInt j_end   = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
+<div class="line"><span class="lineno">  273</span>    PetscInt k_start = (info.zs == 0) ? 1 : info.zs;</div>
+<div class="line"><span class="lineno">  274</span>    PetscInt k_end   = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
 <div class="line"><span class="lineno">  275</span> </div>
-<div class="line"><span class="lineno">  276</span>    <span class="comment">// --- 1. Ensure all required ghost values are up-to-date ---</span></div>
-<div class="line"><span class="lineno">  277</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Ucat&quot;</span>);  CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  278</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Csi&quot;</span>);   CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  279</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Eta&quot;</span>);   CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  280</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Zet&quot;</span>);   CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  281</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Aj&quot;</span>);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  282</span>    ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Nvert&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  283</span> </div>
-<div class="line"><span class="lineno">  284</span>    <span class="comment">// --- 2. Get DMDA info and array pointers ---</span></div>
-<div class="line"><span class="lineno">  285</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  286</span>    </div>
-<div class="line"><span class="lineno">  287</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>,  (<span class="keywordtype">void</span>*)&amp;lucat);   CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  288</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>,   (<span class="keywordtype">void</span>*)&amp;lcsi);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  289</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>,   (<span class="keywordtype">void</span>*)&amp;leta);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  290</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>,   (<span class="keywordtype">void</span>*)&amp;lzet);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  291</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,    (<span class="keywordtype">void</span>*)&amp;laj);     CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  292</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keywordtype">void</span>*)&amp;lnvert);  CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  293</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a">Qcrit</a>, (<span class="keywordtype">void</span>*)&amp;gq);       CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  294</span> </div>
-<div class="line"><span class="lineno">  295</span>    <span class="comment">// --- 3. Define Loop Bounds for INTERIOR Cells ---</span></div>
-<div class="line"><span class="lineno">  296</span>    PetscInt i_start = (info.xs == 0) ? 1 : info.xs;</div>
-<div class="line"><span class="lineno">  297</span>    PetscInt i_end   = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
-<div class="line"><span class="lineno">  298</span>    PetscInt j_start = (info.ys == 0) ? 1 : info.ys;</div>
-<div class="line"><span class="lineno">  299</span>    PetscInt j_end   = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
-<div class="line"><span class="lineno">  300</span>    PetscInt k_start = (info.zs == 0) ? 1 : info.zs;</div>
-<div class="line"><span class="lineno">  301</span>    PetscInt k_end   = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
+<div class="line"><span class="lineno">  276</span>    <span class="comment">// --- 4. Main Computation Loop ---</span></div>
+<div class="line"><span class="lineno">  277</span>    <span class="keywordflow">for</span> (PetscInt k = k_start; k &lt; k_end; k++) {</div>
+<div class="line"><span class="lineno">  278</span>        <span class="keywordflow">for</span> (PetscInt j = j_start; j &lt; j_end; j++) {</div>
+<div class="line"><span class="lineno">  279</span>            <span class="keywordflow">for</span> (PetscInt i = i_start; i &lt; i_end; i++) {</div>
+<div class="line"><span class="lineno">  280</span>                </div>
+<div class="line"><span class="lineno">  281</span>                <span class="comment">// Calculate velocity derivatives in computational space (central differences)</span></div>
+<div class="line"><span class="lineno">  282</span>                PetscReal uc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><span class="lineno">  283</span>                PetscReal vc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><span class="lineno">  284</span>                PetscReal wc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
+<div class="line"><span class="lineno">  285</span> </div>
+<div class="line"><span class="lineno">  286</span>                PetscReal ue = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><span class="lineno">  287</span>                PetscReal ve = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><span class="lineno">  288</span>                PetscReal we = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
+<div class="line"><span class="lineno">  289</span> </div>
+<div class="line"><span class="lineno">  290</span>                PetscReal uz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><span class="lineno">  291</span>                PetscReal vz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><span class="lineno">  292</span>                PetscReal wz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
+<div class="line"><span class="lineno">  293</span> </div>
+<div class="line"><span class="lineno">  294</span>                <span class="comment">// Average metrics to the cell center</span></div>
+<div class="line"><span class="lineno">  295</span>                PetscReal csi1 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  296</span>                PetscReal csi2 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  297</span>                PetscReal csi3 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  298</span>                </div>
+<div class="line"><span class="lineno">  299</span>                PetscReal eta1 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  300</span>                PetscReal eta2 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  301</span>                PetscReal eta3 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
 <div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>    <span class="comment">// --- 4. Main Computation Loop ---</span></div>
-<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">for</span> (PetscInt k = k_start; k &lt; k_end; k++) {</div>
-<div class="line"><span class="lineno">  305</span>        <span class="keywordflow">for</span> (PetscInt j = j_start; j &lt; j_end; j++) {</div>
-<div class="line"><span class="lineno">  306</span>            <span class="keywordflow">for</span> (PetscInt i = i_start; i &lt; i_end; i++) {</div>
-<div class="line"><span class="lineno">  307</span>                </div>
-<div class="line"><span class="lineno">  308</span>                <span class="comment">// Calculate velocity derivatives in computational space (central differences)</span></div>
-<div class="line"><span class="lineno">  309</span>                PetscReal uc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><span class="lineno">  310</span>                PetscReal vc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><span class="lineno">  311</span>                PetscReal wc = 0.5 * (lucat[k][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
-<div class="line"><span class="lineno">  312</span> </div>
-<div class="line"><span class="lineno">  313</span>                PetscReal ue = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><span class="lineno">  314</span>                PetscReal ve = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><span class="lineno">  315</span>                PetscReal we = 0.5 * (lucat[k][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
-<div class="line"><span class="lineno">  316</span> </div>
-<div class="line"><span class="lineno">  317</span>                PetscReal uz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><span class="lineno">  318</span>                PetscReal vz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><span class="lineno">  319</span>                PetscReal wz = 0.5 * (lucat[k+1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> - lucat[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>);</div>
-<div class="line"><span class="lineno">  320</span> </div>
-<div class="line"><span class="lineno">  321</span>                <span class="comment">// Average metrics to the cell center</span></div>
-<div class="line"><span class="lineno">  322</span>                PetscReal csi1 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  323</span>                PetscReal csi2 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  324</span>                PetscReal csi3 = 0.5 * (lcsi[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + lcsi[k][j][i-1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  325</span>                </div>
-<div class="line"><span class="lineno">  326</span>                PetscReal eta1 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  327</span>                PetscReal eta2 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  328</span>                PetscReal eta3 = 0.5 * (leta[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + leta[k][j-1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  329</span> </div>
-<div class="line"><span class="lineno">  330</span>                PetscReal zet1 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  331</span>                PetscReal zet2 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  332</span>                PetscReal zet3 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
-<div class="line"><span class="lineno">  333</span> </div>
-<div class="line"><span class="lineno">  334</span>                <span class="comment">// Calculate velocity gradient tensor components d_ij = du_i/dx_j</span></div>
-<div class="line"><span class="lineno">  335</span>                PetscReal d11 = uc * csi1 + ue * eta1 + uz * zet1;</div>
-<div class="line"><span class="lineno">  336</span>                PetscReal d12 = uc * csi2 + ue * eta2 + uz * zet2;</div>
-<div class="line"><span class="lineno">  337</span>                PetscReal d13 = uc * csi3 + ue * eta3 + uz * zet3;</div>
+<div class="line"><span class="lineno">  303</span>                PetscReal zet1 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  304</span>                PetscReal zet2 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  305</span>                PetscReal zet3 = 0.5 * (lzet[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + lzet[k-1][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>) * laj[k][j][i];</div>
+<div class="line"><span class="lineno">  306</span> </div>
+<div class="line"><span class="lineno">  307</span>                <span class="comment">// Calculate velocity gradient tensor components d_ij = du_i/dx_j</span></div>
+<div class="line"><span class="lineno">  308</span>                PetscReal d11 = uc * csi1 + ue * eta1 + uz * zet1;</div>
+<div class="line"><span class="lineno">  309</span>                PetscReal d12 = uc * csi2 + ue * eta2 + uz * zet2;</div>
+<div class="line"><span class="lineno">  310</span>                PetscReal d13 = uc * csi3 + ue * eta3 + uz * zet3;</div>
+<div class="line"><span class="lineno">  311</span> </div>
+<div class="line"><span class="lineno">  312</span>                PetscReal d21 = vc * csi1 + ve * eta1 + vz * zet1;</div>
+<div class="line"><span class="lineno">  313</span>                PetscReal d22 = vc * csi2 + ve * eta2 + vz * zet2;</div>
+<div class="line"><span class="lineno">  314</span>                PetscReal d23 = vc * csi3 + ve * eta3 + vz * zet3;</div>
+<div class="line"><span class="lineno">  315</span>                </div>
+<div class="line"><span class="lineno">  316</span>                PetscReal d31 = wc * csi1 + we * eta1 + wz * zet1;</div>
+<div class="line"><span class="lineno">  317</span>                PetscReal d32 = wc * csi2 + we * eta2 + wz * zet2;</div>
+<div class="line"><span class="lineno">  318</span>                PetscReal d33 = wc * csi3 + we * eta3 + wz * zet3;</div>
+<div class="line"><span class="lineno">  319</span> </div>
+<div class="line"><span class="lineno">  320</span>                <span class="comment">// Strain-Rate Tensor S_ij = 0.5 * (d_ij + d_ji)</span></div>
+<div class="line"><span class="lineno">  321</span>                PetscReal s11 = d11;</div>
+<div class="line"><span class="lineno">  322</span>                PetscReal s12 = 0.5 * (d12 + d21);</div>
+<div class="line"><span class="lineno">  323</span>                PetscReal s13 = 0.5 * (d13 + d31);</div>
+<div class="line"><span class="lineno">  324</span>                PetscReal s22 = d22;</div>
+<div class="line"><span class="lineno">  325</span>                PetscReal s23 = 0.5 * (d23 + d32);</div>
+<div class="line"><span class="lineno">  326</span>                PetscReal s33 = d33;</div>
+<div class="line"><span class="lineno">  327</span> </div>
+<div class="line"><span class="lineno">  328</span>                <span class="comment">// Vorticity Tensor Omega_ij = 0.5 * (d_ij - d_ji)</span></div>
+<div class="line"><span class="lineno">  329</span>                PetscReal w12 = 0.5 * (d12 - d21);</div>
+<div class="line"><span class="lineno">  330</span>                PetscReal w13 = 0.5 * (d13 - d31);</div>
+<div class="line"><span class="lineno">  331</span>                PetscReal w23 = 0.5 * (d23 - d32);</div>
+<div class="line"><span class="lineno">  332</span> </div>
+<div class="line"><span class="lineno">  333</span>                <span class="comment">// Squared norms of the tensors</span></div>
+<div class="line"><span class="lineno">  334</span>                PetscReal s_norm_sq = s11*s11 + s22*s22 + s33*s33 + 2.0*(s12*s12 + s13*s13 + s23*s23);</div>
+<div class="line"><span class="lineno">  335</span>                PetscReal w_norm_sq = 2.0 * (w12*w12 + w13*w13 + w23*w23);</div>
+<div class="line"><span class="lineno">  336</span>                </div>
+<div class="line"><span class="lineno">  337</span>                gq[k][j][i] = 0.5 * (w_norm_sq - s_norm_sq);</div>
 <div class="line"><span class="lineno">  338</span> </div>
-<div class="line"><span class="lineno">  339</span>                PetscReal d21 = vc * csi1 + ve * eta1 + vz * zet1;</div>
-<div class="line"><span class="lineno">  340</span>                PetscReal d22 = vc * csi2 + ve * eta2 + vz * zet2;</div>
-<div class="line"><span class="lineno">  341</span>                PetscReal d23 = vc * csi3 + ve * eta3 + vz * zet3;</div>
-<div class="line"><span class="lineno">  342</span>                </div>
-<div class="line"><span class="lineno">  343</span>                PetscReal d31 = wc * csi1 + we * eta1 + wz * zet1;</div>
-<div class="line"><span class="lineno">  344</span>                PetscReal d32 = wc * csi2 + we * eta2 + wz * zet2;</div>
-<div class="line"><span class="lineno">  345</span>                PetscReal d33 = wc * csi3 + we * eta3 + wz * zet3;</div>
-<div class="line"><span class="lineno">  346</span> </div>
-<div class="line"><span class="lineno">  347</span>                <span class="comment">// Strain-Rate Tensor S_ij = 0.5 * (d_ij + d_ji)</span></div>
-<div class="line"><span class="lineno">  348</span>                PetscReal s11 = d11;</div>
-<div class="line"><span class="lineno">  349</span>                PetscReal s12 = 0.5 * (d12 + d21);</div>
-<div class="line"><span class="lineno">  350</span>                PetscReal s13 = 0.5 * (d13 + d31);</div>
-<div class="line"><span class="lineno">  351</span>                PetscReal s22 = d22;</div>
-<div class="line"><span class="lineno">  352</span>                PetscReal s23 = 0.5 * (d23 + d32);</div>
-<div class="line"><span class="lineno">  353</span>                PetscReal s33 = d33;</div>
+<div class="line"><span class="lineno">  339</span>                <span class="keywordflow">if</span> (lnvert[k][j][i] &gt; 0.1) {</div>
+<div class="line"><span class="lineno">  340</span>                    gq[k][j][i] = 0.0;</div>
+<div class="line"><span class="lineno">  341</span>                }</div>
+<div class="line"><span class="lineno">  342</span>            }</div>
+<div class="line"><span class="lineno">  343</span>        }</div>
+<div class="line"><span class="lineno">  344</span>    }</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>    <span class="comment">// --- 5. Restore arrays ---</span></div>
+<div class="line"><span class="lineno">  347</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>,  (<span class="keywordtype">void</span>*)&amp;lucat);   CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  348</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>,   (<span class="keywordtype">void</span>*)&amp;lcsi);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  349</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>,   (<span class="keywordtype">void</span>*)&amp;leta);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  350</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>,   (<span class="keywordtype">void</span>*)&amp;lzet);    CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  351</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,    (<span class="keywordtype">void</span>*)&amp;laj);     CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  352</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keywordtype">void</span>*)&amp;lnvert);  CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  353</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a">Qcrit</a>, (<span class="keywordtype">void</span>*)&amp;gq);       CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno">  354</span> </div>
-<div class="line"><span class="lineno">  355</span>                <span class="comment">// Vorticity Tensor Omega_ij = 0.5 * (d_ij - d_ji)</span></div>
-<div class="line"><span class="lineno">  356</span>                PetscReal w12 = 0.5 * (d12 - d21);</div>
-<div class="line"><span class="lineno">  357</span>                PetscReal w13 = 0.5 * (d13 - d31);</div>
-<div class="line"><span class="lineno">  358</span>                PetscReal w23 = 0.5 * (d23 - d32);</div>
-<div class="line"><span class="lineno">  359</span> </div>
-<div class="line"><span class="lineno">  360</span>                <span class="comment">// Squared norms of the tensors</span></div>
-<div class="line"><span class="lineno">  361</span>                PetscReal s_norm_sq = s11*s11 + s22*s22 + s33*s33 + 2.0*(s12*s12 + s13*s13 + s23*s23);</div>
-<div class="line"><span class="lineno">  362</span>                PetscReal w_norm_sq = 2.0 * (w12*w12 + w13*w13 + w23*w23);</div>
-<div class="line"><span class="lineno">  363</span>                </div>
-<div class="line"><span class="lineno">  364</span>                gq[k][j][i] = 0.5 * (w_norm_sq - s_norm_sq);</div>
-<div class="line"><span class="lineno">  365</span> </div>
-<div class="line"><span class="lineno">  366</span>                <span class="keywordflow">if</span> (lnvert[k][j][i] &gt; 0.1) {</div>
-<div class="line"><span class="lineno">  367</span>                    gq[k][j][i] = 0.0;</div>
-<div class="line"><span class="lineno">  368</span>                }</div>
-<div class="line"><span class="lineno">  369</span>            }</div>
-<div class="line"><span class="lineno">  370</span>        }</div>
-<div class="line"><span class="lineno">  371</span>    }</div>
-<div class="line"><span class="lineno">  372</span> </div>
-<div class="line"><span class="lineno">  373</span>    <span class="comment">// --- 5. Restore arrays ---</span></div>
-<div class="line"><span class="lineno">  374</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>,  (<span class="keywordtype">void</span>*)&amp;lucat);   CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  375</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>,   (<span class="keywordtype">void</span>*)&amp;lcsi);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  376</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>,   (<span class="keywordtype">void</span>*)&amp;leta);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  377</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>,   (<span class="keywordtype">void</span>*)&amp;lzet);    CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  378</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>,    (<span class="keywordtype">void</span>*)&amp;laj);     CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  379</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keywordtype">void</span>*)&amp;lnvert);  CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  380</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>,  user-&gt;<a class="code hl_variable" href="variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a">Qcrit</a>, (<span class="keywordtype">void</span>*)&amp;gq);       CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  381</span> </div>
-<div class="line"><span class="lineno">  382</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  383</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  384</span>}</div>
+<div class="line"><span class="lineno">  355</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  356</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  357</span>}</div>
 <div class="ttc" id="avariables_8h_html_a2f213dcdaf9617bfb44e4f22857f2e56"><div class="ttname"><a href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">UserCtx::lNvert</a></div><div class="ttdeci">Vec lNvert</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00764">variables.h:764</a></div></div>
 <div class="ttc" id="avariables_8h_html_a414751d7a391a78834cdce87b52a066f"><div class="ttname"><a href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">UserCtx::lZet</a></div><div class="ttdeci">Vec lZet</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00785">variables.h:785</a></div></div>
 <div class="ttc" id="avariables_8h_html_a70969e8333ab8fd8eb60acc1f22f830a"><div class="ttname"><a href="variables_8h.html#a70969e8333ab8fd8eb60acc1f22f830a">UserCtx::Qcrit</a></div><div class="ttdeci">Vec Qcrit</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00816">variables.h:816</a></div></div>
@@ -449,7 +453,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a303c5afb89d6fdaab3e40f9371d8f1b2_icgraph.svg" width="536" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a303c5afb89d6fdaab3e40f9371d8f1b2_icgraph.svg" width="100%" height="413"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -480,92 +484,94 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Normalizes a relative field by subtracting a reference value. </p>
-<p>This kernel finds the relative field at a specific grid point (i,j,k) and subtracts this value from the entire field. The reference point is configurable via command-line options (-ip, -jp, -kp). The operation is performed in-place on the provided relative field vector.</p>
+<p>Normalizes a relative scalar field using the configured reference pressure scale. </p>
+<p>This is primarily used for pressure-normalized outputs in post-processing. The operation is in-place on the selected field.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">user</td><td>The <a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a>, providing access to DMs and Vecs. </td></tr>
-    <tr><td class="paramname">relative_field_name</td><td>The string name of the relative field Vec to normalize (e.g., "P"). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">user</td><td>Block-level context containing scaling information. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">relative_field_name</td><td>Name of the field to normalize. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success.</dd></dl>
+<p>Normalizes a relative scalar field using the configured reference pressure scale.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="postprocessing__kernels_8h.html">include/postprocessing_kernels.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="postprocessing__kernels_8h.html#a86d13bca79c1355ce808509a999a1d88" title="Normalizes a relative scalar field using the configured reference pressure scale.">NormalizeRelativeField()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00400">400</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  401</span>{</div>
-<div class="line"><span class="lineno">  402</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  403</span>    Vec            P_vec = NULL;</div>
-<div class="line"><span class="lineno">  404</span>    PetscMPIInt    rank;</div>
-<div class="line"><span class="lineno">  405</span>    PetscInt       ip=1, jp=1, kp=1; <span class="comment">// Default reference point</span></div>
-<div class="line"><span class="lineno">  406</span>    PetscReal      p_ref = 0.0;</div>
-<div class="line"><span class="lineno">  407</span>    PetscInt       ref_point_global_idx[1];</div>
-<div class="line"><span class="lineno">  408</span>    PetscScalar    ref_value_local[1];</div>
-<div class="line"><span class="lineno">  409</span>    IS             is_from, is_to;</div>
-<div class="line"><span class="lineno">  410</span>    VecScatter     scatter_ctx;</div>
-<div class="line"><span class="lineno">  411</span>    Vec            ref_vec_seq;</div>
-<div class="line"><span class="lineno">  412</span>    <a class="code hl_struct" href="variables_8h.html#structPostProcessParams">PostProcessParams</a> *pps = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>;</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00367">367</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  368</span>{</div>
+<div class="line"><span class="lineno">  369</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  370</span>    Vec            P_vec = NULL;</div>
+<div class="line"><span class="lineno">  371</span>    PetscMPIInt    rank;</div>
+<div class="line"><span class="lineno">  372</span>    PetscInt       ip=1, jp=1, kp=1; <span class="comment">// Default reference point</span></div>
+<div class="line"><span class="lineno">  373</span>    PetscReal      p_ref = 0.0;</div>
+<div class="line"><span class="lineno">  374</span>    PetscInt       ref_point_global_idx[1];</div>
+<div class="line"><span class="lineno">  375</span>    PetscScalar    ref_value_local[1];</div>
+<div class="line"><span class="lineno">  376</span>    IS             is_from, is_to;</div>
+<div class="line"><span class="lineno">  377</span>    VecScatter     scatter_ctx;</div>
+<div class="line"><span class="lineno">  378</span>    Vec            ref_vec_seq;</div>
+<div class="line"><span class="lineno">  379</span>    <a class="code hl_struct" href="variables_8h.html#structPostProcessParams">PostProcessParams</a> *pps = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#acf6d729ae4d0d996d6b056ccc5438995">pps</a>;</div>
+<div class="line"><span class="lineno">  380</span> </div>
+<div class="line"><span class="lineno">  381</span>    <span class="comment">// Fetch referenc point from pps.</span></div>
+<div class="line"><span class="lineno">  382</span>    ip = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0];</div>
+<div class="line"><span class="lineno">  383</span>    jp = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1];</div>
+<div class="line"><span class="lineno">  384</span>    kp = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2];</div>
+<div class="line"><span class="lineno">  385</span> </div>
+<div class="line"><span class="lineno">  386</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  387</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  388</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running NormalizeRelativeField on &#39;%s&#39;.\n&quot;</span>, relative_field_name);</div>
+<div class="line"><span class="lineno">  389</span> </div>
+<div class="line"><span class="lineno">  390</span>    <span class="comment">// --- 1. Map string argument to the PETSc Vec ---</span></div>
+<div class="line"><span class="lineno">  391</span>    <span class="keywordflow">if</span> (strcasecmp(relative_field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">  392</span>        P_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>;</div>
+<div class="line"><span class="lineno">  393</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  394</span>        SETERRQ(PETSC_COMM_SELF, 1, <span class="stringliteral">&quot;NormalizeRelativeField only supports the primary &#39;P&#39; field , not &#39;%s&#39; currently.&quot;</span>, relative_field_name);</div>
+<div class="line"><span class="lineno">  395</span>    }</div>
+<div class="line"><span class="lineno">  396</span> </div>
+<div class="line"><span class="lineno">  397</span>    <span class="comment">// --- 2. Get reference point from options and calculate its global DA index ---</span></div>
+<div class="line"><span class="lineno">  398</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  399</span> </div>
+<div class="line"><span class="lineno">  400</span>    <span class="comment">// Convert the (i,j,k) logical grid coordinates to the global 1D index used by the DMDA vector</span></div>
+<div class="line"><span class="lineno">  401</span>    ref_point_global_idx[0] = kp * (user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> * user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a>) + jp * user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> + ip;</div>
+<div class="line"><span class="lineno">  402</span> </div>
+<div class="line"><span class="lineno">  403</span>    <span class="comment">// --- 3. Robustly Scatter the single reference value to rank 0 ---</span></div>
+<div class="line"><span class="lineno">  404</span>    <span class="comment">// Create an Index Set (IS) for the source point (from the global vector)</span></div>
+<div class="line"><span class="lineno">  405</span>    ierr = ISCreateGeneral(PETSC_COMM_WORLD, 1, ref_point_global_idx, PETSC_COPY_VALUES, &amp;is_from); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  406</span> </div>
+<div class="line"><span class="lineno">  407</span>    <span class="comment">// Create a sequential vector on rank 0 to hold the result</span></div>
+<div class="line"><span class="lineno">  408</span>    ierr = VecCreateSeq(PETSC_COMM_SELF, 1, &amp;ref_vec_seq); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  409</span>    </div>
+<div class="line"><span class="lineno">  410</span>    <span class="comment">// Create an Index Set for the destination point (index 0 of the new sequential vector)</span></div>
+<div class="line"><span class="lineno">  411</span>    PetscInt dest_idx[1] = {0};</div>
+<div class="line"><span class="lineno">  412</span>    ierr = ISCreateGeneral(PETSC_COMM_SELF, 1, dest_idx, PETSC_COPY_VALUES, &amp;is_to); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno">  413</span> </div>
-<div class="line"><span class="lineno">  414</span>    <span class="comment">// Fetch referenc point from pps.</span></div>
-<div class="line"><span class="lineno">  415</span>    ip = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[0];</div>
-<div class="line"><span class="lineno">  416</span>    jp = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[1];</div>
-<div class="line"><span class="lineno">  417</span>    kp = pps-&gt;<a class="code hl_variable" href="variables_8h.html#a529f45c4ddf21ba85640423978d30ada">reference</a>[2];</div>
+<div class="line"><span class="lineno">  414</span>    <span class="comment">// Create the scatter context and perform the scatter</span></div>
+<div class="line"><span class="lineno">  415</span>    ierr = VecScatterCreate(P_vec, is_from, ref_vec_seq, is_to, &amp;scatter_ctx); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  416</span>    ierr = VecScatterBegin(scatter_ctx, P_vec, ref_vec_seq, INSERT_VALUES, SCATTER_FORWARD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  417</span>    ierr = VecScatterEnd(scatter_ctx, P_vec, ref_vec_seq, INSERT_VALUES, SCATTER_FORWARD); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno">  418</span> </div>
-<div class="line"><span class="lineno">  419</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  420</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  421</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running NormalizeRelativeField on &#39;%s&#39;.\n&quot;</span>, relative_field_name);</div>
-<div class="line"><span class="lineno">  422</span> </div>
-<div class="line"><span class="lineno">  423</span>    <span class="comment">// --- 1. Map string argument to the PETSc Vec ---</span></div>
-<div class="line"><span class="lineno">  424</span>    <span class="keywordflow">if</span> (strcasecmp(relative_field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">  425</span>        P_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>;</div>
-<div class="line"><span class="lineno">  426</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  427</span>        SETERRQ(PETSC_COMM_SELF, 1, <span class="stringliteral">&quot;NormalizeRelativeField only supports the primary &#39;P&#39; field , not &#39;%s&#39; currently.&quot;</span>, relative_field_name);</div>
-<div class="line"><span class="lineno">  428</span>    }</div>
-<div class="line"><span class="lineno">  429</span> </div>
-<div class="line"><span class="lineno">  430</span>    <span class="comment">// --- 2. Get reference point from options and calculate its global DA index ---</span></div>
-<div class="line"><span class="lineno">  431</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  432</span> </div>
-<div class="line"><span class="lineno">  433</span>    <span class="comment">// Convert the (i,j,k) logical grid coordinates to the global 1D index used by the DMDA vector</span></div>
-<div class="line"><span class="lineno">  434</span>    ref_point_global_idx[0] = kp * (user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> * user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a>) + jp * user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> + ip;</div>
-<div class="line"><span class="lineno">  435</span> </div>
-<div class="line"><span class="lineno">  436</span>    <span class="comment">// --- 3. Robustly Scatter the single reference value to rank 0 ---</span></div>
-<div class="line"><span class="lineno">  437</span>    <span class="comment">// Create an Index Set (IS) for the source point (from the global vector)</span></div>
-<div class="line"><span class="lineno">  438</span>    ierr = ISCreateGeneral(PETSC_COMM_WORLD, 1, ref_point_global_idx, PETSC_COPY_VALUES, &amp;is_from); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  439</span> </div>
-<div class="line"><span class="lineno">  440</span>    <span class="comment">// Create a sequential vector on rank 0 to hold the result</span></div>
-<div class="line"><span class="lineno">  441</span>    ierr = VecCreateSeq(PETSC_COMM_SELF, 1, &amp;ref_vec_seq); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  442</span>    </div>
-<div class="line"><span class="lineno">  443</span>    <span class="comment">// Create an Index Set for the destination point (index 0 of the new sequential vector)</span></div>
-<div class="line"><span class="lineno">  444</span>    PetscInt dest_idx[1] = {0};</div>
-<div class="line"><span class="lineno">  445</span>    ierr = ISCreateGeneral(PETSC_COMM_SELF, 1, dest_idx, PETSC_COPY_VALUES, &amp;is_to); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  446</span> </div>
-<div class="line"><span class="lineno">  447</span>    <span class="comment">// Create the scatter context and perform the scatter</span></div>
-<div class="line"><span class="lineno">  448</span>    ierr = VecScatterCreate(P_vec, is_from, ref_vec_seq, is_to, &amp;scatter_ctx); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  449</span>    ierr = VecScatterBegin(scatter_ctx, P_vec, ref_vec_seq, INSERT_VALUES, SCATTER_FORWARD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  450</span>    ierr = VecScatterEnd(scatter_ctx, P_vec, ref_vec_seq, INSERT_VALUES, SCATTER_FORWARD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  451</span> </div>
-<div class="line"><span class="lineno">  452</span>    <span class="comment">// On rank 0, get the value. On other ranks, this will do nothing.</span></div>
-<div class="line"><span class="lineno">  453</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
-<div class="line"><span class="lineno">  454</span>        ierr = VecGetValues(ref_vec_seq, 1, dest_idx, ref_value_local); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  455</span>        p_ref = ref_value_local[0];</div>
-<div class="line"><span class="lineno">  456</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;%s reference point (%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;, %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;, %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;) has value %g.\n&quot;</span>, relative_field_name, jp, kp, ip, p_ref);</div>
-<div class="line"><span class="lineno">  457</span>    }</div>
-<div class="line"><span class="lineno">  458</span>    </div>
-<div class="line"><span class="lineno">  459</span>    <span class="comment">// --- 4. Broadcast the reference value from rank 0 to all other processes ---</span></div>
-<div class="line"><span class="lineno">  460</span>    ierr = MPI_Bcast(&amp;p_ref, 1, MPIU_REAL, 0, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  461</span> </div>
-<div class="line"><span class="lineno">  462</span>    <span class="comment">// --- 5. Perform the normalization (in-place shift) on the full distributed vector ---</span></div>
-<div class="line"><span class="lineno">  463</span>    ierr = VecShift(P_vec, -p_ref); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  464</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;%s field normalized by subtracting %g.\n&quot;</span>, relative_field_name, p_ref);</div>
-<div class="line"><span class="lineno">  465</span>    </div>
-<div class="line"><span class="lineno">  466</span>    <span class="comment">// --- 6. Cleanup ---</span></div>
-<div class="line"><span class="lineno">  467</span>    ierr = ISDestroy(&amp;is_from); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  468</span>    ierr = ISDestroy(&amp;is_to); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  469</span>    ierr = VecScatterDestroy(&amp;scatter_ctx); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  470</span>    ierr = VecDestroy(&amp;ref_vec_seq); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  471</span> </div>
-<div class="line"><span class="lineno">  472</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  473</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  474</span>}</div>
+<div class="line"><span class="lineno">  419</span>    <span class="comment">// On rank 0, get the value. On other ranks, this will do nothing.</span></div>
+<div class="line"><span class="lineno">  420</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line"><span class="lineno">  421</span>        ierr = VecGetValues(ref_vec_seq, 1, dest_idx, ref_value_local); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  422</span>        p_ref = ref_value_local[0];</div>
+<div class="line"><span class="lineno">  423</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;%s reference point (%&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;, %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;, %&quot;</span> PetscInt_FMT <span class="stringliteral">&quot;) has value %g.\n&quot;</span>, relative_field_name, jp, kp, ip, p_ref);</div>
+<div class="line"><span class="lineno">  424</span>    }</div>
+<div class="line"><span class="lineno">  425</span>    </div>
+<div class="line"><span class="lineno">  426</span>    <span class="comment">// --- 4. Broadcast the reference value from rank 0 to all other processes ---</span></div>
+<div class="line"><span class="lineno">  427</span>    ierr = MPI_Bcast(&amp;p_ref, 1, MPIU_REAL, 0, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  428</span> </div>
+<div class="line"><span class="lineno">  429</span>    <span class="comment">// --- 5. Perform the normalization (in-place shift) on the full distributed vector ---</span></div>
+<div class="line"><span class="lineno">  430</span>    ierr = VecShift(P_vec, -p_ref); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  431</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;%s field normalized by subtracting %g.\n&quot;</span>, relative_field_name, p_ref);</div>
+<div class="line"><span class="lineno">  432</span>    </div>
+<div class="line"><span class="lineno">  433</span>    <span class="comment">// --- 6. Cleanup ---</span></div>
+<div class="line"><span class="lineno">  434</span>    ierr = ISDestroy(&amp;is_from); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  435</span>    ierr = ISDestroy(&amp;is_to); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  436</span>    ierr = VecScatterDestroy(&amp;scatter_ctx); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  437</span>    ierr = VecDestroy(&amp;ref_vec_seq); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  438</span> </div>
+<div class="line"><span class="lineno">  439</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  440</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  441</span>}</div>
 <div class="ttc" id="alogging_8h_html_a3758dd5d300a594312c95bc393378df0"><div class="ttname"><a href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a></div><div class="ttdeci">#define LOCAL</div><div class="ttdoc">Logging scope definitions for controlling message output.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00044">logging.h:44</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00741">variables.h:741</a></div></div>
@@ -578,7 +584,7 @@ Here is the caller graph for this function:</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a86d13bca79c1355ce808509a999a1d88_icgraph.svg" width="564" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a86d13bca79c1355ce808509a999a1d88_icgraph.svg" width="100%" height="413"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -618,92 +624,94 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode</dd></dl>
+<p>Scales a specified field from non-dimensional to dimensional units in-place.</p>
+<p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="postprocessing__kernels_8h.html">include/postprocessing_kernels.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="postprocessing__kernels_8h.html#ab72ef98f3a415dddd8e609e95a1aeac6" title="Scales a specified field from non-dimensional to dimensional units in-place.">DimensionalizeField()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00020">20</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   21</span>{</div>
-<div class="line"><span class="lineno">   22</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">   23</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">   24</span>    Vec            target_vec = NULL;</div>
-<div class="line"><span class="lineno">   25</span>    PetscReal      scale_factor = 1.0;</div>
-<div class="line"><span class="lineno">   26</span>    <span class="keywordtype">char</span>           field_type[64] = <span class="stringliteral">&quot;Unknown&quot;</span>;</div>
-<div class="line"><span class="lineno">   27</span>    PetscBool      is_swarm_field = PETSC_FALSE; <span class="comment">// Flag for special swarm handling</span></div>
-<div class="line"><span class="lineno">   28</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *swarm_field_name = NULL;    <span class="comment">// Name of the field within the swarm</span></div>
-<div class="line"><span class="lineno">   29</span> </div>
-<div class="line"><span class="lineno">   30</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">   31</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">   32</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno">   33</span>    <span class="keywordflow">if</span> (!field_name) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;field_name is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno">   34</span> </div>
-<div class="line"><span class="lineno">   35</span>    <span class="comment">// --- 1. Identify the target Vec and the correct scaling factor ---</span></div>
-<div class="line"><span class="lineno">   36</span>    <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Ucat&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   37</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>;</div>
-<div class="line"><span class="lineno">   38</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
-<div class="line"><span class="lineno">   39</span>        strcpy(field_type, <span class="stringliteral">&quot;Cartesian Velocity (L/T)&quot;</span>);</div>
-<div class="line"><span class="lineno">   40</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Ucont&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   41</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>;</div>
-<div class="line"><span class="lineno">   42</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
-<div class="line"><span class="lineno">   43</span>        strcpy(field_type, <span class="stringliteral">&quot;Contravariant Volume Flux (L^3/T)&quot;</span>);</div>
-<div class="line"><span class="lineno">   44</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   45</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>;</div>
-<div class="line"><span class="lineno">   46</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a>;</div>
-<div class="line"><span class="lineno">   47</span>        strcpy(field_type, <span class="stringliteral">&quot;Pressure (M L^-1 T^-2)&quot;</span>);</div>
-<div class="line"><span class="lineno">   48</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Coordinates&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   49</span>        ierr = DMGetCoordinates(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;target_vec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   50</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
-<div class="line"><span class="lineno">   51</span>        strcpy(field_type, <span class="stringliteral">&quot;Grid Coordinates (L)&quot;</span>);</div>
-<div class="line"><span class="lineno">   52</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;ParticlePosition&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   53</span>        is_swarm_field = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">   54</span>        swarm_field_name = <span class="stringliteral">&quot;position&quot;</span>;</div>
-<div class="line"><span class="lineno">   55</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
-<div class="line"><span class="lineno">   56</span>        strcpy(field_type, <span class="stringliteral">&quot;Particle Position (L)&quot;</span>);</div>
-<div class="line"><span class="lineno">   57</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;ParticleVelocity&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   58</span>        is_swarm_field = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">   59</span>        swarm_field_name = <span class="stringliteral">&quot;velocity&quot;</span>;</div>
-<div class="line"><span class="lineno">   60</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
-<div class="line"><span class="lineno">   61</span>        strcpy(field_type, <span class="stringliteral">&quot;Particle Velocity (L/T)&quot;</span>);</div>
-<div class="line"><span class="lineno">   62</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   63</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;DimensionalizeField: Unknown or unhandled field_name &#39;%s&#39;. Field will not be scaled.\n&quot;</span>, field_name);</div>
-<div class="line"><span class="lineno">   64</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">   65</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   66</span>    }</div>
-<div class="line"><span class="lineno">   67</span>    </div>
-<div class="line"><span class="lineno">   68</span>    <span class="comment">// --- 2. Check for trivial scaling ---</span></div>
-<div class="line"><span class="lineno">   69</span>    <span class="keywordflow">if</span> (PetscAbsReal(scale_factor - 1.0) &lt; PETSC_MACHINE_EPSILON) {</div>
-<div class="line"><span class="lineno">   70</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;DimensionalizeField: Scaling factor for &#39;%s&#39; is 1.0. Skipping operation.\n&quot;</span>, field_name);</div>
-<div class="line"><span class="lineno">   71</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">   72</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   73</span>    }</div>
-<div class="line"><span class="lineno">   74</span> </div>
-<div class="line"><span class="lineno">   75</span>    <span class="comment">// --- 3. Perform the in-place scaling operation ---</span></div>
-<div class="line"><span class="lineno">   76</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Scaling &#39;%s&#39; field (%s) by factor %.4e.\n&quot;</span>, field_name, field_type, scale_factor);</div>
-<div class="line"><span class="lineno">   77</span> </div>
-<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">if</span> (is_swarm_field) {</div>
-<div class="line"><span class="lineno">   79</span>        <span class="comment">// Special handling for DMSwarm fields</span></div>
-<div class="line"><span class="lineno">   80</span>        ierr = DMSwarmCreateGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, swarm_field_name, &amp;target_vec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   81</span>        ierr = VecScale(target_vec, scale_factor); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   82</span>        ierr = DMSwarmDestroyGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, swarm_field_name, &amp;target_vec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   83</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   84</span>        <span class="comment">// Standard handling for PETSc Vecs</span></div>
-<div class="line"><span class="lineno">   85</span>        <span class="keywordflow">if</span> (target_vec) {</div>
-<div class="line"><span class="lineno">   86</span>            ierr = VecScale(target_vec, scale_factor); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   87</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   88</span>            SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;Target vector for field &#39;%s&#39; was not found or is NULL.&quot;</span>, field_name);</div>
-<div class="line"><span class="lineno">   89</span>        }</div>
-<div class="line"><span class="lineno">   90</span>    }</div>
-<div class="line"><span class="lineno">   91</span>    </div>
-<div class="line"><span class="lineno">   92</span>    <span class="comment">// --- 4. Post-scaling updates for special cases ---</span></div>
-<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Coordinates&quot;</span>) == 0) {</div>
-<div class="line"><span class="lineno">   94</span>        Vec l_coords;</div>
-<div class="line"><span class="lineno">   95</span>        ierr = DMGetCoordinates(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;target_vec); CHKERRQ(ierr); <span class="comment">// Re-get the global vector</span></div>
-<div class="line"><span class="lineno">   96</span>        ierr = DMGetCoordinatesLocal(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;l_coords); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   97</span>        ierr = DMGlobalToLocalBegin(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, target_vec, INSERT_VALUES, l_coords); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   98</span>        ierr = DMGlobalToLocalEnd(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, target_vec, INSERT_VALUES, l_coords); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   99</span>    }</div>
-<div class="line"><span class="lineno">  100</span> </div>
-<div class="line"><span class="lineno">  101</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  102</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  103</span>}</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00012">12</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   13</span>{</div>
+<div class="line"><span class="lineno">   14</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">   15</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">   16</span>    Vec            target_vec = NULL;</div>
+<div class="line"><span class="lineno">   17</span>    PetscReal      scale_factor = 1.0;</div>
+<div class="line"><span class="lineno">   18</span>    <span class="keywordtype">char</span>           field_type[64] = <span class="stringliteral">&quot;Unknown&quot;</span>;</div>
+<div class="line"><span class="lineno">   19</span>    PetscBool      is_swarm_field = PETSC_FALSE; <span class="comment">// Flag for special swarm handling</span></div>
+<div class="line"><span class="lineno">   20</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *swarm_field_name = NULL;    <span class="comment">// Name of the field within the swarm</span></div>
+<div class="line"><span class="lineno">   21</span> </div>
+<div class="line"><span class="lineno">   22</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">   23</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">   24</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno">   25</span>    <span class="keywordflow">if</span> (!field_name) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;field_name is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno">   26</span> </div>
+<div class="line"><span class="lineno">   27</span>    <span class="comment">// --- 1. Identify the target Vec and the correct scaling factor ---</span></div>
+<div class="line"><span class="lineno">   28</span>    <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Ucat&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   29</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>;</div>
+<div class="line"><span class="lineno">   30</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
+<div class="line"><span class="lineno">   31</span>        strcpy(field_type, <span class="stringliteral">&quot;Cartesian Velocity (L/T)&quot;</span>);</div>
+<div class="line"><span class="lineno">   32</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Ucont&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   33</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>;</div>
+<div class="line"><span class="lineno">   34</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
+<div class="line"><span class="lineno">   35</span>        strcpy(field_type, <span class="stringliteral">&quot;Contravariant Volume Flux (L^3/T)&quot;</span>);</div>
+<div class="line"><span class="lineno">   36</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;P&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   37</span>        target_vec = user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>;</div>
+<div class="line"><span class="lineno">   38</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#ade74d185e7611423c6126ec505309a47">P_ref</a>;</div>
+<div class="line"><span class="lineno">   39</span>        strcpy(field_type, <span class="stringliteral">&quot;Pressure (M L^-1 T^-2)&quot;</span>);</div>
+<div class="line"><span class="lineno">   40</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Coordinates&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   41</span>        ierr = DMGetCoordinates(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;target_vec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   42</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
+<div class="line"><span class="lineno">   43</span>        strcpy(field_type, <span class="stringliteral">&quot;Grid Coordinates (L)&quot;</span>);</div>
+<div class="line"><span class="lineno">   44</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;ParticlePosition&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   45</span>        is_swarm_field = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">   46</span>        swarm_field_name = <span class="stringliteral">&quot;position&quot;</span>;</div>
+<div class="line"><span class="lineno">   47</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#a443db716c1f9b5d3046639bd63241a93">L_ref</a>;</div>
+<div class="line"><span class="lineno">   48</span>        strcpy(field_type, <span class="stringliteral">&quot;Particle Position (L)&quot;</span>);</div>
+<div class="line"><span class="lineno">   49</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;ParticleVelocity&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   50</span>        is_swarm_field = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">   51</span>        swarm_field_name = <span class="stringliteral">&quot;velocity&quot;</span>;</div>
+<div class="line"><span class="lineno">   52</span>        scale_factor = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa24a988353f69e0cf76b358d10fd374a">scaling</a>.<a class="code hl_variable" href="variables_8h.html#aecd5e36365d3d40c5e7e707a93668e92">U_ref</a>;</div>
+<div class="line"><span class="lineno">   53</span>        strcpy(field_type, <span class="stringliteral">&quot;Particle Velocity (L/T)&quot;</span>);</div>
+<div class="line"><span class="lineno">   54</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   55</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;DimensionalizeField: Unknown or unhandled field_name &#39;%s&#39;. Field will not be scaled.\n&quot;</span>, field_name);</div>
+<div class="line"><span class="lineno">   56</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">   57</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   58</span>    }</div>
+<div class="line"><span class="lineno">   59</span>    </div>
+<div class="line"><span class="lineno">   60</span>    <span class="comment">// --- 2. Check for trivial scaling ---</span></div>
+<div class="line"><span class="lineno">   61</span>    <span class="keywordflow">if</span> (PetscAbsReal(scale_factor - 1.0) &lt; PETSC_MACHINE_EPSILON) {</div>
+<div class="line"><span class="lineno">   62</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;DimensionalizeField: Scaling factor for &#39;%s&#39; is 1.0. Skipping operation.\n&quot;</span>, field_name);</div>
+<div class="line"><span class="lineno">   63</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">   64</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   65</span>    }</div>
+<div class="line"><span class="lineno">   66</span> </div>
+<div class="line"><span class="lineno">   67</span>    <span class="comment">// --- 3. Perform the in-place scaling operation ---</span></div>
+<div class="line"><span class="lineno">   68</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Scaling &#39;%s&#39; field (%s) by factor %.4e.\n&quot;</span>, field_name, field_type, scale_factor);</div>
+<div class="line"><span class="lineno">   69</span> </div>
+<div class="line"><span class="lineno">   70</span>    <span class="keywordflow">if</span> (is_swarm_field) {</div>
+<div class="line"><span class="lineno">   71</span>        <span class="comment">// Special handling for DMSwarm fields</span></div>
+<div class="line"><span class="lineno">   72</span>        ierr = DMSwarmCreateGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, swarm_field_name, &amp;target_vec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   73</span>        ierr = VecScale(target_vec, scale_factor); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   74</span>        ierr = DMSwarmDestroyGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, swarm_field_name, &amp;target_vec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   75</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   76</span>        <span class="comment">// Standard handling for PETSc Vecs</span></div>
+<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">if</span> (target_vec) {</div>
+<div class="line"><span class="lineno">   78</span>            ierr = VecScale(target_vec, scale_factor); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   79</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   80</span>            SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;Target vector for field &#39;%s&#39; was not found or is NULL.&quot;</span>, field_name);</div>
+<div class="line"><span class="lineno">   81</span>        }</div>
+<div class="line"><span class="lineno">   82</span>    }</div>
+<div class="line"><span class="lineno">   83</span>    </div>
+<div class="line"><span class="lineno">   84</span>    <span class="comment">// --- 4. Post-scaling updates for special cases ---</span></div>
+<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (strcasecmp(field_name, <span class="stringliteral">&quot;Coordinates&quot;</span>) == 0) {</div>
+<div class="line"><span class="lineno">   86</span>        Vec l_coords;</div>
+<div class="line"><span class="lineno">   87</span>        ierr = DMGetCoordinates(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;target_vec); CHKERRQ(ierr); <span class="comment">// Re-get the global vector</span></div>
+<div class="line"><span class="lineno">   88</span>        ierr = DMGetCoordinatesLocal(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;l_coords); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   89</span>        ierr = DMGlobalToLocalBegin(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, target_vec, INSERT_VALUES, l_coords); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   90</span>        ierr = DMGlobalToLocalEnd(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, target_vec, INSERT_VALUES, l_coords); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   91</span>    }</div>
+<div class="line"><span class="lineno">   92</span> </div>
+<div class="line"><span class="lineno">   93</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">   94</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   95</span>}</div>
 <div class="ttc" id="alogging_8h_html_a672ff9c400e2307306b36415d4fefcb9"><div class="ttname"><a href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a></div><div class="ttdeci">#define LOG(scope, level, fmt,...)</div><div class="ttdoc">Logging macro for PETSc-based applications with scope control.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00083">logging.h:83</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
 <div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00807">variables.h:807</a></div></div>
@@ -717,7 +725,7 @@ Here is the caller graph for this function:</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_ab72ef98f3a415dddd8e609e95a1aeac6_icgraph.svg" width="439" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_ab72ef98f3a415dddd8e609e95a1aeac6_icgraph.svg" width="542" height="102"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -746,38 +754,40 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode</dd></dl>
+<p>Orchestrates the dimensionalization of all relevant fields loaded from a file.</p>
+<p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00118">118</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  119</span>{</div>
-<div class="line"><span class="lineno">  120</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  121</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">  122</span> </div>
-<div class="line"><span class="lineno">  123</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  124</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  125</span> </div>
-<div class="line"><span class="lineno">  126</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Converting all loaded fields to dimensional units ---\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  127</span> </div>
-<div class="line"><span class="lineno">  128</span>    <span class="comment">// Scale the grid itself first</span></div>
-<div class="line"><span class="lineno">  129</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Coordinates&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  130</span> </div>
-<div class="line"><span class="lineno">  131</span>    <span class="comment">// Scale primary fluid fields</span></div>
-<div class="line"><span class="lineno">  132</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Ucat&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  133</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  134</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;P&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  135</span> </div>
-<div class="line"><span class="lineno">  136</span>    <span class="comment">// If particles are present, scale their fields</span></div>
-<div class="line"><span class="lineno">  137</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5eedf611da6dd4f59cc65753b777b957">np</a> &gt; 0 &amp;&amp; user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>) {</div>
-<div class="line"><span class="lineno">  138</span>        ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;ParticlePosition&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  139</span>        ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;ParticleVelocity&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  140</span>    }</div>
-<div class="line"><span class="lineno">  141</span> </div>
-<div class="line"><span class="lineno">  142</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Field dimensionalization complete ---\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  145</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  146</span>}</div>
-<div class="ttc" id="apostprocessing__kernels_8c_html_ab72ef98f3a415dddd8e609e95a1aeac6"><div class="ttname"><a href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a></div><div class="ttdeci">PetscErrorCode DimensionalizeField(UserCtx *user, const char *field_name)</div><div class="ttdoc">Scales a specified field from non-dimensional to dimensional units in-place.</div><div class="ttdef"><b>Definition</b> <a href="postprocessing__kernels_8c_source.html#l00020">postprocessing_kernels.c:20</a></div></div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00103">103</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  104</span>{</div>
+<div class="line"><span class="lineno">  105</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  106</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  109</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  110</span> </div>
+<div class="line"><span class="lineno">  111</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Converting all loaded fields to dimensional units ---\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  112</span> </div>
+<div class="line"><span class="lineno">  113</span>    <span class="comment">// Scale the grid itself first</span></div>
+<div class="line"><span class="lineno">  114</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Coordinates&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  115</span> </div>
+<div class="line"><span class="lineno">  116</span>    <span class="comment">// Scale primary fluid fields</span></div>
+<div class="line"><span class="lineno">  117</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Ucat&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  118</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  119</span>    ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;P&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  120</span> </div>
+<div class="line"><span class="lineno">  121</span>    <span class="comment">// If particles are present, scale their fields</span></div>
+<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5eedf611da6dd4f59cc65753b777b957">np</a> &gt; 0 &amp;&amp; user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>) {</div>
+<div class="line"><span class="lineno">  123</span>        ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;ParticlePosition&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  124</span>        ierr = <a class="code hl_function" href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a>(user, <span class="stringliteral">&quot;ParticleVelocity&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  125</span>    }</div>
+<div class="line"><span class="lineno">  126</span> </div>
+<div class="line"><span class="lineno">  127</span>    <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;--- Field dimensionalization complete ---\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  128</span> </div>
+<div class="line"><span class="lineno">  129</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  130</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  131</span>}</div>
+<div class="ttc" id="apostprocessing__kernels_8c_html_ab72ef98f3a415dddd8e609e95a1aeac6"><div class="ttname"><a href="postprocessing__kernels_8c.html#ab72ef98f3a415dddd8e609e95a1aeac6">DimensionalizeField</a></div><div class="ttdeci">PetscErrorCode DimensionalizeField(UserCtx *user, const char *field_name)</div><div class="ttdoc">Implementation of DimensionalizeField().</div><div class="ttdef"><b>Definition</b> <a href="postprocessing__kernels_8c_source.html#l00012">postprocessing_kernels.c:12</a></div></div>
 <div class="ttc" id="avariables_8h_html_a5eedf611da6dd4f59cc65753b777b957"><div class="ttname"><a href="variables_8h.html#a5eedf611da6dd4f59cc65753b777b957">SimCtx::np</a></div><div class="ttdeci">PetscInt np</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00683">variables.h:683</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -829,48 +839,50 @@ Here is the call graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode</dd></dl>
+<p>Computes the specific kinetic energy (KE per unit mass) for each particle.</p>
+<p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00493">493</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  494</span>{</div>
-<div class="line"><span class="lineno">  495</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  496</span>    PetscInt n_local;</div>
-<div class="line"><span class="lineno">  497</span>    <span class="keyword">const</span> PetscScalar (*vel_arr)[3]; <span class="comment">// Access velocity as array of 3-component vectors</span></div>
-<div class="line"><span class="lineno">  498</span>    PetscScalar *ske_arr;</div>
-<div class="line"><span class="lineno">  499</span> </div>
-<div class="line"><span class="lineno">  500</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  501</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  502</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeSpecificKE (&#39;%s&#39; -&gt; &#39;%s&#39;).\n&quot;</span>, velocity_field, ske_field);</div>
-<div class="line"><span class="lineno">  503</span> </div>
-<div class="line"><span class="lineno">  504</span>    <span class="comment">// Get local data arrays from the DMSwarm</span></div>
-<div class="line"><span class="lineno">  505</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  506</span>    <span class="keywordflow">if</span> (n_local == 0) PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  507</span> </div>
-<div class="line"><span class="lineno">  508</span>    <span class="comment">// Get read-only access to velocity and write access to the output field</span></div>
-<div class="line"><span class="lineno">  509</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, velocity_field, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  510</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, ske_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;ske_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  511</span> </div>
-<div class="line"><span class="lineno">  512</span>    <span class="comment">// Main computation loop</span></div>
-<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><span class="lineno">  514</span>        <span class="keyword">const</span> PetscScalar u = vel_arr[p][0];</div>
-<div class="line"><span class="lineno">  515</span>        <span class="keyword">const</span> PetscScalar v = vel_arr[p][1];</div>
-<div class="line"><span class="lineno">  516</span>        <span class="keyword">const</span> PetscScalar w = vel_arr[p][2];</div>
-<div class="line"><span class="lineno">  517</span>        <span class="keyword">const</span> PetscScalar vel_sq = u*u + v*v + w*w;</div>
-<div class="line"><span class="lineno">  518</span>        ske_arr[p] = 0.5 * vel_sq;</div>
-<div class="line"><span class="lineno">  519</span>    }</div>
-<div class="line"><span class="lineno">  520</span> </div>
-<div class="line"><span class="lineno">  521</span>    <span class="comment">// Restore arrays</span></div>
-<div class="line"><span class="lineno">  522</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, velocity_field, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  523</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, ske_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;ske_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  524</span> </div>
-<div class="line"><span class="lineno">  525</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  526</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  527</span>}</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00452">452</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  453</span>{</div>
+<div class="line"><span class="lineno">  454</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  455</span>    PetscInt n_local;</div>
+<div class="line"><span class="lineno">  456</span>    <span class="keyword">const</span> PetscScalar (*vel_arr)[3]; <span class="comment">// Access velocity as array of 3-component vectors</span></div>
+<div class="line"><span class="lineno">  457</span>    PetscScalar *ske_arr;</div>
+<div class="line"><span class="lineno">  458</span> </div>
+<div class="line"><span class="lineno">  459</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  460</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  461</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeSpecificKE (&#39;%s&#39; -&gt; &#39;%s&#39;).\n&quot;</span>, velocity_field, ske_field);</div>
+<div class="line"><span class="lineno">  462</span> </div>
+<div class="line"><span class="lineno">  463</span>    <span class="comment">// Get local data arrays from the DMSwarm</span></div>
+<div class="line"><span class="lineno">  464</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  465</span>    <span class="keywordflow">if</span> (n_local == 0) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  466</span> </div>
+<div class="line"><span class="lineno">  467</span>    <span class="comment">// Get read-only access to velocity and write access to the output field</span></div>
+<div class="line"><span class="lineno">  468</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, velocity_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  469</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, ske_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;ske_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  470</span> </div>
+<div class="line"><span class="lineno">  471</span>    <span class="comment">// Main computation loop</span></div>
+<div class="line"><span class="lineno">  472</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><span class="lineno">  473</span>        <span class="keyword">const</span> PetscScalar u = vel_arr[p][0];</div>
+<div class="line"><span class="lineno">  474</span>        <span class="keyword">const</span> PetscScalar v = vel_arr[p][1];</div>
+<div class="line"><span class="lineno">  475</span>        <span class="keyword">const</span> PetscScalar w = vel_arr[p][2];</div>
+<div class="line"><span class="lineno">  476</span>        <span class="keyword">const</span> PetscScalar vel_sq = u*u + v*v + w*w;</div>
+<div class="line"><span class="lineno">  477</span>        ske_arr[p] = 0.5 * vel_sq;</div>
+<div class="line"><span class="lineno">  478</span>    }</div>
+<div class="line"><span class="lineno">  479</span> </div>
+<div class="line"><span class="lineno">  480</span>    <span class="comment">// Restore arrays</span></div>
+<div class="line"><span class="lineno">  481</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, velocity_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;vel_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  482</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, ske_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;ske_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  483</span> </div>
+<div class="line"><span class="lineno">  484</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  485</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  486</span>}</div>
 <div class="ttc" id="avariables_8h_html_a49a63fad0d45e1bfc78e69a022c9a9e5"><div class="ttname"><a href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">UserCtx::post_swarm</a></div><div class="ttdeci">DM post_swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00813">variables.h:813</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a37ee1aa2e642bbfd24a6faf33a92568c_icgraph.svg" width="532" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a37ee1aa2e642bbfd24a6faf33a92568c_icgraph.svg" width="100%" height="413"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -912,56 +924,52 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode</dd></dl>
 <p>Computes the displacement magnitude |r_i - r_0| for each particle (per-particle VTK kernel).</p>
-<p>Reference point r_0 is taken from simCtx-&gt;psrc_x/y/z. Reads the "position" field from user-&gt;swarm and writes the scalar distance to user-&gt;post_swarm[disp_field].</p>
-<p>This is a visualisation kernel — for quantitative statistics use ComputeParticleMSD.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">user</td><td>The <a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a> containing the DMSwarms. </td></tr>
-    <tr><td class="paramname">disp_field</td><td>Name of the output scalar field in post_swarm. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode </dd></dl>
+<p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00543">543</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  544</span>{</div>
-<div class="line"><span class="lineno">  545</span>    PetscErrorCode  ierr;</div>
-<div class="line"><span class="lineno">  546</span>    PetscInt        n_local;</div>
-<div class="line"><span class="lineno">  547</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
-<div class="line"><span class="lineno">  548</span>    PetscScalar    *disp_out;</div>
-<div class="line"><span class="lineno">  549</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">  550</span> </div>
-<div class="line"><span class="lineno">  551</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  552</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  553</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeDisplacement (-&gt; &#39;%s&#39;).\n&quot;</span>, disp_field);</div>
-<div class="line"><span class="lineno">  554</span> </div>
-<div class="line"><span class="lineno">  555</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  556</span>    <span class="keywordflow">if</span> (n_local == 0) PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  557</span> </div>
-<div class="line"><span class="lineno">  558</span>    <span class="keyword">const</span> PetscReal x0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322">psrc_x</a>;</div>
-<div class="line"><span class="lineno">  559</span>    <span class="keyword">const</span> PetscReal y0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad">psrc_y</a>;</div>
-<div class="line"><span class="lineno">  560</span>    <span class="keyword">const</span> PetscReal z0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7e53ba8e0f07cf333ca205c5db27afd8">psrc_z</a>;</div>
-<div class="line"><span class="lineno">  561</span> </div>
-<div class="line"><span class="lineno">  562</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>,      <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  563</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, disp_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;disp_out);       CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  564</span> </div>
-<div class="line"><span class="lineno">  565</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><span class="lineno">  566</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
-<div class="line"><span class="lineno">  567</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
-<div class="line"><span class="lineno">  568</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
-<div class="line"><span class="lineno">  569</span>        disp_out[p] = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
-<div class="line"><span class="lineno">  570</span>    }</div>
-<div class="line"><span class="lineno">  571</span> </div>
-<div class="line"><span class="lineno">  572</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>,      <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  573</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, disp_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;disp_out);       CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  574</span> </div>
-<div class="line"><span class="lineno">  575</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  576</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  577</span>}</div>
+<p class="definition">Definition at line <a class="el" href="postprocessing__kernels_8c_source.html#l00494">494</a> of file <a class="el" href="postprocessing__kernels_8c_source.html">postprocessing_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  495</span>{</div>
+<div class="line"><span class="lineno">  496</span>    PetscErrorCode  ierr;</div>
+<div class="line"><span class="lineno">  497</span>    PetscInt        n_local;</div>
+<div class="line"><span class="lineno">  498</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
+<div class="line"><span class="lineno">  499</span>    PetscScalar    *disp_out;</div>
+<div class="line"><span class="lineno">  500</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">  501</span> </div>
+<div class="line"><span class="lineno">  502</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  503</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  504</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;-&gt; KERNEL: Running ComputeDisplacement (-&gt; &#39;%s&#39;).\n&quot;</span>, disp_field);</div>
+<div class="line"><span class="lineno">  505</span> </div>
+<div class="line"><span class="lineno">  506</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  507</span>    <span class="keywordflow">if</span> (n_local == 0) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  508</span> </div>
+<div class="line"><span class="lineno">  509</span>    <span class="keyword">const</span> PetscReal x0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322">psrc_x</a>;</div>
+<div class="line"><span class="lineno">  510</span>    <span class="keyword">const</span> PetscReal y0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad">psrc_y</a>;</div>
+<div class="line"><span class="lineno">  511</span>    <span class="keyword">const</span> PetscReal z0 = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7e53ba8e0f07cf333ca205c5db27afd8">psrc_z</a>;</div>
+<div class="line"><span class="lineno">  512</span> </div>
+<div class="line"><span class="lineno">  513</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>,      <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  514</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, disp_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;disp_out);       CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  515</span> </div>
+<div class="line"><span class="lineno">  516</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><span class="lineno">  517</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
+<div class="line"><span class="lineno">  518</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
+<div class="line"><span class="lineno">  519</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
+<div class="line"><span class="lineno">  520</span>        disp_out[p] = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
+<div class="line"><span class="lineno">  521</span>    }</div>
+<div class="line"><span class="lineno">  522</span> </div>
+<div class="line"><span class="lineno">  523</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>,      <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  524</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a49a63fad0d45e1bfc78e69a022c9a9e5">post_swarm</a>, disp_field, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;disp_out);       CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  525</span> </div>
+<div class="line"><span class="lineno">  526</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  527</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  528</span>}</div>
 <div class="ttc" id="avariables_8h_html_a47f64ce1f07d6c1e4c320209e9e56322"><div class="ttname"><a href="variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322">SimCtx::psrc_x</a></div><div class="ttdeci">PetscReal psrc_x</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00650">variables.h:650</a></div></div>
 <div class="ttc" id="avariables_8h_html_a7e53ba8e0f07cf333ca205c5db27afd8"><div class="ttname"><a href="variables_8h.html#a7e53ba8e0f07cf333ca205c5db27afd8">SimCtx::psrc_z</a></div><div class="ttdeci">PetscReal psrc_z</div><div class="ttdoc">Point source location for PARTICLE_INIT_POINT_SOURCE.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00650">variables.h:650</a></div></div>
 <div class="ttc" id="avariables_8h_html_ab3f5c3aa1890178635080b37bb6b26ad"><div class="ttname"><a href="variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad">SimCtx::psrc_y</a></div><div class="ttdeci">PetscReal psrc_y</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00650">variables.h:650</a></div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="postprocessing__kernels_8h_a836ddac6d7dfdaf6c7daaab953f45850_icgraph.svg" width="530" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
 </div>
 </div>
 </div><!-- contents -->

@@ -83,13 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#formulation_sec">1. Curvilinear Formulation Context</a></li>
-<li class="level1"><a href="#ibm_sec">3. Immersed-Boundary Role In Current Code</a></li>
-<li class="level1"><a href="#practical_sec">4. What This Means For Users</a></li>
+<ul><li class="level1"><a href="#p22_formulation_sec">1. Curvilinear Formulation Context</a></li>
+<li class="level1"><a href="#p22_setup_sec">2. Grid and Metric Build Pipeline</a></li>
+<li class="level1"><a href="#p22_ibm_sec">3. Immersed-Boundary Role In Current Code</a></li>
+<li class="level1"><a href="#p22_literature_sec">4. Literature Anchors</a></li>
+<li class="level1"><a href="#p22_practical_sec">5. What This Means For Users</a></li>
+<li class="level1"><a href="#p22_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md82">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md83">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md84">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv solves flow on structured curvilinear grids and applies immersed-boundary-aware logic in metric, pressure, and projection stages.</p>
-<h1><a class="anchor" id="formulation_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_CURVIB_Method"></a> PICurv solves flow on structured curvilinear grids and applies immersed-boundary-aware logic in metric, pressure, and projection stages.</p>
+<h1><a class="anchor" id="p22_formulation_sec"></a>
 1. Curvilinear Formulation Context</h1>
 <p>The code evolves contravariant flux-like velocity components (<code>Ucont</code>) and derives Cartesian velocity (<code>Ucat</code>) as needed. Curvilinear metrics map physical derivatives to computational coordinates:</p>
 <p class="formulaDsp">
@@ -100,8 +108,8 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 \]
 </p>
 <p>Face and cell metric tensors are precomputed and reused by RHS, Poisson, and projection stages.</p>
-<h1><a class="anchor" id="setup_sec"></a>
-1. Setup and Physics</h1>
+<h1><a class="anchor" id="p22_setup_sec"></a>
+2. Grid and Metric Build Pipeline</h1>
 <p>Main setup touchpoints:</p>
 <ul>
 <li>grid dimensions and decomposition: <a class="el" href="grid_8h.html#a04f0887f08166a2a8d01411f39fa1a40">DefineAllGridDimensions</a></li>
@@ -115,7 +123,7 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <ul>
 <li><a class="el" href="grid_8h.html#a88c33dce12bae2e53bd7370f57548a76">CalculateFaceCenterAndArea</a></li>
 </ul>
-<h1><a class="anchor" id="ibm_sec"></a>
+<h1><a class="anchor" id="p22_ibm_sec"></a>
 3. Immersed-Boundary Role In Current Code</h1>
 <p>The current branch keeps immersed-boundary hooks in solver paths, while several IBM-specific calls are conditional or currently inactive in default runs. In practice:</p>
 <ul>
@@ -123,8 +131,20 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <li>Poisson and projection stencils include boundary-aware logic,</li>
 <li>IBM-specific interpolation hooks remain extension points for fully active IBM runs.</li>
 </ul>
-<h1><a class="anchor" id="practical_sec"></a>
-4. What This Means For Users</h1>
+<h1><a class="anchor" id="p22_literature_sec"></a>
+4. Literature Anchors</h1>
+<p>Relevant CURVIB references for this code path:</p>
+<ul>
+<li>Borazjani I, Ge L, Sotiropoulos F. "Curvilinear immersed boundary method for simulating fluid structure interaction with complex 3D rigid bodies." <em>Journal of Computational Physics</em> 227(16), 7587-7620 (2008). DOI: <code>10.1016/j.jcp.2008.04.024</code>.</li>
+<li>Borazjani I, Di Achille P, D'Souza RM, et al. "The functional role of left atrial flow in ventricular filling and flow evolution in the left ventricle." <em>Annals of Biomedical Engineering</em> 41(6), 1265-1275 (2013). DOI: <code>10.1007/s10439-013-0758-9</code>.</li>
+</ul>
+<p>PICurv implementation notes:</p>
+<ul>
+<li>PICurv follows the same curvilinear metric-centered philosophy (precomputed geometric tensors and metric-aware operators).</li>
+<li>the current branch emphasizes stable production paths for structured curvilinear flow + particle workflows, while preserving immersed-boundary extension hooks for deeper IBM/FSI development.</li>
+</ul>
+<h1><a class="anchor" id="p22_practical_sec"></a>
+5. What This Means For Users</h1>
 <p>You mainly control CurvIB behavior through:</p>
 <ul>
 <li>grid generation/ingestion choice,</li>
@@ -133,13 +153,33 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <li>case geometry and decomposition settings.</li>
 </ul>
 <p>Even when users never interact with metric tensors directly, they govern stability, pressure correction quality, and particle coupling accuracy.</p>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p22_refs_sec"></a>
+6. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="20_Grid_Cell_Architecture_Guide.html">Grid, Cell, and Variable Architecture Guide</a></b></li>
 <li><b><a class="el" href="23_Fractional_Step_Method.html">Fractional-Step (Projection) Method</a></b></li>
-<li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b> </li>
+<li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md82"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>CurvIB Method Overview</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md83"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md84"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

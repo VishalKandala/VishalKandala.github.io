@@ -83,15 +83,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#workflow_sec">1. Standard Extension Workflow</a></li>
-<li class="level1"><a href="#design_sec">2. Design Rules</a></li>
-<li class="level1"><a href="#particle_sec">3. ParticlePhysics Extension Checklist</a></li>
-<li class="level1"><a href="#data_driven_sec">4. Data-Driven Closure Model Note</a></li>
-<li class="level1"><a href="#verification_sec">5. Verification Checklist</a></li>
+<ul><li class="level1"><a href="#p16_workflow_sec">1. Standard Extension Workflow</a></li>
+<li class="level1"><a href="#p16_design_sec">2. Design Rules</a></li>
+<li class="level1"><a href="#p16_particle_sec">3. ParticlePhysics Extension Checklist</a></li>
+<li class="level1"><a href="#p16_data_driven_sec">4. Data-Driven Closure Model Note</a></li>
+<li class="level1"><a href="#p16_verification_sec">5. Verification Checklist</a><ul><li class="level2"><a href="#autotoc_md53">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md54">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md55">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This playbook defines the standard workflow for adding new options/models without breaking YAML-&gt;C contract consistency.</p>
-<h1><a class="anchor" id="workflow_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Config_Extension_Playbook"></a> This playbook defines the standard workflow for adding new options/models without breaking YAML-&gt;C contract consistency.</p>
+<h1><a class="anchor" id="p16_workflow_sec"></a>
 1. Standard Extension Workflow</h1>
 <ol type="1">
 <li>Choose the schema home (<code>case.yml</code>, <code>solver.yml</code>, <code>monitor.yml</code>, or <code>post.yml</code>).</li>
@@ -108,7 +113,7 @@ $(function() {
 <li>Update <code>scripts/audit_ingress_manifest.json</code> when PETSc ingress changes.</li>
 <li>Verify with a config-generation run and static ingress audit.</li>
 </ol>
-<h1><a class="anchor" id="design_sec"></a>
+<h1><a class="anchor" id="p16_design_sec"></a>
 2. Design Rules</h1>
 <ul>
 <li>Prefer structured schema first; use passthrough only for advanced/temporary gaps.</li>
@@ -116,7 +121,7 @@ $(function() {
 <li>Reject unsupported shapes early in Python validation (for example, list-vs-scalar contract mismatches).</li>
 <li>Keep C ingestion concentrated in setup/parsing layers (<code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>) unless data is truly file-local to a subsystem.</li>
 </ul>
-<h1><a class="anchor" id="particle_sec"></a>
+<h1><a class="anchor" id="p16_particle_sec"></a>
 3. ParticlePhysics Extension Checklist</h1>
 <p>Use this checklist when adding a new particle model constant, source term, or initialization mode.</p>
 <ol type="1">
@@ -148,7 +153,7 @@ $(function() {
 </ul>
 </li>
 </ol>
-<h1><a class="anchor" id="data_driven_sec"></a>
+<h1><a class="anchor" id="p16_data_driven_sec"></a>
 4. Data-Driven Closure Model Note</h1>
 <ul>
 <li>Offline integration (recommended first):<ul>
@@ -163,7 +168,7 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="verification_sec"></a>
+<h1><a class="anchor" id="p16_verification_sec"></a>
 5. Verification Checklist</h1>
 <ul>
 <li>Scalar/list and type validation works as expected.</li>
@@ -172,7 +177,27 @@ $(function() {
 <li>Runtime behavior changes only when new key is explicitly set.</li>
 <li>Existing templates/run paths still work with omitted new keys.</li>
 </ul>
-<p>See also <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b> for higher-level workflow expansion patterns. For selector-by-selector hook points, use <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
+<p>See also <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b> for higher-level workflow expansion patterns. For selector-by-selector hook points, use <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
+<h2><a class="anchor" id="autotoc_md53"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Configuration Extension Playbook</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md54"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md55"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

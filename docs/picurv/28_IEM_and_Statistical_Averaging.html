@@ -83,13 +83,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#iem_sec">1. IEM Mixing Update In Current Code</a></li>
-<li class="level1"><a href="#dataflow_sec">2. Required Dataflow For IEM</a></li>
-<li class="level1"><a href="#terminology_sec">4. Averaging Terminology In PICurv</a></li>
+<ul><li class="level1"><a href="#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
+<li class="level1"><a href="#p28_dataflow_sec">2. Required Dataflow For IEM</a></li>
+<li class="level1"><a href="#p28_stats_sec">3. Statistics Pipeline (Postprocessor)</a></li>
+<li class="level1"><a href="#p28_terminology_sec">4. Averaging Terminology In PICurv</a></li>
+<li class="level1"><a href="#p28_refs_sec">5. Related Pages</a><ul><li class="level2"><a href="#autotoc_md100">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md101">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md102">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv currently couples a particle scalar micromixing model (IEM-style) with separate statistics/averaging utilities in solver and post-processing stages.</p>
-<h1><a class="anchor" id="iem_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_IEM_and_Statistical_Averaging"></a> PICurv currently couples a particle scalar micromixing model (IEM-style) with separate statistics/averaging utilities in solver and post-processing stages.</p>
+<h1><a class="anchor" id="p28_iem_sec"></a>
 1. IEM Mixing Update In Current Code</h1>
 <p>For <code>Psi</code>, <a class="el" href="ParticlePhysics_8h.html#a0263b7bdea401ba29b2329c8e0f31d50">UpdateParticleField</a> uses:</p>
 <p class="formulaDsp">
@@ -113,7 +120,7 @@ $(function() {
 <li>per-field particle loop: <a class="el" href="ParticlePhysics_8h.html#a1fccaae261594eef9c4d615ac8322ccf">UpdateFieldForAllParticles</a></li>
 <li>stage wrapper: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
 </ul>
-<h1><a class="anchor" id="dataflow_sec"></a>
+<h1><a class="anchor" id="p28_dataflow_sec"></a>
 2. Required Dataflow For IEM</h1>
 <p>IEM update requires:</p>
 <ul>
@@ -122,8 +129,8 @@ $(function() {
 <li>Eulerian mean field (<code>user-&gt;lPsi</code>) and Jacobian (<code>user-&gt;lAj</code>) for volume scaling.</li>
 </ul>
 <p>This means scatter/interpolation order matters: stale Eulerian means produce stale IEM forcing.</p>
-<h1><a class="anchor" id="stats_sec"></a>
-5. Statistics Pipeline</h1>
+<h1><a class="anchor" id="p28_stats_sec"></a>
+3. Statistics Pipeline (Postprocessor)</h1>
 <p>Current primary reduction kernel:</p>
 <ul>
 <li><a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
@@ -137,7 +144,7 @@ r_{theory} = \sqrt{6Dt},
 \]
 </p>
 <p>with global MPI reductions and CSV output per statistics call.</p>
-<h1><a class="anchor" id="terminology_sec"></a>
+<h1><a class="anchor" id="p28_terminology_sec"></a>
 4. Averaging Terminology In PICurv</h1>
 <p>"Averaging" appears in multiple contexts:</p>
 <ul>
@@ -146,13 +153,33 @@ r_{theory} = \sqrt{6Dt},
 <li>postprocessing global statistical reductions.</li>
 </ul>
 <p>Treat these as distinct workflows with different configuration points.</p>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p28_refs_sec"></a>
+5. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
-<li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b> </li>
+<li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md100"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>IEM Mixing and Statistical Averaging</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md101"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md102"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

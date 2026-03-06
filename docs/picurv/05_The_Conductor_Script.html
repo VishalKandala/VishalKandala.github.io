@@ -83,14 +83,29 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#usage_sec">1. General Usage</a></li>
-<li class="level1"><a href="#sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
-<li class="level1"><a href="#sweep_sec">5. sweep: Parameter Study via Slurm Arrays</a></li>
-<li class="level1"><a href="#modular_sec">7. Modular Profile Strategy</a></li>
+<ul><li class="level1"><a href="#p05_usage_sec">1. General Usage</a></li>
+<li class="level1"><a href="#p05_init_sec">2. init: Create A New Case Directory</a></li>
+<li class="level1"><a href="#p05_build_sec">3. build: Build Project Executables</a></li>
+<li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
+<li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
+<li class="level1"><a href="#p05_sweep_sec">5. sweep: Parameter Study via Slurm Arrays</a></li>
+<li class="level1"><a href="#p05_validate_sec">6. validate: Config-Only Checks</a></li>
+<li class="level1"><a href="#p05_command_matrix_sec">7. Full Command and Option Matrix</a></li>
+<li class="level1"><a href="#p05_strict_validate_sec">8. &lt;tt&gt;validate --strict&lt;/tt&gt;: Additional Checks</a></li>
+<li class="level1"><a href="#p05_dry_run_schema_sec">9. Dry-Run JSON Plan Schema</a></li>
+<li class="level1"><a href="#p05_structured_errors_sec">10. Structured Error Output Contract</a></li>
+<li class="level1"><a href="#p05_modular_sec">11. Modular Profile Strategy</a></li>
+<li class="level1"><a href="#p05_artifacts_sec">12. Generated Runtime Artifacts</a></li>
+<li class="level1"><a href="#p05_next_steps_sec">13. Next Steps</a><ul><li class="level2"><a href="#autotoc_md20">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md21">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md22">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p><code>picurv</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages. It is also the primary user-facing contract layer: many defaults, aliases, and translation rules are enforced here before the C solver starts.</p>
-<h1><a class="anchor" id="usage_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_The_Conductor_Script"></a> <code>picurv</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages. It is also the primary user-facing contract layer: many defaults, aliases, and translation rules are enforced here before the C solver starts.</p>
+<h1><a class="anchor" id="p05_usage_sec"></a>
 1. General Usage</h1>
 <div class="fragment"><div class="line">./bin/picurv [COMMAND] [ARGS...]</div>
 </div><!-- fragment --><p>If <code>bin/picurv</code> does not exist yet, use <code>./scripts/picurv build</code> once to install it.</p>
@@ -122,8 +137,8 @@ $(function() {
 <div class="line">./bin/picurv run --help</div>
 <div class="line">./bin/picurv sweep --help</div>
 <div class="line">./bin/picurv validate --help</div>
-</div><!-- fragment --><h1><a class="anchor" id="init_sec"></a>
-2. Initialize the Study Directory</h1>
+</div><!-- fragment --><h1><a class="anchor" id="p05_init_sec"></a>
+2. init: Create A New Case Directory</h1>
 <div class="fragment"><div class="line">./bin/picurv init &lt;template_name&gt; [--dest &lt;new_dir&gt;]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
@@ -138,8 +153,8 @@ $(function() {
 <div class="fragment"><div class="line">./bin/picurv init flat_channel --dest my_first_case</div>
 <div class="line">./bin/picurv init bent_channel --dest my_bent_case</div>
 </div><!-- fragment --><p>Use <code>init</code> when you want a runnable starting point that you can <code>cd</code> into and launch with <code>./picurv ...</code>. Use reusable profile libraries directly when you already have your own case directory layout.</p>
-<h1><a class="anchor" id="build_sec"></a>
-7. Build with picurv</h1>
+<h1><a class="anchor" id="p05_build_sec"></a>
+3. build: Build Project Executables</h1>
 <div class="fragment"><div class="line">./scripts/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
@@ -155,7 +170,7 @@ $(function() {
 <div class="line">./scripts/picurv build SYSTEM=cluster</div>
 <div class="line">./scripts/picurv build postprocessor</div>
 <div class="line">./my_case/picurv build clean-project</div>
-</div><!-- fragment --><h1><a class="anchor" id="sync_sec"></a>
+</div><!-- fragment --><h1><a class="anchor" id="p05_sync_sec"></a>
 3b. sync-binaries / sync-config / pull-source / status-source</h1>
 <p>These commands are intended for self-contained case directories created by <code>init</code>.</p>
 <p><code>sync-binaries</code> refreshes the case-local copies of <code>picurv</code>, <code>simulator</code>, and <code>postprocessor</code> from the source repo <code>bin/</code>:</p>
@@ -173,8 +188,22 @@ $(function() {
 <div class="fragment"><div class="line">./my_case/picurv status-source</div>
 <div class="line">./my_case/picurv status-source --format json</div>
 </div><!-- fragment --><p>For older cases that do not yet have <code>.picurv-origin.json</code>, pass <code>--source-root /path/to/PICurv</code>. For <code>sync-config</code>, also pass <code>--template-name &lt;example_name&gt;</code> if the template cannot be inferred.</p>
-<h1><a class="anchor" id="run_sec"></a>
-5. Run Solver and Postprocessor</h1>
+<p><code>status-source --format json</code> payload highlights:</p>
+<ul>
+<li><code>source_repo_root</code>, <code>case_dir</code></li>
+<li><code>last_known_source_git_commit</code>, <code>current_source_git_commit</code>, <code>source_commit_changed</code></li>
+<li><code>binaries</code>:<ul>
+<li><code>case_bin_current</code>, <code>case_bin_different</code>, <code>case_bin_missing</code></li>
+</ul>
+</li>
+<li><code>config</code>:<ul>
+<li><code>case_current_files</code>, <code>case_modified_files</code>, <code>case_missing_files</code></li>
+<li><code>template_removed_since_last_sync</code> (when template-managed tracking is available)</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="p05_run_sec"></a>
+4. run: Single-Case Workflow</h1>
 <div class="fragment"><div class="line">./bin/picurv run [STAGES] [INPUTS] [OPTIONS]</div>
 </div><!-- fragment --><p>Stages:</p><ul>
 <li><code>--solve</code></li>
@@ -238,7 +267,7 @@ $(function() {
 <li>cluster script generation without submit: <code>--cluster ... --no-submit</code></li>
 <li>planning and CI-style checks: <code>--dry-run</code></li>
 </ul>
-<h1><a class="anchor" id="sweep_sec"></a>
+<h1><a class="anchor" id="p05_sweep_sec"></a>
 5. sweep: Parameter Study via Slurm Arrays</h1>
 <div class="fragment"><div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
@@ -250,8 +279,8 @@ $(function() {
 <li>submits post array with <code>afterok:&lt;solver_jobid&gt;</code> dependency (unless <code>--no-submit</code>)</li>
 <li>aggregates metrics and emits plots in <code>studies/&lt;study_id&gt;/results/</code></li>
 </ul>
-<h1><a class="anchor" id="validate_sec"></a>
-4. Validate Inputs Before Launch</h1>
+<h1><a class="anchor" id="p05_validate_sec"></a>
+6. validate: Config-Only Checks</h1>
 <div class="fragment"><div class="line">./bin/picurv validate \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -265,8 +294,175 @@ $(function() {
 <li>catch mode-dependent contract errors before the C runtime,</li>
 <li>inspect warnings where <code>picurv</code> preserves a C-side default intentionally.</li>
 </ul>
-<h1><a class="anchor" id="modular_sec"></a>
-7. Modular Profile Strategy</h1>
+<h1><a class="anchor" id="p05_command_matrix_sec"></a>
+7. Full Command and Option Matrix</h1>
+<p>This section is intentionally exhaustive and mirrors the current <code>argparse</code> contract in <code>scripts/picurv</code>. Use it as the authoritative option reference when writing docs, examples, wrappers, or CI jobs.</p>
+<p><code>run</code>:</p><ul>
+<li>stages:<ul>
+<li><code>--solve</code> (requires <code>--case</code>, <code>--solver</code>, <code>--monitor</code>)</li>
+<li><code>--post-process</code> (requires <code>--post</code>; requires <code>--run-dir</code> when <code>--solve</code> is not selected)</li>
+</ul>
+</li>
+<li>solver inputs:<ul>
+<li><code>--case &lt;path&gt;</code></li>
+<li><code>--solver &lt;path&gt;</code></li>
+<li><code>--monitor &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>post inputs:<ul>
+<li><code>--post &lt;path&gt;</code></li>
+<li><code>--run-dir &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>launch controls:<ul>
+<li><code>-n, --num-procs &lt;int&gt;</code> (solver stage only; post remains 1 rank/task)</li>
+<li><code>--cluster &lt;cluster.yml&gt;</code> (enables Slurm mode)</li>
+<li><code>--scheduler &lt;name&gt;</code> (must be used with <code>--cluster</code>; must match <code>cluster.yml:scheduler.type</code>)</li>
+<li><code>--no-submit</code> (render scripts/manifests without <code>sbatch</code>)</li>
+<li><code>--dry-run</code> (no file writes; plan only)</li>
+<li><code>--format {text,json}</code> (dry-run output format)</li>
+</ul>
+</li>
+</ul>
+<p><code>validate</code>:</p><ul>
+<li>role selectors:<ul>
+<li><code>--case &lt;path&gt;</code></li>
+<li><code>--solver &lt;path&gt;</code></li>
+<li><code>--monitor &lt;path&gt;</code></li>
+<li><code>--post &lt;path&gt;</code></li>
+<li><code>--cluster &lt;path&gt;</code></li>
+<li><code>--study &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>stricter policy:<ul>
+<li><code>--strict</code> (adds additional checks for selected roles; documented below)</li>
+</ul>
+</li>
+</ul>
+<p><code>sweep</code>:</p><ul>
+<li>required:<ul>
+<li><code>--study &lt;study.yml&gt;</code></li>
+<li><code>--cluster &lt;cluster.yml&gt;</code></li>
+</ul>
+</li>
+<li>optional:<ul>
+<li><code>--no-submit</code></li>
+</ul>
+</li>
+</ul>
+<p><code>init</code>:</p><ul>
+<li>positional:<ul>
+<li><code>&lt;template_name&gt;</code></li>
+</ul>
+</li>
+<li>optional:<ul>
+<li><code>--dest &lt;dir&gt;</code></li>
+<li><code>--source-root &lt;repo&gt;</code></li>
+</ul>
+</li>
+</ul>
+<p><code>build</code>:</p><ul>
+<li>optional:<ul>
+<li><code>--source-root &lt;repo&gt;</code></li>
+<li><code>--case-dir &lt;case_dir&gt;</code></li>
+</ul>
+</li>
+<li>passthrough:<ul>
+<li>trailing <code>MAKE_ARGS...</code> are passed directly to <code>make</code></li>
+</ul>
+</li>
+</ul>
+<p><code>sync-binaries</code>:</p><ul>
+<li><code>--case-dir &lt;case_dir&gt;</code></li>
+<li><code>--source-root &lt;repo&gt;</code></li>
+</ul>
+<p><code>sync-config</code>:</p><ul>
+<li><code>--case-dir &lt;case_dir&gt;</code></li>
+<li><code>--source-root &lt;repo&gt;</code></li>
+<li><code>--template-name &lt;template&gt;</code></li>
+<li><code>--overwrite</code></li>
+<li><code>--prune</code></li>
+</ul>
+<p><code>pull-source</code>:</p><ul>
+<li><code>--case-dir &lt;case_dir&gt;</code></li>
+<li><code>--source-root &lt;repo&gt;</code></li>
+<li><code>--remote &lt;git_remote&gt;</code></li>
+<li><code>--branch &lt;git_branch&gt;</code></li>
+<li><code>--no-rebase</code></li>
+</ul>
+<p><code>status-source</code>:</p><ul>
+<li><code>--case-dir &lt;case_dir&gt;</code></li>
+<li><code>--source-root &lt;repo&gt;</code></li>
+<li><code>--template-name &lt;template&gt;</code></li>
+<li><code>--format {text,json}</code></li>
+</ul>
+<h1><a class="anchor" id="p05_strict_validate_sec"></a>
+8. &lt;tt&gt;validate --strict&lt;/tt&gt;: Additional Checks</h1>
+<p><code>--strict</code> does not change baseline schema validation, but it adds file-system consistency checks for selected roles:</p>
+<ul>
+<li>with <code>--post</code>:<ul>
+<li>if <code>source_data.directory</code> is not <code>&lt;solver_output_dir&gt;</code>, the resolved directory must exist.</li>
+</ul>
+</li>
+<li>with <code>--study</code>:<ul>
+<li>base configs listed in <code>study.base_configs</code> are loaded and revalidated as real case/solver/monitor/post bundles.</li>
+<li>this catches study files that are syntactically valid but point to invalid base configurations.</li>
+</ul>
+</li>
+</ul>
+<p>Use <code>--strict</code> in CI/pre-submit checks when validating reusable profile libraries or study manifests.</p>
+<h1><a class="anchor" id="p05_dry_run_schema_sec"></a>
+9. Dry-Run JSON Plan Schema</h1>
+<p><code>picurv run --dry-run --format json</code> emits a deterministic plan payload with these top-level keys:</p>
+<ul>
+<li><code>mode</code> (<code>"dry-run"</code>)</li>
+<li><code>created_at</code> (ISO timestamp)</li>
+<li><code>launch_mode</code> (<code>local</code> or <code>slurm</code>)</li>
+<li><code>warnings</code> (list)</li>
+<li><code>inputs</code> (resolved absolute paths)</li>
+<li><code>stages</code> (stage-specific launch plans)</li>
+<li><code>artifacts</code> (predicted files/directories, deduplicated)</li>
+<li><code>run_id_preview</code> / <code>run_dir_preview</code> (when known)</li>
+<li><code>solver_num_procs_effective</code></li>
+<li><code>post_num_procs_effective</code></li>
+<li><code>num_procs_effective</code> (currently mirrors solver count)</li>
+</ul>
+<p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>
+<ul>
+<li><code>mode</code> (<code>local</code> or <code>slurm</code>)</li>
+<li><code>num_procs_effective</code></li>
+<li><code>launch_command</code> (tokenized command list)</li>
+<li><code>launch_command_string</code> (shell-ready display string)</li>
+</ul>
+<p>Additional stage fields:</p><ul>
+<li><code>script</code> (Slurm script path in cluster mode)</li>
+<li><code>source_data_directory</code> (post stage source directory resolution)</li>
+<li><code>restart_source_directory</code> (solve stage, when restart source is resolved)</li>
+</ul>
+<p>Dry-run guarantees:</p><ul>
+<li>no run directory creation,</li>
+<li>no control/post recipe writes,</li>
+<li>no scheduler script writes,</li>
+<li>no job submission.</li>
+</ul>
+<h1><a class="anchor" id="p05_structured_errors_sec"></a>
+10. Structured Error Output Contract</h1>
+<p>Validation and CLI usage errors are emitted as one-line, machine-parseable records:</p>
+<div class="fragment"><div class="line">ERROR &lt;CODE&gt; | key=&lt;yaml_or_cli_key&gt; | file=&lt;path_or_dash&gt; | message=&lt;summary&gt; | hint=&lt;actionable_hint&gt;</div>
+</div><!-- fragment --><p>Current normalized error code set:</p>
+<ul>
+<li><code>CLI_USAGE_INVALID</code></li>
+<li><code>CFG_MISSING_SECTION</code></li>
+<li><code>CFG_MISSING_KEY</code></li>
+<li><code>CFG_INVALID_TYPE</code></li>
+<li><code>CFG_INVALID_VALUE</code></li>
+<li><code>CFG_FILE_NOT_FOUND</code></li>
+<li><code>CFG_GRID_PARSE</code></li>
+<li><code>CFG_INCONSISTENT_COMBO</code></li>
+</ul>
+<p>This contract is exercised by Python tests and should remain stable for wrappers and CI parsers.</p>
+<h1><a class="anchor" id="p05_modular_sec"></a>
+11. Modular Profile Strategy</h1>
 <p>PICurv is intended to be used with reusable profile libraries.</p>
 <p>Typical pattern:</p>
 <ol type="1">
@@ -292,8 +488,8 @@ $(function() {
 <li><code>config/schedulers/</code></li>
 <li><code>examples/master_template/</code></li>
 </ul>
-<h1><a class="anchor" id="artifacts_sec"></a>
-6. Inspect Generated Artifacts</h1>
+<h1><a class="anchor" id="p05_artifacts_sec"></a>
+12. Generated Runtime Artifacts</h1>
 <p>Single run (<code>run</code>):</p><ul>
 <li><code>runs/&lt;run_id&gt;/config/*.control</code>, <code>bcs*.run</code>, <code>post.run</code>, plus optional <code>whitelist.run</code> / <code>profile.run</code> sidecars when enabled</li>
 <li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code>, <code>post.sbatch</code> (cluster mode)</li>
@@ -310,8 +506,8 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/results/plots/*.png</code> (if plotting enabled and matplotlib available)</li>
 <li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p05_next_steps_sec"></a>
+13. Next Steps</h1>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
@@ -320,8 +516,28 @@ $(function() {
 <li>Grid generator details: <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b></li>
 <li>Modular examples and recipes: <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li>Troubleshooting map: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li>Smoke/CI verification details: <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
+<li>Smoke/CI verification details: <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md20"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>The Conductor Script: picurv</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md21"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md22"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

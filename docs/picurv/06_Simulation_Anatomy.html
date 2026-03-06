@@ -83,13 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#compose_sec">2. Composition in Practice</a></li>
-<li class="level1"><a href="#libraries_sec">4. Reusable Config Libraries</a></li>
+<ul><li class="level1"><a href="#p06_roles_sec">1. Logical Inputs</a></li>
+<li class="level1"><a href="#p06_compose_sec">2. Composition in Practice</a></li>
+<li class="level1"><a href="#p06_artifacts_sec">3. YAML -&gt; Runtime Artifacts</a></li>
+<li class="level1"><a href="#p06_libraries_sec">4. Reusable Config Libraries</a></li>
+<li class="level1"><a href="#p06_next_steps_sec">5. Next Steps</a><ul><li class="level2"><a href="#autotoc_md23">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md24">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md25">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv runs are composed from modular inputs. This lets you swap physics, numerics, monitoring, and post-analysis independently.</p>
-<h1><a class="anchor" id="roles_sec"></a>
-3. Understand File Roles</h1>
+<div class="textblock"><p><a class="anchor" id="_Simulation_Anatomy"></a> PICurv runs are composed from modular inputs. This lets you swap physics, numerics, monitoring, and post-analysis independently.</p>
+<h1><a class="anchor" id="p06_roles_sec"></a>
+1. Logical Inputs</h1>
 <p>A single-run workflow uses five logical inputs:</p>
 <ol type="1">
 <li><code>case.yml</code>: physics/domain/grid/BC/run control</li>
@@ -104,7 +112,7 @@ $(function() {
 <li><code>study.yml</code>: parameter matrix + metrics/plot contract (<code>sweep --study</code>)</li>
 </ol>
 <p>You can choose any file names. C binaries do not require fixed YAML names.</p>
-<h1><a class="anchor" id="compose_sec"></a>
+<h1><a class="anchor" id="p06_compose_sec"></a>
 2. Composition in Practice</h1>
 <p>Example solve invocation:</p>
 <div class="fragment"><div class="line">./bin/picurv run --solve -n 16 \</div>
@@ -112,8 +120,8 @@ $(function() {
 <div class="line">  --solver config/solvers/Imp-MG-Standard.yml \</div>
 <div class="line">  --monitor config/monitors/Standard_Output.yml</div>
 </div><!-- fragment --><p>Only numerics/monitoring can be swapped without touching case physics. In practice, users often keep one validated <code>case.yml</code>, then compare multiple <code>solver.yml</code> or <code>monitor.yml</code> profiles against it, or reuse one <code>post.yml</code> across several cases.</p>
-<h1><a class="anchor" id="artifacts_sec"></a>
-6. Inspect Generated Artifacts</h1>
+<h1><a class="anchor" id="p06_artifacts_sec"></a>
+3. YAML -&gt; Runtime Artifacts</h1>
 <p><code>picurv</code> validates inputs, then generates C-facing artifacts under <code>runs/&lt;run_id&gt;/config/</code>:</p>
 <ul>
 <li><code>&lt;run_id&gt;.control</code></li>
@@ -123,7 +131,7 @@ $(function() {
 <li><code>post.run</code></li>
 </ul>
 <p>These are the concrete contract consumed by C-side parsers in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, and BC/profile loaders.</p>
-<h1><a class="anchor" id="libraries_sec"></a>
+<h1><a class="anchor" id="p06_libraries_sec"></a>
 4. Reusable Config Libraries</h1>
 <p>Project-level shared profiles live in:</p>
 <div class="fragment"><div class="line">config/</div>
@@ -133,16 +141,36 @@ $(function() {
 <div class="line">|- schedulers/</div>
 <div class="line">`- studies/</div>
 </div><!-- fragment --><p>Use these as reusable baselines and keep case-specific physics in study-local files.</p>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p06_next_steps_sec"></a>
+5. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b>.</p>
 <p>For full contract and ingestion mapping, also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
-<li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b> </li>
+<li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md23"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Anatomy of a Simulation</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md24"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md25"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

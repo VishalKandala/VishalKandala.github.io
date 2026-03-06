@@ -83,13 +83,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#equation_sec">1. Pressure-Correction Equation</a></li>
-<li class="level1"><a href="#mg_sec">2. Multigrid/KSP Stack In Code</a></li>
-<li class="level1"><a href="#robustness_sec">4. Robustness Characteristics</a></li>
+<ul><li class="level1"><a href="#p25_equation_sec">1. Pressure-Correction Equation</a></li>
+<li class="level1"><a href="#p25_mg_sec">2. Multigrid/KSP Stack In Code</a></li>
+<li class="level1"><a href="#p25_config_sec">3. YAML Mapping and PETSc Options</a></li>
+<li class="level1"><a href="#p25_robustness_sec">4. Robustness Characteristics</a></li>
+<li class="level1"><a href="#p25_refs_sec">5. Related Pages</a><ul><li class="level2"><a href="#autotoc_md91">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md92">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md93">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page describes the pressure-correction solve path used by projection in PICurv.</p>
-<h1><a class="anchor" id="equation_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Pressure_Poisson_GMRES_Multigrid"></a> This page describes the pressure-correction solve path used by projection in PICurv.</p>
+<h1><a class="anchor" id="p25_equation_sec"></a>
 1. Pressure-Correction Equation</h1>
 <p>The correction solve enforces incompressibility through:</p>
 <p class="formulaDsp">
@@ -104,7 +111,7 @@ $(function() {
 <li>solve orchestration: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
 </ul>
 <p>Null-space handling is explicitly configured for Neumann-like pressure systems via function <a class="el" href="poisson_8h.html#a2648a0c6cafb7916a706cd757e5b92f5">PoissonNullSpaceFunction</a> in the Poisson module.</p>
-<h1><a class="anchor" id="mg_sec"></a>
+<h1><a class="anchor" id="p25_mg_sec"></a>
 2. Multigrid/KSP Stack In Code</h1>
 <p><a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a> currently:</p>
 <ol type="1">
@@ -119,8 +126,8 @@ $(function() {
 <li>pressure is updated by <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a></li>
 <li>velocity is projected by <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
 </ul>
-<h1><a class="anchor" id="config_sec"></a>
-2. File-Grid Configuration</h1>
+<h1><a class="anchor" id="p25_config_sec"></a>
+3. YAML Mapping and PETSc Options</h1>
 <p>From <code>solver.yml</code> via <code>scripts/picurv</code>:</p>
 <ul>
 <li><code>pressure_solver.tolerance</code> -&gt; <code>-poisson_tol</code></li>
@@ -132,7 +139,7 @@ $(function() {
 <li><code>petsc_passthrough_options</code> -&gt; raw PETSc flags</li>
 </ul>
 <p>Final option parsing happens in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during context creation.</p>
-<h1><a class="anchor" id="robustness_sec"></a>
+<h1><a class="anchor" id="p25_robustness_sec"></a>
 4. Robustness Characteristics</h1>
 <p>Current implementation includes:</p>
 <ul>
@@ -147,13 +154,33 @@ $(function() {
 <li>grid metrics/orientation quality,</li>
 <li>solver tolerances vs timestep.</li>
 </ol>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p25_refs_sec"></a>
+5. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="23_Fractional_Step_Method.html">Fractional-Step (Projection) Method</a></b></li>
 <li><b><a class="el" href="24_Dual_Time_Picard_RK4.html">Dual-Time Picard RK4 Momentum Solver</a></b></li>
-<li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b> </li>
+<li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md91"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Pressure-Poisson, GMRES, and Multigrid</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md92"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md93"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

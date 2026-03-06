@@ -83,13 +83,27 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#role_sec">1. What &lt;tt&gt;grid.gen&lt;/tt&gt; Is For</a></li>
-<li class="level1"><a href="#invocation_sec">2. Direct CLI Usage</a></li>
-<li class="level1"><a href="#choose_sec">7. When To Use Which Grid Path</a></li>
+<ul><li class="level1"><a href="#p48_role_sec">1. What &lt;tt&gt;grid.gen&lt;/tt&gt; Is For</a></li>
+<li class="level1"><a href="#p48_invocation_sec">2. Direct CLI Usage</a><ul><li class="level2"><a href="#p48_option_matrix_ssec">2.1 Option Families</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p48_types_sec">3. Supported Grid Types</a></li>
+<li class="level1"><a href="#p48_config_sec">4. Config File Model</a></li>
+<li class="level1"><a href="#p48_outputs_sec">5. Outputs</a></li>
+<li class="level1"><a href="#p48_case_sec">6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;</a><ul><li class="level2"><a href="#p48_file_legacy_ssec">6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p48_choose_sec">7. When To Use Which Grid Path</a></li>
+<li class="level1"><a href="#p48_related_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md157">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md158">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md159">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p><code>scripts/grid.gen</code> is the standalone structured-grid generation utility used by the <code>grid.mode: grid_gen</code> workflow. This page documents what it can generate directly, how its config files work, and how <code>picurv</code> wraps it.</p>
-<h1><a class="anchor" id="role_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Grid_Generator_Guide"></a> <code>scripts/grid.gen</code> is the standalone structured-grid utility used by the <code>grid.mode: grid_gen</code> workflow and legacy grid conversion paths. This page documents what it can generate or convert directly, how its config files work, and how <code>picurv</code> wraps it.</p>
+<h1><a class="anchor" id="p48_role_sec"></a>
 1. What &lt;tt&gt;grid.gen&lt;/tt&gt; Is For</h1>
 <p>Use <code>grid.gen</code> when you want:</p>
 <ul>
@@ -97,13 +111,14 @@ $(function() {
 <li>generated <code>.picgrid</code> geometry instead of C-side <code>programmatic_c</code> geometry,</li>
 <li>reusable generator configs that can be versioned and shared across cases,</li>
 <li>optional quick mesh diagnostics (<code>.info</code>) and visualization output (<code>.vts</code>).</li>
+<li>conversion of legacy headerless 1D-axis grid payloads into canonical PICGRID files.</li>
 </ul>
 <p>This is distinct from:</p>
 <ul>
 <li><code>grid.mode: programmatic_c</code>: geometry is generated inside the C runtime,</li>
 <li><code>grid.mode: file</code>: an existing <code>.picgrid</code> file is staged and used directly.</li>
 </ul>
-<h1><a class="anchor" id="invocation_sec"></a>
+<h1><a class="anchor" id="p48_invocation_sec"></a>
 2. Direct CLI Usage</h1>
 <p>General form:</p>
 <div class="fragment"><div class="line">python3 scripts/grid.gen [--config &lt;cfgfile&gt;] &lt;grid_type&gt; [grid-specific options...]</div>
@@ -112,23 +127,60 @@ $(function() {
 <div class="line">python3 scripts/grid.gen cpipe --orientation xz --vts cpipe_xz.vts</div>
 <div class="line">python3 scripts/grid.gen cpipe --ncells-i 32 --ncells-j 32 --stretch-i 2.5 --stretch-j 2.5</div>
 <div class="line">python3 scripts/grid.gen cpipe --ncells-i 32 --ncells-j 32 --first-cell-i-start 0.01 --first-cell-j-start 0.01</div>
+<div class="line">python3 scripts/grid.gen legacy1d --input legacy_flat.grid --output legacy_flat.picgrid --no-write-vtk</div>
 </div><!-- fragment --><p><code>grid.gen</code> accepts both:</p>
 <ul>
 <li>a config file (<code>--config</code>) for reusable defaults,</li>
 <li>direct CLI flags for overrides.</li>
 </ul>
 <p>CLI values override config-file values.</p>
-<h1><a class="anchor" id="types_sec"></a>
-2. Supported Types In Current Code</h1>
+<h2><a class="anchor" id="p48_option_matrix_ssec"></a>
+2.1 Option Families</h2>
+<p>Common options (all grid types):</p>
+<ul>
+<li><code>--config &lt;file&gt;</code></li>
+<li><code>--output &lt;picgrid_path&gt;</code></li>
+<li><code>--vts &lt;vtk_path&gt;</code></li>
+<li><code>--stats-file &lt;info_path&gt;</code></li>
+<li><code>--origin X Y Z</code></li>
+<li><code>--show-stats</code> / <code>--no-show-stats</code></li>
+<li><code>--write-vtk</code> / <code>--no-write-vtk</code></li>
+</ul>
+<p>Global stretching controls:</p>
+<ul>
+<li><code>--stretch-i</code>, <code>--stretch-j</code>, <code>--stretch-k</code></li>
+<li>first-cell sizing controls:<ul>
+<li><code>--first-cell-i-start</code>, <code>--first-cell-i-end</code></li>
+<li><code>--first-cell-j-start</code>, <code>--first-cell-j-end</code></li>
+<li><code>--first-cell-k-start</code>, <code>--first-cell-k-end</code></li>
+</ul>
+</li>
+</ul>
+<p>Grid-type-specific options:</p>
+<ul>
+<li><code>cpipe</code>: <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--side-lengths</code>, <code>--rc-factor</code>, <code>--straight-factor</code>, <code>--bend-angle</code>, <code>--orientation</code></li>
+<li><code>pipe</code>: <code>--ncells-phi</code>, <code>--ncells-r</code>, <code>--ncells-path</code>, <code>--diameter</code>, <code>--pinhole-factor</code>, <code>--rc-factor</code>, <code>--straight-factor</code>, <code>--bend-angle</code>, <code>--orientation</code></li>
+<li><code>warp</code>: <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--bounds-x</code>, <code>--bounds-y</code>, <code>--bounds-z</code>, <code>--amp-A</code>, <code>--amp-B</code>, <code>--amp-C</code></li>
+<li><code>legacy1d</code>: <code>--input</code>, <code>--axis-columns</code>, <code>--strict-trailing</code> / <code>--allow-trailing</code></li>
+</ul>
+<p>Notes for CFD users:</p>
+<ul>
+<li><code>ncells-*</code> are cell counts at input.</li>
+<li>PICGRID header dimensions are node counts (<code>cells + 1</code>) after conversion.</li>
+<li>this conversion behavior is regression-tested in <code>tests/test_cli_smoke.py</code>.</li>
+</ul>
+<h1><a class="anchor" id="p48_types_sec"></a>
+3. Supported Grid Types</h1>
 <p>Current subcommands:</p>
 <ul>
 <li><code>cpipe</code>: bent pipe with a rectangular cross-section</li>
 <li><code>pipe</code>: bent pipe with a circular cross-section (O-grid style)</li>
 <li><code>warp</code>: generic warped Cartesian block</li>
+<li><code>legacy1d</code>: legacy 1D-axis payload converter (headerless block + dims + x/y/z axis lists -&gt; canonical PICGRID)</li>
 </ul>
 <p>These map to different geometric parameter sets inside <code>grid.gen</code>.</p>
-<h1><a class="anchor" id="config_sec"></a>
-2. File-Grid Configuration</h1>
+<h1><a class="anchor" id="p48_config_sec"></a>
+4. Config File Model</h1>
 <p>Reusable config files live naturally in <code>config/grids/</code>, but can also live beside a study for reproducibility snapshots.</p>
 <p>Current shared example:</p>
 <ul>
@@ -148,8 +200,8 @@ $(function() {
 <li>stretching controls,</li>
 <li>output toggles and optional filenames.</li>
 </ul>
-<h1><a class="anchor" id="outputs_sec"></a>
-4. Outputs and Aggregates</h1>
+<h1><a class="anchor" id="p48_outputs_sec"></a>
+5. Outputs</h1>
 <p>Depending on settings, <code>grid.gen</code> can emit:</p>
 <ul>
 <li><code>.picgrid</code>: solver-ingestible structured grid file</li>
@@ -157,8 +209,8 @@ $(function() {
 <li><code>.vts</code>: visualization helper for ParaView</li>
 </ul>
 <p><code>grid.gen</code> also prints mesh-quality information to the console when enabled, including normalized warpage checks.</p>
-<h1><a class="anchor" id="case_sec"></a>
-3. Case Contract Highlights</h1>
+<h1><a class="anchor" id="p48_case_sec"></a>
+6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;</h1>
 <p><code>picurv</code> wraps the generator through:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: grid_gen</div>
@@ -181,7 +233,25 @@ $(function() {
 <li>stage the runtime <code>grid.run</code> artifact for C-side ingestion.</li>
 </ol>
 <p>This means <code>grid_gen</code> remains a Python-side preprocessing workflow even though the final solver still receives a normalized file grid.</p>
-<h1><a class="anchor" id="choose_sec"></a>
+<h2><a class="anchor" id="p48_file_legacy_ssec"></a>
+6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</h2>
+<p>For <code>grid.mode: file</code>, <code>picurv</code> can call <code>grid.gen legacy1d</code> before normal grid staging:</p>
+<div class="fragment"><div class="line">grid:</div>
+<div class="line">  mode: file</div>
+<div class="line">  source_file: legacy_flat.grid</div>
+<div class="line">  legacy_conversion:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    format: legacy1d</div>
+<div class="line">    axis_columns: [0, 1, 2]</div>
+<div class="line">    strict_trailing: true</div>
+</div><!-- fragment --><p>Execution sequence:</p>
+<ol type="1">
+<li>run <code>grid.gen legacy1d --input &lt;source_file&gt; --output &lt;run&gt;/config/grid.converted.picgrid</code></li>
+<li>validate converted PICGRID payload</li>
+<li>non-dimensionalize to <code>grid.run</code></li>
+<li>pass <code>-grid_file &lt;run&gt;/config/grid.run</code> to the C runtime</li>
+</ol>
+<h1><a class="anchor" id="p48_choose_sec"></a>
 7. When To Use Which Grid Path</h1>
 <p>Use <code>programmatic_c</code> when:</p>
 <ul>
@@ -201,14 +271,34 @@ $(function() {
 <li>you want a reusable mesh recipe with controlled overrides,</li>
 <li>you want generated <code>.info</code>/<code>.vts</code> outputs alongside the mesh.</li>
 </ul>
-<h1><a class="anchor" id="related_sec"></a>
-6. Related Docs</h1>
+<h1><a class="anchor" id="p48_related_sec"></a>
+8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
-<li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b> </li>
+<li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md157"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Grid Generator Guide: scripts/grid.gen</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md158"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md159"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -112,397 +112,411 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#undef __FUNCT__</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="les_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5">   22</a></span><span class="preprocessor">#define __FUNCT__ &quot;ComputeSmagorinskyConstant&quot;</span></div>
-<div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">   23</a></span>PetscErrorCode <a class="code hl_function" href="les_8c.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>{</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    PetscErrorCode ierr;</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>; <span class="comment">// Get the global context for simulation parameters</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="comment">// --- Initial Condition / Simple Model Handling ---</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="comment">// For the first couple of steps of a simulation from t=0, the flow is not developed</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="comment">// enough for the dynamic procedure to be stable. Set Cs to zero.</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> &lt; 2 &amp;&amp; simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> == 0) {</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        ierr = VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, 0.0); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Setting Smagorinsky coefficient Cs=0.0 for initial steps (step=%d)\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>);</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    }</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="comment">// If the user requests the non-dynamic, constant-coefficient Smagorinsky model (les=1),</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="comment">// set a constant value and exit.</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad87ed7266a1bc272ab8d4cea4e39d4d2">les</a> == <a class="code hl_enumvalue" href="variables_8h.html#a02c34d525de10470f7953ff7c6d704e2afb7d5d8c3570e7aa635682663af1cacb">CONSTANT_SMAGORINSKY</a>) {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,<span class="stringliteral">&quot;Using constant-coefficient Smagorinsky model with Cs=%.4f \n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa3878f6dae71be87d0a62947d3055663">Const_CS</a>);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        ierr = VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa3878f6dae71be87d0a62947d3055663">Const_CS</a>); CHKERRQ(ierr); <span class="comment">// A typical constant value</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="comment">// --- Setup for Dynamic Procedure ---</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    DM              da = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, fda = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    DMDALocalInfo   info;</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    PetscInt        i, j, k, p, q, r;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    PetscInt        xs, xe, ys, ye, zs, ze; <span class="comment">// Local grid corner indices</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    PetscInt        mx, my, mz;             <span class="comment">// Global grid dimensions</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    PetscInt        lxs, lxe, lys, lye, lzs, lze; <span class="comment">// Local interior loop bounds</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="les_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5">   22</a></span><span class="preprocessor">#define __FUNCT__ &quot;ComputeSmagorinskyConstant&quot;</span><span class="comment"></span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> * @brief Implementation of \ref ComputeSmagorinskyConstant().</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * @details Full API contract (arguments, ownership, side effects) is documented with</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> *          the header declaration in `include/les.h`.</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * @see ComputeSmagorinskyConstant()</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="foldopen" id="foldopen00030" data-start="{" data-end="}">
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">   30</a></span>PetscErrorCode <a class="code hl_function" href="les_8c.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>{</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    PetscErrorCode ierr;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>; <span class="comment">// Get the global context for simulation parameters</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="comment">// --- Initial Condition / Simple Model Handling ---</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="comment">// For the first couple of steps of a simulation from t=0, the flow is not developed</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="comment">// enough for the dynamic procedure to be stable. Set Cs to zero.</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> &lt; 2 &amp;&amp; simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> == 0) {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        ierr = VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, 0.0); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Setting Smagorinsky coefficient Cs=0.0 for initial steps (step=%d)\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    }</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">// If the user requests the non-dynamic, constant-coefficient Smagorinsky model (les=1),</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="comment">// set a constant value and exit.</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad87ed7266a1bc272ab8d4cea4e39d4d2">les</a> == <a class="code hl_enumvalue" href="variables_8h.html#a02c34d525de10470f7953ff7c6d704e2afb7d5d8c3570e7aa635682663af1cacb">CONSTANT_SMAGORINSKY</a>) {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,<span class="stringliteral">&quot;Using constant-coefficient Smagorinsky model with Cs=%.4f \n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa3878f6dae71be87d0a62947d3055663">Const_CS</a>);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        ierr = VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa3878f6dae71be87d0a62947d3055663">Const_CS</a>); CHKERRQ(ierr); <span class="comment">// A typical constant value</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    }</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="comment">// --- Setup for Dynamic Procedure ---</span></div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">// Temporary PETSc vectors required for the calculation. These are allocated</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="comment">// here and destroyed at the end to keep the UserCtx clean.</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    Vec lSx, lSy, lSz, lS_abs;</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    Vec lLM, lMM; <span class="comment">// Leonard &amp; cross-term stress tensors</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="comment">// Get grid dimensions and local bounds</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    ierr = DMDAGetLocalInfo(da, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    mx = info.mx; my = info.my; mz = info.mz;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    xs = info.xs; xe = xs + info.xm;</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    ys = info.ys; ye = ys + info.ym;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    zs = info.zs; ze = zs + info.zm;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    DM              da = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, fda = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    DMDALocalInfo   info;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    PetscInt        i, j, k, p, q, r;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    PetscInt        xs, xe, ys, ye, zs, ze; <span class="comment">// Local grid corner indices</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    PetscInt        mx, my, mz;             <span class="comment">// Global grid dimensions</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    PetscInt        lxs, lxe, lys, lye, lzs, lze; <span class="comment">// Local interior loop bounds</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// Temporary PETSc vectors required for the calculation. These are allocated</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="comment">// here and destroyed at the end to keep the UserCtx clean.</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    Vec lSx, lSy, lSz, lS_abs;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    Vec lLM, lMM; <span class="comment">// Leonard &amp; cross-term stress tensors</span></div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="comment">// Define loop bounds to exclude physical boundaries where stencils are invalid.</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    lxs = xs; lxe = xe; lys = ys; lye = ye; lzs = zs; lze = ze;</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">if</span> (xs==0) lxs = xs+1;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keywordflow">if</span> (ys==0) lys = ys+1;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordflow">if</span> (zs==0) lzs = zs+1;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordflow">if</span> (xe==mx) lxe = xe-1;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keywordflow">if</span> (ye==my) lye = ye-1;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordflow">if</span> (ze==mz) lze = ze-1;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="comment">// Allocate temporary vectors</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSx); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSy); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSz); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lS_abs); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lLM); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lMM); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    ierr = VecSet(lLM, 0.0); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    ierr = VecSet(lMM, 0.0); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="comment">// Get read/write access to PETSc vector data as multidimensional arrays</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***ucat, ***csi, ***eta, ***zet;</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    PetscReal   ***nvert, ***Cs_arr, ***aj, ***S_abs_arr, ***LM_arr, ***MM_arr;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***Sx_arr, ***Sy_arr, ***Sz_arr;</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    ierr = DMDAVecGetArray(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, &amp;ucat); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    ierr = DMDAVecGetArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, &amp;Cs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    ierr = DMDAVecGetArray(fda, lSx, &amp;Sx_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    ierr = DMDAVecGetArray(fda, lSy, &amp;Sy_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    ierr = DMDAVecGetArray(fda, lSz, &amp;Sz_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    ierr = DMDAVecGetArray(da, lS_abs, &amp;S_abs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    ierr = DMDAVecGetArray(da, lLM, &amp;LM_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    ierr = DMDAVecGetArray(da, lMM, &amp;MM_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="comment">// Get grid dimensions and local bounds</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    ierr = DMDAGetLocalInfo(da, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    mx = info.mx; my = info.my; mz = info.mz;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    xs = info.xs; xe = xs + info.xm;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    ys = info.ys; ye = ys + info.ym;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    zs = info.zs; ze = zs + info.zm;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="comment">// Define loop bounds to exclude physical boundaries where stencils are invalid.</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    lxs = xs; lxe = xe; lys = ys; lye = ye; lzs = zs; lze = ze;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keywordflow">if</span> (xs==0) lxs = xs+1;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordflow">if</span> (ys==0) lys = ys+1;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordflow">if</span> (zs==0) lzs = zs+1;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordflow">if</span> (xe==mx) lxe = xe-1;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">if</span> (ye==my) lye = ye-1;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordflow">if</span> (ze==mz) lze = ze-1;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="comment">// Allocate temporary vectors</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSx); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSy); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#ac8ba12826d60a51ec54fa7c047d806e1">lUcont</a>, &amp;lSz); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lS_abs); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lLM); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a95078248cc49ce19d5d05b14e1701888">lP</a>, &amp;lMM); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    ierr = VecSet(lLM, 0.0); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    ierr = VecSet(lMM, 0.0); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="comment">// Get read/write access to PETSc vector data as multidimensional arrays</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***ucat, ***csi, ***eta, ***zet;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    PetscReal   ***nvert, ***Cs_arr, ***aj, ***S_abs_arr, ***LM_arr, ***MM_arr;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***Sx_arr, ***Sy_arr, ***Sz_arr;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    ierr = DMDAVecGetArray(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, &amp;ucat); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    ierr = DMDAVecGetArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, &amp;Cs_arr); CHKERRQ(ierr);</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="comment">// --- 1. Compute and store the strain rate tensor |S| and velocity gradients at all points ---</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keywordflow">if</span>( nvert[k][j][i] &gt; 1.1) <span class="keywordflow">continue</span>; <span class="comment">// Skip points inside solid bodies</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dudx, dvdx, dwdx;</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        ierr = <a class="code hl_function" href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a>(user, i, j, k, ucat, &amp;dudx, &amp;dvdx, &amp;dwdx); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keywordtype">double</span> Sxx = dudx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keywordtype">double</span> Sxy = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + dvdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordtype">double</span> Sxz = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="keywordtype">double</span> Syy = dvdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keywordtype">double</span> Syz = 0.5 * (dvdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <span class="keywordtype">double</span> Szz = dwdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="keywordtype">double</span> Syx = Sxy, Szx = Sxz, Szy = Syz; <span class="comment">// Symmetry</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        S_abs_arr[k][j][i] = sqrt( 2.0 * (Sxx*Sxx + Sxy*Sxy + Sxz*Sxz +</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                                         Syx*Syx + Syy*Syy + Syz*Syz +</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                                         Szx*Szx + Szy*Szy + Szz*Szz) );</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="comment">// Store the full velocity gradient tensor for use in the next step</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        Sx_arr[k][j][i] = dudx; <span class="comment">// Contains {du/dx, du/dy, du/dz}</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        Sy_arr[k][j][i] = dvdx; <span class="comment">// Contains {dv/dx, dv/dy, dv/dz}</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        Sz_arr[k][j][i] = dwdx; <span class="comment">// Contains {dw/dx, dw/dy, dw/dz}</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    }</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    <span class="comment">// --- 2. Main loop to compute the dynamic coefficient ---</span></div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 1.1) {</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>            LM_arr[k][j][i] = 0.0;</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            MM_arr[k][j][i] = 0.0;</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        }</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        <span class="comment">// --- 2a. Gather data from the 3x3x3 stencil around the current point (i,j,k) ---</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        <span class="keywordtype">double</span> u[3][3][3], v[3][3][3], w[3][3][3];</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <span class="keywordtype">double</span> S_abs_stencil[3][3][3];</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        <span class="keywordtype">double</span> S11[3][3][3], S12[3][3][3], S13[3][3][3];</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <span class="keywordtype">double</span> S22[3][3][3], S23[3][3][3], S33[3][3][3];</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        <span class="keywordtype">double</span> weights[3][3][3];</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    ierr = DMDAVecGetArray(fda, lSx, &amp;Sx_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    ierr = DMDAVecGetArray(fda, lSy, &amp;Sy_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    ierr = DMDAVecGetArray(fda, lSz, &amp;Sz_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    ierr = DMDAVecGetArray(da, lS_abs, &amp;S_abs_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    ierr = DMDAVecGetArray(da, lLM, &amp;LM_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    ierr = DMDAVecGetArray(da, lMM, &amp;MM_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <span class="comment">// --- 1. Compute and store the strain rate tensor |S| and velocity gradients at all points ---</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">if</span>( nvert[k][j][i] &gt; 1.1) <span class="keywordflow">continue</span>; <span class="comment">// Skip points inside solid bodies</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dudx, dvdx, dwdx;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        ierr = <a class="code hl_function" href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a>(user, i, j, k, ucat, &amp;dudx, &amp;dvdx, &amp;dwdx); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="keywordtype">double</span> Sxx = dudx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="keywordtype">double</span> Sxy = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + dvdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="keywordtype">double</span> Sxz = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keywordtype">double</span> Syy = dvdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <span class="keywordtype">double</span> Syz = 0.5 * (dvdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="keywordtype">double</span> Szz = dwdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="keywordtype">double</span> Syx = Sxy, Szx = Sxz, Szy = Syz; <span class="comment">// Symmetry</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        S_abs_arr[k][j][i] = sqrt( 2.0 * (Sxx*Sxx + Sxy*Sxy + Sxz*Sxz +</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>                                         Syx*Syx + Syy*Syy + Syz*Syz +</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>                                         Szx*Szx + Szy*Szy + Szz*Szz) );</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="comment">// Store the full velocity gradient tensor for use in the next step</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        Sx_arr[k][j][i] = dudx; <span class="comment">// Contains {du/dx, du/dy, du/dz}</span></div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        Sy_arr[k][j][i] = dvdx; <span class="comment">// Contains {dv/dx, dv/dy, dv/dz}</span></div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        Sz_arr[k][j][i] = dwdx; <span class="comment">// Contains {dw/dx, dw/dy, dw/dz}</span></div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    }</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="comment">// --- 2. Main loop to compute the dynamic coefficient ---</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 1.1) {</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>            LM_arr[k][j][i] = 0.0;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>            MM_arr[k][j][i] = 0.0;</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        }</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        <span class="keywordflow">for</span>(r=-1; r&lt;=1; r++)</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordflow">for</span>(q=-1; q&lt;=1; q++)</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        <span class="keywordflow">for</span>(p=-1; p&lt;=1; p++) {</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>            <span class="keywordtype">int</span> R=r+1, Q=q+1, P=p+1; <span class="comment">// Stencil array indices (0-2)</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>            <span class="keywordtype">int</span> KK=k+r, JJ=j+q, II=i+p; <span class="comment">// Global grid indices</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>            u[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>            v[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>            w[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>            <span class="comment">// Strain rate tensor components (Sij = 0.5 * (dui/dxj + duj/dxi))</span></div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>            S11[R][Q][P] = Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;                      <span class="comment">// du/dx</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>            S12[R][Q][P] = 0.5 * (Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>); <span class="comment">// 0.5 * (du/dy + dv/dx)</span></div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>            S13[R][Q][P] = 0.5 * (Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>); <span class="comment">// 0.5 * (du/dz + dw/dx)</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>            S22[R][Q][P] = Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;                      <span class="comment">// dv/dy</span></div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>            S23[R][Q][P] = 0.5 * (Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>); <span class="comment">// 0.5 * (dv/dz + dw/dy)</span></div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>            S33[R][Q][P] = Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;                      <span class="comment">// dw/dz</span></div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>            S_abs_stencil[R][Q][P] = S_abs_arr[KK][JJ][II];</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>            weights[R][Q][P] = aj[KK][JJ][II]; <span class="comment">// Weight is Jacobian (1/volume)</span></div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        }</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="comment">// --- 2b. Apply the test filter to all required quantities ---</span></div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        <span class="keywordtype">double</span> u_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, u, weights);</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        <span class="keywordtype">double</span> v_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, v, weights);</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="keywordtype">double</span> w_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, w, weights);</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        <span class="keywordtype">double</span> S11_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S11, weights);</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        <span class="keywordtype">double</span> S12_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S12, weights);</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        <span class="keywordtype">double</span> S13_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S13, weights);</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <span class="keywordtype">double</span> S22_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S22, weights);</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="keywordtype">double</span> S23_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S23, weights);</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keywordtype">double</span> S33_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S33, weights);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        <span class="comment">// --- 2a. Gather data from the 3x3x3 stencil around the current point (i,j,k) ---</span></div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordtype">double</span> u[3][3][3], v[3][3][3], w[3][3][3];</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        <span class="keywordtype">double</span> S_abs_stencil[3][3][3];</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        <span class="keywordtype">double</span> S11[3][3][3], S12[3][3][3], S13[3][3][3];</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        <span class="keywordtype">double</span> S22[3][3][3], S23[3][3][3], S33[3][3][3];</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        <span class="keywordtype">double</span> weights[3][3][3];</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <span class="keywordflow">for</span>(r=-1; r&lt;=1; r++)</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        <span class="keywordflow">for</span>(q=-1; q&lt;=1; q++)</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        <span class="keywordflow">for</span>(p=-1; p&lt;=1; p++) {</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>            <span class="keywordtype">int</span> R=r+1, Q=q+1, P=p+1; <span class="comment">// Stencil array indices (0-2)</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>            <span class="keywordtype">int</span> KK=k+r, JJ=j+q, II=i+p; <span class="comment">// Global grid indices</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>            u[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>            v[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>            w[R][Q][P] = ucat[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>            <span class="comment">// Strain rate tensor components (Sij = 0.5 * (dui/dxj + duj/dxi))</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>            S11[R][Q][P] = Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;                      <span class="comment">// du/dx</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>            S12[R][Q][P] = 0.5 * (Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>); <span class="comment">// 0.5 * (du/dy + dv/dx)</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>            S13[R][Q][P] = 0.5 * (Sx_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>); <span class="comment">// 0.5 * (du/dz + dw/dx)</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>            S22[R][Q][P] = Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;                      <span class="comment">// dv/dy</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>            S23[R][Q][P] = 0.5 * (Sy_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>); <span class="comment">// 0.5 * (dv/dz + dw/dy)</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>            S33[R][Q][P] = Sz_arr[KK][JJ][II].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;                      <span class="comment">// dw/dz</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>            S_abs_stencil[R][Q][P] = S_abs_arr[KK][JJ][II];</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>            weights[R][Q][P] = aj[KK][JJ][II]; <span class="comment">// Weight is Jacobian (1/volume)</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        }</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        <span class="comment">// --- 2b. Apply the test filter to all required quantities ---</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>        <span class="keywordtype">double</span> u_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, u, weights);</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="keywordtype">double</span> v_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, v, weights);</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keywordtype">double</span> w_filt  = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, w, weights);</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordtype">double</span> S_abs_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S_abs_stencil, weights);</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        <span class="comment">// Filter quadratic terms: &lt;u*u&gt;, &lt;u*v&gt;, etc.</span></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        <span class="keywordtype">double</span> uu[3][3][3], uv[3][3][3], uw[3][3][3], vv[3][3][3], vw[3][3][3], ww[3][3][3];</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="keywordflow">for</span>(r=0; r&lt;3; r++) <span class="keywordflow">for</span>(q=0; q&lt;3; q++) <span class="keywordflow">for</span>(p=0; p&lt;3; p++) {</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>            uu[r][q][p] = u[r][q][p] * u[r][q][p];</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            uv[r][q][p] = u[r][q][p] * v[r][q][p];</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>            uw[r][q][p] = u[r][q][p] * w[r][q][p];</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            vv[r][q][p] = v[r][q][p] * v[r][q][p];</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>            vw[r][q][p] = v[r][q][p] * w[r][q][p];</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            ww[r][q][p] = w[r][q][p] * w[r][q][p];</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        }</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        <span class="keywordtype">double</span> uu_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uu, weights);</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        <span class="keywordtype">double</span> uv_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uv, weights);</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        <span class="keywordtype">double</span> uw_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uw, weights);</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        <span class="keywordtype">double</span> vv_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, vv, weights);</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        <span class="keywordtype">double</span> vw_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, vw, weights);</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        <span class="keywordtype">double</span> ww_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, ww, weights);</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        <span class="comment">// --- 2c. Compute the Leonard stress tensor (L_ij = &lt;u_i*u_j&gt; - &lt;u_i&gt;*&lt;u_j&gt;) ---</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        <span class="keywordtype">double</span> L11 = uu_filt - u_filt * u_filt;</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        <span class="keywordtype">double</span> L12 = uv_filt - u_filt * v_filt;</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        <span class="keywordtype">double</span> L13 = uw_filt - u_filt * w_filt;</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        <span class="keywordtype">double</span> L22 = vv_filt - v_filt * v_filt;</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>        <span class="keywordtype">double</span> L23 = vw_filt - v_filt * w_filt;</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>        <span class="keywordtype">double</span> L33 = ww_filt - w_filt * w_filt;</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> </div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="comment">// --- 2d. Compute the model tensor M_ij ---</span></div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>        <span class="keywordtype">double</span> grid_filter_width, test_filter_width;</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>        ierr = <a class="code hl_function" href="Metric_8h.html#a75854e9f2d8b34a30be940ec7e722ef0">ComputeCellCharacteristicLengthScale</a>(aj[k][j][i], csi[k][j][i], eta[k][j][i], zet[k][j][i], &amp;grid_filter_width, &amp;test_filter_width, &amp;test_filter_width); CHKERRQ(ierr); <span class="comment">// Simplified for now</span></div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        grid_filter_width = pow(1.0 / aj[k][j][i], 1.0/3.0);</div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        test_filter_width = 2.0 * grid_filter_width; <span class="comment">// Standard box filter definition</span></div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>        <span class="keywordtype">double</span> alpha = pow(test_filter_width / grid_filter_width, 2.0);</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        <span class="keywordtype">double</span> M11 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S11_filt - S_abs_filt * S11_filt);</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordtype">double</span> M12 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S12_filt - S_abs_filt * S12_filt);</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        <span class="keywordtype">double</span> M13 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S13_filt - S_abs_filt * S13_filt);</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        <span class="keywordtype">double</span> M22 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S22_filt - S_abs_filt * S22_filt);</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        <span class="keywordtype">double</span> M23 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S23_filt - S_abs_filt * S23_filt);</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordtype">double</span> M33 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S33_filt - S_abs_filt * S33_filt);</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordtype">double</span> S11_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S11, weights);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="keywordtype">double</span> S12_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S12, weights);</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        <span class="keywordtype">double</span> S13_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S13, weights);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        <span class="keywordtype">double</span> S22_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S22, weights);</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        <span class="keywordtype">double</span> S23_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S23, weights);</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <span class="keywordtype">double</span> S33_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S33, weights);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span> </div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        <span class="keywordtype">double</span> S_abs_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, S_abs_stencil, weights);</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        <span class="comment">// Filter quadratic terms: &lt;u*u&gt;, &lt;u*v&gt;, etc.</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        <span class="keywordtype">double</span> uu[3][3][3], uv[3][3][3], uw[3][3][3], vv[3][3][3], vw[3][3][3], ww[3][3][3];</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        <span class="keywordflow">for</span>(r=0; r&lt;3; r++) <span class="keywordflow">for</span>(q=0; q&lt;3; q++) <span class="keywordflow">for</span>(p=0; p&lt;3; p++) {</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>            uu[r][q][p] = u[r][q][p] * u[r][q][p];</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>            uv[r][q][p] = u[r][q][p] * v[r][q][p];</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>            uw[r][q][p] = u[r][q][p] * w[r][q][p];</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>            vv[r][q][p] = v[r][q][p] * v[r][q][p];</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>            vw[r][q][p] = v[r][q][p] * w[r][q][p];</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>            ww[r][q][p] = w[r][q][p] * w[r][q][p];</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        }</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        <span class="keywordtype">double</span> uu_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uu, weights);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        <span class="keywordtype">double</span> uv_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uv, weights);</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        <span class="keywordtype">double</span> uw_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, uw, weights);</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>        <span class="keywordtype">double</span> vv_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, vv, weights);</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        <span class="keywordtype">double</span> vw_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, vw, weights);</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>        <span class="keywordtype">double</span> ww_filt = <a class="code hl_function" href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a>(simCtx, ww, weights);</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>        <span class="comment">// --- 2c. Compute the Leonard stress tensor (L_ij = &lt;u_i*u_j&gt; - &lt;u_i&gt;*&lt;u_j&gt;) ---</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>        <span class="keywordtype">double</span> L11 = uu_filt - u_filt * u_filt;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>        <span class="keywordtype">double</span> L12 = uv_filt - u_filt * v_filt;</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>        <span class="keywordtype">double</span> L13 = uw_filt - u_filt * w_filt;</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        <span class="keywordtype">double</span> L22 = vv_filt - v_filt * v_filt;</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        <span class="keywordtype">double</span> L23 = vw_filt - v_filt * w_filt;</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        <span class="keywordtype">double</span> L33 = ww_filt - w_filt * w_filt;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>        <span class="comment">// --- 2d. Compute the model tensor M_ij ---</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        <span class="keywordtype">double</span> grid_filter_width, test_filter_width;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        ierr = <a class="code hl_function" href="Metric_8h.html#a75854e9f2d8b34a30be940ec7e722ef0">ComputeCellCharacteristicLengthScale</a>(aj[k][j][i], csi[k][j][i], eta[k][j][i], zet[k][j][i], &amp;grid_filter_width, &amp;test_filter_width, &amp;test_filter_width); CHKERRQ(ierr); <span class="comment">// Simplified for now</span></div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        grid_filter_width = pow(1.0 / aj[k][j][i], 1.0/3.0);</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        test_filter_width = 2.0 * grid_filter_width; <span class="comment">// Standard box filter definition</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordtype">double</span> alpha = pow(test_filter_width / grid_filter_width, 2.0);</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>        <span class="comment">// --- 2e. Contract tensors to find Cs^2 (L_ij * M_ij / (M_kl * M_kl)) ---</span></div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>        LM_arr[k][j][i] = L11*M11 + 2*L12*M12 + 2*L13*M13 + L22*M22 + 2*L23*M23 + L33*M33;</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        MM_arr[k][j][i] = M11*M11 + 2*M12*M12 + 2*M13*M13 + M22*M22 + 2*M23*M23 + M33*M33;</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    }</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    <span class="comment">// --- 3. Averaging and finalization ---</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>        <span class="keywordtype">double</span> M11 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S11_filt - S_abs_filt * S11_filt);</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>        <span class="keywordtype">double</span> M12 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S12_filt - S_abs_filt * S12_filt);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>        <span class="keywordtype">double</span> M13 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S13_filt - S_abs_filt * S13_filt);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        <span class="keywordtype">double</span> M22 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S22_filt - S_abs_filt * S22_filt);</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        <span class="keywordtype">double</span> M23 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S23_filt - S_abs_filt * S23_filt);</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        <span class="keywordtype">double</span> M33 = -2.0 * grid_filter_width * grid_filter_width * (alpha * S_abs_filt * S33_filt - S_abs_filt * S33_filt);</div>
 <div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span> </div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    <span class="comment">// At this point, LM_arr and MM_arr contain raw, unaveraged values.</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <span class="comment">// To stabilize the solution, these are often averaged over homogeneous directions or locally.</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    <span class="comment">// The logic for homogeneous averaging would go here if simCtx-&gt;i_homo_filter is true.</span></div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    <span class="comment">// For this general version, we proceed with the local (unaveraged) values.</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        <span class="comment">// --- 2e. Contract tensors to find Cs^2 (L_ij * M_ij / (M_kl * M_kl)) ---</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        LM_arr[k][j][i] = L11*M11 + 2*L12*M12 + 2*L13*M13 + L22*M22 + 2*L23*M23 + L33*M33;</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        MM_arr[k][j][i] = M11*M11 + 2*M12*M12 + 2*M13*M13 + M22*M22 + 2*M23*M23 + M33*M33;</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    }</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span> </div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 1.1) {</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>            Cs_arr[k][j][i] = 0.0;</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        }</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>        <span class="keywordtype">double</span> C_sq = 0.0;</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>        <span class="keywordflow">if</span> (MM_arr[k][j][i] &gt; <a class="code hl_variable" href="les_8c.html#ade827b0a028c27b7b1a110208774db46">LES_EPSILON</a>) {</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>            C_sq = LM_arr[k][j][i] / MM_arr[k][j][i];</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        }</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        <span class="comment">// Final clipping and assignment: Cs must be positive and not excessively large.</span></div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        <span class="keywordtype">double</span> Cs_val = (C_sq &gt; 0.0) ? sqrt(C_sq) : 0.0;</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        Cs_arr[k][j][i] = PetscMin(PetscMax(Cs_val, 0.0), simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7a3f92059ddd489f41cd89dbcd2a1763">max_cs</a>);</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    }</div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="comment">// --- 4. Cleanup ---</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <span class="comment">// --- 3. Averaging and finalization ---</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="comment">// At this point, LM_arr and MM_arr contain raw, unaveraged values.</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <span class="comment">// To stabilize the solution, these are often averaged over homogeneous directions or locally.</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    <span class="comment">// The logic for homogeneous averaging would go here if simCtx-&gt;i_homo_filter is true.</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    <span class="comment">// For this general version, we proceed with the local (unaveraged) values.</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span> </div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 1.1) {</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>            Cs_arr[k][j][i] = 0.0;</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        }</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        <span class="keywordtype">double</span> C_sq = 0.0;</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        <span class="keywordflow">if</span> (MM_arr[k][j][i] &gt; <a class="code hl_variable" href="les_8c.html#ade827b0a028c27b7b1a110208774db46">LES_EPSILON</a>) {</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>            C_sq = LM_arr[k][j][i] / MM_arr[k][j][i];</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        }</div>
 <div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="comment">// Restore all PETSc arrays</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    ierr = DMDAVecRestoreArray(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, &amp;ucat); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    ierr = DMDAVecRestoreArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, &amp;Cs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    ierr = DMDAVecRestoreArray(fda, lSx, &amp;Sx_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    ierr = DMDAVecRestoreArray(fda, lSy, &amp;Sy_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    ierr = DMDAVecRestoreArray(fda, lSz, &amp;Sz_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    ierr = DMDAVecRestoreArray(da, lS_abs, &amp;S_abs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    ierr = DMDAVecRestoreArray(da, lLM, &amp;LM_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    ierr = DMDAVecRestoreArray(da, lMM, &amp;MM_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <span class="comment">// Destroy temporary vectors to prevent memory leaks</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    ierr = VecDestroy(&amp;lSx); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    ierr = VecDestroy(&amp;lSy); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    ierr = VecDestroy(&amp;lSz); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    ierr = VecDestroy(&amp;lS_abs); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    ierr = VecDestroy(&amp;lLM); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>    ierr = VecDestroy(&amp;lMM); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="comment">// Communicate ghost point data for the newly computed Cs field</span></div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    ierr = DMGlobalToLocalBegin(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    ierr = DMGlobalToLocalEnd(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span> </div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    PetscReal max_norm;</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    ierr = VecMax(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, NULL, &amp;max_norm); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Max dynamic Smagorinsky constant (Cs) computed: %e (clip value: %e)\n&quot;</span>, max_norm, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7a3f92059ddd489f41cd89dbcd2a1763">max_cs</a>);</div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>}</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        <span class="comment">// Final clipping and assignment: Cs must be positive and not excessively large.</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        <span class="keywordtype">double</span> Cs_val = (C_sq &gt; 0.0) ? sqrt(C_sq) : 0.0;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>        Cs_arr[k][j][i] = PetscMin(PetscMax(Cs_val, 0.0), simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7a3f92059ddd489f41cd89dbcd2a1763">max_cs</a>);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    }</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    <span class="comment">// --- 4. Cleanup ---</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="comment">// Restore all PETSc arrays</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    ierr = DMDAVecRestoreArray(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, &amp;ucat); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    ierr = DMDAVecRestoreArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, &amp;Cs_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    ierr = DMDAVecRestoreArray(fda, lSx, &amp;Sx_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    ierr = DMDAVecRestoreArray(fda, lSy, &amp;Sy_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    ierr = DMDAVecRestoreArray(fda, lSz, &amp;Sz_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    ierr = DMDAVecRestoreArray(da, lS_abs, &amp;S_abs_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    ierr = DMDAVecRestoreArray(da, lLM, &amp;LM_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    ierr = DMDAVecRestoreArray(da, lMM, &amp;MM_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    <span class="comment">// Destroy temporary vectors to prevent memory leaks</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    ierr = VecDestroy(&amp;lSx); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    ierr = VecDestroy(&amp;lSy); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    ierr = VecDestroy(&amp;lSz); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    ierr = VecDestroy(&amp;lS_abs); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    ierr = VecDestroy(&amp;lLM); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    ierr = VecDestroy(&amp;lMM); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <span class="comment">// Communicate ghost point data for the newly computed Cs field</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    ierr = DMGlobalToLocalBegin(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    ierr = DMGlobalToLocalEnd(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span> </div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    PetscReal max_norm;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    ierr = VecMax(user-&gt;<a class="code hl_variable" href="variables_8h.html#a5924ed7c71c227e348c1ae65d3e904d0">CS</a>, NULL, &amp;max_norm); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Max dynamic Smagorinsky constant (Cs) computed: %e (clip value: %e)\n&quot;</span>, max_norm, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7a3f92059ddd489f41cd89dbcd2a1763">max_cs</a>);</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>}</div>
 </div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span> </div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="preprocessor">#undef __FUNCT__</span></div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="preprocessor">#define __FUNCT__ &quot;ComputeEddyViscosityLES&quot;</span></div>
-<div class="foldopen" id="foldopen00301" data-start="{" data-end="}">
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno"><a class="line" href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">  301</a></span>PetscErrorCode <a class="code hl_function" href="les_8c.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>{</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    PetscErrorCode ierr;</div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    DM              da = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, fda = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    DMDALocalInfo   info;</div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    PetscInt        i, j, k;</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    PetscInt        xs, xe, ys, ye, zs, ze;</div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    PetscInt        lxs, lxe, lys, lye, lzs, lze; <span class="comment">// Local interior loop bounds</span></div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    PetscInt        mx, my, mz;</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span> </div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    <span class="comment">// Get grid dimensions and local bounds</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    ierr = DMDAGetLocalInfo(da, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    mx = info.mx; my = info.my; mz = info.mz;</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    xs = info.xs; xe = xs + info.xm;</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>    ys = info.ys; ye = ys + info.ym;</div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>    zs = info.zs; ze = zs + info.zm;</div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span> </div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    <span class="comment">// Define loop bounds to exclude physical boundaries where stencils are invalid.</span></div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    lxs = xs; lxe = xe; lys = ys; lye = ye; lzs = zs; lze = ze;</div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    <span class="keywordflow">if</span> (xs==0) lxs = xs+1;</div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>    <span class="keywordflow">if</span> (ys==0) lys = ys+1;</div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    <span class="keywordflow">if</span> (zs==0) lzs = zs+1;</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>    <span class="keywordflow">if</span> (xe==mx) lxe = xe-1;</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>    <span class="keywordflow">if</span> (ye==my) lye = ye-1;</div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="keywordflow">if</span> (ze==mz) lze = ze-1;</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span> </div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span> </div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    <span class="comment">// Get read/write access to PETSc data arrays</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***ucat;</div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    PetscReal   ***Cs_arr, ***nu_t_arr, ***nvert, ***aj;</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span> </div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;ucat); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>, (PetscReal***)&amp;Cs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    ierr = DMDAVecGetArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, &amp;nu_t_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span> </div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="comment">// Loop over the interior of the local domain</span></div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 0.1) {</div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>            nu_t_arr[k][j][i] = 0.0;</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>        }</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span> </div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a">LOG_VERBOSE</a>, <span class="stringliteral">&quot;  Computing eddy viscosity at point (%d,%d,%d)\n&quot;</span>, i, j, k);</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>        <span class="comment">// 1. Compute the local strain rate magnitude |S|</span></div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dudx, dvdx, dwdx;</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>        ierr = <a class="code hl_function" href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a>(user, i, j, k, ucat, &amp;dudx, &amp;dvdx, &amp;dwdx); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="preprocessor">#undef __FUNCT__</span></div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="preprocessor">#define __FUNCT__ &quot;ComputeEddyViscosityLES&quot;</span><span class="comment"></span></div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="comment"> * @brief Implementation of \ref ComputeEddyViscosityLES().</span></div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment"> * @details Full API contract (arguments, ownership, side effects) is documented with</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="comment"> *          the header declaration in `include/les.h`.</span></div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="comment"> * @see ComputeEddyViscosityLES()</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
+<div class="foldopen" id="foldopen00315" data-start="{" data-end="}">
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno"><a class="line" href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">  315</a></span>PetscErrorCode <a class="code hl_function" href="les_8c.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>{</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    PetscErrorCode ierr;</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>    DM              da = user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, fda = user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>;</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>    DMDALocalInfo   info;</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    PetscInt        i, j, k;</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    PetscInt        xs, xe, ys, ye, zs, ze;</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    PetscInt        lxs, lxe, lys, lye, lzs, lze; <span class="comment">// Local interior loop bounds</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    PetscInt        mx, my, mz;</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span> </div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span> </div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="comment">// Get grid dimensions and local bounds</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    ierr = DMDAGetLocalInfo(da, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    mx = info.mx; my = info.my; mz = info.mz;</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    xs = info.xs; xe = xs + info.xm;</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    ys = info.ys; ye = ys + info.ym;</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    zs = info.zs; ze = zs + info.zm;</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span> </div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <span class="comment">// Define loop bounds to exclude physical boundaries where stencils are invalid.</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    lxs = xs; lxe = xe; lys = ys; lye = ye; lzs = zs; lze = ze;</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    <span class="keywordflow">if</span> (xs==0) lxs = xs+1;</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    <span class="keywordflow">if</span> (ys==0) lys = ys+1;</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    <span class="keywordflow">if</span> (zs==0) lzs = zs+1;</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordflow">if</span> (xe==mx) lxe = xe-1;</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    <span class="keywordflow">if</span> (ye==my) lye = ye-1;</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    <span class="keywordflow">if</span> (ze==mz) lze = ze-1;</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span> </div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span> </div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span> </div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="comment">// Get read/write access to PETSc data arrays</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>      ***ucat;</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    PetscReal   ***Cs_arr, ***nu_t_arr, ***nvert, ***aj;</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span> </div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    ierr = DMDAVecGetArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;ucat); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>, (PetscReal***)&amp;Cs_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    ierr = DMDAVecGetArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, &amp;nu_t_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    ierr = DMDAVecGetArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
 <div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span> </div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>        <span class="keywordtype">double</span> Sxx = dudx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        <span class="keywordtype">double</span> Sxy = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + dvdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        <span class="keywordtype">double</span> Sxz = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        <span class="keywordtype">double</span> Syy = dvdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>        <span class="keywordtype">double</span> Syz = 0.5 * (dvdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>        <span class="keywordtype">double</span> Szz = dwdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>        <span class="keywordtype">double</span> strain_rate_mag = sqrt( 2.0 * (Sxx*Sxx + Sxy*Sxy + Sxz*Sxz + Sxy*Sxy + Syy*Syy + Syz*Syz + Sxz*Sxz + Syz*Syz + Szz*Szz) );</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span> </div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>        <span class="comment">// 2. Determine the grid filter width, Delta = (cell volume)^(1/3)</span></div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>        <span class="keywordtype">double</span> filter_width  = pow( 1.0/aj[k][j][i], 1.0/3.0 );</div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>        <span class="comment">// 3. Compute eddy viscosity: nu_t = (Cs * Delta)^2 * |S|</span></div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>        nu_t_arr[k][j][i] = pow(Cs_arr[k][j][i] * filter_width, 2.0) * strain_rate_mag;</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="comment">// Loop over the interior of the local domain</span></div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="keywordflow">for</span> (k=lzs; k&lt;lze; k++)</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="keywordflow">for</span> (j=lys; j&lt;lye; j++)</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <span class="keywordflow">for</span> (i=lxs; i&lt;lxe; i++) {</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>        <span class="keywordflow">if</span>(nvert[k][j][i] &gt; 0.1) {</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>            nu_t_arr[k][j][i] = 0.0;</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>        }</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a">LOG_VERBOSE</a>, <span class="stringliteral">&quot;  Computing eddy viscosity at point (%d,%d,%d)\n&quot;</span>, i, j, k);</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>        <span class="comment">// 1. Compute the local strain rate magnitude |S|</span></div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dudx, dvdx, dwdx;</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>        ierr = <a class="code hl_function" href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a>(user, i, j, k, ucat, &amp;dudx, &amp;dvdx, &amp;dwdx); CHKERRQ(ierr);</div>
 <div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span> </div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a">LOG_VERBOSE</a>, <span class="stringliteral">&quot;    Cs=%.4e, Delta=%.4e, |S|=%.4e =&gt; nu_t=%.4e\n&quot;</span>,</div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>                    Cs_arr[k][j][i], filter_width, strain_rate_mag, nu_t_arr[k][j][i]);</div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    }</div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span> </div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>    <span class="comment">// Restore PETSc data arrays</span></div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;ucat); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>, (PetscReal***)&amp;Cs_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>    ierr = DMDAVecRestoreArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, &amp;nu_t_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>        <span class="keywordtype">double</span> Sxx = dudx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>        <span class="keywordtype">double</span> Sxy = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + dvdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>        <span class="keywordtype">double</span> Sxz = 0.5 * (dudx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>);</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>        <span class="keywordtype">double</span> Syy = dvdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>        <span class="keywordtype">double</span> Syz = 0.5 * (dvdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + dwdx.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>);</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>        <span class="keywordtype">double</span> Szz = dwdx.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>        <span class="keywordtype">double</span> strain_rate_mag = sqrt( 2.0 * (Sxx*Sxx + Sxy*Sxy + Sxz*Sxz + Sxy*Sxy + Syy*Syy + Syz*Syz + Sxz*Sxz + Syz*Syz + Szz*Szz) );</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>        <span class="comment">// 2. Determine the grid filter width, Delta = (cell volume)^(1/3)</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        <span class="keywordtype">double</span> filter_width  = pow( 1.0/aj[k][j][i], 1.0/3.0 );</div>
 <div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span> </div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="comment">// Update ghost points for the newly computed eddy viscosity</span></div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    ierr = DMGlobalToLocalBegin(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9338cb4f3fbc319695a259d0dc09c002">lNu_t</a>); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>    ierr = DMGlobalToLocalEnd(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9338cb4f3fbc319695a259d0dc09c002">lNu_t</a>); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#af86c865e267dfd27e9800ed950bbfe6a">TransferPeriodicField</a>(user,<span class="stringliteral">&quot;Eddy Viscosity&quot;</span>);CHKERRQ(ierr);</div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
-<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>    PetscReal max_norm;</div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>    ierr = VecMax(user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, NULL, &amp;max_norm); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Max eddy viscosity (Nu_t) computed: %e\n&quot;</span>, max_norm);</div>
-<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>}</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>        <span class="comment">// 3. Compute eddy viscosity: nu_t = (Cs * Delta)^2 * |S|</span></div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        nu_t_arr[k][j][i] = pow(Cs_arr[k][j][i] * filter_width, 2.0) * strain_rate_mag;</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span> </div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a">LOG_VERBOSE</a>, <span class="stringliteral">&quot;    Cs=%.4e, Delta=%.4e, |S|=%.4e =&gt; nu_t=%.4e\n&quot;</span>,</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>                    Cs_arr[k][j][i], filter_width, strain_rate_mag, nu_t_arr[k][j][i]);</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>    }</div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span> </div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>    <span class="comment">// Restore PETSc data arrays</span></div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>    ierr = DMDAVecRestoreArrayRead(fda, user-&gt;<a class="code hl_variable" href="variables_8h.html#ace2eeedc863d73caaf51bb83aa993e44">lUcat</a>, (<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;ucat); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a66d4c14737a74d07d188e3e7f2dfee6d">lCs</a>, (PetscReal***)&amp;Cs_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>    ierr = DMDAVecRestoreArray(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, &amp;nu_t_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>    ierr = DMDAVecRestoreArrayRead(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, (PetscReal***)&amp;aj); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span> </div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>    <span class="comment">// Update ghost points for the newly computed eddy viscosity</span></div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    ierr = DMGlobalToLocalBegin(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9338cb4f3fbc319695a259d0dc09c002">lNu_t</a>); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>    ierr = DMGlobalToLocalEnd(da, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, INSERT_VALUES, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9338cb4f3fbc319695a259d0dc09c002">lNu_t</a>); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span> </div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#af86c865e267dfd27e9800ed950bbfe6a">TransferPeriodicField</a>(user,<span class="stringliteral">&quot;Eddy Viscosity&quot;</span>);CHKERRQ(ierr);</div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span> </div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    PetscReal max_norm;</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    ierr = VecMax(user-&gt;<a class="code hl_variable" href="variables_8h.html#a9458ae2fd01569ea1ea0e84106874485">Nu_t</a>, NULL, &amp;max_norm); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Max eddy viscosity (Nu_t) computed: %e\n&quot;</span>, max_norm);</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span> </div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>}</div>
 </div>
-<div class="ttc" id="aBoundaries_8h_html_af86c865e267dfd27e9800ed950bbfe6a"><div class="ttname"><a href="Boundaries_8h.html#af86c865e267dfd27e9800ed950bbfe6a">TransferPeriodicField</a></div><div class="ttdeci">PetscErrorCode TransferPeriodicField(UserCtx *user, const char *field_name)</div><div class="ttdoc">(Private) A generic routine to copy data for a single, named field across periodic boundaries.</div><div class="ttdef"><b>Definition</b> <a href="Boundaries_8c_source.html#l01823">Boundaries.c:1823</a></div></div>
-<div class="ttc" id="aFilter_8h_html_a21d8a9fafc13c59b4cc400e2240751cf"><div class="ttname"><a href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a></div><div class="ttdeci">double ApplyLESTestFilter(const SimCtx *simCtx, double values[3][3][3], double weights[3][3][3])</div><div class="ttdoc">Applies a numerical &quot;test filter&quot; to a 3x3x3 stencil of data points.</div><div class="ttdef"><b>Definition</b> <a href="Filter_8c_source.html#l00145">Filter.c:145</a></div></div>
-<div class="ttc" id="aMetric_8h_html_a75854e9f2d8b34a30be940ec7e722ef0"><div class="ttname"><a href="Metric_8h.html#a75854e9f2d8b34a30be940ec7e722ef0">ComputeCellCharacteristicLengthScale</a></div><div class="ttdeci">PetscErrorCode ComputeCellCharacteristicLengthScale(PetscReal ajc, Cmpnts csi, Cmpnts eta, Cmpnts zet, double *dx, double *dy, double *dz)</div><div class="ttdoc">Computes characteristic length scales (dx, dy, dz) for a curvilinear cell.</div><div class="ttdef"><b>Definition</b> <a href="Metric_8c_source.html#l00313">Metric.c:313</a></div></div>
-<div class="ttc" id="ales_8c_html_a224bc22e175dc737ed50c556c5ee4c05"><div class="ttname"><a href="les_8c.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a></div><div class="ttdeci">PetscErrorCode ComputeEddyViscosityLES(UserCtx *user)</div><div class="ttdoc">Computes the turbulent eddy viscosity (Nu_t) for the LES model.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00301">les.c:301</a></div></div>
-<div class="ttc" id="ales_8c_html_adcc07934d96b59bbddd67f5bb4662df4"><div class="ttname"><a href="les_8c.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a></div><div class="ttdeci">PetscErrorCode ComputeSmagorinskyConstant(UserCtx *user)</div><div class="ttdoc">Computes the dynamic Smagorinsky constant (Cs) for the LES model.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00023">les.c:23</a></div></div>
+<div class="ttc" id="aBoundaries_8h_html_af86c865e267dfd27e9800ed950bbfe6a"><div class="ttname"><a href="Boundaries_8h.html#af86c865e267dfd27e9800ed950bbfe6a">TransferPeriodicField</a></div><div class="ttdeci">PetscErrorCode TransferPeriodicField(UserCtx *user, const char *field_name)</div><div class="ttdoc">(Orchestrator) Applies periodic transfer for one field across all i/j/k directions.</div><div class="ttdef"><b>Definition</b> <a href="Boundaries_8c_source.html#l01656">Boundaries.c:1656</a></div></div>
+<div class="ttc" id="aFilter_8h_html_a21d8a9fafc13c59b4cc400e2240751cf"><div class="ttname"><a href="Filter_8h.html#a21d8a9fafc13c59b4cc400e2240751cf">ApplyLESTestFilter</a></div><div class="ttdeci">double ApplyLESTestFilter(const SimCtx *simCtx, double values[3][3][3], double weights[3][3][3])</div><div class="ttdoc">Applies a numerical &quot;test filter&quot; to a 3x3x3 stencil of data points.</div><div class="ttdef"><b>Definition</b> <a href="Filter_8c_source.html#l00123">Filter.c:123</a></div></div>
+<div class="ttc" id="aMetric_8h_html_a75854e9f2d8b34a30be940ec7e722ef0"><div class="ttname"><a href="Metric_8h.html#a75854e9f2d8b34a30be940ec7e722ef0">ComputeCellCharacteristicLengthScale</a></div><div class="ttdeci">PetscErrorCode ComputeCellCharacteristicLengthScale(PetscReal ajc, Cmpnts csi, Cmpnts eta, Cmpnts zet, double *dx, double *dy, double *dz)</div><div class="ttdoc">Computes characteristic length scales (dx, dy, dz) for a curvilinear cell.</div><div class="ttdef"><b>Definition</b> <a href="Metric_8c_source.html#l00283">Metric.c:283</a></div></div>
+<div class="ttc" id="ales_8c_html_a224bc22e175dc737ed50c556c5ee4c05"><div class="ttname"><a href="les_8c.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a></div><div class="ttdeci">PetscErrorCode ComputeEddyViscosityLES(UserCtx *user)</div><div class="ttdoc">Implementation of ComputeEddyViscosityLES().</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00315">les.c:315</a></div></div>
+<div class="ttc" id="ales_8c_html_adcc07934d96b59bbddd67f5bb4662df4"><div class="ttname"><a href="les_8c.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a></div><div class="ttdeci">PetscErrorCode ComputeSmagorinskyConstant(UserCtx *user)</div><div class="ttdoc">Implementation of ComputeSmagorinskyConstant().</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00030">les.c:30</a></div></div>
 <div class="ttc" id="ales_8c_html_ade827b0a028c27b7b1a110208774db46"><div class="ttname"><a href="les_8c.html#ade827b0a028c27b7b1a110208774db46">LES_EPSILON</a></div><div class="ttdeci">const double LES_EPSILON</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00018">les.c:18</a></div></div>
 <div class="ttc" id="ales_8h_html"><div class="ttname"><a href="les_8h.html">les.h</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
-<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00761">logging.h:761</a></div></div>
+<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00758">logging.h:758</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac74e4f8b7fa7b544b66d09e854b8773a">LOG_VERBOSE</a></div><div class="ttdeci">@ LOG_VERBOSE</div><div class="ttdoc">Extremely detailed logs, typically for development use only.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00034">logging.h:33</a></div></div>
-<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00752">logging.h:752</a></div></div>
-<div class="ttc" id="asetup_8h_html_a04347e0c9c03c23267d401270af85d79"><div class="ttname"><a href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a></div><div class="ttdeci">PetscErrorCode ComputeVectorFieldDerivatives(UserCtx *user, PetscInt i, PetscInt j, PetscInt k, Cmpnts ***field_data, Cmpnts *dudx, Cmpnts *dvdx, Cmpnts *dwdx)</div><div class="ttdoc">Computes the derivatives of a cell-centered vector field at a specific grid point.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02920">setup.c:2920</a></div></div>
+<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00749">logging.h:749</a></div></div>
+<div class="ttc" id="asetup_8h_html_a04347e0c9c03c23267d401270af85d79"><div class="ttname"><a href="setup_8h.html#a04347e0c9c03c23267d401270af85d79">ComputeVectorFieldDerivatives</a></div><div class="ttdeci">PetscErrorCode ComputeVectorFieldDerivatives(UserCtx *user, PetscInt i, PetscInt j, PetscInt k, Cmpnts ***field_data, Cmpnts *dudx, Cmpnts *dvdx, Cmpnts *dwdx)</div><div class="ttdoc">Computes the derivatives of a cell-centered vector field at a specific grid point.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02653">setup.c:2653</a></div></div>
 <div class="ttc" id="avariables_8h_html_a02c34d525de10470f7953ff7c6d704e2afb7d5d8c3570e7aa635682663af1cacb"><div class="ttname"><a href="variables_8h.html#a02c34d525de10470f7953ff7c6d704e2afb7d5d8c3570e7aa635682663af1cacb">CONSTANT_SMAGORINSKY</a></div><div class="ttdeci">@ CONSTANT_SMAGORINSKY</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00449">variables.h:449</a></div></div>
 <div class="ttc" id="avariables_8h_html_a2f213dcdaf9617bfb44e4f22857f2e56"><div class="ttname"><a href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">UserCtx::lNvert</a></div><div class="ttdeci">Vec lNvert</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00764">variables.h:764</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00741">variables.h:741</a></div></div>

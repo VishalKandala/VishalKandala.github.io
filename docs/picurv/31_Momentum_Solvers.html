@@ -83,13 +83,19 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#selection_sec">1. Selection and Dispatch</a></li>
-<li class="level1"><a href="#status_sec">2. Implementation Status Matrix</a></li>
-<li class="level1"><a href="#controls_sec">3. Numerical Controls In Use</a></li>
+<ul><li class="level1"><a href="#p31_selection_sec">1. Selection and Dispatch</a></li>
+<li class="level1"><a href="#p31_status_sec">2. Implementation Status Matrix</a></li>
+<li class="level1"><a href="#p31_controls_sec">3. Numerical Controls In Use</a></li>
+<li class="level1"><a href="#p31_extension_sec">4. Adding A New Momentum Solver</a><ul><li class="level2"><a href="#autotoc_md109">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md110">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md111">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page tracks momentum-solver options accepted by the current configuration and their runtime implementation status.</p>
-<h1><a class="anchor" id="selection_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Momentum_Solvers"></a> This page tracks momentum-solver options accepted by the current configuration and their runtime implementation status.</p>
+<h1><a class="anchor" id="p31_selection_sec"></a>
 1. Selection and Dispatch</h1>
 <p>Runtime selection is controlled by <code>-mom_solver_type</code>, produced from <code>solver.yml</code> (<code>strategy.momentum_solver</code>). Dispatch currently happens in function <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a> within the step orchestrator.</p>
 <p>Accepted YAML values:</p>
@@ -98,13 +104,13 @@ $(function() {
 <li><code>Dual Time Picard RK4</code> -&gt; <code>DUALTIME_PICARD_RK4</code></li>
 </ul>
 <p>Only implemented values are exposed in the enum, parser, and dispatcher. New solver values should be added only with a real implementation plus matching parser, docs, and test updates.</p>
-<h1><a class="anchor" id="status_sec"></a>
+<h1><a class="anchor" id="p31_status_sec"></a>
 2. Implementation Status Matrix</h1>
 <ul>
 <li><code>EXPLICIT_RK</code>: implemented by <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
 <li><code>DUALTIME_PICARD_RK4</code>: implemented by <a class="el" href="momentumsolvers_8h.html#a6c666dcadf0a165bf35bec15662d7072">MomentumSolver_DualTime_Picard_RK4</a></li>
 </ul>
-<h1><a class="anchor" id="controls_sec"></a>
+<h1><a class="anchor" id="p31_controls_sec"></a>
 3. Numerical Controls In Use</h1>
 <p>Main controls consumed by implemented solvers:</p>
 <ul>
@@ -117,8 +123,8 @@ $(function() {
 <li><code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
 </ul>
 <p>Defaults and final option ingestion are in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during startup parsing.</p>
-<h1><a class="anchor" id="extension_sec"></a>
-7. Extensibility Status</h1>
+<h1><a class="anchor" id="p31_extension_sec"></a>
+4. Adding A New Momentum Solver</h1>
 <p>Required steps:</p>
 <ol type="1">
 <li>define solver implementation function in <code><a class="el" href="momentumsolvers_8c.html">src/momentumsolvers.c</a></code>,</li>
@@ -132,8 +138,28 @@ $(function() {
 <li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md109"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Momentum Solver Implementations</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md110"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md111"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

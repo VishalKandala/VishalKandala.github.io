@@ -83,15 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#activation_sec">1. Activation Path</a></li>
-<li class="level1"><a href="#types_sec">2. Supported Types In Current Code</a></li>
-<li class="level1"><a href="#tgv_sec">3. TGV3D Details</a></li>
-<li class="level1"><a href="#zero_sec">4. ZERO_FLOW Details</a></li>
-<li class="level1"><a href="#particles_sec">5. Particle Consistency</a></li>
+<ul><li class="level1"><a href="#p32_activation_sec">1. Activation Path</a></li>
+<li class="level1"><a href="#p32_types_sec">2. Supported Types In Current Code</a></li>
+<li class="level1"><a href="#p32_tgv_sec">3. TGV3D Details</a></li>
+<li class="level1"><a href="#p32_zero_sec">4. ZERO_FLOW Details</a></li>
+<li class="level1"><a href="#p32_particles_sec">5. Particle Consistency</a></li>
+<li class="level1"><a href="#p32_extension_sec">6. Adding A New Analytical Type</a><ul><li class="level2"><a href="#autotoc_md112">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md113">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md114">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>Analytical mode bypasses the normal momentum/Poisson time advancement and directly sets Eulerian fields from closed-form expressions.</p>
-<h1><a class="anchor" id="activation_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Analytical_Solutions"></a> Analytical mode bypasses the normal momentum/Poisson time advancement and directly sets Eulerian fields from closed-form expressions.</p>
+<h1><a class="anchor" id="p32_activation_sec"></a>
 1. Activation Path</h1>
 <p>Analytical mode is selected by:</p>
 <ul>
@@ -110,7 +116,7 @@ $(function() {
 <li><code>picurv</code> now validates this explicitly before runtime</li>
 <li>this avoids misleading combinations where <code>file</code> or <code>grid_gen</code> looks valid in YAML but is not consumed by the current C analytical grid path</li>
 </ul>
-<h1><a class="anchor" id="types_sec"></a>
+<h1><a class="anchor" id="p32_types_sec"></a>
 2. Supported Types In Current Code</h1>
 <ul>
 <li><code>TGV3D</code></li>
@@ -122,7 +128,7 @@ $(function() {
 <li>analytical geometry assignment: <a class="el" href="AnalyticalSolutions_8h.html#ae25959d8a54d4be970967fcec062d28f">SetAnalyticalGridInfo</a></li>
 <li>state setter dispatch: <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a></li>
 </ul>
-<h1><a class="anchor" id="tgv_sec"></a>
+<h1><a class="anchor" id="p32_tgv_sec"></a>
 3. TGV3D Details</h1>
 <p>Current <code>TGV3D</code> implementation sets fields with decaying Taylor-Green style forms in non-dimensional coordinates. Representative form:</p>
 <p class="formulaDsp">
@@ -139,7 +145,7 @@ u_y \sim -\cos(kx)\sin(ky)\cos(kz)e^{-2\nu k^2 t}.
 <li>multi-block: requires perfect-square block count for XY decomposition.</li>
 <li>the analytical geometry logic assigns the domain itself; the launcher-side programmatic grid inputs primarily provide resolution (<code>im/jm/km</code>)</li>
 </ul>
-<h1><a class="anchor" id="zero_sec"></a>
+<h1><a class="anchor" id="p32_zero_sec"></a>
 4. ZERO_FLOW Details</h1>
 <p><code>ZERO_FLOW</code> sets a quiescent background state while preserving the same analytical-mode control path. It is useful for controlled particle-motion or postprocessing validation scenarios.</p>
 <p>Grid behavior:</p>
@@ -148,11 +154,11 @@ u_y \sim -\cos(kx)\sin(ky)\cos(kz)e^{-2\nu k^2 t}.
 <li>so <code>programmatic_settings</code> still matters,</li>
 <li>but the flow field itself is imposed analytically as zero everywhere.</li>
 </ul>
-<h1><a class="anchor" id="particles_sec"></a>
+<h1><a class="anchor" id="p32_particles_sec"></a>
 5. Particle Consistency</h1>
 <p>Particle-side analytical initialization hooks exist via <a class="el" href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d">SetAnalyticalSolutionForParticles</a> so particle fields can remain consistent with analytical Eulerian state when desired.</p>
-<h1><a class="anchor" id="extension_sec"></a>
-7. Extensibility Status</h1>
+<h1><a class="anchor" id="p32_extension_sec"></a>
+6. Adding A New Analytical Type</h1>
 <ol type="1">
 <li>add a new branch in function <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a> for the new type,</li>
 <li>define geometry policy in function <a class="el" href="AnalyticalSolutions_8h.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a> for that type,</li>
@@ -164,8 +170,28 @@ u_y \sim -\cos(kx)\sin(ky)\cos(kz)e^{-2\nu k^2 t}.
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
 <li><b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md112"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Analytical Solution Modes</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md113"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md114"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

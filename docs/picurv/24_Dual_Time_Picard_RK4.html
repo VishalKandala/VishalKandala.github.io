@@ -83,13 +83,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#model_sec">1. Algorithmic Model</a></li>
-<li class="level1"><a href="#convergence_sec">2. Convergence and Backtracking</a></li>
-<li class="level1"><a href="#touchpoints_sec">4. Core Code Touchpoints</a></li>
+<ul><li class="level1"><a href="#p24_model_sec">1. Algorithmic Model</a></li>
+<li class="level1"><a href="#p24_convergence_sec">2. Convergence and Backtracking</a></li>
+<li class="level1"><a href="#p24_config_sec">3. YAML -&gt; Runtime Controls</a></li>
+<li class="level1"><a href="#p24_touchpoints_sec">4. Core Code Touchpoints</a></li>
+<li class="level1"><a href="#p24_practical_sec">5. Practical Tuning Guidance</a><ul><li class="level2"><a href="#autotoc_md88">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md89">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md90">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents the currently active implicit-style momentum strategy in PICurv: dual-time Picard iteration with RK4 pseudo-time smoothing.</p>
-<h1><a class="anchor" id="model_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_RK4"></a> This page documents the currently active implicit-style momentum strategy in PICurv: dual-time Picard iteration with RK4 pseudo-time smoothing.</p>
+<h1><a class="anchor" id="p24_model_sec"></a>
 1. Algorithmic Model</h1>
 <p>The solver enforces the physical-time momentum equation by iterating a pseudo-time equation:</p>
 <p class="formulaDsp">
@@ -103,7 +110,7 @@ $(function() {
 <li><code>R_time</code> uses BDF1/BDF2-style terms from <code>Ucont</code>, <code>Ucont_o</code>, and <code>Ucont_rm1</code>,</li>
 <li>RK4 stages use coefficients \(\{1/4,1/3,1/2,1\}\).</li>
 </ul>
-<h1><a class="anchor" id="convergence_sec"></a>
+<h1><a class="anchor" id="p24_convergence_sec"></a>
 2. Convergence and Backtracking</h1>
 <p>Per pseudo-iteration, the solver tracks:</p>
 <ul>
@@ -118,8 +125,8 @@ $(function() {
 <li>iteration retries from the restored state.</li>
 </ol>
 <p>Pseudo-CFL is also adaptively ramped on successful steps and clamped by configured min/max bounds.</p>
-<h1><a class="anchor" id="config_sec"></a>
-2. File-Grid Configuration</h1>
+<h1><a class="anchor" id="p24_config_sec"></a>
+3. YAML -&gt; Runtime Controls</h1>
 <p>User-facing configuration (<code>solver.yml</code>) maps to:</p>
 <ul>
 <li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code></li>
@@ -131,7 +138,7 @@ $(function() {
 <li><code>rk4_residual_noise_allowance_factor</code> -&gt; <code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
 </ul>
 <p>Parsing and normalization are performed in <code>scripts/picurv</code>, with final option ingestion in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during setup. Only the currently implemented momentum solver values are exposed; add new ones only when the parser and dispatcher are extended in the same change.</p>
-<h1><a class="anchor" id="touchpoints_sec"></a>
+<h1><a class="anchor" id="p24_touchpoints_sec"></a>
 4. Core Code Touchpoints</h1>
 <ul>
 <li>implementation: <a class="el" href="momentumsolvers_8h.html#a6c666dcadf0a165bf35bec15662d7072">MomentumSolver_DualTime_Picard_RK4</a></li>
@@ -139,8 +146,8 @@ $(function() {
 <li>runtime dispatch: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
 <li>options ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
 </ul>
-<h1><a class="anchor" id="practical_sec"></a>
-4. What This Means For Users</h1>
+<h1><a class="anchor" id="p24_practical_sec"></a>
+5. Practical Tuning Guidance</h1>
 <p>Common stability tuning order:</p>
 <ol type="1">
 <li>reduce initial pseudo-CFL,</li>
@@ -149,7 +156,27 @@ $(function() {
 <li>revisit grid quality and boundary consistency if instability persists.</li>
 </ol>
 <p>For many cases, robust Poisson settings and sane initialization matter as much as dual-time tolerances.</p>
-<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
+<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
+<h2><a class="anchor" id="autotoc_md88"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Dual-Time Picard RK4 Momentum Solver</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md89"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md90"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

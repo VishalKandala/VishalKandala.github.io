@@ -83,28 +83,39 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#setup_sec">1. Setup and Physics</a><ul><li class="level2"><a href="#reynolds_ssec">1.1 Change Reynolds Number</a></li>
-<li class="level2"><a href="#twod_ssec">1.2 Run in 2D</a></li>
-<li class="level2"><a href="#gridres_ssec">1.3 Increase Grid Resolution</a></li>
-<li class="level2"><a href="#bc_simple_ssec">2.1 Set a Constant-Velocity Inlet and Walls</a></li>
-<li class="level2"><a href="#bc_periodic_ssec">2.2 Enable Periodicity in One Direction</a></li>
-<li class="level2"><a href="#mpi_ssec">3.1 Run in Parallel and Control DMDA Layout</a></li>
-<li class="level2"><a href="#cluster_run_ssec">3.2 Run on Slurm (Generate and Submit)</a></li>
-<li class="level2"><a href="#restart_ssec">3.3 Restart from a Saved Step</a></li>
-<li class="level2"><a href="#logging_ssec">3.4 Enable Targeted Debug Logging</a></li>
+<ul><li class="level1"><a href="#p11_setup_sec">1. Setup and Physics</a><ul><li class="level2"><a href="#p11_reynolds_ssec">1.1 Change Reynolds Number</a></li>
+<li class="level2"><a href="#p11_twod_ssec">1.2 Run in 2D</a></li>
+<li class="level2"><a href="#p11_gridres_ssec">1.3 Increase Grid Resolution</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#post_sec">4. Post-Processing Recipes</a><ul><li class="level2"><a href="#post_existing_ssec">4.1 Postprocess an Existing Run</a></li>
-<li class="level2"><a href="#qcrit_ssec">4.2 Add Q-Criterion to Eulerian Pipeline</a></li>
-<li class="level2"><a href="#stats_ssec">4.3 Enable Statistics Output (MSD)</a></li>
+<li class="level1"><a href="#p11_bc_sec">2. Boundary Conditions</a><ul><li class="level2"><a href="#p11_bc_simple_ssec">2.1 Set a Constant-Velocity Inlet and Walls</a></li>
+<li class="level2"><a href="#p11_bc_periodic_ssec">2.2 Enable Periodicity in One Direction</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p11_run_sec">3. Running and Monitoring</a><ul><li class="level2"><a href="#p11_mpi_ssec">3.1 Run in Parallel and Control DMDA Layout</a></li>
+<li class="level2"><a href="#p11_cluster_run_ssec">3.2 Run on Slurm (Generate and Submit)</a></li>
+<li class="level2"><a href="#p11_restart_ssec">3.3 Restart from a Saved Step</a></li>
+<li class="level2"><a href="#p11_logging_ssec">3.4 Enable Targeted Debug Logging</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p11_post_sec">4. Post-Processing Recipes</a><ul><li class="level2"><a href="#p11_post_existing_ssec">4.1 Postprocess an Existing Run</a></li>
+<li class="level2"><a href="#p11_qcrit_ssec">4.2 Add Q-Criterion to Eulerian Pipeline</a></li>
+<li class="level2"><a href="#p11_stats_ssec">4.3 Enable Statistics Output (MSD)</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p11_sweep_sec">5. Sweep Studies</a></li>
+<li class="level1"><a href="#p11_next_steps_sec">6. Next Steps</a><ul><li class="level2"><a href="#autotoc_md38">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md39">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md40">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
-<div class="textblock"><p>This page provides operational recipes for common PICurv tasks. Each recipe includes what to change, why it matters, and a quick verification action.</p>
-<h1><a class="anchor" id="setup_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_User_How_To_Guides"></a> This page provides operational recipes for common PICurv tasks. Each recipe includes what to change, why it matters, and a quick verification action.</p>
+<h1><a class="anchor" id="p11_setup_sec"></a>
 1. Setup and Physics</h1>
-<h2><a class="anchor" id="reynolds_ssec"></a>
+<h2><a class="anchor" id="p11_reynolds_ssec"></a>
 1.1 Change Reynolds Number</h2>
 <p>What to change (in <code>case.yml</code>):</p>
 <div class="fragment"><div class="line">properties:</div>
@@ -126,7 +137,7 @@ Re = \frac{\rho U L}{\mu}
 <li>rerun <code>picurv validate ...</code>,</li>
 <li>inspect generated <code>.control</code> file for updated values.</li>
 </ul>
-<h2><a class="anchor" id="twod_ssec"></a>
+<h2><a class="anchor" id="p11_twod_ssec"></a>
 1.2 Run in 2D</h2>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  physics:</div>
@@ -145,7 +156,7 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>confirm generated run uses expected Z resolution.</li>
 </ul>
-<h2><a class="anchor" id="gridres_ssec"></a>
+<h2><a class="anchor" id="p11_gridres_ssec"></a>
 1.3 Increase Grid Resolution</h2>
 <ul>
 <li><code>programmatic_c</code>: increase <code>im/jm/km</code> arrays,</li>
@@ -156,9 +167,9 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>compare runtime memory/cost and key output metrics across resolutions.</li>
 </ul>
-<h1><a class="anchor" id="bc_sec"></a>
-5. boundary_conditions</h1>
-<h2><a class="anchor" id="bc_simple_ssec"></a>
+<h1><a class="anchor" id="p11_bc_sec"></a>
+2. Boundary Conditions</h1>
+<h2><a class="anchor" id="p11_bc_simple_ssec"></a>
 2.1 Set a Constant-Velocity Inlet and Walls</h2>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
@@ -178,7 +189,7 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>use <code>validate</code> first and check BC generation files under <code>runs/&lt;run_id&gt;/config/</code>.</li>
 </ul>
-<h2><a class="anchor" id="bc_periodic_ssec"></a>
+<h2><a class="anchor" id="p11_bc_periodic_ssec"></a>
 2.2 Enable Periodicity in One Direction</h2>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  domain:</div>
@@ -192,9 +203,9 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>confirm paired-face consistency in validation output.</li>
 </ul>
-<h1><a class="anchor" id="run_sec"></a>
-5. Run Solver and Postprocessor</h1>
-<h2><a class="anchor" id="mpi_ssec"></a>
+<h1><a class="anchor" id="p11_run_sec"></a>
+3. Running and Monitoring</h1>
+<h2><a class="anchor" id="p11_mpi_ssec"></a>
 3.1 Run in Parallel and Control DMDA Layout</h2>
 <div class="fragment"><div class="line">./bin/picurv run -n 16 --solve ...</div>
 </div><!-- fragment --><p>Optional partition hints:</p>
@@ -205,7 +216,7 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">    da_processors_y: 2</div>
 <div class="line">    da_processors_z: 2</div>
 </div><!-- fragment --><p>Note: <code>da_processors_*</code> are scalar globals, not per-block vectors.</p>
-<h2><a class="anchor" id="cluster_run_ssec"></a>
+<h2><a class="anchor" id="p11_cluster_run_ssec"></a>
 3.2 Run on Slurm (Generate and Submit)</h2>
 <div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
@@ -225,7 +236,7 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>inspect <code>scheduler/*.sbatch</code> and <code>submission.json</code> in run directory.</li>
 </ul>
-<h2><a class="anchor" id="restart_ssec"></a>
+<h2><a class="anchor" id="p11_restart_ssec"></a>
 3.3 Restart from a Saved Step</h2>
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  start_step: 500</div>
@@ -304,7 +315,7 @@ Re = \frac{\rho U L}{\mu}
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 <li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 </ul>
-<h2><a class="anchor" id="logging_ssec"></a>
+<h2><a class="anchor" id="p11_logging_ssec"></a>
 3.4 Enable Targeted Debug Logging</h2>
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;DEBUG&quot;</div>
@@ -312,15 +323,15 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">    - Projection</div>
 <div class="line">    - UpdatePressure</div>
 </div><!-- fragment --><p>Use this for local diagnosis of instability or boundary anomalies. Prefer narrow function lists to keep logs manageable.</p>
-<h1><a class="anchor" id="post_sec"></a>
+<h1><a class="anchor" id="p11_post_sec"></a>
 4. Post-Processing Recipes</h1>
-<h2><a class="anchor" id="post_existing_ssec"></a>
+<h2><a class="anchor" id="p11_post_existing_ssec"></a>
 4.1 Postprocess an Existing Run</h2>
 <div class="fragment"><div class="line">./bin/picurv run --post-process \</div>
 <div class="line">  --run-dir runs/flat_channel_20240401-153000 \</div>
 <div class="line">  --post my_study/standard_analysis.yml</div>
 </div><!-- fragment --><p>Use when solver outputs already exist and you are iterating only on analysis pipeline.</p>
-<h2><a class="anchor" id="qcrit_ssec"></a>
+<h2><a class="anchor" id="p11_qcrit_ssec"></a>
 4.2 Add Q-Criterion to Eulerian Pipeline</h2>
 <div class="fragment"><div class="line">eulerian_pipeline:</div>
 <div class="line">  - task: nodal_average</div>
@@ -336,7 +347,7 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>open VTK output and confirm <code>Qcrit</code> field is present.</li>
 </ul>
-<h2><a class="anchor" id="stats_ssec"></a>
+<h2><a class="anchor" id="p11_stats_ssec"></a>
 4.3 Enable Statistics Output (MSD)</h2>
 <div class="fragment"><div class="line">statistics_pipeline:</div>
 <div class="line">  output_prefix: &quot;Stats&quot;</div>
@@ -346,8 +357,8 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>check <code>Stats_msd.csv</code> in the run directory root, unless <code>statistics_pipeline.output_prefix</code> includes an explicit path.</li>
 </ul>
-<h1><a class="anchor" id="sweep_sec"></a>
-5. sweep: Parameter Study via Slurm Arrays</h1>
+<h1><a class="anchor" id="p11_sweep_sec"></a>
+5. Sweep Studies</h1>
 <div class="fragment"><div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml</div>
@@ -359,13 +370,33 @@ Re = \frac{\rho U L}{\mu}
 <li>optional plots.</li>
 </ul>
 <p>See <b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b> for full contract details.</p>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p11_next_steps_sec"></a>
+6. Next Steps</h1>
 <ul>
 <li>Full capability map: <b><a class="el" href="12_Capabilities_Summary.html">Capabilities Summary</a></b></li>
 <li>Config references: <b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b>, <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b>, <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b>, <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
-<li>Troubleshooting and quality: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b>, <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
+<li>Troubleshooting and quality: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b>, <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md38"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>User How-To Guides</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md39"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md40"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

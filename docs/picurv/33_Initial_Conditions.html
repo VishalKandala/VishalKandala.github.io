@@ -83,16 +83,23 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#overview_sec">1. Where Initialization Happens</a></li>
-<li class="level1"><a href="#euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#euler_modes_sec">3. Eulerian Mode Details</a></li>
-<li class="level1"><a href="#euler_formula_sec">4. Contravariant Initialization Note</a></li>
-<li class="level1"><a href="#restart_modes_sec">5. Eulerian Restart Branches</a></li>
-<li class="level1"><a href="#particle_link_sec">6. Particle Initialization Relation</a></li>
+<ul><li class="level1"><a href="#p33_overview_sec">1. Where Initialization Happens</a></li>
+<li class="level1"><a href="#p33_euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p33_euler_modes_sec">3. Eulerian Mode Details</a></li>
+<li class="level1"><a href="#p33_euler_formula_sec">4. Contravariant Initialization Note</a></li>
+<li class="level1"><a href="#p33_restart_modes_sec">5. Eulerian Restart Branches</a></li>
+<li class="level1"><a href="#p33_particle_link_sec">6. Particle Initialization Relation</a></li>
+<li class="level1"><a href="#p33_checks_sec">7. Practical Checks</a></li>
+<li class="level1"><a href="#p33_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md115">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md116">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md117">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page documents how PICurv initializes Eulerian velocity fields and particles at startup. It covers both user-facing YAML inputs and the C implementation path that applies them.</p>
-<h1><a class="anchor" id="overview_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Initial_Conditions"></a> This page documents how PICurv initializes Eulerian velocity fields and particles at startup. It covers both user-facing YAML inputs and the C implementation path that applies them.</p>
+<h1><a class="anchor" id="p33_overview_sec"></a>
 1. Where Initialization Happens</h1>
 <p>Startup sequence:</p>
 <ol type="1">
@@ -102,7 +109,7 @@ $(function() {
 <li>Boundary handlers then enforce face values and ghost-cell consistency.</li>
 <li>If particles are enabled, <a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a> runs independently after Eulerian setup.</li>
 </ol>
-<h1><a class="anchor" id="euler_sec"></a>
+<h1><a class="anchor" id="p33_euler_sec"></a>
 2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</h1>
 <p>YAML:</p>
 <div class="fragment"><div class="line">properties:</div>
@@ -144,7 +151,7 @@ $(function() {
 <li><a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></li>
 <li><a class="el" href="logging_8h.html#a266bd07f5be2795e8603a4075440ea25">FieldInitializationToString</a></li>
 </ul>
-<h1><a class="anchor" id="euler_modes_sec"></a>
+<h1><a class="anchor" id="p33_euler_modes_sec"></a>
 3. Eulerian Mode Details</h1>
 <p><code>-finit = 0</code> (Zero):</p>
 <ul>
@@ -164,7 +171,7 @@ $(function() {
 <li>treats the inlet-aligned input component as the profile peak (<code>Vmax</code> / centerline speed), not bulk-average velocity.</li>
 </ul>
 <p>This means <code>peak_velocity_physical</code> is the clearest user-facing representation for Poiseuille mode.</p>
-<h1><a class="anchor" id="euler_formula_sec"></a>
+<h1><a class="anchor" id="p33_euler_formula_sec"></a>
 4. Contravariant Initialization Note</h1>
 <p>Initialization is applied to contravariant velocity components, scaled by face-area metrics:</p>
 <p class="formulaDsp">
@@ -174,9 +181,9 @@ U_n = v_n\,A_n,
 </p>
 <p>where face areas are derived from metric vectors (<code>Csi</code>, <code>Eta</code>, <code>Zet</code>) and sign is aligned with inlet face orientation.</p>
 <p>This is why equivalent physical inflow speed can map to different <code>Ucont</code> magnitudes on stretched/curved meshes.</p>
-<h1><a class="anchor" id="restart_modes_sec"></a>
+<h1><a class="anchor" id="p33_restart_modes_sec"></a>
 5. Eulerian Restart Branches</h1>
-<p>In InitializeEulerianState:</p>
+<p>In <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>:</p>
 <ul>
 <li><code>StartStep == 0</code>:<ul>
 <li><code>eulerian_field_source=solve</code>: fresh initialization path.</li>
@@ -195,7 +202,7 @@ U_n = v_n\,A_n,
 <li><code>StartStep</code> identifies the saved restart state being loaded, not the first new step to compute.</li>
 <li>If a run completed through step <code>N</code>, restart with <code>start_step: N</code>; the first newly advanced step will be <code>N+1</code>.</li>
 </ul>
-<h1><a class="anchor" id="particle_link_sec"></a>
+<h1><a class="anchor" id="p33_particle_link_sec"></a>
 6. Particle Initialization Relation</h1>
 <p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> initialization is configured in <code>case.yml -&gt; models.physics.particles</code>, but executed by a separate subsystem.</p>
 <p>For full particle mode and restart details, use:</p>
@@ -203,8 +210,8 @@ U_n = v_n\,A_n,
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 </ul>
-<h1><a class="anchor" id="checks_sec"></a>
-7. First Validation Checks</h1>
+<h1><a class="anchor" id="p33_checks_sec"></a>
+7. Practical Checks</h1>
 <p>After startup, confirm:</p>
 <ul>
 <li>banner line shows expected field initialization mode,</li>
@@ -218,8 +225,8 @@ U_n = v_n\,A_n,
 <li>forgetting that initialization sets interior only; boundary handlers then overwrite face behavior,</li>
 <li>comparing <code>u_physical</code> directly to <code>Ucont</code> without accounting for metric-face scaling.</li>
 </ul>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p33_refs_sec"></a>
+8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
@@ -229,8 +236,28 @@ U_n = v_n\,A_n,
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md115"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Initial Condition Modes</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md116"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md117"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

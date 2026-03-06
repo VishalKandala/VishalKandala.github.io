@@ -83,17 +83,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#concept_sec">1. Core Search Concept</a></li>
-<li class="level1"><a href="#statuses_sec">2. Settlement Status Model</a></li>
-<li class="level1"><a href="#restart_sec">4. Restart Path Specifics</a></li>
+<ul><li class="level1"><a href="#p26_concept_sec">1. Core Search Concept</a></li>
+<li class="level1"><a href="#p26_statuses_sec">2. Settlement Status Model</a></li>
+<li class="level1"><a href="#p26_implementation_sec">3. Implementation Touchpoints</a></li>
+<li class="level1"><a href="#p26_restart_sec">4. Restart Path Specifics</a></li>
+<li class="level1"><a href="#p26_practical_sec">5. Failure Modes and Signals</a><ul><li class="level2"><a href="#autotoc_md94">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md95">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md96">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell (or is explicitly marked lost).</p>
-<h1><a class="anchor" id="concept_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Walking_Search_Method"></a> PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell (or is explicitly marked lost).</p>
+<h1><a class="anchor" id="p26_concept_sec"></a>
 1. Core Search Concept</h1>
 <p>A particle is tested against candidate cell faces using signed distances. Search starts from prior cell information when available, then walks to neighboring cells by face-crossing logic until a terminal status is reached.</p>
 <p>This avoids expensive global brute-force lookup and is suitable for distributed curvilinear grids.</p>
-<h1><a class="anchor" id="statuses_sec"></a>
+<h1><a class="anchor" id="p26_statuses_sec"></a>
 2. Settlement Status Model</h1>
 <p>Location/migration logic uses <code>ParticleLocationStatus</code>:</p>
 <ul>
@@ -104,8 +111,8 @@ $(function() {
 <li><code>UNINITIALIZED</code></li>
 </ul>
 <p>These statuses drive the iterative migration passes in the orchestrator.</p>
-<h1><a class="anchor" id="implementation_sec"></a>
-2. Code Path In PICurv</h1>
+<h1><a class="anchor" id="p26_implementation_sec"></a>
+3. Implementation Touchpoints</h1>
 <ul>
 <li>single-particle walking search: <a class="el" href="walkingsearch_8h.html#aab2bd86e92a9adc67d49622e20a03dbf">LocateParticleInGrid</a></li>
 <li>robust locate-or-migrate decision: <code>LocateParticleOrFindMigrationTarget</code> (walking-search module)</li>
@@ -122,11 +129,11 @@ $(function() {
 <li>newcomer flagging,</li>
 <li>repeat until no global migrations remain (or safety pass cap).</li>
 </ol>
-<h1><a class="anchor" id="restart_sec"></a>
+<h1><a class="anchor" id="p26_restart_sec"></a>
 4. Restart Path Specifics</h1>
 <p>For restart-loaded particles with valid <code>CellID</code>, PICurv can skip full walking search and directly resolve owner rank via cell ownership map before migration. This is usually much cheaper than full re-location on first restart step.</p>
-<h1><a class="anchor" id="practical_sec"></a>
-4. What This Means For Users</h1>
+<h1><a class="anchor" id="p26_practical_sec"></a>
+5. Failure Modes and Signals</h1>
 <p>Watch for:</p>
 <ul>
 <li>excessive migration pass counts,</li>
@@ -134,7 +141,27 @@ $(function() {
 <li>non-convergence of settlement loop.</li>
 </ul>
 <p>These usually indicate domain-decomposition mismatch, bounding-box mismatch, or invalid particle coordinates.</p>
-<p>See <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for troubleshooting commands. </p>
+<p>See <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for troubleshooting commands.</p>
+<h2><a class="anchor" id="autotoc_md94"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Walking Search for <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Location</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md95"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md96"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

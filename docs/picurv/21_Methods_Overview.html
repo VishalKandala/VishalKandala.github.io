@@ -83,13 +83,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#governing_sec">1. Governing Model Snapshot</a></li>
-<li class="level1"><a href="#runtime_map_sec">2. Runtime Execution Order</a></li>
-<li class="level1"><a href="#method_map_sec">3. Method Map</a></li>
+<ul><li class="level1"><a href="#p21_governing_sec">1. Governing Model Snapshot</a></li>
+<li class="level1"><a href="#p21_runtime_map_sec">2. Runtime Execution Order</a></li>
+<li class="level1"><a href="#p21_method_map_sec">3. Method Map</a></li>
+<li class="level1"><a href="#p21_references_sec">4. External Method References</a></li>
+<li class="level1"><a href="#p21_usage_sec">5. How To Read These Pages</a><ul><li class="level2"><a href="#autotoc_md79">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md80">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md81">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This section maps PICurv's numerical methods to the code paths that execute each step. It is intended as the bridge between theory-level terminology and what the current codebase actually does.</p>
-<h1><a class="anchor" id="governing_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Methods_Overview"></a> This section maps PICurv's numerical methods to the code paths that execute each step. It is intended as the bridge between theory-level terminology and what the current codebase actually does.</p>
+<h1><a class="anchor" id="p21_governing_sec"></a>
 1. Governing Model Snapshot</h1>
 <p>PICurv advances incompressible flow in non-dimensional form on curvilinear grids:</p>
 <p class="formulaDsp">
@@ -107,7 +114,7 @@ $(function() {
 <li>project velocity to divergence-free space,</li>
 <li>execute particle coupling (if enabled).</li>
 </ol>
-<h1><a class="anchor" id="runtime_map_sec"></a>
+<h1><a class="anchor" id="p21_runtime_map_sec"></a>
 2. Runtime Execution Order</h1>
 <p>At runtime, the top-level sequence is:</p>
 <ol type="1">
@@ -117,7 +124,7 @@ $(function() {
 <li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> stage (when active): interpolation -&gt; motion -&gt; relocation -&gt; physics -&gt; scatter.</li>
 </ol>
 <p>The method pages below document each major stage in detail.</p>
-<h1><a class="anchor" id="method_map_sec"></a>
+<h1><a class="anchor" id="p21_method_map_sec"></a>
 3. Method Map</h1>
 <ul>
 <li><b><a class="el" href="22_CURVIB_Method.html">CurvIB Method Overview</a></b>: curvilinear grid/metric framework and immersed-boundary context.</li>
@@ -135,14 +142,45 @@ $(function() {
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b>: detailed particle seeding/restart/migration behavior.</li>
 <li><b><a class="el" href="46_C_Runtime_Execution_Map.html">C Runtime Execution Map</a></b>: code-level startup and timestep execution map.</li>
 </ul>
-<h1><a class="anchor" id="usage_sec"></a>
-1. General Usage</h1>
+<h1><a class="anchor" id="p21_references_sec"></a>
+4. External Method References</h1>
+<p>For readers connecting PICurv implementation to the CURVIB literature, these are the primary starting references:</p>
+<ul>
+<li>Borazjani I, Ge L, Sotiropoulos F. "Curvilinear immersed boundary method for simulating fluid structure interaction with complex 3D rigid bodies." <em>Journal of Computational Physics</em> 227(16), 7587-7620 (2008). DOI: <code>10.1016/j.jcp.2008.04.024</code>.</li>
+<li>Borazjani I, Di Achille P, D'Souza RM, et al. "The functional role of left atrial flow in ventricular filling and flow evolution in the left ventricle." <em>Annals of Biomedical Engineering</em> 41(6), 1265-1275 (2013). DOI: <code>10.1007/s10439-013-0758-9</code>.</li>
+</ul>
+<p>Project context:</p>
+<ul>
+<li>PICurv project page: <code><a href="https://vishalkandala.me/projects/Picurv/">https://vishalkandala.me/projects/Picurv/</a></code></li>
+</ul>
+<h1><a class="anchor" id="p21_usage_sec"></a>
+5. How To Read These Pages</h1>
 <p>Use each page with two goals:</p>
 <ol type="1">
 <li>theory alignment (which equation/model is being approximated),</li>
 <li>implementation alignment (which function actually executes it now).</li>
 </ol>
-<p>When behavior differs from classical textbook formulations, the implementation notes take precedence for this repository. </p>
+<p>When behavior differs from classical textbook formulations, the implementation notes take precedence for this repository.</p>
+<h2><a class="anchor" id="autotoc_md79"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Methods and Models Overview</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md80"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md81"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

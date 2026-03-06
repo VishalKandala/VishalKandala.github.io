@@ -83,13 +83,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#command_sec">2. Core Command Patterns</a></li>
-<li class="level1"><a href="#flow_sec">4. Submission Flow</a></li>
+<ul><li class="level1"><a href="#p36_inputs_sec">1. Required Inputs</a></li>
+<li class="level1"><a href="#p36_command_sec">2. Core Command Patterns</a></li>
+<li class="level1"><a href="#p36_artifacts_sec">3. Generated Scheduler Artifacts</a></li>
+<li class="level1"><a href="#p36_flow_sec">4. Submission Flow</a></li>
+<li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a><ul><li class="level2"><a href="#autotoc_md124">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md125">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md126">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This guide documents how <code>picurv</code> converts case configs into scheduler artifacts for cluster execution.</p>
-<h1><a class="anchor" id="inputs_sec"></a>
-1. Required Input Roles</h1>
+<div class="textblock"><p><a class="anchor" id="_Cluster_Run_Guide"></a> This guide documents how <code>picurv</code> converts case configs into scheduler artifacts for cluster execution.</p>
+<h1><a class="anchor" id="p36_inputs_sec"></a>
+1. Required Inputs</h1>
 <p>Typical cluster-enabled run uses:</p>
 <ul>
 <li><code>case.yml</code></li>
@@ -99,53 +107,88 @@ $(function() {
 <li><code>cluster.yml</code> (scheduler contract)</li>
 </ul>
 <p>Initialize templates from examples, then customize per cluster/account policy.</p>
-<h1><a class="anchor" id="command_sec"></a>
+<h1><a class="anchor" id="p36_command_sec"></a>
 2. Core Command Patterns</h1>
 <p>Generate and submit:</p>
 <div class="fragment"><div class="line">./bin/picurv run \</div>
+<div class="line">  --solve --post-process \</div>
 <div class="line">  --case &lt;case.yml&gt; \</div>
 <div class="line">  --solver &lt;solver.yml&gt; \</div>
 <div class="line">  --monitor &lt;monitor.yml&gt; \</div>
 <div class="line">  --post &lt;post.yml&gt; \</div>
-<div class="line">  --cluster &lt;cluster.yml&gt; \</div>
-<div class="line">  --scheduler slurm</div>
+<div class="line">  --cluster &lt;cluster.yml&gt;</div>
 </div><!-- fragment --><p>Generate only (no submission):</p>
-<div class="fragment"><div class="line">./bin/picurv run ... --scheduler slurm --no-submit</div>
-</div><!-- fragment --><h1><a class="anchor" id="artifacts_sec"></a>
-6. Inspect Generated Artifacts</h1>
+<div class="fragment"><div class="line">./bin/picurv run ... --cluster &lt;cluster.yml&gt; --no-submit</div>
+</div><!-- fragment --><p>Explicit scheduler cross-check (optional):</p>
+<div class="fragment"><div class="line">./bin/picurv run ... --cluster &lt;cluster.yml&gt; --scheduler slurm</div>
+</div><!-- fragment --><p>Notes:</p>
+<ul>
+<li><code>--scheduler</code> is optional and only valid with <code>--cluster</code>.</li>
+<li>if provided, it must match <code>cluster.yml:scheduler.type</code>.</li>
+<li>in cluster mode, solver stage rank count is resolved from <code>cluster.yml</code> (<code>nodes * ntasks_per_node</code>).</li>
+<li>post stage stays single-task by default (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) even when solver stage is multi-rank.</li>
+</ul>
+<h1><a class="anchor" id="p36_artifacts_sec"></a>
+3. Generated Scheduler Artifacts</h1>
 <p>In run directory, scheduler generation typically produces:</p>
 <ul>
-<li><code>solver.sbatch</code></li>
-<li><code>post.sbatch</code></li>
-<li><code>manifest.json</code></li>
-<li><code>submission.json</code> (when submitted)</li>
+<li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code></li>
+<li><code>runs/&lt;run_id&gt;/scheduler/post.sbatch</code></li>
+<li><code>runs/&lt;run_id&gt;/manifest.json</code></li>
+<li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code> (always in cluster mode when run artifacts are written; contains launch metadata and submission IDs when present)</li>
 </ul>
 <p>These coexist with standard runtime control artifacts used by solver/postprocessor binaries.</p>
-<h1><a class="anchor" id="flow_sec"></a>
+<h1><a class="anchor" id="p36_flow_sec"></a>
 4. Submission Flow</h1>
 <ol type="1">
 <li>YAML validation and contract checks,</li>
 <li>run directory + control artifact generation,</li>
 <li>sbatch script rendering from scheduler settings,</li>
-<li>optional solver submission,</li>
-<li>optional post job with dependency linkage.</li>
+<li>optional solver submission (<code>solver.sbatch</code>),</li>
+<li>optional post submission (<code>post.sbatch</code>), with <code>afterok:&lt;solver_jobid&gt;</code> dependency when solve+post are both requested in one command.</li>
 </ol>
 <p>This allows consistent local dry-run and cluster production flow from the same inputs.</p>
-<h1><a class="anchor" id="notes_sec"></a>
-5. Practical Notes</h1>
+<h1><a class="anchor" id="p36_notes_sec"></a>
+5. Operational Notes</h1>
 <ul>
 <li>Prefer <code>--no-submit</code> first when validating new scheduler settings.</li>
 <li>Keep cluster defaults in reusable templates (<code>examples/master_template/master_cluster.yml</code>).</li>
 <li>If queue policies differ by partition/account, encode them in <code>cluster.yml</code> instead of editing generated scripts manually.</li>
 <li>Solver stage uses <code>cluster.yml</code> resources directly.</li>
 <li>Post stage defaults to single-task scheduling (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) in generated <code>post.sbatch</code>.</li>
+<li><code>--num-procs</code> in cluster mode is a consistency guard, not an independent rank selector:<ul>
+<li>allowed values are <code>1</code> (auto) or exactly <code>nodes * ntasks_per_node</code>.</li>
+<li>any other value is rejected as an inconsistent configuration combo.</li>
+</ul>
+</li>
+<li>use <code>picurv run --dry-run --format json</code> before submission when integrating with external launch wrappers.</li>
 </ul>
 <p>See also:</p>
 <ul>
 <li><b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b></li>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md124"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Cluster Run Guide (Slurm)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md125"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md126"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

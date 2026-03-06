@@ -115,173 +115,163 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#undef __FUNCT__</span></div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="particle__statistics_8c.html#ae60511a9aa5cbf216a00a1bb81006bc5">   23</a></span><span class="preprocessor">#define __FUNCT__ &quot;ComputeParticleMSD&quot;</span><span class="comment"></span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * @brief Computes the mean-squared displacement (MSD) of the particle cloud.</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * Two-pass algorithm:</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> *   Pass 1 — accumulate per-component squared displacements and centre-of-mass sums.</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> *   MPI reduction — allreduce 7 values (6 sums + count) to get global MSD and COM.</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> *   Compute scalars — MSD_total, r_rms_meas, r_rms_theory, rel_err_pct.</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *   Pass 2 — count particles inside 1σ/2σ/3σ theoretical shells; allreduce counts.</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *   Output (rank 0) — append one row to {stats_prefix}_msd.csv; LOG_INFO summary.</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * Physics:  D = 1/(Re·Sc),  t = ti·dt,  r_theory = sqrt(6·D·t).</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * Expected fractions inside r_theory / 2·r_theory / 3·r_theory ≈ 61%/97%/99.9%</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> * for a 3D Maxwell-Boltzmann distribution.</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> */</span><span class="preprocessor"></span></div>
-<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">   38</a></span>PetscErrorCode <a class="code hl_function" href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, <span class="keyword">const</span> <span class="keywordtype">char</span> *stats_prefix, PetscInt ti)</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>{</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    PetscErrorCode ierr;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    PetscMPIInt    rank;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    PetscFunctionBeginUser;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">     * Physics parameters                                                   *</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keyword">const</span> PetscReal Re  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> : 1.0;</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keyword">const</span> PetscReal Sc  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> : 1.0;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keyword">const</span> PetscReal D   = 1.0 / (Re * Sc);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">const</span> PetscReal t   = (PetscReal)ti * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keyword">const</span> PetscReal x0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322">psrc_x</a>;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keyword">const</span> PetscReal y0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad">psrc_y</a>;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">const</span> PetscReal z0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7e53ba8e0f07cf333ca205c5db27afd8">psrc_z</a>;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment">     * Pass 1: local accumulation                                           *</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    PetscInt       n_local;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    PetscReal local_sq_x = 0.0, local_sq_y = 0.0, local_sq_z = 0.0;</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    PetscReal local_sx   = 0.0, local_sy   = 0.0, local_sz   = 0.0;</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        local_sq_x += dx * dx;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        local_sq_y += dy * dy;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        local_sq_z += dz * dz;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        local_sx   += dx;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        local_sy   += dy;</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        local_sz   += dz;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment">     * MPI reduction — 7 doubles + count                                   *</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    PetscReal local_buf[7] = { local_sq_x, local_sq_y, local_sq_z,</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                                local_sx,   local_sy,   local_sz,</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                                (PetscReal)n_local };</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    PetscReal global_buf[7] = {0};</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    MPI_Allreduce(local_buf, global_buf, 7, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * @brief Internal helper implementation: `ComputeParticleMSD()`.</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * @details Local to this translation unit.</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> */</span><span class="preprocessor"></span></div>
+<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">   28</a></span>PetscErrorCode <a class="code hl_function" href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, <span class="keyword">const</span> <span class="keywordtype">char</span> *stats_prefix, PetscInt ti)</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>{</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    PetscErrorCode ierr;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    PetscMPIInt    rank;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    PetscFunctionBeginUser;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">     * Physics parameters                                                   *</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keyword">const</span> PetscReal Re  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> : 1.0;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keyword">const</span> PetscReal Sc  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> : 1.0;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keyword">const</span> PetscReal D   = 1.0 / (Re * Sc);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keyword">const</span> PetscReal t   = (PetscReal)ti * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keyword">const</span> PetscReal x0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322">psrc_x</a>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keyword">const</span> PetscReal y0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad">psrc_y</a>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keyword">const</span> PetscReal z0  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a7e53ba8e0f07cf333ca205c5db27afd8">psrc_z</a>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment">     * Pass 1: local accumulation                                           *</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    PetscInt       n_local;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    PetscReal local_sq_x = 0.0, local_sq_y = 0.0, local_sq_z = 0.0;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    PetscReal local_sx   = 0.0, local_sy   = 0.0, local_sz   = 0.0;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>        local_sq_x += dx * dx;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        local_sq_y += dy * dy;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        local_sq_z += dz * dz;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        local_sx   += dx;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        local_sy   += dy;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        local_sz   += dz;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    }</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment">     * MPI reduction — 7 doubles + count                                   *</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    PetscReal local_buf[7] = { local_sq_x, local_sq_y, local_sq_z,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>                                local_sx,   local_sy,   local_sz,</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>                                (PetscReal)n_local };</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    PetscReal global_buf[7] = {0};</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    ierr = MPI_Allreduce(local_buf, global_buf, 7, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keyword">const</span> PetscReal N_total  = global_buf[6];</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordflow">if</span> (N_total &lt; 1.0) PetscFunctionReturn(0); <span class="comment">/* no particles */</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keyword">const</span> PetscReal MSD_x    = global_buf[0] / N_total;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keyword">const</span> PetscReal MSD_y    = global_buf[1] / N_total;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    <span class="keyword">const</span> PetscReal MSD_z    = global_buf[2] / N_total;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keyword">const</span> PetscReal com_x    = global_buf[3] / N_total;</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <span class="keyword">const</span> PetscReal com_y    = global_buf[4] / N_total;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keyword">const</span> PetscReal com_z    = global_buf[5] / N_total;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keyword">const</span> PetscReal N_total  = global_buf[6];</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordflow">if</span> (N_total &lt; 1.0) PetscFunctionReturn(0); <span class="comment">/* no particles */</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keyword">const</span> PetscReal MSD_x    = global_buf[0] / N_total;</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keyword">const</span> PetscReal MSD_y    = global_buf[1] / N_total;</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keyword">const</span> PetscReal MSD_z    = global_buf[2] / N_total;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keyword">const</span> PetscReal com_x    = global_buf[3] / N_total;</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keyword">const</span> PetscReal com_y    = global_buf[4] / N_total;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keyword">const</span> PetscReal com_z    = global_buf[5] / N_total;</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keyword">const</span> PetscReal MSD_total    = MSD_x + MSD_y + MSD_z;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <span class="keyword">const</span> PetscReal r_rms_meas   = PetscSqrtReal(MSD_total);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keyword">const</span> PetscReal r_theory     = (t &gt; 1e-300) ? PetscSqrtReal(6.0 * D * t) : 0.0;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keyword">const</span> PetscReal rel_err_pct  = (r_theory &gt; 1e-12)</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                                   ? PetscAbsReal(r_rms_meas - r_theory) / r_theory * 100.0</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                                   : 0.0;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keyword">const</span> PetscReal MSD_total    = MSD_x + MSD_y + MSD_z;</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keyword">const</span> PetscReal r_rms_meas   = PetscSqrtReal(MSD_total);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keyword">const</span> PetscReal r_theory     = (t &gt; 1e-300) ? PetscSqrtReal(6.0 * D * t) : 0.0;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keyword">const</span> PetscReal rel_err_pct  = (r_theory &gt; 1e-12)</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                                   ? PetscAbsReal(r_rms_meas - r_theory) / r_theory * 100.0</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>                                   : 0.0;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment">     * Pass 2: fraction inside σ-shells                                    *</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    PetscInt local_n1 = 0, local_n2 = 0, local_n3 = 0;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keyword">const</span> PetscReal r1 = r_theory;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <span class="keyword">const</span> PetscReal r2 = 2.0 * r_theory;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keyword">const</span> PetscReal r3 = 3.0 * r_theory;</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment">     * Pass 2: fraction inside σ-shells                                    *</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    PetscInt local_n1 = 0, local_n2 = 0, local_n3 = 0;</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <span class="keyword">const</span> PetscReal r1 = r_theory;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keyword">const</span> PetscReal r2 = 2.0 * r_theory;</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keyword">const</span> PetscReal r3 = 3.0 * r_theory;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <span class="keyword">const</span> PetscReal r  = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        <span class="keywordflow">if</span> (r &lt; r1) local_n1++;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="keywordflow">if</span> (r &lt; r2) local_n2++;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        <span class="keywordflow">if</span> (r &lt; r3) local_n3++;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    }</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="keyword">const</span> PetscReal r  = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <span class="keywordflow">if</span> (r &lt; r1) local_n1++;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="keywordflow">if</span> (r &lt; r2) local_n2++;</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <span class="keywordflow">if</span> (r &lt; r3) local_n3++;</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    }</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keyword">const</span> <span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    PetscReal local_counts[3] = { (PetscReal)local_n1,</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                   (PetscReal)local_n2,</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                                   (PetscReal)local_n3 };</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    PetscReal global_counts[3] = {0};</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    ierr = MPI_Allreduce(local_counts, global_counts, 3, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <span class="keyword">const</span> PetscReal frac_1s = global_counts[0] / N_total * 100.0;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <span class="keyword">const</span> PetscReal frac_2s = global_counts[1] / N_total * 100.0;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keyword">const</span> PetscReal frac_3s = global_counts[2] / N_total * 100.0;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    PetscReal local_counts[3] = { (PetscReal)local_n1,</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>                                   (PetscReal)local_n2,</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>                                   (PetscReal)local_n3 };</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    PetscReal global_counts[3] = {0};</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    MPI_Allreduce(local_counts, global_counts, 3, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keyword">const</span> PetscReal frac_1s = global_counts[0] / N_total * 100.0;</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="keyword">const</span> PetscReal frac_2s = global_counts[1] / N_total * 100.0;</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keyword">const</span> PetscReal frac_3s = global_counts[2] / N_total * 100.0;</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment">     * Output: CSV + LOG_INFO (rank 0 only)                                *</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        <span class="keywordtype">char</span> csv_path[PETSC_MAX_PATH_LEN];</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        PetscSNPrintf(csv_path, <span class="keyword">sizeof</span>(csv_path), <span class="stringliteral">&quot;%s_msd.csv&quot;</span>, stats_prefix);</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        FILE *f = fopen(csv_path, <span class="stringliteral">&quot;a&quot;</span>);</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <span class="keywordflow">if</span> (!f) {</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>                      <span class="stringliteral">&quot;ComputeParticleMSD: could not open &#39;%s&#39; for writing.\n&quot;</span>, csv_path);</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>            <span class="comment">/* Write header if file is empty */</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>            <span class="keywordflow">if</span> (ftell(f) == 0) {</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>                fprintf(f, <span class="stringliteral">&quot;step,t,N,MSD_x,MSD_y,MSD_z,MSD_total,&quot;</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>                        <span class="stringliteral">&quot;r_rms_meas,r_rms_theory,rel_err_pct,&quot;</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>                        <span class="stringliteral">&quot;com_x,com_y,com_z,&quot;</span></div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>                        <span class="stringliteral">&quot;frac_1sigma_pct,frac_2sigma_pct,frac_3sigma_pct\n&quot;</span>);</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>            }</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>            fprintf(f, <span class="stringliteral">&quot;%d,%.6e,%.0f,%.6e,%.6e,%.6e,%.6e,%.6e,%.6e,%.4f,%.6e,%.6e,%.6e,%.2f,%.2f,%.2f\n&quot;</span>,</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>                    (<span class="keywordtype">int</span>)ti, t, N_total,</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>                    MSD_x, MSD_y, MSD_z, MSD_total,</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>                    r_rms_meas, r_theory, rel_err_pct,</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>                    com_x, com_y, com_z,</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>                    frac_1s, frac_2s, frac_3s);</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>            fclose(f);</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>        }</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>                  <span class="stringliteral">&quot;[MSD ti=%d t=%.4f] total=%.4e theory=%.4e err=%.2f%% | &quot;</span></div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>                  <span class="stringliteral">&quot;fracs: %.1f/%.1f/%.1f%% | COM: (%.2e,%.2e,%.2e)\n&quot;</span>,</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>                  (<span class="keywordtype">int</span>)ti, t, MSD_total, r_theory * r_theory, rel_err_pct,</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>                  frac_1s, frac_2s, frac_3s,</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>                  com_x, com_y, com_z);</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    }</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    PetscFunctionReturn(0);</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>}</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">     * Output: CSV + LOG_INFO (rank 0 only)                                *</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <span class="keywordtype">char</span> csv_path[PETSC_MAX_PATH_LEN];</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        PetscSNPrintf(csv_path, <span class="keyword">sizeof</span>(csv_path), <span class="stringliteral">&quot;%s_msd.csv&quot;</span>, stats_prefix);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        FILE *f = fopen(csv_path, <span class="stringliteral">&quot;a&quot;</span>);</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <span class="keywordflow">if</span> (!f) {</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>                      <span class="stringliteral">&quot;ComputeParticleMSD: could not open &#39;%s&#39; for writing.\n&quot;</span>, csv_path);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>            <span class="comment">/* Write header if file is empty */</span></div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>            <span class="keywordflow">if</span> (ftell(f) == 0) {</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>                fprintf(f, <span class="stringliteral">&quot;step,t,N,MSD_x,MSD_y,MSD_z,MSD_total,&quot;</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>                        <span class="stringliteral">&quot;r_rms_meas,r_rms_theory,rel_err_pct,&quot;</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>                        <span class="stringliteral">&quot;com_x,com_y,com_z,&quot;</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>                        <span class="stringliteral">&quot;frac_1sigma_pct,frac_2sigma_pct,frac_3sigma_pct\n&quot;</span>);</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>            }</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>            fprintf(f, <span class="stringliteral">&quot;%d,%.6e,%.0f,%.6e,%.6e,%.6e,%.6e,%.6e,%.6e,%.4f,%.6e,%.6e,%.6e,%.2f,%.2f,%.2f\n&quot;</span>,</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>                    (<span class="keywordtype">int</span>)ti, t, N_total,</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>                    MSD_x, MSD_y, MSD_z, MSD_total,</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>                    r_rms_meas, r_theory, rel_err_pct,</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>                    com_x, com_y, com_z,</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>                    frac_1s, frac_2s, frac_3s);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>            fclose(f);</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        }</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>                  <span class="stringliteral">&quot;[MSD ti=%d t=%.4f] total=%.4e theory=%.4e err=%.2f%% | &quot;</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>                  <span class="stringliteral">&quot;fracs: %.1f/%.1f/%.1f%% | COM: (%.2e,%.2e,%.2e)\n&quot;</span>,</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>                  (<span class="keywordtype">int</span>)ti, t, MSD_total, r_theory * r_theory, rel_err_pct,</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>                  frac_1s, frac_2s, frac_3s,</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>                  com_x, com_y, com_z);</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    }</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span> </div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    PetscFunctionReturn(0);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>}</div>
 </div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
-<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00761">logging.h:761</a></div></div>
+<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00758">logging.h:758</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
-<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00752">logging.h:752</a></div></div>
-<div class="ttc" id="aparticle__statistics_8c_html_acfb130aeba6e6d430c0ca599b34e38d4"><div class="ttname"><a href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></div><div class="ttdeci">PetscErrorCode ComputeParticleMSD(UserCtx *user, const char *stats_prefix, PetscInt ti)</div><div class="ttdoc">Computes the mean-squared displacement (MSD) of the particle cloud.</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00038">particle_statistics.c:38</a></div></div>
+<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00749">logging.h:749</a></div></div>
+<div class="ttc" id="aparticle__statistics_8c_html_acfb130aeba6e6d430c0ca599b34e38d4"><div class="ttname"><a href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></div><div class="ttdeci">PetscErrorCode ComputeParticleMSD(UserCtx *user, const char *stats_prefix, PetscInt ti)</div><div class="ttdoc">Internal helper implementation: ComputeParticleMSD().</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00028">particle_statistics.c:28</a></div></div>
 <div class="ttc" id="aparticle__statistics_8h_html"><div class="ttname"><a href="particle__statistics_8h.html">particle_statistics.h</a></div><div class="ttdoc">Global statistics kernels for the Statistics Pipeline.</div></div>
 <div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00807">variables.h:807</a></div></div>
 <div class="ttc" id="avariables_8h_html_a1950b3a7c86997fb1e1fc11b0c8a9158"><div class="ttname"><a href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">SimCtx::schmidt_number</a></div><div class="ttdeci">PetscReal schmidt_number</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00653">variables.h:653</a></div></div>

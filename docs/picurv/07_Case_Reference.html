@@ -83,21 +83,303 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#properties_sec">1. properties</a></li>
-<li class="level1"><a href="#run_control_sec">2. run_control</a></li>
-<li class="level1"><a href="#grid_sec">3. grid</a><ul><li class="level2"><a href="#grid_prog_ssec">3.1 mode: programmatic_c</a></li>
-<li class="level2"><a href="#grid_file_ssec">3.2 mode: file</a></li>
-<li class="level2"><a href="#grid_gen_ssec">3.3 mode: grid_gen</a></li>
+<ul><li class="level1"><a href="#p07_properties_sec">1. properties</a></li>
+<li class="level1"><a href="#p07_run_control_sec">2. run_control</a></li>
+<li class="level1"><a href="#p07_grid_sec">3. grid</a><ul><li class="level2"><a href="#p07_grid_prog_ssec">3.1 mode: programmatic_c</a></li>
+<li class="level2"><a href="#p07_grid_file_ssec">3.2 mode: file</a></li>
+<li class="level2"><a href="#p07_grid_gen_ssec">3.3 mode: grid_gen</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#models_sec">4. models</a></li>
-<li class="level1"><a href="#bc_sec">5. boundary_conditions</a></li>
-<li class="level1"><a href="#passthrough_sec">6. solver_parameters (Advanced)</a></li>
+<li class="level1"><a href="#p07_models_sec">4. models</a></li>
+<li class="level1"><a href="#p07_bc_sec">5. boundary_conditions</a></li>
+<li class="level1"><a href="#p07_passthrough_sec">6. solver_parameters (Advanced)</a></li>
+<li class="level1"><a href="#p07_modular_sec">7. Mixing With Other Profiles</a></li>
+<li class="level1"><a href="#p07_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md26">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md27">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md28">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>For the full commented template, see:</p>
-<pre class="fragment"></pre><p><code>case.yml</code> defines physical setup, grid source, domain topology, and boundary conditions. It is intentionally modular: the same <code>case.yml</code> can be paired with different <code>solver.yml</code>, <code>monitor.yml</code>, and <code>post.yml</code> profiles when the combination remains contract-compatible.</p>
-<h1><a class="anchor" id="properties_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Case_Reference"></a> For the full commented template, see:</p>
+<pre class="fragment"># ==============================================================================
+#                 PICurv Master Case Configuration Template
+# ==============================================================================
+#
+# PURPOSE:
+# This file defines the complete physical setup for a single simulation experiment.
+# It describes the geometry, fluid properties, run duration, physical models,
+# and boundary conditions. It is the "digital lab notebook" for your run.
+#
+# SECTIONS OVERVIEW:
+#   1. simulation_control:  How long the simulation runs and at what time resolution.
+#   2. properties:          The core physical numbers (density, viscosity, scales).
+#   3. grid:                The geometric domain, either from a file or generated.
+#   4. models:              Switches to turn on/off different physics modules (LES, FSI, etc.).
+#   5. boundary_conditions: What happens at the edges of the domain.
+#
+# YAML SYNTAX NOTE:
+#   - Indentation matters! Use spaces, not tabs.
+#   - For lists, ensure there is a space after the hyphen (e.g., "- item").
+#   - For more details: https://learnxinyminutes.com/docs/yaml/
+#
+# ==============================================================================
+
+# ==============================================================================
+# 1. SIMULATION CONTROL
+#    Defines the duration and temporal resolution of the experiment.
+# ==============================================================================
+run_control:
+  # The simulation step number to start from.
+  # 0 for a new run, or a specific step number for a restart.
+  start_step: 0
+
+  # Total number of timesteps to execute in this run.
+  # Total simulation time = total_steps * dt_physical.
+  total_steps: 2000
+
+  # Optional: point to a previous run directory to automate restart source
+  # resolution. picurv will inspect &lt;that_run&gt;/config/monitor.yml and map
+  # the old restart directory into the new control file automatically.
+  # restart_from_run_dir: "../runs/flat_channel_20260303-120000"
+
+  # The physical time increment for each step, in seconds [s].
+  dt_physical: 0.001
+
+# ==============================================================================
+# 2. PHYSICAL PROPERTIES
+#    Defines the non-dimensional scaling and material properties.
+# ==============================================================================
+properties:
+  # --- Scaling ---
+  # These reference values are used to non-dimensionalize the problem for the solver.
+  scaling:
+    length_ref: 0.05    # [m] Characteristic length of the domain (e.g., pipe diameter, chord length).
+    velocity_ref: 1.5   # [m/s] Characteristic velocity (e.g., inlet velocity, freestream velocity).
+
+  # --- Fluid ---
+  # Properties of the fluid being simulated.
+  fluid:
+    density: 1000.0     # [kg/m^3]
+    viscosity: 0.001    # [Pa.s or kg/(m.s)]
+
+  # --- Initial Conditions ---
+  # The state of the fluid at the start of the simulation (t=0).
+  # Values are in physical units [m/s].
+  initial_conditions:
+    # --- Field Initialization Mode ---
+    # Defines the type of initial velocity field.
+    # Options:
+    #   - "Zero": All velocity components are zero.
+    #   - "Constant": A uniform velocity field is applied everywhere.
+    #   - "Poiseuille": A parabolic velocity profile (for channel/pipe flow).
+    mode: "Constant"  # This will be translated to -finit
+
+    # --- Initial Velocity ---
+    # For 'Constant': set u_physical/v_physical/w_physical.
+    # For 'Poiseuille': prefer 'peak_velocity_physical' (scalar Vmax mapped to the
+    # primary inlet axis), or use u_physical/v_physical/w_physical as an explicit component override.
+    # peak_velocity_physical: 1.0
+    # Values are in physical units [m/s].
+    u_physical: 0.0
+    v_physical: 0.0
+    w_physical: 0.0
+
+# ==============================================================================
+# 3. GRID DEFINITION
+#    Defines the computational mesh for the simulation.
+# ==============================================================================
+grid:
+  # --- Mode Selection ---
+  # Determines how the grid is provided to the solver.
+  # Options: 'file', 'programmatic_c', or 'grid_gen'.
+  mode: programmatic_c
+
+  # --- Option A: Grid from File ---
+  # Use this if you have a pre-generated grid file.
+  # The script validates and non-dimensionalizes coordinates using 'length_ref'.
+  # source_file: "grids/my_premade_grid.picgrid"
+
+  # --- Option B: Grid via Python Grid Generator (scripts/grid.gen) ---
+  # Use this for complex curvilinear meshes generated before solver launch.
+  # generator:
+  #   config_file: "config/grids/coarse_square_tube_curved.cfg"    # Required today. Relative to case.yml or absolute.
+  #   grid_type: "cpipe"               # Optional override: cpipe | pipe | warp
+  #   cli_args:                        # Optional raw CLI token list
+  #     - "--ncells-i"
+  #     - "96"
+  #     - "--ncells-j"
+  #     - "96"
+  #   output_file: "config/grid.generated.picgrid"  # Optional; relative to run dir.
+  #   stats_file: "config/grid.generated.info"      # Optional.
+  #   vts_file: "config/grid.generated.vts"         # Optional.
+
+  # --- Option C: Programmatic Grid Generation in C ---
+  # Use this to have the C solver generate a structured Cartesian grid.
+  # `im/jm/km` are cell counts in YAML; picurv converts them to node counts
+  # before emitting `-im/-jm/-km` for the C runtime.
+  # For MULTI-BLOCK cases, all values must be LISTS of the same length.
+  programmatic_settings:
+    # --- Cell Counts ---
+    im: 64              # [Cells in i-direction] -&gt; For 2 blocks: [64, 128]
+    jm: 32              # [Cells in j-direction] -&gt; For 2 blocks: [32, 32]
+    km: 128             # [Cells in k-direction] -&gt; For 2 blocks: [128, 256]
+
+    # --- Domain Bounds (in physical units [m]) ---
+    xMins: 0.0          # [Min x-coordinate] -&gt; For 2 blocks: [0.0, 1.0]
+    xMaxs: 1.0          # [Max x-coordinate] -&gt; For 2 blocks: [1.0, 2.0]
+    yMins: 0.0
+    yMaxs: 0.5
+    zMins: 0.0
+    zMaxs: 2.0
+
+    # --- Grid Stretching Ratios ---
+    # 1.0 = uniform. &gt;1.0 = stretching towards max coordinate.
+    rxs: 1.0
+    rys: 1.05
+    rzs: 1.0
+
+    # --- Domain Decomposition (for parallel runs) ---
+    # GLOBAL DMDA layout for the run (single value per direction).
+    # NOTE: Per-block processor decomposition is not implemented on the C side.
+    # The product must equal the total number of MPI processes (-n) for parallel runs.
+    da_processors_x: 2
+    da_processors_y: 2
+    da_processors_z: 4
+
+# ==============================================================================
+# 4. MODEL SELECTION
+#    User-friendly switches to enable different physical models and features.
+#    If a section or key is omitted, the C-code's default will be used.
+# ==============================================================================
+models:
+  # --- Domain and Block Configuration ---
+  domain:
+    blocks: 1          # [Integer] -&gt; -nblk. CRITICAL for multi-block setups.
+    i_periodic: false  # [true/false] -&gt; -i_periodic
+    j_periodic: false  # [true/false] -&gt; -j_periodic
+    k_periodic: false  # [true/false] -&gt; -k_periodic
+
+  # --- Core Physics Modules ---
+  physics:
+    dimensionality: "3D" # Options: "3D" (default), "2D" (sets -TwoD 1)
+    
+    fsi:
+      immersed: false    # [true/false] -&gt; -imm (Immersed Boundary Method)
+      moving_fsi: false  # [true/false] -&gt; -fsi (Fluid-Structure Interaction)
+
+    particles:
+      count: 0             # [Integer] -&gt; -numParticles
+      init_mode: "Surface" # [string] -&gt; -pinit. Options: "Surface", "Volume", "PointSource", "SurfaceEdges"
+      restart_mode: "init" # [string] -&gt; -particle_restart_mode. Options: "init", "load"
+      point_source:        # Required only when init_mode = "PointSource" (maps to -psrc_x/-psrc_y/-psrc_z)
+        x: 0.5
+        y: 0.5
+        z: 0.5
+
+    turbulence:
+      les: false           # [true/false] -&gt; -les (Large Eddy Simulation)
+      rans: false          # [true/false] -&gt; -rans (Reynolds-Averaged Navier-Stokes)
+      wall_function: false # [true/false] -&gt; -wallfunction
+  
+  # --- Statistical Analysis ---
+  statistics:
+    time_averaging: false  # [true/false] -&gt; -averaging. Enables running averages.
+
+# ==============================================================================
+# 5. BOUNDARY CONDITIONS
+#    Defines the behavior at each of the 6 faces of the computational domain(s).
+# ==============================================================================
+# --- For SINGLE-BLOCK cases: Provide a simple list of 6 face definitions. ---
+# --- For MULTI-BLOCK cases: Provide a LIST OF LISTS. The outer list corresponds
+#     to the block index [0, 1, ...], and each inner list defines the 6 faces
+#     for that block. See the multi-block example commented out below. ---
+boundary_conditions:
+  # --- Example for a Single Block Case ---
+  - face: "-Xi"
+    type: WALL
+    handler: noslip
+    
+  - face: "+Xi"
+    type: WALL
+    handler: noslip
+
+  - face: "-Eta"
+    type: INLET
+    handler: constant_velocity
+    params:
+      vx: 1.5  # Physical velocity [m/s]
+      vy: 0.0
+      vz: 0.0
+      
+  - face: "+Eta"
+    type: OUTLET
+    handler: conservation
+    
+  - face: "-Zeta"
+    type: WALL
+    handler: noslip
+    
+  - face: "+Zeta"
+    type: WALL
+    handler: noslip
+
+# --- Example for a 2-Block Case (syntax example; all handlers shown are currently supported) ---
+# boundary_conditions:
+#   # --- Block 0 Definitions ---
+#   - - face: "-Xi"
+#       type: INLET
+#       handler: constant_velocity
+#       params: { vx: 1.5, vy: 0.0, vz: 0.0 }
+#     - face: "+Xi"
+#       type: OUTLET
+#       handler: conservation
+#     - face: "-Eta"
+#       type: WALL
+#       handler: noslip
+#     - face: "+Eta"
+#       type: WALL
+#       handler: noslip
+#     - face: "-Zeta"
+#       type: WALL
+#       handler: noslip
+#     - face: "+Zeta"
+#       type: WALL
+#       handler: noslip
+#
+#   # --- Block 1 Definitions ---
+#   - - face: "-Xi"
+#       type: INLET
+#       handler: parabolic
+#       params: { v_max: 1.5 }
+#     - face: "+Xi"
+#       type: OUTLET
+#       handler: conservation
+#     - face: "-Eta"
+#       type: WALL
+#       handler: noslip
+#     - face: "+Eta"
+#       type: WALL
+#       handler: noslip
+#     - face: "-Zeta"
+#       type: WALL
+#       handler: noslip
+#     - face: "+Zeta"
+#       type: WALL
+#       handler: noslip
+
+# ==============================================================================
+# 6. ADVANCED PASSTHROUGH (OPTIONAL)
+# ------------------------------------------------------------------------------
+# Use this for C flags not yet exposed in the structured schema.
+# Keys must be full C/PETSc-style flags (including leading '-').
+# ==============================================================================
+# solver_parameters:
+#   -read_fields: true
+#   -some_new_flag: 123
+</pre><p><code>case.yml</code> defines physical setup, grid source, domain topology, and boundary conditions. It is intentionally modular: the same <code>case.yml</code> can be paired with different <code>solver.yml</code>, <code>monitor.yml</code>, and <code>post.yml</code> profiles when the combination remains contract-compatible.</p>
+<h1><a class="anchor" id="p07_properties_sec"></a>
 1. properties</h1>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  scaling:</div>
@@ -131,7 +413,7 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="run_control_sec"></a>
+<h1><a class="anchor" id="p07_run_control_sec"></a>
 2. run_control</h1>
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  dt_physical: 0.0001</div>
@@ -144,7 +426,7 @@ $(function() {
 <li><code>total_steps</code> -&gt; <code>-totalsteps</code></li>
 <li><code>restart_from_run_dir</code> -&gt; <code>picurv</code> resolves the prior run's actual restart source directory and emits <code>-restart_dir &lt;absolute_previous_source&gt;</code></li>
 </ul>
-<h1><a class="anchor" id="grid_sec"></a>
+<h1><a class="anchor" id="p07_grid_sec"></a>
 3. grid</h1>
 <p>Supported modes:</p><ul>
 <li><code>programmatic_c</code></li>
@@ -156,7 +438,7 @@ $(function() {
 <li>for normal <code>solve</code> and <code>load</code> workflows, all three grid modes are supported.</li>
 <li>for <code>solver.yml -&gt; operation_mode.eulerian_field_source: analytical</code>, the current contract requires <code>grid.mode: programmatic_c</code>.</li>
 </ul>
-<h2><a class="anchor" id="grid_prog_ssec"></a>
+<h2><a class="anchor" id="p07_grid_prog_ssec"></a>
 3.1 mode: programmatic_c</h2>
 <p><code>programmatic_settings</code> supports per-block lists for geometry arrays:</p><ul>
 <li><code>im/jm/km</code></li>
@@ -170,13 +452,23 @@ $(function() {
 <p>Important constraint:</p><ul>
 <li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block processor decomposition is not implemented.</li>
 </ul>
-<h2><a class="anchor" id="grid_file_ssec"></a>
+<h2><a class="anchor" id="p07_grid_file_ssec"></a>
 3.2 mode: file</h2>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>
 <div class="line">  source_file: my_grid.picgrid</div>
 </div><!-- fragment --><p><code>picurv</code> validates existence and prepares normalized grid data for C-side ingestion.</p>
-<h2><a class="anchor" id="grid_gen_ssec"></a>
+<p>Optional legacy conversion path (headerless 1D-axis payloads):</p>
+<div class="fragment"><div class="line">grid:</div>
+<div class="line">  mode: file</div>
+<div class="line">  source_file: legacy_flat.grid</div>
+<div class="line">  legacy_conversion:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    format: legacy1d           # aliases: legacy_1d, les_flat_1d, les-flat-1d</div>
+<div class="line">    axis_columns: [0, 1, 2]    # preferred source columns for X/Y/Z axis rows</div>
+<div class="line">    strict_trailing: true</div>
+</div><!-- fragment --><p>When enabled, <code>picurv</code> first calls <code>scripts/grid.gen legacy1d</code> to create a canonical PICGRID file in the run config, then runs the normal validation/non-dimensionalization staging path.</p>
+<h2><a class="anchor" id="p07_grid_gen_ssec"></a>
 3.3 mode: grid_gen</h2>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: grid_gen</div>
@@ -186,7 +478,7 @@ $(function() {
 <div class="line">    cli_args: [&quot;--ncells-i&quot;, &quot;96&quot;, &quot;--ncells-j&quot;, &quot;96&quot;]</div>
 </div><!-- fragment --><p>This runs <code>scripts/grid.gen</code> before solver launch and stages generated grid artifacts into the run config. <code>grid.generator.config_file</code> is required today; <code>picurv</code> does not synthesize a temporary grid config. <code>grid.gen</code> accepts cell-count inputs (<code>ncells_*</code> / <code>--ncells-*</code>) and writes node counts into the generated <code>.picgrid</code> header.</p>
 <p>For direct <code>grid.gen</code> usage, generator types, and config-file structure, see <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b>.</p>
-<h1><a class="anchor" id="models_sec"></a>
+<h1><a class="anchor" id="p07_models_sec"></a>
 4. models</h1>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  domain:</div>
@@ -217,7 +509,7 @@ $(function() {
 <li>if <code>run_control.start_step &gt; 0</code>, particles are enabled, and <code>restart_mode</code> is omitted, <code>picurv</code> warns that C will default to <code>load</code>.</li>
 </ul>
 <p>For mode-specific particle behavior and restart flow, see <b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b>.</p>
-<h1><a class="anchor" id="bc_sec"></a>
+<h1><a class="anchor" id="p07_bc_sec"></a>
 5. boundary_conditions</h1>
 <p>Single-block syntax: list of 6 face entries. Multi-block syntax: list-of-lists, one 6-face list per block.</p>
 <p>Supported face names:</p><ul>
@@ -232,15 +524,15 @@ $(function() {
 <li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>apply_trim</code>)</li>
 </ul>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
-<h1><a class="anchor" id="passthrough_sec"></a>
+<h1><a class="anchor" id="p07_passthrough_sec"></a>
 6. solver_parameters (Advanced)</h1>
 <p>Optional escape hatch for flags not yet exposed in structured schema:</p>
 <div class="fragment"><div class="line">solver_parameters:</div>
 <div class="line">  -read_fields: true</div>
 <div class="line">  -some_new_flag: 123</div>
 </div><!-- fragment --><p>Use sparingly and prefer structured keys when available.</p>
-<h1><a class="anchor" id="modular_sec"></a>
-7. Modular Profile Strategy</h1>
+<h1><a class="anchor" id="p07_modular_sec"></a>
+7. Mixing With Other Profiles</h1>
 <p><code>case.yml</code> is designed to be combined with reusable profiles for the other config roles.</p>
 <p>Common patterns:</p>
 <ul>
@@ -250,8 +542,8 @@ $(function() {
 <li>one <code>cluster.yml</code> reused across many runs and sweeps.</li>
 </ul>
 <p>For worked combinations, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>.</p>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p07_next_steps_sec"></a>
+8. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b>.</p>
 <p>Cross-file contract/mapping:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
@@ -261,8 +553,28 @@ $(function() {
 <li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
-<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b> </li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md26"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Configuration Reference: Case YAML</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md27"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md28"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

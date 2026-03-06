@@ -83,14 +83,22 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#contract_sec">3. Study Contract Essentials</a></li>
-<li class="level1"><a href="#outputs_sec">4. Outputs and Aggregates</a></li>
-<li class="level1"><a href="#operations_sec">5. Operational Workflow</a></li>
+<ul><li class="level1"><a href="#p37_inputs_sec">1. Inputs and Templates</a></li>
+<li class="level1"><a href="#p37_command_sec">2. Core Sweep Command</a></li>
+<li class="level1"><a href="#p37_contract_sec">3. Study Contract Essentials</a></li>
+<li class="level1"><a href="#p37_outputs_sec">4. Outputs and Aggregates</a></li>
+<li class="level1"><a href="#p37_operations_sec">5. Operational Workflow</a></li>
+<li class="level1"><a href="#p37_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md127">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md128">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md129">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p><code>picurv sweep</code> orchestrates parameter studies with generated run variants, scheduler arrays, and aggregate metrics.</p>
-<h1><a class="anchor" id="inputs_sec"></a>
-1. Required Input Roles</h1>
+<div class="textblock"><p><a class="anchor" id="_Sweep_Studies_Guide"></a> <code>picurv sweep</code> orchestrates parameter studies with generated run variants, scheduler arrays, and aggregate metrics.</p>
+<h1><a class="anchor" id="p37_inputs_sec"></a>
+1. Inputs and Templates</h1>
 <p>A sweep/study commonly uses:</p>
 <ul>
 <li>base case/solver/monitor/post templates,</li>
@@ -98,31 +106,58 @@ $(function() {
 <li>optional cluster scheduler settings for array submission.</li>
 </ul>
 <p>Starter templates are available under <code>examples/*/*study*.yml</code> and <code>examples/master_template/</code>.</p>
-<h1><a class="anchor" id="command_sec"></a>
-2. Core Command Patterns</h1>
-<div class="fragment"><div class="line">./bin/picurv sweep --study &lt;study.yml&gt; --scheduler slurm</div>
-</div><!-- fragment --><p>Typical optional flags include dry-run or no-submit behaviors depending on workflow stage.</p>
-<h1><a class="anchor" id="contract_sec"></a>
+<h1><a class="anchor" id="p37_command_sec"></a>
+2. Core Sweep Command</h1>
+<div class="fragment"><div class="line">./bin/picurv sweep --study &lt;study.yml&gt; --cluster &lt;cluster.yml&gt;</div>
+</div><!-- fragment --><p>Optional generation-only mode:</p>
+<div class="fragment"><div class="line">./bin/picurv sweep --study &lt;study.yml&gt; --cluster &lt;cluster.yml&gt; --no-submit</div>
+</div><!-- fragment --><p>There is no dedicated <code>--dry-run</code> flag on <code>sweep</code>; use <code>--no-submit</code> for non-submitting artifact generation.</p>
+<h1><a class="anchor" id="p37_contract_sec"></a>
 3. Study Contract Essentials</h1>
 <p>A study definition usually specifies:</p>
 <ul>
-<li>parameter space (explicit lists/ranges),</li>
-<li>mapping from parameter key -&gt; YAML target path,</li>
-<li>execution controls,</li>
-<li>metric extraction definitions.</li>
+<li><code>base_configs</code>:<ul>
+<li><code>case</code>, <code>solver</code>, <code>monitor</code>, <code>post</code> paths (all required)</li>
+</ul>
+</li>
+<li><code>study_type</code>:<ul>
+<li>one of <code>grid_independence</code>, <code>timestep_independence</code>, <code>sensitivity</code></li>
+</ul>
+</li>
+<li><code>parameters</code>:<ul>
+<li>non-empty mapping of <code>&lt;target&gt;.&lt;yaml.path&gt;</code> -&gt; non-empty list of values</li>
+<li><code>&lt;target&gt;</code> must be one of <code>case</code>, <code>solver</code>, <code>monitor</code>, <code>post</code></li>
+</ul>
+</li>
+<li><code>metrics</code> (optional):<ul>
+<li>list of metric specs or metric names for aggregation</li>
+</ul>
+</li>
+<li><code>plotting</code> (optional):<ul>
+<li>output controls (<code>enabled</code>, <code>output_format</code>)</li>
+</ul>
+</li>
+<li><code>execution</code> (optional):<ul>
+<li>controls like <code>max_concurrent_array_tasks</code> for Slurm array throttling</li>
+</ul>
+</li>
 </ul>
 <p>Each combination yields a generated run with fully materialized config set.</p>
-<h1><a class="anchor" id="outputs_sec"></a>
+<h1><a class="anchor" id="p37_outputs_sec"></a>
 4. Outputs and Aggregates</h1>
 <p>Expected study outputs include:</p>
 <ul>
-<li>per-combination run directories,</li>
-<li>aggregate table (for example <code>metrics_table.csv</code>),</li>
-<li>summary metadata (for example <code>summary.json</code>),</li>
-<li>optional plot outputs in results/plots.</li>
+<li><code>studies/&lt;study_id&gt;/cases/case_####/</code> per-combination run directories</li>
+<li><code>studies/&lt;study_id&gt;/scheduler/case_index.tsv</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/solver_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/submission.json</code> (when jobs are submitted)</li>
+<li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
+<li><code>studies/&lt;study_id&gt;/results/plots/*</code> (when plotting is enabled and matplotlib is available)</li>
+<li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
 <p>This keeps raw run data and comparative study diagnostics in one reproducible structure.</p>
-<h1><a class="anchor" id="operations_sec"></a>
+<h1><a class="anchor" id="p37_operations_sec"></a>
 5. Operational Workflow</h1>
 <p>Recommended workflow:</p>
 <ol type="1">
@@ -133,13 +168,40 @@ $(function() {
 <li>archive the exact study file with results for reproducibility.</li>
 </ol>
 <p>For fragile metrics, add smoke tests or fixture-based validation before large queue submissions.</p>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<p>Implementation details worth knowing:</p>
+<ul>
+<li>case expansion uses cartesian product over all <code>parameters.*</code> lists.</li>
+<li>generated case configs are revalidated through the same solver/post validators used by <code>picurv run</code>.</li>
+<li>post array submission depends on solver array completion (<code>afterok:&lt;jobid&gt;</code>) unless <code>--no-submit</code> is used.</li>
+<li>generator/file grid external paths are rewritten to absolute paths during case materialization so they remain valid in <code>studies/&lt;study_id&gt;/cases/...</code>.</li>
+</ul>
+<h1><a class="anchor" id="p37_refs_sec"></a>
+6. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="36_Cluster_Run_Guide.html">Cluster Run Guide (Slurm)</a></b></li>
 <li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md127"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Sweep and Study Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md128"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md129"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

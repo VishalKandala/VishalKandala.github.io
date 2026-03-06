@@ -7,7 +7,7 @@ var searchData=
   ['n_5ftime_4',['n_time',['../variables_8h.html#abe9471a10ce3fd8ca6d0b38998095fa1',1,'Cstart']]],
   ['n_5fv_5',['n_v',['../variables_8h.html#afe83433d7e6734e63f739cbd0304988f',1,'IBMNodes::n_v'],['../variables_8h.html#ad7104dcdbc189a60ba55f24729baff40',1,'IBMVNodes::n_v']]],
   ['nallowed_6',['nAllowed',['../variables_8h.html#a9d4d4331609e84f21e3668e6f4746d2c',1,'SimCtx']]],
-  ['name_7',['name',['../variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e',1,'VTKFieldInfo::name'],['../logging_8c.html#afc958d8a55b5a07cac056b59293720c0',1,'ProfiledFunction::name']]],
+  ['name_7',['name',['../variables_8h.html#aa9925ca2ed729970c0fe25a333c6087e',1,'VTKFieldInfo::name'],['../logging_8c.html#afc958d8a55b5a07cac056b59293720c0',1,'ProfiledFunction::name'],['../test__support_8h.html#adae3ab3f55319e725b480d3834df3f02',1,'PicurvTestCase::name']]],
   ['named_5fstruct_5fre_8',['NAMED_STRUCT_RE',['../namespacegenerate__doxygen__fallback__indexes.html#a0c980eeb89c995b89af4089895337485',1,'generate_doxygen_fallback_indexes']]],
   ['nbnumber_9',['nbnumber',['../variables_8h.html#a22d348bdf7bb570279d926019d255547',1,'IBMVNodes::nbnumber'],['../variables_8h.html#aff26156e55bd47794818d4951c106d88',1,'IBMNodes::nbnumber']]],
   ['need3rdpoint_10',['Need3rdPoint',['../variables_8h.html#a8a782cd2fb7f3a7924564660dfdf54e5',1,'SurfElmtInfo']]],

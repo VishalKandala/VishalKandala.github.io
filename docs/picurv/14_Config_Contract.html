@@ -83,15 +83,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#inputs_sec">1. Required Input Roles</a></li>
-<li class="level1"><a href="#case_sec">3. Case Contract Highlights</a></li>
-<li class="level1"><a href="#monitor_sec">5. Monitor Contract Highlights</a></li>
-<li class="level1"><a href="#cluster_sec">7. Cluster Contract Highlights (cluster.yml)</a></li>
-<li class="level1"><a href="#study_sec">8. Study Contract Highlights (study.yml)</a></li>
+<ul><li class="level1"><a href="#p14_inputs_sec">1. Required Input Roles</a></li>
+<li class="level1"><a href="#p14_artifacts_sec">2. Generated Artifacts</a></li>
+<li class="level1"><a href="#p14_case_sec">3. Case Contract Highlights</a></li>
+<li class="level1"><a href="#p14_solver_sec">4. Solver Contract Highlights</a></li>
+<li class="level1"><a href="#p14_monitor_sec">5. Monitor Contract Highlights</a></li>
+<li class="level1"><a href="#p14_post_sec">6. Post Contract Highlights</a></li>
+<li class="level1"><a href="#p14_cluster_sec">7. Cluster Contract Highlights (cluster.yml)</a></li>
+<li class="level1"><a href="#p14_study_sec">8. Study Contract Highlights (study.yml)</a></li>
+<li class="level1"><a href="#p14_passthrough_sec">9. Escape Hatches and Defaults</a><ul><li class="level2"><a href="#autotoc_md47">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md48">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md49">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page is the user-facing source of truth for the configuration contract implemented by <code>picurv</code>. It describes the launcher-level contract, which may be stricter or more explicit than the raw C defaults because <code>picurv</code> validates and normalizes inputs before runtime.</p>
-<h1><a class="anchor" id="inputs_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Config_Contract"></a> This page is the user-facing source of truth for the configuration contract implemented by <code>picurv</code>. It describes the launcher-level contract, which may be stricter or more explicit than the raw C defaults because <code>picurv</code> validates and normalizes inputs before runtime.</p>
+<h1><a class="anchor" id="p14_inputs_sec"></a>
 1. Required Input Roles</h1>
 <p><code>picurv</code> composes a standard single-run workflow from five logical inputs, with two additional files for cluster/sweep modes:</p>
 <ol type="1">
@@ -116,8 +125,8 @@ $(function() {
 <li><code>post.yml</code> describes post-processing outputs.</li>
 </ul>
 <p>In normal use, you reuse and mix these files instead of cloning one monolithic config for every run.</p>
-<h1><a class="anchor" id="artifacts_sec"></a>
-6. Inspect Generated Artifacts</h1>
+<h1><a class="anchor" id="p14_artifacts_sec"></a>
+2. Generated Artifacts</h1>
 <p>For each run, <code>picurv</code> generates:</p>
 <ul>
 <li><code>&lt;run_id&gt;.control</code>: master PETSc/control flags for solver/post setup.</li>
@@ -126,7 +135,7 @@ $(function() {
 <li><code>profile.run</code>: selected per-step profiling function list (only when <code>profiling.timestep_output.mode: selected</code>).</li>
 <li><code>post.run</code>: key=value post-processing recipe consumed by C post parser.</li>
 </ul>
-<h1><a class="anchor" id="case_sec"></a>
+<h1><a class="anchor" id="p14_case_sec"></a>
 3. Case Contract Highlights</h1>
 <ul>
 <li><code>grid.mode</code> supports: <code>file</code>, <code>programmatic_c</code>, <code>grid_gen</code>.</li>
@@ -134,6 +143,7 @@ $(function() {
 <li><code>programmatic_c.im/jm/km</code> are cell counts in YAML; <code>picurv</code> converts them to node counts before writing <code>-im/-jm/-km</code>.</li>
 <li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block MPI decomposition is not currently supported.</li>
 <li>For <code>grid_gen</code>, <code>grid.generator.config_file</code> is required today. <code>grid.gen</code> consumes cell counts and writes node counts into <code>.picgrid</code>.</li>
+<li>For <code>file</code>, optional <code>grid.legacy_conversion</code> can call <code>grid.gen legacy1d</code> to convert headerless 1D-axis legacy payloads before standard validation/non-dimensionalization.</li>
 <li><code>boundary_conditions</code> supports single-block list or multi-block list-of-lists.</li>
 <li><code>solver_parameters</code> is an advanced passthrough map for raw flags not yet modeled in schema.</li>
 <li><code>properties.initial_conditions.mode</code> is required explicitly by the launcher.</li>
@@ -144,8 +154,8 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="solver_sec"></a>
-3. Numerical Solver Stack</h1>
+<h1><a class="anchor" id="p14_solver_sec"></a>
+4. Solver Contract Highlights</h1>
 <ul>
 <li><code>operation_mode.eulerian_field_source</code> -&gt; <code>-euler_field_source</code></li>
 <li><code>operation_mode.analytical_type</code> -&gt; <code>-analytical_type</code></li>
@@ -158,7 +168,7 @@ $(function() {
 <li>when <code>operation_mode.eulerian_field_source: analytical</code> is selected, the current launcher contract requires <code>case.yml -&gt; grid.mode: programmatic_c</code>.</li>
 <li>this reflects the current C analytical ingestion path, which does not consume <code>file</code>/<code>grid_gen</code> geometry in the standard way.</li>
 </ul>
-<h1><a class="anchor" id="monitor_sec"></a>
+<h1><a class="anchor" id="p14_monitor_sec"></a>
 5. Monitor Contract Highlights</h1>
 <ul>
 <li><code>io.data_output_frequency</code> -&gt; <code>-tio</code></li>
@@ -168,8 +178,8 @@ $(function() {
 <li><code>io.directories.eulerian_subdir/particle_subdir</code> -&gt; <code>-euler_subdir/-particle_subdir</code></li>
 <li><code>solver_monitoring</code> maps raw flags directly into control output.</li>
 </ul>
-<h1><a class="anchor" id="post_sec"></a>
-4. Post-Processing Recipes</h1>
+<h1><a class="anchor" id="p14_post_sec"></a>
+6. Post Contract Highlights</h1>
 <ul>
 <li>Pipelines are serialized into semicolon-delimited C pipeline strings.</li>
 <li><code>io.eulerian_fields</code> -&gt; <code>output_fields_instantaneous</code></li>
@@ -178,7 +188,7 @@ $(function() {
 <li><code>io.input_extensions.eulerian/particle</code> -&gt; <code>eulerianExt/particleExt</code> for post input readers</li>
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
 </ul>
-<h1><a class="anchor" id="cluster_sec"></a>
+<h1><a class="anchor" id="p14_cluster_sec"></a>
 7. Cluster Contract Highlights (cluster.yml)</h1>
 <ul>
 <li><code>scheduler.type</code> currently supports <code>slurm</code> only.</li>
@@ -195,7 +205,7 @@ $(function() {
 <li><code>runs/&lt;run_id&gt;/scheduler/post.sbatch</code></li>
 <li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code></li>
 </ul>
-<h1><a class="anchor" id="study_sec"></a>
+<h1><a class="anchor" id="p14_study_sec"></a>
 8. Study Contract Highlights (study.yml)</h1>
 <ul>
 <li><code>base_configs</code> provides case/solver/monitor/post template paths.</li>
@@ -223,8 +233,8 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
 <li><code>studies/&lt;study_id&gt;/results/plots/*</code></li>
 </ul>
-<h1><a class="anchor" id="passthrough_sec"></a>
-6. solver_parameters (Advanced)</h1>
+<h1><a class="anchor" id="p14_passthrough_sec"></a>
+9. Escape Hatches and Defaults</h1>
 <ul>
 <li>Escape hatches stay supported:<ul>
 <li><code>case.solver_parameters</code></li>
@@ -246,7 +256,27 @@ $(function() {
 <li>omitting velocity components for <code>mode: Zero</code> is accepted and defaults to zero,</li>
 <li>omitting <code>models.physics.particles.restart_mode</code> on a particle restart emits a warning that C will default to <code>load</code>.</li>
 </ul>
-<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
+<p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
+<h2><a class="anchor" id="autotoc_md47"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md48"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md49"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

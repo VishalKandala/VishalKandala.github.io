@@ -83,18 +83,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#grammar_sec">1. Boundary-Condition Grammar</a></li>
-<li class="level1"><a href="#supported_sec">2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#nondim_sec">3. Non-Dimensionalization Before C Input</a></li>
-<li class="level1"><a href="#periodic_rules_sec">4. Periodicity Consistency Rules</a></li>
-<li class="level1"><a href="#c_pipeline_sec">5. C-Side Parsing and Dispatch</a></li>
-<li class="level1"><a href="#c_gap_sec">6. Exposed vs Latent Options</a></li>
-<li class="level1"><a href="#examples_sec">7. Authoring Examples</a></li>
-<li class="level1"><a href="#troubleshoot_sec">8. Common Failure Modes</a></li>
+<ul><li class="level1"><a href="#p44_grammar_sec">1. Boundary-Condition Grammar</a></li>
+<li class="level1"><a href="#p44_supported_sec">2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p44_nondim_sec">3. Non-Dimensionalization Before C Input</a></li>
+<li class="level1"><a href="#p44_periodic_rules_sec">4. Periodicity Consistency Rules</a></li>
+<li class="level1"><a href="#p44_c_pipeline_sec">5. C-Side Parsing and Dispatch</a></li>
+<li class="level1"><a href="#p44_c_gap_sec">6. Exposed vs Latent Options</a></li>
+<li class="level1"><a href="#p44_examples_sec">7. Authoring Examples</a></li>
+<li class="level1"><a href="#p44_troubleshoot_sec">8. Common Failure Modes</a></li>
+<li class="level1"><a href="#p44_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md145">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md146">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md147">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>This page is the detailed reference for boundary-condition authoring in <code>case.yml</code>. It documents what is currently supported by the Python conductor and what is currently wired in C.</p>
-<h1><a class="anchor" id="grammar_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Boundary_Conditions_Guide"></a> This page is the detailed reference for boundary-condition authoring in <code>case.yml</code>. It documents what is currently supported by the Python conductor and what is currently wired in C.</p>
+<h1><a class="anchor" id="p44_grammar_sec"></a>
 1. Boundary-Condition Grammar</h1>
 <p><code>case.yml -&gt; boundary_conditions</code> supports:</p>
 <ul>
@@ -106,7 +112,7 @@ $(function() {
 <li><code>-Xi</code>, <code>+Xi</code>, <code>-Eta</code>, <code>+Eta</code>, <code>-Zeta</code>, <code>+Zeta</code></li>
 </ul>
 <p>Every block must provide all six faces exactly once.</p>
-<h1><a class="anchor" id="supported_sec"></a>
+<h1><a class="anchor" id="p44_supported_sec"></a>
 2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</h1>
 <p>The validator accepts these type/handler pairs:</p>
 <table class="markdownTable">
@@ -131,7 +137,7 @@ $(function() {
 <li>unknown params are rejected per handler,</li>
 <li><code>constant_flux</code> must be configured on both faces of the periodic pair.</li>
 </ul>
-<h1><a class="anchor" id="nondim_sec"></a>
+<h1><a class="anchor" id="p44_nondim_sec"></a>
 3. Non-Dimensionalization Before C Input</h1>
 <p><code>picurv</code> converts physical BC values to solver-scale values before writing <code>bcs.run</code>:</p>
 <p class="formulaDsp">
@@ -145,7 +151,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><code>vx/vy/vz/v_max</code> are divided by <code>properties.scaling.velocity_ref</code>,</li>
 <li><code>target_flux</code> is divided by <code>velocity_ref * length_ref^2</code>.</li>
 </ul>
-<h1><a class="anchor" id="periodic_rules_sec"></a>
+<h1><a class="anchor" id="p44_periodic_rules_sec"></a>
 4. Periodicity Consistency Rules</h1>
 <p>Validator checks:</p>
 <ol type="1">
@@ -157,7 +163,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li>incomplete face sets fail validation immediately.</li>
 </ol>
 <p>The C side also performs periodic consistency checks while deriving global periodicity in <a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a>.</p>
-<h1><a class="anchor" id="c_pipeline_sec"></a>
+<h1><a class="anchor" id="p44_c_pipeline_sec"></a>
 5. C-Side Parsing and Dispatch</h1>
 <p>Generated <code>bcs.run</code> lines use:</p>
 <div class="fragment"><div class="line">&lt;face&gt; &lt;type&gt; &lt;handler&gt; key=value key=value ...</div>
@@ -178,7 +184,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li>periodic geometric,</li>
 <li>periodic driven constant flux.</li>
 </ul>
-<h1><a class="anchor" id="c_gap_sec"></a>
+<h1><a class="anchor" id="p44_c_gap_sec"></a>
 6. Exposed vs Latent Options</h1>
 <p>Important contributor note:</p>
 <ul>
@@ -191,7 +197,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li>C parser/factory/handler implementation,</li>
 <li>docs and tests (fixtures + smoke checks).</li>
 </ol>
-<h1><a class="anchor" id="examples_sec"></a>
+<h1><a class="anchor" id="p44_examples_sec"></a>
 7. Authoring Examples</h1>
 <p>Constant-velocity inlet + outlet conservation:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
@@ -236,21 +242,41 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="line">  - face: &quot;+Zeta&quot;</div>
 <div class="line">    type: WALL</div>
 <div class="line">    handler: noslip</div>
-</div><!-- fragment --><h1><a class="anchor" id="troubleshoot_sec"></a>
+</div><!-- fragment --><h1><a class="anchor" id="p44_troubleshoot_sec"></a>
 8. Common Failure Modes</h1>
 <ul>
 <li>&lsquo;missing required key 'face&rsquo;/'type'/'handler'<code>: malformed BC entry object. -</code>Duplicate face<code>: same face declared twice in one block. -</code>incomplete ... Missing faces<code>: not all 6 faces provided. -</code>Inconsistent periodicity<code>: one side periodic and opposite side non-periodic. -</code>Unknown params`: extra keys not allowed for selected handler.</li>
 </ul>
-<h1><a class="anchor" id="refs_sec"></a>
-1. Reference Scales</h1>
+<h1><a class="anchor" id="p44_refs_sec"></a>
+9. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md145"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Boundary Conditions Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md146"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md147"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

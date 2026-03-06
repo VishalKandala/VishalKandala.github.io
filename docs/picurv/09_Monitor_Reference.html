@@ -83,15 +83,141 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#io_sec">1. io</a></li>
-<li class="level1"><a href="#logging_sec">2. logging</a></li>
-<li class="level1"><a href="#profiling_sec">3. profiling</a></li>
-<li class="level1"><a href="#solver_monitoring_sec">4. solver_monitoring</a></li>
+<ul><li class="level1"><a href="#p09_io_sec">1. io</a></li>
+<li class="level1"><a href="#p09_logging_sec">2. logging</a></li>
+<li class="level1"><a href="#p09_profiling_sec">3. profiling</a></li>
+<li class="level1"><a href="#p09_solver_monitoring_sec">4. solver_monitoring</a></li>
+<li class="level1"><a href="#p09_next_steps_sec">5. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md34">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>For the full commented template, see:</p>
-<pre class="fragment"></pre><p><code>monitor.yml</code> controls observability and run I/O behavior.</p>
-<h1><a class="anchor" id="io_sec"></a>
+<div class="textblock"><p><a class="anchor" id="_Monitor_Reference"></a> For the full commented template, see:</p>
+<pre class="fragment"># ==============================================================================
+#                 PICurv Master Monitor Configuration Template
+# ==============================================================================
+#
+# PURPOSE:
+# This file defines the OBSERVATION and DATA MANAGEMENT strategy for a SOLVER run.
+# It controls console verbosity, performance profiling, I/O frequency, and
+# detailed monitoring of the numerical solvers.
+#
+# IMPORTANT:
+# Changing this file will NEVER change the scientific result of the simulation.
+# It only changes what is observed and recorded.
+#
+# ==============================================================================
+
+# ==============================================================================
+# 1. LOGGING
+#    Controls what is printed to the console and saved in the main .log file.
+# ==============================================================================
+logging:
+  # --- Verbosity Level ---
+  # Sets the master LOG_LEVEL for the C-code.
+  # Options: ERROR, WARNING, INFO, DEBUG, TRACE, VERBOSE
+  verbosity: INFO
+
+  # --- Function Allow-List ---
+  # For targeted debugging. If this list is empty, picurv omits the whitelist
+  # file so the C runtime falls back to its built-in default allow-list.
+  enabled_functions: []
+
+# ==============================================================================
+# 2. PROFILING
+#    Controls the performance measurement system.
+# ==============================================================================
+profiling:
+  # --- Per-Step Profiling Output ---
+  # Controls whether timestep-level profiling rows are written to a dedicated file.
+  # mode:
+  #   off      -&gt; no timestep profiling output
+  #   selected -&gt; write only the listed functions
+  #   all      -&gt; write every instrumented function that ran that step
+  timestep_output:
+    mode: "off"
+    # functions:
+    #   - AdvanceSimulation
+    #   - Flow_Solver
+    file: "Profiling_Timestep_Summary.csv"
+
+  # --- Final Profiling Summary ---
+  # Controls the end-of-run aggregated profiling summary file.
+  final_summary:
+    enabled: true
+
+# ==============================================================================
+# 3. I/O AND DATA MANAGEMENT
+#    Controls data file generation and locations for the SOLVER.
+# ==============================================================================
+io:
+  # --- Frequency Control ---
+  # How often data is written or printed, measured in timesteps.
+  
+  # Frequency for saving full simulation field data (for restarts/post-processing).
+  # [Integer] -&gt; -tio
+  data_output_frequency: 100
+
+  # Frequency for printing particle snapshots into the main solver log.
+  # If omitted, picurv uses data_output_frequency. Set to 0 to disable periodic
+  # particle console snapshots entirely.
+  # [Non-negative Integer] -&gt; -particle_console_output_freq
+  particle_console_output_frequency: 100
+
+  # --- Particle Tracking Row Subsampling ---
+  # Within each particle console snapshot, print only every Nth particle row.
+  # [Integer] -&gt; -logfreq
+  particle_log_interval: 50
+
+  # --- Directory Management ---
+  # Specifies subdirectory names within the run folder. If omitted, C-code
+  # defaults will be used.
+  directories:
+    output: "results"   # [string] -&gt; -output_dir
+    restart: "results"  # [string] -&gt; -restart_dir
+    log: "logs"         # [string] -&gt; -log_dir
+    eulerian_subdir: "eulerian"  # [string] -&gt; -euler_subdir
+    particle_subdir: "particles" # [string] -&gt; -particle_subdir
+
+# ==============================================================================
+# 4. SOLVER MONITORING (PASSTHROUGH)
+# ==============================================================================
+#
+# This section provides maximum flexibility for debugging the numerical solvers.
+# Any key-value pair defined here is passed DIRECTLY to the C solver as a
+# command-line flag. This is primarily for PETSc monitoring options.
+#
+# The keys must be the exact flag names (e.g., '-ps_ksp_monitor_true_residual').
+# For flags that don't take an argument (boolean switches), set the value to `true`.
+#
+# ==============================================================================
+solver_monitoring:
+  # --- Example: KSP (Krylov Subspace Method) Monitors ---
+  # Uncomment to enable live monitoring of the pressure solver's convergence.
+  # This custom monitor provides detailed, formatted output.
+  -ps_ksp_pic_monitor_true_residual: true
+
+  # PETSc's standard true residual monitor.
+  # -ps_ksp_monitor_true_residual: true
+  
+  # Print the reason for KSP convergence or divergence (very useful for debugging).
+  # -ps_ksp_converged_reason: true
+  
+  # View the KSP object's configuration at runtime.
+  # -ps_ksp_view: true
+
+  # --- Example: PC (Preconditioner) Monitors ---
+  # If using an SVD-based preconditioner for debugging, monitor its singular values.
+  # -ps_pc_svd_monitor: true
+
+  # --- Example: TS (Time Stepper) Monitors ---
+  # (If your implicit solver uses PETSc's TS object)
+  # -ts_monitor: true
+</pre><p><code>monitor.yml</code> controls observability and run I/O behavior.</p>
+<h1><a class="anchor" id="p09_io_sec"></a>
 1. io</h1>
 <div class="fragment"><div class="line">io:</div>
 <div class="line">  data_output_frequency: 100</div>
@@ -120,7 +246,7 @@ $(function() {
 <li>If <code>particle_console_output_frequency</code> is omitted, <code>picurv</code> defaults it to <code>data_output_frequency</code>.</li>
 <li>If <code>particle_console_output_frequency</code> is <code>0</code>, periodic particle console snapshots are disabled.</li>
 </ul>
-<h1><a class="anchor" id="logging_sec"></a>
+<h1><a class="anchor" id="p09_logging_sec"></a>
 2. logging</h1>
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;INFO&quot;</div>
@@ -140,7 +266,7 @@ $(function() {
 <li><code>TRACE</code></li>
 <li><code>VERBOSE</code></li>
 </ul>
-<h1><a class="anchor" id="profiling_sec"></a>
+<h1><a class="anchor" id="p09_profiling_sec"></a>
 3. profiling</h1>
 <div class="fragment"><div class="line">profiling:</div>
 <div class="line">  timestep_output:</div>
@@ -162,7 +288,7 @@ $(function() {
 <li><code>timestep_output.file</code> sets the filename written under the run <code>logs/</code> directory</li>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
-<h1><a class="anchor" id="solver_monitoring_sec"></a>
+<h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
 4. solver_monitoring</h1>
 <p>Raw flag passthrough for PETSc monitors/debug options:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
@@ -174,14 +300,34 @@ $(function() {
 <li><code>false</code> omits flag.</li>
 <li>Non-boolean values emit <code>flag value</code>.</li>
 </ul>
-<h1><a class="anchor" id="next_steps_sec"></a>
-10. Next Steps</h1>
+<h1><a class="anchor" id="p09_next_steps_sec"></a>
+5. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b>.</p>
 <p>Also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md32"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Configuration Reference: Monitor YAML</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md33"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md34"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

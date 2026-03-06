@@ -83,21 +83,27 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#refs_sec">1. Reference Scales</a></li>
-<li class="level1"><a href="#primary_sec">2. Primary Converted Quantities</a></li>
-<li class="level1"><a href="#fields_sec">3. Field/Coordinate Scaling Conventions</a></li>
-<li class="level1"><a href="#notes_sec">5. Practical Notes</a></li>
-<li class="level1"><a href="#links_sec">6. References</a></li>
+<ul><li class="level1"><a href="#p19_refs_sec">1. Reference Scales</a></li>
+<li class="level1"><a href="#p19_primary_sec">2. Primary Converted Quantities</a></li>
+<li class="level1"><a href="#p19_fields_sec">3. Field/Coordinate Scaling Conventions</a></li>
+<li class="level1"><a href="#p19_pipeline_sec">4. Where This Happens in the Pipeline</a></li>
+<li class="level1"><a href="#p19_notes_sec">5. Practical Notes</a></li>
+<li class="level1"><a href="#p19_links_sec">6. References</a><ul><li class="level2"><a href="#autotoc_md59">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md60">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md61">Practical CFD Troubleshooting Pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>PICurv uses a dimensional-input, non-dimensional-core workflow:</p>
+<div class="textblock"><p><a class="anchor" id="_Nondimensionalization"></a> PICurv uses a dimensional-input, non-dimensional-core workflow:</p>
 <ol type="1">
 <li>Users specify physical quantities in YAML.</li>
 <li><code>picurv</code> converts/control-maps these to non-dimensional solver inputs.</li>
 <li>Solver evolves non-dimensional fields.</li>
 <li>Postprocessing can re-dimensionalize outputs for visualization/analysis.</li>
 </ol>
-<h1><a class="anchor" id="refs_sec"></a>
+<h1><a class="anchor" id="p19_refs_sec"></a>
 1. Reference Scales</h1>
 <p>From <code>case.yml</code>:</p><ul>
 <li><code>L_ref = properties.scaling.length_ref</code></li>
@@ -108,7 +114,7 @@ $(function() {
 <li><code>T_ref = L_ref / U_ref</code></li>
 <li><code>P_ref = rho_ref * U_ref^2</code></li>
 </ul>
-<h1><a class="anchor" id="primary_sec"></a>
+<h1><a class="anchor" id="p19_primary_sec"></a>
 2. Primary Converted Quantities</h1>
 <p>Common quantities prepared before solver launch:</p>
 <ul>
@@ -124,7 +130,7 @@ $(function() {
 </li>
 </ul>
 <p>For file/grid-generated meshes, coordinates are normalized by <code>L_ref</code> before C-side ingestion.</p>
-<h1><a class="anchor" id="fields_sec"></a>
+<h1><a class="anchor" id="p19_fields_sec"></a>
 3. Field/Coordinate Scaling Conventions</h1>
 <p>Representative scaling conventions used across solver/post:</p>
 <ul>
@@ -133,8 +139,8 @@ $(function() {
 <li>Pressure: <code>p* = p / P_ref</code></li>
 </ul>
 <p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> and Eulerian data follow the same scale family so interpolation/projection remain consistent.</p>
-<h1><a class="anchor" id="pipeline_sec"></a>
-1. End-to-End Flow</h1>
+<h1><a class="anchor" id="p19_pipeline_sec"></a>
+4. Where This Happens in the Pipeline</h1>
 <ul>
 <li>YAML validation and conversion: <code>scripts/picurv</code></li>
 <li>Runtime option ingestion: <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code></li>
@@ -145,19 +151,39 @@ $(function() {
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="notes_sec"></a>
+<h1><a class="anchor" id="p19_notes_sec"></a>
 5. Practical Notes</h1>
 <ul>
 <li>Choose physically meaningful <code>L_ref</code> and <code>U_ref</code>; they directly affect <code>Re</code> and <code>dt*</code>.</li>
 <li>Keep input units consistent across all physical parameters in <code>case.yml</code>.</li>
 <li>For reproducibility, keep run-local generated artifacts under <code>runs/&lt;run_id&gt;/config/</code>.</li>
 </ul>
-<h1><a class="anchor" id="links_sec"></a>
+<h1><a class="anchor" id="p19_links_sec"></a>
 6. References</h1>
 <ul>
 <li>PETSc docs (solver stack context): <a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
-<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b> </li>
+<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 </ul>
+<h2><a class="anchor" id="autotoc_md59"></a>
+CFD Reader Guidance and Practical Use</h2>
+<p>This page describes <b>Non-Dimensionalization Model</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
+<h3><a class="anchor" id="autotoc_md60"></a>
+What To Extract Before Changing A Case</h3>
+<ul>
+<li>Identify which YAML role or runtime stage this page governs.</li>
+<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
+<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
+<li>Record failure signals that require rollback or parameter isolation.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md61"></a>
+Practical CFD Troubleshooting Pattern</h3>
+<ol type="1">
+<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
+<li>Change one control at a time and keep all other roles/configs fixed.</li>
+<li>Validate generated artifacts and logs after each change before scaling up.</li>
+<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
