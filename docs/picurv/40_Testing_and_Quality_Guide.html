@@ -91,6 +91,7 @@ $(function() {
 <li class="level1"><a href="#smoke_sec">6. Executable Smoke (&lt;tt&gt;smoke&lt;/tt&gt;)</a></li>
 <li class="level1"><a href="#aggregate_sec">7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)</a></li>
 <li class="level1"><a href="#extend_sec">9. Extending The Test Suite</a></li>
+<li class="level1"><a href="#runtime_coverage_sec">10. Runtime Coverage Map</a></li>
 </ul>
 </div>
 <div class="textblock"><p>This page documents PICurv's local testing model. The suite is intentionally split by intent so users can choose the smallest command that answers the question they actually have.</p>
@@ -114,6 +115,11 @@ $(function() {
 <li><code>make unit-particles</code></li>
 <li><code>make unit-io</code></li>
 <li><code>make unit-post</code></li>
+<li><code>make unit-grid</code></li>
+<li><code>make unit-metric</code></li>
+<li><code>make unit-boundaries</code></li>
+<li><code>make unit-poisson-rhs</code></li>
+<li><code>make unit-runtime</code></li>
 <li><code>make smoke</code></li>
 <li><code>make check</code></li>
 </ul>
@@ -129,6 +135,7 @@ $(function() {
 <div class="fragment"><div class="line">make test</div>
 <div class="line">make doctor</div>
 <div class="line">make unit-io</div>
+<div class="line">make unit-runtime</div>
 <div class="line">make smoke</div>
 <div class="line">make check</div>
 </div><!-- fragment --><p>Guidance:</p>
@@ -136,8 +143,8 @@ $(function() {
 <li>Use <code>make test</code> when working on <code>scripts/picurv</code>, schemas, or repository metadata.</li>
 <li>Use <code>make doctor</code> after provisioning PETSc on a new machine.</li>
 <li>Use <code>make unit-&lt;area&gt;</code> while changing a subsystem in isolation.</li>
-<li>Use <code>make smoke</code> after building binaries to confirm the entrypoints still launch.</li>
-<li>Use <code>make check</code> at the end of a development cycle.</li>
+<li>Use <code>make smoke</code> after building binaries to execute tiny real solve/post/restart workflows.</li>
+<li>Use <code>make check</code> as the pre-merge gate at the end of a development cycle.</li>
 </ul>
 <h1><a class="anchor" id="python_sec"></a>
 3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</h1>
@@ -192,15 +199,25 @@ $(function() {
 <li><code>make unit-particles</code></li>
 <li><code>make unit-io</code></li>
 <li><code>make unit-post</code></li>
+<li><code>make unit-grid</code></li>
+<li><code>make unit-metric</code></li>
+<li><code>make unit-boundaries</code></li>
+<li><code>make unit-poisson-rhs</code></li>
+<li><code>make unit-runtime</code></li>
 <li><code>make unit</code> (all of the above)</li>
 </ul>
-<p>The phase-1 suite focuses on representative coverage:</p>
+<p>Suite focus areas:</p>
 <ul>
 <li>geometry and interpolation invariants</li>
 <li>solver utility kernels</li>
 <li>particle location helpers</li>
 <li>I/O pathing and field round-trips</li>
 <li>post-processing/statistics kernels</li>
+<li>grid decomposition and bounding-box exchange</li>
+<li>metric tensor/face metric kernels</li>
+<li>boundary factory/face-service checks</li>
+<li>Poisson/RHS and diffusivity kernels</li>
+<li>runtime helper kernels (initialization, particle helpers, wall models)</li>
 </ul>
 <p>These tests use real PETSc objects and run single-rank by default.</p>
 <h1><a class="anchor" id="smoke_sec"></a>
@@ -217,8 +234,12 @@ $(function() {
 <li><code>bin/picurv init</code> creates a self-contained case with copied binaries + origin metadata</li>
 <li><code>picurv run --dry-run --format json</code> emits a valid solve/post execution plan</li>
 <li>restart dry-run planning resolves <code>run_control.restart_from_run_dir</code> into the expected restart source directory</li>
+<li>tiny end-to-end solve + post run (flat channel)</li>
+<li>tiny end-to-end particle solve + post run (flat channel)</li>
+<li>restart execution with both particle modes (<code>load</code> and <code>init</code>)</li>
+<li>tiny end-to-end analytical Brownian run with particle VTP + MSD CSV output</li>
 </ul>
-<p>These checks are still lightweight and fast (no full solve/post execution) while exercising real workflow wiring.</p>
+<p>These checks are intentionally tiny but execute real solver/postprocessor runtime paths.</p>
 <p>Run locally:</p>
 <div class="fragment"><div class="line">make smoke</div>
 </div><!-- fragment --><h1><a class="anchor" id="aggregate_sec"></a>
@@ -266,7 +287,47 @@ $(function() {
 <li>keep temporary artifacts under <code>/tmp</code></li>
 <li>document new user-facing targets or workflows in the README and this guide</li>
 </ol>
-<p>For detailed C test maintenance guidance, see <b><a class="el" href="51_C_Test_Suite_Developer_Guide.html">C Test Suite Developer Guide</a></b>. </p>
+<p>For detailed C test maintenance guidance, see <b><a class="el" href="51_C_Test_Suite_Developer_Guide.html">C Test Suite Developer Guide</a></b>.</p>
+<h1><a class="anchor" id="runtime_coverage_sec"></a>
+10. Runtime Coverage Map</h1>
+<p>The smoke suite uses these named runtime sequences:</p>
+<ul>
+<li><code>S1</code>: tiny flat-channel solve+post run</li>
+<li><code>S2</code>: tiny flat-channel solve+post with particles enabled</li>
+<li><code>S3</code>: tiny restart runs from <code>S2</code> with <code>particle_restart_mode=load</code> and <code>particle_restart_mode=init</code></li>
+<li><code>S4</code>: tiny Brownian analytical solve+post with particle outputs and MSD statistics</li>
+</ul>
+<p>Runtime file coverage map (unit targets + runtime sequences):</p>
+<ul>
+<li><code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code>: <code>unit-solver</code>, <code>S4</code></li>
+<li><code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>: <code>unit-boundaries</code>, <code>unit-runtime</code>, <code>S1</code>, <code>S2</code>, <code>S3</code></li>
+<li><code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>: <code>unit-solver</code>, <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>S1</code>, <code>S2</code>, <code>S3</code></li>
+<li><code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">src/Filter.c</a></code>: <code>unit-solver</code></li>
+<li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code>: <code>unit-metric</code>, <code>unit-grid</code>, <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="ParticleSwarm_8c.html">src/ParticleSwarm.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="grid_8c.html">src/grid.c</a></code>: <code>unit-grid</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
+<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code>: <code>unit-runtime</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
+<li><code><a class="el" href="interpolation_8c.html" title="Main program for DMSwarm interpolation using the fdf-curvIB method.">src/interpolation.c</a></code>: <code>unit-geometry</code>, <code>unit-particles</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>: <code>unit-io</code>, <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) turbulence models.">src/les.c</a></code>: <code>unit-runtime</code></li>
+<li><code><a class="el" href="logging_8c.html">src/logging.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="momentumsolvers_8c.html">src/momentumsolvers.c</a></code>: <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="particle__statistics_8c.html" title="Global statistical reduction kernels for the Statistics Pipeline.">src/particle_statistics.c</a></code>: <code>unit-post</code>, <code>S4</code></li>
+<li><code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="postprocessing__kernels_8c.html">src/postprocessing_kernels.c</a></code>: <code>unit-post</code>, <code>S1</code>, <code>S2</code>, <code>S4</code></li>
+<li><code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="rhs_8c.html">src/rhs.c</a></code>: <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">src/simulator.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="solvers_8c.html">src/solvers.c</a></code>: <code>S1</code>, <code>S2</code></li>
+<li><code><a class="el" href="vtk__io_8c.html">src/vtk_io.c</a></code>: <code>S1</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="walkingsearch_8c.html">src/walkingsearch.c</a></code>: <code>unit-geometry</code>, <code>unit-particles</code>, <code>S2</code>, <code>S3</code>, <code>S4</code></li>
+<li><code><a class="el" href="wallfunction_8c.html" title="Wall function implementations for near-wall turbulence modeling.">src/wallfunction.c</a></code>: <code>unit-runtime</code> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
