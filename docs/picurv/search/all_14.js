@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['i_20direction_0',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md32',1,'']]],
+  ['i_20direction_0',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md27',1,'']]],
   ['i1_1',['i1',['../variables_8h.html#a144452238410e7e6ebd65ed09af08a76',1,'IBMInfo']]],
   ['i11_2',['i11',['../variables_8h.html#afcc0a57611796906677e5d3b60bd3d8b',1,'IBMInfo']]],
   ['i2_3',['i2',['../variables_8h.html#af9fcd46831de17b988c18507b754b25f',1,'IBMInfo']]],
@@ -43,7 +43,7 @@ var searchData=
   ['imp_5fstol_40',['imp_stol',['../variables_8h.html#a9ceb6475261683f406ad2961abaa0f3d',1,'SimCtx']]],
   ['implementation_20status_20matrix_41',['2. Implementation Status Matrix',['../35_API_Documentation_Status.html#status_sec',1,'']]],
   ['implementations_42',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['implications_20for_20post_20processing_20tt_20computenodalaverage_20tt_43',['6. Implications for Post-Processing (&lt;tt&gt;ComputeNodalAverage&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md30',1,'']]],
+  ['implications_20for_20post_20processing_20tt_20computenodalaverage_20tt_43',['6. Implications for Post-Processing (&lt;tt&gt;ComputeNodalAverage&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md25',1,'']]],
   ['important_20exceptions_44',['4. Important Exceptions',['../15_Config_Ingestion_Map.html#exceptions_sec',1,'']]],
   ['in_202d_45',['1.2 Run in 2D',['../11_User_How_To_Guides.html#twod_ssec',1,'']]],
   ['in_20c_46',['3. Mode Behavior in C',['../45_Particle_Initialization_and_Restart.html#mode_behavior_sec',1,'']]],
@@ -58,7 +58,7 @@ var searchData=
   ['in_20use_55',['3. Numerical Controls In Use',['../31_Momentum_Solvers.html#controls_sec',1,'']]],
   ['increase_20grid_20resolution_56',['1.3 Increase Grid Resolution',['../11_User_How_To_Guides.html#gridres_ssec',1,'']]],
   ['index_57',['index',['../variables_8h.html#aa505a95bfac2ff1d51138d6869b243bc',1,'list_node']]],
-  ['index_20architecture_20for_20cell_20centered_20variables_20tt_20ucat_20tt_20tt_20p_20tt_58',['4. The Shifted Index Architecture for Cell-Centered Variables (&lt;tt&gt;ucat&lt;/tt&gt;, &lt;tt&gt;P&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md25',1,'']]],
+  ['index_20architecture_20for_20cell_20centered_20variables_20tt_20ucat_20tt_20tt_20p_20tt_58',['4. The Shifted Index Architecture for Cell-Centered Variables (&lt;tt&gt;ucat&lt;/tt&gt;, &lt;tt&gt;P&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md20',1,'']]],
   ['index_20mapping_59',['Face-to-Index Mapping',['../grid_8c.html#face_geometry',1,'']]],
   ['indexing_20architecture_60',['Indexing Architecture',['../grid_8c.html#architecture',1,'']]],
   ['inference_20runtime_61',['4.2 Tightly Coupled Inference (Runtime)',['../17_Workflow_Extensibility.html#ml_coupled_ssec',1,'']]],
@@ -152,7 +152,7 @@ var searchData=
   ['isparticleinbox_149',['IsParticleInBox',['../ParticleMotion_8c.html#ad2b9ac6b5e4d13799fa82dcd34432da4',1,'ParticleMotion.c']]],
   ['isparticleinsideboundingbox_150',['isparticleinsideboundingbox',['../ParticleSwarm_8c.html#a412856be59df7252e66bcbdd13cf1718',1,'IsParticleInsideBoundingBox(const BoundingBox *bbox, const Particle *particle):&#160;ParticleSwarm.c'],['../ParticleSwarm_8h.html#a412856be59df7252e66bcbdd13cf1718',1,'IsParticleInsideBoundingBox(const BoundingBox *bbox, const Particle *particle):&#160;ParticleSwarm.c']]],
   ['issues_151',['9. Common First-Run Issues',['../40_Testing_and_Quality_Guide.html#troubleshooting_sec',1,'']]],
-  ['it_20works_20at_20the_20boundaries_152',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md26',1,'']]],
+  ['it_20works_20at_20the_20boundaries_152',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md21',1,'']]],
   ['iter_5fmarkdown_5ffiles_153',['iter_markdown_files',['../namespacecheck__markdown__links.html#a050b1a56074474a3ccd4e84ff2c82b0a',1,'check_markdown_links']]],
   ['izet_154',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
 ];

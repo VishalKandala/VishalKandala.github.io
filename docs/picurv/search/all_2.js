@@ -44,7 +44,7 @@ var searchData=
   ['2_20strategy_41',['2. strategy',['../08_Solver_Reference.html#strategy_sec',1,'']]],
   ['2_20supported_20types_20in_20current_20code_42',['2. Supported Types In Current Code',['../48_Grid_Generator_Guide.html#types_sec',1,'']]],
   ['2_20supported_20user_20facing_20combinations_20tt_20picurv_20tt_43',['2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)',['../44_Boundary_Conditions_Guide.html#supported_sec',1,'']]],
-  ['2_20the_20geometric_20foundation_3a_20nodes_20and_20cells_44',['2. The Geometric Foundation: Nodes and Cells',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md21',1,'']]],
+  ['2_20the_20geometric_20foundation_3a_20nodes_20and_20cells_44',['2. The Geometric Foundation: Nodes and Cells',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md16',1,'']]],
   ['2_20the_20paraview_20interface_45',['2. The ParaView Interface',['../04_Visualization_Tutorial.html#paraview_basics_sec',1,'']]],
   ['2_20tightly_20coupled_20inference_20runtime_46',['4.2 Tightly Coupled Inference (Runtime)',['../17_Workflow_Extensibility.html#ml_coupled_ssec',1,'']]],
   ['2_20top_20level_20guide_20links_47',['2. Top-Level Guide Links',['../30_Repository_Navigation.html#top_links_sec',1,'']]],

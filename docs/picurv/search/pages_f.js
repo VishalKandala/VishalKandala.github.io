@@ -19,6 +19,5 @@ var searchData=
   ['study_20guide_16',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
   ['suite_20developer_20guide_17',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
   ['summary_18',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['sweep_20and_20study_20guide_19',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['sync_20divergence_20matrix_20',['Branch Sync Divergence Matrix',['../md_Branch__Sync__Divergence__Matrix.html',1,'']]]
+  ['sweep_20and_20study_20guide_19',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
 ];

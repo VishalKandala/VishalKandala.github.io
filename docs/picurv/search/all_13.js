@@ -13,8 +13,8 @@ var searchData=
   ['highlights_20cluster_20yml_10',['7. Cluster Contract Highlights (cluster.yml)',['../14_Config_Contract.html#cluster_sec',1,'']]],
   ['highlights_20study_20yml_11',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#study_sec',1,'']]],
   ['hooks_12',['6. Boundary System Runtime Hooks',['../46_C_Runtime_Execution_Map.html#boundaries_sec',1,'']]],
-  ['how_20it_20works_20at_20the_20boundaries_13',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md26',1,'']]],
+  ['how_20it_20works_20at_20the_20boundaries_13',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md21',1,'']]],
   ['how_20to_20guides_14',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]],
-  ['hybrid_20eulerian_20lagrangian_20framework_20for_20scalar_20transport_15',['PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['../index.html#autotoc_md18',1,'']]],
+  ['hybrid_20eulerian_20lagrangian_20framework_20for_20scalar_20transport_15',['PICurv: A Hybrid Eulerian-Lagrangian Framework for Scalar Transport',['../index.html#autotoc_md13',1,'']]],
   ['hydro_16',['hydro',['../variables_8h.html#acdd1a65b6f7557e023f70e782c24c202',1,'SimCtx']]]
 ];

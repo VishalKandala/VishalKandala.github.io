@@ -10,6 +10,6 @@ var searchData=
   ['7_20full_20validation_20tt_20check_20tt_7',['7. Full Validation (&lt;tt&gt;check&lt;/tt&gt;)',['../40_Testing_and_Quality_Guide.html#aggregate_sec',1,'']]],
   ['7_20generated_20reference_20views_8',['7. Generated Reference Views',['../Documentation_Map.html#ref_axis_sec',1,'']]],
   ['7_20modular_20profile_20strategy_9',['7. Modular Profile Strategy',['../07_Case_Reference.html#modular_sec',1,'']]],
-  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_10',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md32',1,'']]],
+  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_10',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md27',1,'']]],
   ['7_20when_20to_20use_20which_20grid_20path_11',['7. When To Use Which Grid Path',['../49_Workflow_Recipes_and_Config_Cookbook.html#choose_sec',1,'']]]
 ];
