@@ -196,6 +196,14 @@ grid:
   # Options: 'file', 'programmatic_c', or 'grid_gen'.
   mode: programmatic_c
 
+  # --- Optional Global DMDA Layout (applies to all grid modes) ---
+  # Edit or remove these for parallel runs. The product must equal the total
+  # MPI process count (-n) when all three are set.
+  # NOTE: Per-block processor decomposition is not implemented on the C side.
+  da_processors_x: 2
+  da_processors_y: 2
+  da_processors_z: 4
+
   # --- Option A: Grid from File ---
   # Use this if you have a pre-generated grid file.
   # The script validates and non-dimensionalizes coordinates using 'length_ref'.
@@ -239,14 +247,6 @@ grid:
     rxs: 1.0
     rys: 1.05
     rzs: 1.0
-
-    # --- Domain Decomposition (for parallel runs) ---
-    # GLOBAL DMDA layout for the run (single value per direction).
-    # NOTE: Per-block processor decomposition is not implemented on the C side.
-    # The product must equal the total number of MPI processes (-n) for parallel runs.
-    da_processors_x: 2
-    da_processors_y: 2
-    da_processors_z: 4
 
 # ==============================================================================
 # 4. MODEL SELECTION
@@ -438,6 +438,12 @@ boundary_conditions:
 <li>for normal <code>solve</code> and <code>load</code> workflows, all three grid modes are supported.</li>
 <li>for <code>solver.yml -&gt; operation_mode.eulerian_field_source: analytical</code>, the current contract requires <code>grid.mode: programmatic_c</code>.</li>
 </ul>
+<p>Optional global DMDA layout hints apply to all grid modes:</p>
+<div class="fragment"><div class="line">grid:</div>
+<div class="line">  da_processors_x: 4</div>
+<div class="line">  da_processors_y: 2</div>
+<div class="line">  da_processors_z: 2</div>
+</div><!-- fragment --><p>These are scalar global values, not per-block vectors. Legacy placement under <code>grid.programmatic_settings.da_processors_*</code> is still accepted for compatibility, but the shared top-level <code>grid.da_processors_*</code> form is preferred.</p>
 <h2><a class="anchor" id="p07_grid_prog_ssec"></a>
 3.1 mode: programmatic_c</h2>
 <p><code>programmatic_settings</code> supports per-block lists for geometry arrays:</p><ul>
@@ -450,7 +456,7 @@ boundary_conditions:
 <li><code>picurv</code> converts them to node counts before emitting <code>-im/-jm/-km</code> for the C runtime.</li>
 </ul>
 <p>Important constraint:</p><ul>
-<li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block processor decomposition is not implemented.</li>
+<li><code>grid.da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block processor decomposition is not implemented.</li>
 </ul>
 <h2><a class="anchor" id="p07_grid_file_ssec"></a>
 3.2 mode: file</h2>
