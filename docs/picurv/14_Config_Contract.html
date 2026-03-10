@@ -111,6 +111,7 @@ $(function() {
 <li>MPI launch settings (<code>-n</code>, executable stage selection).<ul>
 <li><code>-n/--num-procs</code> sizes the solver stage launch.</li>
 <li>post stage defaults to single-rank execution by workflow policy.</li>
+<li>optional site execution defaults can be supplied via nearest <code>.picurv-execution.yml</code>.</li>
 </ul>
 </li>
 <li>(Cluster mode) <code>cluster.yml</code>: scheduler/resource/launcher contract.</li>
@@ -198,7 +199,20 @@ $(function() {
 <li><code>execution.module_setup</code> injects shell lines before launch.</li>
 <li><code>execution.launcher</code> controls launch style (<code>srun</code>, <code>mpirun</code>, custom). A multi-word launcher string is accepted for site compatibility, but keeping the executable here and extra flags in <code>execution.launcher_args</code> is the preferred portable form.</li>
 <li><code>execution.launcher_args</code> provides site-specific launch flags and is appended after any inline tokens parsed from <code>execution.launcher</code>.</li>
+<li>when <code>execution.launcher</code> / <code>execution.launcher_args</code> are omitted, <code>picurv</code> falls back to nearest <code>.picurv-execution.yml</code> (<code>cluster_execution</code>, then <code>default_execution</code>) before using the built-in default <code>srun</code>.</li>
 <li><code>execution.extra_sbatch</code> supports scheduler-specific pass-through flags.</li>
+<li><code>cluster.yml</code> does not currently define run naming. <code>picurv</code> derives <code>run_id</code> from <code>&lt;case_basename&gt;_&lt;timestamp&gt;</code> and uses that same run ID to name generated scheduler jobs.</li>
+</ul>
+<p>Optional shared runtime execution file:</p>
+<ul>
+<li>nearest <code>.picurv-execution.yml</code> may define:<ul>
+<li><code>default_execution</code></li>
+<li><code>local_execution</code></li>
+<li><code>cluster_execution</code></li>
+</ul>
+</li>
+<li>local precedence is: <code>PICURV_MPI_LAUNCHER</code> -&gt; <code>MPI_LAUNCHER</code> -&gt; <code>.picurv-execution.yml</code> -&gt; legacy <code>.picurv-local.yml</code> -&gt; default <code>mpiexec</code></li>
+<li>cluster precedence is: <code>cluster.yml.execution</code> -&gt; <code>.picurv-execution.yml cluster_execution</code> -&gt; <code>.picurv-execution.yml default_execution</code> -&gt; default <code>srun</code></li>
 </ul>
 <p><code>picurv run --cluster ...</code> generates:</p><ul>
 <li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code></li>

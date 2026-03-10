@@ -138,6 +138,12 @@ $(function() {
 <li>reuse one <code>cluster.yml</code> for site policy</li>
 <li>vary only case/solver/monitor/post inputs</li>
 </ul>
+<p>Pattern E: same case, different local launch environment</p>
+<ul>
+<li>keep case/solver/monitor/post unchanged</li>
+<li>use default <code>mpiexec</code> on ordinary workstations</li>
+<li>add a repo-local or case-local <code>.picurv-execution.yml</code> when a cluster login node or cluster batch job needs site-specific launcher flags</li>
+</ul>
 <h1><a class="anchor" id="p49_recipes_sec"></a>
 3. Command Recipes</h1>
 <p>First-time local workflow:</p>
@@ -146,13 +152,25 @@ $(function() {
 <div class="line">./bin/picurv run --solve --post-process -n 4 --case my_case/flat_channel.yml --solver my_case/Imp-MG-Standard.yml --monitor my_case/Standard_Output.yml --post my_case/standard_analysis.yml</div>
 </div><!-- fragment --><p>Solver-only run:</p>
 <div class="fragment"><div class="line">./bin/picurv run --solve -n 8 --case case.yml --solver solver.yml --monitor monitor.yml</div>
+</div><!-- fragment --><p>Solver-only run on a cluster login node with a persistent site launcher config:</p>
+<div class="fragment"><div class="line">cp config/runtime/execution.example.yml .picurv-execution.yml</div>
+<div class="line">./bin/picurv run --solve -n 8 --case case.yml --solver solver.yml --monitor monitor.yml</div>
+</div><!-- fragment --><p>Cluster run that reuses the same site launcher defaults unless <code>cluster.yml</code> overrides them:</p>
+<div class="fragment"><div class="line">cp config/runtime/execution.example.yml .picurv-execution.yml</div>
+<div class="line">./bin/picurv run --solve --post-process --case case.yml --solver solver.yml --monitor monitor.yml --post post.yml --cluster cluster.yml</div>
 </div><!-- fragment --><p>Post-process an existing run with a different recipe:</p>
 <div class="fragment"><div class="line">./bin/picurv run --post-process --run-dir runs/&lt;run_id&gt; --post alt_analysis.yml</div>
 </div><!-- fragment --><p>Dry-run planning:</p>
 <div class="fragment"><div class="line">./bin/picurv run --solve --post-process --case case.yml --solver solver.yml --monitor monitor.yml --post post.yml --dry-run --format json</div>
 </div><!-- fragment --><p>Cluster generation without submit:</p>
 <div class="fragment"><div class="line">./bin/picurv run --solve --post-process --case case.yml --solver solver.yml --monitor monitor.yml --post post.yml --cluster cluster.yml --no-submit</div>
-</div><!-- fragment --><h1><a class="anchor" id="p49_examples_sec"></a>
+</div><!-- fragment --><p>Run naming note:</p>
+<ul>
+<li><code>cluster.yml</code> does not provide a run-name field.</li>
+<li><code>picurv</code> creates <code>runs/&lt;case_basename&gt;_&lt;timestamp&gt;/</code> automatically.</li>
+<li>generated Slurm job names are derived from that run ID.</li>
+</ul>
+<h1><a class="anchor" id="p49_examples_sec"></a>
 4. Example Config Combinations</h1>
 <p>Programmatic baseline:</p>
 <ul>
@@ -251,6 +269,7 @@ $(function() {
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li><b><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a></b></li>
 <li><b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 </ul>

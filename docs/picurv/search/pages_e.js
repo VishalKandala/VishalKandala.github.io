@@ -10,6 +10,7 @@ var searchData=
   ['results_7',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
   ['rk4_20momentum_20solver_8',['Dual-Time Picard RK4 Momentum Solver',['../24_Dual_Time_Picard_RK4.html',1,'']]],
   ['run_20guide_20slurm_9',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['runtime_10',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['runtime_20execution_20map_11',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
+  ['run_20lifecycle_20guide_10',['Run Lifecycle Guide',['../52_Run_Lifecycle_Guide.html',1,'']]],
+  ['runtime_11',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['runtime_20execution_20map_12',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
 ];
