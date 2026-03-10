@@ -15,9 +15,10 @@ var searchData=
   ['7_20next_20steps_12',['7 next steps',['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'7. Next Steps'],['../08_Solver_Reference.html#p08_next_steps_sec',1,'7. Next Steps']]],
   ['7_20practical_20checks_13',['7. Practical Checks',['../33_Initial_Conditions.html#p33_checks_sec',1,'']]],
   ['7_20related_20pages_14',['7. Related Pages',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_next_steps_sec',1,'']]],
-  ['7_20safe_20extension_20workflow_20c_20side_15',['7. Safe Extension Workflow (C Side)',['../46_C_Runtime_Execution_Map.html#p46_extension_sec',1,'']]],
-  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_16',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md75',1,'']]],
-  ['7_20temporary_20files_17',['7. Temporary Files',['../51_C_Test_Suite_Developer_Guide.html#p51_fs_sec',1,'']]],
-  ['7_20when_20to_20use_20which_20grid_20path_18',['7. When To Use Which Grid Path',['../48_Grid_Generator_Guide.html#p48_choose_sec',1,'']]],
-  ['7_20where_20to_20extend_19',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]]
+  ['7_20runtime_20observability_20backlog_15',['7. Runtime Observability Backlog',['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'']]],
+  ['7_20safe_20extension_20workflow_20c_20side_16',['7. Safe Extension Workflow (C Side)',['../46_C_Runtime_Execution_Map.html#p46_extension_sec',1,'']]],
+  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_17',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md75',1,'']]],
+  ['7_20temporary_20files_18',['7. Temporary Files',['../51_C_Test_Suite_Developer_Guide.html#p51_fs_sec',1,'']]],
+  ['7_20when_20to_20use_20which_20grid_20path_19',['7. When To Use Which Grid Path',['../48_Grid_Generator_Guide.html#p48_choose_sec',1,'']]],
+  ['7_20where_20to_20extend_20',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]]
 ];

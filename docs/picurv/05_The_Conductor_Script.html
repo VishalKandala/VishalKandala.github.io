@@ -88,6 +88,7 @@ $(function() {
 <li class="level1"><a href="#p05_build_sec">3. build: Build Project Executables</a></li>
 <li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
+<li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Health Summary</a></li>
 <li class="level1"><a href="#p05_sweep_sec">5. sweep: Parameter Study via Slurm Arrays</a></li>
 <li class="level1"><a href="#p05_validate_sec">6. validate: Config-Only Checks</a></li>
 <li class="level1"><a href="#p05_command_matrix_sec">7. Full Command and Option Matrix</a></li>
@@ -117,6 +118,7 @@ $(function() {
 <li><code>pull-source</code></li>
 <li><code>status-source</code></li>
 <li><code>run</code></li>
+<li><code>summarize</code></li>
 <li><code>sweep</code></li>
 <li><code>validate</code></li>
 </ul>
@@ -135,6 +137,7 @@ $(function() {
 <div class="line">./bin/picurv pull-source --help</div>
 <div class="line">./bin/picurv status-source --help</div>
 <div class="line">./bin/picurv run --help</div>
+<div class="line">./bin/picurv summarize --help</div>
 <div class="line">./bin/picurv sweep --help</div>
 <div class="line">./bin/picurv validate --help</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_init_sec"></a>
@@ -257,7 +260,45 @@ $(function() {
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
-</div><!-- fragment --><p>Dry-run example (no file writes): </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
+</div><!-- fragment --><p>Runtime stream logs:</p>
+<ul>
+<li>C-managed logs remain under <code>runs/&lt;run_id&gt;/logs/</code>.</li>
+<li>wrapper stdout/stderr stream logs now live under <code>runs/&lt;run_id&gt;/scheduler/</code> for both local and Slurm launches.</li>
+<li>this avoids collisions with solver startup, which recreates the C log directory.</li>
+</ul>
+<h1><a class="anchor" id="p05_summarize_sec"></a>
+5. summarize: Read-Only Run Health Summary</h1>
+<div class="fragment"><div class="line">./bin/picurv summarize --run-dir &lt;run_dir&gt; [--latest | --step &lt;n&gt;] [--format json]</div>
+</div><!-- fragment --><p>Behavior:</p>
+<ul>
+<li>reads copied run configs plus existing runtime artifacts,</li>
+<li>builds a best-effort step summary without changing solver output,</li>
+<li>works for active runs and completed runs,</li>
+<li>reports unavailable sections when a source log is missing or disabled.</li>
+</ul>
+<p>Examples:</p>
+<div class="fragment"><div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest</div>
+<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --step 500</div>
+<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest --format json</div>
+</div><!-- fragment --><p>Typical sources:</p>
+<ul>
+<li><code>logs/Continuity_Metrics.log</code></li>
+<li><code>logs/Particle_Metrics.log</code></li>
+<li><code>logs/Momentum_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>logs/Poisson_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>logs/Profiling_Timestep_Summary.csv</code> when enabled</li>
+<li><code>scheduler/*_solver.log</code> or <code>scheduler/solver_*.out</code> for sampled particle snapshot previews</li>
+</ul>
+<p>When particle snapshots are available, <code>summarize</code> reports sampled diagnostics such as:</p>
+<ul>
+<li>speed min/mean/max/std and stagnant-count</li>
+<li>sampled position bounds and centroid</li>
+<li>sampled rank counts and duplicate sampled cells</li>
+<li>sampled weight min/max by component</li>
+<li>sanity checks for duplicate PIDs and non-finite/zero/negative weights</li>
+<li>top sampled speeds and sampled deltas versus the previous snapshot when matching PIDs exist</li>
+</ul>
+<p>Dry-run example (no file writes): </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
