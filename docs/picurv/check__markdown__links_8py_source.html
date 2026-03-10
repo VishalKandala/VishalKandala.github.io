@@ -208,27 +208,32 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> normalized:</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                <span class="keywordflow">continue</span></div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>            resolved = (md_file.parent / normalized).resolve()</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> resolved.exists():</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                failures.append((str(md_file.relative_to(repo_root)), target, str(resolved)))</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">if</span> failures:</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        print(<span class="stringliteral">&quot;Broken markdown links detected:&quot;</span>)</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="keywordflow">for</span> src, target, resolved <span class="keywordflow">in</span> failures:</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>            print(f<span class="stringliteral">&quot;  - {src}: &#39;{target}&#39; -&gt; missing &#39;{resolved}&#39;&quot;</span>)</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    scope = []</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> args.no_readme:</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        scope.append(<span class="stringliteral">&quot;README.md&quot;</span>)</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    scope.append(f<span class="stringliteral">&quot;{args.docs_dir}/**/*.md&quot;</span>)</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    scope.append(f<span class="stringliteral">&quot;{args.examples_dir}/**/*.md&quot;</span>)</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    print(f<span class="stringliteral">&quot;Markdown link check passed for {&#39;, &#39;.join(scope)}&quot;</span>)</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keywordflow">return</span> 0</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                exists = resolved.exists()</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>            <span class="keywordflow">except</span> OSError <span class="keyword">as</span> exc:</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                failures.append((str(md_file.relative_to(repo_root)), target, f<span class="stringliteral">&quot;{resolved} ({exc})&quot;</span>))</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                <span class="keywordflow">continue</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> exists:</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>                failures.append((str(md_file.relative_to(repo_root)), target, str(resolved)))</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">if</span> failures:</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        print(<span class="stringliteral">&quot;Broken markdown links detected:&quot;</span>)</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        <span class="keywordflow">for</span> src, target, resolved <span class="keywordflow">in</span> failures:</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>            print(f<span class="stringliteral">&quot;  - {src}: &#39;{target}&#39; -&gt; missing &#39;{resolved}&#39;&quot;</span>)</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    scope = []</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> args.no_readme:</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        scope.append(<span class="stringliteral">&quot;README.md&quot;</span>)</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    scope.append(f<span class="stringliteral">&quot;{args.docs_dir}/**/*.md&quot;</span>)</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    scope.append(f<span class="stringliteral">&quot;{args.examples_dir}/**/*.md&quot;</span>)</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    print(f<span class="stringliteral">&quot;Markdown link check passed for {&#39;, &#39;.join(scope)}&quot;</span>)</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordflow">return</span> 0</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
 </div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="keywordflow">if</span> __name__ == <span class="stringliteral">&quot;__main__&quot;</span>:</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    sys.exit(<a class="code hl_function" href="namespacecheck__markdown__links.html#a7b132c7903820ee884b96cba9ed1b9f3">main</a>())</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="keywordflow">if</span> __name__ == <span class="stringliteral">&quot;__main__&quot;</span>:</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    sys.exit(<a class="code hl_function" href="namespacecheck__markdown__links.html#a7b132c7903820ee884b96cba9ed1b9f3">main</a>())</div>
 <div class="ttc" id="anamespacecheck__markdown__links_html_a025e9347c6a76eb27558ad65b08594e8"><div class="ttname"><a href="namespacecheck__markdown__links.html#a025e9347c6a76eb27558ad65b08594e8">check_markdown_links.should_skip_link</a></div><div class="ttdeci">bool should_skip_link(str target)</div><div class="ttdef"><b>Definition</b> <a href="check__markdown__links_8py_source.html#l00068">check_markdown_links.py:68</a></div></div>
 <div class="ttc" id="anamespacecheck__markdown__links_html_a22f7dc88938346ea06c0a00a9c17af11"><div class="ttname"><a href="namespacecheck__markdown__links.html#a22f7dc88938346ea06c0a00a9c17af11">check_markdown_links.parse_args</a></div><div class="ttdeci">argparse.Namespace parse_args()</div><div class="ttdef"><b>Definition</b> <a href="check__markdown__links_8py_source.html#l00013">check_markdown_links.py:13</a></div></div>
 <div class="ttc" id="anamespacecheck__markdown__links_html_a6ef883a74d5e7da7bc895071df08e5b8"><div class="ttname"><a href="namespacecheck__markdown__links.html#a6ef883a74d5e7da7bc895071df08e5b8">check_markdown_links.normalize_target</a></div><div class="ttdeci">str normalize_target(str raw_target)</div><div class="ttdef"><b>Definition</b> <a href="check__markdown__links_8py_source.html#l00079">check_markdown_links.py:79</a></div></div>
