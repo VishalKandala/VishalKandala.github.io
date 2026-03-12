@@ -28,7 +28,7 @@ var searchData=
   ['6_20sandbox_20policy_25',['6. Sandbox Policy',['../29_Maintenance_Backlog.html#p29_sandbox_sec',1,'']]],
   ['6_20solver_5fparameters_20advanced_26',['6. solver_parameters (Advanced)',['../07_Case_Reference.html#p07_passthrough_sec',1,'']]],
   ['6_20swarm_20fields_20initialized_20at_20startup_27',['6. Swarm Fields Initialized at Startup',['../45_Particle_Initialization_and_Restart.html#p45_fields_sec',1,'']]],
-  ['6_20using_20tt_20grid_20gen_20tt_20through_20tt_20case_20yml_20tt_28',['6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_case_sec',1,'']]],
-  ['6_20validate_3a_20config_20only_20checks_29',['6. validate: Config-Only Checks',['../05_The_Conductor_Script.html#p05_validate_sec',1,'']]],
+  ['6_20sweep_3a_20parameter_20study_20via_20slurm_20arrays_28',['6. sweep: Parameter Study via Slurm Arrays',['../05_The_Conductor_Script.html#p05_sweep_sec',1,'']]],
+  ['6_20using_20tt_20grid_20gen_20tt_20through_20tt_20case_20yml_20tt_29',['6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_case_sec',1,'']]],
   ['6_20which_20example_20to_20start_20from_30',['6. Which Example To Start From',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_choose_sec',1,'']]]
 ];

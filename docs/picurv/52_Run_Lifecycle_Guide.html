@@ -152,6 +152,7 @@ $(function() {
 <ul>
 <li>if validation succeeds but runtime is wrong, inspect <code>config/</code> first,</li>
 <li>if scheduler behavior is wrong, inspect <code>scheduler/solver.sbatch</code> or <code>scheduler/post.sbatch</code>,</li>
+<li><code>scheduler/submission.json</code> is the source of truth for delayed <code>submit</code> and run-directory-based <code>cancel</code>,</li>
 <li>if restart/post-only behavior is wrong, confirm the previous run directory contents before changing YAML again.</li>
 </ul>
 <h1><a class="anchor" id="p52_launchers_sec"></a>
@@ -234,7 +235,8 @@ $(function() {
 <ol type="1">
 <li><code>--dry-run</code> to confirm launch commands and artifact paths</li>
 <li><code>--no-submit</code> to inspect generated batch scripts</li>
-<li>full submit only after the scripts look correct</li>
+<li><code>picurv submit --run-dir runs/&lt;run_id&gt;</code> only after the scripts look correct</li>
+<li><code>picurv cancel --run-dir runs/&lt;run_id&gt;</code> when you need to stop a submitted stage without separate job-id bookkeeping</li>
 </ol>
 <p>This is especially useful when changing:</p>
 <ul>
@@ -243,6 +245,10 @@ $(function() {
 <li>queue/account settings,</li>
 <li>restart or post-only job behavior.</li>
 </ul>
+<p>Operational examples:</p>
+<div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
+<div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt; --stage solve</div>
+</div><!-- fragment --><p>If the cluster profile requests an early signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last output snapshot at the next safe checkpoint before exiting cleanly. Use <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</p>
 <h1><a class="anchor" id="p52_rules_sec"></a>
 8. Safe Rules Of Thumb</h1>
 <ul>
@@ -251,6 +257,7 @@ $(function() {
 <li>Use a fresh restarted run instead of overwriting the previous run directory.</li>
 <li>Use post-only reruns when analysis changes but solver data do not.</li>
 <li>Keep site launcher policy in <code>.picurv-execution.yml</code>; keep scheduler policy in <code>cluster.yml</code>.</li>
+<li>Keep the shutdown warning window longer than the slowest expected timestep if you rely on the final-snapshot signal path.</li>
 </ul>
 <h1><a class="anchor" id="p52_refs_sec"></a>
 9. Related Pages</h1>

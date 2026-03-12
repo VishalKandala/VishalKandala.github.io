@@ -93,7 +93,7 @@ var searchData=
   ['boundarycondition_90',['boundarycondition',['../variables_8h.html#a3fad79185f97288cad2fe2f7c820773e',1,'BoundaryCondition:&#160;variables.h'],['../structBoundaryCondition.html',1,'BoundaryCondition']]],
   ['boundarycondition_5fcreate_91',['boundarycondition_create',['../Boundaries_8c.html#aa6465ccb79293d6d9e1724d39d11af41',1,'BoundaryCondition_Create(BCHandlerType handler_type, BoundaryCondition **new_bc_ptr):&#160;Boundaries.c'],['../Boundaries_8h.html#aa6465ccb79293d6d9e1724d39d11af41',1,'BoundaryCondition_Create(BCHandlerType handler_type, BoundaryCondition **new_bc_ptr):&#160;Boundaries.c']]],
   ['boundaryfaceconfig_92',['boundaryfaceconfig',['../variables_8h.html#structBoundaryFaceConfig',1,'BoundaryFaceConfig'],['../variables_8h.html#a57e72fa4e9f1403a0b2a60a81c04603f',1,'BoundaryFaceConfig:&#160;variables.h']]],
-  ['boundarysystem_5fdestroy_93',['boundarysystem_destroy',['../Boundaries_8c.html#ad7e67f2745311e4714392fce3bf998ec',1,'BoundarySystem_Destroy(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8h.html#ad7e67f2745311e4714392fce3bf998ec',1,'BoundarySystem_Destroy(UserCtx *user):&#160;Boundaries.c']]],
+  ['boundarysystem_5fdestroy_93',['boundarysystem_destroy',['../Boundaries_8h.html#ad7e67f2745311e4714392fce3bf998ec',1,'BoundarySystem_Destroy(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#ad7e67f2745311e4714392fce3bf998ec',1,'BoundarySystem_Destroy(UserCtx *user):&#160;Boundaries.c']]],
   ['boundarysystem_5fexecutestep_94',['boundarysystem_executestep',['../Boundaries_8h.html#ad2fb8398b76f81e8c846afbea638baef',1,'BoundarySystem_ExecuteStep(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#ad2fb8398b76f81e8c846afbea638baef',1,'BoundarySystem_ExecuteStep(UserCtx *user):&#160;Boundaries.c']]],
   ['boundarysystem_5finitialize_95',['boundarysystem_initialize',['../Boundaries_8h.html#a0e31d96fd68e70d568d4d12ddc4da619',1,'BoundarySystem_Initialize(UserCtx *user, const char *bcs_filename):&#160;Boundaries.c'],['../Boundaries_8c.html#a0e31d96fd68e70d568d4d12ddc4da619',1,'BoundarySystem_Initialize(UserCtx *user, const char *bcs_filename):&#160;Boundaries.c']]],
   ['boundarysystem_5frefreshubcs_96',['boundarysystem_refreshubcs',['../Boundaries_8c.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8h.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c']]],
@@ -119,5 +119,6 @@ var searchData=
   ['bvel_5fv_116',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
   ['bvel_5fw_117',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]],
   ['bw_118',['BW',['../poisson_8c.html#a84909b16209480034c40276c4f84f975',1,'poisson.c']]],
-  ['by_20a_20scalar_20field_119',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]]
+  ['by_20a_20scalar_20field_119',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]],
+  ['by_20run_20directory_120',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]]
 ];

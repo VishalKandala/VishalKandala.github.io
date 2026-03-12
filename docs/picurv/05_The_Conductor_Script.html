@@ -89,9 +89,11 @@ $(function() {
 <li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
 <li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Health Summary</a></li>
-<li class="level1"><a href="#p05_sweep_sec">5. sweep: Parameter Study via Slurm Arrays</a></li>
-<li class="level1"><a href="#p05_validate_sec">6. validate: Config-Only Checks</a></li>
-<li class="level1"><a href="#p05_command_matrix_sec">7. Full Command and Option Matrix</a></li>
+<li class="level1"><a href="#p05_submit_sec">5b. submit: Submit Existing Slurm Artifacts</a></li>
+<li class="level1"><a href="#p05_cancel_sec">5c. cancel: Stop A Slurm Run By Run Directory</a></li>
+<li class="level1"><a href="#p05_sweep_sec">6. sweep: Parameter Study via Slurm Arrays</a></li>
+<li class="level1"><a href="#p05_validate_sec">7. validate: Config-Only Checks</a></li>
+<li class="level1"><a href="#p05_command_matrix_sec">8. Full Command and Option Matrix</a></li>
 <li class="level1"><a href="#p05_strict_validate_sec">8. &lt;tt&gt;validate --strict&lt;/tt&gt;: Additional Checks</a></li>
 <li class="level1"><a href="#p05_dry_run_schema_sec">9. Dry-Run JSON Plan Schema</a></li>
 <li class="level1"><a href="#p05_structured_errors_sec">10. Structured Error Output Contract</a></li>
@@ -119,6 +121,8 @@ $(function() {
 <li><code>status-source</code></li>
 <li><code>run</code></li>
 <li><code>summarize</code></li>
+<li><code>submit</code></li>
+<li><code>cancel</code></li>
 <li><code>sweep</code></li>
 <li><code>validate</code></li>
 </ul>
@@ -138,6 +142,8 @@ $(function() {
 <div class="line">./bin/picurv status-source --help</div>
 <div class="line">./bin/picurv run --help</div>
 <div class="line">./bin/picurv summarize --help</div>
+<div class="line">./bin/picurv submit --help</div>
+<div class="line">./bin/picurv cancel --help</div>
 <div class="line">./bin/picurv sweep --help</div>
 <div class="line">./bin/picurv validate --help</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_init_sec"></a>
@@ -260,7 +266,13 @@ $(function() {
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
-</div><!-- fragment --><p>Runtime stream logs:</p>
+</div><!-- fragment --><p>Follow-up submission from existing artifacts: </p><div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
+</div><!-- fragment --><p>Graceful shutdown note:</p>
+<ul>
+<li>if <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> requests an early warning signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last snapshot at the next safe checkpoint even when the normal recording interval has not been reached.</li>
+<li>use <code>signal: "USR1@300"</code> for <code>srun</code>-launched jobs, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
+</ul>
+<p>Runtime stream logs:</p>
 <ul>
 <li>C-managed logs remain under <code>runs/&lt;run_id&gt;/logs/</code>.</li>
 <li>wrapper stdout/stderr stream logs now live under <code>runs/&lt;run_id&gt;/scheduler/</code> for both local and Slurm launches.</li>
@@ -310,10 +322,53 @@ $(function() {
 <li>solver-only run: <code>--solve</code></li>
 <li>post-only rerun on an existing run directory: <code>--post-process --run-dir ...</code></li>
 <li>cluster script generation without submit: <code>--cluster ... --no-submit</code></li>
+<li>delayed submission of an already-staged run: <code>submit --run-dir ...</code></li>
 <li>planning and CI-style checks: <code>--dry-run</code></li>
 </ul>
+<h1><a class="anchor" id="p05_submit_sec"></a>
+5b. submit: Submit Existing Slurm Artifacts</h1>
+<div class="fragment"><div class="line">./bin/picurv submit [--run-dir &lt;run_dir&gt; | --study-dir &lt;study_dir&gt;] \</div>
+<div class="line">  [--stage {all,solve,post-process}] [--force] [--dry-run]</div>
+</div><!-- fragment --><p>Behavior:</p>
+<ul>
+<li>consumes existing <code>--no-submit</code> artifacts without regenerating configs or scripts,</li>
+<li>reads <code>scheduler/submission.json</code> to locate the staged Slurm scripts,</li>
+<li>submits <code>solve</code>, <code>post-process</code>, or both,</li>
+<li>wires the post stage dependency automatically when <code>all</code> is selected,</li>
+<li>refuses re-submission unless <code>--force</code> is explicitly provided.</li>
+</ul>
+<p>Examples:</p>
+<div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/my_case_20260310-120000</div>
+<div class="line">./bin/picurv submit --run-dir runs/my_case_20260310-120000 --stage solve</div>
+<div class="line">./bin/picurv submit --study-dir studies/my_study_20260310-120000 --dry-run</div>
+</div><!-- fragment --><p>Notes:</p>
+<ul>
+<li>works only for Slurm-staged artifacts,</li>
+<li><code>--dry-run</code> prints the exact <code>sbatch</code> plan,</li>
+<li><code>--force</code> is the opt-in path for deliberate resubmission.</li>
+</ul>
+<h1><a class="anchor" id="p05_cancel_sec"></a>
+5c. cancel: Stop A Slurm Run By Run Directory</h1>
+<div class="fragment"><div class="line">./bin/picurv cancel --run-dir &lt;run_dir&gt; [--stage {all,solve,post-process}] [--dry-run]</div>
+</div><!-- fragment --><p>Behavior:</p>
+<ul>
+<li>reads <code>scheduler/submission.json</code> from an existing run directory,</li>
+<li>resolves the recorded Slurm job IDs for <code>solve</code> and/or <code>post-process</code>,</li>
+<li>runs <code>scancel</code> for the selected stage set,</li>
+<li>avoids manual job-id lookup when the run directory is already known.</li>
+</ul>
+<p>Examples:</p>
+<div class="fragment"><div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000</div>
+<div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --stage solve</div>
+<div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --dry-run</div>
+</div><!-- fragment --><p>Notes:</p>
+<ul>
+<li>works only for Slurm-submitted runs that have <code>scheduler/submission.json</code>,</li>
+<li>does not apply to local runs,</li>
+<li><code>--dry-run</code> is useful when you want to confirm the recorded stage/job mapping first.</li>
+</ul>
 <h1><a class="anchor" id="p05_sweep_sec"></a>
-5. sweep: Parameter Study via Slurm Arrays</h1>
+6. sweep: Parameter Study via Slurm Arrays</h1>
 <div class="fragment"><div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml [--no-submit]</div>
@@ -325,7 +380,7 @@ $(function() {
 <li>aggregates metrics and emits plots in <code>studies/&lt;study_id&gt;/results/</code></li>
 </ul>
 <h1><a class="anchor" id="p05_validate_sec"></a>
-6. validate: Config-Only Checks</h1>
+7. validate: Config-Only Checks</h1>
 <div class="fragment"><div class="line">./bin/picurv validate \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -340,7 +395,7 @@ $(function() {
 <li>inspect warnings where <code>picurv</code> preserves a C-side default intentionally.</li>
 </ul>
 <h1><a class="anchor" id="p05_command_matrix_sec"></a>
-7. Full Command and Option Matrix</h1>
+8. Full Command and Option Matrix</h1>
 <p>This section is intentionally exhaustive and mirrors the current <code>argparse</code> contract in <code>scripts/picurv</code>. Use it as the authoritative option reference when writing docs, examples, wrappers, or CI jobs.</p>
 <p><code>run</code>:</p><ul>
 <li>stages:<ul>
@@ -381,6 +436,29 @@ $(function() {
 </li>
 <li>stricter policy:<ul>
 <li><code>--strict</code> (adds additional checks for selected roles; documented below)</li>
+</ul>
+</li>
+</ul>
+<p><code>submit</code>:</p><ul>
+<li>required:<ul>
+<li>exactly one of <code>--run-dir &lt;path&gt;</code> or <code>--study-dir &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>optional:<ul>
+<li><code>--stage {all,solve,post-process}</code></li>
+<li><code>--force</code></li>
+<li><code>--dry-run</code></li>
+</ul>
+</li>
+</ul>
+<p><code>cancel</code>:</p><ul>
+<li>required:<ul>
+<li><code>--run-dir &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>optional:<ul>
+<li><code>--stage {all,solve,post-process}</code></li>
+<li><code>--dry-run</code></li>
 </ul>
 </li>
 </ul>

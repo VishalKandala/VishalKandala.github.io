@@ -98,13 +98,15 @@ $(function() {
 <div class="textblock"><p><a class="anchor" id="_API_Documentation_Status"></a> This page describes current API-doc quality, warning sources, and the expected standard for new changes.</p>
 <h1><a class="anchor" id="p35_status_sec"></a>
 1. Current Status</h1>
-<p>API documentation quality is improving but not yet uniformly clean across all modules. Known issues in some headers/source pairs include:</p>
+<p>Function-level documentation coverage is now enforced across:</p>
 <ul>
-<li>stale parameter names in Doxygen blocks,</li>
-<li>duplicate/missing <code>@param</code> entries,</li>
-<li>partial function-level docs on legacy-heavy paths.</li>
+<li>public C headers in <code>include/</code>,</li>
+<li>C implementations in <code>src/</code>,</li>
+<li>C tests in <code>tests/c/</code>,</li>
+<li>Python product scripts in <code>scripts/</code>,</li>
+<li>Python tests in <code>tests/</code>.</li>
 </ul>
-<p>Treat these as active maintenance items rather than hidden debt.</p>
+<p>The current repository contract requires every executable function to have a Doxygen-compatible comment/docstring with a valid <code>@brief</code>, exact parameter coverage, and documented return values where applicable.</p>
 <h1><a class="anchor" id="p35_warning_sec"></a>
 2. Warning Log and Build Path</h1>
 <p>Doxygen warnings are written to:</p>
@@ -115,26 +117,32 @@ $(function() {
 <ul>
 <li><code>WARN_LOGFILE = ../logs/doxygen.warnings</code></li>
 </ul>
-<p>CI currently enforces Markdown-link integrity; Doxygen warning cleanup remains a repository maintenance objective.</p>
+<p>Repository consistency checks now also enforce function-level documentation via:</p>
+<ul>
+<li><code><a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">scripts/audit_function_docs.py</a></code></li>
+</ul>
+<p>GitHub Actions quality CI also runs the audit explicitly before <code>pytest -q</code> on pull requests and pushes to <code>main</code>.</p>
+<p><code>make build-docs</code> remains useful for rendered output verification, but the audit script is the primary completeness gate for function comments.</p>
 <h1><a class="anchor" id="p35_expected_sec"></a>
 3. Expected Standard For New APIs</h1>
-<p>For newly added or modified public functions:</p>
+<p>For newly added or modified functions and test helpers:</p>
 <ol type="1">
 <li>each parameter must have exactly one matching <code>@param</code>,</li>
 <li>function summary should describe behavior and side effects,</li>
 <li>return/CHKERRQ semantics should be documented,</li>
-<li>cross-module dependencies should be explicit when non-obvious.</li>
+<li>cross-module dependencies should be explicit when non-obvious,</li>
+<li>Python functions must use Doxygen-compatible docstrings, not plain one-line docstrings.</li>
 </ol>
 <p>Minimum acceptable quality is interface correctness and discoverability, even when deep theoretical derivation is documented elsewhere.</p>
 <h1><a class="anchor" id="p35_workflow_sec"></a>
 4. Practical Cleanup Workflow</h1>
 <ol type="1">
-<li>run docs build (<code>make build-docs</code>) where available,</li>
-<li>inspect <code>logs/doxygen.warnings</code>,</li>
-<li>patch one module at a time (<code>include/*.h</code> + matching <code>src/*.c</code>),</li>
-<li>re-run warning pass and track net reduction.</li>
+<li>run <code>python3 <a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">scripts/audit_function_docs.py</a></code>,</li>
+<li>patch one module at a time (<code>include/*.h</code> + matching <code>src/*.c</code>, plus affected Python helpers/tests),</li>
+<li>run the repo consistency tests that wrap the audit,</li>
+<li>run docs build (<code>make build-docs</code>) to verify rendered output where needed.</li>
 </ol>
-<p>Batching by module avoids regressions and keeps review scope manageable.</p>
+<p>Batching by subsystem still keeps review scope manageable, but the audit gate now prevents silent regressions between cleanup passes.</p>
 <h1><a class="anchor" id="p35_refs_sec"></a>
 5. Related Pages</h1>
 <ul>

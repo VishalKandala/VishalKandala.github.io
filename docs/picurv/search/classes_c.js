@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vtkfieldinfo_0',['VTKFieldInfo',['../variables_8h.html#structVTKFieldInfo',1,'']]],
-  ['vtkmetadata_1',['VTKMetaData',['../variables_8h.html#structVTKMetaData',1,'']]]
+  ['userctx_0',['UserCtx',['../variables_8h.html#structUserCtx',1,'']]],
+  ['usermg_1',['UserMG',['../variables_8h.html#structUserMG',1,'']]]
 ];

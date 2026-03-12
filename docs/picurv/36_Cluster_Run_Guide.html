@@ -119,6 +119,10 @@ $(function() {
 <div class="line">  --cluster &lt;cluster.yml&gt;</div>
 </div><!-- fragment --><p>Generate only (no submission):</p>
 <div class="fragment"><div class="line">./bin/picurv run ... --cluster &lt;cluster.yml&gt; --no-submit</div>
+</div><!-- fragment --><p>Submit existing staged artifacts later:</p>
+<div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
+</div><!-- fragment --><p>Stop a submitted run by directory:</p>
+<div class="fragment"><div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt;</div>
 </div><!-- fragment --><p>Explicit scheduler cross-check (optional):</p>
 <div class="fragment"><div class="line">./bin/picurv run ... --cluster &lt;cluster.yml&gt; --scheduler slurm</div>
 </div><!-- fragment --><p>Notes:</p>
@@ -141,15 +145,15 @@ $(function() {
 <li><code>runs/&lt;run_id&gt;/manifest.json</code></li>
 <li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code> (always in cluster mode when run artifacts are written; contains launch metadata and submission IDs when present)</li>
 </ul>
-<p>These coexist with standard runtime control artifacts used by solver/postprocessor binaries.</p>
+<p>These coexist with standard runtime control artifacts used by solver/postprocessor binaries. <code>submission.json</code> is also the run-directory contract consumed by <code>picurv submit</code> and <code>picurv cancel</code>.</p>
 <h1><a class="anchor" id="p36_flow_sec"></a>
 4. Submission Flow</h1>
 <ol type="1">
 <li>YAML validation and contract checks,</li>
 <li>run directory + control artifact generation,</li>
 <li>sbatch script rendering from scheduler settings,</li>
-<li>optional solver submission (<code>solver.sbatch</code>),</li>
-<li>optional post submission (<code>post.sbatch</code>), with <code>afterok:&lt;solver_jobid&gt;</code> dependency when solve+post are both requested in one command.</li>
+<li>optional solver submission (<code>solver.sbatch</code>) immediately, or later via <code>picurv submit --run-dir ...</code>,</li>
+<li>optional post submission (<code>post.sbatch</code>), with <code>afterok:&lt;solver_jobid&gt;</code> dependency when solve+post are both requested in one command or when <code>submit --stage all</code> is used.</li>
 </ol>
 <p>This allows consistent local dry-run and cluster production flow from the same inputs.</p>
 <h1><a class="anchor" id="p36_notes_sec"></a>
@@ -159,6 +163,7 @@ $(function() {
 <li>Keep cluster defaults in reusable templates (<code>examples/master_template/master_cluster.yml</code>).</li>
 <li>For personal cluster copies, prefer local operational files such as <code>short_job.local.yml</code> / <code>long_job.local.yml</code> instead of committing account/module-specific scheduler profiles.</li>
 <li>If queue policies differ by partition/account, encode them in <code>cluster.yml</code> instead of editing generated scripts manually.</li>
+<li>If you need one last output before walltime, request an early signal in <code>cluster.yml</code>: <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
 <li>Solver stage uses <code>cluster.yml</code> resources directly.</li>
 <li>Post stage defaults to single-task scheduling (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) in generated <code>post.sbatch</code>.</li>
 <li>Slurm stdout/stderr lives under <code>scheduler/</code>; solver-generated runtime logs still live under <code>logs/</code>.</li>
@@ -171,6 +176,7 @@ $(function() {
 </ul>
 </li>
 <li>use <code>picurv run --dry-run --format json</code> before submission when integrating with external launch wrappers.</li>
+<li>for new profiles, the safest operational loop is <code>--dry-run</code>, then <code>--no-submit</code>, then <code>submit --run-dir ...</code>.</li>
 </ul>
 <p>See also:</p>
 <ul>

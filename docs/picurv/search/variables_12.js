@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R']]],
+  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_2',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
   ['rank_5fxm_3',['rank_xm',['../variables_8h.html#a9419886ec15f30fb98c71804d563796c',1,'RankNeighbors']]],
@@ -17,7 +17,7 @@ var searchData=
   ['reference_14',['reference',['../variables_8h.html#a529f45c4ddf21ba85640423978d30ada',1,'PostProcessParams']]],
   ['ren_15',['ren',['../variables_8h.html#a4897d17394963da4ac73b9856fac48c5',1,'SimCtx']]],
   ['repo_5fblob_5furl_16',['REPO_BLOB_URL',['../namespacegenerate__doxygen__fallback__indexes.html#a12a0570c80cb1098ecac3acc39c8473b',1,'generate_doxygen_fallback_indexes']]],
-  ['repo_5froot_17',['REPO_ROOT',['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate']]],
+  ['repo_5froot_17',['repo_root',['../namespaceaudit__function__docs.html#ac65217d5896858efa2494a1f41351edd',1,'audit_function_docs.REPO_ROOT'],['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate.REPO_ROOT']]],
   ['restart_5fdir_18',['restart_dir',['../variables_8h.html#af09e3f546ff8fa1192338e746391aa22',1,'SimCtx']]],
   ['rheology_19',['rheology',['../variables_8h.html#aa872769b7375d16b560211774f36eab3',1,'SimCtx']]],
   ['rho_5fref_20',['rho_ref',['../variables_8h.html#ae416661ab9a82b299cd562940881d07d',1,'ScalingCtx']]],
