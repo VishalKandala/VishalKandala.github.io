@@ -163,7 +163,14 @@ $(function() {
 <li>Keep cluster defaults in reusable templates (<code>examples/master_template/master_cluster.yml</code>).</li>
 <li>For personal cluster copies, prefer local operational files such as <code>short_job.local.yml</code> / <code>long_job.local.yml</code> instead of committing account/module-specific scheduler profiles.</li>
 <li>If queue policies differ by partition/account, encode them in <code>cluster.yml</code> instead of editing generated scripts manually.</li>
-<li>If you need one last output before walltime, request an early signal in <code>cluster.yml</code>: <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
+<li>Generated Slurm solver jobs enable a runtime walltime guard by default:<ul>
+<li>warmup: first 10 completed steps</li>
+<li>estimator: <code>max(warmup_avg, ewma, latest_step)</code></li>
+<li>cutoff: <code>max(60 s, 2.0 * estimator)</code></li>
+</ul>
+</li>
+<li>Override that policy in <code>cluster.yml -&gt; execution.walltime_guard</code> only when the defaults do not fit your timestep variability or filesystem overhead.</li>
+<li>Keep an early signal in <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> as fallback protection: <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
 <li>Solver stage uses <code>cluster.yml</code> resources directly.</li>
 <li>Post stage defaults to single-task scheduling (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) in generated <code>post.sbatch</code>.</li>
 <li>Slurm stdout/stderr lives under <code>scheduler/</code>; solver-generated runtime logs still live under <code>logs/</code>.</li>

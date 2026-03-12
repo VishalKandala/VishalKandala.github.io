@@ -248,7 +248,7 @@ $(function() {
 <p>Operational examples:</p>
 <div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
 <div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt; --stage solve</div>
-</div><!-- fragment --><p>If the cluster profile requests an early signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last output snapshot at the next safe checkpoint before exiting cleanly. Use <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</p>
+</div><!-- fragment --><p>Generated Slurm solver jobs also export runtime walltime metadata into <code>solver.sbatch</code>, so the solver can estimate completed-step cost and request a graceful final write before remaining walltime gets too tight. If the cluster profile also requests an early signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then uses the same safe-checkpoint final-write path. Use <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</p>
 <h1><a class="anchor" id="p52_rules_sec"></a>
 8. Safe Rules Of Thumb</h1>
 <ul>
@@ -257,7 +257,8 @@ $(function() {
 <li>Use a fresh restarted run instead of overwriting the previous run directory.</li>
 <li>Use post-only reruns when analysis changes but solver data do not.</li>
 <li>Keep site launcher policy in <code>.picurv-execution.yml</code>; keep scheduler policy in <code>cluster.yml</code>.</li>
-<li>Keep the shutdown warning window longer than the slowest expected timestep if you rely on the final-snapshot signal path.</li>
+<li>Keep the shutdown warning window longer than the slowest expected timestep if you rely on the fallback signal path.</li>
+<li>If the runtime walltime guard is too eager or too late for a workload, tune <code>execution.walltime_guard</code> in the cluster profile rather than editing generated scripts.</li>
 </ul>
 <h1><a class="anchor" id="p52_refs_sec"></a>
 9. Related Pages</h1>

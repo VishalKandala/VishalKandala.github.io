@@ -269,7 +269,9 @@ $(function() {
 </div><!-- fragment --><p>Follow-up submission from existing artifacts: </p><div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
 </div><!-- fragment --><p>Graceful shutdown note:</p>
 <ul>
-<li>if <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> requests an early warning signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last snapshot at the next safe checkpoint even when the normal recording interval has not been reached.</li>
+<li>generated Slurm solver jobs enable a runtime walltime guard by default; after 10 completed warmup steps, PICurv estimates timestep cost and requests the same graceful final-write path before remaining walltime gets too tight.</li>
+<li>if <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> requests an early warning signal, PICurv also traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last snapshot at the next safe checkpoint even when the normal recording interval has not been reached.</li>
+<li>tune the automatic estimator in <code>cluster.yml -&gt; execution.walltime_guard</code>; keep <code>execution.extra_sbatch.signal</code> as fallback protection for preemption/manual termination or jobs that may not reach the warmup window.</li>
 <li>use <code>signal: "USR1@300"</code> for <code>srun</code>-launched jobs, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
 </ul>
 <p>Runtime stream logs:</p>

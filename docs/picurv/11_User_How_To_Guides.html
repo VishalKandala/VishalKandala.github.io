@@ -234,7 +234,15 @@ Re = \frac{\rho U L}{\mu}
 <div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
 </div><!-- fragment --><p>Cancel a submitted run by directory:</p>
 <div class="fragment"><div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt; --stage solve</div>
-</div><!-- fragment --><p>Ask Slurm for an early warning signal when you want PICurv to flush one last snapshot before walltime:</p>
+</div><!-- fragment --><p>Generated Slurm solver jobs already enable an automatic runtime walltime guard. Override it only when you need a different warmup/headroom policy:</p>
+<div class="fragment"><div class="line">execution:</div>
+<div class="line">  walltime_guard:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    warmup_steps: 10</div>
+<div class="line">    multiplier: 2.0</div>
+<div class="line">    min_seconds: 60</div>
+<div class="line">    estimator_alpha: 0.35</div>
+</div><!-- fragment --><p>Ask Slurm for an early warning signal as fallback protection when you want PICurv to flush one last snapshot before walltime or preemption:</p>
 <div class="fragment"><div class="line">execution:</div>
 <div class="line">  extra_sbatch:</div>
 <div class="line">    signal: &quot;USR1@300&quot;</div>
@@ -242,7 +250,8 @@ Re = \frac{\rho U L}{\mu}
 <p>Verification:</p>
 <ul>
 <li>inspect <code>scheduler/*.sbatch</code> and <code>submission.json</code> in run directory.</li>
-<li>confirm the generated cluster profile contains the intended <code>signal</code> policy before submission.</li>
+<li>confirm the generated solver script exports <code>PICURV_JOB_START_EPOCH</code> and <code>PICURV_WALLTIME_LIMIT_SECONDS</code>.</li>
+<li>confirm the generated cluster profile contains the intended <code>signal</code> fallback policy before submission.</li>
 </ul>
 <h2><a class="anchor" id="p11_restart_ssec"></a>
 3.3 Restart from a Saved Step</h2>
