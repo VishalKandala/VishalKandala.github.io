@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['scalingctx_0',['ScalingCtx',['../variables_8h.html#a9047d2cf27848731712703164586b3ca',1,'variables.h']]],
-  ['simctx_1',['SimCtx',['../variables_8h.html#a74fd530dc4655170098467d1d4d5cbb3',1,'variables.h']]],
-  ['surfelmtinfo_2',['SurfElmtInfo',['../variables_8h.html#a2b696f21d07e025e07cfe31fdcb17b25',1,'variables.h']]]
+  ['rankcellinfo_0',['RankCellInfo',['../variables_8h.html#ab70965b70916c19e61deb4ff9061148e',1,'variables.h']]],
+  ['rankneighbors_1',['RankNeighbors',['../variables_8h.html#a3f15d7dc17333561196f2b63274b21ff',1,'variables.h']]]
 ];

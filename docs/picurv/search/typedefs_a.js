@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['userctx_0',['UserCtx',['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'variables.h']]],
-  ['usermg_1',['UserMG',['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'variables.h']]]
+  ['scalingctx_0',['ScalingCtx',['../variables_8h.html#a9047d2cf27848731712703164586b3ca',1,'variables.h']]],
+  ['simctx_1',['SimCtx',['../variables_8h.html#a74fd530dc4655170098467d1d4d5cbb3',1,'variables.h']]],
+  ['surfelmtinfo_2',['SurfElmtInfo',['../variables_8h.html#a2b696f21d07e025e07cfe31fdcb17b25',1,'variables.h']]]
 ];

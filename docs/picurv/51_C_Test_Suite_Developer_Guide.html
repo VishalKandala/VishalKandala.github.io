@@ -89,7 +89,9 @@ $(function() {
 <li class="level1"><a href="#p51_targets_sec">2. Canonical Targets</a></li>
 <li class="level1"><a href="#p51_choosing_sec">3. Where A Test Belongs</a></li>
 <li class="level1"><a href="#p51_smoke_bridge_sec">4. Smoke Harness Relationship</a></li>
-<li class="level1"><a href="#p51_fixtures_sec">5. Fixture Helpers</a></li>
+<li class="level1"><a href="#p51_fixtures_sec">5. Fixture Helpers</a><ul><li class="level2"><a href="#p51_gap_ssec">5.1 Current next-gap priorities</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p51_style_sec">6. Conventions</a></li>
 <li class="level1"><a href="#p51_fs_sec">7. Temporary Files</a></li>
 <li class="level1"><a href="#p51_extending_sec">8. Adding A New C Unit Suite</a></li>
@@ -116,10 +118,11 @@ $(function() {
 <li><code><a class="el" href="test__support_8c.html" title="Shared C test fixtures, assertions, and PETSc helper utilities.">test_support.c</a></code></li>
 <li><code><a class="el" href="test__install__check_8c.html" title="C unit tests for PETSc installation and environment readiness checks.">test_install_check.c</a></code></li>
 <li><code><a class="el" href="test__geometry_8c.html" title="C unit tests for interpolation and signed-distance geometry helpers.">test_geometry.c</a></code></li>
+<li><code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">test_setup_lifecycle.c</a></code></li>
 <li><code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">test_solver_kernels.c</a></code></li>
 <li><code><a class="el" href="test__particle__kernels_8c.html" title="C unit tests for particle walking-search helper routines.">test_particle_kernels.c</a></code></li>
 <li><code><a class="el" href="test__io_8c.html" title="C unit tests for I/O helpers, parsers, and startup-banner output.">test_io.c</a></code></li>
-<li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, and snapshot helpers.">test_logging.c</a></code></li>
+<li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, conversion, and profiling helpers.">test_logging.c</a></code></li>
 <li><code><a class="el" href="test__postprocessing_8c.html" title="C unit tests for post-processing kernel functions.">test_postprocessing.c</a></code></li>
 <li><code><a class="el" href="test__vtk__io_8c.html" title="C unit tests for VTK output preparation and file writing helpers.">test_vtk_io.c</a></code></li>
 <li><code><a class="el" href="test__postprocessor_8c.html" title="C unit tests for postprocessor orchestration and output paths.">test_postprocessor.c</a></code></li>
@@ -127,6 +130,7 @@ $(function() {
 <li><code><a class="el" href="test__grid_8c.html" title="C unit tests for grid bounding-box helper routines.">test_grid.c</a></code></li>
 <li><code><a class="el" href="test__metric_8c.html" title="C unit tests for metric tensors, face geometry, and length-scale helpers.">test_metric.c</a></code></li>
 <li><code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">test_boundaries.c</a></code></li>
+<li><code><a class="el" href="test__periodic__dev_8c.html" title="Non-gating periodic-boundary development harnesses.">test_periodic_dev.c</a></code></li>
 <li><code><a class="el" href="test__poisson__rhs_8c.html" title="C unit tests for Poisson, RHS, body-force, and diffusivity helpers.">test_poisson_rhs.c</a></code></li>
 <li><code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">test_runtime_kernels.c</a></code></li>
 <li><code><a class="el" href="test__mpi__kernels_8c.html" title="C unit tests for MPI collective helper routines.">test_mpi_kernels.c</a></code></li>
@@ -135,15 +139,33 @@ $(function() {
 1.1 Named C Test Case Matrix</h2>
 <p>Representative named cases by suite (exact strings used in <code><a class="el" href="test__support_8h.html#structPicurvTestCase" title="Named test case descriptor consumed by PicurvRunTests.">PicurvTestCase</a></code> arrays):</p>
 <ul>
+<li><code><a class="el" href="test__install__check_8c.html" title="C unit tests for PETSc installation and environment readiness checks.">test_install_check.c</a></code>:<ul>
+<li><code>environment-visible</code></li>
+<li><code>basic-petsc-objects</code></li>
+</ul>
+</li>
 <li><code><a class="el" href="test__geometry_8c.html" title="C unit tests for interpolation and signed-distance geometry helpers.">test_geometry.c</a></code>:<ul>
 <li><code>scalar-interpolation-constant</code></li>
 <li><code>vector-interpolation-constant</code></li>
 <li><code>signed-distance-and-classification</code></li>
 </ul>
 </li>
+<li><code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">test_setup_lifecycle.c</a></code>:<ul>
+<li><code>shared-runtime-fixture-contracts</code></li>
+<li><code>setup-lifecycle-core-solver-setup</code></li>
+<li><code>setup-lifecycle-particle-initialization</code></li>
+<li><code>setup-lifecycle-random-generators-and-cleanup</code></li>
+<li><code>setup-lifecycle-cleanup-across-initialization-states</code></li>
+</ul>
+</li>
 <li><code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">test_solver_kernels.c</a></code>:<ul>
 <li><code>les-filter-paths</code></li>
 <li><code>analytical-geometry-selection</code></li>
+<li><code>analytical-solution-engine-dispatch</code></li>
+<li><code>analytical-particle-dispatch</code></li>
+<li><code>compute-eddy-viscosity-les-deterministic-field</code></li>
+<li><code>analytical-solution-engine-taylor-green-samples</code></li>
+<li><code>flow-solver-rejects-unsupported-momentum-solver-type</code></li>
 <li><code>driven-channel-flow-source</code></li>
 </ul>
 </li>
@@ -162,12 +184,22 @@ $(function() {
 <li><code>bc-string-parsers</code></li>
 <li><code>validate-bc-handler-for-type</code></li>
 <li><code>parse-scaling-information</code></li>
+<li><code>display-banner-startup-summary</code></li>
 </ul>
 </li>
-<li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, and snapshot helpers.">test_logging.c</a></code>:<ul>
+<li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, conversion, and profiling helpers.">test_logging.c</a></code>:<ul>
+<li><code>string-conversion-helpers</code></li>
 <li><code>get-log-level-from-environment</code></li>
 <li><code>allowed-functions-filter</code></li>
 <li><code>particle-console-snapshot-cadence</code></li>
+<li><code>logging-file-parsing-and-formatting-helpers</code></li>
+<li><code>logging-continuity-and-field-diagnostics</code></li>
+<li><code>interpolation-error-logging</code></li>
+<li><code>particle-field-table-logging</code></li>
+<li><code>particle-console-snapshot-logging</code></li>
+<li><code>particle-metrics-logging</code></li>
+<li><code>field-anatomy-logging</code></li>
+<li><code>profiling-lifecycle-helpers</code></li>
 </ul>
 </li>
 <li><code><a class="el" href="test__postprocessing_8c.html" title="C unit tests for post-processing kernel functions.">test_postprocessing.c</a></code>:<ul>
@@ -221,6 +253,17 @@ $(function() {
 <li><code>boundary-condition-factory-rejects-unsupported-handler</code></li>
 <li><code>deterministic-face-grid-location-matrix</code></li>
 <li><code>random-inlet-face-location-matrix</code></li>
+<li><code>inlet-constant-velocity-handler-behavior</code></li>
+<li><code>inlet-parabolic-profile-handler-behavior</code></li>
+<li><code>outlet-conservation-handler-behavior</code></li>
+</ul>
+</li>
+<li><code><a class="el" href="test__periodic__dev_8c.html" title="Non-gating periodic-boundary development harnesses.">test_periodic_dev.c</a></code>:<ul>
+<li><code>periodic-geometric-factory-assignment</code></li>
+<li><code>transfer-periodic-face-field-copies-x-faces</code></li>
+<li><code>apply-metrics-periodic-bcs-copies-aj-faces</code></li>
+<li><code>periodic-driven-constant-handler-behavior</code></li>
+<li><code>periodic-driven-constant-rejects-non-periodic-face</code></li>
 </ul>
 </li>
 <li><code><a class="el" href="test__poisson__rhs_8c.html" title="C unit tests for Poisson, RHS, body-force, and diffusivity helpers.">test_poisson_rhs.c</a></code>:<ul>
@@ -228,6 +271,14 @@ $(function() {
 <li><code>poisson-rhs-zero-divergence</code></li>
 <li><code>compute-body-forces-dispatcher</code></li>
 <li><code>compute-eulerian-diffusivity-molecular-only</code></li>
+<li><code>convection-zero-field</code></li>
+<li><code>viscous-uniform-field</code></li>
+<li><code>compute-rhs-zero-field-no-forcing</code></li>
+<li><code>compute-eulerian-diffusivity-gradient-constant-field</code></li>
+<li><code>poisson-null-space-function-removes-mean</code></li>
+<li><code>poisson-lhsnew-assembles-operator</code></li>
+<li><code>projection-zero-phi-leaves-velocity-unchanged</code></li>
+<li><code>projection-linear-phi-corrects-velocity</code></li>
 </ul>
 </li>
 <li><code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">test_runtime_kernels.c</a></code>:<ul>
@@ -238,18 +289,34 @@ $(function() {
 <li><code>update-particle-field-iem-relaxation</code></li>
 <li><code>set-initial-interior-field-ignores-non-ucont-request</code></li>
 <li><code>set-initial-interior-field-constant-profile-on-z-inlet</code></li>
+<li><code>interpolate-all-fields-to-swarm-constant-fields</code></li>
+<li><code>scatter-all-particle-fields-to-euler-fields-averages-psi</code></li>
+<li><code>calculate-particle-count-per-cell-counts-global-cell-ids</code></li>
+<li><code>reset-all-particle-statuses-leaves-lost-particles-untouched</code></li>
+<li><code>check-and-remove-out-of-bounds-particles-removes-escaped-particle</code></li>
+<li><code>check-and-remove-lost-particles-removes-lost-entries</code></li>
+<li><code>calculate-brownian-displacement-deterministic-seed</code></li>
+<li><code>update-all-particle-positions-moves-swarm-entries</code></li>
+<li><code>locate-all-particles-in-grid-prior-cell-fast-path</code></li>
+<li><code>locate-all-particles-in-grid-guess-path-resolves-local-particle</code></li>
 <li><code>wall-noslip-and-freeslip-helpers</code></li>
 <li><code>wall-model-scalar-helpers</code></li>
+<li><code>wall-model-velocity-helpers</code></li>
+<li><code>wall-function-vector-wrappers</code></li>
 <li><code>validate-driven-flow-configuration-no-driven-handlers</code></li>
 <li><code>compute-smagorinsky-constant-constant-model</code></li>
 <li><code>update-solver-history-vectors-shifts-states</code></li>
 <li><code>get-owned-cell-range-single-rank-accounting</code></li>
 <li><code>compute-and-store-neighbor-ranks-single-rank</code></li>
+<li><code>runtime-walltime-guard-parses-positive-seconds</code></li>
+<li><code>runtime-walltime-guard-estimator-helpers</code></li>
+<li><code>runtime-walltime-guard-trigger-decision</code></li>
 </ul>
 </li>
 <li><code><a class="el" href="test__mpi__kernels_8c.html" title="C unit tests for MPI collective helper routines.">test_mpi_kernels.c</a></code>:<ul>
 <li><code>distribute-particles-collective-consistency</code></li>
 <li><code>bounding-box-collectives-multi-rank</code></li>
+<li><code>restart-cellid-migration-moves-particle-to-owner</code></li>
 </ul>
 </li>
 </ul>
@@ -260,6 +327,7 @@ $(function() {
 <li><code>make doctor</code></li>
 <li><code>make unit</code></li>
 <li><code>make unit-geometry</code></li>
+<li><code>make unit-setup</code></li>
 <li><code>make unit-solver</code></li>
 <li><code>make unit-particles</code></li>
 <li><code>make unit-io</code></li>
@@ -270,15 +338,20 @@ $(function() {
 <li><code>make unit-boundaries</code></li>
 <li><code>make unit-poisson-rhs</code></li>
 <li><code>make unit-runtime</code></li>
+<li><code>make unit-simulation</code></li>
 <li><code>make unit-mpi</code></li>
+<li><code>make unit-periodic-dev</code></li>
 <li><code>make smoke</code></li>
 <li><code>make smoke-mpi</code></li>
 <li><code>make smoke-mpi-matrix</code></li>
+<li><code>make smoke-stress</code></li>
+<li><code>make smoke-periodic-dev</code></li>
 <li><code>make coverage-c</code></li>
 <li><code>make check</code></li>
 <li><code>make check-mpi</code></li>
 <li><code>make check-mpi-matrix</code></li>
 <li><code>make check-full</code></li>
+<li><code>make check-stress</code></li>
 </ul>
 <p>Compatibility aliases (<code>install-check</code>, <code>ctest*</code>) should be preserved for continuity, but documentation and new contributor guidance should always prefer the canonical names.</p>
 <h1><a class="anchor" id="p51_choosing_sec"></a>
@@ -314,12 +387,17 @@ $(function() {
 <p><code>tests/smoke/run_smoke.sh</code> is not a C unit file, but it is the integration bridge that verifies how C executables behave under real launcher orchestration.</p>
 <p>Smoke checks include:</p>
 <ul>
-<li>executable <code>-help</code> viability</li>
+<li>executable <code>-help</code> viability<ul>
+<li>banner presence is authoritative; local PETSc may exit with code <code>62</code> (<code>PETSC_ERR_ARG_WRONG</code>) after printing help</li>
+</ul>
+</li>
 <li>tiny solve/post end-to-end runs</li>
 <li>particle restart branches (<code>load</code> and <code>init</code>)</li>
 <li>restart-equivalence continuity check</li>
 <li>analytical Brownian branch</li>
 <li>MPI rank variants and rank-matrix sweeps</li>
+<li>opt-in stress extensions (<code>make smoke-stress</code>) for longer particle cycling, chained restarts, parabolic-inlet runtime coverage, periodic constant-flux validate/dry-run coverage, and extra-rank MPI particle runs</li>
+<li>periodic runtime development harness (<code>make smoke-periodic-dev</code>) for the in-progress periodic constant-flux path; not part of the default gate</li>
 </ul>
 <p>Environment knobs relevant to C contributors:</p>
 <ul>
@@ -333,14 +411,34 @@ $(function() {
 <p><code>tests/c/test_support.*</code> provides the shared PETSc-backed fixture layer.</p>
 <p>Current responsibilities:</p>
 <ul>
-<li>create minimal <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> and <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> fixtures</li>
-<li>create deterministic <code>DMDA</code> objects</li>
-<li>create deterministic <code>DMSwarm</code> objects</li>
+<li>create minimal <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> and <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> fixtures for fast kernel-level tests</li>
+<li>create a richer tiny-runtime fixture through the real setup path for behavior/orchestrator tests</li>
+<li>create deterministic <code>DMDA</code> objects using the production node contract (<code>da</code> sized as <code>IM+1/JM+1/KM+1</code>)</li>
+<li>derive <code>fda</code> from the <code>da</code> coordinate-DM path and keep <code>user-&gt;info</code> aligned with <code>da</code></li>
+<li>create deterministic <code>DMSwarm</code> objects with the production solver field set (<code>position</code>, <code>velocity</code>, <code>DMSwarm_CellID</code>, <code>weight</code>, <code>Diffusivity</code>, <code>DiffusivityGradient</code>, <code>Psi</code>, <code>DMSwarm_location_status</code>)</li>
 <li>seed identity metric fields</li>
+<li>normalize DM coordinates to the same <code>0..1</code> convention used by the main grid path</li>
 <li>create unique temporary directories under <code>/tmp</code></li>
 <li>provide assertion helpers for reals, ints, vectors, and file existence</li>
 </ul>
-<p>Future C tests should reuse these helpers instead of rebuilding fixtures inline unless a suite truly needs a specialized setup.</p>
+<p>Future C tests should reuse these helpers instead of rebuilding fixtures inline unless a suite truly needs a specialized setup. Periodic boundary harnesses belong in the dedicated development targets until the product implementation is stable enough for the default gate.</p>
+<h2><a class="anchor" id="p51_gap_ssec"></a>
+5.1 Current next-gap priorities</h2>
+<p>The current highest-value additions are:</p>
+<ul>
+<li>direct walking-search branch tests for <code>LocateParticleOrFindMigrationTarget</code><ul>
+<li>boundary clamp</li>
+<li>ghost-region handoff</li>
+<li>tie-breaker</li>
+<li><code>LOST</code> and <code>MIGRATING_OUT</code> outcomes</li>
+</ul>
+</li>
+<li>explicit direction-complete and failure-path coverage for the <code>GuessParticleOwnerWithBBox</code> heuristic</li>
+<li>non-restart MPI particle migration tests covering multi-pass handoff, newcomer flagging, and count conservation</li>
+<li>direct positive-path momentum harnesses for <code>MomentumSolver_Explicit_RungeKutta4</code> and one small invariant case for <code>MomentumSolver_DualTime_Picard_RK4</code></li>
+<li>deeper <code>PoissonSolver_MG</code> and periodic/IBM stencil behavior checks beyond the current helper-level <code>unit-poisson-rhs</code> surface</li>
+<li>richer-runtime fixture variants for more geometry/topology cases than the tiny Cartesian baseline</li>
+</ul>
 <h1><a class="anchor" id="p51_style_sec"></a>
 6. Conventions</h1>
 <p>Naming:</p>

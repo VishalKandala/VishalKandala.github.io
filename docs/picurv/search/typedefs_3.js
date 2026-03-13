@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['ibminfo_0',['IBMInfo',['../variables_8h.html#a72f68a05e3394dd04aa1c27df39a0dac',1,'variables.h']]],
-  ['ibmlist_1',['IBMList',['../variables_8h.html#a48835bb3e95726270d15ae238f08a699',1,'variables.h']]],
-  ['ibmlistnode_2',['IBMListNode',['../variables_8h.html#a4222faf080077cd7e5703d7bd83cf992',1,'variables.h']]],
-  ['ibmnodes_3',['IBMNodes',['../variables_8h.html#a7c1a3c14b68c85a7deef47faca72a267',1,'variables.h']]],
-  ['ibmvnodes_4',['IBMVNodes',['../variables_8h.html#acf87099edb59ceb9f9684cb70400527d',1,'variables.h']]]
+  ['flowwave_0',['FlowWave',['../variables_8h.html#a3dfec431fa23ae2d42abc44985151b6c',1,'variables.h']]],
+  ['fsinfo_1',['FSInfo',['../variables_8h.html#a369910ecc7cd44a3f600262867babb50',1,'variables.h']]]
 ];

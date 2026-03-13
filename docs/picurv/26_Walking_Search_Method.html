@@ -87,7 +87,8 @@ $(function() {
 <li class="level1"><a href="#p26_statuses_sec">2. Settlement Status Model</a></li>
 <li class="level1"><a href="#p26_implementation_sec">3. Implementation Touchpoints</a></li>
 <li class="level1"><a href="#p26_restart_sec">4. Restart Path Specifics</a></li>
-<li class="level1"><a href="#p26_practical_sec">5. Failure Modes and Signals</a><ul><li class="level2"><a href="#autotoc_md94">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md95">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p26_testing_sec">5. Current test status</a></li>
+<li class="level1"><a href="#p26_practical_sec">6. Failure Modes and Signals</a><ul><li class="level2"><a href="#autotoc_md94">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md95">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md96">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -132,8 +133,27 @@ $(function() {
 <h1><a class="anchor" id="p26_restart_sec"></a>
 4. Restart Path Specifics</h1>
 <p>For restart-loaded particles with valid <code>CellID</code>, PICurv can skip full walking search and directly resolve owner rank via cell ownership map before migration. This is usually much cheaper than full re-location on first restart step.</p>
+<h1><a class="anchor" id="p26_testing_sec"></a>
+5. Current test status</h1>
+<p>Current direct coverage is strongest at the orchestrator level:</p>
+<ul>
+<li><code>LocateAllParticlesInGrid</code> has dedicated direct tests for the prior-cell fast path and the local guess-then-verify path</li>
+<li>restart fast-path migration is covered directly through <code>MigrateRestartParticlesUsingCellID</code></li>
+</ul>
+<p>Current direct gaps still targeted for the next remediation are:</p>
+<ul>
+<li>branch-complete unit coverage for <code>LocateParticleOrFindMigrationTarget</code><ul>
+<li>boundary clamp</li>
+<li>ghost-region handoff</li>
+<li>stuck/tie-breaker</li>
+<li><code>LOST</code> and <code>MIGRATING_OUT</code></li>
+</ul>
+</li>
+<li>direction-complete and failure-path coverage for the <code>GuessParticleOwnerWithBBox</code> heuristic</li>
+<li>non-restart MPI migration tests for multi-pass handoff and newcomer flagging</li>
+</ul>
 <h1><a class="anchor" id="p26_practical_sec"></a>
-5. Failure Modes and Signals</h1>
+6. Failure Modes and Signals</h1>
 <p>Watch for:</p>
 <ul>
 <li>excessive migration pass counts,</li>

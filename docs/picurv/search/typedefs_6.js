@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['node_0',['node',['../variables_8h.html#af4aeda155dbe167f1c1cf38cb65bf324',1,'variables.h']]],
-  ['node_5flist_1',['Node_List',['../variables_8h.html#adaaacd4affdea8751e35bff19e7e5191',1,'variables.h']]]
+  ['mgctx_0',['MGCtx',['../variables_8h.html#ab026875e0ebe17a1230d314a22f81a3b',1,'variables.h']]],
+  ['migrationinfo_1',['MigrationInfo',['../variables_8h.html#acf4646d5bc6be3696d3cf898d91293dc',1,'variables.h']]]
 ];

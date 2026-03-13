@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vtkfieldinfo_0',['VTKFieldInfo',['../variables_8h.html#a5edbfeb2b39ca8a3b6c74d6f1f3586c7',1,'variables.h']]],
-  ['vtkmetadata_1',['VTKMetaData',['../variables_8h.html#ac41abc41e23100f2a2231147d83d2022',1,'variables.h']]]
+  ['userctx_0',['UserCtx',['../variables_8h.html#a8af80dea40db36357149fbf3f19bdb1e',1,'variables.h']]],
+  ['usermg_1',['UserMG',['../variables_8h.html#a4fbd51eff54ceced404bfcd85622fdeb',1,'variables.h']]]
 ];

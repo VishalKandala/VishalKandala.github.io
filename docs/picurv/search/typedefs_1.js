@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['cell_0',['Cell',['../variables_8h.html#a60bf09598e66928bf67a21a22bc17814',1,'variables.h']]],
-  ['cmpnts_1',['Cmpnts',['../variables_8h.html#abe7f60605e135192ee23df40cf5d7766',1,'variables.h']]],
-  ['cmpnts2_2',['Cmpnts2',['../variables_8h.html#ad042f0115a0e6f067f875fd8507e7335',1,'variables.h']]],
-  ['cpt2d_3',['Cpt2D',['../variables_8h.html#a7655d75be2c80769f87f3b7efeebeff8',1,'variables.h']]],
-  ['cstart_4',['Cstart',['../variables_8h.html#aee06eec51514d3eba023f8ffd5424b2a',1,'variables.h']]]
+  ['bc_5fparam_0',['BC_Param',['../variables_8h.html#a22a9148c380850b8568b82d154446340',1,'variables.h']]],
+  ['bccontext_1',['BCContext',['../variables_8h.html#a12664a80533859c5e09e680cfbcc3ace',1,'variables.h']]],
+  ['bcs_2',['BCS',['../variables_8h.html#ac9b0fe93a51a32ce6440282d28fdc986',1,'variables.h']]],
+  ['boundarycondition_3',['BoundaryCondition',['../variables_8h.html#a3fad79185f97288cad2fe2f7c820773e',1,'variables.h']]],
+  ['boundaryfaceconfig_4',['BoundaryFaceConfig',['../variables_8h.html#a57e72fa4e9f1403a0b2a60a81c04603f',1,'variables.h']]],
+  ['boundingbox_5',['BoundingBox',['../variables_8h.html#a87a49c783469e6e8b255a3214f17a832',1,'variables.h']]]
 ];
