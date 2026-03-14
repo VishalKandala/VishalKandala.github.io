@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['particleinitializationtype_0',['ParticleInitializationType',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cd',1,'variables.h']]],
-  ['particlelocationstatus_1',['ParticleLocationStatus',['../variables_8h.html#a347829443e8a679209e21f7f04f51581',1,'variables.h']]]
+  ['momentumsolvertype_0',['MomentumSolverType',['../variables_8h.html#a6f9f5b1b6f265e06f92b418a011dc3c3',1,'variables.h']]]
 ];

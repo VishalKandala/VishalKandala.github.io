@@ -83,7 +83,12 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p27_g2p_sec">1. Grid -&gt; Particle Interpolation</a></li>
+<ul><li class="level1"><a href="#p27_g2p_sec">1. Grid -&gt; Particle Interpolation</a><ul><li class="level2"><a href="#p27_trilinear_ssec">1.1 Trilinear (Direct Cell-Center) — Default</a></li>
+<li class="level2"><a href="#p27_corner_averaged_ssec">1.2 Corner-Averaged (Legacy)</a></li>
+<li class="level2"><a href="#p27_shared_ssec">1.3 Shared Kernels</a></li>
+<li class="level2"><a href="#p27_config_ssec">1.4 Configuration</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p27_p2g_sec">2. Particle -&gt; Grid Scatter and Normalization</a></li>
 <li class="level1"><a href="#p27_coupling_sec">3. Accuracy and Stability Considerations</a></li>
 <li class="level1"><a href="#p27_refs_sec">4. Related Pages</a><ul><li class="level2"><a href="#autotoc_md97">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md98">What To Extract Before Changing A Case</a></li>
@@ -97,7 +102,7 @@ $(function() {
 <div class="textblock"><p><a class="anchor" id="_Trilinear_Interpolation_and_Projection"></a> Eulerian-Lagrangian coupling in PICurv is built from interpolation (grid -&gt; particle) and scatter/normalization (particle -&gt; grid).</p>
 <h1><a class="anchor" id="p27_g2p_sec"></a>
 1. Grid -&gt; Particle Interpolation</h1>
-<p>For a particle inside a host cell with local coordinates \((a_1,a_2,a_3)\in[0,1]^3\), trilinear interpolation uses 8 corner weights:</p>
+<p>For a particle inside a host cell with local coordinates \((a_1,a_2,a_3)\in[0,1]^3\), trilinear interpolation uses 8 source-point weights:</p>
 <p class="formulaDsp">
 \[
 \phi_p = \sum_{m=1}^{8} w_m(a_1,a_2,a_3)\,\phi_m,
@@ -105,14 +110,44 @@ $(function() {
 \sum_m w_m = 1.
 \]
 </p>
-<p>Code touchpoints:</p>
+<p>PICurv supports two grid-to-particle interpolation methods, selectable at runtime via the <code>interpolation_method</code> YAML key (or <code>-interpolation_method</code> flag).</p>
+<h2><a class="anchor" id="p27_trilinear_ssec"></a>
+1.1 Trilinear (Direct Cell-Center) — Default</h2>
+<p>The recommended method. For each particle, the 8 nearest cell centers are identified via octant detection (based on existing host-cell weights), forming a "dual cell." Trilinear interpolation is performed directly from these cell-centered field values to the particle position.</p>
+<p>Key properties:</p>
+<ul>
+<li><b>Second-order accurate</b> on both uniform and curvilinear grids.</li>
+<li><b>No intermediate staging</b>: operates directly on the ghosted cell-centered field (<code>lUcat</code>, <code>lDiffusivity</code>, etc.) and ghosted cell center coordinates (<code>lCent</code>). No extra ghost exchange is needed beyond what the solver already provides.</li>
+<li><b>Boundary handling</b>: at non-periodic boundaries, the dual-cell octant is clamped to use only physical cell centers, and trilinear weights are left unclamped (may exceed [0,1]) to provide second-order linear extrapolation. Weights still sum to 1.0.</li>
+<li><b>Periodic boundaries</b>: ghost cell centers and field values are properly set by <code><a class="el" href="Metric_8h.html#a2bbd55708b37a703b5bcd3a37b44b4ac" title="Applies periodic boundary corrections to cell centers (Cent) and grid spacing (GridSpace).">ApplyPeriodicCorrectionsToCellCentersAndSpacing()</a></code> and <code>DMGlobalToLocal</code> with <code>DM_BOUNDARY_PERIODIC</code>, so no special handling is needed.</li>
+</ul>
+<p>Code path: <a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a> dispatches to <code>InterpolateEulerFieldFromCenterToSwarm</code>.</p>
+<h2><a class="anchor" id="p27_corner_averaged_ssec"></a>
+1.2 Corner-Averaged (Legacy)</h2>
+<p>The original two-stage method:</p>
+<ol type="1">
+<li><b>Center -&gt; Corner</b>: average surrounding cell-center values to each grid node via <a class="el" href="interpolation_8h.html#a60d783e6b448175916bd9125648ba8af">InterpolateFieldFromCenterToCorner</a> (unweighted <code>sum/count</code>).</li>
+<li><b>Corner -&gt; <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a></b>: standard trilinear interpolation from the 8 corner values of the host cell.</li>
+</ol>
+<p>This is second-order on uniform Cartesian grids but degrades to first-order on curvilinear grids because the unweighted averaging does not account for the asymmetric placement of cell centers around nodes.</p>
+<p>Code path: <a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a> dispatches to <code>InterpolateEulerFieldFromCornerToSwarm</code>.</p>
+<h2><a class="anchor" id="p27_shared_ssec"></a>
+1.3 Shared Kernels</h2>
+<p>Both methods share the same underlying trilinear kernels:</p>
 <ul>
 <li>scalar kernel: <a class="el" href="interpolation_8h.html#a703c00f6badf5c3f0558df315a340579">TrilinearInterpolation_Scalar</a></li>
 <li>vector kernel: <a class="el" href="interpolation_8h.html#a4373b52d08a935bb4cf8465228effe63">TrilinearInterpolation_Vector</a></li>
-<li>field-by-field wrapper: <a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a></li>
+<li>weight computation: <a class="el" href="interpolation_8c.html#abb885423e57747be4eb786faf6bb032d">ComputeTrilinearWeights</a></li>
+<li>field-by-field dispatcher: <a class="el" href="interpolation_8h.html#ad200d31b74c511e4388b757fb0359001">InterpolateEulerFieldToSwarm</a></li>
 <li>stage wrapper: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
 </ul>
-<p>Implementation note: interpolation path includes center-to-corner staging before final particle evaluation.</p>
+<h2><a class="anchor" id="p27_config_ssec"></a>
+1.4 Configuration</h2>
+<p>YAML (<code>solver.yml</code>):</p>
+<div class="fragment"><div class="line">interpolation:</div>
+<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;</div>
+</div><!-- fragment --><p>C flag: <code>-interpolation_method 0</code> (Trilinear) or <code>-interpolation_method 1</code> (CornerAveraged).</p>
+<p>Enum: <code>InterpolationMethod</code> in <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">include/variables.h</a></code>. Stored in <code><a class="el" href="variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f">SimCtx.interpolationMethod</a></code>.</p>
 <h1><a class="anchor" id="p27_p2g_sec"></a>
 2. Particle -&gt; Grid Scatter and Normalization</h1>
 <p>Scatter computes per-cell sums, then normalizes by particle count:</p>

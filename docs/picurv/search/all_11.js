@@ -33,7 +33,7 @@ var searchData=
   ['features_30',['Key Features',['../index.html#features_sec',1,'']]],
   ['field_31',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]],
   ['field_20coordinate_20scaling_20conventions_32',['3. Field/Coordinate Scaling Conventions',['../19_Nondimensionalization.html#p19_fields_sec',1,'']]],
-  ['field_20initialization_20mode_33',['5. Field Initialization Mode',['../50_Modular_Selector_Extension_Guide.html#p50_field_init_sec',1,'']]],
+  ['field_20initialization_20mode_33',['6. Field Initialization Mode',['../50_Modular_Selector_Extension_Guide.html#p50_field_init_sec',1,'']]],
   ['field_20initialization_20tt_20properties_20initial_5fconditions_20tt_34',['2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)',['../33_Initial_Conditions.html#p33_euler_sec',1,'']]],
   ['field_5fname_35',['field_name',['../test__logging_8c.html#ae9ec6ddc04e11bf16213f3f09faa2fcc',1,'AnatomyCaptureCtx']]],
   ['fieldinitialization_36',['FieldInitialization',['../variables_8h.html#a483945572b5ab1461a864ee1e3eb1d37',1,'SimCtx']]],

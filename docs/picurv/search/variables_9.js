@@ -36,8 +36,9 @@ var searchData=
   ['initialize_33',['Initialize',['../structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7',1,'BoundaryCondition']]],
   ['inletfacedefined_34',['inletFaceDefined',['../variables_8h.html#a1300c167a3006a58c71fe8759ebf5ef1',1,'UserCtx']]],
   ['inletprofile_35',['inletprofile',['../variables_8h.html#a57b3c5733ac4acdef370e635e85df95f',1,'SimCtx']]],
-  ['invicid_36',['invicid',['../variables_8h.html#a7af448f97fbebfd44e5989614b982a93',1,'SimCtx']]],
-  ['isc_37',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
-  ['ismastercontroller_38',['isMasterController',['../BC__Handlers_8c.html#a5cb060b42fdff55e2d016318d3b43ad4',1,'DrivenConstantData']]],
-  ['izet_39',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
+  ['interpolationmethod_36',['interpolationMethod',['../variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f',1,'SimCtx']]],
+  ['invicid_37',['invicid',['../variables_8h.html#a7af448f97fbebfd44e5989614b982a93',1,'SimCtx']]],
+  ['isc_38',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
+  ['ismastercontroller_39',['isMasterController',['../BC__Handlers_8c.html#a5cb060b42fdff55e2d016318d3b43ad4',1,'DrivenConstantData']]],
+  ['izet_40',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['momentumsolvertype_0',['MomentumSolverType',['../variables_8h.html#a6f9f5b1b6f265e06f92b418a011dc3c3',1,'variables.h']]]
+  ['lesmodeltype_0',['LESModelType',['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2',1,'variables.h']]],
+  ['loglevel_1',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
 ];

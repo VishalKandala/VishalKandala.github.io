@@ -88,8 +88,9 @@ $(function() {
 <li class="level1"><a href="#p08_tol_sec">3. tolerances</a></li>
 <li class="level1"><a href="#p08_msolver_sec">4. momentum_solver (Solver-Specific Block)</a></li>
 <li class="level1"><a href="#p08_pressure_sec">5. pressure_solver</a></li>
-<li class="level1"><a href="#p08_petsc_sec">6. petsc_passthrough_options</a></li>
-<li class="level1"><a href="#p08_next_steps_sec">7. Next Steps</a><ul><li class="level2"><a href="#autotoc_md29">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md30">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p08_interp_sec">6. interpolation</a></li>
+<li class="level1"><a href="#p08_petsc_sec">7. petsc_passthrough_options</a></li>
+<li class="level1"><a href="#p08_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md29">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md30">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md31">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -186,7 +187,20 @@ pressure_solver:
         ksp_type: "gmres"      # -&gt; -ps_mg_levels_2_ksp_type "gmres"
 
 # ==============================================================================
-# 4. PETSC PASSTHROUGH OPTIONS (FOR ADVANCED USERS)
+# 4. INTERPOLATION
+#    Controls grid-to-particle interpolation numerics.
+# ==============================================================================
+interpolation:
+  # Method for interpolating Eulerian fields to particle positions.
+  # Options:
+  #   - "Trilinear"       (default) Direct trilinear from 8 nearest cell centers.
+  #                        Second-order on both uniform and curvilinear grids.
+  #   - "CornerAveraged"  Legacy two-stage: center-&gt;corner average, then trilinear
+  #                        from corners. Second-order only on uniform Cartesian grids.
+  method: "Trilinear"     # -&gt; -interpolation_method
+
+# ==============================================================================
+# 5. PETSC PASSTHROUGH OPTIONS (FOR ADVANCED USERS)
 # ==============================================================================
 petsc_passthrough_options:
   # --- Top-level KSP settings ---
@@ -278,15 +292,24 @@ petsc_passthrough_options:
 <li><code>multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
 <li><code>multigrid.semi_coarsening.i/j/k</code> -&gt; <code>-mg_i_semi/-mg_j_semi/-mg_k_semi</code></li>
 </ul>
+<h1><a class="anchor" id="p08_interp_sec"></a>
+6. interpolation</h1>
+<div class="fragment"><div class="line">interpolation:</div>
+<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>method</code> -&gt; <code>-interpolation_method</code> (<code>Trilinear</code> = <code>0</code>, <code>CornerAveraged</code> = <code>1</code>)</li>
+</ul>
+<p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers, providing second-order accuracy on both uniform and curvilinear grids. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners), which is second-order only on uniform Cartesian grids.</p>
+<p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
 <h1><a class="anchor" id="p08_petsc_sec"></a>
-6. petsc_passthrough_options</h1>
+7. petsc_passthrough_options</h1>
 <p>Advanced escape hatch for raw PETSc flags:</p>
 <div class="fragment"><div class="line">petsc_passthrough_options:</div>
 <div class="line">  -ps_ksp_type: &quot;gmres&quot;</div>
 <div class="line">  -ps_pc_type: &quot;ilu&quot;</div>
 </div><!-- fragment --><p>These are passed into PETSc options DB and consumed by runtime calls like <code>KSPSetFromOptions</code>.</p>
 <h1><a class="anchor" id="p08_next_steps_sec"></a>
-7. Next Steps</h1>
+8. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b>.</p>
 <p>For mapping and extension workflows:</p><ul>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
