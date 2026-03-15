@@ -3840,27 +3840,49 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 1754</span>    ierr = VecNorm(errorVec, NORM_2, &amp;Interpolation_error); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno"> 1755</span>    ierr = VecNorm(errorVec,NORM_INFINITY,&amp;Maximum_Interpolation_error); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno"> 1756</span>    </div>
-<div class="line"><span class="lineno"> 1757</span>    ErrorPercentage = (AnalyticalSolution_magnitude &gt; 0) ? </div>
+<div class="line"><span class="lineno"> 1757</span>    ErrorPercentage = (AnalyticalSolution_magnitude &gt; 0) ?</div>
 <div class="line"><span class="lineno"> 1758</span>                      (Interpolation_error / AnalyticalSolution_magnitude * 100.0) : 0.0;</div>
-<div class="line"><span class="lineno"> 1759</span>    </div>
-<div class="line"><span class="lineno"> 1760</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Interpolation error (%%): %g\n&quot;</span>, ErrorPercentage);</div>
-<div class="line"><span class="lineno"> 1761</span>    PetscPrintf(PETSC_COMM_WORLD, <span class="stringliteral">&quot;Interpolation error (%%): %g\n&quot;</span>, ErrorPercentage);</div>
-<div class="line"><span class="lineno"> 1762</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Maximum Interpolation error: %g\n&quot;</span>, Maximum_Interpolation_error);</div>
-<div class="line"><span class="lineno"> 1763</span>    PetscPrintf(PETSC_COMM_WORLD, <span class="stringliteral">&quot;Maximum Interpolation error: %g\n&quot;</span>, Maximum_Interpolation_error);</div>
-<div class="line"><span class="lineno"> 1764</span> </div>
-<div class="line"><span class="lineno"> 1765</span>    </div>
-<div class="line"><span class="lineno"> 1766</span>    ierr = VecDestroy(&amp;analyticalvelocityVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1767</span>    ierr = VecDestroy(&amp;errorVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1768</span>    ierr = DMSwarmDestroyGlobalVectorFromField(swarm, <span class="stringliteral">&quot;position&quot;</span>, &amp;positionVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1769</span>    ierr = DMSwarmDestroyGlobalVectorFromField(swarm, <span class="stringliteral">&quot;velocity&quot;</span>, &amp;velocityVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1770</span>    </div>
-<div class="line"><span class="lineno"> 1771</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno"> 1772</span>}</div>
-<div class="ttc" id="aAnalyticalSolutions_8h_html_a7b03e94375708c44a9c39d9c6312b01d"><div class="ttname"><a href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d">SetAnalyticalSolutionForParticles</a></div><div class="ttdeci">PetscErrorCode SetAnalyticalSolutionForParticles(Vec tempVec, SimCtx *simCtx)</div><div class="ttdoc">Applies the analytical solution to particle velocity vector.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00430">AnalyticalSolutions.c:430</a></div></div>
+<div class="line"><span class="lineno"> 1759</span> </div>
+<div class="line"><span class="lineno"> 1760</span>    <span class="comment">/* --- CSV output (always, rank 0 only) --- */</span></div>
+<div class="line"><span class="lineno"> 1761</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) {</div>
+<div class="line"><span class="lineno"> 1762</span>        <span class="keywordtype">char</span> csv_path[PETSC_MAX_PATH_LEN];</div>
+<div class="line"><span class="lineno"> 1763</span>        snprintf(csv_path, <span class="keyword">sizeof</span>(csv_path), <span class="stringliteral">&quot;%s/interpolation_error.csv&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a922566a9e001486fa838d96925a6f102">log_dir</a>);</div>
+<div class="line"><span class="lineno"> 1764</span>        FILE *f = fopen(csv_path, <span class="stringliteral">&quot;a&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1765</span>        <span class="keywordflow">if</span> (f) {</div>
+<div class="line"><span class="lineno"> 1766</span>            <span class="keywordflow">if</span> (ftell(f) == 0) {</div>
+<div class="line"><span class="lineno"> 1767</span>                fprintf(f, <span class="stringliteral">&quot;step,time,L2_error,Linf_error,L2_analytical,error_pct\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1768</span>            }</div>
+<div class="line"><span class="lineno"> 1769</span>            PetscReal t = (PetscReal)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">ti</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
+<div class="line"><span class="lineno"> 1770</span>            fprintf(f, <span class="stringliteral">&quot;%d,%.6e,%.6e,%.6e,%.6e,%.4f\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1771</span>                    (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, t,</div>
+<div class="line"><span class="lineno"> 1772</span>                    Interpolation_error, Maximum_Interpolation_error,</div>
+<div class="line"><span class="lineno"> 1773</span>                    AnalyticalSolution_magnitude, ErrorPercentage);</div>
+<div class="line"><span class="lineno"> 1774</span>            fclose(f);</div>
+<div class="line"><span class="lineno"> 1775</span>        }</div>
+<div class="line"><span class="lineno"> 1776</span>    }</div>
+<div class="line"><span class="lineno"> 1777</span> </div>
+<div class="line"><span class="lineno"> 1778</span>    <span class="comment">/* --- Console output (only at INFO level or above) --- */</span></div>
+<div class="line"><span class="lineno"> 1779</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="logging_8c.html#a9585f583c260f40a73f2490914edc689">get_log_level</a>() &gt;= <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>) {</div>
+<div class="line"><span class="lineno"> 1780</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Interpolation error (%%): %g\n&quot;</span>, ErrorPercentage);</div>
+<div class="line"><span class="lineno"> 1781</span>        PetscPrintf(PETSC_COMM_WORLD, <span class="stringliteral">&quot;Interpolation error (%%): %g\n&quot;</span>, ErrorPercentage);</div>
+<div class="line"><span class="lineno"> 1782</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Maximum Interpolation error: %g\n&quot;</span>, Maximum_Interpolation_error);</div>
+<div class="line"><span class="lineno"> 1783</span>        PetscPrintf(PETSC_COMM_WORLD, <span class="stringliteral">&quot;Maximum Interpolation error: %g\n&quot;</span>, Maximum_Interpolation_error);</div>
+<div class="line"><span class="lineno"> 1784</span>    }</div>
+<div class="line"><span class="lineno"> 1785</span> </div>
+<div class="line"><span class="lineno"> 1786</span>    ierr = VecDestroy(&amp;analyticalvelocityVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1787</span>    ierr = VecDestroy(&amp;errorVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1788</span>    ierr = DMSwarmDestroyGlobalVectorFromField(swarm, <span class="stringliteral">&quot;position&quot;</span>, &amp;positionVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1789</span>    ierr = DMSwarmDestroyGlobalVectorFromField(swarm, <span class="stringliteral">&quot;velocity&quot;</span>, &amp;velocityVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1790</span>    </div>
+<div class="line"><span class="lineno"> 1791</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno"> 1792</span>}</div>
+<div class="ttc" id="aAnalyticalSolutions_8h_html_a7b03e94375708c44a9c39d9c6312b01d"><div class="ttname"><a href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d">SetAnalyticalSolutionForParticles</a></div><div class="ttdeci">PetscErrorCode SetAnalyticalSolutionForParticles(Vec tempVec, SimCtx *simCtx)</div><div class="ttdoc">Applies the analytical solution to particle velocity vector.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00437">AnalyticalSolutions.c:437</a></div></div>
+<div class="ttc" id="avariables_8h_html_a53b044b8b0e4a4dc8c8fa05387af564c"><div class="ttname"><a href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">SimCtx::dt</a></div><div class="ttdeci">PetscReal dt</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00617">variables.h:617</a></div></div>
+<div class="ttc" id="avariables_8h_html_aea06dd1e5437886745d3545e2a383172"><div class="ttname"><a href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">SimCtx::ti</a></div><div class="ttdeci">PetscReal ti</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00611">variables.h:611</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="logging_8c_a39d7c2bbd2fcd8e2a055ec59f7e9ef26_cgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="logging_8c_a39d7c2bbd2fcd8e2a055ec59f7e9ef26_cgraph.svg" width="100%" height="376"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -3890,51 +3912,51 @@ Here is the caller graph for this function:</div>
 <p>Computes advanced particle statistics and stores them in <a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a>.</p>
 <p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="logging_8c_source.html#l01780">1780</a> of file <a class="el" href="logging_8c_source.html">logging.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1781</span>{</div>
-<div class="line"><span class="lineno"> 1782</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 1783</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno"> 1784</span>    PetscMPIInt    size, rank;</div>
-<div class="line"><span class="lineno"> 1785</span> </div>
-<div class="line"><span class="lineno"> 1786</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1787</span>    ierr = MPI_Comm_size(PETSC_COMM_WORLD, &amp;size); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1788</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1789</span> </div>
-<div class="line"><span class="lineno"> 1790</span>    <span class="comment">// --- 1. Particle Load Imbalance ---</span></div>
-<div class="line"><span class="lineno"> 1791</span>    PetscInt nLocal, nGlobal, nLocalMax;</div>
-<div class="line"><span class="lineno"> 1792</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nLocal); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1793</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nGlobal); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1794</span>    ierr = MPI_Allreduce(&amp;nLocal, &amp;nLocalMax, 1, MPIU_INT, MPI_MAX, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1795</span> </div>
-<div class="line"><span class="lineno"> 1796</span>    PetscReal avg_per_rank = (size &gt; 0) ? ((PetscReal)nGlobal / size) : 0.0;</div>
-<div class="line"><span class="lineno"> 1797</span>    <span class="comment">// Handle division by zero if there are no particles</span></div>
-<div class="line"><span class="lineno"> 1798</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a> = (avg_per_rank &gt; 1e-9) ? (nLocalMax / avg_per_rank) : 1.0;</div>
-<div class="line"><span class="lineno"> 1799</span> </div>
-<div class="line"><span class="lineno"> 1800</span> </div>
-<div class="line"><span class="lineno"> 1801</span>    <span class="comment">// --- 2. Number of Occupied Cells ---</span></div>
-<div class="line"><span class="lineno"> 1802</span>    <span class="comment">// This part requires access to the user-&gt;ParticleCount vector.</span></div>
-<div class="line"><span class="lineno"> 1803</span>    PetscInt       local_occupied_cells = 0;</div>
-<div class="line"><span class="lineno"> 1804</span>    PetscInt       global_occupied_cells;</div>
-<div class="line"><span class="lineno"> 1805</span>    <span class="keyword">const</span> PetscScalar *count_array;</div>
-<div class="line"><span class="lineno"> 1806</span>    PetscInt       vec_local_size;</div>
-<div class="line"><span class="lineno"> 1807</span> </div>
-<div class="line"><span class="lineno"> 1808</span>    ierr = VecGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;vec_local_size); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1809</span>    ierr = VecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;count_array); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1810</span> </div>
-<div class="line"><span class="lineno"> 1811</span>    <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; vec_local_size; ++i) {</div>
-<div class="line"><span class="lineno"> 1812</span>        <span class="keywordflow">if</span> (count_array[i] &gt; 0.5) { <span class="comment">// Use 0.5 to be safe with floating point</span></div>
-<div class="line"><span class="lineno"> 1813</span>            local_occupied_cells++;</div>
-<div class="line"><span class="lineno"> 1814</span>        }</div>
-<div class="line"><span class="lineno"> 1815</span>    }</div>
-<div class="line"><span class="lineno"> 1816</span>    ierr = VecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;count_array); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1817</span> </div>
-<div class="line"><span class="lineno"> 1818</span>    ierr = MPI_Allreduce(&amp;local_occupied_cells, &amp;global_occupied_cells, 1, MPIU_INT, MPI_SUM, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1819</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a> = global_occupied_cells;</div>
+<p class="definition">Definition at line <a class="el" href="logging_8c_source.html#l01800">1800</a> of file <a class="el" href="logging_8c_source.html">logging.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1801</span>{</div>
+<div class="line"><span class="lineno"> 1802</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 1803</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno"> 1804</span>    PetscMPIInt    size, rank;</div>
+<div class="line"><span class="lineno"> 1805</span> </div>
+<div class="line"><span class="lineno"> 1806</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1807</span>    ierr = MPI_Comm_size(PETSC_COMM_WORLD, &amp;size); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1808</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1809</span> </div>
+<div class="line"><span class="lineno"> 1810</span>    <span class="comment">// --- 1. Particle Load Imbalance ---</span></div>
+<div class="line"><span class="lineno"> 1811</span>    PetscInt nLocal, nGlobal, nLocalMax;</div>
+<div class="line"><span class="lineno"> 1812</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nLocal); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1813</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nGlobal); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1814</span>    ierr = MPI_Allreduce(&amp;nLocal, &amp;nLocalMax, 1, MPIU_INT, MPI_MAX, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1815</span> </div>
+<div class="line"><span class="lineno"> 1816</span>    PetscReal avg_per_rank = (size &gt; 0) ? ((PetscReal)nGlobal / size) : 0.0;</div>
+<div class="line"><span class="lineno"> 1817</span>    <span class="comment">// Handle division by zero if there are no particles</span></div>
+<div class="line"><span class="lineno"> 1818</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a> = (avg_per_rank &gt; 1e-9) ? (nLocalMax / avg_per_rank) : 1.0;</div>
+<div class="line"><span class="lineno"> 1819</span> </div>
 <div class="line"><span class="lineno"> 1820</span> </div>
-<div class="line"><span class="lineno"> 1821</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;[Rank %d] Advanced Metrics: Imbalance=%.2f, OccupiedCells=%d\n&quot;</span>, rank, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a>);</div>
-<div class="line"><span class="lineno"> 1822</span> </div>
-<div class="line"><span class="lineno"> 1823</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1824</span>}</div>
+<div class="line"><span class="lineno"> 1821</span>    <span class="comment">// --- 2. Number of Occupied Cells ---</span></div>
+<div class="line"><span class="lineno"> 1822</span>    <span class="comment">// This part requires access to the user-&gt;ParticleCount vector.</span></div>
+<div class="line"><span class="lineno"> 1823</span>    PetscInt       local_occupied_cells = 0;</div>
+<div class="line"><span class="lineno"> 1824</span>    PetscInt       global_occupied_cells;</div>
+<div class="line"><span class="lineno"> 1825</span>    <span class="keyword">const</span> PetscScalar *count_array;</div>
+<div class="line"><span class="lineno"> 1826</span>    PetscInt       vec_local_size;</div>
+<div class="line"><span class="lineno"> 1827</span> </div>
+<div class="line"><span class="lineno"> 1828</span>    ierr = VecGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;vec_local_size); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1829</span>    ierr = VecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;count_array); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1830</span> </div>
+<div class="line"><span class="lineno"> 1831</span>    <span class="keywordflow">for</span> (PetscInt i = 0; i &lt; vec_local_size; ++i) {</div>
+<div class="line"><span class="lineno"> 1832</span>        <span class="keywordflow">if</span> (count_array[i] &gt; 0.5) { <span class="comment">// Use 0.5 to be safe with floating point</span></div>
+<div class="line"><span class="lineno"> 1833</span>            local_occupied_cells++;</div>
+<div class="line"><span class="lineno"> 1834</span>        }</div>
+<div class="line"><span class="lineno"> 1835</span>    }</div>
+<div class="line"><span class="lineno"> 1836</span>    ierr = VecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, &amp;count_array); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1837</span> </div>
+<div class="line"><span class="lineno"> 1838</span>    ierr = MPI_Allreduce(&amp;local_occupied_cells, &amp;global_occupied_cells, 1, MPIU_INT, MPI_SUM, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1839</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a> = global_occupied_cells;</div>
+<div class="line"><span class="lineno"> 1840</span> </div>
+<div class="line"><span class="lineno"> 1841</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;[Rank %d] Advanced Metrics: Imbalance=%.2f, OccupiedCells=%d\n&quot;</span>, rank, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a>);</div>
+<div class="line"><span class="lineno"> 1842</span> </div>
+<div class="line"><span class="lineno"> 1843</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1844</span>}</div>
 <div class="ttc" id="avariables_8h_html_a551c135902b8dc62d4fe63eb63dda1f9"><div class="ttname"><a href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">SimCtx::occupiedCellCount</a></div><div class="ttdeci">PetscInt occupiedCellCount</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00704">variables.h:704</a></div></div>
 <div class="ttc" id="avariables_8h_html_aa194db376ea0f68ec7090718804488ab"><div class="ttname"><a href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">UserCtx::ParticleCount</a></div><div class="ttdeci">Vec ParticleCount</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00835">variables.h:835</a></div></div>
 <div class="ttc" id="avariables_8h_html_af96e44d78862a6882c9121a385c8d584"><div class="ttname"><a href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">SimCtx::particleLoadImbalance</a></div><div class="ttdeci">PetscReal particleLoadImbalance</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00705">variables.h:705</a></div></div>
@@ -3976,40 +3998,40 @@ Here is the caller graph for this function:</div>
 <p>Logs particle swarm metrics, adapting its behavior based on a boolean flag in <a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a>.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="logging_8h.html" title="Logging utilities and macros for PETSc-based applications.">include/logging.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="logging_8h.html#a187c2a605018df135485c587a6f87747" title="Logs particle swarm metrics, adapting its behavior based on a boolean flag in SimCtx.">LOG_PARTICLE_METRICS()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="logging_8c_source.html#l01834">1834</a> of file <a class="el" href="logging_8c_source.html">logging.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1835</span>{</div>
-<div class="line"><span class="lineno"> 1836</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 1837</span>    PetscMPIInt    rank;</div>
-<div class="line"><span class="lineno"> 1838</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno"> 1839</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *stage_label = (stageName &amp;&amp; stageName[0] != <span class="charliteral">&#39;\0&#39;</span>) ? stageName : <span class="stringliteral">&quot;N/A&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1840</span> </div>
-<div class="line"><span class="lineno"> 1841</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1842</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1843</span> </div>
-<div class="line"><span class="lineno"> 1844</span>    PetscInt totalParticles;</div>
-<div class="line"><span class="lineno"> 1845</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;totalParticles); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1846</span> </div>
-<div class="line"><span class="lineno"> 1847</span>    <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno"> 1848</span>        FILE *f;</div>
-<div class="line"><span class="lineno"> 1849</span>        <span class="keywordtype">char</span> filen[PETSC_MAX_PATH_LEN + 64];</div>
-<div class="line"><span class="lineno"> 1850</span>        ierr = PetscSNPrintf(filen, <span class="keyword">sizeof</span>(filen), <span class="stringliteral">&quot;%s/Particle_Metrics.log&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a922566a9e001486fa838d96925a6f102">log_dir</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1851</span>        f = fopen(filen, <span class="stringliteral">&quot;a&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1852</span>        <span class="keywordflow">if</span> (!f) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_FILE_OPEN, <span class="stringliteral">&quot;Cannot open particle log file: %s&quot;</span>, filen);</div>
-<div class="line"><span class="lineno"> 1853</span> </div>
-<div class="line"><span class="lineno"> 1854</span>        <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> == simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + 1) {</div>
-<div class="line"><span class="lineno"> 1855</span>            PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;%-18s | %-10s | %-12s | %-10s | %-10s | %-15s | %-10s | %-10s\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1856</span>                            <span class="stringliteral">&quot;Stage&quot;</span>, <span class="stringliteral">&quot;Timestep&quot;</span>, <span class="stringliteral">&quot;Total Ptls&quot;</span>, <span class="stringliteral">&quot;Lost&quot;</span>, <span class="stringliteral">&quot;Migrated&quot;</span>, <span class="stringliteral">&quot;Occupied Cells&quot;</span>, <span class="stringliteral">&quot;Imbalance&quot;</span>, <span class="stringliteral">&quot;Mig Passes&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1857</span>            PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;----------------------------------------------------------------------------------------------------------------------------\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1858</span>        }</div>
-<div class="line"><span class="lineno"> 1859</span> </div>
-<div class="line"><span class="lineno"> 1860</span>        PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;%-18s | %-10d | %-12d | %-10d | %-10d | %-15d | %-10.2f | %-10d\n&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1861</span>                        stage_label, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, (<span class="keywordtype">int</span>)totalParticles, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3ed2dec031a6af53c13702ae3c12813c">particlesLostLastStep</a>,</div>
-<div class="line"><span class="lineno"> 1862</span>                        (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#abc3183b2a2580de4a2f176107163b3c5">particlesMigratedLastStep</a>, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a>,</div>
-<div class="line"><span class="lineno"> 1863</span>                        (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a>, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad004a4e44f6fbc15c2f92a386e0c06ac">migrationPassesLastStep</a>);</div>
-<div class="line"><span class="lineno"> 1864</span>        fclose(f);</div>
-<div class="line"><span class="lineno"> 1865</span>    }</div>
-<div class="line"><span class="lineno"> 1866</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1867</span>}</div>
+<p class="definition">Definition at line <a class="el" href="logging_8c_source.html#l01854">1854</a> of file <a class="el" href="logging_8c_source.html">logging.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1855</span>{</div>
+<div class="line"><span class="lineno"> 1856</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 1857</span>    PetscMPIInt    rank;</div>
+<div class="line"><span class="lineno"> 1858</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>         *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno"> 1859</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *stage_label = (stageName &amp;&amp; stageName[0] != <span class="charliteral">&#39;\0&#39;</span>) ? stageName : <span class="stringliteral">&quot;N/A&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1860</span> </div>
+<div class="line"><span class="lineno"> 1861</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1862</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1863</span> </div>
+<div class="line"><span class="lineno"> 1864</span>    PetscInt totalParticles;</div>
+<div class="line"><span class="lineno"> 1865</span>    ierr = DMSwarmGetSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;totalParticles); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1866</span> </div>
+<div class="line"><span class="lineno"> 1867</span>    <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno"> 1868</span>        FILE *f;</div>
+<div class="line"><span class="lineno"> 1869</span>        <span class="keywordtype">char</span> filen[PETSC_MAX_PATH_LEN + 64];</div>
+<div class="line"><span class="lineno"> 1870</span>        ierr = PetscSNPrintf(filen, <span class="keyword">sizeof</span>(filen), <span class="stringliteral">&quot;%s/Particle_Metrics.log&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a922566a9e001486fa838d96925a6f102">log_dir</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1871</span>        f = fopen(filen, <span class="stringliteral">&quot;a&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1872</span>        <span class="keywordflow">if</span> (!f) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_FILE_OPEN, <span class="stringliteral">&quot;Cannot open particle log file: %s&quot;</span>, filen);</div>
+<div class="line"><span class="lineno"> 1873</span> </div>
+<div class="line"><span class="lineno"> 1874</span>        <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> == simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + 1) {</div>
+<div class="line"><span class="lineno"> 1875</span>            PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;%-18s | %-10s | %-12s | %-10s | %-10s | %-15s | %-10s | %-10s\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1876</span>                            <span class="stringliteral">&quot;Stage&quot;</span>, <span class="stringliteral">&quot;Timestep&quot;</span>, <span class="stringliteral">&quot;Total Ptls&quot;</span>, <span class="stringliteral">&quot;Lost&quot;</span>, <span class="stringliteral">&quot;Migrated&quot;</span>, <span class="stringliteral">&quot;Occupied Cells&quot;</span>, <span class="stringliteral">&quot;Imbalance&quot;</span>, <span class="stringliteral">&quot;Mig Passes&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1877</span>            PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;----------------------------------------------------------------------------------------------------------------------------\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1878</span>        }</div>
+<div class="line"><span class="lineno"> 1879</span> </div>
+<div class="line"><span class="lineno"> 1880</span>        PetscFPrintf(PETSC_COMM_SELF, f, <span class="stringliteral">&quot;%-18s | %-10d | %-12d | %-10d | %-10d | %-15d | %-10.2f | %-10d\n&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1881</span>                        stage_label, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, (<span class="keywordtype">int</span>)totalParticles, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3ed2dec031a6af53c13702ae3c12813c">particlesLostLastStep</a>,</div>
+<div class="line"><span class="lineno"> 1882</span>                        (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#abc3183b2a2580de4a2f176107163b3c5">particlesMigratedLastStep</a>, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a551c135902b8dc62d4fe63eb63dda1f9">occupiedCellCount</a>,</div>
+<div class="line"><span class="lineno"> 1883</span>                        (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af96e44d78862a6882c9121a385c8d584">particleLoadImbalance</a>, (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad004a4e44f6fbc15c2f92a386e0c06ac">migrationPassesLastStep</a>);</div>
+<div class="line"><span class="lineno"> 1884</span>        fclose(f);</div>
+<div class="line"><span class="lineno"> 1885</span>    }</div>
+<div class="line"><span class="lineno"> 1886</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1887</span>}</div>
 <div class="ttc" id="avariables_8h_html_a3ed2dec031a6af53c13702ae3c12813c"><div class="ttname"><a href="variables_8h.html#a3ed2dec031a6af53c13702ae3c12813c">SimCtx::particlesLostLastStep</a></div><div class="ttdeci">PetscInt particlesLostLastStep</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00701">variables.h:701</a></div></div>
 <div class="ttc" id="avariables_8h_html_abc3183b2a2580de4a2f176107163b3c5"><div class="ttname"><a href="variables_8h.html#abc3183b2a2580de4a2f176107163b3c5">SimCtx::particlesMigratedLastStep</a></div><div class="ttdeci">PetscInt particlesMigratedLastStep</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00703">variables.h:703</a></div></div>
 <div class="ttc" id="avariables_8h_html_ad004a4e44f6fbc15c2f92a386e0c06ac"><div class="ttname"><a href="variables_8h.html#ad004a4e44f6fbc15c2f92a386e0c06ac">SimCtx::migrationPassesLastStep</a></div><div class="ttdeci">PetscInt migrationPassesLastStep</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00702">variables.h:702</a></div></div>
