@@ -258,7 +258,13 @@ Re = \frac{\rho U L}{\mu}
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  start_step: 500</div>
 <div class="line">  total_steps: 1000</div>
-<div class="line">  restart_from_run_dir: &quot;../runs/flat_channel_20260303-120000&quot;</div>
+</div><!-- fragment --><p>Pass <code>--restart-from</code> on the CLI to point at the previous run:</p>
+<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
+<div class="line">  --restart-from ../runs/flat_channel_20260303-120000 \</div>
+<div class="line">  --case restart_case/case.yml \</div>
+<div class="line">  --solver restart_case/solver.yml \</div>
+<div class="line">  --monitor restart_case/monitor.yml \</div>
+<div class="line">  --post restart_case/post.yml</div>
 </div><!-- fragment --><p>Meaning:</p>
 <ul>
 <li>If a run has completed through step 500, set <code>start_step: 500</code>.</li>
@@ -266,7 +272,7 @@ Re = \frac{\rho U L}{\mu}
 <li>The first new step advanced is step 501.</li>
 <li><code>total_steps</code> is the number of additional steps to run.</li>
 <li>In this example, the restarted run advances from step 501 through step 1500.</li>
-<li>If <code>restart_from_run_dir</code> is set, <code>picurv</code> automatically resolves the previous run's restart directory from that run's <code>config/monitor.yml</code> and injects the correct <code>-restart_dir</code> into the new control file.</li>
+<li>When <code>--restart-from</code> is given, <code>picurv</code> automatically resolves the previous run's restart directory from that run's <code>config/monitor.yml</code> and injects the correct <code>-restart_dir</code> into the new control file.</li>
 </ul>
 <p>Typical full field restart (<code>solver.yml</code>):</p>
 <div class="fragment"><div class="line">operation_mode:</div>
@@ -288,24 +294,19 @@ Re = \frac{\rho U L}{\mu}
 <li>Flow restart + fresh particles: <code>start_step &gt; 0</code>, <code>eulerian_field_source: load</code>, <code>restart_mode: init</code></li>
 <li>Analytical mode is different: <code>eulerian_field_source: analytical</code> regenerates the analytical field at the requested <code>(t, step)</code> instead of loading restart files.</li>
 </ul>
-<p>Command example:</p>
-<div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
-<div class="line">  --case restart_case/case.yml \</div>
-<div class="line">  --solver restart_case/solver.yml \</div>
-<div class="line">  --monitor restart_case/monitor.yml \</div>
-<div class="line">  --post restart_case/post.yml</div>
-</div><!-- fragment --><p>How to think about this workflow:</p>
+<p>How to think about this workflow:</p>
 <ul>
 <li>restart uses the normal <code>run --solve</code> path; there is no separate restart command,</li>
 <li>the new run directory is a fresh run artifact,</li>
 <li>the saved field state is loaded from existing restart/output files referenced by the current restart path contract,</li>
-<li><code>run_control.restart_from_run_dir</code> is the preferred way to point <code>picurv</code> at the old run automatically,</li>
+<li><code>--restart-from</code> on the CLI is the preferred way to point <code>picurv</code> at the old run automatically,</li>
+<li>use <code>--continue</code> as a shorthand when resuming from the most recent run of the same case,</li>
 <li>the old run directory is not mutated in place by <code>picurv</code>.</li>
 </ul>
 <p>Before launching a restart, verify:</p>
 <ul>
 <li>the previous run actually wrote solver outputs for the target <code>start_step</code>,</li>
-<li><code>run_control.restart_from_run_dir</code> points to the intended previous run directory (if you use automated restart resolution),</li>
+<li>the <code>--restart-from</code> path points to the intended previous run directory,</li>
 <li><code>monitor.yml -&gt; io.directories.restart</code> points to the intended restart directory name,</li>
 <li><code>monitor.yml -&gt; io.directories.output</code> matches where the prior run wrote field data,</li>
 <li>restart source files for the requested step exist,</li>

@@ -87,7 +87,12 @@ $(function() {
 <li class="level1"><a href="#p52_newrun_sec">2. Start A New Run</a></li>
 <li class="level1"><a href="#p52_layout_sec">3. Read The Run Directory Correctly</a></li>
 <li class="level1"><a href="#p52_launchers_sec">4. Local, Login-Node, and Batch Launch Resolution</a></li>
-<li class="level1"><a href="#p52_restart_sec">5. Restart From An Existing Run</a></li>
+<li class="level1"><a href="#p52_restart_sec">5. Restart And Continuation</a><ul><li class="level2"><a href="#p52_restart_cfd">5.1 CFD Restart (New Run, Continue Solving)</a></li>
+<li class="level2"><a href="#p52_restart_particle">5.2 Particle-Tracking Restart (New Run, Pre-Computed Flow)</a></li>
+<li class="level2"><a href="#p52_continue">5.3 Continue In-Place (Same Run Directory)</a></li>
+<li class="level2"><a href="#p52_restart_notes">5.4 Notes</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p52_post_sec">6. Postprocess An Existing Run</a></li>
 <li class="level1"><a href="#p52_cluster_sec">7. Batch Job Generation And Reuse</a></li>
 <li class="level1"><a href="#p52_rules_sec">8. Safe Rules Of Thumb</a></li>
@@ -113,7 +118,8 @@ $(function() {
 <ul>
 <li>every <code>picurv run --solve ...</code> creates a fresh run directory,</li>
 <li><code>picurv</code> does not mutate an old run directory in place when you start a new solve,</li>
-<li>restart workflows read from an existing run but still create a new run directory for the restarted continuation.</li>
+<li>restart workflows (<code>--restart-from</code>) read from an existing run but still create a new run directory for the restarted continuation,</li>
+<li>continuation workflows (<code>--continue --run-dir</code>) resume inside the same run directory.</li>
 </ul>
 <p><code>run_id</code> is generated automatically as <code>&lt;case_basename&gt;_&lt;timestamp&gt;</code>.</p>
 <h1><a class="anchor" id="p52_newrun_sec"></a>
@@ -144,7 +150,7 @@ $(function() {
 <ul>
 <li><code>runs/&lt;run_id&gt;/config/</code>: generated <code>.control</code>, BC files, copied YAML inputs, and <code>post.run</code></li>
 <li><code>runs/&lt;run_id&gt;/logs/</code>: solver/postprocessor runtime logs and metrics written by PICurv itself</li>
-<li><code>runs/&lt;run_id&gt;/results/</code>: solver outputs when monitor paths use the default layout</li>
+<li><code>runs/&lt;run_id&gt;/output/</code>: solver outputs when monitor paths use the default layout</li>
 <li><code>runs/&lt;run_id&gt;/scheduler/</code>: generated Slurm scripts, <code>submission.json</code>, and cluster stdout/stderr in cluster mode</li>
 <li><code>runs/&lt;run_id&gt;/manifest.json</code>: top-level run metadata</li>
 </ul>
@@ -181,31 +187,60 @@ $(function() {
 <li>batch users can reuse that same file unless <code>cluster.yml</code> needs a batch-specific override.</li>
 </ul>
 <h1><a class="anchor" id="p52_restart_sec"></a>
-5. Restart From An Existing Run</h1>
-<p>Restart uses the normal solve workflow. There is no separate restart command.</p>
-<p>Example:</p>
-<div class="fragment"><div class="line">run_control:</div>
-<div class="line">  start_step: 500</div>
-<div class="line">  total_steps: 1000</div>
-<div class="line">  restart_from_run_dir: &quot;../runs/flat_channel_20260303-120000&quot;</div>
-</div><!-- fragment --><div class="fragment"><div class="line">operation_mode:</div>
-<div class="line">  eulerian_field_source: &quot;load&quot;</div>
-</div><!-- fragment --><div class="fragment"><div class="line">models:</div>
-<div class="line">  physics:</div>
-<div class="line">    particles:</div>
-<div class="line">      restart_mode: &quot;load&quot;   # or &quot;init&quot;</div>
+5. Restart And Continuation</h1>
+<p>Restart and continuation use the normal solve workflow. There is no separate restart command. The restart source is specified entirely through CLI flags rather than YAML keys.</p>
+<p>Three scenarios are supported:</p>
+<h2><a class="anchor" id="p52_restart_cfd"></a>
+5.1 CFD Restart (New Run, Continue Solving)</h2>
+<p>Use <code>--restart-from</code> to create a new run that continues solving from another run's checkpoint data.</p>
+<div class="fragment"><div class="line">picurv run --solve --restart-from runs/old_run \</div>
+<div class="line">  --case case.yml --solver solver.yml --monitor monitor.yml</div>
+</div><!-- fragment --><p>Relevant YAML settings:</p>
+<ul>
+<li><code>case.yml</code>: set <code>start_step</code> to the checkpoint step (e.g. 500) and <code>total_steps</code> to the desired additional count.</li>
+<li><code>solver.yml</code>: set <code>eulerian_field_source: "solve"</code> so the solver advances the Eulerian fields from the restart state.</li>
+</ul>
+<p>Operational meaning:</p>
+<ul>
+<li>PICurv copies the checkpoint from <code>runs/old_run</code> into the new run's <code>restart/</code> directory,</li>
+<li>the solver loads that checkpoint and continues from step 501,</li>
+<li>all new output is written into a fresh <code>runs/&lt;new_run_id&gt;/</code> directory.</li>
+</ul>
+<h2><a class="anchor" id="p52_restart_particle"></a>
+5.2 Particle-Tracking Restart (New Run, Pre-Computed Flow)</h2>
+<p>Use <code>--restart-from</code> when the Eulerian flow is already computed and you only need to track particles through it.</p>
+<div class="fragment"><div class="line">picurv run --solve --restart-from runs/old_flow_run \</div>
+<div class="line">  --case case.yml --solver solver.yml --monitor monitor.yml</div>
+</div><!-- fragment --><p>Relevant YAML settings:</p>
+<ul>
+<li><code>solver.yml</code>: set <code>eulerian_field_source: "load"</code> so the solver reads pre-computed Eulerian fields instead of advancing them.</li>
+</ul>
+<p>Operational meaning:</p>
+<ul>
+<li>PICurv points <code>restart_dir</code> directly at the source run's output (no file copy),</li>
+<li>the solver loads the pre-computed flow fields from that source,</li>
+<li>particle tracking proceeds using the loaded fields,</li>
+<li>all new output is written into a fresh <code>runs/&lt;new_run_id&gt;/</code> directory.</li>
+</ul>
+<h2><a class="anchor" id="p52_continue"></a>
+5.3 Continue In-Place (Same Run Directory)</h2>
+<p>Use <code>--continue --run-dir</code> to resume a run that was interrupted or stopped early, writing into the same run directory.</p>
+<div class="fragment"><div class="line">picurv run --solve --continue --run-dir runs/my_run \</div>
+<div class="line">  --case case.yml --solver solver.yml --monitor monitor.yml</div>
 </div><!-- fragment --><p>Operational meaning:</p>
 <ul>
-<li>previous run ended at step <code>500</code>,</li>
-<li>new run loads state from that old run,</li>
-<li>first new advanced step is <code>501</code>,</li>
-<li>new run finishes at <code>1500</code>,</li>
-<li>restarted continuation is written into a new <code>runs/&lt;new_run_id&gt;/</code> directory.</li>
+<li>PICurv copies the latest checkpoint from <code>output/</code> to <code>restart/</code> inside <code>runs/my_run/</code>,</li>
+<li>the solver resumes from that checkpoint,</li>
+<li>logs append to the existing log files,</li>
+<li>all output stays within the same <code>runs/my_run/</code> directory.</li>
 </ul>
-<p>Before launching:</p>
+<h2><a class="anchor" id="p52_restart_notes"></a>
+5.4 Notes</h2>
+<p>When <code>start_step &gt; 0</code>, the initial Eulerian state is always loaded from the restart source regardless of the <code>eulerian_field_source</code> setting. The <code>eulerian_field_source</code> value only controls what happens on subsequent steps: <code>"solve"</code> advances the fields, <code>"load"</code> reads pre-computed fields.</p>
+<p>Before launching any restart or continuation:</p>
 <ul>
 <li>verify restart source files exist for the requested step,</li>
-<li>use <code>start_step</code> equal to the saved step, not the next desired step,</li>
+<li>use <code>start_step</code> equal to the saved checkpoint step, not the next desired step,</li>
 <li>verify <code>monitor.yml</code> directory names match the source run layout.</li>
 </ul>
 <h1><a class="anchor" id="p52_post_sec"></a>
