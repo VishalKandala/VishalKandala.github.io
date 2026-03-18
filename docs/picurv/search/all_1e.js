@@ -197,7 +197,7 @@ var searchData=
   ['structured_20error_20output_20contract_194',['10. Structured Error Output Contract',['../05_The_Conductor_Script.html#p05_structured_errors_sec',1,'']]],
   ['structured_20validation_20errors_20error_20lt_20code_20gt_195',['1. Structured Validation Errors (ERROR &amp;lt;CODE&amp;gt;)',['../39_Common_Fatal_Errors.html#p39_structured_sec',1,'']]],
   ['studies_196',['studies',['../17_Workflow_Extensibility.html#p17_orchestration_sec',1,'3. Multi-Run Orchestration (Sweeps/Studies)'],['../11_User_How_To_Guides.html#p11_sweep_sec',1,'5. Sweep Studies']]],
-  ['study_197',['1. Initialize a Study',['../03_Tutorial_File-Based_Grid.html#p03_init_sec',1,'']]],
+  ['study_197',['study',['../03_Tutorial_File-Based_Grid.html#p03_init_sec',1,'1. Initialize a Study'],['../37_Sweep_Studies_Guide.html#p37_continue_sec',1,'6. Continuing a Partially-Completed Study']]],
   ['study_20contract_20essentials_198',['3. Study Contract Essentials',['../37_Sweep_Studies_Guide.html#p37_contract_sec',1,'']]],
   ['study_20contract_20highlights_20study_20yml_199',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#p14_study_sec',1,'']]],
   ['study_20directory_200',['2. Initialize the Study Directory',['../02_Tutorial_Programmatic_Grid.html#p02_init_sec',1,'']]],

@@ -8,7 +8,7 @@ var searchData=
   ['8_20full_20command_20and_20option_20matrix_5',['8. Full Command and Option Matrix',['../05_The_Conductor_Script.html#p05_command_matrix_sec',1,'']]],
   ['8_20grid_20selector_20generator_20selector_6',['8. Grid Selector / Generator Selector',['../50_Modular_Selector_Extension_Guide.html#p50_grid_sec',1,'']]],
   ['8_20next_20steps_7',['8 next steps',['../07_Case_Reference.html#p07_next_steps_sec',1,'8. Next Steps'],['../08_Solver_Reference.html#p08_next_steps_sec',1,'8. Next Steps'],['../13_Code_Architecture.html#p13_next_steps_sec',1,'8. Next Steps']]],
-  ['8_20related_20pages_8',['8 related pages',['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages'],['../33_Initial_Conditions.html#p33_refs_sec',1,'8. Related Pages']]],
+  ['8_20related_20pages_8',['8 related pages',['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages'],['../33_Initial_Conditions.html#p33_refs_sec',1,'8. Related Pages'],['../37_Sweep_Studies_Guide.html#p37_refs_sec',1,'8. Related Pages']]],
   ['8_20safe_20rules_20of_20thumb_9',['8. Safe Rules Of Thumb',['../52_Run_Lifecycle_Guide.html#p52_rules_sec',1,'']]],
   ['8_20study_20contract_20highlights_20study_20yml_10',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#p14_study_sec',1,'']]],
   ['8_20suggested_20reading_20order_11',['8. Suggested Reading Order',['../12_Capabilities_Summary.html#p12_next_steps_sec',1,'']]],

@@ -371,15 +371,31 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="p05_sweep_sec"></a>
 6. sweep: Parameter Study via Slurm Arrays</h1>
-<div class="fragment"><div class="line">./bin/picurv sweep \</div>
+<div class="fragment"><div class="line"># Launch new study</div>
+<div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml [--no-submit]</div>
-</div><!-- fragment --><p>Behavior:</p><ul>
+<div class="line"> </div>
+<div class="line"># Continue a partially-completed study</div>
+<div class="line">./bin/picurv sweep --continue --study-dir studies/&lt;study_id&gt; \</div>
+<div class="line">  [--cluster cluster_more_time.yml]</div>
+<div class="line"> </div>
+<div class="line"># Re-aggregate metrics manually</div>
+<div class="line">./bin/picurv sweep --reaggregate --study-dir studies/&lt;study_id&gt;</div>
+</div><!-- fragment --><p>Behavior (new study):</p><ul>
 <li>expands parameter matrix from <code>study.yml</code></li>
 <li>materializes case directories under <code>studies/&lt;study_id&gt;/cases/</code></li>
-<li>generates <code>solver_array.sbatch</code> and <code>post_array.sbatch</code></li>
-<li>submits post array with <code>afterok:&lt;solver_jobid&gt;</code> dependency (unless <code>--no-submit</code>)</li>
-<li>aggregates metrics and emits plots in <code>studies/&lt;study_id&gt;/results/</code></li>
+<li>generates <code>solver_array.sbatch</code>, <code>post_array.sbatch</code>, and <code>metrics_aggregate.sbatch</code></li>
+<li>submits solver → post (<code>afterok</code>) → metrics (<code>afterany</code>) chain (unless <code>--no-submit</code>)</li>
+</ul>
+<p>Behavior (<code>--continue</code>):</p><ul>
+<li>detects per-case completion status (complete / partial / empty)</li>
+<li>if all cases complete, auto-aggregates metrics and exits</li>
+<li>otherwise prepares continuation for incomplete cases (checkpoint restart via <code>resolve_restart_source</code>)</li>
+<li>submits sparse solver array (incomplete cases only) → full post array → metrics aggregation</li>
+</ul>
+<p>Behavior (<code>--reaggregate</code>):</p><ul>
+<li>re-runs metrics collection and plot generation on existing study outputs</li>
 </ul>
 <h1><a class="anchor" id="p05_validate_sec"></a>
 7. validate: Config-Only Checks</h1>
@@ -465,13 +481,21 @@ $(function() {
 </li>
 </ul>
 <p><code>sweep</code>:</p><ul>
-<li>required:<ul>
-<li><code>--study &lt;study.yml&gt;</code></li>
-<li><code>--cluster &lt;cluster.yml&gt;</code></li>
+<li>new study mode (default):<ul>
+<li><code>--study &lt;study.yml&gt;</code> (required)</li>
+<li><code>--cluster &lt;cluster.yml&gt;</code> (required)</li>
+<li><code>--no-submit</code> (optional)</li>
 </ul>
 </li>
-<li>optional:<ul>
-<li><code>--no-submit</code></li>
+<li>continuation mode:<ul>
+<li><code>--continue</code> (required)</li>
+<li><code>--study-dir &lt;path&gt;</code> (required)</li>
+<li><code>--cluster &lt;cluster.yml&gt;</code> (optional; overrides original cluster resources)</li>
+</ul>
+</li>
+<li>reaggregation mode:<ul>
+<li><code>--reaggregate</code> (required)</li>
+<li><code>--study-dir &lt;path&gt;</code> (required)</li>
 </ul>
 </li>
 </ul>

@@ -88,7 +88,9 @@ $(function() {
 <li class="level1"><a href="#p37_contract_sec">3. Study Contract Essentials</a></li>
 <li class="level1"><a href="#p37_outputs_sec">4. Outputs and Aggregates</a></li>
 <li class="level1"><a href="#p37_operations_sec">5. Operational Workflow</a></li>
-<li class="level1"><a href="#p37_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md127">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md128">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p37_continue_sec">6. Continuing a Partially-Completed Study</a></li>
+<li class="level1"><a href="#p37_reaggregate_sec">7. Manual Metrics Re-Aggregation</a></li>
+<li class="level1"><a href="#p37_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md127">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md128">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md129">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -159,6 +161,7 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/scheduler/case_index.tsv</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/solver_array.sbatch</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
+<li><code>studies/&lt;study_id&gt;/scheduler/metrics_aggregate.sbatch</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/solver_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code> after submission</li>
 <li><code>studies/&lt;study_id&gt;/scheduler/post_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code> after submission</li>
 <li><code>studies/&lt;study_id&gt;/scheduler/submission.json</code> (when jobs are submitted)</li>
@@ -167,6 +170,7 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
 <p>This keeps raw run data and comparative study diagnostics in one reproducible structure.</p>
+<p>Metrics aggregation runs automatically as a Slurm job chained after the post-processing array (<code>afterany</code> dependency). If the automatic metrics job fails (e.g. Python unavailable on compute nodes), use <code>--reaggregate</code> manually.</p>
 <h1><a class="anchor" id="p37_operations_sec"></a>
 5. Operational Workflow</h1>
 <p>Recommended workflow:</p>
@@ -174,7 +178,7 @@ $(function() {
 <li>run a tiny subset locally or with <code>--no-submit</code>,</li>
 <li>verify parameter substitution and metric extraction,</li>
 <li>launch full array, either directly with <code>picurv sweep ...</code> or later with <code>picurv submit --study-dir ...</code>,</li>
-<li>inspect aggregate outputs,</li>
+<li>inspect aggregate outputs (auto-collected by the metrics Slurm job, or via <code>--reaggregate</code>),</li>
 <li>archive the exact study file with results for reproducibility.</li>
 </ol>
 <p><code>picurv sweep</code> is the scheduler-backed study path. For local parameter studies, repeat <code>picurv run</code> manually across a small set of edited case variants and compare the resulting run directories.</p>
@@ -183,13 +187,35 @@ $(function() {
 <ul>
 <li>case expansion uses cartesian product over all <code>parameters.*</code> lists.</li>
 <li>generated case configs are revalidated through the same solver/post validators used by <code>picurv run</code>.</li>
-<li>post array submission depends on solver array completion (<code>afterok:&lt;jobid&gt;</code>) unless <code>--no-submit</code> is used.</li>
+<li>submission chain: solver array → post array (<code>afterok</code>) → metrics job (<code>afterany</code>).</li>
 <li><code>scheduler/submission.json</code> is the study-directory contract consumed by <code>picurv submit --study-dir ...</code>.</li>
 <li>generator/file grid external paths are rewritten to absolute paths during case materialization so they remain valid in <code>studies/&lt;study_id&gt;/cases/...</code>.</li>
 <li>generated <code>solver_array.sbatch</code> exports walltime metadata for the runtime walltime guard, while <code>post_array.sbatch</code> remains a plain post-processing launcher.</li>
 </ul>
+<h1><a class="anchor" id="p37_continue_sec"></a>
+6. Continuing a Partially-Completed Study</h1>
+<p>If any solver case is killed (e.g. by the walltime guard or Slurm time limit), the entire post array is cancelled (<code>afterok</code> dependency). Use <code>--continue</code> to resume the study:</p>
+<div class="fragment"><div class="line">./bin/picurv sweep --continue --study-dir studies/&lt;study_id&gt;</div>
+</div><!-- fragment --><p>To override cluster resources (e.g. increase walltime):</p>
+<div class="fragment"><div class="line">./bin/picurv sweep --continue --study-dir studies/&lt;study_id&gt; \</div>
+<div class="line">  --cluster cluster_more_time.yml</div>
+</div><!-- fragment --><p>What <code>--continue</code> does:</p>
+<ol type="1">
+<li>Reads the original <code>study.yml</code> and <code>case_index.tsv</code> from the study directory.</li>
+<li>Classifies each case as <b>complete</b>, <b>partial</b>, or <b>empty</b> by scanning checkpoints.</li>
+<li>If all cases are complete, auto-aggregates metrics and exits (no jobs submitted).</li>
+<li>For partial cases: updates <code>case.yml</code> (<code>start_step</code>, <code>total_steps</code>), sets particle <code>restart_mode</code> to <code>load</code> when a checkpoint exists, and delegates to <code>resolve_restart_source</code> for the full restart scenario matrix.</li>
+<li>For empty cases (no checkpoint): re-runs from scratch with unmodified control files.</li>
+<li>Submits a sparse solver array (incomplete cases only) → full post array → metrics aggregation.</li>
+</ol>
+<p>Repeated continuation is safe: the target step count is always computed from the original <code>study.yml</code>, not from the (potentially modified) per-case <code>case.yml</code>.</p>
+<h1><a class="anchor" id="p37_reaggregate_sec"></a>
+7. Manual Metrics Re-Aggregation</h1>
+<p>If the automatic metrics Slurm job fails or you want to re-collect metrics after manual intervention:</p>
+<div class="fragment"><div class="line">./bin/picurv sweep --reaggregate --study-dir studies/&lt;study_id&gt;</div>
+</div><!-- fragment --><p>This reads all case outputs, writes <code>results/metrics_table.csv</code>, and generates plots (if enabled in <code>study.yml</code>).</p>
 <h1><a class="anchor" id="p37_refs_sec"></a>
-6. Related Pages</h1>
+8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="36_Cluster_Run_Guide.html">Cluster Run Guide (Slurm)</a></b></li>
 <li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
