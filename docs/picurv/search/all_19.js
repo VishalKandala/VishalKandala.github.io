@@ -19,7 +19,7 @@ var searchData=
   ['needs_5flocation_16',['NEEDS_LOCATION',['../variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a',1,'variables.h']]],
   ['needs_5fstructs_5ffallback_17',['needs_structs_fallback',['../namespacegenerate__doxygen__fallback__indexes.html#a1e0c701c76db76a5349db71e7124ad16',1,'generate_doxygen_fallback_indexes']]],
   ['neighbors_18',['neighbors',['../variables_8h.html#a58c51750e5a9172516dd2af41fd5fd42',1,'UserCtx']]],
-  ['new_20analytical_20type_19',['6. Adding A New Analytical Type',['../32_Analytical_Solutions.html#p32_extension_sec',1,'']]],
+  ['new_20analytical_20type_19',['7. Adding A New Analytical Type',['../32_Analytical_Solutions.html#p32_extension_sec',1,'']]],
   ['new_20apis_20',['3. Expected Standard For New APIs',['../35_API_Documentation_Status.html#p35_expected_sec',1,'']]],
   ['new_20c_20unit_20suite_21',['8. Adding A New C Unit Suite',['../51_C_Test_Suite_Developer_Guide.html#p51_extending_sec',1,'']]],
   ['new_20case_22',['5.1 Initialize a New Case',['../11_User_How_To_Guides.html#p11_init_basic_ssec',1,'']]],

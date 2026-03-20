@@ -305,7 +305,7 @@ var searchData=
   ['tutorial_3a_20your_20first_20simulation_20flat_20channel_302',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
   ['tw_303',['TW',['../poisson_8c.html#a051c83d6554c006261a198d0682d84e4',1,'poisson.c']]],
   ['twod_304',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
-  ['type_305',['type',['../32_Analytical_Solutions.html#p32_extension_sec',1,'6. Adding A New Analytical Type'],['../50_Modular_Selector_Extension_Guide.html#p50_analytical_sec',1,'7. Analytical Type'],['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition::type']]],
+  ['type_305',['type',['../32_Analytical_Solutions.html#p32_extension_sec',1,'7. Adding A New Analytical Type'],['../50_Modular_Selector_Extension_Guide.html#p50_analytical_sec',1,'7. Analytical Type'],['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition::type']]],
   ['type_20or_20handler_306',['3. Boundary Condition Type Or Handler',['../50_Modular_Selector_Extension_Guide.html#p50_bc_sec',1,'']]],
   ['typedef_5fend_5fre_307',['TYPEDEF_END_RE',['../namespacegenerate__doxygen__fallback__indexes.html#adac8641254e10cfe2c77e196ad1041c0',1,'generate_doxygen_fallback_indexes']]],
   ['typedef_5fstart_5fre_308',['TYPEDEF_START_RE',['../namespacegenerate__doxygen__fallback__indexes.html#a1782d19a48ed4594cce7d85ffdadd14d',1,'generate_doxygen_fallback_indexes']]],

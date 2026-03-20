@@ -87,8 +87,9 @@ $(function() {
 <li class="level1"><a href="#p32_types_sec">2. Supported Types In Current Code</a></li>
 <li class="level1"><a href="#p32_tgv_sec">3. TGV3D Details</a></li>
 <li class="level1"><a href="#p32_zero_sec">4. ZERO_FLOW Details</a></li>
-<li class="level1"><a href="#p32_particles_sec">5. Particle Consistency</a></li>
-<li class="level1"><a href="#p32_extension_sec">6. Adding A New Analytical Type</a><ul><li class="level2"><a href="#autotoc_md112">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md113">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p32_uniform_sec">5. UNIFORM_FLOW Details</a></li>
+<li class="level1"><a href="#p32_particles_sec">6. Particle Consistency</a></li>
+<li class="level1"><a href="#p32_extension_sec">7. Adding A New Analytical Type</a><ul><li class="level2"><a href="#autotoc_md112">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md113">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md114">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -121,6 +122,7 @@ $(function() {
 <ul>
 <li><code>TGV3D</code></li>
 <li><code>ZERO_FLOW</code></li>
+<li><code>UNIFORM_FLOW</code></li>
 </ul>
 <p>Implementation touchpoints:</p>
 <ul>
@@ -154,11 +156,25 @@ u_y \sim -\cos(kx)\sin(ky)\cos(kz)e^{-2\nu k^2 t}.
 <li>so <code>programmatic_settings</code> still matters,</li>
 <li>but the flow field itself is imposed analytically as zero everywhere.</li>
 </ul>
+<h1><a class="anchor" id="p32_uniform_sec"></a>
+5. UNIFORM_FLOW Details</h1>
+<p><code>UNIFORM_FLOW</code> sets a constant Eulerian velocity field everywhere in the domain while keeping pressure zero. It is intended for deterministic particle-advection verification, where cloud centre-of-mass motion should match the configured constant velocity exactly.</p>
+<p>Configuration:</p>
+<ul>
+<li><code>solver.yml -&gt; operation_mode.analytical_type: "UNIFORM_FLOW"</code></li>
+<li><code>solver.yml -&gt; operation_mode.uniform_flow.{u,v,w}</code></li>
+</ul>
+<p>Grid behavior:</p>
+<ul>
+<li><code>UNIFORM_FLOW</code> uses the standard programmatic-grid fallback path,</li>
+<li>so <code>programmatic_settings</code> still provides dimensions and bounds,</li>
+<li>but the analytical engine populates both Eulerian cell-center and boundary velocity data with the configured constant vector.</li>
+</ul>
 <h1><a class="anchor" id="p32_particles_sec"></a>
-5. Particle Consistency</h1>
+6. Particle Consistency</h1>
 <p>Particle-side analytical initialization hooks exist via <a class="el" href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d">SetAnalyticalSolutionForParticles</a> so particle fields can remain consistent with analytical Eulerian state when desired.</p>
 <h1><a class="anchor" id="p32_extension_sec"></a>
-6. Adding A New Analytical Type</h1>
+7. Adding A New Analytical Type</h1>
 <ol type="1">
 <li>add a new branch in function <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a> for the new type,</li>
 <li>define geometry policy in function <a class="el" href="AnalyticalSolutions_8h.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a> for that type,</li>
