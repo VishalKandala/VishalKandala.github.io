@@ -205,7 +205,7 @@ var searchData=
   ['configuration_20contract_20yaml_20generated_20artifacts_20runtime_202',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
   ['configuration_20extension_20playbook_203',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
   ['configuration_20ingestion_20boundaries_204',['6. Configuration Ingestion Boundaries',['../13_Code_Architecture.html#p13_ingestion_sec',1,'']]],
-  ['configuration_20patterns_20worth_20reusing_205',['5. Configuration Patterns Worth Reusing',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_config_patterns_sec',1,'']]],
+  ['configuration_20patterns_20worth_20reusing_205',['6. Configuration Patterns Worth Reusing',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_config_patterns_sec',1,'']]],
   ['configuration_20reference_3a_20case_20yaml_206',['Configuration Reference: Case YAML',['../07_Case_Reference.html',1,'']]],
   ['configuration_20reference_3a_20monitor_20yaml_207',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
   ['configuration_20reference_3a_20postprocessor_20yaml_208',['Configuration Reference: Postprocessor YAML',['../10_Post_Processing_Reference.html',1,'']]],

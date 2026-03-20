@@ -87,8 +87,9 @@ $(function() {
 <li class="level1"><a href="#p49_combos_sec">2. Common Mix-and-Match Patterns</a></li>
 <li class="level1"><a href="#p49_recipes_sec">3. Command Recipes</a></li>
 <li class="level1"><a href="#p49_examples_sec">4. Example Config Combinations</a></li>
-<li class="level1"><a href="#p49_config_patterns_sec">5. Configuration Patterns Worth Reusing</a></li>
-<li class="level1"><a href="#p49_choose_sec">6. Which Example To Start From</a></li>
+<li class="level1"><a href="#p49_drift_verification_sec">5. Drift Verification Workflow</a></li>
+<li class="level1"><a href="#p49_config_patterns_sec">6. Configuration Patterns Worth Reusing</a></li>
+<li class="level1"><a href="#p49_choose_sec">7. Which Example To Start From</a></li>
 <li class="level1"><a href="#p49_next_steps_sec">7. Related Pages</a><ul><li class="level2"><a href="#autotoc_md160">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md161">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md162">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
@@ -214,9 +215,50 @@ $(function() {
 <li>monitor: <code>examples/brownian_motion/Standard_Output.yml</code></li>
 <li>post: <code>examples/brownian_motion/brownian_analysis.yml</code></li>
 </ul>
+<p>Analytical uniform-flow deterministic drift verification:</p>
+<ul>
+<li>case: <code>examples/drift_uniform_flow/case.yml</code></li>
+<li>solver: <code>examples/drift_uniform_flow/solver.yml</code></li>
+<li>monitor: <code>examples/drift_uniform_flow/monitor.yml</code></li>
+<li>post: <code>examples/drift_uniform_flow/post.yml</code></li>
+</ul>
+<p>Analytical zero-flow plus verification-source diffusivity drift verification:</p>
+<ul>
+<li>case: <code>examples/drift_diffusivity_gradient/case.yml</code></li>
+<li>solver: <code>examples/drift_diffusivity_gradient/solver.yml</code></li>
+<li>monitor: <code>examples/drift_diffusivity_gradient/monitor.yml</code></li>
+<li>post: <code>examples/drift_diffusivity_gradient/post.yml</code></li>
+</ul>
 <p>These are examples, not fixed bundles. You can intentionally swap roles when the contract makes sense.</p>
+<h1><a class="anchor" id="p49_drift_verification_sec"></a>
+5. Drift Verification Workflow</h1>
+<p>Use the drift examples as separate, end-to-end checks for the two deterministic particle-position terms:</p>
+<ul>
+<li><code>examples/drift_uniform_flow/</code> isolates the carrier-velocity term in <code>X_new = X_old + (vel + diffusivitygradient) * dt + Brownian</code>.</li>
+<li><code>examples/drift_diffusivity_gradient/</code> isolates the diffusivity-gradient term while keeping the carrier flow at zero.</li>
+</ul>
+<p>The intended policy is:</p>
+<ul>
+<li>prefer ordinary production pathways first,</li>
+<li>use analytical solver modes when the solver already supports them,</li>
+<li>only use <code>verification.*</code> overrides when there is no cleaner end-to-end way to prescribe the field needed for verification.</li>
+</ul>
+<p>For the current diffusivity-drift case, the curated source override lives behind:</p>
+<div class="fragment"><div class="line">verification:</div>
+<div class="line">  sources:</div>
+<div class="line">    diffusivity:</div>
+<div class="line">      mode: &quot;analytical&quot;</div>
+<div class="line">      profile: &quot;LINEAR_X&quot;</div>
+<div class="line">      gamma0: 1.0e-3</div>
+<div class="line">      slope_x: 2.0e-4</div>
+</div><!-- fragment --><p>Contributor note:</p>
+<ul>
+<li>new verification source injections must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
+<li>production call sites should stay thin and delegate into that module</li>
+<li>do not introduce one-off verification flags directly into unrelated solver files unless there is no alternative and the delegation point remains explicit</li>
+</ul>
 <h1><a class="anchor" id="p49_config_patterns_sec"></a>
-5. Configuration Patterns Worth Reusing</h1>
+6. Configuration Patterns Worth Reusing</h1>
 <p>Minimal zero-flow startup:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
@@ -265,7 +307,7 @@ $(function() {
 <li>final step after this run is <code>1500</code></li>
 </ul>
 <h1><a class="anchor" id="p49_choose_sec"></a>
-6. Which Example To Start From</h1>
+7. Which Example To Start From</h1>
 <p>Choose <code>flat_channel</code> when:</p>
 <ul>
 <li>you want the simplest first runnable case,</li>

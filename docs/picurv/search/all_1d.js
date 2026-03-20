@@ -116,7 +116,7 @@ var searchData=
   ['retrievecurrentcell_113',['retrievecurrentcell',['../walkingsearch_8h.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c'],['../walkingsearch_8c.html#acb77aa5204ab90392c67f10a55227bb6',1,'RetrieveCurrentCell(UserCtx *user, PetscInt idx, PetscInt idy, PetscInt idz, Cell *cell):&#160;walkingsearch.c']]],
   ['reusable_20config_20libraries_114',['4. Reusable Config Libraries',['../06_Simulation_Anatomy.html#p06_libraries_sec',1,'']]],
   ['reuse_115',['7. Batch Job Generation And Reuse',['../52_Run_Lifecycle_Guide.html#p52_cluster_sec',1,'']]],
-  ['reusing_116',['5. Configuration Patterns Worth Reusing',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_config_patterns_sec',1,'']]],
+  ['reusing_116',['6. Configuration Patterns Worth Reusing',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_config_patterns_sec',1,'']]],
   ['reynolds_20number_117',['1.1 Change Reynolds Number',['../11_User_How_To_Guides.html#p11_reynolds_ssec',1,'']]],
   ['rheology_118',['rheology',['../variables_8h.html#aa872769b7375d16b560211774f36eab3',1,'SimCtx::rheology'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faa9331c56dedc775b064f31ce6981f56c1',1,'RHEOLOGY:&#160;variables.h']]],
   ['rho_5fref_119',['rho_ref',['../variables_8h.html#ae416661ab9a82b299cd562940881d07d',1,'ScalingCtx']]],

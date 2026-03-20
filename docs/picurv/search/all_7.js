@@ -13,7 +13,7 @@ var searchData=
   ['7_20generated_20reference_20views_10',['7. Generated Reference Views',['../Documentation_Map.html#p47_ref_axis_sec',1,'']]],
   ['7_20manual_20metrics_20re_20aggregation_11',['7. Manual Metrics Re-Aggregation',['../37_Sweep_Studies_Guide.html#p37_reaggregate_sec',1,'']]],
   ['7_20mixing_20with_20other_20profiles_12',['7. Mixing With Other Profiles',['../07_Case_Reference.html#p07_modular_sec',1,'']]],
-  ['7_20next_20steps_13',['7 next steps',['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'7. Next Steps'],['../11_User_How_To_Guides.html#p11_next_steps_sec',1,'7. Next Steps']]],
+  ['7_20next_20steps_13',['7 next steps',['../11_User_How_To_Guides.html#p11_next_steps_sec',1,'7. Next Steps'],['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'7. Next Steps']]],
   ['7_20practical_20checks_14',['7. Practical Checks',['../33_Initial_Conditions.html#p33_checks_sec',1,'']]],
   ['7_20related_20pages_15',['7. Related Pages',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_next_steps_sec',1,'']]],
   ['7_20runtime_20observability_20backlog_16',['7. Runtime Observability Backlog',['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'']]],
@@ -23,5 +23,6 @@ var searchData=
   ['7_20validate_3a_20config_20only_20checks_20',['7. validate: Config-Only Checks',['../05_The_Conductor_Script.html#p05_validate_sec',1,'']]],
   ['7_20verification_21',['7. verification',['../08_Solver_Reference.html#p08_verification_sec',1,'']]],
   ['7_20when_20to_20use_20which_20grid_20path_22',['7. When To Use Which Grid Path',['../48_Grid_Generator_Guide.html#p48_choose_sec',1,'']]],
-  ['7_20where_20to_20extend_23',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]]
+  ['7_20where_20to_20extend_23',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]],
+  ['7_20which_20example_20to_20start_20from_24',['7. Which Example To Start From',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_choose_sec',1,'']]]
 ];
