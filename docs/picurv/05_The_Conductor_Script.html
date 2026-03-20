@@ -98,8 +98,9 @@ $(function() {
 <li class="level1"><a href="#p05_dry_run_schema_sec">9. Dry-Run JSON Plan Schema</a></li>
 <li class="level1"><a href="#p05_structured_errors_sec">10. Structured Error Output Contract</a></li>
 <li class="level1"><a href="#p05_modular_sec">11. Modular Profile Strategy</a></li>
-<li class="level1"><a href="#p05_artifacts_sec">12. Generated Runtime Artifacts</a></li>
-<li class="level1"><a href="#p05_next_steps_sec">13. Next Steps</a><ul><li class="level2"><a href="#autotoc_md20">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md21">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p05_binaries_sec">12. Binary Resolution and Rebuild Safety</a></li>
+<li class="level1"><a href="#p05_artifacts_sec">13. Generated Runtime Artifacts</a></li>
+<li class="level1"><a href="#p05_next_steps_sec">14. Next Steps</a><ul><li class="level2"><a href="#autotoc_md20">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md21">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md22">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -110,8 +111,8 @@ $(function() {
 <div class="textblock"><p><a class="anchor" id="_The_Conductor_Script"></a> <code>picurv</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages. It is also the primary user-facing contract layer: many defaults, aliases, and translation rules are enforced here before the C solver starts.</p>
 <h1><a class="anchor" id="p05_usage_sec"></a>
 1. General Usage</h1>
-<div class="fragment"><div class="line">./bin/picurv [COMMAND] [ARGS...]</div>
-</div><!-- fragment --><p>If <code>bin/picurv</code> does not exist yet, use <code>./scripts/picurv build</code> once to install it.</p>
+<div class="fragment"><div class="line">picurv [COMMAND] [ARGS...]</div>
+</div><!-- fragment --><p>After <code>make all</code>, <code>bin/picurv</code> is a symlink to <code>scripts/picurv</code> (the single source of truth). Source <code>etc/picurv.sh</code> to add <code>bin/</code> to your PATH so <code>picurv</code> works from any directory. If <code>bin/picurv</code> does not exist yet, run <code>./scripts/picurv build</code> or <code>make conductor</code>.</p>
 <p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
@@ -148,7 +149,7 @@ $(function() {
 <div class="line">./bin/picurv validate --help</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_init_sec"></a>
 2. init: Create A New Case Directory</h1>
-<div class="fragment"><div class="line">./bin/picurv init &lt;template_name&gt; [--dest &lt;new_dir&gt;]</div>
+<div class="fragment"><div class="line">picurv init &lt;template_name&gt; [--dest &lt;new_dir&gt;] [--pin-binaries]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>copies <code>examples/&lt;template_name&gt;/</code> into a new working directory,</li>
@@ -156,14 +157,20 @@ $(function() {
 <li>writes <code>.picurv-origin.json</code> with the source repo path and template name,</li>
 <li>writes <code>.picurv-execution.yml</code> for optional site-specific launcher overrides,</li>
 <li>seeds that file from a repo-root <code>.picurv-execution.yml</code> when the source clone already has one, otherwise from inert defaults,</li>
-<li>does <b>not</b> copy binaries; runtime executables are resolved from the project <code>bin/</code> directory via PATH.</li>
+<li>does <b>not</b> copy binaries by default; runtime executables are resolved from the project <code>bin/</code> directory via PATH.</li>
 </ul>
-<p>To pin specific binary versions into a case directory, run <code>picurv sync-binaries</code> after init.</p>
+<p>Binary pinning (<code>--pin-binaries</code>):</p>
+<ul>
+<li>when <code>--pin-binaries</code> is passed, <code>simulator</code> and <code>postprocessor</code> are copied into the case directory,</li>
+<li>case-local copies take precedence over <code>bin/</code> originals at runtime (<code>resolve_runtime_executable</code> checks the invocation directory first),</li>
+<li>use this when submitting Slurm jobs and you may rebuild the repo before the job runs,</li>
+<li><code>picurv</code> itself is never copied — it is always used from PATH and is safe to update mid-run since it only launches the C binaries.</li>
+</ul>
+<p>Equivalent manual step (after init): <code>picurv sync-binaries --case-dir &lt;case&gt;</code>.</p>
 <p>Examples:</p>
-<div class="fragment"><div class="line">./bin/picurv init flat_channel --dest my_first_case</div>
-<div class="line">./bin/picurv init bent_channel --dest my_bent_case</div>
-</div><!-- fragment --><p>Use <code>init</code> when you want a runnable starting point. Ensure <code>picurv</code> is on your PATH (source <code>etc/picurv.sh</code>) to run from any directory.</p>
-<h1><a class="anchor" id="p05_build_sec"></a>
+<div class="fragment"><div class="line">picurv init flat_channel --dest my_first_case</div>
+<div class="line">picurv init bent_channel --dest my_bent_case --pin-binaries</div>
+</div><!-- fragment --><h1><a class="anchor" id="p05_build_sec"></a>
 3. build: Build Project Executables</h1>
 <div class="fragment"><div class="line">./scripts/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
 </div><!-- fragment --><p>Behavior:</p>
@@ -506,6 +513,7 @@ $(function() {
 <li>optional:<ul>
 <li><code>--dest &lt;dir&gt;</code></li>
 <li><code>--source-root &lt;repo&gt;</code></li>
+<li><code>--pin-binaries</code> (copy <code>simulator</code>/<code>postprocessor</code> into the case for version-pinning)</li>
 </ul>
 </li>
 </ul>
@@ -636,8 +644,32 @@ $(function() {
 <li><code>config/schedulers/</code></li>
 <li><code>examples/master_template/</code></li>
 </ul>
-<h1><a class="anchor" id="p05_artifacts_sec"></a>
-12. Generated Runtime Artifacts</h1>
+<h1><a class="anchor" id="p05_binaries_sec"></a>
+12. Binary Resolution and Rebuild Safety</h1>
+<p><code>picurv</code> resolves <code>simulator</code> and <code>postprocessor</code> at launch time using this precedence:</p>
+<ol type="1">
+<li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code> or <code>sync-binaries</code>), it is used first.</li>
+<li><b>Project <code>bin/</code> directory</b> — the default location after <code>make all</code>.</li>
+</ol>
+<p><code>bin/picurv</code> is a symlink to <code>scripts/picurv</code>. This means:</p>
+<ul>
+<li>there is exactly one source file (<code>scripts/picurv</code>), so code changes never drift,</li>
+<li><code>make conductor</code> recreates the symlink (idempotent),</li>
+<li><code>etc/picurv.sh</code> adds <code>bin/</code> to PATH so <code>picurv</code> works from any directory.</li>
+</ul>
+<p><b>Rebuilding while jobs are running:</b></p>
+<ul>
+<li>Updating <code>picurv</code> (the Python script) mid-run is always safe — it is only used to launch jobs, not during solver execution.</li>
+<li>Rebuilding <code>simulator</code>/<code>postprocessor</code> (<code>make all</code>) overwrites the binaries in <code>bin/</code>. If a Slurm job references <code>bin/simulator</code> by absolute path and has not yet started, the running binary may be replaced before execution begins.</li>
+<li>To protect against this, use <code>--pin-binaries</code> at init time or <code>sync-binaries</code> before submission. Case-local copies are isolated from repo rebuilds.</li>
+</ul>
+<p><b>Recommended workflow for concurrent development and production:</b></p>
+<div class="fragment"><div class="line">picurv init flat_channel --dest production_case --pin-binaries</div>
+<div class="line">picurv run --solve --cluster cluster.yml ...   # uses case-local binaries</div>
+<div class="line"># safe to rebuild in the repo now — production_case has its own copies</div>
+<div class="line">make all</div>
+</div><!-- fragment --><h1><a class="anchor" id="p05_artifacts_sec"></a>
+13. Generated Runtime Artifacts</h1>
 <p>Single run (<code>run</code>):</p><ul>
 <li><code>runs/&lt;run_id&gt;/config/*.control</code>, <code>bcs*.run</code>, <code>post.run</code>, plus optional <code>whitelist.run</code> / <code>profile.run</code> sidecars when enabled</li>
 <li><code>runs/&lt;run_id&gt;/logs/*</code> (runtime logs and metrics written by solver/postprocessor)</li>
@@ -658,7 +690,7 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
 <h1><a class="anchor" id="p05_next_steps_sec"></a>
-13. Next Steps</h1>
+14. Next Steps</h1>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>

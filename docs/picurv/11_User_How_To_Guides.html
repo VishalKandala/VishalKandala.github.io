@@ -103,8 +103,13 @@ $(function() {
 <li class="level2"><a href="#p11_stats_ssec">4.3 Enable Statistics Output (MSD)</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#p11_sweep_sec">5. Sweep Studies</a></li>
-<li class="level1"><a href="#p11_next_steps_sec">6. Next Steps</a><ul><li class="level2"><a href="#autotoc_md38">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md39">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p11_init_sec">5. Case Initialization and Binary Management</a><ul><li class="level2"><a href="#p11_init_basic_ssec">5.1 Initialize a New Case</a></li>
+<li class="level2"><a href="#p11_init_pin_ssec">5.2 Pin Binaries for Reproducibility</a></li>
+<li class="level2"><a href="#p11_rebuild_ssec">5.3 Rebuild Safety</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p11_sweep_sec">6. Sweep Studies</a></li>
+<li class="level1"><a href="#p11_next_steps_sec">7. Next Steps</a><ul><li class="level2"><a href="#autotoc_md38">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md39">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md40">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -377,8 +382,27 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>check <code>Stats_msd.csv</code> in the run directory root, unless <code>statistics_pipeline.output_prefix</code> includes an explicit path.</li>
 </ul>
+<h1><a class="anchor" id="p11_init_sec"></a>
+5. Case Initialization and Binary Management</h1>
+<h2><a class="anchor" id="p11_init_basic_ssec"></a>
+5.1 Initialize a New Case</h2>
+<div class="fragment"><div class="line">picurv init flat_channel --dest my_case</div>
+</div><!-- fragment --><p>This copies template files and writes metadata. Runtime binaries (<code>simulator</code>, <code>postprocessor</code>) are resolved from the project <code>bin/</code> directory via PATH — no copies are placed in the case.</p>
+<h2><a class="anchor" id="p11_init_pin_ssec"></a>
+5.2 Pin Binaries for Reproducibility</h2>
+<div class="fragment"><div class="line">picurv init flat_channel --dest my_case --pin-binaries</div>
+</div><!-- fragment --><p>Use <code>--pin-binaries</code> when you plan to submit Slurm jobs and may rebuild the repo before the job executes. Case-local copies take precedence over <code>bin/</code> originals at runtime.</p>
+<p>Equivalent manual step after init:</p>
+<div class="fragment"><div class="line">picurv sync-binaries --case-dir my_case</div>
+</div><!-- fragment --><h2><a class="anchor" id="p11_rebuild_ssec"></a>
+5.3 Rebuild Safety</h2>
+<ul>
+<li><code>picurv</code> (the Python conductor) can be updated at any time — it only launches jobs, it does not run during solver execution.</li>
+<li><code>simulator</code> and <code>postprocessor</code> in <code>bin/</code> are overwritten by <code>make all</code>. If a queued Slurm job references them by absolute path, the running binary may change.</li>
+<li>Use <code>--pin-binaries</code> or <code>sync-binaries</code> before submission to protect running jobs.</li>
+</ul>
 <h1><a class="anchor" id="p11_sweep_sec"></a>
-5. Sweep Studies</h1>
+6. Sweep Studies</h1>
 <div class="fragment"><div class="line">./bin/picurv sweep \</div>
 <div class="line">  --study my_study/study.yml \</div>
 <div class="line">  --cluster my_study/cluster.yml</div>
@@ -395,7 +419,7 @@ Re = \frac{\rho U L}{\mu}
 <div class="fragment"><div class="line">./bin/picurv sweep --reaggregate --study-dir studies/&lt;study_id&gt;</div>
 </div><!-- fragment --><p>See <b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b> for full contract details.</p>
 <h1><a class="anchor" id="p11_next_steps_sec"></a>
-6. Next Steps</h1>
+7. Next Steps</h1>
 <ul>
 <li>Full capability map: <b><a class="el" href="12_Capabilities_Summary.html">Capabilities Summary</a></b></li>
 <li>Config references: <b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b>, <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b>, <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b>, <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
