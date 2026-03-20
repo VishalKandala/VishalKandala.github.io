@@ -89,7 +89,8 @@ $(function() {
 <li class="level1"><a href="#p08_msolver_sec">4. momentum_solver (Solver-Specific Block)</a></li>
 <li class="level1"><a href="#p08_pressure_sec">5. pressure_solver</a></li>
 <li class="level1"><a href="#p08_interp_sec">6. interpolation</a></li>
-<li class="level1"><a href="#p08_petsc_sec">7. petsc_passthrough_options</a></li>
+<li class="level1"><a href="#p08_verification_sec">7. verification</a></li>
+<li class="level1"><a href="#p08_petsc_sec">8. petsc_passthrough_options</a></li>
 <li class="level1"><a href="#p08_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md29">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md30">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md31">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
@@ -128,6 +129,18 @@ operation_mode:
     u: 0.0                        # -&gt; -analytical_uniform_u
     v: 0.0                        # -&gt; -analytical_uniform_v
     w: 0.0                        # -&gt; -analytical_uniform_w
+
+# Verification-only source overrides.
+# Use these only when ordinary end-to-end setup cannot expose the behavior you need to test.
+# New verification-pathway source injections must be implemented in
+# include/verification_sources.h and src/verification_sources.c.
+verification:
+  sources:
+    diffusivity:
+      mode: "analytical"          # Verification-only selector; currently fixed to analytical
+      profile: "LINEAR_X"         # Supported today: LINEAR_X
+      gamma0: 1.0e-3              # -&gt; -verification_diffusivity_gamma0
+      slope_x: 2.0e-4             # -&gt; -verification_diffusivity_slope_x
 
 # ==============================================================================
 # 2. PRIMARY SOLVER STRATEGY &amp; TOLERANCES
@@ -244,6 +257,7 @@ petsc_passthrough_options:
 <li><code>analytical_type</code> -&gt; <code>-analytical_type</code></li>
 <li><code>uniform_flow.u/v/w</code> -&gt; <code>-analytical_uniform_u/-analytical_uniform_v/-analytical_uniform_w</code> when <code>analytical_type: "UNIFORM_FLOW"</code></li>
 </ul>
+<p><code>uniform_flow</code> is only valid when <code>analytical_type: "UNIFORM_FLOW"</code>.</p>
 <h1><a class="anchor" id="p08_strategy_sec"></a>
 2. strategy</h1>
 <div class="fragment"><div class="line">strategy:</div>
@@ -312,8 +326,28 @@ petsc_passthrough_options:
 </ul>
 <p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers, providing second-order accuracy on both uniform and curvilinear grids. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners), which is second-order only on uniform Cartesian grids.</p>
 <p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
+<h1><a class="anchor" id="p08_verification_sec"></a>
+7. verification</h1>
+<div class="fragment"><div class="line">verification:</div>
+<div class="line">  sources:</div>
+<div class="line">    diffusivity:</div>
+<div class="line">      mode: &quot;analytical&quot;</div>
+<div class="line">      profile: &quot;LINEAR_X&quot;</div>
+<div class="line">      gamma0: 1.0e-3</div>
+<div class="line">      slope_x: 2.0e-4</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>verification.sources.diffusivity.mode</code> -&gt; <code>-verification_diffusivity_mode</code></li>
+<li><code>verification.sources.diffusivity.profile</code> -&gt; <code>-verification_diffusivity_profile</code></li>
+<li><code>verification.sources.diffusivity.gamma0</code> -&gt; <code>-verification_diffusivity_gamma0</code></li>
+<li><code>verification.sources.diffusivity.slope_x</code> -&gt; <code>-verification_diffusivity_slope_x</code></li>
+</ul>
+<p>Rules:</p><ul>
+<li>this path is verification-only and should be used only when no ordinary end-to-end workflow can expose the behavior under test</li>
+<li>it is only valid with <code>operation_mode.eulerian_field_source: "analytical"</code></li>
+<li>new verification source overrides must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
+</ul>
 <h1><a class="anchor" id="p08_petsc_sec"></a>
-7. petsc_passthrough_options</h1>
+8. petsc_passthrough_options</h1>
 <p>Advanced escape hatch for raw PETSc flags:</p>
 <div class="fragment"><div class="line">petsc_passthrough_options:</div>
 <div class="line">  -ps_ksp_type: &quot;gmres&quot;</div>

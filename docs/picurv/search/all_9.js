@@ -5,6 +5,6 @@ var searchData=
   ['9_20common_20installation_20failures_2',['9. Common Installation Failures',['../01_Installation.html#p01_common_sec',1,'']]],
   ['9_20dry_20run_20json_20plan_20schema_3',['9. Dry-Run JSON Plan Schema',['../05_The_Conductor_Script.html#p05_dry_run_schema_sec',1,'']]],
   ['9_20escape_20hatches_20and_20defaults_4',['9. Escape Hatches and Defaults',['../14_Config_Contract.html#p14_passthrough_sec',1,'']]],
-  ['9_20profiling_20selector_5',['9. Profiling Selector',['../50_Modular_Selector_Extension_Guide.html#p50_profiling_sec',1,'']]],
+  ['9_20grid_20selector_20generator_20selector_5',['9. Grid Selector / Generator Selector',['../50_Modular_Selector_Extension_Guide.html#p50_grid_sec',1,'']]],
   ['9_20related_20pages_6',['9 related pages',['../44_Boundary_Conditions_Guide.html#p44_refs_sec',1,'9. Related Pages'],['../45_Particle_Initialization_and_Restart.html#p45_refs_sec',1,'9. Related Pages'],['../46_C_Runtime_Execution_Map.html#p46_refs_sec',1,'9. Related Pages'],['../51_C_Test_Suite_Developer_Guide.html#p51_refs_sec',1,'9. Related Pages'],['../52_Run_Lifecycle_Guide.html#p52_refs_sec',1,'9. Related Pages']]]
 ];

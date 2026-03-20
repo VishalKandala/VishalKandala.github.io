@@ -90,9 +90,10 @@ $(function() {
 <li class="level1"><a href="#p50_interp_sec">5. Interpolation Method</a></li>
 <li class="level1"><a href="#p50_field_init_sec">6. Field Initialization Mode</a></li>
 <li class="level1"><a href="#p50_analytical_sec">7. Analytical Type</a></li>
-<li class="level1"><a href="#p50_grid_sec">8. Grid Selector / Generator Selector</a></li>
-<li class="level1"><a href="#p50_profiling_sec">9. Profiling Selector</a></li>
-<li class="level1"><a href="#p50_post_sec">10. Postprocessing / Statistics Tasks</a></li>
+<li class="level1"><a href="#p50_verification_sources_sec">8. Verification Source Overrides</a></li>
+<li class="level1"><a href="#p50_grid_sec">9. Grid Selector / Generator Selector</a></li>
+<li class="level1"><a href="#p50_profiling_sec">10. Profiling Selector</a></li>
+<li class="level1"><a href="#p50_post_sec">11. Postprocessing / Statistics Tasks</a></li>
 <li class="level1"><a href="#p50_related_sec">11. Related Pages</a><ul><li class="level2"><a href="#autotoc_md163">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md164">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md165">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
@@ -320,6 +321,7 @@ $(function() {
 <li>Canonical values:<ul>
 <li><code>TGV3D</code></li>
 <li><code>ZERO_FLOW</code></li>
+<li><code>UNIFORM_FLOW</code></li>
 </ul>
 </li>
 <li>Python hook:<ul>
@@ -346,8 +348,52 @@ $(function() {
 </ul>
 </li>
 </ul>
+<h1><a class="anchor" id="p50_verification_sources_sec"></a>
+8. Verification Source Overrides</h1>
+<ul>
+<li>Schema home: <code>solver.yml -&gt; verification.sources.*</code></li>
+<li>Design intent:<ul>
+<li>reserved for verification-only source injections when no ordinary end-to-end path is sufficient</li>
+<li>keep runtime call sites thin and centralize override implementations in <code>verification_sources.*</code></li>
+</ul>
+</li>
+<li>Current support:<ul>
+<li><code>verification.sources.diffusivity</code></li>
+<li>profile <code>LINEAR_X</code></li>
+</ul>
+</li>
+<li>Python hooks:<ul>
+<li>validation and flag emission in <code>scripts/picurv</code></li>
+</ul>
+</li>
+<li>Generated mapping:<ul>
+<li><code>verification.sources.diffusivity.mode</code> -&gt; <code>-verification_diffusivity_mode</code></li>
+<li><code>verification.sources.diffusivity.profile</code> -&gt; <code>-verification_diffusivity_profile</code></li>
+<li><code>verification.sources.diffusivity.gamma0</code> -&gt; <code>-verification_diffusivity_gamma0</code></li>
+<li><code>verification.sources.diffusivity.slope_x</code> -&gt; <code>-verification_diffusivity_slope_x</code></li>
+</ul>
+</li>
+<li>C storage/parser:<ul>
+<li><code>verificationDiffusivity</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
+<li>option parsing in <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
+</ul>
+</li>
+<li>Runtime:<ul>
+<li><code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
+<li>thin delegation from <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code></li>
+</ul>
+</li>
+<li>Tests/docs to update:<ul>
+<li><code>tests/test_config_regressions.py</code></li>
+<li><code><a class="el" href="test__poisson__rhs_8c.html" title="C unit tests for Poisson, RHS, body-force, and diffusivity helpers.">tests/c/test_poisson_rhs.c</a></code></li>
+<li><code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code></li>
+<li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
+<li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
+</ul>
+</li>
+</ul>
 <h1><a class="anchor" id="p50_grid_sec"></a>
-8. Grid Selector / Generator Selector</h1>
+9. Grid Selector / Generator Selector</h1>
 <ul>
 <li>Schema homes:<ul>
 <li><code>case.yml -&gt; grid.mode</code></li>
@@ -387,7 +433,7 @@ $(function() {
 </li>
 </ul>
 <h1><a class="anchor" id="p50_profiling_sec"></a>
-9. Profiling Selector</h1>
+10. Profiling Selector</h1>
 <ul>
 <li>Schema home: <code>monitor.yml -&gt; profiling.timestep_output.mode</code></li>
 <li>Canonical values:<ul>
@@ -424,7 +470,7 @@ $(function() {
 </li>
 </ul>
 <h1><a class="anchor" id="p50_post_sec"></a>
-10. Postprocessing / Statistics Tasks</h1>
+11. Postprocessing / Statistics Tasks</h1>
 <ul>
 <li>Schema home: <code>post.yml -&gt; statistics_pipeline</code></li>
 <li>Canonical values:<ul>
