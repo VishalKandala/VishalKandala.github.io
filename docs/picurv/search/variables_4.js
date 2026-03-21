@@ -22,7 +22,7 @@ var searchData=
   ['dgf_5fy_19',['dgf_y',['../variables_8h.html#af2143bc1a9f6bb90236d624f4a45b4e2',1,'SimCtx']]],
   ['dgf_5fz_20',['dgf_z',['../variables_8h.html#a12ea69c9013845d392b1a2c3036d8042',1,'SimCtx']]],
   ['diffusivity_21',['diffusivity',['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity']]],
-  ['diffusivitygradient_22',['diffusivitygradient',['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient'],['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient']]],
+  ['diffusivitygradient_22',['diffusivitygradient',['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient'],['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient']]],
   ['direction_23',['direction',['../BC__Handlers_8c.html#a5ad0b8e5020d9ace5fb5b8f6992bbabb',1,'DrivenConstantData']]],
   ['distance_24',['Distance',['../variables_8h.html#a3f6bbba18dc8ab4b0822d88e7eb8b0ff',1,'UserCtx']]],
   ['dm_5fswarm_25',['dm_swarm',['../variables_8h.html#ab32e253228241b5de900c4ac9c9e7452',1,'SimCtx']]],

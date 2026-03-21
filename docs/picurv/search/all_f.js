@@ -69,7 +69,7 @@ var searchData=
   ['diagnostics_20and_20sanity_20checks_66',['7. Diagnostics and Sanity Checks',['../45_Particle_Initialization_and_Restart.html#p45_diagnostics_sec',1,'']]],
   ['diagnostics_20to_20watch_67',['4. Diagnostics To Watch',['../23_Fractional_Step_Method.html#p23_runtime_sec',1,'']]],
   ['diffusivity_68',['diffusivity',['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity']]],
-  ['diffusivitygradient_69',['diffusivitygradient',['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient'],['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient']]],
+  ['diffusivitygradient_69',['diffusivitygradient',['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient'],['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient']]],
   ['dimensionalization_20before_20c_20input_70',['3. Non-Dimensionalization Before C Input',['../44_Boundary_Conditions_Guide.html#p44_nondim_sec',1,'']]],
   ['dimensionalization_20model_71',['Non-Dimensionalization Model',['../19_Nondimensionalization.html',1,'']]],
   ['dimensionalizeallloadedfields_72',['dimensionalizeallloadedfields',['../postprocessing__kernels_8c.html#ac5e15eee2694bd1b1dfc8a62d4393b48',1,'DimensionalizeAllLoadedFields(UserCtx *user):&#160;postprocessing_kernels.c'],['../postprocessing__kernels_8h.html#ac5e15eee2694bd1b1dfc8a62d4393b48',1,'DimensionalizeAllLoadedFields(UserCtx *user):&#160;postprocessing_kernels.c']]],

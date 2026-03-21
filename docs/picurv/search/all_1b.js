@@ -239,7 +239,7 @@ var searchData=
   ['pseudo_5fcfl_5freduction_5ffactor_236',['pseudo_cfl_reduction_factor',['../variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53',1,'SimCtx']]],
   ['pseudo_5fdt_5fscaling_20in_20half_20and_20retries_20the_20iteration_237',['scaling factor (pseudo_dt_scaling) in half, and retries the iteration.',['../momentumsolvers_8h.html#autotoc_md2',1,'']]],
   ['pseudo_5fperiodic_238',['pseudo_periodic',['../variables_8h.html#a0e447e75b801c0a9305fcadd317159a4',1,'SimCtx']]],
-  ['psi_239',['psi',['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi'],['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi']]],
+  ['psi_239',['psi',['../variables_8h.html#aca5183ff602e43d5a3f1d801d7603d63',1,'Particle::psi'],['../variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b',1,'UserCtx::Psi']]],
   ['psi_5fnodal_240',['Psi_nodal',['../variables_8h.html#ac0025b1b394319e0af260c6d472bd9d8',1,'UserCtx']]],
   ['psrc_5fx_241',['psrc_x',['../variables_8h.html#a47f64ce1f07d6c1e4c320209e9e56322',1,'SimCtx']]],
   ['psrc_5fy_242',['psrc_y',['../variables_8h.html#ab3f5c3aa1890178635080b37bb6b26ad',1,'SimCtx']]],
