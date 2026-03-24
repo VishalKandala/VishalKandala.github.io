@@ -85,7 +85,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">particle_statistics.c File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -95,6 +96,8 @@ $(function() {
 <div class="textblock"><code>#include &quot;<a class="el" href="particle__statistics_8h_source.html">particle_statistics.h</a>&quot;</code><br />
 <code>#include &lt;math.h&gt;</code><br />
 <code>#include &lt;mpi.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for particle_statistics.c:</div>
 <div class="dyncontent">
@@ -110,15 +113,26 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:abfe2ce5619119391ef2dc117963d32d7" id="r_abfe2ce5619119391ef2dc117963d32d7"><td class="memItemLeft" align="right" valign="top">static PetscBool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="particle__statistics_8c.html#abfe2ce5619119391ef2dc117963d32d7">MSDCSVLineMatchesStep</a> (const char *line, PetscInt ti)</td></tr>
+<tr class="memdesc:abfe2ce5619119391ef2dc117963d32d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return whether a CSV row belongs to the requested timestep.  <br /></td></tr>
+<tr class="separator:abfe2ce5619119391ef2dc117963d32d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e36221617211f1cd7e7925615bd6d1a" id="r_a2e36221617211f1cd7e7925615bd6d1a"><td class="memItemLeft" align="right" valign="top">static PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="particle__statistics_8c.html#a2e36221617211f1cd7e7925615bd6d1a">RewriteParticleMSDCSV</a> (const char *csv_path, PetscInt ti, const char *row_line)</td></tr>
+<tr class="memdesc:a2e36221617211f1cd7e7925615bd6d1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite the MSD CSV so the requested timestep appears exactly once.  <br /></td></tr>
+<tr class="separator:a2e36221617211f1cd7e7925615bd6d1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfb130aeba6e6d430c0ca599b34e38d4" id="r_acfb130aeba6e6d430c0ca599b34e38d4"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user, const char *stats_prefix, PetscInt ti)</td></tr>
 <tr class="memdesc:acfb130aeba6e6d430c0ca599b34e38d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal helper implementation: <code><a class="el" href="particle__statistics_8c.html#acfb130aeba6e6d430c0ca599b34e38d4" title="Internal helper implementation: ComputeParticleMSD().">ComputeParticleMSD()</a></code>.  <br /></td></tr>
 <tr class="separator:acfb130aeba6e6d430c0ca599b34e38d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a01c3c52b9680a426476ef83cc76b44e3" id="r_a01c3c52b9680a426476ef83cc76b44e3"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="particle__statistics_8c.html#a01c3c52b9680a426476ef83cc76b44e3">PARTICLE_MSD_CSV_HEADER</a></td></tr>
+<tr class="separator:a01c3c52b9680a426476ef83cc76b44e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Global statistical reduction kernels for the Statistics Pipeline. </p>
 <p>Each kernel in this file:</p><ul>
 <li>Performs an MPI_Allreduce over all particles across all ranks.</li>
-<li>Appends one CSV row per call to its own output file.</li>
+<li>Maintains one logical CSV row per processed step in its output file.</li>
 <li>Logs a one-line summary via LOG_INFO on rank 0.</li>
 <li>Produces O(1) output regardless of particle count, making these kernels the primary quantitative diagnostic path for large (100M+) particle runs.</li>
 </ul>
@@ -142,11 +156,210 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00023">23</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00124">124</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="abfe2ce5619119391ef2dc117963d32d7" name="abfe2ce5619119391ef2dc117963d32d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfe2ce5619119391ef2dc117963d32d7">&#9670;&#160;</a></span>MSDCSVLineMatchesStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static PetscBool MSDCSVLineMatchesStep </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>line</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PetscInt&#160;</td>
+          <td class="paramname"><em>ti</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return whether a CSV row belongs to the requested timestep. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">line</td><td>CSV row text to inspect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ti</td><td>Requested timestep id. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>PETSC_TRUE when the row begins with the requested step id. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00036">36</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   37</span>{</div>
+<div class="line"><span class="lineno">   38</span>    <span class="keywordtype">char</span> *endptr = NULL;</div>
+<div class="line"><span class="lineno">   39</span>    <span class="keywordtype">long</span> parsed_step;</div>
+<div class="line"><span class="lineno">   40</span> </div>
+<div class="line"><span class="lineno">   41</span>    <span class="keywordflow">if</span> (!line) <span class="keywordflow">return</span> PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   42</span>    parsed_step = strtol(line, &amp;endptr, 10);</div>
+<div class="line"><span class="lineno">   43</span>    <span class="keywordflow">if</span> (endptr == line) <span class="keywordflow">return</span> PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">while</span> (*endptr == <span class="charliteral">&#39; &#39;</span> || *endptr == <span class="charliteral">&#39;\t&#39;</span>) endptr++;</div>
+<div class="line"><span class="lineno">   45</span>    <span class="keywordflow">if</span> (*endptr != <span class="charliteral">&#39;,&#39;</span>) <span class="keywordflow">return</span> PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">return</span> (PetscBool)(parsed_step == (long)ti ? PETSC_TRUE : PETSC_FALSE);</div>
+<div class="line"><span class="lineno">   47</span>}</div>
+</div><!-- fragment --><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_abfe2ce5619119391ef2dc117963d32d7_icgraph.svg" width="100%" height="461"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+
+</div>
+</div>
+<a id="a2e36221617211f1cd7e7925615bd6d1a" name="a2e36221617211f1cd7e7925615bd6d1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e36221617211f1cd7e7925615bd6d1a">&#9670;&#160;</a></span>RewriteParticleMSDCSV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static PetscErrorCode RewriteParticleMSDCSV </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>csv_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PetscInt&#160;</td>
+          <td class="paramname"><em>ti</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>row_line</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Rewrite the MSD CSV so the requested timestep appears exactly once. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">csv_path</td><td>Target CSV path. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ti</td><td>Timestep being written. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_line</td><td>Fully formatted CSV row for the timestep. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Petsc error code. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00056">56</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   57</span>{</div>
+<div class="line"><span class="lineno">   58</span>    <span class="keywordtype">char</span> tmp_path[PETSC_MAX_PATH_LEN];</div>
+<div class="line"><span class="lineno">   59</span>    FILE *src = NULL;</div>
+<div class="line"><span class="lineno">   60</span>    FILE *dst = NULL;</div>
+<div class="line"><span class="lineno">   61</span>    <span class="keywordtype">char</span> line[4096];</div>
+<div class="line"><span class="lineno">   62</span>    PetscBool wrote_header = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   63</span>    PetscBool inserted_row = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">   64</span> </div>
+<div class="line"><span class="lineno">   65</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">   66</span>    PetscCall(PetscSNPrintf(tmp_path, <span class="keyword">sizeof</span>(tmp_path), <span class="stringliteral">&quot;%s.tmp&quot;</span>, csv_path));</div>
+<div class="line"><span class="lineno">   67</span> </div>
+<div class="line"><span class="lineno">   68</span>    dst = fopen(tmp_path, <span class="stringliteral">&quot;w&quot;</span>);</div>
+<div class="line"><span class="lineno">   69</span>    <span class="keywordflow">if</span> (!dst) {</div>
+<div class="line"><span class="lineno">   70</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">   71</span>                  <span class="stringliteral">&quot;ComputeParticleMSD: could not open &#39;%s&#39; for writing.\n&quot;</span>, tmp_path);</div>
+<div class="line"><span class="lineno">   72</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   73</span>    }</div>
+<div class="line"><span class="lineno">   74</span> </div>
+<div class="line"><span class="lineno">   75</span>    src = fopen(csv_path, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">if</span> (src) {</div>
+<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">while</span> (fgets(line, <span class="keyword">sizeof</span>(line), src)) {</div>
+<div class="line"><span class="lineno">   78</span>            <span class="keywordflow">if</span> (!wrote_header) {</div>
+<div class="line"><span class="lineno">   79</span>                <span class="keywordflow">if</span> (strncmp(line, <span class="stringliteral">&quot;step,&quot;</span>, 5) == 0) {</div>
+<div class="line"><span class="lineno">   80</span>                    fputs(line, dst);</div>
+<div class="line"><span class="lineno">   81</span>                    wrote_header = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">   82</span>                    <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">   83</span>                }</div>
+<div class="line"><span class="lineno">   84</span>                fputs(<a class="code hl_variable" href="particle__statistics_8c.html#a01c3c52b9680a426476ef83cc76b44e3">PARTICLE_MSD_CSV_HEADER</a>, dst);</div>
+<div class="line"><span class="lineno">   85</span>                wrote_header = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">   86</span>            }</div>
+<div class="line"><span class="lineno">   87</span> </div>
+<div class="line"><span class="lineno">   88</span>            <span class="keywordflow">if</span> (<a class="code hl_function" href="particle__statistics_8c.html#abfe2ce5619119391ef2dc117963d32d7">MSDCSVLineMatchesStep</a>(line, ti)) {</div>
+<div class="line"><span class="lineno">   89</span>                <span class="keywordflow">if</span> (!inserted_row) {</div>
+<div class="line"><span class="lineno">   90</span>                    fputs(row_line, dst);</div>
+<div class="line"><span class="lineno">   91</span>                    inserted_row = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">   92</span>                }</div>
+<div class="line"><span class="lineno">   93</span>                <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">   94</span>            }</div>
+<div class="line"><span class="lineno">   95</span>            fputs(line, dst);</div>
+<div class="line"><span class="lineno">   96</span>        }</div>
+<div class="line"><span class="lineno">   97</span>        fclose(src);</div>
+<div class="line"><span class="lineno">   98</span>        src = NULL;</div>
+<div class="line"><span class="lineno">   99</span>    }</div>
+<div class="line"><span class="lineno">  100</span> </div>
+<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">if</span> (!wrote_header) {</div>
+<div class="line"><span class="lineno">  102</span>        fputs(<a class="code hl_variable" href="particle__statistics_8c.html#a01c3c52b9680a426476ef83cc76b44e3">PARTICLE_MSD_CSV_HEADER</a>, dst);</div>
+<div class="line"><span class="lineno">  103</span>    }</div>
+<div class="line"><span class="lineno">  104</span>    <span class="keywordflow">if</span> (!inserted_row) {</div>
+<div class="line"><span class="lineno">  105</span>        fputs(row_line, dst);</div>
+<div class="line"><span class="lineno">  106</span>    }</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>    <span class="keywordflow">if</span> (fclose(dst) != 0) {</div>
+<div class="line"><span class="lineno">  109</span>        remove(tmp_path);</div>
+<div class="line"><span class="lineno">  110</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  111</span>                  <span class="stringliteral">&quot;ComputeParticleMSD: could not finalize &#39;%s&#39;.\n&quot;</span>, tmp_path);</div>
+<div class="line"><span class="lineno">  112</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  113</span>    }</div>
+<div class="line"><span class="lineno">  114</span> </div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">if</span> (rename(tmp_path, csv_path) != 0) {</div>
+<div class="line"><span class="lineno">  116</span>        remove(tmp_path);</div>
+<div class="line"><span class="lineno">  117</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  118</span>                  <span class="stringliteral">&quot;ComputeParticleMSD: could not replace &#39;%s&#39;.\n&quot;</span>, csv_path);</div>
+<div class="line"><span class="lineno">  119</span>    }</div>
+<div class="line"><span class="lineno">  120</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  121</span>}</div>
+<div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
+<div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
+<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
+<div class="ttc" id="aparticle__statistics_8c_html_a01c3c52b9680a426476ef83cc76b44e3"><div class="ttname"><a href="particle__statistics_8c.html#a01c3c52b9680a426476ef83cc76b44e3">PARTICLE_MSD_CSV_HEADER</a></div><div class="ttdeci">static const char * PARTICLE_MSD_CSV_HEADER</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00024">particle_statistics.c:24</a></div></div>
+<div class="ttc" id="aparticle__statistics_8c_html_abfe2ce5619119391ef2dc117963d32d7"><div class="ttname"><a href="particle__statistics_8c.html#abfe2ce5619119391ef2dc117963d32d7">MSDCSVLineMatchesStep</a></div><div class="ttdeci">static PetscBool MSDCSVLineMatchesStep(const char *line, PetscInt ti)</div><div class="ttdoc">Return whether a CSV row belongs to the requested timestep.</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00036">particle_statistics.c:36</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_a2e36221617211f1cd7e7925615bd6d1a_cgraph.svg" width="424" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_a2e36221617211f1cd7e7925615bd6d1a_icgraph.svg" width="100%" height="461"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+
+</div>
+</div>
 <a id="acfb130aeba6e6d430c0ca599b34e38d4" name="acfb130aeba6e6d430c0ca599b34e38d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acfb130aeba6e6d430c0ca599b34e38d4">&#9670;&#160;</a></span>ComputeParticleMSD()</h2>
 
@@ -183,157 +396,146 @@ Functions</h2></td></tr>
 <p>Computes the mean-squared displacement (MSD) of a particle cloud.</p>
 <p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00028">28</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   29</span>{</div>
-<div class="line"><span class="lineno">   30</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">   31</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">   32</span>    PetscMPIInt    rank;</div>
-<div class="line"><span class="lineno">   33</span> </div>
-<div class="line"><span class="lineno">   34</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">   35</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">   36</span> </div>
-<div class="line"><span class="lineno">   37</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   38</span> </div>
-<div class="line"><span class="lineno">   39</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><span class="lineno">   40</span><span class="comment">     * Physics parameters                                                   *</span></div>
-<div class="line"><span class="lineno">   41</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><span class="lineno">   42</span>    <span class="keyword">const</span> PetscReal Re  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> : 1.0;</div>
-<div class="line"><span class="lineno">   43</span>    <span class="keyword">const</span> PetscReal Sc  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> : 1.0;</div>
-<div class="line"><span class="lineno">   44</span>    <span class="keyword">const</span> PetscReal D   = 1.0 / (Re * Sc);</div>
-<div class="line"><span class="lineno">   45</span>    <span class="keyword">const</span> PetscReal t   = (PetscReal)ti * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
-<div class="line"><span class="lineno">   46</span>    <span class="keyword">const</span> PetscReal x0  = simCtx-&gt;psrc_x;</div>
-<div class="line"><span class="lineno">   47</span>    <span class="keyword">const</span> PetscReal y0  = simCtx-&gt;psrc_y;</div>
-<div class="line"><span class="lineno">   48</span>    <span class="keyword">const</span> PetscReal z0  = simCtx-&gt;psrc_z;</div>
-<div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><span class="lineno">   51</span><span class="comment">     * Pass 1: local accumulation                                           *</span></div>
-<div class="line"><span class="lineno">   52</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><span class="lineno">   53</span>    PetscInt       n_local;</div>
-<div class="line"><span class="lineno">   54</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
-<div class="line"><span class="lineno">   55</span> </div>
-<div class="line"><span class="lineno">   56</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   57</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   58</span> </div>
-<div class="line"><span class="lineno">   59</span>    PetscReal local_sq_x = 0.0, local_sq_y = 0.0, local_sq_z = 0.0;</div>
-<div class="line"><span class="lineno">   60</span>    PetscReal local_sx   = 0.0, local_sy   = 0.0, local_sz   = 0.0;</div>
-<div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><span class="lineno">   63</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
-<div class="line"><span class="lineno">   64</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
-<div class="line"><span class="lineno">   65</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
-<div class="line"><span class="lineno">   66</span>        local_sq_x += dx * dx;</div>
-<div class="line"><span class="lineno">   67</span>        local_sq_y += dy * dy;</div>
-<div class="line"><span class="lineno">   68</span>        local_sq_z += dz * dz;</div>
-<div class="line"><span class="lineno">   69</span>        local_sx   += dx;</div>
-<div class="line"><span class="lineno">   70</span>        local_sy   += dy;</div>
-<div class="line"><span class="lineno">   71</span>        local_sz   += dz;</div>
-<div class="line"><span class="lineno">   72</span>    }</div>
-<div class="line"><span class="lineno">   73</span> </div>
-<div class="line"><span class="lineno">   74</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   75</span> </div>
-<div class="line"><span class="lineno">   76</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><span class="lineno">   77</span><span class="comment">     * MPI reduction — 7 doubles + count                                   *</span></div>
-<div class="line"><span class="lineno">   78</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><span class="lineno">   79</span>    PetscReal local_buf[7] = { local_sq_x, local_sq_y, local_sq_z,</div>
-<div class="line"><span class="lineno">   80</span>                                local_sx,   local_sy,   local_sz,</div>
-<div class="line"><span class="lineno">   81</span>                                (PetscReal)n_local };</div>
-<div class="line"><span class="lineno">   82</span>    PetscReal global_buf[7] = {0};</div>
-<div class="line"><span class="lineno">   83</span>    ierr = MPI_Allreduce(local_buf, global_buf, 7, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
-<div class="line"><span class="lineno">   84</span> </div>
-<div class="line"><span class="lineno">   85</span>    <span class="keyword">const</span> PetscReal N_total  = global_buf[6];</div>
-<div class="line"><span class="lineno">   86</span>    <span class="keywordflow">if</span> (N_total &lt; 1.0) PetscFunctionReturn(0); <span class="comment">/* no particles */</span></div>
-<div class="line"><span class="lineno">   87</span> </div>
-<div class="line"><span class="lineno">   88</span>    <span class="keyword">const</span> PetscReal MSD_x    = global_buf[0] / N_total;</div>
-<div class="line"><span class="lineno">   89</span>    <span class="keyword">const</span> PetscReal MSD_y    = global_buf[1] / N_total;</div>
-<div class="line"><span class="lineno">   90</span>    <span class="keyword">const</span> PetscReal MSD_z    = global_buf[2] / N_total;</div>
-<div class="line"><span class="lineno">   91</span>    <span class="keyword">const</span> PetscReal com_x    = global_buf[3] / N_total;</div>
-<div class="line"><span class="lineno">   92</span>    <span class="keyword">const</span> PetscReal com_y    = global_buf[4] / N_total;</div>
-<div class="line"><span class="lineno">   93</span>    <span class="keyword">const</span> PetscReal com_z    = global_buf[5] / N_total;</div>
-<div class="line"><span class="lineno">   94</span> </div>
-<div class="line"><span class="lineno">   95</span>    <span class="keyword">const</span> PetscReal MSD_total    = MSD_x + MSD_y + MSD_z;</div>
-<div class="line"><span class="lineno">   96</span>    <span class="keyword">const</span> PetscReal r_rms_meas   = PetscSqrtReal(MSD_total);</div>
-<div class="line"><span class="lineno">   97</span>    <span class="keyword">const</span> PetscReal r_theory     = (t &gt; 1e-300) ? PetscSqrtReal(6.0 * D * t) : 0.0;</div>
-<div class="line"><span class="lineno">   98</span>    <span class="keyword">const</span> PetscReal rel_err_pct  = (r_theory &gt; 1e-12)</div>
-<div class="line"><span class="lineno">   99</span>                                   ? PetscAbsReal(r_rms_meas - r_theory) / r_theory * 100.0</div>
-<div class="line"><span class="lineno">  100</span>                                   : 0.0;</div>
-<div class="line"><span class="lineno">  101</span> </div>
-<div class="line"><span class="lineno">  102</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><span class="lineno">  103</span><span class="comment">     * Pass 2: fraction inside σ-shells                                    *</span></div>
-<div class="line"><span class="lineno">  104</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><span class="lineno">  105</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  106</span> </div>
-<div class="line"><span class="lineno">  107</span>    PetscInt local_n1 = 0, local_n2 = 0, local_n3 = 0;</div>
-<div class="line"><span class="lineno">  108</span>    <span class="keyword">const</span> PetscReal r1 = r_theory;</div>
-<div class="line"><span class="lineno">  109</span>    <span class="keyword">const</span> PetscReal r2 = 2.0 * r_theory;</div>
-<div class="line"><span class="lineno">  110</span>    <span class="keyword">const</span> PetscReal r3 = 3.0 * r_theory;</div>
-<div class="line"><span class="lineno">  111</span> </div>
-<div class="line"><span class="lineno">  112</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
-<div class="line"><span class="lineno">  113</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
-<div class="line"><span class="lineno">  114</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
-<div class="line"><span class="lineno">  115</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
-<div class="line"><span class="lineno">  116</span>        <span class="keyword">const</span> PetscReal r  = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
-<div class="line"><span class="lineno">  117</span>        <span class="keywordflow">if</span> (r &lt; r1) local_n1++;</div>
-<div class="line"><span class="lineno">  118</span>        <span class="keywordflow">if</span> (r &lt; r2) local_n2++;</div>
-<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">if</span> (r &lt; r3) local_n3++;</div>
-<div class="line"><span class="lineno">  120</span>    }</div>
-<div class="line"><span class="lineno">  121</span> </div>
-<div class="line"><span class="lineno">  122</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>    PetscReal local_counts[3] = { (PetscReal)local_n1,</div>
-<div class="line"><span class="lineno">  125</span>                                   (PetscReal)local_n2,</div>
-<div class="line"><span class="lineno">  126</span>                                   (PetscReal)local_n3 };</div>
-<div class="line"><span class="lineno">  127</span>    PetscReal global_counts[3] = {0};</div>
-<div class="line"><span class="lineno">  128</span>    ierr = MPI_Allreduce(local_counts, global_counts, 3, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
-<div class="line"><span class="lineno">  129</span> </div>
-<div class="line"><span class="lineno">  130</span>    <span class="keyword">const</span> PetscReal frac_1s = global_counts[0] / N_total * 100.0;</div>
-<div class="line"><span class="lineno">  131</span>    <span class="keyword">const</span> PetscReal frac_2s = global_counts[1] / N_total * 100.0;</div>
-<div class="line"><span class="lineno">  132</span>    <span class="keyword">const</span> PetscReal frac_3s = global_counts[2] / N_total * 100.0;</div>
-<div class="line"><span class="lineno">  133</span> </div>
-<div class="line"><span class="lineno">  134</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
-<div class="line"><span class="lineno">  135</span><span class="comment">     * Output: CSV + LOG_INFO (rank 0 only)                                *</span></div>
-<div class="line"><span class="lineno">  136</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
-<div class="line"><span class="lineno">  137</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
-<div class="line"><span class="lineno">  138</span>        <span class="keywordtype">char</span> csv_path[PETSC_MAX_PATH_LEN];</div>
-<div class="line"><span class="lineno">  139</span>        PetscSNPrintf(csv_path, <span class="keyword">sizeof</span>(csv_path), <span class="stringliteral">&quot;%s_msd.csv&quot;</span>, stats_prefix);</div>
-<div class="line"><span class="lineno">  140</span> </div>
-<div class="line"><span class="lineno">  141</span>        FILE *f = fopen(csv_path, <span class="stringliteral">&quot;a&quot;</span>);</div>
-<div class="line"><span class="lineno">  142</span>        <span class="keywordflow">if</span> (!f) {</div>
-<div class="line"><span class="lineno">  143</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno">  144</span>                      <span class="stringliteral">&quot;ComputeParticleMSD: could not open &#39;%s&#39; for writing.\n&quot;</span>, csv_path);</div>
-<div class="line"><span class="lineno">  145</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  146</span>            <span class="comment">/* Write header if file is empty */</span></div>
-<div class="line"><span class="lineno">  147</span>            <span class="keywordflow">if</span> (ftell(f) == 0) {</div>
-<div class="line"><span class="lineno">  148</span>                fprintf(f, <span class="stringliteral">&quot;step,t,N,MSD_x,MSD_y,MSD_z,MSD_total,&quot;</span></div>
-<div class="line"><span class="lineno">  149</span>                        <span class="stringliteral">&quot;r_rms_meas,r_rms_theory,rel_err_pct,&quot;</span></div>
-<div class="line"><span class="lineno">  150</span>                        <span class="stringliteral">&quot;com_x,com_y,com_z,&quot;</span></div>
-<div class="line"><span class="lineno">  151</span>                        <span class="stringliteral">&quot;frac_1sigma_pct,frac_2sigma_pct,frac_3sigma_pct\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  152</span>            }</div>
-<div class="line"><span class="lineno">  153</span>            fprintf(f, <span class="stringliteral">&quot;%d,%.6e,%.0f,%.6e,%.6e,%.6e,%.6e,%.6e,%.6e,%.4f,%.6e,%.6e,%.6e,%.2f,%.2f,%.2f\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  154</span>                    (<span class="keywordtype">int</span>)ti, t, N_total,</div>
-<div class="line"><span class="lineno">  155</span>                    MSD_x, MSD_y, MSD_z, MSD_total,</div>
-<div class="line"><span class="lineno">  156</span>                    r_rms_meas, r_theory, rel_err_pct,</div>
-<div class="line"><span class="lineno">  157</span>                    com_x, com_y, com_z,</div>
-<div class="line"><span class="lineno">  158</span>                    frac_1s, frac_2s, frac_3s);</div>
-<div class="line"><span class="lineno">  159</span>            fclose(f);</div>
-<div class="line"><span class="lineno">  160</span>        }</div>
-<div class="line"><span class="lineno">  161</span> </div>
-<div class="line"><span class="lineno">  162</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
-<div class="line"><span class="lineno">  163</span>                  <span class="stringliteral">&quot;[MSD ti=%d t=%.4f] total=%.4e theory=%.4e err=%.2f%% | &quot;</span></div>
-<div class="line"><span class="lineno">  164</span>                  <span class="stringliteral">&quot;fracs: %.1f/%.1f/%.1f%% | COM: (%.2e,%.2e,%.2e)\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  165</span>                  (<span class="keywordtype">int</span>)ti, t, MSD_total, r_theory * r_theory, rel_err_pct,</div>
-<div class="line"><span class="lineno">  166</span>                  frac_1s, frac_2s, frac_3s,</div>
-<div class="line"><span class="lineno">  167</span>                  com_x, com_y, com_z);</div>
-<div class="line"><span class="lineno">  168</span>    }</div>
-<div class="line"><span class="lineno">  169</span> </div>
-<div class="line"><span class="lineno">  170</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  171</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  172</span>}</div>
-<div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
-<div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
+<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00129">129</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  130</span>{</div>
+<div class="line"><span class="lineno">  131</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  132</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">  133</span>    PetscMPIInt    rank;</div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  136</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  137</span> </div>
+<div class="line"><span class="lineno">  138</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><span class="lineno">  141</span><span class="comment">     * Physics parameters                                                   *</span></div>
+<div class="line"><span class="lineno">  142</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><span class="lineno">  143</span>    <span class="keyword">const</span> PetscReal Re  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a4897d17394963da4ac73b9856fac48c5">ren</a> : 1.0;</div>
+<div class="line"><span class="lineno">  144</span>    <span class="keyword">const</span> PetscReal Sc  = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">schmidt_number</a> : 1.0;</div>
+<div class="line"><span class="lineno">  145</span>    <span class="keyword">const</span> PetscReal D   = 1.0 / (Re * Sc);</div>
+<div class="line"><span class="lineno">  146</span>    <span class="keyword">const</span> PetscReal t   = (PetscReal)ti * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a>;</div>
+<div class="line"><span class="lineno">  147</span>    <span class="keyword">const</span> PetscReal x0  = simCtx-&gt;psrc_x;</div>
+<div class="line"><span class="lineno">  148</span>    <span class="keyword">const</span> PetscReal y0  = simCtx-&gt;psrc_y;</div>
+<div class="line"><span class="lineno">  149</span>    <span class="keyword">const</span> PetscReal z0  = simCtx-&gt;psrc_z;</div>
+<div class="line"><span class="lineno">  150</span> </div>
+<div class="line"><span class="lineno">  151</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><span class="lineno">  152</span><span class="comment">     * Pass 1: local accumulation                                           *</span></div>
+<div class="line"><span class="lineno">  153</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><span class="lineno">  154</span>    PetscInt       n_local;</div>
+<div class="line"><span class="lineno">  155</span>    <span class="keyword">const</span> PetscReal (*pos_arr)[3];</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>    ierr = DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;n_local); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  158</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>    PetscReal local_sq_x = 0.0, local_sq_y = 0.0, local_sq_z = 0.0;</div>
+<div class="line"><span class="lineno">  161</span>    PetscReal local_sx   = 0.0, local_sy   = 0.0, local_sz   = 0.0;</div>
+<div class="line"><span class="lineno">  162</span> </div>
+<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><span class="lineno">  164</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
+<div class="line"><span class="lineno">  165</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
+<div class="line"><span class="lineno">  166</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
+<div class="line"><span class="lineno">  167</span>        local_sq_x += dx * dx;</div>
+<div class="line"><span class="lineno">  168</span>        local_sq_y += dy * dy;</div>
+<div class="line"><span class="lineno">  169</span>        local_sq_z += dz * dz;</div>
+<div class="line"><span class="lineno">  170</span>        local_sx   += dx;</div>
+<div class="line"><span class="lineno">  171</span>        local_sy   += dy;</div>
+<div class="line"><span class="lineno">  172</span>        local_sz   += dz;</div>
+<div class="line"><span class="lineno">  173</span>    }</div>
+<div class="line"><span class="lineno">  174</span> </div>
+<div class="line"><span class="lineno">  175</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  176</span> </div>
+<div class="line"><span class="lineno">  177</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><span class="lineno">  178</span><span class="comment">     * MPI reduction — 7 doubles + count                                   *</span></div>
+<div class="line"><span class="lineno">  179</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><span class="lineno">  180</span>    PetscReal local_buf[7] = { local_sq_x, local_sq_y, local_sq_z,</div>
+<div class="line"><span class="lineno">  181</span>                                local_sx,   local_sy,   local_sz,</div>
+<div class="line"><span class="lineno">  182</span>                                (PetscReal)n_local };</div>
+<div class="line"><span class="lineno">  183</span>    PetscReal global_buf[7] = {0};</div>
+<div class="line"><span class="lineno">  184</span>    ierr = MPI_Allreduce(local_buf, global_buf, 7, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
+<div class="line"><span class="lineno">  185</span> </div>
+<div class="line"><span class="lineno">  186</span>    <span class="keyword">const</span> PetscReal N_total  = global_buf[6];</div>
+<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">if</span> (N_total &lt; 1.0) PetscFunctionReturn(0); <span class="comment">/* no particles */</span></div>
+<div class="line"><span class="lineno">  188</span> </div>
+<div class="line"><span class="lineno">  189</span>    <span class="keyword">const</span> PetscReal MSD_x    = global_buf[0] / N_total;</div>
+<div class="line"><span class="lineno">  190</span>    <span class="keyword">const</span> PetscReal MSD_y    = global_buf[1] / N_total;</div>
+<div class="line"><span class="lineno">  191</span>    <span class="keyword">const</span> PetscReal MSD_z    = global_buf[2] / N_total;</div>
+<div class="line"><span class="lineno">  192</span>    <span class="keyword">const</span> PetscReal com_x    = global_buf[3] / N_total;</div>
+<div class="line"><span class="lineno">  193</span>    <span class="keyword">const</span> PetscReal com_y    = global_buf[4] / N_total;</div>
+<div class="line"><span class="lineno">  194</span>    <span class="keyword">const</span> PetscReal com_z    = global_buf[5] / N_total;</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>    <span class="keyword">const</span> PetscReal MSD_total    = MSD_x + MSD_y + MSD_z;</div>
+<div class="line"><span class="lineno">  197</span>    <span class="keyword">const</span> PetscReal r_rms_meas   = PetscSqrtReal(MSD_total);</div>
+<div class="line"><span class="lineno">  198</span>    <span class="keyword">const</span> PetscReal r_theory     = (t &gt; 1e-300) ? PetscSqrtReal(6.0 * D * t) : 0.0;</div>
+<div class="line"><span class="lineno">  199</span>    <span class="keyword">const</span> PetscReal rel_err_pct  = (r_theory &gt; 1e-12)</div>
+<div class="line"><span class="lineno">  200</span>                                   ? PetscAbsReal(r_rms_meas - r_theory) / r_theory * 100.0</div>
+<div class="line"><span class="lineno">  201</span>                                   : 0.0;</div>
+<div class="line"><span class="lineno">  202</span> </div>
+<div class="line"><span class="lineno">  203</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><span class="lineno">  204</span><span class="comment">     * Pass 2: fraction inside σ-shells                                    *</span></div>
+<div class="line"><span class="lineno">  205</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><span class="lineno">  206</span>    ierr = DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  207</span> </div>
+<div class="line"><span class="lineno">  208</span>    PetscInt local_n1 = 0, local_n2 = 0, local_n3 = 0;</div>
+<div class="line"><span class="lineno">  209</span>    <span class="keyword">const</span> PetscReal r1 = r_theory;</div>
+<div class="line"><span class="lineno">  210</span>    <span class="keyword">const</span> PetscReal r2 = 2.0 * r_theory;</div>
+<div class="line"><span class="lineno">  211</span>    <span class="keyword">const</span> PetscReal r3 = 3.0 * r_theory;</div>
+<div class="line"><span class="lineno">  212</span> </div>
+<div class="line"><span class="lineno">  213</span>    <span class="keywordflow">for</span> (PetscInt p = 0; p &lt; n_local; p++) {</div>
+<div class="line"><span class="lineno">  214</span>        <span class="keyword">const</span> PetscReal dx = pos_arr[p][0] - x0;</div>
+<div class="line"><span class="lineno">  215</span>        <span class="keyword">const</span> PetscReal dy = pos_arr[p][1] - y0;</div>
+<div class="line"><span class="lineno">  216</span>        <span class="keyword">const</span> PetscReal dz = pos_arr[p][2] - z0;</div>
+<div class="line"><span class="lineno">  217</span>        <span class="keyword">const</span> PetscReal r  = PetscSqrtReal(dx*dx + dy*dy + dz*dz);</div>
+<div class="line"><span class="lineno">  218</span>        <span class="keywordflow">if</span> (r &lt; r1) local_n1++;</div>
+<div class="line"><span class="lineno">  219</span>        <span class="keywordflow">if</span> (r &lt; r2) local_n2++;</div>
+<div class="line"><span class="lineno">  220</span>        <span class="keywordflow">if</span> (r &lt; r3) local_n3++;</div>
+<div class="line"><span class="lineno">  221</span>    }</div>
+<div class="line"><span class="lineno">  222</span> </div>
+<div class="line"><span class="lineno">  223</span>    ierr = DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span>**)&amp;pos_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>    PetscReal local_counts[3] = { (PetscReal)local_n1,</div>
+<div class="line"><span class="lineno">  226</span>                                   (PetscReal)local_n2,</div>
+<div class="line"><span class="lineno">  227</span>                                   (PetscReal)local_n3 };</div>
+<div class="line"><span class="lineno">  228</span>    PetscReal global_counts[3] = {0};</div>
+<div class="line"><span class="lineno">  229</span>    ierr = MPI_Allreduce(local_counts, global_counts, 3, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
+<div class="line"><span class="lineno">  230</span> </div>
+<div class="line"><span class="lineno">  231</span>    <span class="keyword">const</span> PetscReal frac_1s = global_counts[0] / N_total * 100.0;</div>
+<div class="line"><span class="lineno">  232</span>    <span class="keyword">const</span> PetscReal frac_2s = global_counts[1] / N_total * 100.0;</div>
+<div class="line"><span class="lineno">  233</span>    <span class="keyword">const</span> PetscReal frac_3s = global_counts[2] / N_total * 100.0;</div>
+<div class="line"><span class="lineno">  234</span> </div>
+<div class="line"><span class="lineno">  235</span>    <span class="comment">/* ------------------------------------------------------------------ *</span></div>
+<div class="line"><span class="lineno">  236</span><span class="comment">     * Output: CSV + LOG_INFO (rank 0 only)                                *</span></div>
+<div class="line"><span class="lineno">  237</span><span class="comment">     * ------------------------------------------------------------------ */</span></div>
+<div class="line"><span class="lineno">  238</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line"><span class="lineno">  239</span>        <span class="keywordtype">char</span> csv_path[PETSC_MAX_PATH_LEN];</div>
+<div class="line"><span class="lineno">  240</span>        <span class="keywordtype">char</span> row_line[1024];</div>
+<div class="line"><span class="lineno">  241</span>        PetscSNPrintf(csv_path, <span class="keyword">sizeof</span>(csv_path), <span class="stringliteral">&quot;%s_msd.csv&quot;</span>, stats_prefix);</div>
+<div class="line"><span class="lineno">  242</span>        PetscSNPrintf(</div>
+<div class="line"><span class="lineno">  243</span>            row_line,</div>
+<div class="line"><span class="lineno">  244</span>            <span class="keyword">sizeof</span>(row_line),</div>
+<div class="line"><span class="lineno">  245</span>            <span class="stringliteral">&quot;%d,%.6e,%.0f,%.6e,%.6e,%.6e,%.6e,%.6e,%.6e,%.4f,%.6e,%.6e,%.6e,%.2f,%.2f,%.2f\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  246</span>            (<span class="keywordtype">int</span>)ti, t, N_total,</div>
+<div class="line"><span class="lineno">  247</span>            MSD_x, MSD_y, MSD_z, MSD_total,</div>
+<div class="line"><span class="lineno">  248</span>            r_rms_meas, r_theory, rel_err_pct,</div>
+<div class="line"><span class="lineno">  249</span>            com_x, com_y, com_z,</div>
+<div class="line"><span class="lineno">  250</span>            frac_1s, frac_2s, frac_3s</div>
+<div class="line"><span class="lineno">  251</span>        );</div>
+<div class="line"><span class="lineno">  252</span>        PetscCall(<a class="code hl_function" href="particle__statistics_8c.html#a2e36221617211f1cd7e7925615bd6d1a">RewriteParticleMSDCSV</a>(csv_path, ti, row_line));</div>
+<div class="line"><span class="lineno">  253</span> </div>
+<div class="line"><span class="lineno">  254</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
+<div class="line"><span class="lineno">  255</span>                  <span class="stringliteral">&quot;[MSD ti=%d t=%.4f] total=%.4e theory=%.4e err=%.2f%% | &quot;</span></div>
+<div class="line"><span class="lineno">  256</span>                  <span class="stringliteral">&quot;fracs: %.1f/%.1f/%.1f%% | COM: (%.2e,%.2e,%.2e)\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  257</span>                  (<span class="keywordtype">int</span>)ti, t, MSD_total, r_theory * r_theory, rel_err_pct,</div>
+<div class="line"><span class="lineno">  258</span>                  frac_1s, frac_2s, frac_3s,</div>
+<div class="line"><span class="lineno">  259</span>                  com_x, com_y, com_z);</div>
+<div class="line"><span class="lineno">  260</span>    }</div>
+<div class="line"><span class="lineno">  261</span> </div>
+<div class="line"><span class="lineno">  262</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  263</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  264</span>}</div>
 <div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00779">logging.h:779</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
-<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
 <div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00770">logging.h:770</a></div></div>
+<div class="ttc" id="aparticle__statistics_8c_html_a2e36221617211f1cd7e7925615bd6d1a"><div class="ttname"><a href="particle__statistics_8c.html#a2e36221617211f1cd7e7925615bd6d1a">RewriteParticleMSDCSV</a></div><div class="ttdeci">static PetscErrorCode RewriteParticleMSDCSV(const char *csv_path, PetscInt ti, const char *row_line)</div><div class="ttdoc">Rewrite the MSD CSV so the requested timestep appears exactly once.</div><div class="ttdef"><b>Definition</b> <a href="particle__statistics_8c_source.html#l00056">particle_statistics.c:56</a></div></div>
 <div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00859">variables.h:859</a></div></div>
 <div class="ttc" id="avariables_8h_html_a1950b3a7c86997fb1e1fc11b0c8a9158"><div class="ttname"><a href="variables_8h.html#a1950b3a7c86997fb1e1fc11b0c8a9158">SimCtx::schmidt_number</a></div><div class="ttdeci">PetscReal schmidt_number</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00688">variables.h:688</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00793">variables.h:793</a></div></div>
@@ -341,10 +543,45 @@ Functions</h2></td></tr>
 <div class="ttc" id="avariables_8h_html_a53b044b8b0e4a4dc8c8fa05387af564c"><div class="ttname"><a href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">SimCtx::dt</a></div><div class="ttdeci">PetscReal dt</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00638">variables.h:638</a></div></div>
 <div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00623">variables.h:623</a></div></div>
 </div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_acfb130aeba6e6d430c0ca599b34e38d4_cgraph.svg" width="631" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_acfb130aeba6e6d430c0ca599b34e38d4_icgraph.svg" width="100%" height="445"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="particle__statistics_8c_acfb130aeba6e6d430c0ca599b34e38d4_icgraph.svg" width="100%" height="461"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a01c3c52b9680a426476ef83cc76b44e3" name="a01c3c52b9680a426476ef83cc76b44e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01c3c52b9680a426476ef83cc76b44e3">&#9670;&#160;</a></span>PARTICLE_MSD_CSV_HEADER</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* PARTICLE_MSD_CSV_HEADER</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    <span class="stringliteral">&quot;step,t,N,MSD_x,MSD_y,MSD_z,MSD_total,&quot;</span></div>
+<div class="line">    <span class="stringliteral">&quot;r_rms_meas,r_rms_theory,rel_err_pct,&quot;</span></div>
+<div class="line">    <span class="stringliteral">&quot;com_x,com_y,com_z,&quot;</span></div>
+<div class="line">    <span class="stringliteral">&quot;frac_1sigma_pct,frac_2sigma_pct,frac_3sigma_pct\n&quot;</span></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="particle__statistics_8c_source.html#l00024">24</a> of file <a class="el" href="particle__statistics_8c_source.html">particle_statistics.c</a>.</p>
 
 </div>
 </div>

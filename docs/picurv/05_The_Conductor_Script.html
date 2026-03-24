@@ -283,7 +283,20 @@ $(function() {
 <div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
 </div><!-- fragment --><p>Follow-up submission from existing artifacts: </p><div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
-</div><!-- fragment --><p>Graceful shutdown note:</p>
+</div><!-- fragment --><p>Post-only continuation examples:</p>
+<ul>
+<li>Catch up a live run without editing <code>post.yml.start_step</code>. Keep the full desired analysis window in <code>post.yml</code>, then let <code>--continue</code> move the launch cursor inside that window:</li>
+</ul>
+<div class="fragment"><div class="line">./bin/picurv run --post-process --continue \</div>
+<div class="line">  --run-dir runs/search_robustness_20260322-073415 \</div>
+<div class="line">  --post search_robustness_analysis.yml</div>
+</div><!-- fragment --><ul>
+<li>If the solver has only written source data through step <code>420</code>, PICurv launches only the fully available prefix in the requested stride. A later <code>--continue</code> run picks up the newer steps after the solver produces them.</li>
+<li>If the same recipe already post-processed the requested window, PICurv skips the launch and reports that the run is already caught up.</li>
+<li>If you change the recipe itself, for example by adding <code>Qcrit</code> or changing the statistics output prefix, PICurv treats that as a new recipe lineage and starts again from the configured <code>start_step</code>.</li>
+<li>PICurv allows only one post writer per run directory. If a second post job targets the same <code>runs/&lt;run_id&gt;</code>, it is refused immediately instead of racing on <code>viz/</code> or <code>statistics/</code>.</li>
+</ul>
+<p>Graceful shutdown note:</p>
 <ul>
 <li>generated Slurm solver jobs enable a runtime walltime guard by default; after 10 completed warmup steps, PICurv estimates timestep cost and requests the same graceful final-write path before remaining walltime gets too tight.</li>
 <li>if <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> requests an early warning signal, PICurv also traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then writes one last snapshot at the next safe checkpoint even when the normal recording interval has not been reached.</li>

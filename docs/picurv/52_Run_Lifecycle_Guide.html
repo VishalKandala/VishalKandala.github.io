@@ -256,6 +256,20 @@ $(function() {
 <li>you do not want to rerun the solver.</li>
 </ul>
 <p>PICurv will auto-identify the required case/monitor/control artifacts from <code>runs/&lt;run_id&gt;/config/</code>.</p>
+<p>Operational patterns for post-only reuse:</p>
+<ul>
+<li>Keep <code>post.yml</code> as the full analysis window you want, then use <code>--continue</code> to skip steps that were already completed for the same recipe. You do not need to keep editing <code>start_step</code> during batch catch-up.</li>
+</ul>
+<div class="fragment"><div class="line">./bin/picurv run --post-process --continue \</div>
+<div class="line">  --run-dir runs/search_robustness_20260322-073415 \</div>
+<div class="line">  --post search_robustness_analysis.yml</div>
+</div><!-- fragment --><ul>
+<li>Live solver example: if <code>post.yml</code> requests <code>0..1000</code> every <code>10</code>, but solver source files currently exist only through step <code>420</code>, PICurv launches only <code>0..420</code> on the first pass. A later <code>--continue</code> run resumes at <code>430</code> after those source files appear.</li>
+<li>Interrupted batch example: if <code>Field_00070.vts</code> exists but the required MSD CSV still stops at <code>60</code>, step <code>70</code> is treated as incomplete and the next <code>--continue</code> run restarts from <code>70</code>.</li>
+<li>Explicit rerun example: if you omit <code>--continue</code>, PICurv honors the requested window exactly, rewrites any overlapping VTK files for those steps, and rewrites repeated statistics rows so each step still appears once in the final CSV.</li>
+<li>Changed recipe example: if you point the same <code>run_dir</code> at a different <code>post.yml</code> recipe, such as adding <code>Qcrit</code> or changing the statistics prefix, PICurv starts from that recipe's configured <code>start_step</code> instead of inheriting completion from the previous recipe.</li>
+<li>Concurrency rule: PICurv holds a run-directory post lock while the post stage is active. A second post job targeting the same <code>runs/&lt;run_id&gt;</code> is refused immediately so two writers cannot race on the same output tree.</li>
+</ul>
 <h1><a class="anchor" id="p52_cluster_sec"></a>
 7. Batch Job Generation And Reuse</h1>
 <p>In cluster mode, <code>picurv</code> writes scheduler artifacts into the new run directory:</p>
