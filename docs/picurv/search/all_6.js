@@ -26,13 +26,14 @@ var searchData=
   ['6_20references_23',['6. References',['../19_Nondimensionalization.html#p19_links_sec',1,'']]],
   ['6_20related_20docs_24',['6. Related Docs',['../17_Workflow_Extensibility.html#p17_related_sec',1,'']]],
   ['6_20related_20documentation_25',['6. Related Documentation',['../30_Repository_Navigation.html#p30_related_sec',1,'']]],
-  ['6_20related_20pages_26',['6 related pages',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages'],['../22_CURVIB_Method.html#p22_refs_sec',1,'6. Related Pages'],['../34_Particle_Model_Overview.html#p34_refs_sec',1,'6. Related Pages']]],
+  ['6_20related_20pages_26',['6 related pages',['../34_Particle_Model_Overview.html#p34_refs_sec',1,'6. Related Pages'],['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages'],['../22_CURVIB_Method.html#p22_refs_sec',1,'6. Related Pages']]],
   ['6_20repository_20and_20documentation_20navigation_27',['6. Repository and Documentation Navigation',['../Documentation_Map.html#p47_repo_axis_sec',1,'']]],
-  ['6_20sandbox_20policy_28',['6. Sandbox Policy',['../29_Maintenance_Backlog.html#p29_sandbox_sec',1,'']]],
-  ['6_20solver_5fparameters_20advanced_29',['6. solver_parameters (Advanced)',['../07_Case_Reference.html#p07_passthrough_sec',1,'']]],
-  ['6_20swarm_20fields_20initialized_20at_20startup_30',['6. Swarm Fields Initialized at Startup',['../45_Particle_Initialization_and_Restart.html#p45_fields_sec',1,'']]],
-  ['6_20sweep_20studies_31',['6. Sweep Studies',['../11_User_How_To_Guides.html#p11_sweep_sec',1,'']]],
-  ['6_20sweep_3a_20parameter_20study_20via_20slurm_20arrays_32',['6. sweep: Parameter Study via Slurm Arrays',['../05_The_Conductor_Script.html#p05_sweep_sec',1,'']]],
-  ['6_20using_20tt_20grid_20gen_20tt_20through_20tt_20case_20yml_20tt_33',['6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_case_sec',1,'']]],
-  ['6_20worked_20example_20classes_34',['6. Worked Example Classes',['../53_Search_Robustness_Metrics_Reference.html#p53_examples_sec',1,'']]]
+  ['6_20run_20level_20reductions_20and_20percentiles_28',['4.6 Run-Level Reductions and Percentiles',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_reductions',1,'']]],
+  ['6_20sandbox_20policy_29',['6. Sandbox Policy',['../29_Maintenance_Backlog.html#p29_sandbox_sec',1,'']]],
+  ['6_20solver_5fparameters_20advanced_30',['6. solver_parameters (Advanced)',['../07_Case_Reference.html#p07_passthrough_sec',1,'']]],
+  ['6_20swarm_20fields_20initialized_20at_20startup_31',['6. Swarm Fields Initialized at Startup',['../45_Particle_Initialization_and_Restart.html#p45_fields_sec',1,'']]],
+  ['6_20sweep_20studies_32',['6. Sweep Studies',['../11_User_How_To_Guides.html#p11_sweep_sec',1,'']]],
+  ['6_20sweep_3a_20parameter_20study_20via_20slurm_20arrays_33',['6. sweep: Parameter Study via Slurm Arrays',['../05_The_Conductor_Script.html#p05_sweep_sec',1,'']]],
+  ['6_20using_20tt_20grid_20gen_20tt_20through_20tt_20case_20yml_20tt_34',['6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_case_sec',1,'']]],
+  ['6_20worked_20example_20classes_35',['6. Worked Example Classes',['../53_Search_Robustness_Metrics_Reference.html#p53_examples_sec',1,'']]]
 ];
