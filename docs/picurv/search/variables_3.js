@@ -68,8 +68,9 @@ var searchData=
   ['current_5flog_5flevel_65',['current_log_level',['../logging_8c.html#a3903f35c62e68bc1cadbb294f727469c',1,'logging.c']]],
   ['current_5fstep_5fcall_5fcount_66',['current_step_call_count',['../logging_8c.html#abaebe3fc2647f70c48f8883421c468de',1,'ProfiledFunction']]],
   ['current_5fstep_5ftime_67',['current_step_time',['../logging_8c.html#ab8731f86c7a1ac2e7ae8bcb1bf35341b',1,'ProfiledFunction']]],
-  ['cv_5fye_68',['CV_ye',['../variables_8h.html#a03d777d3d310e154f385ad53f5ec168c',1,'FSInfo']]],
-  ['cv_5fys_69',['CV_ys',['../variables_8h.html#a31670fd5fc1904aaac6ced4c61a348d9',1,'FSInfo']]],
-  ['cv_5fze_70',['CV_ze',['../variables_8h.html#af8094d9eee5f0ec6bdc1e6b386ec5761',1,'FSInfo']]],
-  ['cv_5fzs_71',['CV_zs',['../variables_8h.html#a2990557269af36d6a44a4ec49d77f328',1,'FSInfo']]]
+  ['currentsettlementpass_68',['currentSettlementPass',['../variables_8h.html#a5e5e36e3ba26094ecbe32ea513a6dfdc',1,'SearchMetricsState']]],
+  ['cv_5fye_69',['CV_ye',['../variables_8h.html#a03d777d3d310e154f385ad53f5ec168c',1,'FSInfo']]],
+  ['cv_5fys_70',['CV_ys',['../variables_8h.html#a31670fd5fc1904aaac6ced4c61a348d9',1,'FSInfo']]],
+  ['cv_5fze_71',['CV_ze',['../variables_8h.html#af8094d9eee5f0ec6bdc1e6b386ec5761',1,'FSInfo']]],
+  ['cv_5fzs_72',['CV_zs',['../variables_8h.html#a2990557269af36d6a44a4ec49d77f328',1,'FSInfo']]]
 ];

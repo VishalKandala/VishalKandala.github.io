@@ -53,7 +53,7 @@ var searchData=
   ['1_20prerequisites_50',['1. Prerequisites',['../01_Installation.html#p01_prereqs_sec',1,'']]],
   ['1_20pressure_20correction_20equation_51',['1. Pressure-Correction Equation',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_equation_sec',1,'']]],
   ['1_20properties_52',['1. properties',['../07_Case_Reference.html#p07_properties_sec',1,'']]],
-  ['1_20purpose_53',['1. Purpose',['../29_Maintenance_Backlog.html#p29_purpose_sec',1,'']]],
+  ['1_20purpose_53',['1 purpose',['../53_Search_Robustness_Metrics_Reference.html#p53_purpose_sec',1,'1. Purpose'],['../29_Maintenance_Backlog.html#p29_purpose_sec',1,'1. Purpose']]],
   ['1_20python_20test_20file_20matrix_54',['3.1 Python Test File Matrix',['../40_Testing_and_Quality_Guide.html#p40_python_files_ssec',1,'']]],
   ['1_20recipe_3a_20coloring_20by_20a_20scalar_20field_55',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]],
   ['1_20reference_20scales_56',['1. Reference Scales',['../19_Nondimensionalization.html#p19_refs_sec',1,'']]],
