@@ -2,7 +2,7 @@ var searchData=
 [
   ['eel_0',['eel',['../variables_8h.html#a912b5bb58c3db258fa468d66ead8d6fd',1,'SimCtx']]],
   ['elmtinfo_1',['elmtinfo',['../variables_8h.html#a4d5e8775b899743430a99dbc2a4f6bfc',1,'FSInfo']]],
-  ['enabled_2',['enabled',['../variables_8h.html#a9b83197d0d2181197d58408a03dd84e6',1,'VerificationDiffusivityConfig']]],
+  ['enabled_2',['enabled',['../variables_8h.html#a9b83197d0d2181197d58408a03dd84e6',1,'VerificationDiffusivityConfig::enabled'],['../variables_8h.html#a70c1cad588f331e1cf1e52a0602ea42b',1,'VerificationScalarConfig::enabled']]],
   ['endtime_3',['endTime',['../variables_8h.html#a76d29089d00d89348f32bbf0e2981497',1,'PostProcessParams']]],
   ['eta_4',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
   ['euler_5fsubdir_5',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],

@@ -9,7 +9,7 @@ var searchData=
   ['8_20full_20command_20and_20option_20matrix_6',['8. Full Command and Option Matrix',['../05_The_Conductor_Script.html#p05_command_matrix_sec',1,'']]],
   ['8_20next_20steps_7',['8 next steps',['../07_Case_Reference.html#p07_next_steps_sec',1,'8. Next Steps'],['../08_Solver_Reference.html#p08_next_steps_sec',1,'8. Next Steps'],['../13_Code_Architecture.html#p13_next_steps_sec',1,'8. Next Steps']]],
   ['8_20petsc_5fpassthrough_5foptions_8',['8. petsc_passthrough_options',['../08_Solver_Reference.html#p08_petsc_sec',1,'']]],
-  ['8_20related_20pages_9',['8 related pages',['../37_Sweep_Studies_Guide.html#p37_refs_sec',1,'8. Related Pages'],['../53_Search_Robustness_Metrics_Reference.html#p53_related_sec',1,'8. Related Pages'],['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages'],['../33_Initial_Conditions.html#p33_refs_sec',1,'8. Related Pages']]],
+  ['8_20related_20pages_9',['8 related pages',['../37_Sweep_Studies_Guide.html#p37_refs_sec',1,'8. Related Pages'],['../53_Search_Robustness_Metrics_Reference.html#p53_related_sec',1,'8. Related Pages'],['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_next_steps_sec',1,'8. Related Pages'],['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages'],['../33_Initial_Conditions.html#p33_refs_sec',1,'8. Related Pages']]],
   ['8_20safe_20rules_20of_20thumb_10',['8. Safe Rules Of Thumb',['../52_Run_Lifecycle_Guide.html#p52_rules_sec',1,'']]],
   ['8_20study_20contract_20highlights_20study_20yml_11',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#p14_study_sec',1,'']]],
   ['8_20suggested_20reading_20order_12',['8. Suggested Reading Order',['../12_Capabilities_Summary.html#p12_next_steps_sec',1,'']]],

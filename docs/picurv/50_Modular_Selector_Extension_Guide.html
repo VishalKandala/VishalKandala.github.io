@@ -359,7 +359,9 @@ $(function() {
 </li>
 <li>Current support:<ul>
 <li><code>verification.sources.diffusivity</code></li>
-<li>profile <code>LINEAR_X</code></li>
+<li><code>verification.sources.scalar</code></li>
+<li>diffusivity profile <code>LINEAR_X</code></li>
+<li>scalar profiles <code>CONSTANT</code>, <code>LINEAR_X</code>, <code>SIN_PRODUCT</code></li>
 </ul>
 </li>
 <li>Python hooks:<ul>
@@ -371,23 +373,41 @@ $(function() {
 <li><code>verification.sources.diffusivity.profile</code> -&gt; <code>-verification_diffusivity_profile</code></li>
 <li><code>verification.sources.diffusivity.gamma0</code> -&gt; <code>-verification_diffusivity_gamma0</code></li>
 <li><code>verification.sources.diffusivity.slope_x</code> -&gt; <code>-verification_diffusivity_slope_x</code></li>
+<li><code>verification.sources.scalar.mode</code> -&gt; <code>-verification_scalar_mode</code></li>
+<li><code>verification.sources.scalar.profile</code> -&gt; <code>-verification_scalar_profile</code></li>
+<li><code>verification.sources.scalar.value</code> -&gt; <code>-verification_scalar_value</code></li>
+<li><code>verification.sources.scalar.phi0</code> -&gt; <code>-verification_scalar_phi0</code></li>
+<li><code>verification.sources.scalar.slope_x</code> -&gt; <code>-verification_scalar_slope_x</code></li>
+<li><code>verification.sources.scalar.amplitude</code> -&gt; <code>-verification_scalar_amplitude</code></li>
+<li><code>verification.sources.scalar.kx/ky/kz</code> -&gt; <code>-verification_scalar_kx/-verification_scalar_ky/-verification_scalar_kz</code></li>
 </ul>
 </li>
 <li>C storage/parser:<ul>
-<li><code>verificationDiffusivity</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
+<li><code>verificationDiffusivity</code> and <code>verificationScalar</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
 <li>option parsing in <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
 </ul>
 </li>
 <li>Runtime:<ul>
 <li><code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
-<li>thin delegation from <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code></li>
+<li>thin delegation from <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code> for diffusivity</li>
+<li>analytical scalar truth in <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code></li>
+<li>gated particle-physics bypass in <code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code></li>
+<li>runtime metric writer in <code><a class="el" href="logging_8c.html">src/logging.c</a></code> (<code>logs/scatter_metrics.csv</code>)</li>
+</ul>
+</li>
+<li>Design boundary:<ul>
+<li>verification sources exist only for otherwise-unreachable verification scenarios</li>
+<li>analytical truth definitions belong in <code>AnalyticalSolutions</code>, not in model-evolution code such as <code>ParticlePhysics</code></li>
 </ul>
 </li>
 <li>Tests/docs to update:<ul>
 <li><code>tests/test_config_regressions.py</code></li>
 <li><code><a class="el" href="test__poisson__rhs_8c.html" title="C unit tests for Poisson, RHS, body-force, and diffusivity helpers.">tests/c/test_poisson_rhs.c</a></code></li>
-<li><code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code></li>
+<li><code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code></li>
+<li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, conversion, and profiling helpers.">tests/c/test_logging.c</a></code></li>
+<li><code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">tests/c/test_setup_lifecycle.c</a></code></li>
 <li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
+<li><b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 </ul>
 </li>

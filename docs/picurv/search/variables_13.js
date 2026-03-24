@@ -22,7 +22,7 @@ var searchData=
   ['sediment_19',['sediment',['../variables_8h.html#a292340e9970a9cd8564bfb064862730f',1,'SimCtx']]],
   ['simctx_20',['simCtx',['../variables_8h.html#a322702c716e6e140d71515d0b3e111b1',1,'UserCtx']]],
   ['size_21',['size',['../variables_8h.html#ad09da84b8a2e17ea5eae96dcb66c38aa',1,'SimCtx']]],
-  ['slope_5fx_22',['slope_x',['../variables_8h.html#a9163091b27bcc37b9e84367db1acebc7',1,'VerificationDiffusivityConfig']]],
+  ['slope_5fx_22',['slope_x',['../variables_8h.html#a9163091b27bcc37b9e84367db1acebc7',1,'VerificationDiffusivityConfig::slope_x'],['../variables_8h.html#afbd532ffae5e9499886c14df764a98b2',1,'VerificationScalarConfig::slope_x']]],
   ['smode_23',['smode',['../variables_8h.html#a60779054120e65c1c050f97f8f59691f',1,'IBMInfo']]],
   ['snespacker_24',['snespacker',['../variables_8h.html#a2daea7c5d04c32762e3c41c7a79b7d54',1,'UserMG']]],
   ['source_5fdir_25',['source_dir',['../variables_8h.html#a94fc423a207f2ee2f702f2f51ba0c321',1,'PostProcessParams']]],

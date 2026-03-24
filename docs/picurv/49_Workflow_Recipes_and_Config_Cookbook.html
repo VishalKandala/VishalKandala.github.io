@@ -90,7 +90,8 @@ $(function() {
 <li class="level1"><a href="#p49_drift_verification_sec">5. Drift Verification Workflow</a></li>
 <li class="level1"><a href="#p49_config_patterns_sec">6. Configuration Patterns Worth Reusing</a></li>
 <li class="level1"><a href="#p49_choose_sec">7. Which Example To Start From</a></li>
-<li class="level1"><a href="#p49_next_steps_sec">7. Related Pages</a><ul><li class="level2"><a href="#autotoc_md160">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md161">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p49_scatter_recipe_sec">7. Scatter Verification Recipe</a></li>
+<li class="level1"><a href="#p49_next_steps_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md160">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md161">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md162">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -334,8 +335,34 @@ $(function() {
 <li>you want a particle-focused test with minimal flow complexity,</li>
 <li>you want a reference for <code>ZERO_FLOW</code> analytical mode.</li>
 </ul>
+<h1><a class="anchor" id="p49_scatter_recipe_sec"></a>
+7. Scatter Verification Recipe</h1>
+<p>Use <code>solver.yml -&gt; verification.sources.scalar</code> when you need a known particle scalar truth field and there is no ordinary production workflow that can create that truth end-to-end.</p>
+<p>Recommended pattern:</p>
+<ul>
+<li>keep <code>operation_mode.eulerian_field_source: analytical</code></li>
+<li>use <code>analytical_type: ZERO_FLOW</code> for pure deposition checks</li>
+<li>choose a scalar profile under <code>verification.sources.scalar</code></li>
+<li>reuse the production scatter operator rather than adding a second deposition path</li>
+<li>read the runtime metric from <code>logs/scatter_metrics.csv</code></li>
+</ul>
+<p>Separation rules:</p>
+<ul>
+<li>when <code>verification.sources.scalar</code> is absent, ordinary production runs are unchanged</li>
+<li>only the particle <code>Psi</code> update is bypassed in verification mode</li>
+<li>carrier-flow selection remains independent, so the same scalar truth can later be paired with <code>UNIFORM_FLOW</code> or <code>TGV3D</code></li>
+</ul>
+<p>This pathway is useful for more than one study. It enables:</p>
+<ul>
+<li>static deposition verification</li>
+<li>moving-cloud scatter checks</li>
+<li>conservation diagnostics on deposited scalar fields</li>
+<li>grid-sensitivity studies using <code>scatter_metrics.csv</code></li>
+<li>future scalar-transport verification reuse</li>
+</ul>
+<p>A complete runnable example is provided in <code>examples/scatter_verification/</code>.</p>
 <h1><a class="anchor" id="p49_next_steps_sec"></a>
-7. Related Pages</h1>
+8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>

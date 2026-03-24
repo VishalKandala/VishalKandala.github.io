@@ -58,7 +58,7 @@ var searchData=
   ['min_5fz_55',['Min_Z',['../variables_8h.html#aaeef1864bb110c26e4b30a9e2c8c116d',1,'UserCtx']]],
   ['min_5fzbc_56',['Min_zbc',['../variables_8h.html#af3262b46369acfec9eb907421ae22dd5',1,'FSInfo']]],
   ['mixed_57',['mixed',['../variables_8h.html#a4b2a3494bdeca82703c2b3125c81c8f6',1,'SimCtx']]],
-  ['mode_58',['mode',['../variables_8h.html#a4e2177236cc82bd73fc5d32a28974f8b',1,'VerificationDiffusivityConfig']]],
+  ['mode_58',['mode',['../variables_8h.html#a4e2177236cc82bd73fc5d32a28974f8b',1,'VerificationDiffusivityConfig::mode'],['../variables_8h.html#a195ee6795b228db4baf19b49635662db',1,'VerificationScalarConfig::mode']]],
   ['mom_5fatol_59',['mom_atol',['../variables_8h.html#a59a7b230c084e07a66f9db0d55cc10b5',1,'SimCtx']]],
   ['mom_5fdt_5frk4_5fresidual_5fnorm_5fnoise_5fallowance_5ffactor_60',['mom_dt_rk4_residual_norm_noise_allowance_factor',['../variables_8h.html#abc2bb7e69c7ed292a55703328bbf241d',1,'SimCtx']]],
   ['mom_5fmax_5fpseudo_5fsteps_61',['mom_max_pseudo_steps',['../variables_8h.html#acaf3b5e080eec860a259a6398eee42d8',1,'SimCtx']]],

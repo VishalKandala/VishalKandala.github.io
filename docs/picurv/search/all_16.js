@@ -30,5 +30,8 @@ var searchData=
   ['kske_27',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
   ['ksp_28',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
   ['ksp_20stack_20in_20code_29',['2. Multigrid/KSP Stack In Code',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_mg_sec',1,'']]],
-  ['kzet_30',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
+  ['kx_30',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
+  ['ky_31',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
+  ['kz_32',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
+  ['kzet_33',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
 ];
