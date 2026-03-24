@@ -249,7 +249,7 @@ $(function() {
 <p>MPI/local options:</p><ul>
 <li><code>-n, --num-procs</code><ul>
 <li>applies to solver stage launch sizing.</li>
-<li>post-processing defaults to one rank/task.</li>
+<li>post-processing is forced to one rank/task. PICurv strips conflicting MPI size flags from post launches and rewrites them to rank <code>1</code>.</li>
 <li>local multi-rank runs resolve launcher overrides in this order: <code>PICURV_MPI_LAUNCHER</code>, <code>MPI_LAUNCHER</code>, nearest <code>.picurv-execution.yml</code>, nearest legacy <code>.picurv-local.yml</code>, then default <code>mpiexec</code>.</li>
 </ul>
 </li>
@@ -268,7 +268,7 @@ $(function() {
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml</div>
-</div><!-- fragment --><p> In this command, solver runs with 8 ranks; post-processing still defaults to 1 rank.</p>
+</div><!-- fragment --><p> In this command, solver runs with 8 ranks; post-processing is still forced to 1 rank.</p>
 <p>Slurm example (generate + submit): </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -415,6 +415,7 @@ $(function() {
 <li>expands parameter matrix from <code>study.yml</code></li>
 <li>materializes case directories under <code>studies/&lt;study_id&gt;/cases/</code></li>
 <li>generates <code>solver_array.sbatch</code>, <code>post_array.sbatch</code>, and <code>metrics_aggregate.sbatch</code></li>
+<li>renders <code>post_array.sbatch</code> with a single-task allocation and a forced one-rank launcher command</li>
 <li>submits solver → post (<code>afterok</code>) → metrics (<code>afterany</code>) chain (unless <code>--no-submit</code>)</li>
 </ul>
 <p>Behavior (<code>--continue</code>):</p><ul>
@@ -462,7 +463,7 @@ $(function() {
 </ul>
 </li>
 <li>launch controls:<ul>
-<li><code>-n, --num-procs &lt;int&gt;</code> (solver stage only; post remains 1 rank/task)</li>
+<li><code>-n, --num-procs &lt;int&gt;</code> (solver stage only; post is forced to 1 rank/task)</li>
 <li><code>--cluster &lt;cluster.yml&gt;</code> (enables Slurm mode)</li>
 <li><code>--scheduler &lt;name&gt;</code> (must be used with <code>--cluster</code>; must match <code>cluster.yml:scheduler.type</code>)</li>
 <li><code>--no-submit</code> (render scripts/manifests without <code>sbatch</code>)</li>
