@@ -84,7 +84,7 @@ var searchData=
   ['1_20workflow_20and_20orchestration_81',['1. Workflow and Orchestration',['../42_User_Guide_Index.html#p42_workflow_sec',1,'']]],
   ['1_20yaml_20contracts_20and_20ingestion_82',['2.1 YAML Contracts and Ingestion',['../Documentation_Map.html#p47_artifact_yaml_sec',1,'']]],
   ['10_20extending_20the_20test_20suite_83',['10. Extending The Test Suite',['../40_Testing_and_Quality_Guide.html#p40_extend_sec',1,'']]],
-  ['10_20next_20steps_84',['10 next steps',['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps'],['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps']]],
+  ['10_20next_20steps_84',['10 next steps',['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps'],['../08_Solver_Reference.html#p08_next_steps_sec',1,'10. Next Steps'],['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps']]],
   ['10_20profiling_20selector_85',['10. Profiling Selector',['../50_Modular_Selector_Extension_Guide.html#p50_profiling_sec',1,'']]],
   ['10_20structured_20error_20output_20contract_86',['10. Structured Error Output Contract',['../05_The_Conductor_Script.html#p05_structured_errors_sec',1,'']]],
   ['10_5fpost_5fprocessing_5freference_2emd_87',['10_Post_Processing_Reference.md',['../10__Post__Processing__Reference_8md.html',1,'']]],

@@ -14,5 +14,9 @@ var searchData=
   ['search_5fmetric_5fsum_5fsearch_5fpopulation_11',['SEARCH_METRIC_SUM_SEARCH_POPULATION',['../logging_8c.html#a06fc87d81c62e9abb8790b6e5713c55ba914c619ee4d9dd4578110d0b7721af8f',1,'logging.c']]],
   ['search_5fmetric_5fsum_5ftie_5fbreaks_12',['SEARCH_METRIC_SUM_TIE_BREAKS',['../logging_8c.html#a06fc87d81c62e9abb8790b6e5713c55babef0de0bbfbe40a6612c927564c212cd',1,'logging.c']]],
   ['search_5fmetric_5fsum_5ftraversal_5fsteps_13',['SEARCH_METRIC_SUM_TRAVERSAL_STEPS',['../logging_8c.html#a06fc87d81c62e9abb8790b6e5713c55ba81116230ef07fe0d38549f3f8f75392a',1,'logging.c']]],
-  ['symmetry_14',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
+  ['solution_5fconvergence_5fperiodic_5fdeterministic_14',['SOLUTION_CONVERGENCE_PERIODIC_DETERMINISTIC',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433ada4badc5a490a1e43f2e7f75fe7e24d4',1,'variables.h']]],
+  ['solution_5fconvergence_5fstatistical_5fsteady_15',['SOLUTION_CONVERGENCE_STATISTICAL_STEADY',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433ae6095657d98dedbdf9a11b04c577e830',1,'variables.h']]],
+  ['solution_5fconvergence_5fsteady_5fdeterministic_16',['SOLUTION_CONVERGENCE_STEADY_DETERMINISTIC',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433af8d1485dbc97f10af72599e0ebaabd61',1,'variables.h']]],
+  ['solution_5fconvergence_5ftransient_17',['SOLUTION_CONVERGENCE_TRANSIENT',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433a7184e5d0dc097511df6fc318c6882c09',1,'variables.h']]],
+  ['symmetry_18',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
 ];

@@ -167,6 +167,7 @@ $(function() {
 <li><code>verification.sources.scalar.*</code> -&gt; <code>-verification_scalar_*</code></li>
 <li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code> via normalized names.</li>
 <li>Solver-specific block support currently includes <code>momentum_solver.dual_time_picard_rk4</code>.</li>
+<li><code>solution_convergence.*</code> -&gt; <code>-solution_convergence_*</code> for physical solution drift logging.</li>
 <li><code>interpolation.method</code> -&gt; <code>-interpolation_method</code>. Defaults to <code>Trilinear</code> (direct cell-center, second-order). Set to <code>CornerAveraged</code> for the legacy two-stage path.</li>
 <li><code>petsc_passthrough_options</code> remains the escape hatch for advanced PETSc/C flags.</li>
 </ul>
@@ -182,6 +183,27 @@ $(function() {
 <li>they are only valid for analytical solver runs.</li>
 <li><code>verification.sources.scalar</code> prescribes particle <code>Psi</code> and drives the runtime diagnostic <code>logs/scatter_metrics.csv</code> while leaving ordinary production runs unchanged when absent.</li>
 <li>new verification source overrides belong in <code>verification_sources.*</code>, with production call sites kept as thin delegation points.</li>
+</ul>
+<p>Solution-convergence rule:</p>
+<ul>
+<li><code>solver.yml -&gt; solution_convergence</code> is an optional override block for the always-on runtime solution-convergence logger.</li>
+<li>the runtime always writes <code>logs/solution_convergence.csv</code> once per physical timestep, defaulting to <code>steady_deterministic</code> mode when the block is omitted.</li>
+<li>it complements, rather than replaces, the inner solver-health logs:<ul>
+<li><code>logs/Momentum_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>logs/Poisson_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>logs/Continuity_Metrics.log</code></li>
+</ul>
+</li>
+<li>supported modes are:<ul>
+<li><code>steady_deterministic</code></li>
+<li><code>periodic_deterministic</code></li>
+<li><code>statistical_steady</code></li>
+<li><code>transient</code></li>
+</ul>
+</li>
+<li><code>periodic_deterministic.period_steps</code> is required only when <code>mode: periodic_deterministic</code>.</li>
+<li><code>statistical_steady.window_steps</code> is required only when <code>mode: statistical_steady</code>.</li>
+<li>nested mode blocks are rejected when they do not match the selected <code>mode</code>.</li>
 </ul>
 <h1><a class="anchor" id="p14_monitor_sec"></a>
 5. Monitor Contract Highlights</h1>

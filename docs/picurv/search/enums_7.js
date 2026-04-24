@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vtkfiletype_0',['VTKFileType',['../variables_8h.html#afef259795cd298f0d543f574536e4dd7',1,'variables.h']]]
+  ['solutionconvergencemode_0',['SolutionConvergenceMode',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433',1,'variables.h']]]
 ];
