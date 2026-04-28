@@ -381,22 +381,26 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="p05_cancel_sec"></a>
 5c. cancel: Stop A Slurm Run By Run Directory</h1>
-<div class="fragment"><div class="line">./bin/picurv cancel --run-dir &lt;run_dir&gt; [--stage {all,solve,post-process}] [--dry-run]</div>
+<div class="fragment"><div class="line">./bin/picurv cancel --run-dir &lt;run_dir&gt; [--stage {all,solve,post-process}] [--graceful] [--dry-run]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>reads <code>scheduler/submission.json</code> from an existing run directory,</li>
 <li>resolves the recorded Slurm job IDs for <code>solve</code> and/or <code>post-process</code>,</li>
-<li>runs <code>scancel</code> for the selected stage set,</li>
+<li>runs hard <code>scancel &lt;job_id&gt;</code> for the selected stage set by default,</li>
+<li>with <code>--graceful</code>, sends <code>scancel --signal=USR1 &lt;job_id&gt;</code> for solver jobs so the runtime can write the latest safe off-cadence step at the next checkpoint,</li>
+<li>post-process jobs still use hard cancellation, even when <code>--graceful</code> is present,</li>
 <li>avoids manual job-id lookup when the run directory is already known.</li>
 </ul>
 <p>Examples:</p>
 <div class="fragment"><div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000</div>
 <div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --stage solve</div>
+<div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --stage solve --graceful</div>
 <div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --dry-run</div>
 </div><!-- fragment --><p>Notes:</p>
 <ul>
 <li>works only for Slurm-submitted runs that have <code>scheduler/submission.json</code>,</li>
 <li>does not apply to local runs,</li>
+<li><code>--graceful</code> requests solver shutdown and final output; if a job is wedged or not reaching runtime checkpoints, rerun without <code>--graceful</code> to hard-cancel it,</li>
 <li><code>--dry-run</code> is useful when you want to confirm the recorded stage/job mapping first.</li>
 </ul>
 <h1><a class="anchor" id="p05_sweep_sec"></a>

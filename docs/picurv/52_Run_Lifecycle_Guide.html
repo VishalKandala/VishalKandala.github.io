@@ -297,7 +297,9 @@ $(function() {
 <p>Operational examples:</p>
 <div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
 <div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt; --stage solve</div>
+<div class="line">./bin/picurv cancel --run-dir runs/&lt;run_id&gt; --stage solve --graceful</div>
 </div><!-- fragment --><p>Generated Slurm solver jobs also export runtime walltime metadata into <code>solver.sbatch</code>, so the solver can estimate completed-step cost and request a graceful final write before remaining walltime gets too tight. If the cluster profile also requests an early signal, PICurv traps <code>SIGUSR1</code>, <code>SIGTERM</code>, and <code>SIGINT</code>, then uses the same safe-checkpoint final-write path. Use <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</p>
+<p>For manual cancellation, plain <code>picurv cancel</code> is a hard Slurm cancel. Add <code>--graceful</code> when you want the solver to receive <code>SIGUSR1</code>, stop at the next safe checkpoint, and write the latest safe off-cadence output first. Fall back to plain cancel if the job is wedged or not reaching checkpoints.</p>
 <h1><a class="anchor" id="p52_rules_sec"></a>
 8. Safe Rules Of Thumb</h1>
 <ul>
