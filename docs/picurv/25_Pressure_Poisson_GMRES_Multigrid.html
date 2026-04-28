@@ -131,15 +131,29 @@ $(function() {
 3. YAML Mapping and PETSc Options</h1>
 <p>From <code>solver.yml</code> via <code>scripts/picurv</code>:</p>
 <ul>
-<li><code>pressure_solver.tolerance</code> -&gt; <code>-poisson_tol</code></li>
-<li><code>pressure_solver.multigrid.levels</code> -&gt; <code>-mg_level</code></li>
-<li><code>pressure_solver.multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
-<li><code>pressure_solver.multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
-<li><code>pressure_solver.multigrid.semi_coarsening.{i,j,k}</code> -&gt; <code>-mg_i_semi</code>, <code>-mg_j_semi</code>, <code>-mg_k_semi</code></li>
-<li>optional level solver keys -&gt; <code>-ps_mg_levels_*</code></li>
-<li><code>petsc_passthrough_options</code> -&gt; raw PETSc flags</li>
+<li><code>poisson_solver.method</code> -&gt; <code>-ps_ksp_type</code></li>
+<li><code>poisson_solver.absolute_tolerance</code> -&gt; <code>-ps_ksp_atol</code> and legacy <code>-poisson_tol</code></li>
+<li><code>poisson_solver.relative_tolerance</code> -&gt; <code>-ps_ksp_rtol</code></li>
+<li><code>poisson_solver.max_iterations</code> -&gt; <code>-ps_ksp_max_it</code></li>
+<li><code>poisson_solver.gmres.restart</code> -&gt; <code>-ps_ksp_gmres_restart</code></li>
+<li><code>poisson_solver.preconditioner.type</code> -&gt; <code>-ps_pc_type</code>; only <code>multigrid</code> is supported today</li>
+<li><code>poisson_solver.multigrid.levels</code> -&gt; <code>-mg_level</code></li>
+<li><code>poisson_solver.multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
+<li><code>poisson_solver.multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
+<li><code>poisson_solver.multigrid.semi_coarsening.{i,j,k}</code> -&gt; <code>-mg_i_semi</code>, <code>-mg_j_semi</code>, <code>-mg_k_semi</code></li>
+<li><code>poisson_solver.multigrid.level_solvers.level_N.method</code> -&gt; <code>-ps_mg_levels_N_ksp_type</code></li>
+<li><code>poisson_solver.multigrid.level_solvers.level_N.preconditioner</code> -&gt; <code>-ps_mg_levels_N_pc_type</code></li>
+<li><code>pressure_solver</code> remains a legacy alias for <code>poisson_solver</code></li>
+<li><code>petsc_passthrough_options</code> -&gt; advanced PETSc flags not exposed as structured YAML</li>
 </ul>
 <p>Final option parsing happens in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during context creation.</p>
+<p>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest grid. Larger level numbers are progressively finer. The default MG level preconditioner is block Jacobi (<code>bjacobi</code>) when not specified. The current PETSc binding applies one MG smoother count; if <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</p>
+<p>Common MG-level preconditioner notes:</p>
+<ul>
+<li><code>jacobi</code> and <code>sor</code> are simple smoother PCs. SOR can use <code>-ps_mg_levels_N_pc_sor_omega &lt;positive-real&gt;</code> through passthrough when needed.</li>
+<li><code>ilu</code> and <code>lu</code> are factor PCs. Useful passthrough knobs include <code>-ps_mg_levels_N_pc_factor_levels &lt;nonnegative-integer&gt;</code> and <code>-ps_mg_levels_N_pc_factor_shift_amount &lt;nonnegative-real&gt;</code>.</li>
+<li><code>bjacobi</code> owns nested block solves; inspect exact nested PETSc prefixes with <code>-ps_ksp_view</code> before tuning sub-KSP/sub-PC options for a specific PETSc build.</li>
+</ul>
 <h1><a class="anchor" id="p25_robustness_sec"></a>
 4. Robustness Characteristics</h1>
 <p>Current implementation includes:</p>

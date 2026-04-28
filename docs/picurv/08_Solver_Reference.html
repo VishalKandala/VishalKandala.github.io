@@ -87,7 +87,7 @@ $(function() {
 <li class="level1"><a href="#p08_strategy_sec">2. strategy</a></li>
 <li class="level1"><a href="#p08_tol_sec">3. tolerances</a></li>
 <li class="level1"><a href="#p08_msolver_sec">4. momentum_solver (Solver-Specific Block)</a></li>
-<li class="level1"><a href="#p08_pressure_sec">5. pressure_solver</a></li>
+<li class="level1"><a href="#p08_poisson_sec">5. poisson_solver</a></li>
 <li class="level1"><a href="#p08_solution_conv_sec">6. solution_convergence</a></li>
 <li class="level1"><a href="#p08_interp_sec">7. interpolation</a></li>
 <li class="level1"><a href="#p08_verification_sec">8. verification</a></li>
@@ -205,35 +205,56 @@ momentum_solver:
 #   #   window_steps: 500          # -&gt; -solution_convergence_window_steps
 
 # ==============================================================================
-# 3. PRESSURE-POISSON SOLVER CONFIGURATION
+# 3. POISSON SOLVER CONFIGURATION
 # ==============================================================================
-pressure_solver:
-  # --- Main Tolerance ---
-  tolerance: 1.0e-9 # [Float] -&gt; -poisson_tol
+poisson_solver:
+  # Solves for pressure correction Phi, then the runtime updates pressure P.
+  # The outer linear solver uses PETSc KSP under the hood, but this block uses
+  # PICurv-facing names for the common controls.
+  method: "fgmres"             # -&gt; -ps_ksp_type
+  absolute_tolerance: 1.0e-5   # -&gt; -ps_ksp_atol and legacy -poisson_tol
+  relative_tolerance: 1.0e-11  # -&gt; -ps_ksp_rtol
+  max_iterations: 50           # -&gt; -ps_ksp_max_it
+  gmres:
+    # Only valid for GMRES-family methods: gmres, fgmres, lgmres.
+    restart: 20                # -&gt; -ps_ksp_gmres_restart
+
+  preconditioner:
+    # Only multigrid is supported for the outer Poisson preconditioner today.
+    # Other values are rejected until the C runtime grows a non-PCMG path.
+    type: "multigrid"          # -&gt; -ps_pc_type mg
 
   # --- Geometric Multigrid (PCMG) Settings ---
   multigrid:
     levels: 3         # [Integer] -&gt; -mg_level
     pre_sweeps: 2     # [Integer] -&gt; -mg_pre_it
     post_sweeps: 2    # [Integer] -&gt; -mg_post_it
+    # Current PETSc binding applies one smoother count; if these differ,
+    # PICurv uses the larger value and logs a warning.
     semi_coarsening:
       i: false        # [true/false] -&gt; -mg_i_semi
       j: false        # [true/false] -&gt; -mg_j_semi
       k: true         # [true/false] -&gt; -mg_k_semi
       
-    # --- CONVENIENCE: Smoother Configuration Per Level ---
-    # This section sets the KSP (solver) type for the smoother on each MG level.
-    # NOTE: The C-code hardcodes the preconditioner (PC) for each smoother to
-    #       Block Jacobi (PCBJACOBI). You can only set the KSP type here.
-    # Level 0 is the finest grid.
+    cycle: "v"        # Currently supported: "v"
+    mode: "multiplicative" # Currently supported: "multiplicative"
+
+    # --- Smoother / Coarse Solver Configuration Per MG Level ---
+    # PETSc/PICurv level numbering uses level_0 as the coarsest grid; larger
+    # level numbers are progressively finer.
+    # `method` maps to PETSc KSP type. `preconditioner` maps to PETSc PC type.
+    # The default level preconditioner is bjacobi when omitted.
     level_solvers:
       level_0:
-        ksp_type: "richardson" # -&gt; -ps_mg_levels_0_ksp_type "richardson"
-      level_1:
-        ksp_type: "chebyshev"  # -&gt; -ps_mg_levels_1_ksp_type "chebyshev"
-      level_2:
         # The coarsest level often uses a more robust solver.
-        ksp_type: "gmres"      # -&gt; -ps_mg_levels_2_ksp_type "gmres"
+        method: "fgmres"          # -&gt; -ps_mg_levels_0_ksp_type
+        preconditioner: "bjacobi" # -&gt; -ps_mg_levels_0_pc_type
+      level_1:
+        method: "richardson"
+        preconditioner: "bjacobi"
+      level_2:
+        method: "richardson"
+        preconditioner: "bjacobi"
 
 # ==============================================================================
 # 4. INTERPOLATION
@@ -252,14 +273,22 @@ interpolation:
 # 5. PETSC PASSTHROUGH OPTIONS (FOR ADVANCED USERS)
 # ==============================================================================
 petsc_passthrough_options:
-  # --- Top-level KSP settings ---
-  -ps_ksp_type: "fgmres"
-  -ps_ksp_rtol: 1.0e-11
-  -ps_ksp_max_it: 50
-  
-  # --- PC (Preconditioner) Settings ---
-  # The C-code forces the top-level PC to be 'mg'. This line is for clarity.
-  -ps_pc_type: "mg"
+  # Use this only for advanced PETSc controls that do not have structured YAML
+  # above. Structured values and passthrough flags target the same PETSc options;
+  # passthrough wins when the same flag is listed in both places.
+
+  # --- MG level preconditioner tuning examples ---
+  # jacobi / sor: simple smoother PCs; no extra nested setup is normally needed.
+  # -ps_mg_levels_2_pc_type: "sor"
+  # -ps_mg_levels_2_pc_sor_omega: 1.0      # PETSc SOR relaxation; positive real
+
+  # ilu / lu: factor PCs; use PETSc factor controls when pivots are fragile.
+  # -ps_mg_levels_0_pc_type: "ilu"
+  # -ps_mg_levels_0_pc_factor_levels: 1    # nonnegative integer
+  # -ps_mg_levels_0_pc_factor_shift_amount: 1.0e-10 # nonnegative real
+
+  # bjacobi: nested block solves. Inspect exact nested prefixes with -ps_ksp_view
+  # when tuning sub-KSP/sub-PC options for your PETSc version.
 
   # --- Additional Momentum Controls (if you prefer passthrough style) ---
   # -pseudo_cfl: 0.1
@@ -267,11 +296,6 @@ petsc_passthrough_options:
   # -min_pseudo_cfl: 0.001
   # -pseudo_cfl_growth_factor: 1.0
   # -pseudo_cfl_reduction_factor: 1.0
-
-  # --- Redundant/Ineffective Flag Example ---
-  # You could add the following line here, but the C-code's hardcoded
-  # PCSetType(subpc, PCBJACOBI) call would override it. It will have no effect.
-  # -ps_mg_levels_1_pc_type: "sor"
 </pre><p><code>solver.yml</code> controls numerical strategy and solver internals.</p>
 <h1><a class="anchor" id="p08_opmode_sec"></a>
 1. operation_mode</h1>
@@ -332,20 +356,52 @@ petsc_passthrough_options:
 <li><code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
 </ul>
 <p>Rule: solver-specific blocks must match selected momentum solver type.</p>
-<h1><a class="anchor" id="p08_pressure_sec"></a>
-5. pressure_solver</h1>
-<div class="fragment"><div class="line">pressure_solver:</div>
-<div class="line">  tolerance: 5.0e-9</div>
+<h1><a class="anchor" id="p08_poisson_sec"></a>
+5. poisson_solver</h1>
+<div class="fragment"><div class="line">poisson_solver:</div>
+<div class="line">  method: &quot;fgmres&quot;</div>
+<div class="line">  absolute_tolerance: 1.0e-5</div>
+<div class="line">  relative_tolerance: 1.0e-11</div>
+<div class="line">  max_iterations: 50</div>
+<div class="line">  gmres:</div>
+<div class="line">    restart: 20</div>
+<div class="line">  preconditioner:</div>
+<div class="line">    type: &quot;multigrid&quot;</div>
 <div class="line">  multigrid:</div>
 <div class="line">    levels: 3</div>
-<div class="line">    pre_sweeps: 1</div>
-<div class="line">    post_sweeps: 1</div>
+<div class="line">    cycle: &quot;v&quot;</div>
+<div class="line">    mode: &quot;multiplicative&quot;</div>
+<div class="line">    semi_coarsening:</div>
+<div class="line">      i: false</div>
+<div class="line">      j: false</div>
+<div class="line">      k: true</div>
+<div class="line">    level_solvers:</div>
+<div class="line">      level_0:</div>
+<div class="line">        method: &quot;fgmres&quot;</div>
+<div class="line">        preconditioner: &quot;bjacobi&quot;</div>
+<div class="line">      level_1:</div>
+<div class="line">        method: &quot;richardson&quot;</div>
+<div class="line">        preconditioner: &quot;bjacobi&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>tolerance</code> -&gt; <code>-poisson_tol</code></li>
+<li><code>method</code> -&gt; <code>-ps_ksp_type</code></li>
+<li><code>absolute_tolerance</code> -&gt; <code>-ps_ksp_atol</code> and legacy <code>-poisson_tol</code></li>
+<li><code>relative_tolerance</code> -&gt; <code>-ps_ksp_rtol</code></li>
+<li><code>max_iterations</code> -&gt; <code>-ps_ksp_max_it</code></li>
+<li><code>gmres.restart</code> -&gt; <code>-ps_ksp_gmres_restart</code>; valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code></li>
+<li><code>preconditioner.type</code> -&gt; <code>-ps_pc_type</code>; currently only <code>multigrid</code> is supported</li>
 <li><code>multigrid.levels</code> -&gt; <code>-mg_level</code></li>
 <li><code>multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
 <li><code>multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
 <li><code>multigrid.semi_coarsening.i/j/k</code> -&gt; <code>-mg_i_semi/-mg_j_semi/-mg_k_semi</code></li>
+<li><code>multigrid.level_solvers.level_N.method</code> -&gt; <code>-ps_mg_levels_N_ksp_type</code></li>
+<li><code>multigrid.level_solvers.level_N.preconditioner</code> -&gt; <code>-ps_mg_levels_N_pc_type</code></li>
+</ul>
+<p>Rules:</p><ul>
+<li><code>pressure_solver</code> is accepted as a legacy alias, but <code>poisson_solver</code> is preferred because the linear solve computes pressure correction <code>Phi</code>.</li>
+<li>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest level and larger numbers are finer.</li>
+<li>The outer Poisson preconditioner is multigrid-only in the current runtime.</li>
+<li>The current PETSc binding applies one MG smoother count; when <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</li>
+<li>Advanced PETSc tuning remains available through <code>petsc_passthrough_options</code>; common examples include <code>-ps_mg_levels_N_pc_sor_omega</code> for SOR and <code>-ps_mg_levels_N_pc_factor_shift_amount</code> / <code>-ps_mg_levels_N_pc_factor_levels</code> for factor PCs.</li>
 </ul>
 <h1><a class="anchor" id="p08_solution_conv_sec"></a>
 6. solution_convergence</h1>
