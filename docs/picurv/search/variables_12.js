@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
+  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_2',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
   ['rank_5fxm_3',['rank_xm',['../variables_8h.html#a9419886ec15f30fb98c71804d563796c',1,'RankNeighbors']]],
@@ -29,7 +29,12 @@ var searchData=
   ['rotateframe_26',['rotateframe',['../variables_8h.html#aecc33b61ded0b8c01e2524094af2504a',1,'SimCtx']]],
   ['rotatefsi_27',['rotatefsi',['../variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9',1,'SimCtx']]],
   ['rstart_5ffsi_28',['rstart_fsi',['../variables_8h.html#a5d62bb83d782192bfb7a04b985d1b8aa',1,'SimCtx']]],
-  ['rx_29',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
-  ['ry_30',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
-  ['rz_31',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
+  ['runtimememorylogenabled_29',['runtimeMemoryLogEnabled',['../variables_8h.html#a39d780017d47dd98456e1b05d5ff2d42',1,'SimCtx']]],
+  ['runtimememorylogfile_30',['runtimeMemoryLogFile',['../variables_8h.html#a543082a23c10272ae26ebca05f87d677',1,'SimCtx']]],
+  ['runtimememoryloghasprevious_31',['runtimeMemoryLogHasPrevious',['../variables_8h.html#aaab42722ec6a189f479b9637a719faf6',1,'SimCtx']]],
+  ['runtimememorylogpreviousprocessmb_32',['runtimeMemoryLogPreviousProcessMB',['../variables_8h.html#ac8f6c09ebbf4a97fbffa1b5a88675f87',1,'SimCtx']]],
+  ['runtimememorylogstarted_33',['runtimeMemoryLogStarted',['../variables_8h.html#a5479290d05da608eeaf1dd2d948e54d6',1,'SimCtx']]],
+  ['rx_34',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
+  ['ry_35',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
+  ['rz_36',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
 ];

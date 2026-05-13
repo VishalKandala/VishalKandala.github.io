@@ -86,8 +86,9 @@ $(function() {
 <ul><li class="level1"><a href="#p09_io_sec">1. io</a></li>
 <li class="level1"><a href="#p09_logging_sec">2. logging</a></li>
 <li class="level1"><a href="#p09_profiling_sec">3. profiling</a></li>
-<li class="level1"><a href="#p09_solver_monitoring_sec">4. solver_monitoring</a></li>
-<li class="level1"><a href="#p09_next_steps_sec">5. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p09_diagnostics_sec">4. diagnostics</a></li>
+<li class="level1"><a href="#p09_solver_monitoring_sec">5. solver_monitoring</a></li>
+<li class="level1"><a href="#p09_next_steps_sec">6. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md34">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -157,7 +158,30 @@ profiling:
     enabled: true
 
 # ==============================================================================
-# 3. I/O AND DATA MANAGEMENT
+# 3. DIAGNOSTICS
+#    Controls PETSc-native diagnostics and the compact runtime memory log.
+# ==============================================================================
+diagnostics:
+  petsc:
+    malloc_debug: false
+    malloc_test: false
+    malloc_dump: false
+    malloc_view: false
+    malloc_view_threshold: null
+    memory_view: false
+    log_view: false
+    log_view_memory: false
+    log_all: false
+    log_trace: false
+    objects_dump: false
+    options_left: null
+
+  runtime_memory_log:
+    enabled: true
+    file: "Runtime_Memory.log"
+
+# ==============================================================================
+# 4. I/O AND DATA MANAGEMENT
 #    Controls data file generation and locations for the SOLVER.
 # ==============================================================================
 io:
@@ -223,7 +247,7 @@ solver_monitoring:
   # --- Example: TS (Time Stepper) Monitors ---
   # (If your implicit solver uses PETSc's TS object)
   # -ts_monitor: true
-</pre><p><code>monitor.yml</code> controls observability and run I/O behavior.</p>
+</pre><p><code>monitor.yml</code> controls observability, diagnostics, and run I/O behavior.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
 1. io</h1>
 <div class="fragment"><div class="line">io:</div>
@@ -297,8 +321,34 @@ solver_monitoring:
 <li><code>timestep_output.file</code> sets the filename written under the run <code>logs/</code> directory</li>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
+<h1><a class="anchor" id="p09_diagnostics_sec"></a>
+4. diagnostics</h1>
+<p>Structured diagnostics for PETSc memory/object/function debugging plus a compact PICurv runtime memory log:</p>
+<div class="fragment"><div class="line">diagnostics:</div>
+<div class="line">  petsc:</div>
+<div class="line">    malloc_debug: false</div>
+<div class="line">    malloc_test: false</div>
+<div class="line">    malloc_dump: false</div>
+<div class="line">    malloc_view: false</div>
+<div class="line">    malloc_view_threshold: null</div>
+<div class="line">    memory_view: false</div>
+<div class="line">    log_view: false</div>
+<div class="line">    log_view_memory: false</div>
+<div class="line">    log_all: false</div>
+<div class="line">    log_trace: false</div>
+<div class="line">    objects_dump: false</div>
+<div class="line">    options_left: null</div>
+<div class="line">  runtime_memory_log:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    file: &quot;Runtime_Memory.log&quot;</div>
+</div><!-- fragment --><p>Rules:</p><ul>
+<li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
+<li>PETSc diagnostics that support output files use run-local defaults under <code>logs/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
+<li><code>runtime_memory_log</code> writes a rank-reduced, terminal-readable log with max process/PETSc allocation signals per step.</li>
+<li><code>picurv summarize</code> reports the latest runtime memory signals when the log is present.</li>
+</ul>
 <h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
-4. solver_monitoring</h1>
+5. solver_monitoring</h1>
 <p>Raw flag passthrough for PETSc monitors/debug options:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
 <div class="line">  -ps_ksp_pic_monitor_true_residual: true</div>
@@ -310,7 +360,7 @@ solver_monitoring:
 <li>Non-boolean values emit <code>flag value</code>.</li>
 </ul>
 <h1><a class="anchor" id="p09_next_steps_sec"></a>
-5. Next Steps</h1>
+6. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b>.</p>
 <p>Also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
