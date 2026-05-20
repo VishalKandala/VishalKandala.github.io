@@ -90,7 +90,8 @@ $(function() {
 <li class="level1"><a href="#p48_types_sec">3. Supported Grid Types</a></li>
 <li class="level1"><a href="#p48_config_sec">4. Config File Model</a></li>
 <li class="level1"><a href="#p48_outputs_sec">5. Outputs</a></li>
-<li class="level1"><a href="#p48_case_sec">6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;</a><ul><li class="level2"><a href="#p48_file_legacy_ssec">6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#p48_case_sec">6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;</a><ul><li class="level2"><a href="#p48_promote_generated_ssec">6.1 Promoting a Generated Grid to File Mode</a></li>
+<li class="level2"><a href="#p48_file_legacy_ssec">6.2 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p48_choose_sec">7. When To Use Which Grid Path</a></li>
@@ -233,8 +234,27 @@ $(function() {
 <li>stage the runtime <code>grid.run</code> artifact for C-side ingestion.</li>
 </ol>
 <p>This means <code>grid_gen</code> remains a Python-side preprocessing workflow even though the final solver still receives a normalized file grid. Fresh solve runs and <code>--restart-from</code> runs stage a grid in the target run directory. For <code>--continue</code> solve runs, an existing <code>config/grid.run</code> is reused when present so the generator is not called again. Post-only runs read the existing control file and do not regenerate grids.</p>
-<h2><a class="anchor" id="p48_file_legacy_ssec"></a>
-6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</h2>
+<h2><a class="anchor" id="p48_promote_generated_ssec"></a>
+6.1 Promoting a Generated Grid to File Mode</h2>
+<p>Use <code>grid_gen</code> when you want PICurv to run <code>grid.gen</code> as part of staging a case. Use <code>file</code> mode for later runs when you want to reuse a generated <code>.picgrid</code> without invoking the generator again.</p>
+<p>A practical workflow is:</p>
+<ol type="1">
+<li>stage the original case with <code>grid.mode: grid_gen</code> and <code>--no-submit</code>,</li>
+<li>inspect the generated PICGRID artifact under the run config directory,</li>
+<li>copy or reference that <code>.picgrid</code> from a later case,</li>
+<li>switch the later case to <code>grid.mode: file</code>.</li>
+</ol>
+<p>By default the generated artifact is:</p>
+<div class="fragment"><div class="line">runs/&lt;run_id&gt;/config/grid.generated.picgrid</div>
+</div><!-- fragment --><p>The solver does not ingest that dimensional file directly. PICurv validates and non-dimensionalizes it into:</p>
+<div class="fragment"><div class="line">runs/&lt;run_id&gt;/config/grid.run</div>
+</div><!-- fragment --><p>and the generated solver control file points the C runtime at <code>config/grid.run</code>. When reusing the generated mesh in another case, point <code>grid.source_file</code> at the <code>.picgrid</code> artifact, not at <code>grid.run</code>.</p>
+<p>Example follow-up case:</p>
+<div class="fragment"><div class="line">grid:</div>
+<div class="line">  mode: file</div>
+<div class="line">  source_file: ../runs/&lt;run_id&gt;/config/grid.generated.picgrid</div>
+</div><!-- fragment --><h2><a class="anchor" id="p48_file_legacy_ssec"></a>
+6.2 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;</h2>
 <p>For <code>grid.mode: file</code>, <code>picurv</code> can call <code>grid.gen legacy1d</code> before normal grid staging:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>

@@ -19,7 +19,7 @@ var searchData=
   ['ldiffusivitygradient_16',['lDiffusivityGradient',['../variables_8h.html#a037180d872c92c3e4f871b3a9eb161d5',1,'UserCtx']]],
   ['left_17',['LEFT',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fadb45120aafd37a973140edee24708065',1,'variables.h']]],
   ['legacy_18',['1.2 Corner-Averaged (Legacy)',['../27_Trilinear_Interpolation_and_Projection.html#p27_corner_averaged_ssec',1,'']]],
-  ['legacy_20file_20conversion_20through_20tt_20case_20yml_20tt_19',['6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_file_legacy_ssec',1,'']]],
+  ['legacy_20file_20conversion_20through_20tt_20case_20yml_20tt_19',['6.2 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_file_legacy_ssec',1,'']]],
   ['lens_20',['5.2 Source-to-Test Coverage Lens',['../13_Code_Architecture.html#p13_source_to_tests_ssec',1,'']]],
   ['les_21',['les',['../variables_8h.html#ad87ed7266a1bc272ab8d4cea4e39d4d2',1,'SimCtx']]],
   ['les_2ec_22',['les.c',['../les_8c.html',1,'']]],

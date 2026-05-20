@@ -20,7 +20,7 @@ var searchData=
   ['ymax_17',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
   ['ymin_18',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
   ['yml_19',['yml',['../14_Config_Contract.html#p14_cluster_sec',1,'7. Cluster Contract Highlights (cluster.yml)'],['../14_Config_Contract.html#p14_study_sec',1,'8. Study Contract Highlights (study.yml)']]],
-  ['yml_20tt_20',['yml tt',['../45_Particle_Initialization_and_Restart.html#p45_contract_sec',1,'1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_case_sec',1,'6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_file_legacy_ssec',1,'6.1 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;']]],
+  ['yml_20tt_20',['yml tt',['../45_Particle_Initialization_and_Restart.html#p45_contract_sec',1,'1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_case_sec',1,'6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_file_legacy_ssec',1,'6.2 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;']]],
   ['you_20should_20gain_21',['5. Competencies You Should Gain',['../42_User_Guide_Index.html#p42_outcomes_sec',1,'']]],
   ['your_20first_20simulation_20flat_20channel_22',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
   ['your_20output_20files_23',['1. Understanding Your Output Files',['../04_Visualization_Tutorial.html#p04_files_sec',1,'']]],
