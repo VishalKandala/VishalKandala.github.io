@@ -89,7 +89,7 @@ $(function() {
 <li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
 <li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Health Summary</a></li>
-<li class="level1"><a href="#p05_submit_sec">5b. submit: Submit Existing Slurm Artifacts</a></li>
+<li class="level1"><a href="#p05_submit_sec">5b. submit: Execute Existing Staged Artifacts</a></li>
 <li class="level1"><a href="#p05_cancel_sec">5c. cancel: Stop A Slurm Run By Run Directory</a></li>
 <li class="level1"><a href="#p05_sweep_sec">6. sweep: Parameter Study via Slurm Arrays</a></li>
 <li class="level1"><a href="#p05_validate_sec">7. validate: Config-Only Checks</a></li>
@@ -254,10 +254,10 @@ $(function() {
 </ul>
 </li>
 </ul>
-<p>Cluster/Slurm options:</p><ul>
+<p>Staging/execution options:</p><ul>
 <li><code>--cluster &lt;cluster.yml&gt;</code></li>
 <li><code>--scheduler slurm</code> (optional explicit selector)</li>
-<li><code>--no-submit</code> (generate scripts/manifests only)</li>
+<li><code>--no-submit</code> (stage run artifacts without starting the local or Slurm backend)</li>
 </ul>
 <p>Preflight options:</p><ul>
 <li><code>--dry-run</code> (resolve and print launch/artifact plan only, including PETSc diagnostic flags and log paths)</li>
@@ -275,14 +275,14 @@ $(function() {
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
 <div class="line">  --cluster my_case/cluster.yml</div>
-</div><!-- fragment --><p>Slurm example (generate only): </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
+</div><!-- fragment --><p>Stage artifacts without starting execution: </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml \</div>
-<div class="line">  --cluster my_case/cluster.yml \</div>
 <div class="line">  --no-submit</div>
-</div><!-- fragment --><p>Follow-up submission from existing artifacts: </p><div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
+</div><!-- fragment --><p> Add <code>--cluster my_case/cluster.yml</code> to stage Slurm scripts instead of local commands.</p>
+<p>Follow-up execution/submission from existing artifacts: </p><div class="fragment"><div class="line">./bin/picurv submit --run-dir runs/&lt;run_id&gt;</div>
 </div><!-- fragment --><p>Post-only continuation examples:</p>
 <ul>
 <li>Catch up a live run without editing <code>post.yml.start_step</code>. Keep the full desired analysis window in <code>post.yml</code>, then let <code>--continue</code> move the launch cursor inside that window:</li>
@@ -353,20 +353,21 @@ $(function() {
 <li>first full local run: <code>--solve --post-process</code></li>
 <li>solver-only run: <code>--solve</code></li>
 <li>post-only rerun on an existing run directory: <code>--post-process --run-dir ...</code></li>
-<li>cluster script generation without submit: <code>--cluster ... --no-submit</code></li>
+<li>staged local/cluster run without execution: <code>--no-submit</code></li>
 <li>delayed submission of an already-staged run: <code>submit --run-dir ...</code></li>
 <li>planning and CI-style checks: <code>--dry-run</code></li>
 </ul>
 <h1><a class="anchor" id="p05_submit_sec"></a>
-5b. submit: Submit Existing Slurm Artifacts</h1>
+5b. submit: Execute Existing Staged Artifacts</h1>
 <div class="fragment"><div class="line">./bin/picurv submit [--run-dir &lt;run_dir&gt; | --study-dir &lt;study_dir&gt;] \</div>
 <div class="line">  [--stage {all,solve,post-process}] [--force] [--dry-run]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>consumes existing <code>--no-submit</code> artifacts without regenerating configs or scripts,</li>
-<li>reads <code>scheduler/submission.json</code> to locate the staged Slurm scripts,</li>
-<li>submits <code>solve</code>, <code>post-process</code>, or both,</li>
-<li>wires the post stage dependency automatically when <code>all</code> is selected,</li>
+<li>reads <code>scheduler/submission.json</code> to locate staged Slurm scripts or local command tokens,</li>
+<li>executes/submits <code>solve</code>, <code>post-process</code>, or both,</li>
+<li>wires the post stage dependency automatically for Slurm when <code>all</code> is selected,</li>
+<li>executes local staged stages in order when <code>launch_mode: local</code>,</li>
 <li>refuses re-submission unless <code>--force</code> is explicitly provided.</li>
 </ul>
 <p>Examples:</p>
@@ -375,8 +376,9 @@ $(function() {
 <div class="line">./bin/picurv submit --study-dir studies/my_study_20260310-120000 --dry-run</div>
 </div><!-- fragment --><p>Notes:</p>
 <ul>
-<li>works only for Slurm-staged artifacts,</li>
-<li><code>--dry-run</code> prints the exact <code>sbatch</code> plan,</li>
+<li><code>--run-dir</code> supports local and Slurm staged runs,</li>
+<li><code>--study-dir</code> remains Slurm-only,</li>
+<li><code>--dry-run</code> prints the exact local command or <code>sbatch</code> plan,</li>
 <li><code>--force</code> is the opt-in path for deliberate resubmission.</li>
 </ul>
 <h1><a class="anchor" id="p05_cancel_sec"></a>
@@ -471,7 +473,7 @@ $(function() {
 <li><code>-n, --num-procs &lt;int&gt;</code> (solver stage only; post is forced to 1 rank/task)</li>
 <li><code>--cluster &lt;cluster.yml&gt;</code> (enables Slurm mode)</li>
 <li><code>--scheduler &lt;name&gt;</code> (must be used with <code>--cluster</code>; must match <code>cluster.yml:scheduler.type</code>)</li>
-<li><code>--no-submit</code> (render scripts/manifests without <code>sbatch</code>)</li>
+<li><code>--no-submit</code> (stage files and submission metadata without starting execution)</li>
 <li><code>--dry-run</code> (no file writes; plan only, including diagnostic artifacts)</li>
 <li><code>--format {text,json}</code> (dry-run output format)</li>
 </ul>
@@ -612,6 +614,7 @@ $(function() {
 <li><code>post_num_procs_effective</code></li>
 <li><code>num_procs_effective</code> (currently mirrors solver count)</li>
 </ul>
+<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>scripts/grid.gen</code> or write these files.</p>
 <p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>
 <ul>
 <li><code>mode</code> (<code>local</code> or <code>slurm</code>)</li>
@@ -621,6 +624,7 @@ $(function() {
 </ul>
 <p>Additional stage fields:</p><ul>
 <li><code>script</code> (Slurm script path in cluster mode)</li>
+<li><code>command</code> / <code>command_string</code> (local staged command tokens/display string)</li>
 <li><code>source_data_directory</code> (post stage source directory resolution)</li>
 <li><code>restart_source_directory</code> (solve stage, when restart source is resolved)</li>
 </ul>

@@ -62,6 +62,6 @@ var searchData=
   ['51_5fc_5ftest_5fsuite_5fdeveloper_5fguide_2emd_59',['51_C_Test_Suite_Developer_Guide.md',['../51__C__Test__Suite__Developer__Guide_8md.html',1,'']]],
   ['52_5frun_5flifecycle_5fguide_2emd_60',['52_Run_Lifecycle_Guide.md',['../52__Run__Lifecycle__Guide_8md.html',1,'']]],
   ['53_5fsearch_5frobustness_5fmetrics_5freference_2emd_61',['53_Search_Robustness_Metrics_Reference.md',['../53__Search__Robustness__Metrics__Reference_8md.html',1,'']]],
-  ['5b_20submit_3a_20submit_20existing_20slurm_20artifacts_62',['5b. submit: Submit Existing Slurm Artifacts',['../05_The_Conductor_Script.html#p05_submit_sec',1,'']]],
+  ['5b_20submit_3a_20execute_20existing_20staged_20artifacts_62',['5b. submit: Execute Existing Staged Artifacts',['../05_The_Conductor_Script.html#p05_submit_sec',1,'']]],
   ['5c_20cancel_3a_20stop_20a_20slurm_20run_20by_20run_20directory_63',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]]
 ];
