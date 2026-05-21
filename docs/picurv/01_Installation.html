@@ -127,7 +127,7 @@ $(function() {
 <li><code>bin/postprocessor</code> (compiled C post-processor)</li>
 <li><code>bin/picurv</code> (launcher for <code>scripts/picurv</code>, the Python conductor)</li>
 </ul>
-<p>By default, bootstrap creates <code>.picurv-venv/</code> under the repo and installs the Python-side CLI dependencies there. PETSc, MPI, compilers, and scheduler tools remain provided by your loaded system or cluster modules.</p>
+<p>By default, bootstrap creates <code>.picurv-venv/</code> under the repo and installs the Python-side CLI dependencies there. PETSc, MPI, compilers, and scheduler tools remain provided by your loaded system or cluster modules. Bootstrap also writes <code>.picurv-python-env</code>, which records the seed Python runtime library path needed to launch the managed venv after you switch to a different module stack.</p>
 <p>On an existing HPC cluster where modules already provide compilers, MPI, and PETSc, skip OS package installation:</p>
 <div class="fragment"><div class="line">module load &lt;compiler-mpi-petsc-stack&gt;</div>
 <div class="line">./scripts/bootstrap_install.sh --skip-system-deps --install-shell-hook</div>
@@ -243,6 +243,7 @@ $(function() {
 <li>MPI compiler wrappers unavailable in PATH.</li>
 <li>Python interpreter too old for default bootstrap (load Python 3.10+, pass <code>--python-bin</code>, or use <code>--no-venv</code>).</li>
 <li>Visualization modules leaking incompatible Python packages into <code>PYTHONPATH</code>; prefer the managed venv launcher from bootstrap for normal CLI use.</li>
+<li>Managed venv Python cannot find <code>libpython</code>; rerun bootstrap after pulling current source so <code>.picurv-python-env</code> records the seed Python library path.</li>
 <li>Old checkouts where <code>bin/picurv</code> is still a symlink; rerun <code>make -B conductor</code> after pulling current source.</li>
 <li>PETSc configured without required downloaded dependencies.</li>
 <li>missing X11 dev library at link time (<code>cannot find -lX11</code> on Linux; install <code>libx11-dev</code>).</li>
