@@ -116,6 +116,7 @@ $(function() {
 2. Automated Install (Recommended)</h1>
 <p>From the PICurv repo root:</p>
 <div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
+<div class="line"># Set PETSC_ARCH only for old-style in-tree PETSc builds.</div>
 <div class="line">export PETSC_ARCH=arch-linux-c-debug</div>
 <div class="line">./scripts/bootstrap_install.sh</div>
 </div><!-- fragment --><p>If PETSc is not installed yet, let the script build it:</p>
@@ -176,6 +177,7 @@ $(function() {
 5. Configure Environment Variables</h1>
 <p>Add to your shell profile (<code>~/.bashrc</code> or equivalent):</p>
 <div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
+<div class="line"># PETSC_ARCH is optional for prefix installs from EasyBuild/Spack/system packages.</div>
 <div class="line">export PETSC_ARCH=arch-linux-c-debug</div>
 <div class="line">source /path/to/PICurv/etc/picurv.sh</div>
 </div><!-- fragment --><p>The <code>etc/picurv.sh</code> script sets <code>PICURV_DIR</code>, exports <code>PICURV_PYTHON</code> when a managed venv or bootstrap-selected Python is available, adds <code>bin/</code> to your <code>PATH</code> for compiled executables, and also exposes <code>scripts/</code> as a fallback so <code>picurv</code> still resolves if <code>bin/picurv</code> is temporarily absent before a rebuild. It is idempotent and safe to source multiple times.</p>
@@ -186,7 +188,7 @@ $(function() {
 <div class="line">picurv --help</div>
 </div><!-- fragment --><p>Verify PETSc has DMSwarm headers:</p>
 <div class="fragment"><div class="line">test -f &quot;$PETSC_DIR/include/petscdmswarm.h&quot; &amp;&amp; echo &quot;DMSwarm header found&quot;</div>
-<div class="line">test -f &quot;$PETSC_DIR/$PETSC_ARCH/include/petscconf.h&quot; &amp;&amp; echo &quot;PETSc arch config found&quot;</div>
+<div class="line">test -f &quot;$PETSC_DIR/$PETSC_ARCH/include/petscconf.h&quot; || test -f &quot;$PETSC_DIR/include/petscconf.h&quot;</div>
 </div><!-- fragment --><h1><a class="anchor" id="p01_clone_sec"></a>
 6. Clone PICurv</h1>
 <div class="fragment"><div class="line">git clone https://github.com/VishalKandala/PICurv.git</div>
@@ -230,7 +232,7 @@ $(function() {
 <h1><a class="anchor" id="p01_common_sec"></a>
 9. Common Installation Failures</h1>
 <ul>
-<li><code>PETSC_DIR</code>/<code>PETSC_ARCH</code> unset or mismatched with built arch.</li>
+<li><code>PETSC_DIR</code> unset or pointing at the wrong PETSc installation; <code>PETSC_ARCH</code> is only required for old-style in-tree PETSc builds.</li>
 <li>MPI compiler wrappers unavailable in PATH.</li>
 <li>Python interpreter too old for default bootstrap (load Python 3.10+, pass <code>--python-bin</code>, or use <code>--no-venv</code>).</li>
 <li>Visualization modules leaking incompatible Python packages into <code>PYTHONPATH</code>; prefer the managed venv launcher from bootstrap for normal CLI use.</li>

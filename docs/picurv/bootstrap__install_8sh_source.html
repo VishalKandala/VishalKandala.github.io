@@ -217,13 +217,13 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  log &quot;Creating/updating managed Python environment at ${VENV_DIR}...&quot;</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  &quot;${PYTHON_BIN}&quot; -m venv &quot;${VENV_DIR}&quot;</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  CLI_PYTHON=&quot;${VENV_DIR}/bin/python&quot;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  &quot;${CLI_PYTHON}&quot; -m pip install --upgrade pip</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  env -u PYTHONPATH PYTHONNOUSERSITE=1 &quot;${CLI_PYTHON}&quot; -m pip install --upgrade pip</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>  PYTHON_PACKAGES=(pyyaml numpy)</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  if [[ &quot;${WITH_PLOTTING}&quot; -eq 1 ]]; then</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    PYTHON_PACKAGES+=(matplotlib)</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  fi</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  log &quot;Installing Python dependencies into managed venv: ${PYTHON_PACKAGES[*]}&quot;</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>  &quot;${CLI_PYTHON}&quot; -m pip install &quot;${PYTHON_PACKAGES[@]}&quot;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>  env -u PYTHONPATH PYTHONNOUSERSITE=1 &quot;${CLI_PYTHON}&quot; -m pip install &quot;${PYTHON_PACKAGES[@]}&quot;</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>else</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  CLI_PYTHON=&quot;${PYTHON_BIN}&quot;</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>  log &quot;Installing Python dependencies with site-managed Python: ${CLI_PYTHON}&quot;</div>
@@ -263,30 +263,40 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  export PETSC_ARCH=&quot;${PETSC_ARCH}&quot;</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>fi</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>if [[ -z &quot;${PETSC_DIR:-}&quot; || -z &quot;${PETSC_ARCH:-}&quot; ]]; then</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>  die &quot;PETSC_DIR and PETSC_ARCH must be set (or use --install-petsc).&quot;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>if [[ -z &quot;${PETSC_DIR:-}&quot; ]]; then</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>  die &quot;PETSC_DIR must be set (or use --install-petsc).&quot;</div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>fi</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>PETSC_CONF=&quot;${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h&quot;</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>PETSC_DMSWARM_HEADER=&quot;${PETSC_DIR}/include/petscdmswarm.h&quot;</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>[[ -f &quot;${PETSC_CONF}&quot; ]] || die &quot;PETSc config not found: ${PETSC_CONF}&quot;</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>[[ -f &quot;${PETSC_DMSWARM_HEADER}&quot; ]] || die &quot;DMSwarm header not found: ${PETSC_DMSWARM_HEADER}&quot;</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>log &quot;Verified PETSc config and DMSwarm header.&quot;</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>log &quot;Building PICurv binaries...&quot;</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>cd &quot;${REPO_ROOT}&quot;</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>&quot;${CLI_PYTHON}&quot; ./scripts/picurv build</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span> </div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>[[ -x &quot;${REPO_ROOT}/bin/simulator&quot; ]] || die &quot;Missing binary: bin/simulator&quot;</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>[[ -x &quot;${REPO_ROOT}/bin/postprocessor&quot; ]] || die &quot;Missing binary: bin/postprocessor&quot;</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>[[ -x &quot;${REPO_ROOT}/bin/picurv&quot; ]] || die &quot;Missing binary: bin/picurv&quot;</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>PETSC_DMSWARM_HEADER=&quot;${PETSC_DIR}/include/petscdmswarm.h&quot;</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>PETSC_CONF_CANDIDATES=(&quot;${PETSC_DIR}/include/petscconf.h&quot;)</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>if [[ -n &quot;${PETSC_ARCH:-}&quot; ]]; then</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>  PETSC_CONF_CANDIDATES=(&quot;${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h&quot; &quot;${PETSC_CONF_CANDIDATES[@]}&quot;)</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>fi</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>PETSC_CONF=&quot;&quot;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>for candidate in &quot;${PETSC_CONF_CANDIDATES[@]}&quot;; do</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>  if [[ -f &quot;${candidate}&quot; ]]; then</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    PETSC_CONF=&quot;${candidate}&quot;</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    break</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>  fi</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>done</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>[[ -n &quot;${PETSC_CONF}&quot; ]] || die &quot;PETSc config not found. Checked: ${PETSC_CONF_CANDIDATES[*]}&quot;</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>[[ -f &quot;${PETSC_DMSWARM_HEADER}&quot; ]] || die &quot;DMSwarm header not found: ${PETSC_DMSWARM_HEADER}&quot;</div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>log &quot;Bootstrap complete.&quot;</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>log &quot;PICurv Python: ${CLI_PYTHON}&quot;</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>log &quot;To add picurv to your PATH, run:&quot;</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>log &quot;  echo &#39;source ${REPO_ROOT}/etc/picurv.sh&#39; &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc&quot;</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>log &quot;Then verify with: picurv --help&quot;</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>log &quot;Verified PETSc config (${PETSC_CONF}) and DMSwarm header.&quot;</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span> </div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>log &quot;Building PICurv binaries...&quot;</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>cd &quot;${REPO_ROOT}&quot;</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>&quot;${CLI_PYTHON}&quot; ./scripts/picurv build</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>[[ -x &quot;${REPO_ROOT}/bin/simulator&quot; ]] || die &quot;Missing binary: bin/simulator&quot;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>[[ -x &quot;${REPO_ROOT}/bin/postprocessor&quot; ]] || die &quot;Missing binary: bin/postprocessor&quot;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>[[ -x &quot;${REPO_ROOT}/bin/picurv&quot; ]] || die &quot;Missing binary: bin/picurv&quot;</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span> </div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>log &quot;Bootstrap complete.&quot;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>log &quot;PICurv Python: ${CLI_PYTHON}&quot;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>log &quot;To add picurv to your PATH, run:&quot;</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>log &quot;  echo &#39;source ${REPO_ROOT}/etc/picurv.sh&#39; &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc&quot;</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>log &quot;Then verify with: picurv --help&quot;</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
