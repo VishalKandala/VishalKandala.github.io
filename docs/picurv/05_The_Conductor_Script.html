@@ -112,7 +112,7 @@ $(function() {
 <h1><a class="anchor" id="p05_usage_sec"></a>
 1. General Usage</h1>
 <div class="fragment"><div class="line">picurv [COMMAND] [ARGS...]</div>
-</div><!-- fragment --><p>After <code>make all</code>, <code>bin/picurv</code> is a symlink to <code>scripts/picurv</code> (the single source of truth). Source <code>etc/picurv.sh</code> to add <code>bin/</code> to your PATH and expose <code>scripts/</code> as a fallback so <code>picurv</code> works from any directory even if <code>bin/picurv</code> is temporarily absent before <code>make conductor</code> recreates the symlink. If <code>bin/picurv</code> does not exist yet, run <code>./scripts/picurv build</code> or <code>make conductor</code>.</p>
+</div><!-- fragment --><p>After <code>make all</code>, <code>bin/picurv</code> is a launcher for <code>scripts/picurv</code> (the single source of truth). The launcher uses <code>.picurv-venv/bin/python</code> when bootstrap created a managed environment, then a bootstrap-recorded or user-provided <code>PICURV_PYTHON</code>, and finally <code>python3</code>. Source <code>etc/picurv.sh</code> to add <code>bin/</code> to your PATH and expose <code>scripts/</code> as a fallback so <code>picurv</code> works from any directory even if <code>bin/picurv</code> is temporarily absent before <code>make conductor</code> recreates the launcher. If <code>bin/picurv</code> does not exist yet, run <code>./scripts/picurv build</code> or <code>make conductor</code>.</p>
 <p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
@@ -686,10 +686,11 @@ $(function() {
 <li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code> or <code>sync-binaries</code>), it is used first.</li>
 <li><b>Project <code>bin/</code> directory</b> — the default location after <code>make all</code>.</li>
 </ol>
-<p><code>bin/picurv</code> is a symlink to <code>scripts/picurv</code>. This means:</p>
+<p><code>bin/picurv</code> is a launcher for <code>scripts/picurv</code>. This means:</p>
 <ul>
 <li>there is exactly one source file (<code>scripts/picurv</code>), so code changes never drift,</li>
-<li><code>make conductor</code> recreates the symlink (idempotent),</li>
+<li><code>make conductor</code> recreates the launcher (idempotent),</li>
+<li>bootstrap-managed installs run with the repo-local <code>.picurv-venv</code> Python,</li>
 <li><code>etc/picurv.sh</code> adds <code>bin/</code> to PATH so <code>picurv</code> works from any directory.</li>
 </ul>
 <p><b>Rebuilding while jobs are running:</b></p>
