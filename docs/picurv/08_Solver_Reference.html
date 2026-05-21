@@ -90,9 +90,10 @@ $(function() {
 <li class="level1"><a href="#p08_poisson_sec">5. poisson_solver</a></li>
 <li class="level1"><a href="#p08_solution_conv_sec">6. solution_convergence</a></li>
 <li class="level1"><a href="#p08_interp_sec">7. interpolation</a></li>
-<li class="level1"><a href="#p08_verification_sec">8. verification</a></li>
-<li class="level1"><a href="#p08_petsc_sec">9. petsc_passthrough_options</a></li>
-<li class="level1"><a href="#p08_next_steps_sec">10. Next Steps</a><ul><li class="level2"><a href="#autotoc_md29">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md30">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p08_scalar_transport_sec">8. scalar_transport</a></li>
+<li class="level1"><a href="#p08_verification_sec">9. verification</a></li>
+<li class="level1"><a href="#p08_petsc_sec">10. petsc_passthrough_options</a></li>
+<li class="level1"><a href="#p08_next_steps_sec">11. Next Steps</a><ul><li class="level2"><a href="#autotoc_md29">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md30">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md31">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -158,6 +159,12 @@ operation_mode:
 # Scalar verification is intended for runtime diagnostics such as
 # logs/scatter_metrics.csv. It bypasses only the particle Psi evolution path and
 # reuses the production scatter operator.
+
+# --- Scalar Transport Properties ---
+# These affect Eulerian diffusivity and particle scalar/Brownian models.
+scalar_transport:
+  schmidt_number: 1.0              # -&gt; -schmidt_number
+  turbulent_schmidt_number: 0.7    # -&gt; -turb_schmidt_number
 
 # ==============================================================================
 # 2. PRIMARY SOLVER STRATEGY &amp; TOLERANCES
@@ -450,8 +457,22 @@ petsc_passthrough_options:
 </ul>
 <p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers, providing second-order accuracy on both uniform and curvilinear grids. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners), which is second-order only on uniform Cartesian grids.</p>
 <p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
+<h1><a class="anchor" id="p08_scalar_transport_sec"></a>
+8. scalar_transport</h1>
+<div class="fragment"><div class="line">scalar_transport:</div>
+<div class="line">  schmidt_number: 1.0</div>
+<div class="line">  turbulent_schmidt_number: 0.7</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>schmidt_number</code> -&gt; <code>-schmidt_number</code></li>
+<li><code>turbulent_schmidt_number</code> -&gt; <code>-turb_schmidt_number</code></li>
+</ul>
+<p>Rules:</p><ul>
+<li>values must be positive numbers</li>
+<li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code> and <code>turbulent_schmidt_number = 0.7</code></li>
+<li>use this structured block for ordinary scalar/Brownian transport tuning; reserve <code>petsc_passthrough_options</code> for flags without a YAML schema</li>
+</ul>
 <h1><a class="anchor" id="p08_verification_sec"></a>
-8. verification</h1>
+9. verification</h1>
 <div class="fragment"><div class="line">verification:</div>
 <div class="line">  sources:</div>
 <div class="line">    diffusivity:</div>
@@ -491,14 +512,14 @@ petsc_passthrough_options:
 <li>new verification source overrides must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
 </ul>
 <h1><a class="anchor" id="p08_petsc_sec"></a>
-9. petsc_passthrough_options</h1>
+10. petsc_passthrough_options</h1>
 <p>Advanced escape hatch for raw PETSc flags:</p>
 <div class="fragment"><div class="line">petsc_passthrough_options:</div>
 <div class="line">  -ps_ksp_type: &quot;gmres&quot;</div>
 <div class="line">  -ps_pc_type: &quot;ilu&quot;</div>
 </div><!-- fragment --><p>These are passed into PETSc options DB and consumed by runtime calls like <code>KSPSetFromOptions</code>.</p>
 <h1><a class="anchor" id="p08_next_steps_sec"></a>
-10. Next Steps</h1>
+11. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b>.</p>
 <p>For mapping and extension workflows:</p><ul>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>

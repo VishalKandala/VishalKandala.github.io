@@ -163,9 +163,17 @@ profiling:
 # ==============================================================================
 diagnostics:
   petsc:
+    # These options are passed on the solver/postprocessor command line so
+    # PETSc sees them during PetscInitialize().
+    # Example:
+    #   malloc_debug: true  -&gt; executable arg: -malloc_debug
+    #   log_view: true      -&gt; executable args: -log_view :runs/&lt;run_id&gt;/logs/PETSc_LogView_Solver.log
+    #   objects_dump: all   -&gt; executable args: -objects_dump all
     malloc_debug: false
     malloc_test: false
     malloc_dump: false
+    # Boolean true uses run-local default log files where PETSc supports file
+    # output. A non-empty string can override the PETSc viewer/path.
     malloc_view: false
     malloc_view_threshold: null
     memory_view: false
@@ -177,6 +185,8 @@ diagnostics:
     options_left: null
 
   runtime_memory_log:
+    # This custom PICurv log is emitted from the runtime through control-file
+    # flags, independent of PETSc-native diagnostics above.
     enabled: true
     file: "Runtime_Memory.log"
 
@@ -214,39 +224,32 @@ io:
     particle_subdir: "particles" # [string] -&gt; -particle_subdir
 
 # ==============================================================================
-# 4. SOLVER MONITORING (PASSTHROUGH)
+# 5. SOLVER MONITORING (PASSTHROUGH)
 # ==============================================================================
 #
-# This section provides maximum flexibility for debugging the numerical solvers.
-# Any key-value pair defined here is passed DIRECTLY to the C solver as a
-# command-line flag. This is primarily for PETSc monitoring options.
+# This section exposes common solver-monitor controls with readable names.
+# PICurv maps these keys to the C/PETSc flags written into the generated
+# `.control` file.
 #
-# The keys must be the exact flag names (e.g., '-ps_ksp_monitor_true_residual').
-# For flags that don't take an argument (boolean switches), set the value to `true`.
+# For advanced one-off PETSc flags, keep them under `petsc_passthrough_options`.
 #
 # ==============================================================================
 solver_monitoring:
-  # --- Example: KSP (Krylov Subspace Method) Monitors ---
-  # Uncomment to enable live monitoring of the pressure solver's convergence.
-  # This custom monitor provides detailed, formatted output.
-  -ps_ksp_pic_monitor_true_residual: true
+  poisson:
+    # Custom PICurv pressure-correction residual monitor.
+    pic_true_residual: true       # -&gt; -ps_ksp_pic_monitor_true_residual
+    # PETSc's standard true residual monitor.
+    true_residual: false          # -&gt; -ps_ksp_monitor_true_residual
+    # Print the KSP convergence/divergence reason.
+    converged_reason: true        # -&gt; -ps_ksp_converged_reason
+    # View the pressure-correction KSP object configuration.
+    view: false                   # -&gt; -ps_ksp_view
 
-  # PETSc's standard true residual monitor.
-  # -ps_ksp_monitor_true_residual: true
-  
-  # Print the reason for KSP convergence or divergence (very useful for debugging).
-  # -ps_ksp_converged_reason: true
-  
-  # View the KSP object's configuration at runtime.
-  # -ps_ksp_view: true
-
-  # --- Example: PC (Preconditioner) Monitors ---
-  # If using an SVD-based preconditioner for debugging, monitor its singular values.
-  # -ps_pc_svd_monitor: true
-
-  # --- Example: TS (Time Stepper) Monitors ---
-  # (If your implicit solver uses PETSc's TS object)
-  # -ts_monitor: true
+  petsc_passthrough_options:
+    # Raw escape hatch for PETSc monitor/debug flags not yet exposed above.
+    # Boolean true emits a switch-only flag; false omits it.
+    # -ps_pc_svd_monitor: true
+    # -ts_monitor: true
 </pre><p><code>monitor.yml</code> controls observability, diagnostics, and run I/O behavior.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
 1. io</h1>
@@ -343,21 +346,45 @@ solver_monitoring:
 <div class="line">    file: &quot;Runtime_Memory.log&quot;</div>
 </div><!-- fragment --><p>Rules:</p><ul>
 <li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
+<li>For example, this YAML:</li>
+</ul>
+<div class="fragment"><div class="line">diagnostics:</div>
+<div class="line">  petsc:</div>
+<div class="line">    malloc_debug: true</div>
+<div class="line">    log_view: true</div>
+<div class="line">    objects_dump: &quot;all&quot;</div>
+</div><!-- fragment --><p>adds PETSc startup arguments like:</p>
+<div class="fragment"><div class="line">-malloc_debug -log_view :runs/&lt;run_id&gt;/logs/PETSc_LogView_Solver.log -objects_dump all</div>
+</div><!-- fragment --><p>for the solver stage, with analogous <code>PostProcessor</code> log names for post runs.</p><ul>
+<li><code>malloc_view</code>, <code>log_view</code>, and <code>log_trace</code> accept <code>false</code>, <code>true</code>, or a non-empty PETSc viewer/path string. When set to <code>true</code>, PICurv writes run-local defaults such as <code>logs/PETSc_MallocView_Solver.log</code>, <code>logs/PETSc_LogView_Solver.log</code>, and matching <code>PostProcessor</code> files.</li>
+<li><code>objects_dump</code> accepts <code>false</code>, <code>true</code>, or <code>all</code>.</li>
+<li><code>options_left</code> accepts <code>true</code>, <code>false</code>, or <code>null</code>; use <code>null</code> to omit the PETSc option entirely.</li>
 <li>PETSc diagnostics that support output files use run-local defaults under <code>logs/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
 <li><code>runtime_memory_log</code> writes a rank-reduced, terminal-readable log with max process/PETSc allocation signals per step.</li>
 <li><code>picurv summarize</code> reports the latest runtime memory signals when the log is present.</li>
 </ul>
 <h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
 5. solver_monitoring</h1>
-<p>Raw flag passthrough for PETSc monitors/debug options:</p>
+<p>Human-readable solver monitor controls. PICurv maps these keys to the raw C/PETSc flags written into the generated <code>.control</code> file:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
-<div class="line">  -ps_ksp_pic_monitor_true_residual: true</div>
-<div class="line">  -ps_ksp_converged_reason: true</div>
-</div><!-- fragment --><p>Rules:</p><ul>
-<li>Keys must be full flags (with leading <code>-</code>).</li>
-<li><code>true</code> emits switch-only flag.</li>
-<li><code>false</code> omits flag.</li>
-<li>Non-boolean values emit <code>flag value</code>.</li>
+<div class="line">  poisson:</div>
+<div class="line">    pic_true_residual: true</div>
+<div class="line">    true_residual: false</div>
+<div class="line">    converged_reason: true</div>
+<div class="line">    view: false</div>
+<div class="line">  petsc_passthrough_options:</div>
+<div class="line">    -ps_pc_svd_monitor: false</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>poisson.pic_true_residual</code> -&gt; <code>-ps_ksp_pic_monitor_true_residual</code></li>
+<li><code>poisson.true_residual</code> -&gt; <code>-ps_ksp_monitor_true_residual</code></li>
+<li><code>poisson.converged_reason</code> -&gt; <code>-ps_ksp_converged_reason</code></li>
+<li><code>poisson.view</code> -&gt; <code>-ps_ksp_view</code></li>
+</ul>
+<p>Rules:</p><ul>
+<li>The structured <code>poisson.*</code> keys are booleans.</li>
+<li><code>petsc_passthrough_options</code> remains available for raw PETSc flags not yet exposed as structured YAML. In passthrough, <code>true</code> emits a switch-only flag, <code>false</code> omits the flag, and non-boolean values emit <code>flag value</code>.</li>
+<li><code>solver_monitoring</code> is written into the generated <code>.control</code> file and consumed during solver setup, while <code>diagnostics.petsc</code> is placed on the executable command line for PETSc initialization-time diagnostics.</li>
+<li>Legacy direct flag entries under <code>solver_monitoring</code> are still accepted for compatibility, but new profiles should prefer the structured form above.</li>
 </ul>
 <h1><a class="anchor" id="p09_next_steps_sec"></a>
 6. Next Steps</h1>

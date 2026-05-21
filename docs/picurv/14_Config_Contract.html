@@ -170,6 +170,7 @@ $(function() {
 <li><code>solution_convergence.*</code> -&gt; <code>-solution_convergence_*</code> for physical solution drift logging.</li>
 <li><code>interpolation.method</code> -&gt; <code>-interpolation_method</code>. Defaults to <code>Trilinear</code> (direct cell-center, second-order). Set to <code>CornerAveraged</code> for the legacy two-stage path.</li>
 <li><code>petsc_passthrough_options</code> remains the escape hatch for advanced PETSc/C flags.</li>
+<li><code>scalar_transport.schmidt_number</code> and <code>scalar_transport.turbulent_schmidt_number</code> are the structured scalar/Brownian transport controls; do not use passthrough for ordinary Schmidt-number tuning.</li>
 </ul>
 <p>Analytical-mode compatibility rule:</p>
 <ul>
@@ -213,7 +214,11 @@ $(function() {
 <li><code>io.particle_log_interval</code> -&gt; <code>-logfreq</code></li>
 <li><code>io.directories.output/restart/log</code> -&gt; <code>-output_dir/-restart_dir/-log_dir</code></li>
 <li><code>io.directories.eulerian_subdir/particle_subdir</code> -&gt; <code>-euler_subdir/-particle_subdir</code></li>
-<li><code>solver_monitoring</code> maps raw flags directly into control output.</li>
+<li><code>profiling.timestep_output</code> -&gt; <code>profile.run</code> when <code>mode: selected</code>, plus profiling control flags</li>
+<li><code>diagnostics.petsc</code> -&gt; PETSc startup arguments on solver/postprocessor commands</li>
+<li><code>diagnostics.runtime_memory_log</code> -&gt; <code>-runtime_memory_log_enabled/-runtime_memory_log_file</code></li>
+<li><code>solver_monitoring.poisson.*</code> maps readable monitor keys into prefixed Poisson KSP flags.</li>
+<li><code>solver_monitoring.petsc_passthrough_options</code> maps raw PETSc flags directly into control output.</li>
 </ul>
 <h1><a class="anchor" id="p14_post_sec"></a>
 6. Post Contract Highlights</h1>
@@ -293,9 +298,10 @@ $(function() {
 <li>Escape hatches stay supported:<ul>
 <li><code>case.solver_parameters</code></li>
 <li><code>solver.petsc_passthrough_options</code></li>
-<li><code>monitor.solver_monitoring</code></li>
+<li><code>monitor.solver_monitoring.petsc_passthrough_options</code></li>
 </ul>
 </li>
+<li>Prefer structured keys first: use <code>solver.poisson_solver</code> for pressure-solver KSP/MG setup and <code>monitor.diagnostics.petsc</code> for PETSc startup diagnostics.</li>
 <li>Default post input/output extension is <code>dat</code> unless overridden.</li>
 </ul>
 <p>Launcher defaults vs C defaults:</p>

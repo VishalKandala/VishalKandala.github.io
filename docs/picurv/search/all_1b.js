@@ -92,7 +92,7 @@ var searchData=
   ['periodicity_20in_20one_20direction_89',['2.2 Enable Periodicity in One Direction',['../11_User_How_To_Guides.html#p11_bc_periodic_ssec',1,'']]],
   ['petsc_90',['4. Install PETSc',['../01_Installation.html#p01_petsc_sec',1,'']]],
   ['petsc_20options_91',['3. YAML Mapping and PETSc Options',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_config_sec',1,'']]],
-  ['petsc_5fpassthrough_5foptions_92',['9. petsc_passthrough_options',['../08_Solver_Reference.html#p08_petsc_sec',1,'']]],
+  ['petsc_5fpassthrough_5foptions_92',['10. petsc_passthrough_options',['../08_Solver_Reference.html#p08_petsc_sec',1,'']]],
   ['petscmkdirrecursive_93',['PetscMkdirRecursive',['../setup_8c.html#a5adc558d68a2e79ed92d18f2280ab376',1,'setup.c']]],
   ['phi_94',['Phi',['../variables_8h.html#a2f3825691b122a0bf2ed5728b70bc9b1',1,'UserCtx']]],
   ['phi0_95',['phi0',['../variables_8h.html#ac8bb81ba4e1eac03c3f3cd73140b33c7',1,'VerificationScalarConfig']]],
