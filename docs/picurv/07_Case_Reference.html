@@ -310,6 +310,24 @@ boundary_conditions:
       vx: 1.5  # Physical velocity [m/s]
       vy: 0.0
       vz: 0.0
+
+    # Alternative inlet profile from a precomputed PICSLICE file:
+    # handler: prescribed_flow
+    # params:
+    #   source:
+    #     type: file
+    #     path: profiles/inlet.picslice
+    #
+    # Alternative generated analytical square-duct Poiseuille profile:
+    # handler: prescribed_flow
+    # params:
+    #   source:
+    #     type: generated
+    #     generator: square_duct_poiseuille
+    #     output_file: config/inlet_profile_block0_negEta.generated.picslice
+    #     params:
+    #       bulk_velocity: 1.5
+    #       n_terms: 101
       
   - face: "+Eta"
     type: OUTLET
@@ -525,13 +543,29 @@ boundary_conditions:
 <p>Supported type/handler combinations:</p><ul>
 <li><code>INLET</code> + <code>constant_velocity</code> (<code>vx/vy/vz</code>)</li>
 <li><code>INLET</code> + <code>parabolic</code> (<code>v_max</code>)</li>
-<li><code>INLET</code> + <code>prescribed_flow</code> (<code>params.source.type: file</code>, <code>params.source.path</code>)</li>
+<li><code>INLET</code> + <code>prescribed_flow</code>:<ul>
+<li>file-backed: <code>params.source.type: file</code>, <code>params.source.path</code></li>
+<li>generated: <code>params.source.type: generated</code>, <code>params.source.generator: square_duct_poiseuille</code></li>
+</ul>
+</li>
 <li><code>OUTLET</code> + <code>conservation</code></li>
 <li><code>WALL</code> + <code>noslip</code></li>
 <li><code>PERIODIC</code> + <code>geometric</code></li>
 <li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>apply_trim</code>)</li>
 </ul>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
+<p>Generated profile example:</p>
+<div class="fragment"><div class="line">- face: &quot;-Zeta&quot;</div>
+<div class="line">  type: INLET</div>
+<div class="line">  handler: prescribed_flow</div>
+<div class="line">  params:</div>
+<div class="line">    source:</div>
+<div class="line">      type: generated</div>
+<div class="line">      generator: square_duct_poiseuille</div>
+<div class="line">      params:</div>
+<div class="line">        bulk_velocity: 1.0</div>
+<div class="line">        n_terms: 101</div>
+</div><!-- fragment --><p><code>picurv run --solve</code> generates the dimensional <code>.picslice</code>, writes <code>profile.info</code>, stages the solver-scale <code>.picslice</code>, and passes the existing <code>source_file</code> key to the C runtime. Use <code>picurv precompute --case ...</code> to create the same deterministic artifacts without launching the solver.</p>
 <h1><a class="anchor" id="p07_passthrough_sec"></a>
 6. solver_parameters (Advanced)</h1>
 <p>Optional escape hatch for flags not yet exposed in structured schema:</p>
