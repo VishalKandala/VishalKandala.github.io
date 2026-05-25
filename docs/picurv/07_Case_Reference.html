@@ -328,6 +328,19 @@ boundary_conditions:
     #     params:
     #       bulk_velocity: 1.5
     #       n_terms: 101
+    #
+    # Alternative profile sliced from an old Cartesian Ucat field:
+    # handler: prescribed_flow
+    # params:
+    #   source:
+    #     type: field_slice
+    #     field_file: ../old_run/output/eulerian/ufield10000_0.dat
+    #     grid_file: ../old_run/config/grid.run
+    #     source_case: ../old_run/config/case.yml
+    #     output_file: config/inlet_profile_block0_negEta.sliced.picslice
+    #     slice:
+    #       face: "+Eta"
+    #       orientation: opposite
       
   - face: "+Eta"
     type: OUTLET
@@ -546,6 +559,7 @@ boundary_conditions:
 <li><code>INLET</code> + <code>prescribed_flow</code>:<ul>
 <li>file-backed: <code>params.source.type: file</code>, <code>params.source.path</code></li>
 <li>generated: <code>params.source.type: generated</code>, <code>params.source.generator: square_duct_poiseuille</code></li>
+<li>field-sliced: <code>params.source.type: field_slice</code>, <code>params.source.field_file</code>, <code>params.source.grid_file</code>, <code>params.source.slice</code></li>
 </ul>
 </li>
 <li><code>OUTLET</code> + <code>conservation</code></li>
@@ -566,6 +580,20 @@ boundary_conditions:
 <div class="line">        bulk_velocity: 1.0</div>
 <div class="line">        n_terms: 101</div>
 </div><!-- fragment --><p><code>picurv run --solve</code> generates the dimensional <code>.picslice</code>, writes <code>profile.info</code>, stages the solver-scale <code>.picslice</code>, and passes the existing <code>source_file</code> key to the C runtime. Use <code>picurv precompute --case ...</code> to create the same deterministic artifacts without launching the solver.</p>
+<p>Field-sliced profile example:</p>
+<div class="fragment"><div class="line">- face: &quot;-Zeta&quot;</div>
+<div class="line">  type: INLET</div>
+<div class="line">  handler: prescribed_flow</div>
+<div class="line">  params:</div>
+<div class="line">    source:</div>
+<div class="line">      type: field_slice</div>
+<div class="line">      field_file: ../old_run/output/eulerian/ufield10000_0.dat</div>
+<div class="line">      grid_file: ../old_run/config/grid.run</div>
+<div class="line">      source_case: ../old_run/config/case.yml</div>
+<div class="line">      slice:</div>
+<div class="line">        face: &quot;+Zeta&quot;</div>
+<div class="line">        orientation: opposite</div>
+</div><!-- fragment --><p><code>field_slice</code> uses Python preprocessing to write a normal dimensional PICSLICE; the C runtime still sees only the staged <code>source_file</code>.</p>
 <h1><a class="anchor" id="p07_passthrough_sec"></a>
 6. solver_parameters (Advanced)</h1>
 <p>Optional escape hatch for flags not yet exposed in structured schema:</p>
