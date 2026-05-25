@@ -42,7 +42,7 @@ var searchData=
   ['prestep_39',['PreStep',['../structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c',1,'BoundaryCondition']]],
   ['priority_40',['priority',['../structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb',1,'BoundaryCondition']]],
   ['process_5fpipeline_41',['process_pipeline',['../variables_8h.html#ab589b17f1c36d62817d4b17ec0a53f4a',1,'PostProcessParams']]],
-  ['profile_42',['profile',['../variables_8h.html#ad77bfe26c43b5af9b4884e973e0a83c7',1,'VerificationDiffusivityConfig::profile'],['../variables_8h.html#ad99db7698477bada0a1c77e149192a2a',1,'VerificationScalarConfig::profile']]],
+  ['profile_42',['profile',['../variables_8h.html#ad77bfe26c43b5af9b4884e973e0a83c7',1,'VerificationDiffusivityConfig::profile'],['../variables_8h.html#ad99db7698477bada0a1c77e149192a2a',1,'VerificationScalarConfig::profile'],['../BC__Handlers_8c.html#a5adcb5a256e161f6f314a7ac6226cf5d',1,'InletProfileFileData::profile']]],
   ['profilingfinalsummary_43',['profilingFinalSummary',['../variables_8h.html#a1870b2e4781e3e3d235459027148d819',1,'SimCtx']]],
   ['profilingselectedfuncs_44',['profilingSelectedFuncs',['../variables_8h.html#aad4f648fcf7b6187b98bd8cc5539cbd7',1,'SimCtx']]],
   ['profilingselectedfuncsfile_45',['profilingSelectedFuncsFile',['../variables_8h.html#a87ef6584ea47d6e2278ec1f407908dc8',1,'SimCtx']]],

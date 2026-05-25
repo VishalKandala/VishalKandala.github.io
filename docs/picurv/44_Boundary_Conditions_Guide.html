@@ -85,7 +85,9 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p44_grammar_sec">1. Boundary-Condition Grammar</a></li>
 <li class="level1"><a href="#p44_supported_sec">2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#p44_nondim_sec">3. Non-Dimensionalization Before C Input</a></li>
+<li class="level1"><a href="#p44_nondim_sec">3. Non-Dimensionalization Before C Input</a><ul><li class="level2"><a href="#p44_picslice_ssec">3.1 Prescribed Inlet Profile Files</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p44_periodic_rules_sec">4. Periodicity Consistency Rules</a></li>
 <li class="level1"><a href="#p44_c_pipeline_sec">5. C-Side Parsing and Dispatch</a></li>
 <li class="level1"><a href="#p44_c_gap_sec">6. Exposed vs Latent Options</a></li>
@@ -125,10 +127,12 @@ $(function() {
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>INLET</code>   </td><td class="markdownTableBodyNone"><code>parabolic</code>   </td><td class="markdownTableBodyNone"><code>v_max</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">m/s    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>OUTLET</code>   </td><td class="markdownTableBodyNone"><code>conservation</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">n/a    </td></tr>
+<td class="markdownTableBodyNone"><code>INLET</code>   </td><td class="markdownTableBodyNone"><code>prescribed_flow</code>   </td><td class="markdownTableBodyNone"><code>source.type: file</code>, <code>source.path</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">m/s scalar speeds in <code>.picslice</code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>geometric</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">n/a    </td></tr>
+<td class="markdownTableBodyNone"><code>OUTLET</code>   </td><td class="markdownTableBodyNone"><code>conservation</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">n/a    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>geometric</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">n/a    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>constant_flux</code>   </td><td class="markdownTableBodyNone"><code>target_flux</code>   </td><td class="markdownTableBodyNone"><code>apply_trim</code>   </td><td class="markdownTableBodyNone">m^3/s   </td></tr>
 </table>
 <p>Notes:</p>
@@ -149,8 +153,26 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <p>Specifically:</p>
 <ul>
 <li><code>vx/vy/vz/v_max</code> are divided by <code>properties.scaling.velocity_ref</code>,</li>
+<li><code>prescribed_flow</code> PICSLICE scalar speeds are divided by <code>properties.scaling.velocity_ref</code> while staging the solver-side <code>.picslice</code>,</li>
 <li><code>target_flux</code> is divided by <code>velocity_ref * length_ref^2</code>.</li>
 </ul>
+<h2><a class="anchor" id="p44_picslice_ssec"></a>
+3.1 Prescribed Inlet Profile Files</h2>
+<p><code>prescribed_flow</code> uses a face-scoped canonical <code>PICSLICE</code> file:</p>
+<div class="fragment"><div class="line">PICSLICE</div>
+<div class="line">1</div>
+<div class="line">&lt;n1&gt; &lt;n2&gt;</div>
+<div class="line">&lt;positive_scalar_speed_0&gt;</div>
+<div class="line">&lt;positive_scalar_speed_1&gt;</div>
+<div class="line">...</div>
+</div><!-- fragment --><p>The second line is the frame count. Static prescribed profiles require <code>1</code>. Values are positive scalar speed magnitudes normal to the inlet surface, not Cartesian velocity components and not contravariant fluxes. The C handler uses the existing inlet face sign and metric conversion to populate <code>Ucont</code> and <code>Ubcs</code>.</p>
+<p>Expected dimensions follow the existing inlet face loop order:</p>
+<ul>
+<li><code>-Xi/+Xi</code>: <code>(KM - 2, JM - 2)</code>, ordered <code>(k, j)</code></li>
+<li><code>-Eta/+Eta</code>: <code>(KM - 2, IM - 2)</code>, ordered <code>(k, i)</code></li>
+<li><code>-Zeta/+Zeta</code>: <code>(JM - 2, IM - 2)</code>, ordered <code>(j, i)</code></li>
+</ul>
+<p>For multi-block cases, keep using the existing list-of-lists <code>boundary_conditions</code> shape. Each block face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per block face and writes <code>source_file=...</code> into that block's <code>bcs_block*.run</code>.</p>
 <h1><a class="anchor" id="p44_periodic_rules_sec"></a>
 4. Periodicity Consistency Rules</h1>
 <p>Validator checks:</p>
@@ -180,6 +202,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li>wall no-slip,</li>
 <li>inlet constant velocity,</li>
 <li>inlet parabolic,</li>
+<li>inlet prescribed flow from file,</li>
 <li>outlet conservation,</li>
 <li>periodic geometric,</li>
 <li>periodic driven constant flux.</li>
@@ -190,6 +213,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <ul>
 <li>C enums include additional BC categories and handlers (for example symmetry-family and <code>initial_flux</code> enum entries),</li>
 <li>but the current end-to-end user contract intentionally exposes the validated subset listed above.</li>
+<li><code>source.type: field_slice</code> is intentionally deferred; future Python staging should convert a field slice into the same <code>PICSLICE</code> format so C remains source-agnostic.</li>
 </ul>
 <p>If you add a new BC mode, update all three layers in one change:</p>
 <ol type="1">
