@@ -18,7 +18,7 @@ var searchData=
   ['5_20case_20initialization_20and_20binary_20management_15',['5. Case Initialization and Binary Management',['../11_User_How_To_Guides.html#p11_init_sec',1,'']]],
   ['5_20competencies_20you_20should_20gain_16',['5. Competencies You Should Gain',['../42_User_Guide_Index.html#p42_outcomes_sec',1,'']]],
   ['5_20configure_20environment_20variables_17',['5. Configure Environment Variables',['../01_Installation.html#p01_env_sec',1,'']]],
-  ['5_20current_20test_20status_18',['5 current test status',['../26_Walking_Search_Method.html#p26_testing_sec',1,'5. Current test status'],['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_testing_sec',1,'5. Current test status']]],
+  ['5_20current_20test_20status_18',['5 current test status',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_testing_sec',1,'5. Current test status'],['../26_Walking_Search_Method.html#p26_testing_sec',1,'5. Current test status']]],
   ['5_20derived_20per_20timestep_20signals_19',['4.5 Derived Per-Timestep Signals',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_derived',1,'']]],
   ['5_20documentation_20organization_20rules_20',['5. Documentation Organization Rules',['../30_Repository_Navigation.html#p30_usage_sec',1,'']]],
   ['5_20drift_20verification_20workflow_21',['5. Drift Verification Workflow',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_drift_verification_sec',1,'']]],
@@ -46,7 +46,7 @@ var searchData=
   ['5_20practical_20notes_43',['5. Practical Notes',['../19_Nondimensionalization.html#p19_notes_sec',1,'']]],
   ['5_20practical_20tuning_20guidance_44',['5. Practical Tuning Guidance',['../24_Dual_Time_Picard_RK4.html#p24_practical_sec',1,'']]],
   ['5_20prioritization_20policy_45',['5. Prioritization Policy',['../29_Maintenance_Backlog.html#p29_policy_sec',1,'']]],
-  ['5_20related_20pages_46',['5 related pages',['../35_API_Documentation_Status.html#p35_refs_sec',1,'5. Related Pages'],['../28_IEM_and_Statistical_Averaging.html#p28_refs_sec',1,'5. Related Pages'],['../23_Fractional_Step_Method.html#p23_refs_sec',1,'5. Related Pages']]],
+  ['5_20related_20pages_46',['5 related pages',['../23_Fractional_Step_Method.html#p23_refs_sec',1,'5. Related Pages'],['../28_IEM_and_Statistical_Averaging.html#p28_refs_sec',1,'5. Related Pages'],['../35_API_Documentation_Status.html#p35_refs_sec',1,'5. Related Pages']]],
   ['5_20restart_20and_20continuation_47',['5. Restart And Continuation',['../52_Run_Lifecycle_Guide.html#p52_restart_sec',1,'']]],
   ['5_20run_20solver_20and_20postprocessor_48',['5. Run Solver and Postprocessor',['../02_Tutorial_Programmatic_Grid.html#p02_run_sec',1,'']]],
   ['5_20saving_20your_20work_49',['5. Saving Your Work',['../04_Visualization_Tutorial.html#p04_export_sec',1,'']]],
@@ -62,6 +62,7 @@ var searchData=
   ['51_5fc_5ftest_5fsuite_5fdeveloper_5fguide_2emd_59',['51_C_Test_Suite_Developer_Guide.md',['../51__C__Test__Suite__Developer__Guide_8md.html',1,'']]],
   ['52_5frun_5flifecycle_5fguide_2emd_60',['52_Run_Lifecycle_Guide.md',['../52__Run__Lifecycle__Guide_8md.html',1,'']]],
   ['53_5fsearch_5frobustness_5fmetrics_5freference_2emd_61',['53_Search_Robustness_Metrics_Reference.md',['../53__Search__Robustness__Metrics__Reference_8md.html',1,'']]],
-  ['5b_20submit_3a_20execute_20existing_20staged_20artifacts_62',['5b. submit: Execute Existing Staged Artifacts',['../05_The_Conductor_Script.html#p05_submit_sec',1,'']]],
-  ['5c_20cancel_3a_20stop_20a_20slurm_20run_20by_20run_20directory_63',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]]
+  ['5a_20precompute_3a_20generate_20deterministic_20artifacts_62',['5a. precompute: Generate Deterministic Artifacts',['../05_The_Conductor_Script.html#p05_precompute_sec',1,'']]],
+  ['5b_20submit_3a_20execute_20existing_20staged_20artifacts_63',['5b. submit: Execute Existing Staged Artifacts',['../05_The_Conductor_Script.html#p05_submit_sec',1,'']]],
+  ['5c_20cancel_3a_20stop_20a_20slurm_20run_20by_20run_20directory_64',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]]
 ];

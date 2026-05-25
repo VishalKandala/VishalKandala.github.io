@@ -89,6 +89,7 @@ $(function() {
 <li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
 <li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Health Summary</a></li>
+<li class="level1"><a href="#p05_precompute_sec">5a. precompute: Generate Deterministic Artifacts</a></li>
 <li class="level1"><a href="#p05_submit_sec">5b. submit: Execute Existing Staged Artifacts</a></li>
 <li class="level1"><a href="#p05_cancel_sec">5c. cancel: Stop A Slurm Run By Run Directory</a></li>
 <li class="level1"><a href="#p05_sweep_sec">6. sweep: Parameter Study via Slurm Arrays</a></li>
@@ -121,6 +122,7 @@ $(function() {
 <li><code>pull-source</code></li>
 <li><code>status-source</code></li>
 <li><code>run</code></li>
+<li><code>precompute</code></li>
 <li><code>summarize</code></li>
 <li><code>submit</code></li>
 <li><code>cancel</code></li>
@@ -142,6 +144,7 @@ $(function() {
 <div class="line">./bin/picurv pull-source --help</div>
 <div class="line">./bin/picurv status-source --help</div>
 <div class="line">./bin/picurv run --help</div>
+<div class="line">./bin/picurv precompute --help</div>
 <div class="line">./bin/picurv summarize --help</div>
 <div class="line">./bin/picurv submit --help</div>
 <div class="line">./bin/picurv cancel --help</div>
@@ -359,6 +362,16 @@ $(function() {
 <li>delayed submission of an already-staged run: <code>submit --run-dir ...</code></li>
 <li>planning and CI-style checks: <code>--dry-run</code></li>
 </ul>
+<h1><a class="anchor" id="p05_precompute_sec"></a>
+5a. precompute: Generate Deterministic Artifacts</h1>
+<div class="fragment"><div class="line">./bin/picurv precompute --case case.yml [--output-dir precomputed/&lt;name&gt;]</div>
+</div><!-- fragment --><p><code>precompute</code> materializes deterministic case artifacts without launching the solver. It uses the same <code>case.yml</code> generator settings as <code>run --solve</code>:</p>
+<ul>
+<li><code>grid.mode: grid_gen</code> writes the configured dimensional <code>PICGRID</code>,</li>
+<li><code>prescribed_flow.source.type: generated</code> delegates dimensional <code>.picslice</code> profile generation to <code>scripts/profile.gen</code> and writes <code>profile.info</code>,</li>
+<li><code>config/precompute.manifest.json</code> records generated paths and profile stats.</li>
+</ul>
+<p>The output layout mirrors <code>runs/&lt;run_id&gt;/config/</code> so inspected artifacts can be reused later with <code>grid.mode: file</code> and <code>prescribed_flow.source.type: file</code>.</p>
 <h1><a class="anchor" id="p05_submit_sec"></a>
 5b. submit: Execute Existing Staged Artifacts</h1>
 <div class="fragment"><div class="line">./bin/picurv submit [--run-dir &lt;run_dir&gt; | --study-dir &lt;study_dir&gt;] \</div>
@@ -496,6 +509,16 @@ $(function() {
 </ul>
 </li>
 </ul>
+<p><code>precompute</code>:</p><ul>
+<li>required:<ul>
+<li><code>--case &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>optional:<ul>
+<li><code>--output-dir &lt;path&gt;</code> (defaults to <code>precomputed/&lt;case-name&gt;</code>)</li>
+</ul>
+</li>
+</ul>
 <p><code>submit</code>:</p><ul>
 <li>required:<ul>
 <li>exactly one of <code>--run-dir &lt;path&gt;</code> or <code>--study-dir &lt;path&gt;</code></li>
@@ -616,7 +639,7 @@ $(function() {
 <li><code>post_num_procs_effective</code></li>
 <li><code>num_procs_effective</code> (currently mirrors solver count)</li>
 </ul>
-<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>scripts/grid.gen</code> or write these files.</p>
+<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>scripts/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
 <p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>
 <ul>
 <li><code>mode</code> (<code>local</code> or <code>slurm</code>)</li>
