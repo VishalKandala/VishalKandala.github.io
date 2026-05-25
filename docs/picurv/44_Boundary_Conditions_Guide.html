@@ -168,11 +168,21 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 </div><!-- fragment --><p>The second line is the frame count. Static prescribed profiles require <code>1</code>. Values are positive scalar speed magnitudes normal to the inlet surface, not Cartesian velocity components and not contravariant fluxes. The C handler uses the existing inlet face sign and metric conversion to populate <code>Ucont</code> and <code>Ubcs</code>.</p>
 <p>Expected dimensions follow the existing inlet face loop order:</p>
 <ul>
-<li><code>-Xi/+Xi</code>: <code>(KM - 2, JM - 2)</code>, ordered <code>(k, j)</code></li>
-<li><code>-Eta/+Eta</code>: <code>(KM - 2, IM - 2)</code>, ordered <code>(k, i)</code></li>
-<li><code>-Zeta/+Zeta</code>: <code>(JM - 2, IM - 2)</code>, ordered <code>(j, i)</code></li>
+<li><code>-Xi/+Xi</code>: <code>(KM - 1, JM - 1)</code>, ordered <code>(k, j)</code></li>
+<li><code>-Eta/+Eta</code>: <code>(KM - 1, IM - 1)</code>, ordered <code>(k, i)</code></li>
+<li><code>-Zeta/+Zeta</code>: <code>(JM - 1, IM - 1)</code>, ordered <code>(j, i)</code></li>
 </ul>
-<p>For multi-block cases, keep using the existing list-of-lists <code>boundary_conditions</code> shape. Each block face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per block face and writes <code>source_file=...</code> into that block's <code>bcs_block*.run</code>.</p>
+<p>For a case with <code>64 x 64 x 1024</code> cells, the corresponding profile dimensions are <code>64 x 64</code> for <code>-Zeta/+Zeta</code>, <code>1024 x 64</code> for <code>-Xi/+Xi</code>, and <code>1024 x 64</code> for <code>-Eta/+Eta</code>.</p>
+<p>Copy-paste file-backed inlet example:</p>
+<div class="fragment"><div class="line">boundary_conditions:</div>
+<div class="line">  - face: &quot;-Zeta&quot;</div>
+<div class="line">    type: INLET</div>
+<div class="line">    handler: prescribed_flow</div>
+<div class="line">    params:</div>
+<div class="line">      source:</div>
+<div class="line">        type: file</div>
+<div class="line">        path: profiles/inlet.picslice</div>
+</div><!-- fragment --><p>For multi-block cases, keep using the existing list-of-lists <code>boundary_conditions</code> shape. Each block face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per block face and writes <code>source_file=...</code> into that block's <code>bcs_block*.run</code>.</p>
 <p>Generated profiles currently support analytical square-duct Poiseuille flow:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
@@ -187,9 +197,9 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="line">          n_terms: 101</div>
 </div><!-- fragment --><p>The face selects the two transverse dimensions automatically:</p>
 <ul>
-<li><code>-Xi/+Xi</code>: <code>(KM - 2, JM - 2)</code>, ordered <code>(k, j)</code></li>
-<li><code>-Eta/+Eta</code>: <code>(KM - 2, IM - 2)</code>, ordered <code>(k, i)</code></li>
-<li><code>-Zeta/+Zeta</code>: <code>(JM - 2, IM - 2)</code>, ordered <code>(j, i)</code></li>
+<li><code>-Xi/+Xi</code>: <code>(KM - 1, JM - 1)</code>, ordered <code>(k, j)</code></li>
+<li><code>-Eta/+Eta</code>: <code>(KM - 1, IM - 1)</code>, ordered <code>(k, i)</code></li>
+<li><code>-Zeta/+Zeta</code>: <code>(JM - 1, IM - 1)</code>, ordered <code>(j, i)</code></li>
 </ul>
 <p>For <code>grid.mode: grid_gen</code>, <code>picurv run --solve</code> generates the grid first, then reads the generated <code>PICGRID</code> header to size the profile. For <code>grid.mode: file</code>, it reads the source <code>PICGRID</code> header. Generated dimensional profiles and <code>profile.info</code> are written under the run <code>config/</code> directory, then the staged solver-scale <code>.picslice</code> is referenced from <code>bcs.run</code>.</p>
 <h1><a class="anchor" id="p44_periodic_rules_sec"></a>
