@@ -277,9 +277,32 @@ models:
         z: 0.5
 
     turbulence:
-      les: false           # [true/false] -&gt; -les (Large Eddy Simulation)
-      rans: false          # [true/false] -&gt; -rans (Reynolds-Averaged Navier-Stokes)
-      wall_function: false # [true/false] -&gt; -wallfunction
+      # Preferred structured LES form. Legacy shorthand is still accepted:
+      #   les: false       -&gt; -les 0
+      #   les: true        -&gt; -les 1 (constant Smagorinsky)
+      #   les: 1           -&gt; constant Smagorinsky
+      #   les: 2           -&gt; dynamic Smagorinsky
+      les:
+        enabled: false
+        # model is only needed when enabled: true. Options: constant_smagorinsky | dynamic_smagorinsky
+        # model: "constant_smagorinsky"
+        constant_cs: 0.03             # -&gt; -const_cs; used by constant_smagorinsky
+        max_cs: 0.5                   # -&gt; -max_cs; clip for dynamic_smagorinsky
+        dynamic_frequency: 1          # -&gt; -dynamic_freq; recompute dynamic Cs every N steps
+        test_filter: "volume_weighted_box" # volume_weighted_box | homogeneous_ik -&gt; -testfilter_ik
+
+      # RANS selector. The k-omega runtime path is accepted but currently incomplete.
+      rans:
+        enabled: false
+        # model is only needed when enabled: true. Currently supported: k_omega
+        # model: "k_omega"
+
+      # Wall functions are independent of LES/RANS and apply on WALL faces.
+      wall_function:
+        enabled: false
+        # model is only needed when enabled: true. Currently supported: log_law
+        # model: "log_law"
+        roughness_height: 1.0e-16     # -&gt; -wall_roughness
   
   # --- Statistical Analysis ---
   statistics:
@@ -527,7 +550,12 @@ boundary_conditions:
 <div class="line">  physics:</div>
 <div class="line">    dimensionality: &quot;3D&quot;</div>
 <div class="line">    turbulence:</div>
-<div class="line">      les: false</div>
+<div class="line">      les:</div>
+<div class="line">        enabled: false</div>
+<div class="line">      rans:</div>
+<div class="line">        enabled: false</div>
+<div class="line">      wall_function:</div>
+<div class="line">        enabled: false</div>
 <div class="line">    particles:</div>
 <div class="line">      count: 0</div>
 <div class="line">      init_mode: &quot;Surface&quot;</div>
@@ -536,12 +564,26 @@ boundary_conditions:
 <li><code>domain.blocks</code> -&gt; <code>-nblk</code></li>
 <li>periodic flags -&gt; <code>-i_periodic/-j_periodic/-k_periodic</code></li>
 <li><code>physics.dimensionality: "2D"</code> -&gt; <code>-TwoD 1</code></li>
-<li><code>physics.turbulence.les</code> -&gt; <code>-les</code></li>
+<li><code>physics.turbulence.les.enabled/model</code> -&gt; <code>-les</code> (<code>0</code> none, <code>1</code> constant Smagorinsky, <code>2</code> dynamic Smagorinsky)</li>
+<li><code>physics.turbulence.les.constant_cs</code> -&gt; <code>-const_cs</code></li>
+<li><code>physics.turbulence.les.max_cs</code> -&gt; <code>-max_cs</code></li>
+<li><code>physics.turbulence.les.dynamic_frequency</code> -&gt; <code>-dynamic_freq</code></li>
+<li><code>physics.turbulence.les.test_filter</code> -&gt; <code>-testfilter_ik</code> (<code>volume_weighted_box</code> = 0, <code>homogeneous_ik</code> = 1)</li>
+<li><code>physics.turbulence.rans.enabled/model</code> -&gt; <code>-rans</code> (<code>k_omega</code> accepted; runtime update currently incomplete)</li>
+<li><code>physics.turbulence.wall_function.enabled</code> -&gt; <code>-wallfunction</code></li>
+<li><code>physics.turbulence.wall_function.roughness_height</code> -&gt; <code>-wall_roughness</code></li>
 <li><code>physics.particles.count</code> -&gt; <code>-numParticles</code></li>
 <li><code>physics.particles.init_mode</code> -&gt; <code>-pinit</code> (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>, <code>SurfaceEdges</code>)</li>
 <li><code>physics.particles.restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
 <li>point source coordinates -&gt; <code>-psrc_x/-psrc_y/-psrc_z</code></li>
 </ul>
+<p>Legacy turbulence shorthand remains valid:</p>
+<ul>
+<li><code>les: false</code> -&gt; <code>-les 0</code></li>
+<li><code>les: true</code> or <code>les: 1</code> -&gt; constant Smagorinsky (<code>-les 1</code>)</li>
+<li><code>les: 2</code> -&gt; dynamic Smagorinsky (<code>-les 2</code>)</li>
+</ul>
+<p>LES and RANS are mutually exclusive in one case. <code>wall_function</code> is a sibling option because wall functions can be used with wall-modeled LES or RANS boundary treatments.</p>
 <p>Restart note:</p>
 <ul>
 <li>if <code>run_control.start_step &gt; 0</code>, particles are enabled, and <code>restart_mode</code> is omitted, <code>picurv</code> warns that C will default to <code>load</code>.</li>
