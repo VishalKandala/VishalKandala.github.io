@@ -86,12 +86,13 @@ $(function() {
 <ul><li class="level1"><a href="#p17_goals_sec">1. Design Goal</a></li>
 <li class="level1"><a href="#p17_grid_sec">2. Grid Workflow Extensions</a></li>
 <li class="level1"><a href="#p17_orchestration_sec">3. Multi-Run Orchestration (Sweeps/Studies)</a></li>
-<li class="level1"><a href="#p17_ml_sec">4. Data-Driven Particle Closure Integration</a><ul><li class="level2"><a href="#p17_ml_offline_ssec">4.1 Offline (Recommended First)</a></li>
-<li class="level2"><a href="#p17_ml_coupled_ssec">4.2 Tightly Coupled Inference (Runtime)</a></li>
+<li class="level1"><a href="#p17_completion_sec">4. Runtime Completion Extensions</a></li>
+<li class="level1"><a href="#p17_ml_sec">5. Data-Driven Particle Closure Integration</a><ul><li class="level2"><a href="#p17_ml_offline_ssec">5.1 Offline (Recommended First)</a></li>
+<li class="level2"><a href="#p17_ml_coupled_ssec">5.2 Tightly Coupled Inference (Runtime)</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#p17_guardrails_sec">5. Guardrails for Safe Growth</a></li>
-<li class="level1"><a href="#p17_related_sec">6. Related Docs</a><ul><li class="level2"><a href="#autotoc_md56">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md57">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p17_guardrails_sec">6. Guardrails for Safe Growth</a></li>
+<li class="level1"><a href="#p17_related_sec">7. Related Docs</a><ul><li class="level2"><a href="#autotoc_md56">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md57">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md58">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -130,10 +131,21 @@ $(function() {
 <li>add sweep resume/retry policies,</li>
 <li>add scheduler backends beyond Slurm without changing C contracts.</li>
 </ol>
+<h1><a class="anchor" id="p17_completion_sec"></a>
+4. Runtime Completion Extensions</h1>
+<p>The current runtime already supports safe early shutdown for walltime and signal events. Physics-based completion is a separate future extension and should keep that same checkpoint discipline.</p>
+<p>Extension-ready next steps:</p><ol type="1">
+<li>add optional convergence-stop criteria under <code>solver.yml -&gt; solution_convergence</code>,</li>
+<li>limit deterministic fixed-state stopping to <code>mode: steady_deterministic</code>,</li>
+<li>use explicit tolerances, minimum samples, and dwell windows before declaring completion,</li>
+<li>keep <code>mode: transient</code> diagnostic-only because nonzero drift can be the expected physics,</li>
+<li>route any automatic completion through the existing final-write/safe-checkpoint path.</li>
+</ol>
+<p>For statistically steady turbulence, prefer postprocessing-heavy turbulence analysis after runtime window metrics indicate stationarity; runtime completion criteria should remain lightweight and conservative.</p>
 <h1><a class="anchor" id="p17_ml_sec"></a>
-4. Data-Driven Particle Closure Integration</h1>
+5. Data-Driven Particle Closure Integration</h1>
 <h2><a class="anchor" id="p17_ml_offline_ssec"></a>
-4.1 Offline (Recommended First)</h2>
+5.1 Offline (Recommended First)</h2>
 <ul>
 <li>Use solver/post outputs as training/inference datasets.</li>
 <li>Keep ML scripts external (Python pipeline).</li>
@@ -141,7 +153,7 @@ $(function() {
 </ul>
 <p>This requires minimal C changes and is ideal for rapid iteration.</p>
 <h2><a class="anchor" id="p17_ml_coupled_ssec"></a>
-4.2 Tightly Coupled Inference (Runtime)</h2>
+5.2 Tightly Coupled Inference (Runtime)</h2>
 <p>For in-solver inference:</p><ol type="1">
 <li>add runtime-selectable closure model interface in <code><a class="el" href="ParticlePhysics_8c.html">ParticlePhysics.c</a></code>,</li>
 <li>expose model type and parameters in schema,</li>
@@ -151,7 +163,7 @@ $(function() {
 </ol>
 <p>Keep deterministic fallback as default for robustness.</p>
 <h1><a class="anchor" id="p17_guardrails_sec"></a>
-5. Guardrails for Safe Growth</h1>
+6. Guardrails for Safe Growth</h1>
 <ul>
 <li>Keep new user options structured first; reserve passthrough for temporary gaps.</li>
 <li>Keep ingestion mostly in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>/<code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>.</li>
@@ -159,7 +171,7 @@ $(function() {
 <li>Require at least one template/example update per new user-visible feature.</li>
 </ul>
 <h1><a class="anchor" id="p17_related_sec"></a>
-6. Related Docs</h1>
+7. Related Docs</h1>
 <ul>
 <li>User contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>Ingestion map: <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>

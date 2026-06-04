@@ -12,7 +12,7 @@ var searchData=
   ['s_5freal_9',['S_real',['../variables_8h.html#a824a222da81b9e73d12b14dfba560c34',1,'FSInfo']]],
   ['s_5frealm1_10',['S_realm1',['../variables_8h.html#a70f36662d6de8b6dd325d632799db7de',1,'FSInfo']]],
   ['safe_20extension_20workflow_20c_20side_11',['7. Safe Extension Workflow (C Side)',['../46_C_Runtime_Execution_Map.html#p46_extension_sec',1,'']]],
-  ['safe_20growth_12',['5. Guardrails for Safe Growth',['../17_Workflow_Extensibility.html#p17_guardrails_sec',1,'']]],
+  ['safe_20growth_12',['6. Guardrails for Safe Growth',['../17_Workflow_Extensibility.html#p17_guardrails_sec',1,'']]],
   ['safe_20rules_20of_20thumb_13',['8. Safe Rules Of Thumb',['../52_Run_Lifecycle_Guide.html#p52_rules_sec',1,'']]],
   ['safety_14',['safety',['../05_The_Conductor_Script.html#p05_binaries_sec',1,'12. Binary Resolution and Rebuild Safety'],['../11_User_How_To_Guides.html#p11_rebuild_ssec',1,'5.3 Rebuild Safety']]],
   ['same_20run_20directory_15',['5.3 Continue In-Place (Same Run Directory)',['../52_Run_Lifecycle_Guide.html#p52_continue',1,'']]],

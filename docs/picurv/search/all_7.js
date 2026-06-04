@@ -17,13 +17,14 @@ var searchData=
   ['7_20next_20steps_14',['7 next steps',['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'7. Next Steps'],['../11_User_How_To_Guides.html#p11_next_steps_sec',1,'7. Next Steps']]],
   ['7_20practical_20checks_15',['7. Practical Checks',['../33_Initial_Conditions.html#p33_checks_sec',1,'']]],
   ['7_20recommended_20usage_16',['7. Recommended Usage',['../53_Search_Robustness_Metrics_Reference.html#p53_usage_sec',1,'']]],
-  ['7_20runtime_20observability_20backlog_17',['7. Runtime Observability Backlog',['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'']]],
-  ['7_20safe_20extension_20workflow_20c_20side_18',['7. Safe Extension Workflow (C Side)',['../46_C_Runtime_Execution_Map.html#p46_extension_sec',1,'']]],
-  ['7_20scatter_20verification_20recipe_19',['7. Scatter Verification Recipe',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_scatter_recipe_sec',1,'']]],
-  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_20',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md75',1,'']]],
-  ['7_20temporary_20files_21',['7. Temporary Files',['../51_C_Test_Suite_Developer_Guide.html#p51_fs_sec',1,'']]],
-  ['7_20validate_3a_20config_20only_20checks_22',['7. validate: Config-Only Checks',['../05_The_Conductor_Script.html#p05_validate_sec',1,'']]],
-  ['7_20when_20to_20use_20which_20grid_20path_23',['7. When To Use Which Grid Path',['../48_Grid_Generator_Guide.html#p48_choose_sec',1,'']]],
-  ['7_20where_20to_20extend_24',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]],
-  ['7_20which_20example_20to_20start_20from_25',['7. Which Example To Start From',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_choose_sec',1,'']]]
+  ['7_20related_20docs_17',['7. Related Docs',['../17_Workflow_Extensibility.html#p17_related_sec',1,'']]],
+  ['7_20runtime_20observability_20backlog_18',['7. Runtime Observability Backlog',['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'']]],
+  ['7_20safe_20extension_20workflow_20c_20side_19',['7. Safe Extension Workflow (C Side)',['../46_C_Runtime_Execution_Map.html#p46_extension_sec',1,'']]],
+  ['7_20scatter_20verification_20recipe_20',['7. Scatter Verification Recipe',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_scatter_recipe_sec',1,'']]],
+  ['7_20summary_20table_20of_20tt_20ucat_20tt_20anatomy_20i_20direction_21',['7. Summary Table of &lt;tt&gt;ucat&lt;/tt&gt; Anatomy (i-direction)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md75',1,'']]],
+  ['7_20temporary_20files_22',['7. Temporary Files',['../51_C_Test_Suite_Developer_Guide.html#p51_fs_sec',1,'']]],
+  ['7_20validate_3a_20config_20only_20checks_23',['7. validate: Config-Only Checks',['../05_The_Conductor_Script.html#p05_validate_sec',1,'']]],
+  ['7_20when_20to_20use_20which_20grid_20path_24',['7. When To Use Which Grid Path',['../48_Grid_Generator_Guide.html#p48_choose_sec',1,'']]],
+  ['7_20where_20to_20extend_25',['7. Where to Extend',['../13_Code_Architecture.html#p13_extension_sec',1,'']]],
+  ['7_20which_20example_20to_20start_20from_26',['7. Which Example To Start From',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_choose_sec',1,'']]]
 ];
