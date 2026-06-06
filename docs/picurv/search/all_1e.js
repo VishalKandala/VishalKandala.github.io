@@ -170,7 +170,7 @@ var searchData=
   ['solutionconvergencesaferelative_167',['SolutionConvergenceSafeRelative',['../logging_8c.html#a57d6832322e3d500731dd03221ee53a9',1,'logging.c']]],
   ['solutionconvergencesamplesrecorded_168',['solutionConvergenceSamplesRecorded',['../variables_8h.html#a4c3ab486afa8ec78614207f557c01cb3',1,'SimCtx']]],
   ['solutionconvergencewindowsteps_169',['solutionConvergenceWindowSteps',['../variables_8h.html#ab45c9bb3339f58e9192d2984cb8d61be',1,'SimCtx']]],
-  ['solver_170',['solver',['../31_Momentum_Solvers.html#p31_extension_sec',1,'5. Adding A New Momentum Solver'],['../24_Dual_Time_Picard_RK4.html',1,'Dual-Time Picard RK4 Momentum Solver']]],
+  ['solver_170',['solver',['../31_Momentum_Solvers.html#p31_extension_sec',1,'5. Adding A New Momentum Solver'],['../24_Dual_Time_Picard_Jameson_RK.html',1,'Dual-Time Picard Jameson RK Momentum Solver']]],
   ['solver_20and_20postprocessor_171',['5. Run Solver and Postprocessor',['../02_Tutorial_Programmatic_Grid.html#p02_run_sec',1,'']]],
   ['solver_20contract_20highlights_172',['4. Solver Contract Highlights',['../14_Config_Contract.html#p14_solver_sec',1,'']]],
   ['solver_20documentation_173',['PICurv Solver Documentation',['../index.html',1,'']]],

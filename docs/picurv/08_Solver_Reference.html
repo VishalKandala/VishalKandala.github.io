@@ -171,7 +171,7 @@ scalar_transport:
 # ==============================================================================
 # --- Main Time-Stepping Scheme ---
 strategy:
-  momentum_solver: "Dual Time Picard RK4" # -&gt; -mom_solver_type. Options: "Explicit RK4", "Dual Time Picard RK4"
+  momentum_solver: "Dual Time Picard Jameson RK" # -&gt; -mom_solver_type. Options: "Explicit RK4", "Dual Time Picard Jameson RK"
   central_diff: false # [true/false] -&gt; -central
 
 # --- Convergence Criteria for the Momentum Solver ---
@@ -184,8 +184,8 @@ tolerances:
 # --- Advanced Momentum Solver Controls (optional) ---
 # This section exposes newer dual-time controls directly (no passthrough needed).
 momentum_solver:
-  # Solver-specific controls for Dual Time Picard RK4.
-  dual_time_picard_rk4:
+  # Solver-specific controls for Dual Time Picard Jameson RK.
+  dual_time_picard_jameson_rk:
     max_pseudo_steps: 50         # -&gt; -mom_max_pseudo_steps
     absolute_tol: 1.0e-8         # -&gt; -mom_atol
     relative_tol: 1.0e-5         # -&gt; -mom_rtol
@@ -196,7 +196,7 @@ momentum_solver:
       maximum: 1.0               # -&gt; -max_pseudo_cfl
       growth_factor: 1.0         # -&gt; -pseudo_cfl_growth_factor
       reduction_factor: 1.0      # -&gt; -pseudo_cfl_reduction_factor
-    rk4_residual_noise_allowance_factor: 1.05 # -&gt; -mom_dt_rk4_residual_norm_noise_allowance_factor
+    jameson_residual_noise_allowance_factor: 1.05 # -&gt; -mom_dt_jameson_residual_norm_noise_allowance_factor
 
 # --- Physical Solution Convergence Logging ---
 # This layer is separate from the inner solver-health logs. It always records
@@ -322,13 +322,13 @@ petsc_passthrough_options:
 <h1><a class="anchor" id="p08_strategy_sec"></a>
 2. strategy</h1>
 <div class="fragment"><div class="line">strategy:</div>
-<div class="line">  momentum_solver: &quot;Dual Time Picard RK4&quot;</div>
+<div class="line">  momentum_solver: &quot;Dual Time Picard Jameson RK&quot;</div>
 <div class="line">  central_diff: false</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>momentum_solver</code> -&gt; <code>-mom_solver_type</code> (<code>picurv</code> accepts <code>Explicit RK4</code> or <code>Dual Time Picard RK4</code>)</li>
+<li><code>momentum_solver</code> -&gt; <code>-mom_solver_type</code> (<code>picurv</code> accepts <code>Explicit RK4</code> or <code>Dual Time Picard Jameson RK</code>)</li>
 <li><code>central_diff</code> -&gt; <code>-central</code></li>
 </ul>
-<p>Older boolean toggles are not supported; use <code>strategy.momentum_solver</code>. Only implemented momentum solver values are accepted by <code>picurv</code> and the C runtime.</p>
+<p>Older boolean toggles are not supported; use <code>strategy.momentum_solver</code>. Only implemented momentum solver values are accepted by <code>picurv</code> and the C runtime. The deprecated <code>Dual Time Picard RK4</code> display name, <code>dual_time_picard_rk4</code> solver block, and <code>rk4_residual_noise_allowance_factor</code> key remain readable compatibility aliases; generated controls always use the canonical Jameson names.</p>
 <h1><a class="anchor" id="p08_tol_sec"></a>
 3. tolerances</h1>
 <div class="fragment"><div class="line">tolerances:</div>
@@ -345,7 +345,7 @@ petsc_passthrough_options:
 <h1><a class="anchor" id="p08_msolver_sec"></a>
 4. momentum_solver (Solver-Specific Block)</h1>
 <div class="fragment"><div class="line">momentum_solver:</div>
-<div class="line">  dual_time_picard_rk4:</div>
+<div class="line">  dual_time_picard_jameson_rk:</div>
 <div class="line">    max_pseudo_steps: 50</div>
 <div class="line">    absolute_tol: 1.0e-8</div>
 <div class="line">    relative_tol: 1.0e-5</div>
@@ -356,13 +356,13 @@ petsc_passthrough_options:
 <div class="line">      maximum: 1.0</div>
 <div class="line">      growth_factor: 1.0</div>
 <div class="line">      reduction_factor: 1.0</div>
-<div class="line">    rk4_residual_noise_allowance_factor: 1.05</div>
+<div class="line">    jameson_residual_noise_allowance_factor: 1.05</div>
 </div><!-- fragment --><p>Mappings include:</p><ul>
 <li><code>-pseudo_cfl</code>, <code>-min_pseudo_cfl</code>, <code>-max_pseudo_cfl</code></li>
 <li><code>-pseudo_cfl_growth_factor</code>, <code>-pseudo_cfl_reduction_factor</code></li>
-<li><code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
+<li><code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code></li>
 </ul>
-<p>Rule: solver-specific blocks must match selected momentum solver type.</p>
+<p>Rule: solver-specific blocks must match selected momentum solver type. Do not set canonical Jameson keys and their deprecated RK4 aliases together.</p>
 <h1><a class="anchor" id="p08_poisson_sec"></a>
 5. poisson_solver</h1>
 <div class="fragment"><div class="line">poisson_solver:</div>
@@ -530,7 +530,7 @@ petsc_passthrough_options:
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
-<li><b><a class="el" href="24_Dual_Time_Picard_RK4.html">Dual-Time Picard RK4 Momentum Solver</a></b></li>
+<li><b><a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a></b></li>
 <li><b><a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>

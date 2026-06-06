@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Dual-Time Picard RK4 Momentum Solver</title>
+<title>PICurv: Dual-Time Picard Jameson RK Momentum Solver</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,7 +79,7 @@ $(function() {
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">Dual-Time Picard RK4 Momentum Solver</div></div>
+  <div class="headertitle"><div class="title">Dual-Time Picard Jameson RK Momentum Solver</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
@@ -95,7 +95,7 @@ $(function() {
 </li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_RK4"></a> This page documents the currently active implicit-style momentum strategy in PICurv: dual-time Picard iteration with RK4 pseudo-time smoothing.</p>
+<div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_Jameson_RK"></a> This page documents the currently active implicit-style momentum strategy in PICurv: dual-time Picard iteration with Jameson RK pseudo-time smoothing.</p>
 <h1><a class="anchor" id="p24_model_sec"></a>
 1. Algorithmic Model</h1>
 <p>The solver enforces the physical-time momentum equation by iterating a pseudo-time equation:</p>
@@ -108,7 +108,8 @@ $(function() {
 <ul>
 <li><code>R_spatial</code> comes from <a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8">ComputeRHS</a></li>
 <li><code>R_time</code> uses BDF1/BDF2-style terms from <code>Ucont</code>, <code>Ucont_o</code>, and <code>Ucont_rm1</code>,</li>
-<li>RK4 stages use coefficients \(\{1/4,1/3,1/2,1\}\).</li>
+<li>Jameson RK smoothing stages use coefficients \(\{1/4,1/3,1/2,1\}\).</li>
+<li>Each stage evaluates a fresh residual at the previous stage state, then forms the next stage from the fixed pseudo-iteration base state. This is not classical fourth-order Runge-Kutta time integration.</li>
 </ul>
 <h1><a class="anchor" id="p24_convergence_sec"></a>
 2. Convergence and Backtracking</h1>
@@ -134,14 +135,15 @@ $(function() {
 <li><code>tolerances.absolute_tol</code> -&gt; <code>-mom_atol</code></li>
 <li><code>tolerances.relative_tol</code> -&gt; <code>-mom_rtol</code></li>
 <li><code>tolerances.step_tol</code> -&gt; <code>-imp_stol</code></li>
-<li><code>momentum_solver.dual_time_picard_rk4.pseudo_cfl.*</code> -&gt; pseudo-CFL flags</li>
-<li><code>rk4_residual_noise_allowance_factor</code> -&gt; <code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code></li>
+<li><code>momentum_solver.dual_time_picard_jameson_rk.pseudo_cfl.*</code> -&gt; pseudo-CFL flags</li>
+<li><code>jameson_residual_noise_allowance_factor</code> -&gt; <code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code></li>
 </ul>
+<p>The former <code>Dual Time Picard RK4</code>, <code>dual_time_picard_rk4</code>, <code>rk4_residual_noise_allowance_factor</code>, <code>DUALTIME_PICARD_RK4</code>, and <code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code> spellings remain deprecated compatibility aliases. Canonical configuration and generated controls use the Jameson names.</p>
 <p>Parsing and normalization are performed in <code>scripts/picurv</code>, with final option ingestion in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during setup. Only the currently implemented momentum solver values are exposed; add new ones only when the parser and dispatcher are extended in the same change.</p>
 <h1><a class="anchor" id="p24_touchpoints_sec"></a>
 4. Core Code Touchpoints</h1>
 <ul>
-<li>implementation: <a class="el" href="momentumsolvers_8h.html#a6c666dcadf0a165bf35bec15662d7072">MomentumSolver_DualTime_Picard_RK4</a></li>
+<li>implementation: <a class="el" href="momentumsolvers_8h.html#a173269bc83cefbbc44ef4869bd3fa753">MomentumSolver_DualTime_Picard_JamesonRK</a></li>
 <li>explicit comparator path: <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
 <li>runtime dispatch: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
 <li>options ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
@@ -159,7 +161,7 @@ $(function() {
 <p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
 <h2><a class="anchor" id="autotoc_md88"></a>
 CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Dual-Time Picard RK4 Momentum Solver</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
+<p>This page describes <b>Dual-Time Picard Jameson RK Momentum Solver</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
 <h3><a class="anchor" id="autotoc_md89"></a>
 What To Extract Before Changing A Case</h3>

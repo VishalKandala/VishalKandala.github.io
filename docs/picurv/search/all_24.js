@@ -15,7 +15,7 @@ var searchData=
   ['yaml_20generated_20artifacts_20runtime_12',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
   ['yaml_20mapping_20and_20petsc_20options_13',['3. YAML Mapping and PETSc Options',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_config_sec',1,'']]],
   ['yaml_20runtime_20artifacts_14',['3. YAML -&gt; Runtime Artifacts',['../06_Simulation_Anatomy.html#p06_artifacts_sec',1,'']]],
-  ['yaml_20runtime_20controls_15',['3. YAML -&gt; Runtime Controls',['../24_Dual_Time_Picard_RK4.html#p24_config_sec',1,'']]],
+  ['yaml_20runtime_20controls_15',['3. YAML -&gt; Runtime Controls',['../24_Dual_Time_Picard_Jameson_RK.html#p24_config_sec',1,'']]],
   ['ym_5fcell_16',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
   ['ymax_17',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
   ['ymin_18',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],

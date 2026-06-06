@@ -6,5 +6,7 @@ var searchData=
   ['max_5fpoint_5fdata_5ffields_3',['MAX_POINT_DATA_FIELDS',['../variables_8h.html#a10a62bce766452804bad64d119e127f7',1,'variables.h']]],
   ['max_5ftraversal_4',['MAX_TRAVERSAL',['../walkingsearch_8c.html#a0b04c9114da8773de79936038f5c36a0',1,'walkingsearch.c']]],
   ['max_5fvtk_5ffield_5fname_5flength_5',['MAX_VTK_FIELD_NAME_LENGTH',['../variables_8h.html#af429c472ad06c2094bc8d598231b2e0a',1,'variables.h']]],
-  ['momentumsolvers_5fh_6',['MOMENTUMSOLVERS_H',['../momentumsolvers_8h.html#a1193a534e7c6fa093fa04228d95c76ce',1,'momentumsolvers.h']]]
+  ['mom_5fdt_5frk4_5fresidual_5fnorm_5fnoise_5fallowance_5ffactor_6',['mom_dt_rk4_residual_norm_noise_allowance_factor',['../variables_8h.html#aa3b6728e3eb4702f2fd4425d08d73695',1,'variables.h']]],
+  ['momentumsolver_5fdualtime_5fpicard_5frk4_7',['MomentumSolver_DualTime_Picard_RK4',['../momentumsolvers_8h.html#a8cd365acf3fb49f865039f78c2a53c38',1,'momentumsolvers.h']]],
+  ['momentumsolvers_5fh_8',['MOMENTUMSOLVERS_H',['../momentumsolvers_8h.html#a1193a534e7c6fa093fa04228d95c76ce',1,'momentumsolvers.h']]]
 ];
