@@ -68,7 +68,7 @@ var searchData=
   ['extending_20the_20test_20suite_65',['10. Extending The Test Suite',['../40_Testing_and_Quality_Guide.html#p40_extend_sec',1,'']]],
   ['extending_20to_20new_20closures_66',['5. Extending To New Closures',['../34_Particle_Model_Overview.html#p34_extension_sec',1,'']]],
   ['extensibility_20guide_67',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
-  ['extensibility_20status_68',['7. Extensibility Status',['../12_Capabilities_Summary.html#p12_extension_sec',1,'']]],
+  ['extensibility_20status_68',['8. Extensibility Status',['../12_Capabilities_Summary.html#p12_extension_sec',1,'']]],
   ['extension_20checklist_69',['3. ParticlePhysics Extension Checklist',['../16_Config_Extension_Playbook.html#p16_particle_sec',1,'']]],
   ['extension_20guide_70',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
   ['extension_20playbook_71',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],

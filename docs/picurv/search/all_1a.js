@@ -28,7 +28,7 @@ var searchData=
   ['orchestration_25',['orchestration',['../42_User_Guide_Index.html#p42_workflow_sec',1,'1. Workflow and Orchestration'],['../12_Capabilities_Summary.html#p12_orchestration_sec',1,'6. Cluster and Study Orchestration']]],
   ['orchestration_20mapping_20no_20c_20ingestion_26',['3. Python-Only Orchestration Mapping (No C Ingestion)',['../15_Config_Ingestion_Map.html#p15_python_only_sec',1,'']]],
   ['orchestration_20sweeps_20studies_27',['3. Multi-Run Orchestration (Sweeps/Studies)',['../17_Workflow_Extensibility.html#p17_orchestration_sec',1,'']]],
-  ['order_28',['order',['../21_Methods_Overview.html#p21_runtime_map_sec',1,'2. Runtime Execution Order'],['../41_Getting_Started_Index.html#p41_path_sec',1,'3. Recommended Read Order'],['../12_Capabilities_Summary.html#p12_next_steps_sec',1,'8. Suggested Reading Order']]],
+  ['order_28',['order',['../21_Methods_Overview.html#p21_runtime_map_sec',1,'2. Runtime Execution Order'],['../41_Getting_Started_Index.html#p41_path_sec',1,'3. Recommended Read Order'],['../12_Capabilities_Summary.html#p12_next_steps_sec',1,'9. Suggested Reading Order']]],
   ['order_20tt_20src_20simulator_20c_20tt_29',['1. Solver Startup Order (&lt;tt&gt;src/simulator.c&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#p46_startup_sec',1,'']]],
   ['organization_20rules_30',['5. Documentation Organization Rules',['../30_Repository_Navigation.html#p30_usage_sec',1,'']]],
   ['orientation_31',['4. Repository Orientation',['../42_User_Guide_Index.html#p42_support_sec',1,'']]],
