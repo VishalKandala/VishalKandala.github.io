@@ -483,348 +483,335 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  190</span>    PetscErrorCode ierr;</div>
 <div class="line"><span class="lineno">  191</span>    PetscMPIInt    rank;</div>
 <div class="line"><span class="lineno">  192</span>    PetscInt       istage, pseudo_iter;</div>
-<div class="line"><span class="lineno">  193</span>    PetscReal      ts, te, cput;</div>
-<div class="line"><span class="lineno">  194</span> </div>
-<div class="line"><span class="lineno">  195</span>    <span class="comment">// --- Global Convergence Metrics ---</span></div>
-<div class="line"><span class="lineno">  196</span>    PetscReal global_norm_delta = 10.0; </div>
-<div class="line"><span class="lineno">  197</span>    PetscReal global_rel_delta  = 1.0;  </div>
-<div class="line"><span class="lineno">  198</span>    PetscReal global_rel_resid  = 1.0;  </div>
-<div class="line"><span class="lineno">  199</span> </div>
-<div class="line"><span class="lineno">  200</span>    <span class="comment">// --- Local Metric Arrays (Per Block) ---</span></div>
-<div class="line"><span class="lineno">  201</span>    PetscReal *delta_sol_norm_init, *delta_sol_norm_prev, *delta_sol_norm_curr, *delta_sol_rel_curr;</div>
-<div class="line"><span class="lineno">  202</span>    PetscReal *resid_norm_init,     *resid_norm_prev,     *resid_norm_curr,     *resid_rel_curr;</div>
-<div class="line"><span class="lineno">  203</span>    PetscReal *pseudo_dt_scaling;</div>
-<div class="line"><span class="lineno">  204</span> </div>
-<div class="line"><span class="lineno">  205</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  206</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  207</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  208</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Executing Dual-Time Momentum Solver for %d block(s).\n&quot;</span>, block_number);</div>
-<div class="line"><span class="lineno">  209</span> </div>
-<div class="line"><span class="lineno">  210</span>    <span class="comment">// --- Allocate metric arrays ---</span></div>
-<div class="line"><span class="lineno">  211</span>    ierr = PetscMalloc2(block_number, &amp;delta_sol_norm_init, block_number, &amp;delta_sol_norm_prev); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  212</span>    ierr = PetscMalloc2(block_number, &amp;delta_sol_norm_curr, block_number, &amp;delta_sol_rel_curr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  213</span>    ierr = PetscMalloc2(block_number, &amp;resid_norm_init,     block_number, &amp;resid_norm_prev); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  214</span>    ierr = PetscMalloc2(block_number, &amp;resid_norm_curr,     block_number, &amp;pseudo_dt_scaling); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  215</span>    ierr = PetscMalloc1(block_number, &amp;resid_rel_curr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  216</span>    ierr = PetscMalloc1(block_number, &amp;pRhs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  217</span> </div>
-<div class="line"><span class="lineno">  218</span>    ierr = PetscTime(&amp;ts); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  193</span>    PetscInt       accepted_iter = 0, rejected_iter = 0, recovery_streak = 0;</div>
+<div class="line"><span class="lineno">  194</span>    PetscReal      ts, te, cput;</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>    <span class="comment">// --- Global Convergence Metrics ---</span></div>
+<div class="line"><span class="lineno">  197</span>    PetscReal global_norm_delta = 10.0; </div>
+<div class="line"><span class="lineno">  198</span>    PetscReal global_rel_delta  = 1.0;  </div>
+<div class="line"><span class="lineno">  199</span>    PetscReal global_norm_resid = 1.0;</div>
+<div class="line"><span class="lineno">  200</span>    PetscReal global_rel_resid  = 1.0;  </div>
+<div class="line"><span class="lineno">  201</span> </div>
+<div class="line"><span class="lineno">  202</span>    <span class="comment">// --- Local Metric Arrays (Per Block) ---</span></div>
+<div class="line"><span class="lineno">  203</span>    PetscReal *delta_sol_norm_init, *delta_sol_norm_prev, *delta_sol_norm_curr, *delta_sol_rel_curr;</div>
+<div class="line"><span class="lineno">  204</span>    PetscReal *resid_norm_init,     *resid_norm_prev,     *resid_norm_curr,     *resid_rel_curr;</div>
+<div class="line"><span class="lineno">  205</span>    PetscReal *pseudo_dt_scaling;</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  208</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  209</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  210</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Executing Dual-Time Momentum Solver for %d block(s).\n&quot;</span>, block_number);</div>
+<div class="line"><span class="lineno">  211</span> </div>
+<div class="line"><span class="lineno">  212</span>    <span class="comment">// --- Allocate metric arrays ---</span></div>
+<div class="line"><span class="lineno">  213</span>    ierr = PetscMalloc2(block_number, &amp;delta_sol_norm_init, block_number, &amp;delta_sol_norm_prev); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  214</span>    ierr = PetscMalloc2(block_number, &amp;delta_sol_norm_curr, block_number, &amp;delta_sol_rel_curr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  215</span>    ierr = PetscMalloc2(block_number, &amp;resid_norm_init,     block_number, &amp;resid_norm_prev); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  216</span>    ierr = PetscMalloc2(block_number, &amp;resid_norm_curr,     block_number, &amp;pseudo_dt_scaling); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  217</span>    ierr = PetscMalloc1(block_number, &amp;resid_rel_curr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  218</span>    ierr = PetscMalloc1(block_number, &amp;pRhs); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno">  219</span> </div>
-<div class="line"><span class="lineno">  220</span>    <span class="comment">// --- 1. Pre-Loop Initialization ---</span></div>
-<div class="line"><span class="lineno">  221</span>    </div>
-<div class="line"><span class="lineno">  222</span>    <span class="keywordflow">if</span> (block_number &gt; 1) {</div>
-<div class="line"><span class="lineno">  223</span>      <span class="comment">// ierr = Block_Interface_U(user); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  224</span>    }</div>
-<div class="line"><span class="lineno">  225</span> </div>
-<div class="line"><span class="lineno">  226</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  227</span>        ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  228</span>        </div>
-<div class="line"><span class="lineno">  229</span>        <span class="comment">// Immersed boundary interpolation (if enabled)</span></div>
-<div class="line"><span class="lineno">  230</span> </div>
-<div class="line"><span class="lineno">  231</span>        <span class="comment">// Allocate workspace</span></div>
-<div class="line"><span class="lineno">  232</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].Rhs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  233</span>        ierr = VecDuplicate(user[bi].Rhs, &amp;pRhs[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  234</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].dUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  235</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].pUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  236</span>        </div>
-<div class="line"><span class="lineno">  237</span>        <span class="comment">// Initialize Backup (pUcont) with current state</span></div>
-<div class="line"><span class="lineno">  238</span>        ierr = VecCopy(user[bi].Ucont, user[bi].pUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  239</span> </div>
-<div class="line"><span class="lineno">  240</span>        <span class="comment">// --- Calculate Initial Total Residual (Spatial + Temporal) ---</span></div>
-<div class="line"><span class="lineno">  241</span>        ierr = <a class="code hl_function" href="momentumsolvers_8c.html#a3aa9a9ff749db24932b4ac7fc0e72666">ComputeTotalResidual</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  242</span> </div>
-<div class="line"><span class="lineno">  243</span>        <span class="comment">// Backup Rhs with current state</span></div>
-<div class="line"><span class="lineno">  244</span>        ierr = VecCopy(user[bi].Rhs, pRhs[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  245</span> </div>
-<div class="line"><span class="lineno">  246</span>        <span class="comment">// Compute Initial Norms</span></div>
-<div class="line"><span class="lineno">  247</span>        ierr = VecNorm(user[bi].Rhs, NORM_INFINITY, &amp;resid_norm_init[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  248</span>        </div>
-<div class="line"><span class="lineno">  249</span>        <span class="comment">// Initialize history for backtracking logic</span></div>
-<div class="line"><span class="lineno">  250</span>        resid_norm_prev[bi]     = resid_norm_init[bi]; <span class="comment">// Meaningful ratio on first iteration</span></div>
-<div class="line"><span class="lineno">  251</span>        delta_sol_norm_prev[bi] = 1000.0;</div>
-<div class="line"><span class="lineno">  252</span>        pseudo_dt_scaling[bi] = cfl; <span class="comment">// Initialize adaptive scalar</span></div>
-<div class="line"><span class="lineno">  253</span> </div>
-<div class="line"><span class="lineno">  254</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,<span class="stringliteral">&quot; Block %d | Max RHS = %.6f | Pseudo-CFL = %.4f .\n&quot;</span>, bi, resid_norm_init[bi], cfl);</div>
-<div class="line"><span class="lineno">  255</span>    }</div>
-<div class="line"><span class="lineno">  256</span>    </div>
-<div class="line"><span class="lineno">  257</span>    <span class="comment">// --- 2. Main Pseudo-Time Iteration Loop ---</span></div>
-<div class="line"><span class="lineno">  258</span>    pseudo_iter = 0;</div>
-<div class="line"><span class="lineno">  259</span>    <span class="keywordflow">while</span> ((force_restart || (global_norm_delta &gt; tol_abs_delta || global_rel_delta &gt; tol_rtol_delta) || pseudo_iter &lt; 1)</div>
-<div class="line"><span class="lineno">  260</span>            &amp;&amp; pseudo_iter &lt; max_pseudo_steps)</div>
-<div class="line"><span class="lineno">  261</span>    {</div>
-<div class="line"><span class="lineno">  262</span>        pseudo_iter++;</div>
-<div class="line"><span class="lineno">  263</span>        force_restart = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  264</span>    </div>
-<div class="line"><span class="lineno">  265</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  266</span>            </div>
-<div class="line"><span class="lineno">  267</span>            <span class="comment">// === 4-Stage Jameson RK Smoothing Loop ===</span></div>
-<div class="line"><span class="lineno">  268</span>            <span class="keywordflow">for</span> (istage = 0; istage &lt; 4; istage++) {</div>
-<div class="line"><span class="lineno">  269</span>                </div>
-<div class="line"><span class="lineno">  270</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,<span class="stringliteral">&quot; Pseudo-Iter: %d | RK-Stage: %d\n&quot;</span>, pseudo_iter, istage);</div>
-<div class="line"><span class="lineno">  271</span>                </div>
-<div class="line"><span class="lineno">  272</span>                <span class="comment">// RK Update: U_new = U_old + (Scaler * Alpha * dt) * Total_Residual</span></div>
-<div class="line"><span class="lineno">  273</span>                ierr = VecWAXPY(user[bi].Ucont, </div>
-<div class="line"><span class="lineno">  274</span>                                pseudo_dt_scaling[bi] * alfa[istage] * dt, </div>
-<div class="line"><span class="lineno">  275</span>                                user[bi].Rhs, </div>
-<div class="line"><span class="lineno">  276</span>                                user[bi].pUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  277</span> </div>
-<div class="line"><span class="lineno">  278</span>                <span class="comment">// Sync Ghosts &amp; Re-apply BCs for intermediate stage</span></div>
-<div class="line"><span class="lineno">  279</span>                ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi],<span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  280</span>                </div>
-<div class="line"><span class="lineno">  281</span>                <span class="comment">//ierr = DMGlobalToLocalBegin(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  282</span>                <span class="comment">//ierr = DMGlobalToLocalEnd(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  283</span>                </div>
-<div class="line"><span class="lineno">  284</span>                ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  285</span> </div>
-<div class="line"><span class="lineno">  286</span>                <span class="comment">// --- Re-calculate Total Residual for next stage ---</span></div>
-<div class="line"><span class="lineno">  287</span>                ierr = <a class="code hl_function" href="momentumsolvers_8c.html#a3aa9a9ff749db24932b4ac7fc0e72666">ComputeTotalResidual</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  288</span>      </div>
-<div class="line"><span class="lineno">  289</span>            } <span class="comment">// End RK Stages</span></div>
+<div class="line"><span class="lineno">  220</span>    ierr = PetscTime(&amp;ts); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  221</span> </div>
+<div class="line"><span class="lineno">  222</span>    <span class="comment">// --- 1. Pre-Loop Initialization ---</span></div>
+<div class="line"><span class="lineno">  223</span>    </div>
+<div class="line"><span class="lineno">  224</span>    <span class="keywordflow">if</span> (block_number &gt; 1) {</div>
+<div class="line"><span class="lineno">  225</span>      <span class="comment">// ierr = Block_Interface_U(user); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno">  226</span>    }</div>
+<div class="line"><span class="lineno">  227</span> </div>
+<div class="line"><span class="lineno">  228</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  229</span>        ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  230</span>        </div>
+<div class="line"><span class="lineno">  231</span>        <span class="comment">// Immersed boundary interpolation (if enabled)</span></div>
+<div class="line"><span class="lineno">  232</span> </div>
+<div class="line"><span class="lineno">  233</span>        <span class="comment">// Allocate workspace</span></div>
+<div class="line"><span class="lineno">  234</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].Rhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  235</span>        ierr = VecDuplicate(user[bi].Rhs, &amp;pRhs[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  236</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].dUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  237</span>        ierr = VecDuplicate(user[bi].Ucont, &amp;user[bi].pUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  238</span>        </div>
+<div class="line"><span class="lineno">  239</span>        <span class="comment">// Initialize Backup (pUcont) with current state</span></div>
+<div class="line"><span class="lineno">  240</span>        ierr = VecCopy(user[bi].Ucont, user[bi].pUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  241</span> </div>
+<div class="line"><span class="lineno">  242</span>        <span class="comment">// --- Calculate Initial Total Residual (Spatial + Temporal) ---</span></div>
+<div class="line"><span class="lineno">  243</span>        ierr = <a class="code hl_function" href="momentumsolvers_8c.html#a3aa9a9ff749db24932b4ac7fc0e72666">ComputeTotalResidual</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  244</span> </div>
+<div class="line"><span class="lineno">  245</span>        <span class="comment">// Backup Rhs with current state</span></div>
+<div class="line"><span class="lineno">  246</span>        ierr = VecCopy(user[bi].Rhs, pRhs[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  247</span> </div>
+<div class="line"><span class="lineno">  248</span>        <span class="comment">// Compute Initial Norms</span></div>
+<div class="line"><span class="lineno">  249</span>        ierr = VecNorm(user[bi].Rhs, NORM_INFINITY, &amp;resid_norm_init[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  250</span>        </div>
+<div class="line"><span class="lineno">  251</span>        <span class="comment">// Initialize history for backtracking logic</span></div>
+<div class="line"><span class="lineno">  252</span>        resid_norm_prev[bi]     = resid_norm_init[bi]; <span class="comment">// Meaningful ratio on first iteration</span></div>
+<div class="line"><span class="lineno">  253</span>        delta_sol_norm_prev[bi] = 1000.0;</div>
+<div class="line"><span class="lineno">  254</span>        pseudo_dt_scaling[bi] = cfl; <span class="comment">// Initialize adaptive scalar</span></div>
+<div class="line"><span class="lineno">  255</span> </div>
+<div class="line"><span class="lineno">  256</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,<span class="stringliteral">&quot; Block %d | Max RHS = %.6f | Pseudo-CFL = %.4f .\n&quot;</span>, bi, resid_norm_init[bi], cfl);</div>
+<div class="line"><span class="lineno">  257</span>    }</div>
+<div class="line"><span class="lineno">  258</span>    </div>
+<div class="line"><span class="lineno">  259</span>    <span class="comment">// --- 2. Main Pseudo-Time Iteration Loop ---</span></div>
+<div class="line"><span class="lineno">  260</span>    pseudo_iter = 0;</div>
+<div class="line"><span class="lineno">  261</span>    PetscBool residual_convergence_enabled =</div>
+<div class="line"><span class="lineno">  262</span>        (PetscBool)(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae4f8483ace07e3437a1cf544fad31a5c">mom_resid_atol</a> &gt; 0.0 || simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac833f3b4d8cea83dba8f7f6ec028dfd7">mom_resid_rtol</a> &gt; 0.0);</div>
+<div class="line"><span class="lineno">  263</span>    PetscBool converged = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  264</span>    PetscBool last_trial_nonfinite = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">while</span> (!converged &amp;&amp; pseudo_iter &lt; max_pseudo_steps)</div>
+<div class="line"><span class="lineno">  266</span>    {</div>
+<div class="line"><span class="lineno">  267</span>        pseudo_iter++;</div>
+<div class="line"><span class="lineno">  268</span>        force_restart = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  269</span> </div>
+<div class="line"><span class="lineno">  270</span>        <span class="comment">// Every attempt starts from the last globally accepted state.</span></div>
+<div class="line"><span class="lineno">  271</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  272</span>            ierr = VecCopy(user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  273</span>            ierr = VecCopy(pRhs[bi], user[bi].Rhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  274</span>            ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi], <span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  275</span>            ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  276</span>        }</div>
+<div class="line"><span class="lineno">  277</span>    </div>
+<div class="line"><span class="lineno">  278</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  279</span>            </div>
+<div class="line"><span class="lineno">  280</span>            <span class="comment">// === 4-Stage Jameson RK Smoothing Loop ===</span></div>
+<div class="line"><span class="lineno">  281</span>            <span class="keywordflow">for</span> (istage = 0; istage &lt; 4; istage++) {</div>
+<div class="line"><span class="lineno">  282</span>                </div>
+<div class="line"><span class="lineno">  283</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,<span class="stringliteral">&quot; Pseudo-Iter: %d | RK-Stage: %d\n&quot;</span>, pseudo_iter, istage);</div>
+<div class="line"><span class="lineno">  284</span>                </div>
+<div class="line"><span class="lineno">  285</span>                <span class="comment">// RK Update: U_new = U_old + (Scaler * Alpha * dt) * Total_Residual</span></div>
+<div class="line"><span class="lineno">  286</span>                ierr = VecWAXPY(user[bi].Ucont, </div>
+<div class="line"><span class="lineno">  287</span>                                pseudo_dt_scaling[bi] * alfa[istage] * dt, </div>
+<div class="line"><span class="lineno">  288</span>                                user[bi].Rhs, </div>
+<div class="line"><span class="lineno">  289</span>                                user[bi].pUcont); CHKERRQ(ierr);</div>
 <div class="line"><span class="lineno">  290</span> </div>
-<div class="line"><span class="lineno">  291</span>            <span class="comment">// Immersed boundary interpolation (if enabled)</span></div>
-<div class="line"><span class="lineno">  292</span> </div>
-<div class="line"><span class="lineno">  293</span>            <span class="comment">// === Convergence Metrics Calculation ===</span></div>
-<div class="line"><span class="lineno">  294</span>            </div>
-<div class="line"><span class="lineno">  295</span>            <span class="comment">// Calculate dU = U_current - U_backup</span></div>
-<div class="line"><span class="lineno">  296</span>            ierr = VecWAXPY(user[bi].dUcont, -1.0, user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  297</span> </div>
-<div class="line"><span class="lineno">  298</span>            <span class="comment">// Compute Infinity Norms</span></div>
-<div class="line"><span class="lineno">  299</span>            ierr = VecNorm(user[bi].dUcont, NORM_INFINITY, &amp;delta_sol_norm_curr[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  300</span>            ierr = VecNorm(user[bi].Rhs, NORM_INFINITY, &amp;resid_norm_curr[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  301</span>        </div>
-<div class="line"><span class="lineno">  302</span>            <span class="comment">// Normalize relative metrics</span></div>
-<div class="line"><span class="lineno">  303</span>            <span class="keywordflow">if</span> (pseudo_iter == 1) {</div>
-<div class="line"><span class="lineno">  304</span>                delta_sol_norm_init[bi] = delta_sol_norm_curr[bi];</div>
-<div class="line"><span class="lineno">  305</span>                delta_sol_rel_curr[bi]  = 1.0;</div>
-<div class="line"><span class="lineno">  306</span>                resid_rel_curr[bi]      = 1.0;</div>
-<div class="line"><span class="lineno">  307</span>                <span class="comment">// resid_norm_init[bi] set correctly before the loop — do not overwrite</span></div>
-<div class="line"><span class="lineno">  308</span>            } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  309</span>                <span class="keywordflow">if</span> (delta_sol_norm_init[bi] &gt; 1.0e-10) </div>
-<div class="line"><span class="lineno">  310</span>                    delta_sol_rel_curr[bi] = delta_sol_norm_curr[bi] / delta_sol_norm_init[bi];</div>
-<div class="line"><span class="lineno">  311</span>                <span class="keywordflow">else</span> </div>
-<div class="line"><span class="lineno">  312</span>                    delta_sol_rel_curr[bi] = 0.0;</div>
-<div class="line"><span class="lineno">  313</span> </div>
-<div class="line"><span class="lineno">  314</span>                <span class="keywordflow">if</span>(resid_norm_init[bi] &gt; 1.0e-10) </div>
-<div class="line"><span class="lineno">  315</span>                    resid_rel_curr[bi] = resid_norm_curr[bi] / resid_norm_init[bi];</div>
-<div class="line"><span class="lineno">  316</span>                <span class="keywordflow">else</span> </div>
-<div class="line"><span class="lineno">  317</span>                    resid_rel_curr[bi] = 0.0;</div>
-<div class="line"><span class="lineno">  318</span>            }</div>
-<div class="line"><span class="lineno">  319</span>          </div>
-<div class="line"><span class="lineno">  320</span>            <span class="comment">// --- File Logging ---</span></div>
-<div class="line"><span class="lineno">  321</span>            <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno">  322</span>                FILE *f;</div>
-<div class="line"><span class="lineno">  323</span>                <span class="keywordtype">char</span> filen[PETSC_MAX_PATH_LEN + 128];</div>
-<div class="line"><span class="lineno">  324</span>                ierr = PetscSNPrintf(filen, <span class="keyword">sizeof</span>(filen), <span class="stringliteral">&quot;%s/Momentum_Solver_Convergence_History_Block_%1d.log&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a922566a9e001486fa838d96925a6f102">log_dir</a>, bi); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  325</span>                <span class="keywordflow">if</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> == simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + 1 &amp;&amp; pseudo_iter == 1 &amp;&amp; !simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a0bd475311ed5699354d45aaa34691fca">continueMode</a>) f = fopen(filen, <span class="stringliteral">&quot;w&quot;</span>);</div>
-<div class="line"><span class="lineno">  326</span>                <span class="keywordflow">else</span> f = fopen(filen, <span class="stringliteral">&quot;a&quot;</span>);</div>
-<div class="line"><span class="lineno">  327</span>                </div>
-<div class="line"><span class="lineno">  328</span>                PetscFPrintf(PETSC_COMM_WORLD, f, <span class="stringliteral">&quot;Step: %d | PseudoIter(k): %d| | Pseudo-cfl: %.4f |dUk|: %le | |dUk|/|dUprev|: %le | |Rk|: %le | |Rk|/|Rprev|: %le \n&quot;</span>,</div>
-<div class="line"><span class="lineno">  329</span>                             (<span class="keywordtype">int</span>)ti, (<span class="keywordtype">int</span>)pseudo_iter, pseudo_dt_scaling[bi], delta_sol_norm_curr[bi], delta_sol_rel_curr[bi], resid_norm_curr[bi],resid_rel_curr[bi]);</div>
-<div class="line"><span class="lineno">  330</span>                fclose(f);</div>
+<div class="line"><span class="lineno">  291</span>                <span class="comment">// Sync Ghosts &amp; Re-apply BCs for intermediate stage</span></div>
+<div class="line"><span class="lineno">  292</span>                ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi],<span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  293</span>                </div>
+<div class="line"><span class="lineno">  294</span>                <span class="comment">//ierr = DMGlobalToLocalBegin(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno">  295</span>                <span class="comment">//ierr = DMGlobalToLocalEnd(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno">  296</span>                </div>
+<div class="line"><span class="lineno">  297</span>                ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  298</span> </div>
+<div class="line"><span class="lineno">  299</span>                <span class="comment">// --- Re-calculate Total Residual for next stage ---</span></div>
+<div class="line"><span class="lineno">  300</span>                ierr = <a class="code hl_function" href="momentumsolvers_8c.html#a3aa9a9ff749db24932b4ac7fc0e72666">ComputeTotalResidual</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  301</span>      </div>
+<div class="line"><span class="lineno">  302</span>            } <span class="comment">// End RK Stages</span></div>
+<div class="line"><span class="lineno">  303</span> </div>
+<div class="line"><span class="lineno">  304</span>            <span class="comment">// Immersed boundary interpolation (if enabled)</span></div>
+<div class="line"><span class="lineno">  305</span> </div>
+<div class="line"><span class="lineno">  306</span>            <span class="comment">// === Convergence Metrics Calculation ===</span></div>
+<div class="line"><span class="lineno">  307</span>            </div>
+<div class="line"><span class="lineno">  308</span>            <span class="comment">// Calculate dU = U_current - U_backup</span></div>
+<div class="line"><span class="lineno">  309</span>            ierr = VecWAXPY(user[bi].dUcont, -1.0, user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  310</span> </div>
+<div class="line"><span class="lineno">  311</span>            <span class="comment">// Compute Infinity Norms</span></div>
+<div class="line"><span class="lineno">  312</span>            ierr = VecNorm(user[bi].dUcont, NORM_INFINITY, &amp;delta_sol_norm_curr[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  313</span>            ierr = VecNorm(user[bi].Rhs, NORM_INFINITY, &amp;resid_norm_curr[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  314</span>        </div>
+<div class="line"><span class="lineno">  315</span>            <span class="comment">// Normalize relative metrics</span></div>
+<div class="line"><span class="lineno">  316</span>            <span class="keywordflow">if</span> (pseudo_iter == 1) {</div>
+<div class="line"><span class="lineno">  317</span>                delta_sol_norm_init[bi] = delta_sol_norm_curr[bi];</div>
+<div class="line"><span class="lineno">  318</span>                delta_sol_rel_curr[bi]  = 1.0;</div>
+<div class="line"><span class="lineno">  319</span>                resid_rel_curr[bi]      = 1.0;</div>
+<div class="line"><span class="lineno">  320</span>                <span class="comment">// resid_norm_init[bi] set correctly before the loop — do not overwrite</span></div>
+<div class="line"><span class="lineno">  321</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  322</span>                <span class="keywordflow">if</span> (delta_sol_norm_init[bi] &gt; 1.0e-10) </div>
+<div class="line"><span class="lineno">  323</span>                    delta_sol_rel_curr[bi] = delta_sol_norm_curr[bi] / delta_sol_norm_init[bi];</div>
+<div class="line"><span class="lineno">  324</span>                <span class="keywordflow">else</span> </div>
+<div class="line"><span class="lineno">  325</span>                    delta_sol_rel_curr[bi] = 0.0;</div>
+<div class="line"><span class="lineno">  326</span> </div>
+<div class="line"><span class="lineno">  327</span>                <span class="keywordflow">if</span>(resid_norm_init[bi] &gt; 1.0e-10) </div>
+<div class="line"><span class="lineno">  328</span>                    resid_rel_curr[bi] = resid_norm_curr[bi] / resid_norm_init[bi];</div>
+<div class="line"><span class="lineno">  329</span>                <span class="keywordflow">else</span> </div>
+<div class="line"><span class="lineno">  330</span>                    resid_rel_curr[bi] = 0.0;</div>
 <div class="line"><span class="lineno">  331</span>            }</div>
-<div class="line"><span class="lineno">  332</span>        } <span class="comment">// End loop over blocks</span></div>
-<div class="line"><span class="lineno">  333</span> </div>
-<div class="line"><span class="lineno">  334</span>        <span class="comment">// --- Update Global Convergence Criteria ---</span></div>
-<div class="line"><span class="lineno">  335</span>        global_norm_delta = -1.0e20; </div>
-<div class="line"><span class="lineno">  336</span>        global_rel_delta  = -1.0e20; </div>
-<div class="line"><span class="lineno">  337</span>        global_rel_resid  = -1.0e20;</div>
-<div class="line"><span class="lineno">  338</span>        </div>
-<div class="line"><span class="lineno">  339</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  340</span>            global_norm_delta = PetscMax(delta_sol_norm_curr[bi], global_norm_delta);</div>
-<div class="line"><span class="lineno">  341</span>            global_rel_delta  = PetscMax(delta_sol_rel_curr[bi],  global_rel_delta);</div>
-<div class="line"><span class="lineno">  342</span>            global_rel_resid  = PetscMax(resid_rel_curr[bi],      global_rel_resid);</div>
-<div class="line"><span class="lineno">  343</span>        }</div>
-<div class="line"><span class="lineno">  344</span>        ierr = PetscTime(&amp;te); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  345</span>        cput = te - ts;</div>
-<div class="line"><span class="lineno">  346</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Pseudo-Iter(k) %d: |dUk|=%e, |dUk|/|dU0| = %e, |Rk|/|R0| = %e, CPU=%.2fs\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  347</span>              pseudo_iter, global_norm_delta, global_rel_delta, global_rel_resid, cput);</div>
-<div class="line"><span class="lineno">  348</span> </div>
-<div class="line"><span class="lineno">  349</span>        <span class="comment">// === Backtracking Line Search ===</span></div>
-<div class="line"><span class="lineno">  350</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  351</span> </div>
-<div class="line"><span class="lineno">  352</span>            PetscReal resid_ratio = resid_norm_curr[bi] / resid_norm_prev[bi];</div>
-<div class="line"><span class="lineno">  353</span>            </div>
-<div class="line"><span class="lineno">  354</span>            PetscBool is_sol_nan, is_resid_nan, is_diverging;</div>
-<div class="line"><span class="lineno">  355</span>            <span class="comment">// Check for NaNs in Solution and Residual</span></div>
-<div class="line"><span class="lineno">  356</span>            is_sol_nan = (PetscBool)PetscIsNanReal(delta_sol_norm_curr[bi]);</div>
-<div class="line"><span class="lineno">  357</span>            is_resid_nan = (PetscBool)PetscIsNanReal(resid_norm_curr[bi]);</div>
-<div class="line"><span class="lineno">  358</span> </div>
-<div class="line"><span class="lineno">  359</span>            <span class="comment">// TRIGGER: Divergence Detected</span></div>
-<div class="line"><span class="lineno">  360</span>            is_diverging = (PetscBool)(pseudo_iter &gt; 1 &amp;&amp; </div>
-<div class="line"><span class="lineno">  361</span>                resid_norm_curr[bi] &gt; simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9ef8a78d7c4a70c72feb869b03e51d28">mom_dt_jameson_residual_norm_noise_allowance_factor</a>*resid_norm_prev[bi] &amp;&amp;</div>
-<div class="line"><span class="lineno">  362</span>                delta_sol_norm_curr[bi] &gt; delta_sol_norm_prev[bi]</div>
-<div class="line"><span class="lineno">  363</span>                ); </div>
-<div class="line"><span class="lineno">  364</span>            </div>
-<div class="line"><span class="lineno">  365</span>                <span class="keywordflow">if</span>(is_diverging || is_sol_nan || is_resid_nan) {</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>                    <span class="keywordflow">if</span>(is_sol_nan){</div>
-<div class="line"><span class="lineno">  368</span>                        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;  Block %d: NaN detected in solution update norm.\n&quot;</span>, bi);</div>
-<div class="line"><span class="lineno">  369</span>                    }</div>
-<div class="line"><span class="lineno">  370</span>                    <span class="keywordflow">if</span>(is_resid_nan){</div>
-<div class="line"><span class="lineno">  371</span>                        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;  Block %d: NaN detected in residual norm.\n&quot;</span>, bi);</div>
-<div class="line"><span class="lineno">  372</span>                    }</div>
-<div class="line"><span class="lineno">  373</span>                    <span class="keywordflow">if</span>(is_diverging){</div>
-<div class="line"><span class="lineno">  374</span>                        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;  Block %d: Divergence detected (|R| and |dU| increasing).\n&quot;</span>, bi);</div>
-<div class="line"><span class="lineno">  375</span>                    }</div>
-<div class="line"><span class="lineno">  376</span> </div>
-<div class="line"><span class="lineno">  377</span>                    <span class="keywordflow">if</span>(pseudo_dt_scaling[bi] &lt; simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>) {</div>
-<div class="line"><span class="lineno">  378</span>                        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_CONV_FAILED, </div>
-<div class="line"><span class="lineno">  379</span>                            <span class="stringliteral">&quot;Block %d: Solver diverged (NaN or explosion) and min time-step reached. Simulation aborted.&quot;</span>, bi);</div>
-<div class="line"><span class="lineno">  380</span>                    }</div>
-<div class="line"><span class="lineno">  381</span> </div>
-<div class="line"><span class="lineno">  382</span>                    <span class="comment">// For nan situations, we always backtrack.</span></div>
-<div class="line"><span class="lineno">  383</span>                    force_restart = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  384</span> </div>
-<div class="line"><span class="lineno">  385</span>                <span class="comment">// 1. Reduce Step Size</span></div>
-<div class="line"><span class="lineno">  386</span>                pseudo_dt_scaling[bi] *= 0.5*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">pseudo_cfl_reduction_factor</a>; <span class="comment">// Aggressive deceleration (1/2 x reduction factor).</span></div>
-<div class="line"><span class="lineno">  387</span>                <span class="comment">// NOTE: pseudo_iter-- is handled once after this loop to avoid multi-decrement for block_number &gt; 1.</span></div>
-<div class="line"><span class="lineno">  388</span> </div>
-<div class="line"><span class="lineno">  389</span>                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  Block %d: Backtracking triggered. Reducing scaling to %f.\n&quot;</span>, bi, pseudo_dt_scaling[bi]);</div>
-<div class="line"><span class="lineno">  390</span>                </div>
-<div class="line"><span class="lineno">  391</span>                <span class="comment">// 3. RESTORE from Backup</span></div>
-<div class="line"><span class="lineno">  392</span>                ierr = VecCopy(user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  393</span> </div>
-<div class="line"><span class="lineno">  394</span>                ierr = VecCopy(pRhs[bi], user[bi].Rhs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  395</span>                </div>
-<div class="line"><span class="lineno">  396</span>                <span class="comment">// 4. SYNC Ghost Cells</span></div>
-<div class="line"><span class="lineno">  397</span>                ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi],<span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  398</span>                <span class="comment">//ierr = DMGlobalToLocalBegin(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  399</span>                <span class="comment">//ierr = DMGlobalToLocalEnd(user[bi].fda, user[bi].Ucont, INSERT_VALUES, user[bi].lUcont); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  400</span> </div>
-<div class="line"><span class="lineno">  401</span>                <span class="comment">// 5. Reset current norms to avoid polluting next loop check.</span></div>
-<div class="line"><span class="lineno">  402</span>                delta_sol_norm_curr[bi] = 1000.0;</div>
-<div class="line"><span class="lineno">  403</span>                resid_norm_curr[bi] = 1000.0;</div>
-<div class="line"><span class="lineno">  404</span> </div>
-<div class="line"><span class="lineno">  405</span>            } </div>
-<div class="line"><span class="lineno">  406</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  407</span>                <span class="comment">// SUCCESS: Step accepted. Update Backup and History.</span></div>
-<div class="line"><span class="lineno">  408</span>                ierr = VecCopy(user[bi].Ucont, user[bi].pUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  409</span>                ierr = VecCopy(user[bi].Rhs,   pRhs[bi]);        CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  410</span>                resid_norm_prev[bi]     = resid_norm_curr[bi];</div>
-<div class="line"><span class="lineno">  411</span>                delta_sol_norm_prev[bi] = delta_sol_norm_curr[bi];</div>
-<div class="line"><span class="lineno">  412</span> </div>
-<div class="line"><span class="lineno">  413</span>                <span class="comment">// Adaptive Ramping of solution speed (Pseudo-CFL)</span></div>
-<div class="line"><span class="lineno">  414</span> </div>
-<div class="line"><span class="lineno">  415</span>                PetscBool is_converging_fast;  </div>
-<div class="line"><span class="lineno">  416</span>                is_converging_fast = (PetscBool)(resid_ratio &lt; 0.9);</div>
-<div class="line"><span class="lineno">  417</span>                PetscBool is_stagnating;       </div>
-<div class="line"><span class="lineno">  418</span>                is_stagnating = (PetscBool)(resid_ratio &gt;= 0.98 &amp;&amp; resid_ratio &lt; 1.0);</div>
-<div class="line"><span class="lineno">  419</span>                PetscBool is_noisy;            </div>
-<div class="line"><span class="lineno">  420</span>                is_noisy = (PetscBool)(resid_ratio &gt;= 1.0 &amp;&amp; resid_ratio &lt; simCtx-&gt;mom_dt_jameson_residual_norm_noise_allowance_factor);</div>
-<div class="line"><span class="lineno">  421</span>                </div>
-<div class="line"><span class="lineno">  422</span>                PetscReal current_cfl = pseudo_dt_scaling[bi];</div>
-<div class="line"><span class="lineno">  423</span>                PetscReal cfl_floor = 10*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>; <span class="comment">// Define a &quot;low CFL&quot; threshold for more aggressive acceleration.</span></div>
-<div class="line"><span class="lineno">  424</span>                PetscReal cfl_ceiling = 0.75*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8247142b51d67d251a5aa6768ae9c0de">max_pseudo_cfl</a>; <span class="comment">// Define a &quot;high CFL&quot; threshold for mild acceleration.</span></div>
-<div class="line"><span class="lineno">  425</span> </div>
-<div class="line"><span class="lineno">  426</span>                <span class="keywordflow">if</span>(is_converging_fast){ </div>
-<div class="line"><span class="lineno">  427</span>                    <span class="comment">// Residual is falling fast (good convergence)</span></div>
-<div class="line"><span class="lineno">  428</span>                    pseudo_dt_scaling[bi] *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>;</div>
-<div class="line"><span class="lineno">  429</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_stagnating &amp;&amp; current_cfl &lt; cfl_floor){ </div>
-<div class="line"><span class="lineno">  430</span>                    <span class="comment">// Residual is falling very slow (weak convergence.) we accelerate at low CFL</span></div>
-<div class="line"><span class="lineno">  431</span>                    pseudo_dt_scaling[bi] *= PetscMin(1.2*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>, 1.1); <span class="comment">// more aggressive acceleration at low CFL</span></div>
-<div class="line"><span class="lineno">  432</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_stagnating &amp;&amp; current_cfl &gt;= cfl_floor &amp;&amp; current_cfl &lt; cfl_ceiling &amp;&amp; !is_noisy){ </div>
-<div class="line"><span class="lineno">  433</span>                    <span class="comment">// moderate CFL - normal acceleration</span></div>
-<div class="line"><span class="lineno">  434</span>                    pseudo_dt_scaling[bi] *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>;</div>
-<div class="line"><span class="lineno">  435</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_stagnating &amp;&amp; current_cfl &gt;= cfl_ceiling &amp;&amp; !is_noisy){ </div>
-<div class="line"><span class="lineno">  436</span>                    <span class="comment">// high CFL - mild acceleration (creep)</span></div>
-<div class="line"><span class="lineno">  437</span>                    pseudo_dt_scaling[bi] *= PetscMax(0.95*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>,1.005);</div>
-<div class="line"><span class="lineno">  438</span>                } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_noisy){ </div>
-<div class="line"><span class="lineno">  439</span>                    <span class="comment">// Residual is rising slightly (within noise allowance). we decelerate mildly.</span></div>
-<div class="line"><span class="lineno">  440</span>                    <span class="keywordflow">if</span>(current_cfl &gt; cfl_ceiling){</div>
-<div class="line"><span class="lineno">  441</span>                        <span class="comment">// High CFL - more aggressive deceleration</span></div>
-<div class="line"><span class="lineno">  442</span>                        pseudo_dt_scaling[bi] *= PetscMax(0.9*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">pseudo_cfl_reduction_factor</a>,0.9);</div>
-<div class="line"><span class="lineno">  443</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(current_cfl &gt; cfl_floor &amp;&amp; current_cfl &lt;= cfl_ceiling){</div>
-<div class="line"><span class="lineno">  444</span>                        <span class="comment">// Moderate CFL - mild deceleration</span></div>
-<div class="line"><span class="lineno">  445</span>                        pseudo_dt_scaling[bi] *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">pseudo_cfl_reduction_factor</a>;</div>
-<div class="line"><span class="lineno">  446</span>                    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(current_cfl &lt;= cfl_floor){</div>
-<div class="line"><span class="lineno">  447</span>                        <span class="comment">// Low CFL - gentle acceleration</span></div>
-<div class="line"><span class="lineno">  448</span>                        <span class="comment">// rise in residual likely due to noise, so we back off slightly.</span></div>
-<div class="line"><span class="lineno">  449</span>                        pseudo_dt_scaling[bi] *= PetscMax(0.95*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>,1.01);</div>
-<div class="line"><span class="lineno">  450</span>                    }</div>
-<div class="line"><span class="lineno">  451</span>                } </div>
-<div class="line"><span class="lineno">  452</span>                <span class="comment">// Clamp to max bound.</span></div>
-<div class="line"><span class="lineno">  453</span>                pseudo_dt_scaling[bi] = PetscMin(pseudo_dt_scaling[bi], simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8247142b51d67d251a5aa6768ae9c0de">max_pseudo_cfl</a>);</div>
-<div class="line"><span class="lineno">  454</span>                pseudo_dt_scaling[bi] = PetscMax(pseudo_dt_scaling[bi], simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>);</div>
-<div class="line"><span class="lineno">  455</span>            }</div>
-<div class="line"><span class="lineno">  456</span>        }</div>
-<div class="line"><span class="lineno">  457</span> </div>
-<div class="line"><span class="lineno">  458</span>        <span class="comment">// Decrement once regardless of how many blocks backtracked.</span></div>
-<div class="line"><span class="lineno">  459</span>        <span class="keywordflow">if</span> (force_restart) pseudo_iter--;</div>
-<div class="line"><span class="lineno">  460</span> </div>
-<div class="line"><span class="lineno">  461</span>        <span class="keywordflow">if</span> (block_number &gt; 1) {</div>
-<div class="line"><span class="lineno">  462</span>             <span class="comment">// ierr = Block_Interface_U(user); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno">  463</span>        }</div>
-<div class="line"><span class="lineno">  464</span>    } <span class="comment">// End while loop</span></div>
-<div class="line"><span class="lineno">  465</span> </div>
+<div class="line"><span class="lineno">  332</span>          </div>
+<div class="line"><span class="lineno">  333</span>            <span class="comment">// --- File Logging ---</span></div>
+<div class="line"><span class="lineno">  334</span>            <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno">  335</span>                FILE *f;</div>
+<div class="line"><span class="lineno">  336</span>                <span class="keywordtype">char</span> filen[PETSC_MAX_PATH_LEN + 128];</div>
+<div class="line"><span class="lineno">  337</span>                ierr = PetscSNPrintf(filen, <span class="keyword">sizeof</span>(filen), <span class="stringliteral">&quot;%s/Momentum_Solver_Convergence_History_Block_%1d.log&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a922566a9e001486fa838d96925a6f102">log_dir</a>, bi); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  338</span>                <span class="keywordflow">if</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> == simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a6a5533a086f46652d5587ae84ec62c9f">StartStep</a> + 1 &amp;&amp; pseudo_iter == 1 &amp;&amp; !simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a0bd475311ed5699354d45aaa34691fca">continueMode</a>) f = fopen(filen, <span class="stringliteral">&quot;w&quot;</span>);</div>
+<div class="line"><span class="lineno">  339</span>                <span class="keywordflow">else</span> f = fopen(filen, <span class="stringliteral">&quot;a&quot;</span>);</div>
+<div class="line"><span class="lineno">  340</span>                </div>
+<div class="line"><span class="lineno">  341</span>                PetscFPrintf(PETSC_COMM_WORLD, f, <span class="stringliteral">&quot;Step: %d | PseudoIter(k): %d| | Pseudo-cfl: %.4f |dUk|: %le | |dUk|/|dUprev|: %le | |Rk|: %le | |Rk|/|Rprev|: %le \n&quot;</span>,</div>
+<div class="line"><span class="lineno">  342</span>                             (<span class="keywordtype">int</span>)ti, (<span class="keywordtype">int</span>)pseudo_iter, pseudo_dt_scaling[bi], delta_sol_norm_curr[bi], delta_sol_rel_curr[bi], resid_norm_curr[bi],resid_rel_curr[bi]);</div>
+<div class="line"><span class="lineno">  343</span>                fclose(f);</div>
+<div class="line"><span class="lineno">  344</span>            }</div>
+<div class="line"><span class="lineno">  345</span>        } <span class="comment">// End loop over blocks</span></div>
+<div class="line"><span class="lineno">  346</span> </div>
+<div class="line"><span class="lineno">  347</span>        <span class="comment">// --- Update Global Convergence Criteria ---</span></div>
+<div class="line"><span class="lineno">  348</span>        global_norm_delta = -1.0e20; </div>
+<div class="line"><span class="lineno">  349</span>        global_rel_delta  = -1.0e20; </div>
+<div class="line"><span class="lineno">  350</span>        global_norm_resid = -1.0e20;</div>
+<div class="line"><span class="lineno">  351</span>        global_rel_resid  = -1.0e20;</div>
+<div class="line"><span class="lineno">  352</span>        </div>
+<div class="line"><span class="lineno">  353</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  354</span>            global_norm_delta = PetscMax(delta_sol_norm_curr[bi], global_norm_delta);</div>
+<div class="line"><span class="lineno">  355</span>            global_rel_delta  = PetscMax(delta_sol_rel_curr[bi],  global_rel_delta);</div>
+<div class="line"><span class="lineno">  356</span>            global_norm_resid = PetscMax(resid_norm_curr[bi],      global_norm_resid);</div>
+<div class="line"><span class="lineno">  357</span>            global_rel_resid  = PetscMax(resid_rel_curr[bi],      global_rel_resid);</div>
+<div class="line"><span class="lineno">  358</span>        }</div>
+<div class="line"><span class="lineno">  359</span>        ierr = PetscTime(&amp;te); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  360</span>        cput = te - ts;</div>
+<div class="line"><span class="lineno">  361</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  Pseudo-Iter(k) %d: |dUk|=%e, |dUk|/|dU0| = %e, |Rk|/|R0| = %e, CPU=%.2fs\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  362</span>              pseudo_iter, global_norm_delta, global_rel_delta, global_rel_resid, cput);</div>
+<div class="line"><span class="lineno">  363</span> </div>
+<div class="line"><span class="lineno">  364</span>        <span class="comment">// === Adaptive Pseudo-CFL Trial Acceptance and Rollback ===</span></div>
+<div class="line"><span class="lineno">  365</span>        <span class="keyword">const</span> PetscReal resid_floor = 1.0e-30;</div>
+<div class="line"><span class="lineno">  366</span>        PetscReal global_trial_ratio = 0.0;</div>
+<div class="line"><span class="lineno">  367</span>        PetscBool global_nonfinite = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  368</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  369</span>            PetscReal ratio;</div>
+<div class="line"><span class="lineno">  370</span>            <span class="keywordflow">if</span> (resid_norm_prev[bi] &gt; resid_floor) {</div>
+<div class="line"><span class="lineno">  371</span>                ratio = resid_norm_curr[bi] / resid_norm_prev[bi];</div>
+<div class="line"><span class="lineno">  372</span>            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (resid_norm_curr[bi] &lt;= resid_floor) {</div>
+<div class="line"><span class="lineno">  373</span>                ratio = 0.0;</div>
+<div class="line"><span class="lineno">  374</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  375</span>                ratio = PETSC_MAX_REAL;</div>
+<div class="line"><span class="lineno">  376</span>            }</div>
+<div class="line"><span class="lineno">  377</span>            global_trial_ratio = PetscMax(global_trial_ratio, ratio);</div>
+<div class="line"><span class="lineno">  378</span>            global_nonfinite = (PetscBool)(global_nonfinite ||</div>
+<div class="line"><span class="lineno">  379</span>                PetscIsInfOrNanReal(delta_sol_norm_curr[bi]) ||</div>
+<div class="line"><span class="lineno">  380</span>                PetscIsInfOrNanReal(resid_norm_curr[bi]) ||</div>
+<div class="line"><span class="lineno">  381</span>                PetscIsInfOrNanReal(ratio));</div>
+<div class="line"><span class="lineno">  382</span>        }</div>
+<div class="line"><span class="lineno">  383</span> </div>
+<div class="line"><span class="lineno">  384</span>        PetscReal reduced_trial_ratio;</div>
+<div class="line"><span class="lineno">  385</span>        PetscMPIInt local_nonfinite = global_nonfinite ? 1 : 0;</div>
+<div class="line"><span class="lineno">  386</span>        PetscMPIInt reduced_nonfinite = 0;</div>
+<div class="line"><span class="lineno">  387</span>        ierr = MPI_Allreduce(&amp;global_trial_ratio, &amp;reduced_trial_ratio, 1, MPIU_REAL, MPI_MAX, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  388</span>        ierr = MPI_Allreduce(&amp;local_nonfinite, &amp;reduced_nonfinite, 1, MPI_INT, MPI_LOR, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  389</span>        global_trial_ratio = reduced_trial_ratio;</div>
+<div class="line"><span class="lineno">  390</span>        global_nonfinite = reduced_nonfinite ? PETSC_TRUE : PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  391</span>        last_trial_nonfinite = global_nonfinite;</div>
+<div class="line"><span class="lineno">  392</span>        force_restart = (PetscBool)(global_nonfinite ||</div>
+<div class="line"><span class="lineno">  393</span>            global_trial_ratio &gt; simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a9ef8a78d7c4a70c72feb869b03e51d28">mom_dt_jameson_residual_norm_noise_allowance_factor</a>);</div>
+<div class="line"><span class="lineno">  394</span> </div>
+<div class="line"><span class="lineno">  395</span>        <span class="keywordflow">if</span> (force_restart) {</div>
+<div class="line"><span class="lineno">  396</span>            PetscReal old_cfl = pseudo_dt_scaling[0];</div>
+<div class="line"><span class="lineno">  397</span>            PetscReal next_cfl = PetscMax(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>,</div>
+<div class="line"><span class="lineno">  398</span>                old_cfl * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">pseudo_cfl_reduction_factor</a>);</div>
+<div class="line"><span class="lineno">  399</span>            rejected_iter++;</div>
+<div class="line"><span class="lineno">  400</span>            recovery_streak = 0;</div>
+<div class="line"><span class="lineno">  401</span>            <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  402</span>                ierr = VecCopy(user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  403</span>                ierr = VecCopy(pRhs[bi], user[bi].Rhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  404</span>                ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi], <span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  405</span>                ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  406</span>                pseudo_dt_scaling[bi] = next_cfl;</div>
+<div class="line"><span class="lineno">  407</span>            }</div>
+<div class="line"><span class="lineno">  408</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno">  409</span>                      <span class="stringliteral">&quot;  Momentum trial %d rejected (ratio=%e, nonfinite=%d); CFL %.6f -&gt; %.6f.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  410</span>                      pseudo_iter, global_trial_ratio, (<span class="keywordtype">int</span>)global_nonfinite, old_cfl, next_cfl);</div>
+<div class="line"><span class="lineno">  411</span>            <span class="keywordflow">if</span> (global_nonfinite &amp;&amp; old_cfl &lt;= simCtx-&gt;min_pseudo_cfl) {</div>
+<div class="line"><span class="lineno">  412</span>                SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_CONV_FAILED,</div>
+<div class="line"><span class="lineno">  413</span>                        <span class="stringliteral">&quot;Momentum solver produced a non-finite trial at minimum pseudo-CFL.&quot;</span>);</div>
+<div class="line"><span class="lineno">  414</span>            }</div>
+<div class="line"><span class="lineno">  415</span>            <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  416</span>        }</div>
+<div class="line"><span class="lineno">  417</span> </div>
+<div class="line"><span class="lineno">  418</span>        accepted_iter++;</div>
+<div class="line"><span class="lineno">  419</span>        last_trial_nonfinite = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  420</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  421</span>            ierr = VecCopy(user[bi].Ucont, user[bi].pUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  422</span>            ierr = VecCopy(user[bi].Rhs, pRhs[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  423</span>            resid_norm_prev[bi] = resid_norm_curr[bi];</div>
+<div class="line"><span class="lineno">  424</span>            delta_sol_norm_prev[bi] = delta_sol_norm_curr[bi];</div>
+<div class="line"><span class="lineno">  425</span>        }</div>
+<div class="line"><span class="lineno">  426</span> </div>
+<div class="line"><span class="lineno">  427</span>        PetscReal next_cfl = pseudo_dt_scaling[0];</div>
+<div class="line"><span class="lineno">  428</span>        <span class="keywordflow">if</span> (global_trial_ratio &lt; 0.90) {</div>
+<div class="line"><span class="lineno">  429</span>            next_cfl *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>;</div>
+<div class="line"><span class="lineno">  430</span>            recovery_streak = 0;</div>
+<div class="line"><span class="lineno">  431</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (global_trial_ratio &lt;= 1.0) {</div>
+<div class="line"><span class="lineno">  432</span>            recovery_streak++;</div>
+<div class="line"><span class="lineno">  433</span>            <span class="keywordflow">if</span> (recovery_streak &gt;= 3) {</div>
+<div class="line"><span class="lineno">  434</span>                next_cfl *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">pseudo_cfl_growth_factor</a>;</div>
+<div class="line"><span class="lineno">  435</span>                recovery_streak = 0;</div>
+<div class="line"><span class="lineno">  436</span>            }</div>
+<div class="line"><span class="lineno">  437</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  438</span>            next_cfl *= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">pseudo_cfl_reduction_factor</a>;</div>
+<div class="line"><span class="lineno">  439</span>            recovery_streak = 0;</div>
+<div class="line"><span class="lineno">  440</span>        }</div>
+<div class="line"><span class="lineno">  441</span>        next_cfl = PetscMin(next_cfl, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8247142b51d67d251a5aa6768ae9c0de">max_pseudo_cfl</a>);</div>
+<div class="line"><span class="lineno">  442</span>        next_cfl = PetscMax(next_cfl, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>);</div>
+<div class="line"><span class="lineno">  443</span>        <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) pseudo_dt_scaling[bi] = next_cfl;</div>
+<div class="line"><span class="lineno">  444</span> </div>
+<div class="line"><span class="lineno">  445</span>        PetscBool update_pass;</div>
+<div class="line"><span class="lineno">  446</span>        PetscBool residual_pass = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  447</span>        <span class="keywordflow">if</span> (residual_convergence_enabled) {</div>
+<div class="line"><span class="lineno">  448</span>            update_pass = (PetscBool)(global_norm_delta &lt;= tol_abs_delta || global_rel_delta &lt;= tol_rtol_delta);</div>
+<div class="line"><span class="lineno">  449</span>            residual_pass = (PetscBool)(</div>
+<div class="line"><span class="lineno">  450</span>                (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ae4f8483ace07e3437a1cf544fad31a5c">mom_resid_atol</a> &gt; 0.0 &amp;&amp; global_norm_resid &lt;= simCtx-&gt;mom_resid_atol) ||</div>
+<div class="line"><span class="lineno">  451</span>                (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac833f3b4d8cea83dba8f7f6ec028dfd7">mom_resid_rtol</a> &gt; 0.0 &amp;&amp; global_rel_resid &lt;= simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac833f3b4d8cea83dba8f7f6ec028dfd7">mom_resid_rtol</a>));</div>
+<div class="line"><span class="lineno">  452</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  453</span>            update_pass = (PetscBool)(global_norm_delta &lt;= tol_abs_delta &amp;&amp; global_rel_delta &lt;= tol_rtol_delta);</div>
+<div class="line"><span class="lineno">  454</span>        }</div>
+<div class="line"><span class="lineno">  455</span>        converged = (PetscBool)(update_pass &amp;&amp; residual_pass);</div>
+<div class="line"><span class="lineno">  456</span> </div>
+<div class="line"><span class="lineno">  457</span>        <span class="keywordflow">if</span> (block_number &gt; 1) {</div>
+<div class="line"><span class="lineno">  458</span>             <span class="comment">// ierr = Block_Interface_U(user); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno">  459</span>        }</div>
+<div class="line"><span class="lineno">  460</span>    } <span class="comment">// End while loop</span></div>
+<div class="line"><span class="lineno">  461</span> </div>
+<div class="line"><span class="lineno">  462</span>    <span class="keywordflow">if</span> (last_trial_nonfinite) {</div>
+<div class="line"><span class="lineno">  463</span>        SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_CONV_FAILED,</div>
+<div class="line"><span class="lineno">  464</span>                <span class="stringliteral">&quot;Momentum solver exhausted its attempt limit while recovering from a non-finite trial.&quot;</span>);</div>
+<div class="line"><span class="lineno">  465</span>    }</div>
 <div class="line"><span class="lineno">  466</span> </div>
-<div class="line"><span class="lineno">  467</span>    <span class="comment">// Smart CFL Carry Over</span></div>
-<div class="line"><span class="lineno">  468</span> </div>
-<div class="line"><span class="lineno">  469</span>    PetscReal local_min_cfl = 1.0e20;</div>
-<div class="line"><span class="lineno">  470</span>    PetscReal global_min_cfl;</div>
-<div class="line"><span class="lineno">  471</span> </div>
-<div class="line"><span class="lineno">  472</span>    PetscReal cfl_floor = 10*simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>;</div>
-<div class="line"><span class="lineno">  473</span> </div>
-<div class="line"><span class="lineno">  474</span>    <span class="comment">// 1. Find the &quot;Weakest Link&quot; (lowest CFL) across local blocks</span></div>
-<div class="line"><span class="lineno">  475</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  476</span>        <span class="keywordflow">if</span> (pseudo_dt_scaling[bi] &lt; local_min_cfl) {</div>
-<div class="line"><span class="lineno">  477</span>            local_min_cfl = pseudo_dt_scaling[bi];</div>
-<div class="line"><span class="lineno">  478</span>        }</div>
-<div class="line"><span class="lineno">  479</span>    }</div>
-<div class="line"><span class="lineno">  480</span> </div>
-<div class="line"><span class="lineno">  481</span>    <span class="comment">// 2. MPI Reduction (Crucial if blocks are distributed across ranks)</span></div>
-<div class="line"><span class="lineno">  482</span>    <span class="comment">// We want the minimum CFL across the entire simulation, not just this processor.</span></div>
-<div class="line"><span class="lineno">  483</span>    ierr = MPI_Allreduce(&amp;local_min_cfl, &amp;global_min_cfl, 1, MPIU_REAL, MPI_MIN, PETSC_COMM_WORLD); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  484</span> </div>
-<div class="line"><span class="lineno">  485</span>    <span class="comment">// 3. Apply Safety Factor &amp; Update simCtx</span></div>
-<div class="line"><span class="lineno">  486</span>    <span class="comment">// We use a factor (e.g., 0.85) to back off slightly for the start of the next timestep</span></div>
-<div class="line"><span class="lineno">  487</span>    <span class="comment">// to accommodate the initial residual spike from the BDF term.</span></div>
-<div class="line"><span class="lineno">  488</span>    </div>
-<div class="line"><span class="lineno">  489</span>    PetscReal cfl_carry_over_relaxation_factor = 1.0; <span class="comment">// Could be parameterized in simCtx if desired.</span></div>
-<div class="line"><span class="lineno">  490</span>    </div>
-<div class="line"><span class="lineno">  491</span>    PetscReal next_start_cfl;</div>
-<div class="line"><span class="lineno">  492</span> </div>
-<div class="line"><span class="lineno">  493</span>    <span class="keywordflow">if</span>(global_min_cfl &lt; cfl_floor){</div>
-<div class="line"><span class="lineno">  494</span>        <span class="comment">// If the minimum CFL is very low, we back off more aggressively.</span></div>
-<div class="line"><span class="lineno">  495</span>        next_start_cfl = cfl_floor * 1.5;</div>
-<div class="line"><span class="lineno">  496</span>    } <span class="keywordflow">else</span>{</div>
-<div class="line"><span class="lineno">  497</span>        next_start_cfl = global_min_cfl * cfl_carry_over_relaxation_factor;</div>
-<div class="line"><span class="lineno">  498</span>    }</div>
-<div class="line"><span class="lineno">  499</span>    </div>
-<div class="line"><span class="lineno">  500</span>    next_start_cfl = PetscMin(next_start_cfl, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8247142b51d67d251a5aa6768ae9c0de">max_pseudo_cfl</a>);</div>
-<div class="line"><span class="lineno">  501</span>    next_start_cfl = PetscMax(next_start_cfl, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a3c723a9e4e47665c79b86d7d15a45f33">min_pseudo_cfl</a>);</div>
-<div class="line"><span class="lineno">  502</span> </div>
-<div class="line"><span class="lineno">  503</span>    <span class="comment">// 5. Save for next Physical Time Step</span></div>
-<div class="line"><span class="lineno">  504</span>    <span class="keywordflow">if</span> (!rank) {</div>
-<div class="line"><span class="lineno">  505</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  CFL Adaptation: Step %d finished at CFL %.3f. Next step will start at CFL %.3f.\n&quot;</span>, </div>
-<div class="line"><span class="lineno">  506</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, global_min_cfl, next_start_cfl);</div>
-<div class="line"><span class="lineno">  507</span>    }</div>
-<div class="line"><span class="lineno">  508</span>    </div>
-<div class="line"><span class="lineno">  509</span>    <span class="comment">// Update the context so the next call to MomentumSolver reads this new value</span></div>
-<div class="line"><span class="lineno">  510</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af358bcdc4d800d707f3863ac730c4ee2">pseudo_cfl</a> = next_start_cfl;    </div>
-<div class="line"><span class="lineno">  511</span> </div>
-<div class="line"><span class="lineno">  512</span>    <span class="comment">// --- Final Cleanup ---</span></div>
-<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
-<div class="line"><span class="lineno">  514</span>        ierr = VecDestroy(&amp;user[bi].Rhs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  515</span>        ierr = VecDestroy(&amp;user[bi].dUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  516</span>        ierr = VecDestroy(&amp;user[bi].pUcont); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  517</span>        ierr = VecDestroy(&amp;pRhs[bi]); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  518</span>    }</div>
-<div class="line"><span class="lineno">  519</span>    ierr = PetscFree(pRhs); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  520</span> </div>
-<div class="line"><span class="lineno">  521</span>    ierr = PetscFree2(delta_sol_norm_init, delta_sol_norm_prev);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  522</span>    ierr = PetscFree2(delta_sol_norm_curr, delta_sol_rel_curr);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  523</span>    ierr = PetscFree2(resid_norm_init,     resid_norm_prev);CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  524</span>    ierr = PetscFree2(resid_norm_curr,     pseudo_dt_scaling); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  525</span>    ierr = PetscFree(resid_rel_curr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  526</span>    </div>
-<div class="line"><span class="lineno">  527</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Momentum Solver converged/completed after %d pseudo-iterations.\n&quot;</span>, pseudo_iter);</div>
-<div class="line"><span class="lineno">  528</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  529</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  530</span>}</div>
+<div class="line"><span class="lineno">  467</span>    <span class="comment">// Carry the controller-selected next CFL directly into the next physical step.</span></div>
+<div class="line"><span class="lineno">  468</span>    PetscReal next_start_cfl = pseudo_dt_scaling[0];</div>
+<div class="line"><span class="lineno">  469</span> </div>
+<div class="line"><span class="lineno">  470</span>    <span class="comment">// 5. Save for next Physical Time Step</span></div>
+<div class="line"><span class="lineno">  471</span>    <span class="keywordflow">if</span> (!rank) {</div>
+<div class="line"><span class="lineno">  472</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;  CFL Adaptation: Step %d finished at CFL %.3f. Next step will start at CFL %.3f.\n&quot;</span>, </div>
+<div class="line"><span class="lineno">  473</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, pseudo_dt_scaling[0], next_start_cfl);</div>
+<div class="line"><span class="lineno">  474</span>    }</div>
+<div class="line"><span class="lineno">  475</span>    </div>
+<div class="line"><span class="lineno">  476</span>    <span class="comment">// Update the context so the next call to MomentumSolver reads this new value</span></div>
+<div class="line"><span class="lineno">  477</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af358bcdc4d800d707f3863ac730c4ee2">pseudo_cfl</a> = next_start_cfl;    </div>
+<div class="line"><span class="lineno">  478</span> </div>
+<div class="line"><span class="lineno">  479</span>    <span class="comment">// Ensure every nonfatal exit exposes the last accepted finite state.</span></div>
+<div class="line"><span class="lineno">  480</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  481</span>        ierr = VecCopy(user[bi].pUcont, user[bi].Ucont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  482</span>        ierr = VecCopy(pRhs[bi], user[bi].Rhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  483</span>        ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(&amp;user[bi], <span class="stringliteral">&quot;Ucont&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  484</span>        ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(&amp;user[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  485</span>    }</div>
+<div class="line"><span class="lineno">  486</span> </div>
+<div class="line"><span class="lineno">  487</span>    <span class="keywordflow">if</span> (!converged) {</div>
+<div class="line"><span class="lineno">  488</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  489</span>                  <span class="stringliteral">&quot;Momentum solver reached %d attempts without convergence; continuing from the last accepted finite state.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  490</span>                  pseudo_iter);</div>
+<div class="line"><span class="lineno">  491</span>    }</div>
+<div class="line"><span class="lineno">  492</span>    <span class="keywordflow">if</span> (accepted_iter == 0) {</div>
+<div class="line"><span class="lineno">  493</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  494</span>                  <span class="stringliteral">&quot;Momentum solver accepted no pseudo-time trials; retaining the physical-step entry state.\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  495</span>    }</div>
+<div class="line"><span class="lineno">  496</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
+<div class="line"><span class="lineno">  497</span>              <span class="stringliteral">&quot;Momentum solver finished after %d attempts (%d accepted, %d rejected), next CFL=%.6f.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  498</span>              pseudo_iter, accepted_iter, rejected_iter, next_start_cfl);</div>
+<div class="line"><span class="lineno">  499</span> </div>
+<div class="line"><span class="lineno">  500</span>    <span class="comment">// --- Final Cleanup ---</span></div>
+<div class="line"><span class="lineno">  501</span>    <span class="keywordflow">for</span> (PetscInt bi = 0; bi &lt; block_number; bi++) {</div>
+<div class="line"><span class="lineno">  502</span>        ierr = VecDestroy(&amp;user[bi].Rhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  503</span>        ierr = VecDestroy(&amp;user[bi].dUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  504</span>        ierr = VecDestroy(&amp;user[bi].pUcont); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  505</span>        ierr = VecDestroy(&amp;pRhs[bi]); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  506</span>    }</div>
+<div class="line"><span class="lineno">  507</span>    ierr = PetscFree(pRhs); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  508</span> </div>
+<div class="line"><span class="lineno">  509</span>    ierr = PetscFree2(delta_sol_norm_init, delta_sol_norm_prev);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  510</span>    ierr = PetscFree2(delta_sol_norm_curr, delta_sol_rel_curr);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  511</span>    ierr = PetscFree2(resid_norm_init,     resid_norm_prev);CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  512</span>    ierr = PetscFree2(resid_norm_curr,     pseudo_dt_scaling); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  513</span>    ierr = PetscFree(resid_rel_curr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  514</span>    </div>
+<div class="line"><span class="lineno">  515</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  516</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  517</span>}</div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a></div><div class="ttdeci">@ LOG_TRACE</div><div class="ttdoc">Very fine-grained tracing information for in-depth debugging.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00032">logging.h:32</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
 <div class="ttc" id="amomentumsolvers_8c_html_a3aa9a9ff749db24932b4ac7fc0e72666"><div class="ttname"><a href="momentumsolvers_8c.html#a3aa9a9ff749db24932b4ac7fc0e72666">ComputeTotalResidual</a></div><div class="ttdeci">static PetscErrorCode ComputeTotalResidual(UserCtx *user)</div><div class="ttdoc">Internal helper implementation: ComputeTotalResidual().</div><div class="ttdef"><b>Definition</b> <a href="momentumsolvers_8c_source.html#l00010">momentumsolvers.c:10</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01513">setup.c:1513</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01530">setup.c:1530</a></div></div>
 <div class="ttc" id="avariables_8h_html_a0bd475311ed5699354d45aaa34691fca"><div class="ttname"><a href="variables_8h.html#a0bd475311ed5699354d45aaa34691fca">SimCtx::continueMode</a></div><div class="ttdeci">PetscBool continueMode</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00670">variables.h:670</a></div></div>
 <div class="ttc" id="avariables_8h_html_a264e921ecad0a1e889b4e6197b45c559"><div class="ttname"><a href="variables_8h.html#a264e921ecad0a1e889b4e6197b45c559">SimCtx::mom_rtol</a></div><div class="ttdeci">PetscReal mom_rtol</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00695">variables.h:695</a></div></div>
 <div class="ttc" id="avariables_8h_html_a3196abeed1e369450c471d9d7c8b9b53"><div class="ttname"><a href="variables_8h.html#a3196abeed1e369450c471d9d7c8b9b53">SimCtx::pseudo_cfl_reduction_factor</a></div><div class="ttdeci">PetscReal pseudo_cfl_reduction_factor</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00702">variables.h:702</a></div></div>
@@ -834,7 +821,9 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="avariables_8h_html_a922566a9e001486fa838d96925a6f102"><div class="ttname"><a href="variables_8h.html#a922566a9e001486fa838d96925a6f102">SimCtx::log_dir</a></div><div class="ttdeci">char log_dir[PETSC_MAX_PATH_LEN]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00678">variables.h:678</a></div></div>
 <div class="ttc" id="avariables_8h_html_a9ef8a78d7c4a70c72feb869b03e51d28"><div class="ttname"><a href="variables_8h.html#a9ef8a78d7c4a70c72feb869b03e51d28">SimCtx::mom_dt_jameson_residual_norm_noise_allowance_factor</a></div><div class="ttdeci">PetscReal mom_dt_jameson_residual_norm_noise_allowance_factor</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00704">variables.h:704</a></div></div>
 <div class="ttc" id="avariables_8h_html_ab93e16d3feaf58ac559aef07c06e3ed5"><div class="ttname"><a href="variables_8h.html#ab93e16d3feaf58ac559aef07c06e3ed5">SimCtx::pseudo_cfl_growth_factor</a></div><div class="ttdeci">PetscReal pseudo_cfl_growth_factor</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00702">variables.h:702</a></div></div>
+<div class="ttc" id="avariables_8h_html_ac833f3b4d8cea83dba8f7f6ec028dfd7"><div class="ttname"><a href="variables_8h.html#ac833f3b4d8cea83dba8f7f6ec028dfd7">SimCtx::mom_resid_rtol</a></div><div class="ttdeci">PetscReal mom_resid_rtol</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00695">variables.h:695</a></div></div>
 <div class="ttc" id="avariables_8h_html_acaf3b5e080eec860a259a6398eee42d8"><div class="ttname"><a href="variables_8h.html#acaf3b5e080eec860a259a6398eee42d8">SimCtx::mom_max_pseudo_steps</a></div><div class="ttdeci">PetscInt mom_max_pseudo_steps</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00694">variables.h:694</a></div></div>
+<div class="ttc" id="avariables_8h_html_ae4f8483ace07e3437a1cf544fad31a5c"><div class="ttname"><a href="variables_8h.html#ae4f8483ace07e3437a1cf544fad31a5c">SimCtx::mom_resid_atol</a></div><div class="ttdeci">PetscReal mom_resid_atol</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00695">variables.h:695</a></div></div>
 <div class="ttc" id="avariables_8h_html_af358bcdc4d800d707f3863ac730c4ee2"><div class="ttname"><a href="variables_8h.html#af358bcdc4d800d707f3863ac730c4ee2">SimCtx::pseudo_cfl</a></div><div class="ttdeci">PetscReal pseudo_cfl</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00701">variables.h:701</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>

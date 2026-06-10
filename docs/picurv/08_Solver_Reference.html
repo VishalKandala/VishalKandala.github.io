@@ -179,7 +179,8 @@ tolerances:
   max_iterations: 50   # [Integer] -&gt; -mom_max_pseudo_steps
   absolute_tol: 1.0e-8 # [Float] -&gt; -mom_atol
   relative_tol: 1.0e-5 # [Float] -&gt; -mom_rtol
-  step_tol:     1.0e-8 # [Float] -&gt; -imp_stol
+  residual_absolute_tol: 0.0 # Disabled when non-positive
+  residual_relative_tol: 1.0e-3 # Use 1.0e-2 for looser exploratory LES
 
 # --- Advanced Momentum Solver Controls (optional) ---
 # This section exposes newer dual-time controls directly (no passthrough needed).
@@ -189,13 +190,12 @@ momentum_solver:
     max_pseudo_steps: 50         # -&gt; -mom_max_pseudo_steps
     absolute_tol: 1.0e-8         # -&gt; -mom_atol
     relative_tol: 1.0e-5         # -&gt; -mom_rtol
-    step_tol: 1.0e-8             # -&gt; -imp_stol
     pseudo_cfl:
       initial: 0.1               # -&gt; -pseudo_cfl
       minimum: 0.001             # -&gt; -min_pseudo_cfl
       maximum: 1.0               # -&gt; -max_pseudo_cfl
-      growth_factor: 1.0         # -&gt; -pseudo_cfl_growth_factor
-      reduction_factor: 1.0      # -&gt; -pseudo_cfl_reduction_factor
+      growth_factor: 1.05        # -&gt; -pseudo_cfl_growth_factor
+      reduction_factor: 0.75     # -&gt; -pseudo_cfl_reduction_factor
     jameson_residual_noise_allowance_factor: 1.05 # -&gt; -mom_dt_jameson_residual_norm_noise_allowance_factor
 
 # --- Physical Solution Convergence Logging ---
@@ -302,7 +302,7 @@ petsc_passthrough_options:
   # -max_pseudo_cfl: 1.0
   # -min_pseudo_cfl: 0.001
   # -pseudo_cfl_growth_factor: 1.0
-  # -pseudo_cfl_reduction_factor: 1.0
+  # -pseudo_cfl_reduction_factor: 0.75
 </pre><p><code>solver.yml</code> controls numerical strategy and solver internals.</p>
 <h1><a class="anchor" id="p08_opmode_sec"></a>
 1. operation_mode</h1>
@@ -335,13 +335,16 @@ petsc_passthrough_options:
 <div class="line">  max_iterations: 50</div>
 <div class="line">  absolute_tol: 1.0e-7</div>
 <div class="line">  relative_tol: 1.0e-4</div>
-<div class="line">  step_tol: 1.0e-8</div>
+<div class="line">  residual_absolute_tol: 0.0</div>
+<div class="line">  residual_relative_tol: 1.0e-3</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>max_iterations</code> -&gt; <code>-mom_max_pseudo_steps</code></li>
 <li><code>absolute_tol</code> -&gt; <code>-mom_atol</code></li>
 <li><code>relative_tol</code> -&gt; <code>-mom_rtol</code></li>
-<li><code>step_tol</code> -&gt; <code>-imp_stol</code></li>
+<li><code>residual_absolute_tol</code> -&gt; <code>-mom_resid_atol</code></li>
+<li><code>residual_relative_tol</code> -&gt; <code>-mom_resid_rtol</code></li>
 </ul>
+<p>When both residual tolerances are non-positive, the solver preserves its existing update-only convergence criterion. <code>step_tol</code>/<code>-imp_stol</code> remains accepted as a deprecated compatibility option but is unused by active momentum solvers.</p>
 <h1><a class="anchor" id="p08_msolver_sec"></a>
 4. momentum_solver (Solver-Specific Block)</h1>
 <div class="fragment"><div class="line">momentum_solver:</div>
@@ -349,13 +352,12 @@ petsc_passthrough_options:
 <div class="line">    max_pseudo_steps: 50</div>
 <div class="line">    absolute_tol: 1.0e-8</div>
 <div class="line">    relative_tol: 1.0e-5</div>
-<div class="line">    step_tol: 1.0e-8</div>
 <div class="line">    pseudo_cfl:</div>
 <div class="line">      initial: 0.1</div>
 <div class="line">      minimum: 0.001</div>
 <div class="line">      maximum: 1.0</div>
-<div class="line">      growth_factor: 1.0</div>
-<div class="line">      reduction_factor: 1.0</div>
+<div class="line">      growth_factor: 1.05</div>
+<div class="line">      reduction_factor: 0.75</div>
 <div class="line">    jameson_residual_noise_allowance_factor: 1.05</div>
 </div><!-- fragment --><p>Mappings include:</p><ul>
 <li><code>-pseudo_cfl</code>, <code>-min_pseudo_cfl</code>, <code>-max_pseudo_cfl</code></li>
