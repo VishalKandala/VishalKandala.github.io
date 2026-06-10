@@ -88,7 +88,7 @@ $(function() {
 <li class="level1"><a href="#p05_build_sec">3. build: Build Project Executables</a></li>
 <li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
-<li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Health Summary</a></li>
+<li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Configuration and Health Summary</a></li>
 <li class="level1"><a href="#p05_precompute_sec">5a. precompute: Generate Deterministic Artifacts</a></li>
 <li class="level1"><a href="#p05_submit_sec">5b. submit: Execute Existing Staged Artifacts</a></li>
 <li class="level1"><a href="#p05_cancel_sec">5c. cancel: Stop A Slurm Run By Run Directory</a></li>
@@ -313,20 +313,29 @@ $(function() {
 <li>this avoids collisions with solver startup, which recreates the C log directory.</li>
 </ul>
 <h1><a class="anchor" id="p05_summarize_sec"></a>
-5. summarize: Read-Only Run Health Summary</h1>
-<div class="fragment"><div class="line">./bin/picurv summarize --run-dir &lt;run_dir&gt; [--latest | --step &lt;n&gt;] [--format json]</div>
+5. summarize: Read-Only Run Configuration and Health Summary</h1>
+<div class="fragment"><div class="line">./bin/picurv summarize --run-dir &lt;run_dir&gt; \</div>
+<div class="line">  [--overview] [--case] [--solver] [--monitor] \</div>
+<div class="line">  [--latest | --max-step | --step &lt;n&gt;] [--format json]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
-<li>reads copied run configs plus existing runtime artifacts,</li>
+<li><code>--overview</code> reports run metadata plus curated case, solver, and monitor summaries,</li>
+<li><code>--case</code>, <code>--solver</code>, and <code>--monitor</code> are additive selectors for individual copied configs,</li>
+<li>config-only selectors work before runtime logs exist,</li>
+<li>timestep selectors read existing runtime artifacts and still require summary-capable logs,</li>
+<li>plain <code>summarize --run-dir ...</code> preserves the implicit latest-step health behavior,</li>
 <li>builds a best-effort step summary without changing solver output,</li>
 <li>works for active runs and completed runs,</li>
 <li>reports unavailable sections when a source log is missing or disabled.</li>
 </ul>
 <p>Examples:</p>
-<div class="fragment"><div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest</div>
-<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --step 500</div>
+<div class="fragment"><div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --overview</div>
+<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --case --solver</div>
+<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest</div>
+<div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --monitor --step 500</div>
 <div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest --format json</div>
-</div><!-- fragment --><p>Typical sources:</p>
+</div><!-- fragment --><p>Configuration summaries include configured values plus useful normalized and derived values such as Reynolds number, nondimensional timestep, normalized solver selections, effective monitoring cadence, and enabled diagnostics.</p>
+<p>Typical sources:</p>
 <ul>
 <li><code>logs/Continuity_Metrics.log</code></li>
 <li><code>logs/Particle_Metrics.log</code> (per-step <code>Lost</code> plus run-local <code>Lost Total</code> when available)</li>

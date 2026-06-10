@@ -54,7 +54,7 @@ var searchData=
   ['5_20saving_20your_20work_51',['5. Saving Your Work',['../04_Visualization_Tutorial.html#p04_export_sec',1,'']]],
   ['5_20solver_5fmonitoring_52',['5. solver_monitoring',['../09_Monitor_Reference.html#p09_solver_monitoring_sec',1,'']]],
   ['5_20statistics_20pipeline_53',['5. Statistics Pipeline',['../10_Post_Processing_Reference.html#p10_stats_sec',1,'']]],
-  ['5_20summarize_3a_20read_20only_20run_20health_20summary_54',['5. summarize: Read-Only Run Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
+  ['5_20summarize_3a_20read_20only_20run_20configuration_20and_20health_20summary_54',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['5_20timestep_20loop_20tt_20advancesimulation_20tt_55',['5. Timestep Loop (&lt;tt&gt;AdvanceSimulation&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#p46_loop_sec',1,'']]],
   ['5_20uniform_5fflow_20details_56',['5. UNIFORM_FLOW Details',['../32_Analytical_Solutions.html#p32_uniform_sec',1,'']]],
   ['5_20verification_20checklist_57',['5. Verification Checklist',['../16_Config_Extension_Playbook.html#p16_verification_sec',1,'']]],

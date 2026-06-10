@@ -11,7 +11,7 @@ var searchData=
   ['head_8',['head',['../variables_8h.html#af0b49fb7e16779d8954af1c5528d585f',1,'list::head'],['../variables_8h.html#aeebefbaee8441ef28ed3121ceebb27fc',1,'IBMList::head']]],
   ['head_5fang_9',['head_ang',['../variables_8h.html#a3c873d7c4829ae18c321a737c0577d95',1,'Cstart']]],
   ['header_5fsuffixes_10',['HEADER_SUFFIXES',['../namespacegenerate__doxygen__fallback__indexes.html#a4f6c199c3c48cde5d36bb0993fd1a33d',1,'generate_doxygen_fallback_indexes']]],
-  ['health_20summary_11',['5. summarize: Read-Only Run Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
+  ['health_20summary_11',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['helpers_12',['helpers',['../51_C_Test_Suite_Developer_Guide.html#p51_fixtures_sec',1,'5. Fixture Helpers'],['../group__scatter__module__internal.html',1,'Internal Scattering Helpers']]],
   ['high_20frequency_20fatal_20messages_20runtime_20paths_13',['2. High-Frequency Fatal Messages (Runtime Paths)',['../39_Common_Fatal_Errors.html#p39_legacy_sec',1,'']]],
   ['highlights_14',['highlights',['../14_Config_Contract.html#p14_case_sec',1,'3. Case Contract Highlights'],['../14_Config_Contract.html#p14_solver_sec',1,'4. Solver Contract Highlights'],['../14_Config_Contract.html#p14_monitor_sec',1,'5. Monitor Contract Highlights'],['../14_Config_Contract.html#p14_post_sec',1,'6. Post Contract Highlights']]],

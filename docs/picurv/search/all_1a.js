@@ -14,7 +14,7 @@ var searchData=
   ['one_20direction_11',['2.2 Enable Periodicity in One Direction',['../11_User_How_To_Guides.html#p11_bc_periodic_ssec',1,'']]],
   ['only_20checks_12',['7. validate: Config-Only Checks',['../05_The_Conductor_Script.html#p05_validate_sec',1,'']]],
   ['only_20orchestration_20mapping_20no_20c_20ingestion_13',['3. Python-Only Orchestration Mapping (No C Ingestion)',['../15_Config_Ingestion_Map.html#p15_python_only_sec',1,'']]],
-  ['only_20run_20health_20summary_14',['5. summarize: Read-Only Run Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
+  ['only_20run_20configuration_20and_20health_20summary_14',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['onlysetup_15',['OnlySetup',['../variables_8h.html#a6bae0e92738d6c3498ac41b67ed5b7a4',1,'SimCtx']]],
   ['operation_5fmode_16',['1. operation_mode',['../08_Solver_Reference.html#p08_opmode_sec',1,'']]],
   ['operational_20notes_17',['5. Operational Notes',['../36_Cluster_Run_Guide.html#p36_notes_sec',1,'']]],
