@@ -14,7 +14,7 @@ var searchData=
   ['bnorm_11',['bnorm',['../logging_8h.html#a5f81613b3f10140c09097044c39eb0f7',1,'DualMonitorCtx']]],
   ['boundary_5ffaces_12',['boundary_faces',['../variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443',1,'UserCtx']]],
   ['boundaryclampcount_13',['boundaryClampCount',['../variables_8h.html#a3d9a093e9ab28579a523e6223a69fc9d',1,'SearchMetricsState']]],
-  ['boundaryvelocitycorrection_14',['boundaryVelocityCorrection',['../BC__Handlers_8c.html#ae28dc39ba36f4ec961e8e68090a601fb',1,'DrivenConstantData']]],
+  ['boundaryvelocitycorrection_14',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
   ['brownianmotionrng_15',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
   ['bulkvelocitycorrection_16',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
   ['bvel_5fu_17',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],

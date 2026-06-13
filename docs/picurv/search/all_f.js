@@ -78,7 +78,7 @@ var searchData=
   ['diagnostics_75',['diagnostics',['../09_Monitor_Reference.html#p09_diagnostics_sec',1,'4. diagnostics'],['../24_Dual_Time_Picard_Jameson_RK.html#p24_logging_sec',1,'4. Logging and Diagnostics'],['../34_Particle_Model_Overview.html#p34_statistics_sec',1,'4. Statistics and Diagnostics']]],
   ['diagnostics_20and_20sanity_20checks_76',['7. Diagnostics and Sanity Checks',['../45_Particle_Initialization_and_Restart.html#p45_diagnostics_sec',1,'']]],
   ['diagnostics_20to_20watch_77',['4. Diagnostics To Watch',['../23_Fractional_Step_Method.html#p23_runtime_sec',1,'']]],
-  ['diffusivity_78',['diffusivity',['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity'],['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity']]],
+  ['diffusivity_78',['diffusivity',['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity']]],
   ['diffusivitygradient_79',['diffusivitygradient',['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient'],['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient']]],
   ['dimensionalization_20before_20c_20input_80',['3. Non-Dimensionalization Before C Input',['../44_Boundary_Conditions_Guide.html#p44_nondim_sec',1,'']]],
   ['dimensionalization_20model_81',['Non-Dimensionalization Model',['../19_Nondimensionalization.html',1,'']]],
