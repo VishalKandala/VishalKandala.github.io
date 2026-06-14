@@ -167,22 +167,30 @@ properties:
   # Values are in physical units [m/s].
   initial_conditions:
     # --- Field Initialization Mode ---
-    # Defines the type of initial velocity field.
     # Options:
-    #   - "Zero": All velocity components are zero.
-    #   - "Constant": A uniform velocity field is applied everywhere.
-    #   - "Poiseuille": A parabolic velocity profile (for channel/pipe flow).
-    mode: "Constant"  # This will be translated to -finit
+    #   "Zero"       - all velocity components set to zero.
+    #   "Constant"   - uniform velocity field; two sub-modes (see below).
+    #   "Poiseuille" - separable parabolic profile in the two cross-stream directions.
+    mode: "Constant"
 
-    # --- Initial Velocity ---
-    # For 'Constant': set u_physical/v_physical/w_physical.
-    # For 'Poiseuille': prefer 'peak_velocity_physical' (scalar Vmax mapped to the
-    # primary inlet axis), or use u_physical/v_physical/w_physical as an explicit component override.
-    # peak_velocity_physical: 1.0
-    # Values are in physical units [m/s].
-    u_physical: 0.0
+    # --- Constant, cartesian sub-mode (default when u/v/w_physical keys are present) ---
+    # Provide all three Cartesian components; flow_direction must NOT be set.
+    u_physical: 0.0   # [m/s]
     v_physical: 0.0
-    w_physical: 0.0
+    w_physical: 1.0
+
+    # --- Constant, curvilinear/streamwise sub-mode (when velocity_physical key is present) ---
+    # Sets a uniform speed along the streamwise axis only.
+    # Requires flow_direction (or an INLET face that defines the axis).
+    # velocity_physical: 1.0        # [m/s] — replaces u/v/w_physical
+    # flow_direction: "+Zeta"       # +Xi | -Xi | +Eta | -Eta | +Zeta | -Zeta
+
+    # --- Poiseuille sub-mode ---
+    # peak_velocity_physical is the centerline speed (Vmax), not the bulk mean.
+    # Requires flow_direction (or an INLET face).
+    # mode: "Poiseuille"
+    # peak_velocity_physical: 1.0   # [m/s]
+    # flow_direction: "+Zeta"       # required when no INLET face present
 
 # ==============================================================================
 # 3. GRID DEFINITION
@@ -441,29 +449,42 @@ boundary_conditions:
 <div class="line">    density: 1000.0</div>
 <div class="line">    viscosity: 0.001</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Constant&quot;</div>
-<div class="line">    u_physical: 1.5</div>
+<div class="line">    mode: &quot;Constant&quot;       # Zero | Constant | Poiseuille</div>
+<div class="line">    u_physical: 1.5        # cartesian Constant: explicit x/y/z components</div>
 <div class="line">    v_physical: 0.0</div>
 <div class="line">    w_physical: 0.0</div>
+</div><!-- fragment --><p>Alternative IC forms:</p>
+<div class="fragment"><div class="line"># curvilinear Constant — single streamwise speed (periodic or no-inlet case)</div>
+<div class="line">initial_conditions:</div>
+<div class="line">  mode: &quot;Constant&quot;</div>
+<div class="line">  velocity_physical: 1.5</div>
+<div class="line">  flow_direction: &quot;+Zeta&quot;  # required when no INLET face; omit if INLET provides direction</div>
+<div class="line"> </div>
+<div class="line"># Poiseuille — parabolic profile</div>
+<div class="line">initial_conditions:</div>
+<div class="line">  mode: &quot;Poiseuille&quot;</div>
+<div class="line">  peak_velocity_physical: 1.5</div>
+<div class="line">  flow_direction: &quot;+Zeta&quot;  # required when no INLET face</div>
 </div><!-- fragment --><p>Key mappings:</p><ul>
 <li><code>scaling.length_ref</code> -&gt; <code>-scaling_L_ref</code></li>
 <li><code>scaling.velocity_ref</code> -&gt; <code>-scaling_U_ref</code></li>
 <li><code>fluid.density</code> and <code>fluid.viscosity</code> are used by <code>picurv</code> to compute Reynolds number -&gt; <code>-ren</code></li>
-<li><code>initial_conditions.mode</code> -&gt; <code>-finit</code> (<code>Zero</code>, <code>Constant</code>, <code>Poiseuille</code>)</li>
-<li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code></li>
-<li><code>peak_velocity_physical</code> (Poiseuille only) -&gt; mapped by <code>picurv</code> to the inlet-aligned <code>-ucont_*</code> component</li>
+<li><code>initial_conditions.mode</code> -&gt; <code>-finit</code> (<code>Zero</code>→0, <code>Constant</code>→1, <code>Poiseuille</code>→2)</li>
+<li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code> (cartesian Constant)</li>
+<li><code>velocity_physical</code> -&gt; <code>-ic_velocity_physical</code> + <code>-ic_coordinate_system 1</code> (curvilinear Constant)</li>
+<li><code>peak_velocity_physical</code> -&gt; <code>-ic_velocity_physical</code> (Poiseuille)</li>
+<li><code>flow_direction</code> -&gt; <code>-flow_direction &lt;int&gt;</code> (<code>+Xi=0,-Xi=1,+Eta=2,-Eta=3,+Zeta=4,-Zeta=5</code>)</li>
 </ul>
 <p>For the scaling model and conversion logic, see <b><a class="el" href="19_Nondimensionalization.html">Non-Dimensionalization Model</a></b>. For detailed startup behavior of field initialization modes, see <b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b>.</p>
 <p>Practical contract notes:</p>
 <ul>
-<li><code>initial_conditions.mode</code> should be set explicitly. The launcher now requires the choice instead of silently inferring it.</li>
+<li><code>initial_conditions.mode</code> must be set explicitly.</li>
 <li><code>mode: "Zero"</code> may omit velocity components entirely.</li>
-<li><code>mode: "Constant"</code> requires explicit <code>u_physical/v_physical/w_physical</code>.</li>
-<li><code>mode: "Poiseuille"</code> may use either:<ul>
-<li><code>peak_velocity_physical</code> for the scalar centerline-speed input, or</li>
-<li><code>u_physical/v_physical/w_physical</code> for an explicit component override.</li>
-</ul>
-</li>
+<li><code>mode: "Constant"</code> with <code>u/v/w_physical</code> → cartesian mode (<code>flow_direction</code> forbidden).</li>
+<li><code>mode: "Constant"</code> with <code>velocity_physical</code> → curvilinear/streamwise mode.</li>
+<li><code>mode: "Poiseuille"</code> uses <code>peak_velocity_physical</code> as the centerline speed (not bulk mean).</li>
+<li><code>flow_direction</code> is required for curvilinear Constant and Poiseuille when no INLET face exists.</li>
+<li>Mixing <code>u/v/w_physical</code> and <code>velocity_physical</code> in the same block is an error.</li>
 </ul>
 <h1><a class="anchor" id="p07_run_control_sec"></a>
 2. run_control</h1>

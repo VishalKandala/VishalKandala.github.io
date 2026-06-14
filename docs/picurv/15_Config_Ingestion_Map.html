@@ -213,8 +213,14 @@ $(function() {
 5. Mode-Dependent Normalization in &lt;tt&gt;picurv&lt;/tt&gt;</h1>
 <p>Some launcher behaviors depend on other config selections before values ever reach C:</p>
 <ul>
-<li><code>case.properties.initial_conditions.mode: Zero</code> allows <code>u_physical</code>, <code>v_physical</code>, and <code>w_physical</code> to be omitted; <code>picurv</code> writes zeros.</li>
-<li><code>case.properties.initial_conditions.mode: Poiseuille</code> accepts <code>peak_velocity_physical</code> as the preferred YAML input and maps it to the inlet-aligned <code>-ucont_*</code> component that C later interprets as <code>Vmax</code>.</li>
+<li><code>case.properties.initial_conditions.mode: Zero</code> allows velocity keys to be omitted; <code>picurv</code> writes no velocity flags (C defaults to zero).</li>
+<li><code>case.properties.initial_conditions.mode: Constant</code> supports two sub-modes inferred from which keys are present:<ul>
+<li><b>Cartesian</b> (<code>u_physical/v_physical/w_physical</code>): emits <code>-ucont_x/-ucont_y/-ucont_z</code>; <code>flow_direction</code> is forbidden.</li>
+<li><b>Curvilinear/streamwise</b> (<code>velocity_physical</code>): emits <code>-ic_coordinate_system 1 -ic_velocity_physical</code>; requires <code>flow_direction</code> or an INLET face to define the streamwise axis.</li>
+<li>Mixing cartesian and curvilinear keys in the same block is a validation error.</li>
+</ul>
+</li>
+<li><code>case.properties.initial_conditions.mode: Poiseuille</code> requires <code>peak_velocity_physical</code> (the centerline <code>Vmax</code>, not bulk mean); emits <code>-ic_velocity_physical</code>; requires <code>flow_direction</code> or an INLET face; when both are present their axes must agree.</li>
 <li><code>solver.operation_mode.eulerian_field_source: analytical</code> routes through the analytical grid-ingestion split: <code>TGV3D</code> still requires <code>case.grid.mode: programmatic_c</code>, while <code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> accept <code>case.grid.mode: programmatic_c</code> or <code>case.grid.mode: file</code>.</li>
 <li><code>case.properties.initial_conditions.mode</code> is now an explicit launcher requirement even though raw C has its own internal default.</li>
 </ul>

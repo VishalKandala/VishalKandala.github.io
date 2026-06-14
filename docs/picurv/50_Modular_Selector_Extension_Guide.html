@@ -285,27 +285,33 @@ $(function() {
 <li>Schema home: <code>case.yml -&gt; properties.initial_conditions.mode</code></li>
 <li>Canonical values:<ul>
 <li><code>Zero</code></li>
-<li><code>Constant</code></li>
+<li><code>Constant</code> — two sub-modes, inferred from YAML keys present</li>
 <li><code>Poiseuille</code></li>
 </ul>
 </li>
 <li>Python hooks:<ul>
 <li><code>normalize_field_init_mode()</code></li>
-<li><code>resolve_initial_velocity_components()</code></li>
+<li><code>normalize_flow_direction_token()</code></li>
+<li><code>resolve_ic_cli_params()</code></li>
+<li><code>_ic_has_inlet()</code></li>
 </ul>
 </li>
 <li>Generated mapping:<ul>
 <li><code>mode</code> -&gt; <code>-finit</code></li>
-<li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code></li>
+<li>cartesian Constant (<code>u/v/w_physical</code> present): <code>-ucont_x/-ucont_y/-ucont_z</code></li>
+<li>curvilinear Constant (<code>velocity_physical</code> present): <code>-ic_coordinate_system 1 -ic_velocity_physical</code></li>
+<li>Poiseuille: <code>-ic_velocity_physical</code></li>
+<li><code>flow_direction</code> (curvilinear Constant / Poiseuille, when no INLET): <code>-flow_direction &lt;int&gt;</code></li>
 </ul>
 </li>
 <li>C storage/parser:<ul>
-<li><code>FieldInitialization</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
-<li><code>-finit</code> in <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
+<li><code>FieldInitialization</code>, <code>icCoordinateSystem</code>, <code>icVelocityPhysical</code>, <code>flowDirection</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
+<li>Parsed via <code>-finit</code>, <code>-ic_coordinate_system</code>, <code>-ic_velocity_physical</code>, <code>-flow_direction</code></li>
 </ul>
 </li>
 <li>Runtime:<ul>
-<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code></li>
+<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code> — <code>SetInitialInteriorField</code></li>
+<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> — <code>Cart2Contra</code></li>
 </ul>
 </li>
 <li>Tests/docs to update:<ul>
