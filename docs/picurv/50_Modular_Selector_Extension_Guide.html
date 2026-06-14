@@ -284,34 +284,30 @@ $(function() {
 <ul>
 <li>Schema home: <code>case.yml -&gt; properties.initial_conditions.mode</code></li>
 <li>Canonical values:<ul>
-<li><code>Zero</code></li>
-<li><code>Constant</code> — two sub-modes, inferred from YAML keys present</li>
-<li><code>Poiseuille</code></li>
+<li><code>generated</code> with <code>generator: zero|constant|streamwise_constant|poiseuille|ic_gen</code></li>
+<li><code>file</code> with <code>field: Ucat|Ucont</code></li>
 </ul>
 </li>
 <li>Python hooks:<ul>
-<li><code>normalize_field_init_mode()</code></li>
+<li><code>resolve_initial_condition_config()</code></li>
+<li><code>stage_initial_condition_file()</code></li>
+<li><code>run_initial_condition_generator()</code></li>
 <li><code>normalize_flow_direction_token()</code></li>
 <li><code>resolve_ic_cli_params()</code></li>
-<li><code>_ic_has_inlet()</code></li>
 </ul>
 </li>
 <li>Generated mapping:<ul>
-<li><code>mode</code> -&gt; <code>-finit</code></li>
-<li>cartesian Constant (<code>u/v/w_physical</code> present): <code>-ucont_x/-ucont_y/-ucont_z</code></li>
-<li>curvilinear Constant (<code>velocity_physical</code> present): <code>-ic_coordinate_system 1 -ic_velocity_physical</code></li>
-<li>Poiseuille: <code>-ic_velocity_physical</code></li>
-<li><code>flow_direction</code> (curvilinear Constant / Poiseuille, when no INLET): <code>-flow_direction &lt;int&gt;</code></li>
+<li>built-in generator -&gt; matching <code>-finit</code> and parameter flags</li>
+<li>file or <code>ic_gen</code> -&gt; <code>-finit 4 -ic_field ... -ic_dir ...</code></li>
 </ul>
 </li>
 <li>C storage/parser:<ul>
-<li><code>FieldInitialization</code>, <code>icCoordinateSystem</code>, <code>icVelocityPhysical</code>, <code>flowDirection</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
-<li>Parsed via <code>-finit</code>, <code>-ic_coordinate_system</code>, <code>-ic_velocity_physical</code>, <code>-flow_direction</code></li>
+<li><code>initialConditionMode</code>, <code>initialConditionField</code>, <code>initialConditionDirectory</code>, <code>icVelocityPhysical</code>, and <code>flowDirection</code> in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
 </ul>
 </li>
 <li>Runtime:<ul>
-<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code> — <code>SetInitialInteriorField</code></li>
-<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> — <code>Cart2Contra</code></li>
+<li><code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">src/initialcondition.c</a></code> — <code>PopulateInitialUcont</code>, <code>SetInitialInteriorField</code></li>
+<li><code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code> — <code>Cart2Contra</code>, <code>UniformCart2Contra</code></li>
 </ul>
 </li>
 <li>Tests/docs to update:<ul>

@@ -150,15 +150,13 @@ $(function() {
 <li><code>boundary_conditions</code> supports single-block list or multi-block list-of-lists.</li>
 <li><code>INLET</code> + <code>prescribed_flow</code> supports <code>source.type: file</code>, <code>source.type: generated</code>, and <code>source.type: field_slice</code>. Generated square-duct Poiseuille profiles and old-field slices are produced by Python, written under <code>config/</code>, summarized in <code>profile.info</code>, then converted to the existing C-side <code>source_file</code> contract.</li>
 <li><code>solver_parameters</code> is an advanced passthrough map for raw flags not yet modeled in schema.</li>
-<li><code>properties.initial_conditions.mode</code> is required explicitly by the launcher.</li>
-<li><code>properties.initial_conditions.mode: Zero</code> may omit velocity components.</li>
-<li><code>properties.initial_conditions.mode: Constant</code> supports two sub-modes (inferred from keys present):<ul>
-<li><b>Cartesian</b>: provide <code>u_physical</code>, <code>v_physical</code>, <code>w_physical</code>; <code>flow_direction</code> is forbidden.</li>
-<li><b>Curvilinear/streamwise</b>: provide <code>velocity_physical</code> (scalar speed); requires <code>flow_direction</code> or an INLET face to define the streamwise axis.</li>
-<li>Mixing cartesian and curvilinear keys in the same block is an error.</li>
-</ul>
-</li>
-<li><code>properties.initial_conditions.mode: Poiseuille</code> requires <code>peak_velocity_physical</code> (the centerline speed, not bulk mean); requires <code>flow_direction</code> or an INLET face; when both are present their axes must agree.</li>
+<li><code>properties.initial_conditions.mode</code> is <code>generated</code> or <code>file</code>.</li>
+<li>generated built-ins are <code>zero</code>, <code>constant</code>, <code>streamwise_constant</code>, and <code>poiseuille</code>; their inputs live under <code>params</code>.</li>
+<li><code>generator: ic_gen</code> requires <code>params.field</code> and <code>params.config_file</code>, defaults to <code>scripts/ic.gen</code>, accepts optional <code>params.script</code>, and stages its PETSc vector output exactly like file mode.</li>
+<li>generated and field-sliced <code>prescribed_flow</code> sources default to <code>scripts/profile.gen</code> and accept optional <code>source.script</code>.</li>
+<li><code>mode: file</code> requires <code>field: Ucat|Ucont</code> and <code>source_file</code>.</li>
+<li>file-backed ICs currently support single-block cases only.</li>
+<li><code>solver.operation_mode.eulerian_field_source</code> and <code>run_control.start_step</code> determine whether <code>initial_conditions</code> has authority.</li>
 </ul>
 <h1><a class="anchor" id="p14_solver_sec"></a>
 4. Solver Contract Highlights</h1>
@@ -318,7 +316,7 @@ $(function() {
 <p>Examples:</p>
 <ul>
 <li>omitting <code>properties.initial_conditions.mode</code> is rejected at the launcher level,</li>
-<li>omitting velocity components for <code>mode: Zero</code> is accepted and defaults to zero,</li>
+<li><code>generator: zero</code> requires no <code>params</code>,</li>
 <li>omitting <code>models.physics.particles.restart_mode</code> on a particle restart emits a warning that C will default to <code>load</code>.</li>
 </ul>
 <p>For workflow growth patterns (grid generation orchestration, multi-run studies, and ML coupling paths), see <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>. For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>

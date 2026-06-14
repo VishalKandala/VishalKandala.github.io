@@ -184,7 +184,7 @@ properties:
     # generator: ic_gen
     # params:
     #   field: Ucat
-    #   script: scripts/my_ic.py
+    #   script: tools/custom_ic.py  # Optional; defaults to scripts/ic.gen
     #   config_file: config/initial_condition.cfg
     #   output_file: config/initial_condition.generated.dat
 
@@ -355,6 +355,7 @@ boundary_conditions:
     #   source:
     #     type: generated
     #     generator: square_duct_poiseuille
+    #     script: tools/custom_profile.py  # Optional; defaults to scripts/profile.gen
     #     output_file: config/inlet_profile_block0_negEta.generated.picslice
     #     params:
     #       bulk_velocity: 1.5
@@ -365,6 +366,7 @@ boundary_conditions:
     # params:
     #   source:
     #     type: field_slice
+    #     script: tools/custom_profile.py  # Optional; defaults to scripts/profile.gen
     #     field_file: ../old_run/output/eulerian/ufield10000_0.dat
     #     grid_file: ../old_run/config/grid.run
     #     source_case: ../old_run/config/case.yml
@@ -449,42 +451,45 @@ boundary_conditions:
 <div class="line">    density: 1000.0</div>
 <div class="line">    viscosity: 0.001</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Constant&quot;       # Zero | Constant | Poiseuille</div>
-<div class="line">    u_physical: 1.5        # cartesian Constant: explicit x/y/z components</div>
-<div class="line">    v_physical: 0.0</div>
-<div class="line">    w_physical: 0.0</div>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: constant</div>
+<div class="line">    params:</div>
+<div class="line">      u_physical: 1.5</div>
+<div class="line">      v_physical: 0.0</div>
+<div class="line">      w_physical: 0.0</div>
 </div><!-- fragment --><p>Alternative IC forms:</p>
-<div class="fragment"><div class="line"># curvilinear Constant — single streamwise speed (periodic or no-inlet case)</div>
+<div class="fragment"><div class="line"># Single streamwise speed</div>
 <div class="line">initial_conditions:</div>
-<div class="line">  mode: &quot;Constant&quot;</div>
-<div class="line">  velocity_physical: 1.5</div>
-<div class="line">  flow_direction: &quot;+Zeta&quot;  # required when no INLET face; omit if INLET provides direction</div>
+<div class="line">  mode: generated</div>
+<div class="line">  generator: streamwise_constant</div>
+<div class="line">  params:</div>
+<div class="line">    velocity_physical: 1.5</div>
+<div class="line">    flow_direction: &quot;+Zeta&quot;</div>
 <div class="line"> </div>
-<div class="line"># Poiseuille — parabolic profile</div>
+<div class="line"># File-backed Cartesian velocity</div>
 <div class="line">initial_conditions:</div>
-<div class="line">  mode: &quot;Poiseuille&quot;</div>
-<div class="line">  peak_velocity_physical: 1.5</div>
-<div class="line">  flow_direction: &quot;+Zeta&quot;  # required when no INLET face</div>
+<div class="line">  mode: file</div>
+<div class="line">  field: Ucat</div>
+<div class="line">  source_file: initial_conditions/velocity.dat</div>
 </div><!-- fragment --><p>Key mappings:</p><ul>
 <li><code>scaling.length_ref</code> -&gt; <code>-scaling_L_ref</code></li>
 <li><code>scaling.velocity_ref</code> -&gt; <code>-scaling_U_ref</code></li>
 <li><code>fluid.density</code> and <code>fluid.viscosity</code> are used by <code>picurv</code> to compute Reynolds number -&gt; <code>-ren</code></li>
-<li><code>initial_conditions.mode</code> -&gt; <code>-finit</code> (<code>Zero</code>→0, <code>Constant</code>→1, <code>Poiseuille</code>→2)</li>
-<li><code>u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code> (cartesian Constant)</li>
-<li><code>velocity_physical</code> -&gt; <code>-ic_velocity_physical</code> + <code>-ic_coordinate_system 1</code> (curvilinear Constant)</li>
-<li><code>peak_velocity_physical</code> -&gt; <code>-ic_velocity_physical</code> (Poiseuille)</li>
+<li><code>generator: zero|constant|poiseuille|streamwise_constant</code> -&gt; the corresponding built-in <code>-finit</code> mode</li>
+<li><code>mode: file</code> and <code>generator: ic_gen</code> -&gt; <code>-finit 4</code>, <code>-ic_field</code>, and staged <code>-ic_dir</code></li>
+<li><code>params.u_physical/v_physical/w_physical</code> -&gt; <code>-ucont_x/-ucont_y/-ucont_z</code></li>
+<li><code>params.velocity_physical</code> and <code>params.peak_velocity_physical</code> -&gt; <code>-ic_velocity_physical</code></li>
 <li><code>flow_direction</code> -&gt; <code>-flow_direction &lt;int&gt;</code> (<code>+Xi=0,-Xi=1,+Eta=2,-Eta=3,+Zeta=4,-Zeta=5</code>)</li>
 </ul>
 <p>For the scaling model and conversion logic, see <b><a class="el" href="19_Nondimensionalization.html">Non-Dimensionalization Model</a></b>. For detailed startup behavior of field initialization modes, see <b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b>.</p>
 <p>Practical contract notes:</p>
 <ul>
-<li><code>initial_conditions.mode</code> must be set explicitly.</li>
-<li><code>mode: "Zero"</code> may omit velocity components entirely.</li>
-<li><code>mode: "Constant"</code> with <code>u/v/w_physical</code> → cartesian mode (<code>flow_direction</code> forbidden).</li>
-<li><code>mode: "Constant"</code> with <code>velocity_physical</code> → curvilinear/streamwise mode.</li>
-<li><code>mode: "Poiseuille"</code> uses <code>peak_velocity_physical</code> as the centerline speed (not bulk mean).</li>
+<li><code>initial_conditions.mode</code> is <code>generated</code> or <code>file</code>.</li>
+<li>generated built-ins are <code>zero</code>, <code>constant</code>, <code>streamwise_constant</code>, and <code>poiseuille</code>.</li>
+<li><code>generator: ic_gen</code> defaults to <code>scripts/ic.gen</code>; optional <code>params.script</code> selects a compatible override.</li>
+<li>file-backed ICs accept one PETSc binary <code>Ucat</code> or <code>Ucont</code> vector and currently require a single-block case.</li>
 <li><code>flow_direction</code> is required for curvilinear Constant and Poiseuille when no INLET face exists.</li>
-<li>Mixing <code>u/v/w_physical</code> and <code>velocity_physical</code> in the same block is an error.</li>
+<li><code>eulerian_field_source</code> and restart selection supersede <code>initial_conditions</code>.</li>
 </ul>
 <h1><a class="anchor" id="p07_run_control_sec"></a>
 2. run_control</h1>
@@ -620,6 +625,7 @@ boundary_conditions:
 <li>file-backed: <code>params.source.type: file</code>, <code>params.source.path</code></li>
 <li>generated: <code>params.source.type: generated</code>, <code>params.source.generator: square_duct_poiseuille</code></li>
 <li>field-sliced: <code>params.source.type: field_slice</code>, <code>params.source.field_file</code>, <code>params.source.grid_file</code>, <code>params.source.slice</code></li>
+<li>generated and field-sliced sources default to <code>scripts/profile.gen</code>; optional <code>params.source.script</code> selects a compatible override</li>
 </ul>
 </li>
 <li><code>OUTLET</code> + <code>conservation</code></li>

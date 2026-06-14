@@ -110,7 +110,7 @@ $(function() {
 </ol>
 <h1><a class="anchor" id="p33_euler_sec"></a>
 2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</h1>
-<p>The canonical contract has two modes: <code>generated</code> and <code>file</code>. Generated ICs may use a built-in C generator or an external <code>ic_gen</code> script. Both produce the same solver-facing result: one initial velocity field.</p>
+<p>The canonical contract has two modes: <code>generated</code> and <code>file</code>. Generated ICs may use a built-in C generator or the repository <code>scripts/ic.gen</code> utility. Both produce the same solver-facing result: one initial velocity field.</p>
 <p>Built-in zero:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
@@ -148,18 +148,18 @@ $(function() {
 <div class="line">    field: Ucat</div>
 <div class="line">    source_file: initial_conditions/velocity.dat</div>
 </div><!-- fragment --><p>The input must be one PETSc binary <code>.dat</code> vector readable by <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>. <code>Ucat</code> inputs are converted by <a class="el" href="setup_8h.html#ad029c429cf3e717072a5dbac13fc59da">Cart2Contra</a>; <code>Ucont</code> inputs are used directly. The first implementation supports one block only because it intentionally reuses the existing single-field <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a> path.</p>
-<p>External generator:</p>
+<p>Repository generator:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
 <div class="line">    mode: generated</div>
 <div class="line">    generator: ic_gen</div>
 <div class="line">    params:</div>
 <div class="line">      field: Ucat</div>
-<div class="line">      script: scripts/my_ic.py</div>
+<div class="line">      script: tools/custom_ic.py  # optional; defaults to scripts/ic.gen</div>
 <div class="line">      config_file: config/initial_condition.yml</div>
 <div class="line">      output_file: config/initial_condition.generated.dat</div>
-</div><!-- fragment --><p>The launcher invokes the script as:</p>
-<div class="fragment"><div class="line">python &lt;script&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; [cli_args...]</div>
+</div><!-- fragment --><p>The launcher invokes <code>scripts/ic.gen</code> by default, or the optional case-relative/absolute <code>params.script</code> override, as:</p>
+<div class="fragment"><div class="line">python &lt;ic-generator&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; [cli_args...]</div>
 </div><!-- fragment --><p><code>picurv run --solve</code> materializes the result after grid preparation. <code>picurv precompute --case ...</code> materializes and stages the same artifact without running the solver.</p>
 <h1><a class="anchor" id="p33_euler_modes_sec"></a>
 3. C Runtime Modes and Entry Points</h1>
