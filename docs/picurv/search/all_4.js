@@ -15,7 +15,7 @@ var searchData=
   ['4_20averaging_20terminology_20in_20picurv_12',['4. Averaging Terminology In PICurv',['../28_IEM_and_Statistical_Averaging.html#p28_terminology_sec',1,'']]],
   ['4_20boundary_20and_20runtime_20controls_13',['4. Boundary and Runtime Controls',['../12_Capabilities_Summary.html#p12_bc_sec',1,'']]],
   ['4_20config_20file_20model_14',['4. Config File Model',['../48_Grid_Generator_Guide.html#p48_config_sec',1,'']]],
-  ['4_20configuration_15',['1.4 Configuration',['../27_Trilinear_Interpolation_and_Projection.html#p27_config_ssec',1,'']]],
+  ['4_20configuration_15',['4 configuration',['../27_Trilinear_Interpolation_and_Projection.html#p27_config_ssec',1,'1.4 Configuration'],['../p54_geometric_periodic.html#p54_config_sec',1,'4. Configuration']]],
   ['4_20contravariant_20initialization_20note_16',['4. Contravariant Initialization Note',['../33_Initial_Conditions.html#p33_euler_formula_sec',1,'']]],
   ['4_20core_20context_20objects_17',['4. Core Context Objects',['../13_Code_Architecture.html#p13_contexts_sec',1,'']]],
   ['4_20current_20test_20status_18',['4. Current test status',['../31_Momentum_Solvers.html#p31_testing_sec',1,'']]],

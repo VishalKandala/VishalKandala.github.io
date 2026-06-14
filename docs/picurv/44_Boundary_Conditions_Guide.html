@@ -230,7 +230,14 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li>driven periodic handler (<code>constant_flux</code>) must match on both faces of a periodic pair.</li>
 <li>incomplete face sets fail validation immediately.</li>
 </ol>
-<p>The C side also performs periodic consistency checks while deriving global periodicity in <a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a>.</p>
+<p>The C side derives periodic axes from those pairs in <a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a>, before DMDA creation. There are no independent YAML periodic flags.</p>
+<p>For each active axis, <a class="el" href="grid_8h.html#a4b1c4355ef3d19bc43b0d6878a4cfd13">ValidatePeriodicGeometry</a> also requires:</p>
+<ul>
+<li>at least four physical nodes along the periodic direction,</li>
+<li>pointwise matching opposite surfaces under one nonzero constant Cartesian translation,</li>
+<li>the same translation at every point on the paired surfaces.</li>
+</ul>
+<p>These rules are checked independently for mixed periodic/non-periodic cases. PETSc periodic DMDAs wrap indices; PICurv separately constructs translated coordinate images and synchronizes cell-centered, face-family, and component-staggered Eulerian fields. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> periodic wrapping is not implemented.</p>
 <h1><a class="anchor" id="p44_c_pipeline_sec"></a>
 5. C-Side Parsing and Dispatch</h1>
 <p>Generated <code>bcs.run</code> lines use:</p>
@@ -315,7 +322,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 </div><!-- fragment --><h1><a class="anchor" id="p44_troubleshoot_sec"></a>
 8. Common Failure Modes</h1>
 <ul>
-<li>&lsquo;missing required key 'face&rsquo;/'type'/'handler'<code>: malformed BC entry object. -</code>Duplicate face<code>: same face declared twice in one block. -</code>incomplete ... Missing faces<code>: not all 6 faces provided. -</code>Inconsistent periodicity<code>: one side periodic and opposite side non-periodic. -</code>Unknown params`: extra keys not allowed for selected handler.</li>
+<li>&lsquo;missing required key 'face&rsquo;/'type'/'handler'<code>: malformed BC entry object. -</code>Duplicate face<code>: same face declared twice in one block. -</code>incomplete ... Missing faces<code>: not all 6 faces provided. -</code>Inconsistent periodicity<code>: one side periodic and opposite side non-periodic. -</code>Periodic geometry validation failed<code>: paired surfaces do not differ by one constant nonzero translation, or the periodic axis is too short. -</code>Unknown params`: extra keys not allowed for selected handler.</li>
 </ul>
 <h1><a class="anchor" id="p44_refs_sec"></a>
 9. Related Pages</h1>
@@ -326,6 +333,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
+<li><b>54_Geometric_Periodic_Boundaries</b></li>
 </ul>
 <h2><a class="anchor" id="autotoc_md145"></a>
 CFD Reader Guidance and Practical Use</h2>

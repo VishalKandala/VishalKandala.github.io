@@ -263,9 +263,8 @@ models:
   # --- Domain and Block Configuration ---
   domain:
     blocks: 1          # [Integer] -&gt; -nblk. CRITICAL for multi-block setups.
-    i_periodic: false  # [true/false] -&gt; -i_periodic
-    j_periodic: false  # [true/false] -&gt; -j_periodic
-    k_periodic: false  # [true/false] -&gt; -k_periodic
+    # Periodic axes are derived exclusively from paired PERIODIC boundary
+    # conditions. Do not add separate periodic flags here.
 
   # --- Core Physics Modules ---
   physics:
@@ -324,6 +323,11 @@ models:
 # --- For MULTI-BLOCK cases: Provide a LIST OF LISTS. The outer list corresponds
 #     to the block index [0, 1, ...], and each inner list defines the 6 faces
 #     for that block. See the multi-block example commented out below. ---
+# --- Geometric periodicity: set both opposite faces to PERIODIC/geometric.
+#     Periodic axes are derived from these BC pairs. The paired grid surfaces
+#     must match pointwise under one nonzero constant Cartesian translation,
+#     and the axis must contain at least four physical nodes. Periodic particle
+#     wrapping is not implemented. See examples/periodic_test/. ---
 boundary_conditions:
   # --- Example for a Single Block Case ---
   - face: "-Xi"
@@ -565,9 +569,6 @@ boundary_conditions:
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  domain:</div>
 <div class="line">    blocks: 1</div>
-<div class="line">    i_periodic: false</div>
-<div class="line">    j_periodic: false</div>
-<div class="line">    k_periodic: false</div>
 <div class="line">  physics:</div>
 <div class="line">    dimensionality: &quot;3D&quot;</div>
 <div class="line">    turbulence:</div>
@@ -583,7 +584,7 @@ boundary_conditions:
 <div class="line">      restart_mode: &quot;init&quot;</div>
 </div><!-- fragment --><p>Common mappings:</p><ul>
 <li><code>domain.blocks</code> -&gt; <code>-nblk</code></li>
-<li>periodic flags -&gt; <code>-i_periodic/-j_periodic/-k_periodic</code></li>
+<li>periodic axes are derived from paired <code>PERIODIC</code> boundary conditions before DMDA creation; <code>models.domain</code> does not accept periodic flags</li>
 <li><code>physics.dimensionality: "2D"</code> -&gt; <code>-TwoD 1</code></li>
 <li><code>physics.turbulence.les.enabled/model</code> -&gt; <code>-les</code> (<code>0</code> none, <code>1</code> constant Smagorinsky, <code>2</code> dynamic Smagorinsky)</li>
 <li><code>physics.turbulence.les.constant_cs</code> -&gt; <code>-const_cs</code></li>

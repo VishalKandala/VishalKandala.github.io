@@ -145,12 +145,12 @@ $(function() {
 <li><code>make unit-runtime</code></li>
 <li><code>make unit-simulation</code></li>
 <li><code>make unit-mpi</code></li>
-<li><code>make unit-periodic-dev</code></li>
+<li><code>make unit-periodic</code></li>
 <li><code>make smoke</code></li>
 <li><code>make smoke-mpi</code></li>
 <li><code>make smoke-mpi-matrix</code></li>
 <li><code>make smoke-stress</code></li>
-<li><code>make smoke-periodic-dev</code></li>
+<li><code>make smoke-periodic</code></li>
 <li><code>make check</code></li>
 <li><code>make check-mpi</code></li>
 <li><code>make check-mpi-matrix</code></li>
@@ -177,7 +177,7 @@ $(function() {
 <div class="line">make unit-runtime</div>
 <div class="line">make unit-mpi</div>
 <div class="line">make smoke</div>
-<div class="line">make smoke-periodic-dev</div>
+<div class="line">make smoke-periodic</div>
 <div class="line">make check</div>
 <div class="line">make check-full</div>
 </div><!-- fragment --><p>Guidance:</p>
@@ -193,7 +193,7 @@ $(function() {
 <li>Use <code>make smoke</code> after building binaries to execute tiny real solve/post/restart workflows.</li>
 <li>Use <code>make smoke-mpi-matrix</code> when you need a rank-sweep MPI runtime sanity check.</li>
 <li>Use <code>make smoke-stress</code> when you want the opt-in medium-budget runtime extension tier.</li>
-<li>Use <code>make unit-periodic-dev</code> and <code>make smoke-periodic-dev</code> only while working on the in-development periodic BC path; they are intentionally non-gating.</li>
+<li>Use <code>make unit-periodic</code> and <code>make smoke-periodic</code> when changing geometric-periodic Eulerian behavior; both are included in the standard gates.</li>
 <li>Use <code>make coverage</code> to enforce line-coverage floors for core Python scripts and C sources.</li>
 <li>Use <code>make check</code> as the pre-merge gate at the end of a development cycle.</li>
 <li>Use <code>make check-mpi</code> when multi-rank MPI behavior is in scope.</li>
@@ -367,7 +367,7 @@ $(function() {
 <li>multi-rank flat particle runtime + restart (<code>load</code>/<code>init</code>) runs (<code>make smoke-mpi</code>)</li>
 <li>rank-matrix MPI runtime sweep across flat+bent+flat-particle-restart (<code>make smoke-mpi-matrix</code>)</li>
 <li>opt-in stress extensions for longer particle cycling, chained restarts, parabolic-inlet runtime coverage, periodic constant-flux validate/dry-run coverage, and extra-rank MPI particle runs (<code>make smoke-stress</code>)</li>
-<li>periodic runtime development harness for the in-progress periodic constant-flux path (<code>make smoke-periodic-dev</code>, non-gating)</li>
+<li>geometric-periodic real runtime harness (<code>make smoke-periodic</code>, included in <code>check</code>)</li>
 </ul>
 <p>These checks are intentionally tiny but execute real solver/postprocessor runtime paths. For the <code>-help</code> smoke checks, banner presence is authoritative: the local PETSc debug build may exit with code <code>62</code> (<code>PETSC_ERR_ARG_WRONG</code>) after printing help, and that still counts as a pass.</p>
 <p>Run locally:</p>
@@ -375,7 +375,7 @@ $(function() {
 <div class="line">make smoke-mpi</div>
 <div class="line">make smoke-mpi-matrix</div>
 <div class="line">make smoke-stress</div>
-<div class="line">make smoke-periodic-dev</div>
+<div class="line">make smoke-periodic</div>
 </div><!-- fragment --><h2><a class="anchor" id="p40_smoke_knobs_ssec"></a>
 6.1 Useful Smoke Knobs</h2>
 <p>Environment controls used by the smoke layer:</p>
@@ -408,7 +408,7 @@ $(function() {
 <p><code>make check-mpi</code> extends this sweep by running <code>make smoke-mpi</code> and <code>make unit-mpi</code> afterward.</p>
 <p><code>make check-mpi-matrix</code> extends this sweep by running <code>make smoke-mpi-matrix</code> and <code>make unit-mpi</code>.</p>
 <p><code>make check-full</code> is the comprehensive MPI-inclusive gate. It runs <code>make check</code>, then <code>make unit-mpi</code>, <code>make smoke-mpi</code>, and <code>make smoke-mpi-matrix</code>.</p>
-<p><code>make check-stress</code> extends <code>make check-full</code> by running <code>make smoke-stress</code> afterward. <code>make smoke-periodic-dev</code> is intentionally outside the default gates and may fail honestly while periodic BC work is still in development.</p>
+<p><code>make check-stress</code> extends <code>make check-full</code> by running <code>make smoke-stress</code> afterward. <code>make smoke-periodic</code> runs as part of <code>make check</code>; <code>make unit-periodic</code> runs as part of <code>make unit</code>.</p>
 <p>Use <code>check-full</code> for release candidates or CI workflows where both focused multi-rank tests and rank-matrix runtime checks are required in a single pass.</p>
 <h1><a class="anchor" id="p40_coverage_impl_sec"></a>
 8. Coverage Gate Implementation Notes</h1>
@@ -501,14 +501,14 @@ $(function() {
 <li><code>S5</code>: multi-rank tiny solve+post runs for flat and bent channels, plus flat particle base/restart (<code>load</code> and <code>init</code>) branches</li>
 <li><code>S6</code>: restart-equivalence run for flat channel (continuous vs split restart continuity metric agreement)</li>
 <li><code>S7</code>: periodic constant-flux validate + dry-run contract coverage in the opt-in stress tier</li>
-<li><code>S8</code>: periodic constant-flux real runtime development harness (<code>make smoke-periodic-dev</code>, non-gating)</li>
+<li><code>S8</code>: geometric-periodic real runtime harness (<code>make smoke-periodic</code>, gating)</li>
 </ul>
 <p>Runtime file coverage map (unit targets + runtime sequences):</p>
 <ul>
 <li><code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code>: <code>unit-solver</code>, <code>S4</code></li>
-<li><code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>: <code>unit-boundaries</code>, <code>unit-periodic-dev</code>, <code>unit-runtime</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code>, <code>S7</code>, <code>S8</code></li>
+<li><code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>: <code>unit-boundaries</code>, <code>unit-periodic</code>, <code>unit-runtime</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code>, <code>S7</code>, <code>S8</code></li>
 <li><code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>: <code>unit-solver</code>, <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
-<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>unit-periodic-dev</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code>, <code>S7</code>, <code>S8</code></li>
+<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>unit-periodic</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code>, <code>S7</code>, <code>S8</code></li>
 <li><code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">src/Filter.c</a></code>: <code>unit-solver</code></li>
 <li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code>: <code>unit-metric</code>, <code>unit-grid</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
