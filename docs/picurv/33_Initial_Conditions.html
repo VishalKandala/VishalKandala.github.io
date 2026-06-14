@@ -85,12 +85,11 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p33_overview_sec">1. Where Initialization Happens</a></li>
 <li class="level1"><a href="#p33_euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#p33_euler_modes_sec">3. Eulerian Mode Details</a></li>
-<li class="level1"><a href="#p33_euler_formula_sec">4. Contravariant Initialization Note</a></li>
-<li class="level1"><a href="#p33_restart_modes_sec">5. Eulerian Restart Branches</a></li>
-<li class="level1"><a href="#p33_particle_link_sec">6. Particle Initialization Relation</a></li>
-<li class="level1"><a href="#p33_checks_sec">7. Practical Checks</a></li>
-<li class="level1"><a href="#p33_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md115">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md116">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p33_euler_modes_sec">3. C Runtime Modes and Entry Points</a></li>
+<li class="level1"><a href="#p33_restart_modes_sec">4. Authority and Restart Branches</a></li>
+<li class="level1"><a href="#p33_particle_link_sec">5. Particle Initialization Relation</a></li>
+<li class="level1"><a href="#p33_checks_sec">6. Practical Checks</a></li>
+<li class="level1"><a href="#p33_refs_sec">7. Related Pages</a><ul><li class="level2"><a href="#autotoc_md115">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md116">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md117">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -103,127 +102,100 @@ $(function() {
 1. Where Initialization Happens</h1>
 <p>Startup sequence:</p>
 <ol type="1">
-<li><code>scripts/picurv</code> converts YAML to control flags (<code>-finit</code>, <code>-ucont_*</code>, <code>-pinit</code>, etc.).</li>
-<li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a> chooses fresh-start, load, or analytical branch.</li>
-<li>For fresh starts, <a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a> initializes interior <code>Ucont</code>.</li>
-<li>Boundary handlers then enforce face values and ghost-cell consistency.</li>
+<li><code>scripts/picurv</code> resolves built-in, file, or external-generator YAML.</li>
+<li>File-backed ICs are staged in the filename layout expected by <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>.</li>
+<li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a> chooses fresh solve, restart load, or analytical initialization.</li>
+<li>On a fresh solve, <a class="el" href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a> populates <code>Ucont</code>; existing finalization then applies boundary values and derives the remaining velocity state.</li>
 <li>If particles are enabled, <a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a> runs independently after Eulerian setup.</li>
 </ol>
 <h1><a class="anchor" id="p33_euler_sec"></a>
 2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</h1>
-<p>There are three IC modes (Zero, Constant, Poiseuille) and two Constant sub-modes (cartesian and curvilinear). The sub-mode is inferred from which velocity keys are present — no explicit <code>coordinate_system</code> key is needed.</p>
-<p><b>Zero</b> — set everything to zero:</p>
+<p>The canonical contract has two modes: <code>generated</code> and <code>file</code>. Generated ICs may use a built-in C generator or an external <code>ic_gen</code> script. Both produce the same solver-facing result: one initial velocity field.</p>
+<p>Built-in zero:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Zero&quot;</div>
-</div><!-- fragment --><p><b>Constant, cartesian</b> — three Cartesian components; works for any domain:</p>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: zero</div>
+</div><!-- fragment --><p>Built-in Cartesian constant:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Constant&quot;</div>
-<div class="line">    u_physical: 1.5   # x-component (physical units)</div>
-<div class="line">    v_physical: 0.0</div>
-<div class="line">    w_physical: 0.0</div>
-</div><!-- fragment --><p><b>Constant, curvilinear</b> — single streamwise speed; requires <code>flow_direction</code> or an INLET face:</p>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: constant</div>
+<div class="line">    params:</div>
+<div class="line">      u_physical: 1.5</div>
+<div class="line">      v_physical: 0.0</div>
+<div class="line">      w_physical: 0.0</div>
+</div><!-- fragment --><p>Built-in streamwise constant:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Constant&quot;</div>
-<div class="line">    velocity_physical: 1.5        # streamwise speed (physical units)</div>
-<div class="line">    flow_direction: &quot;+Zeta&quot;       # required when no INLET face is present</div>
-</div><!-- fragment --><p>Valid <code>flow_direction</code> tokens: <code>+Xi</code>, <code>-Xi</code>, <code>+Eta</code>, <code>-Eta</code>, <code>+Zeta</code>, <code>-Zeta</code>.</p>
-<p><b>Poiseuille</b> — separable parabolic profile in the two cross-stream directions:</p>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: streamwise_constant</div>
+<div class="line">    params:</div>
+<div class="line">      velocity_physical: 1.5</div>
+<div class="line">      flow_direction: &quot;+Zeta&quot;</div>
+</div><!-- fragment --><p>Built-in Poiseuille:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: &quot;Poiseuille&quot;</div>
-<div class="line">    peak_velocity_physical: 1.5   # centerline speed (physical units)</div>
-<div class="line">    flow_direction: &quot;+Zeta&quot;       # required when no INLET face is present</div>
-</div><!-- fragment --><p><code>picurv</code> mapping:</p>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: poiseuille</div>
+<div class="line">    params:</div>
+<div class="line">      peak_velocity_physical: 1.5</div>
+<div class="line">      flow_direction: &quot;+Zeta&quot;</div>
+</div><!-- fragment --><p>File-backed <code>Ucat</code> or <code>Ucont</code>:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    mode: file</div>
+<div class="line">    field: Ucat</div>
+<div class="line">    source_file: initial_conditions/velocity.dat</div>
+</div><!-- fragment --><p>The input must be one PETSc binary <code>.dat</code> vector readable by <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>. <code>Ucat</code> inputs are converted by <a class="el" href="setup_8h.html#ad029c429cf3e717072a5dbac13fc59da">Cart2Contra</a>; <code>Ucont</code> inputs are used directly. The first implementation supports one block only because it intentionally reuses the existing single-field <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a> path.</p>
+<p>External generator:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: ic_gen</div>
+<div class="line">    params:</div>
+<div class="line">      field: Ucat</div>
+<div class="line">      script: scripts/my_ic.py</div>
+<div class="line">      config_file: config/initial_condition.yml</div>
+<div class="line">      output_file: config/initial_condition.generated.dat</div>
+</div><!-- fragment --><p>The launcher invokes the script as:</p>
+<div class="fragment"><div class="line">python &lt;script&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; [cli_args...]</div>
+</div><!-- fragment --><p><code>picurv run --solve</code> materializes the result after grid preparation. <code>picurv precompute --case ...</code> materializes and stages the same artifact without running the solver.</p>
+<h1><a class="anchor" id="p33_euler_modes_sec"></a>
+3. C Runtime Modes and Entry Points</h1>
+<p>The launcher maps the contract to one InitialConditionMode:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">YAML key   </th><th class="markdownTableHeadNone">CLI flag   </th><th class="markdownTableHeadNone">Notes    </th></tr>
+<th class="markdownTableHeadNone">Initial-condition selection   </th><th class="markdownTableHeadNone">C mode    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>mode: "Zero"</code>   </td><td class="markdownTableBodyNone"><code>-finit 0</code>   </td><td class="markdownTableBodyNone">velocity components ignored    </td></tr>
+<td class="markdownTableBodyNone"><code>generator: zero</code>   </td><td class="markdownTableBodyNone"><code>IC_MODE_ZERO</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>mode: "Constant"</code> + <code>u/v/w_physical</code>   </td><td class="markdownTableBodyNone"><code>-finit 1 -ucont_x … -ucont_y … -ucont_z …</code>   </td><td class="markdownTableBodyNone">cartesian sub-mode; <code>flow_direction</code> forbidden    </td></tr>
+<td class="markdownTableBodyNone"><code>generator: constant</code>   </td><td class="markdownTableBodyNone"><code>IC_MODE_CONSTANT_CARTESIAN</code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>mode: "Constant"</code> + <code>velocity_physical</code>   </td><td class="markdownTableBodyNone"><code>-finit 1 -ic_coordinate_system 1 -ic_velocity_physical …</code>   </td><td class="markdownTableBodyNone">curvilinear sub-mode    </td></tr>
+<td class="markdownTableBodyNone"><code>generator: streamwise_constant</code>   </td><td class="markdownTableBodyNone"><code>IC_MODE_CONSTANT_STREAMWISE</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>mode: "Poiseuille"</code>   </td><td class="markdownTableBodyNone"><code>-finit 2 -ic_velocity_physical …</code>   </td><td class="markdownTableBodyNone"><code>peak_velocity_physical</code> is the centerline speed    </td></tr>
+<td class="markdownTableBodyNone"><code>generator: poiseuille</code>   </td><td class="markdownTableBodyNone"><code>IC_MODE_POISEUILLE</code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>flow_direction: "+Zeta"</code>   </td><td class="markdownTableBodyNone"><code>-flow_direction 4</code>   </td><td class="markdownTableBodyNone">token-to-int map: <code>+Xi=0,-Xi=1,+Eta=2,-Eta=3,+Zeta=4,-Zeta=5</code>   </td></tr>
+<td class="markdownTableBodyNone"><code>mode: file</code> or <code>generator: ic_gen</code>   </td><td class="markdownTableBodyNone"><code>IC_MODE_FILE</code>   </td></tr>
 </table>
-<p><code>flow_direction</code> resolution order (C side):</p><ol type="1">
-<li>Derived from identified INLET face (if present).</li>
-<li>Explicit <code>-flow_direction</code> CLI flag (set by <code>flow_direction</code> key).</li>
-<li>Error — one of the above is required for curvilinear Constant and Poiseuille.</li>
-</ol>
-<p>Launcher-side contract:</p>
-<ul>
-<li><code>mode</code> must be set explicitly.</li>
-<li>For <code>Zero</code>, velocity keys may be omitted.</li>
-<li>For <code>Constant</code>, provide either <code>u/v/w_physical</code> (cartesian) <b>or</b> <code>velocity_physical</code> (curvilinear), not both.</li>
-<li>For cartesian <code>Constant</code>, <code>flow_direction</code> is forbidden.</li>
-<li>For curvilinear <code>Constant</code> and <code>Poiseuille</code>, <code>flow_direction</code> is required when no INLET face exists.</li>
-<li>When both <code>flow_direction</code> and an INLET face are present (Poiseuille only), their axes must agree.</li>
-</ul>
-<p>C-side entry points:</p>
-<ul>
-<li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a></li>
-<li><a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></li>
-<li><a class="el" href="setup_8h.html#ae6daf1c10ce894fe3eccfa6c181fe3d7">Cart2Contra</a></li>
-<li><a class="el" href="logging_8h.html#a266bd07f5be2795e8603a4075440ea25">FieldInitializationToString</a></li>
-</ul>
-<h1><a class="anchor" id="p33_euler_modes_sec"></a>
-3. Eulerian Mode Details</h1>
-<p><code>-finit = 0</code> (Zero):</p>
-<ul>
-<li>sets all interior contravariant velocity components to zero.</li>
-</ul>
-<p><code>-finit = 1</code> (Constant Velocity) — two sub-modes selected by <code>-ic_coordinate_system</code>:</p>
-<ul>
-<li><b>Cartesian</b> (<code>-ic_coordinate_system 0</code>, default): <code>Cart2Contra</code> dots the Cartesian vector <code>(-ucont_x, -ucont_y, -ucont_z)</code> with face-area metric vectors (<code>Csi</code>, <code>Eta</code>, <code>Zet</code>) at every interior node, filling all three contravariant components correctly. The old <code>identifiedInletBCFace</code>-based path is no longer used for this mode.</li>
-<li><b>Curvilinear / streamwise</b> (<code>-ic_coordinate_system 1</code>): sets only the normal contravariant component along the streamwise axis (derived from <code>flow_direction</code>), scaled by the face-area magnitude. The two cross-stream components are left at zero.</li>
-</ul>
-<p><code>-finit = 2</code> (Poiseuille-like Normal Velocity):</p>
-<ul>
-<li>computes a separable parabolic profile in the two cross-stream index directions,</li>
-<li>applies zero-clamping to suppress roundoff negatives near corners,</li>
-<li><code>peak_velocity_physical</code> is the centerline speed (<code>Vmax</code>), not the bulk/mean average.</li>
-</ul>
-<h1><a class="anchor" id="p33_euler_formula_sec"></a>
-4. Contravariant Initialization Note</h1>
-<p>Contravariant velocity (flux) at a face equals the physical velocity dotted with the face-area metric vector:</p>
-<p class="formulaDsp">
-\[
-U_\xi = \mathbf{v} \cdot \mathbf{A}_\xi, \quad
-U_\eta = \mathbf{v} \cdot \mathbf{A}_\eta, \quad
-U_\zeta = \mathbf{v} \cdot \mathbf{A}_\zeta.
-\]
-</p>
-<p><code>Cart2Contra</code> performs this dot product over all owned interior nodes for the cartesian Constant mode and is also used by the analytical solver. For curvilinear / Poiseuille modes the streamwise normal component is computed directly from the face-area magnitude and the physical speed.</p>
-<p>Because face areas scale with mesh spacing and curvature, the same physical speed produces different <code>Ucont</code> magnitudes on stretched or curved meshes — this is expected and correct.</p>
+<p><a class="el" href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a> is the fresh-solve dispatcher. Built-in modes reuse <a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a> and <a class="el" href="setup_8h.html#a2675aaad6b90ef117bda6a52315be9a5">UniformCart2Contra</a>. File mode reuses <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>; when its field selector is <code>Ucat</code>, <a class="el" href="setup_8h.html#ad029c429cf3e717072a5dbac13fc59da">Cart2Contra</a> converts the loaded vector field to <code>Ucont</code>. After that point, the existing finalization path treats every IC source identically.</p>
 <h1><a class="anchor" id="p33_restart_modes_sec"></a>
-5. Eulerian Restart Branches</h1>
+4. Authority and Restart Branches</h1>
 <p>In <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>:</p>
 <ul>
-<li><code>StartStep == 0</code>:<ul>
-<li><code>eulerian_field_source=solve</code>: fresh initialization path.</li>
-<li><code>eulerian_field_source=load</code>: reads initial fields from restart files.</li>
-<li><code>eulerian_field_source=analytical</code>: uses analytical initializer.</li>
+<li><code>eulerian_field_source=solve</code> and <code>StartStep == 0</code> consumes <code>initial_conditions</code>.</li>
+<li><code>eulerian_field_source=solve</code> and <code>StartStep &gt; 0</code> consumes the restart path.</li>
+<li><code>eulerian_field_source=load</code> consumes the existing load path.</li>
+<li><code>eulerian_field_source=analytical</code> consumes the analytical initializer.</li>
 </ul>
-</li>
-<li><code>StartStep &gt; 0</code>:<ul>
-<li><code>load</code> source reloads restart fields for the requested step.</li>
-<li><code>analytical</code> source regenerates analytical field at current <code>(t, step)</code>.</li>
-</ul>
-</li>
-</ul>
+<p>Thus <code>eulerian_field_source</code> supersedes <code>initial_conditions</code>; the launcher does not materialize a configured file or <code>ic_gen</code> artifact when another source has authority.</p>
 <p>Operational note:</p>
 <ul>
 <li><code>StartStep</code> identifies the saved restart state being loaded, not the first new step to compute.</li>
 <li>If a run completed through step <code>N</code>, restart with <code>start_step: N</code>; the first newly advanced step will be <code>N+1</code>.</li>
 </ul>
 <h1><a class="anchor" id="p33_particle_link_sec"></a>
-6. Particle Initialization Relation</h1>
+5. Particle Initialization Relation</h1>
 <p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> initialization is configured in <code>case.yml -&gt; models.physics.particles</code>, but executed by a separate subsystem.</p>
 <p>For full particle mode and restart details, use:</p>
 <ul>
@@ -231,7 +203,7 @@ U_\zeta = \mathbf{v} \cdot \mathbf{A}_\zeta.
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 </ul>
 <h1><a class="anchor" id="p33_checks_sec"></a>
-7. Practical Checks</h1>
+6. Practical Checks</h1>
 <p>After startup, confirm:</p>
 <ul>
 <li>banner line shows expected field initialization mode,</li>
@@ -243,12 +215,13 @@ U_\zeta = \mathbf{v} \cdot \mathbf{A}_\zeta.
 <li>using <code>Poiseuille</code> in strongly non-rectangular topology and expecting a textbook cylindrical profile,</li>
 <li>supplying a bulk/mean velocity to Poiseuille mode when the current implementation expects <code>Vmax</code>,</li>
 <li>forgetting that initialization sets the interior only; boundary handlers then overwrite face values,</li>
-<li>mixing <code>u/v/w_physical</code> and <code>velocity_physical</code> in the same <code>initial_conditions</code> block,</li>
+<li>providing a PETSc vector whose size does not match the target DM,</li>
+<li>attempting a file-backed IC for a multi-block case in the first implementation,</li>
 <li>omitting <code>flow_direction</code> when the domain is fully periodic (no INLET face),</li>
 <li>comparing <code>u_physical</code> directly to <code>Ucont</code> without accounting for metric-face scaling.</li>
 </ul>
 <h1><a class="anchor" id="p33_refs_sec"></a>
-8. Related Pages</h1>
+7. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>

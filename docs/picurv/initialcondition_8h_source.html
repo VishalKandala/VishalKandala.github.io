@@ -120,17 +120,17 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * @brief Sets the initial values for the INTERIOR of a specified Eulerian field.</span></div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * This function initializes the interior nodes of `Ucont` based on the mode selected</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * by `simCtx-&gt;FieldInitialization` and the coordinate system flag `simCtx-&gt;icCoordinateSystem`.</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * by `simCtx-&gt;initialConditionMode`.</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> * Supported profiles for &quot;Ucont&quot;:</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *  - 0: Zero. All interior contravariant components are set to zero.</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *  - 1 (icCoordinateSystem=0): Cartesian Constant. `Cart2Contra` dots the Cartesian</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> *  - IC_MODE_ZERO: All interior contravariant components are set to zero.</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *  - IC_MODE_CONSTANT_CARTESIAN: `UniformCart2Contra` dots the Cartesian</span></div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> *       vector `(InitialConstantContra.x/y/z)` with the local metric vectors to fill</span></div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> *       all three contravariant components correctly across the entire interior.</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> *  - 1 (icCoordinateSystem=1): Curvilinear/Streamwise Constant. Sets only the</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> *  - IC_MODE_CONSTANT_STREAMWISE: Sets only the</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"> *       contravariant component along the streamwise axis (from `flowDirection` or the</span></div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment"> *       identified INLET face) proportional to `icVelocityPhysical * |A_n|`.</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> *  - 2: Poiseuille. Separable parabolic profile in the two cross-stream index directions;</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> *  - IC_MODE_POISEUILLE: Separable parabolic profile in the two cross-stream index directions;</span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> *       centerline speed is `icVelocityPhysical`; streamwise axis from `flowDirection`</span></div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> *       or the identified INLET face.</span></div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> *</span></div>
@@ -141,34 +141,45 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>PetscErrorCode <a class="code hl_function" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, <span class="keyword">const</span> <span class="keywordtype">char</span> *fieldName);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"></span> </div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> * @brief High-level orchestrator to set the complete initial state of the Eulerian solver.</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> * @brief Populate Ucont for one fresh-start block from the configured IC mode.</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> * This function is called once from main() before the time loop begins. It inspects</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> * the simulation context to determine whether to perform a fresh start (t=0) or</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> * restart from saved files. It then delegates to the appropriate helper function.</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> * Finally, it initializes the solver&#39;s history vectors (Ucont_o, P_o, etc.)</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> * to ensure the first time step has the necessary data.</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> * @param simCtx Simulation context controlling the operation.</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>PetscErrorCode <a class="code hl_function" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#endif </span><span class="comment">// INITIALCONDITION_H</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> * Built-in modes generate Ucont directly. File mode loads either Ucat or Ucont</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> * from the staged IC directory and converts Ucat when necessary.</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> * @param[in,out] user Block context whose velocity field is populated.</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> * @return PETSc error code.</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>PetscErrorCode <a class="code hl_function" href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"></span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> * @brief High-level orchestrator to set the complete initial state of the Eulerian solver.</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> * This function is called once from main() before the time loop begins. It inspects</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> * the simulation context to determine whether to perform a fresh start (t=0) or</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> * restart from saved files. It then delegates to the appropriate helper function.</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> * Finally, it initializes the solver&#39;s history vectors (Ucont_o, P_o, etc.)</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * to ensure the first time step has the necessary data.</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> * @param simCtx Simulation context controlling the operation.</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>PetscErrorCode <a class="code hl_function" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>(<a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#endif </span><span class="comment">// INITIALCONDITION_H</span></div>
 <div class="ttc" id="aAnalyticalSolutions_8h_html"><div class="ttname"><a href="AnalyticalSolutions_8h.html">AnalyticalSolutions.h</a></div></div>
 <div class="ttc" id="aBoundaries_8h_html"><div class="ttname"><a href="Boundaries_8h.html">Boundaries.h</a></div></div>
 <div class="ttc" id="aParticleMotion_8h_html"><div class="ttname"><a href="ParticleMotion_8h.html">ParticleMotion.h</a></div><div class="ttdoc">Header file for Particle Motion and migration related functions.</div></div>
 <div class="ttc" id="aParticleSwarm_8h_html"><div class="ttname"><a href="ParticleSwarm_8h.html">ParticleSwarm.h</a></div><div class="ttdoc">Header file for Particle Swarm management functions.</div></div>
 <div class="ttc" id="agrid_8h_html"><div class="ttname"><a href="grid_8h.html">grid.h</a></div><div class="ttdoc">Public interface for grid, solver, and metric setup routines.</div></div>
 <div class="ttc" id="ainitialcondition_8h_html_a62dfa993750dc34d1729c575bb1dde66"><div class="ttname"><a href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></div><div class="ttdeci">PetscErrorCode SetInitialInteriorField(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Sets the initial values for the INTERIOR of a specified Eulerian field.</div><div class="ttdef"><b>Definition</b> <a href="initialcondition_8c_source.html#l00014">initialcondition.c:14</a></div></div>
-<div class="ttc" id="ainitialcondition_8h_html_ad0dd7d3f2528b6a7802fcd551e88ea99"><div class="ttname"><a href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a></div><div class="ttdeci">PetscErrorCode InitializeEulerianState(SimCtx *simCtx)</div><div class="ttdoc">High-level orchestrator to set the complete initial state of the Eulerian solver.</div><div class="ttdef"><b>Definition</b> <a href="initialcondition_8c_source.html#l00302">initialcondition.c:302</a></div></div>
+<div class="ttc" id="ainitialcondition_8h_html_ad0dd7d3f2528b6a7802fcd551e88ea99"><div class="ttname"><a href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a></div><div class="ttdeci">PetscErrorCode InitializeEulerianState(SimCtx *simCtx)</div><div class="ttdoc">High-level orchestrator to set the complete initial state of the Eulerian solver.</div><div class="ttdef"><b>Definition</b> <a href="initialcondition_8c_source.html#l00352">initialcondition.c:352</a></div></div>
+<div class="ttc" id="ainitialcondition_8h_html_ad6fa2492674655c0d12108914f1cce7f"><div class="ttname"><a href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a></div><div class="ttdeci">PetscErrorCode PopulateInitialUcont(UserCtx *user)</div><div class="ttdoc">Populate Ucont for one fresh-start block from the configured IC mode.</div><div class="ttdef"><b>Definition</b> <a href="initialcondition_8c_source.html#l00215">initialcondition.c:215</a></div></div>
 <div class="ttc" id="ainterpolation_8h_html"><div class="ttname"><a href="interpolation_8h.html">interpolation.h</a></div></div>
 <div class="ttc" id="aio_8h_html"><div class="ttname"><a href="io_8h.html">io.h</a></div><div class="ttdoc">Public interface for data input/output routines.</div></div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Logging utilities and macros for PETSc-based applications.</div></div>
 <div class="ttc" id="arunloop_8h_html"><div class="ttname"><a href="runloop_8h.html">runloop.h</a></div></div>
 <div class="ttc" id="avariables_8h_html"><div class="ttname"><a href="variables_8h.html">variables.h</a></div><div class="ttdoc">Main header file for a complex fluid dynamics solver.</div></div>
-<div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00668">variables.h:668</a></div></div>
-<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00854">variables.h:854</a></div></div>
+<div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00683">variables.h:683</a></div></div>
+<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00870">variables.h:870</a></div></div>
 <div class="ttc" id="awalkingsearch_8h_html"><div class="ttname"><a href="walkingsearch_8h.html">walkingsearch.h</a></div><div class="ttdoc">Header file for particle location functions using the walking search algorithm.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

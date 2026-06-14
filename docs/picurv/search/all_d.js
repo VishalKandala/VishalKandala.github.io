@@ -106,7 +106,7 @@ var searchData=
   ['boundaryvelocitycorrection_103',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
   ['boundingbox_104',['boundingbox',['../variables_8h.html#structBoundingBox',1,'BoundingBox'],['../variables_8h.html#a87a49c783469e6e8b255a3214f17a832',1,'BoundingBox:&#160;variables.h']]],
   ['bp_105',['BP',['../poisson_8c.html#a82b271e081de4cfb35eb87b0c13dddba',1,'poisson.c']]],
-  ['branches_106',['branches',['../46_C_Runtime_Execution_Map.html#p46_init_branches_sec',1,'4. Initialization Branches'],['../33_Initial_Conditions.html#p33_restart_modes_sec',1,'5. Eulerian Restart Branches']]],
+  ['branches_106',['branches',['../33_Initial_Conditions.html#p33_restart_modes_sec',1,'4. Authority and Restart Branches'],['../46_C_Runtime_Execution_Map.html#p46_init_branches_sec',1,'4. Initialization Branches']]],
   ['broadcastallboundingboxes_107',['broadcastallboundingboxes',['../grid_8h.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c'],['../grid_8c.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c']]],
   ['brownianmotionrng_108',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
   ['bs_109',['BS',['../poisson_8c.html#a580a88f98668df1ac5e1683cae31c0b3',1,'poisson.c']]],
