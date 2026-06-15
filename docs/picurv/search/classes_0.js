@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['anatomycapturectx_0',['AnatomyCaptureCtx',['../test__logging_8c.html#structAnatomyCaptureCtx',1,'']]],
-  ['auditfinding_1',['AuditFinding',['../classaudit__function__docs_1_1AuditFinding.html',1,'audit_function_docs']]]
+  ['_5flazynumpyproxy_0',['_LazyNumpyProxy',['../classpicurv__cli_1_1core_1_1__LazyNumpyProxy.html',1,'picurv_cli::core']]]
 ];

@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['cell_0',['Cell',['../variables_8h.html#structCell',1,'']]],
-  ['cmpnts_1',['Cmpnts',['../variables_8h.html#structCmpnts',1,'']]],
-  ['cmpnts2_2',['Cmpnts2',['../variables_8h.html#structCmpnts2',1,'']]],
-  ['cpt2d_3',['Cpt2D',['../variables_8h.html#structCpt2D',1,'']]],
-  ['cstart_4',['Cstart',['../variables_8h.html#structCstart',1,'']]]
+  ['bc_5fparam_5fs_0',['BC_Param_s',['../variables_8h.html#structBC__Param__s',1,'']]],
+  ['bccontext_1',['BCContext',['../variables_8h.html#structBCContext',1,'']]],
+  ['bcs_2',['BCS',['../variables_8h.html#structBCS',1,'']]],
+  ['boundarycondition_3',['BoundaryCondition',['../structBoundaryCondition.html',1,'']]],
+  ['boundaryfaceconfig_4',['BoundaryFaceConfig',['../variables_8h.html#structBoundaryFaceConfig',1,'']]],
+  ['boundingbox_5',['BoundingBox',['../variables_8h.html#structBoundingBox',1,'']]]
 ];

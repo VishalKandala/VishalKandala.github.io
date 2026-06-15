@@ -118,27 +118,27 @@ $(function() {
 <div class="fragment"><div class="line">export PETSC_DIR=/path/to/petsc</div>
 <div class="line"># Set PETSC_ARCH only for old-style in-tree PETSc builds:</div>
 <div class="line"># export PETSC_ARCH=arch-linux-c-debug</div>
-<div class="line">./scripts/bootstrap_install.sh --install-shell-hook</div>
+<div class="line">./bootstrap_install.sh --install-shell-hook</div>
 </div><!-- fragment --><p>If PETSc is not installed yet, let the script build it:</p>
-<div class="fragment"><div class="line">./scripts/bootstrap_install.sh --install-petsc</div>
+<div class="fragment"><div class="line">./bootstrap_install.sh --install-petsc</div>
 </div><!-- fragment --><p>The script installs system and Python dependencies, verifies PETSc/DMSwarm visibility, then builds:</p>
 <ul>
 <li><code>bin/simulator</code> (compiled C solver)</li>
 <li><code>bin/postprocessor</code> (compiled C post-processor)</li>
-<li><code>bin/picurv</code> (launcher for <code>scripts/picurv</code>, the Python conductor)</li>
+<li><code>bin/picurv</code> (launcher for <code>picurv_cli/picurv</code>, the Python conductor entrypoint)</li>
 </ul>
 <p>By default, bootstrap creates <code>.picurv-venv/</code> under the repo and installs the Python-side CLI dependencies there. PETSc, MPI, compilers, and scheduler tools remain provided by your loaded system or cluster modules. Bootstrap also writes <code>.picurv-python-env</code>, which records the seed Python runtime library path needed to launch the managed venv after you switch to a different module stack.</p>
 <p>On an existing HPC cluster where modules already provide compilers, MPI, and PETSc, skip OS package installation:</p>
 <div class="fragment"><div class="line">module load &lt;compiler-mpi-petsc-stack&gt;</div>
-<div class="line">./scripts/bootstrap_install.sh --skip-system-deps --install-shell-hook</div>
+<div class="line">./bootstrap_install.sh --skip-system-deps --install-shell-hook</div>
 <div class="line">source ~/.bashrc</div>
 <div class="line">picurv --help</div>
 </div><!-- fragment --><p>Useful variants:</p>
-<div class="fragment"><div class="line">./scripts/bootstrap_install.sh --venv-dir /path/to/picurv-venv</div>
-<div class="line">./scripts/bootstrap_install.sh --python-bin /path/to/python3.11</div>
-<div class="line">./scripts/bootstrap_install.sh --upgrade-pip</div>
-<div class="line">./scripts/bootstrap_install.sh --install-shell-hook</div>
-<div class="line">./scripts/bootstrap_install.sh --no-venv</div>
+<div class="fragment"><div class="line">./bootstrap_install.sh --venv-dir /path/to/picurv-venv</div>
+<div class="line">./bootstrap_install.sh --python-bin /path/to/python3.11</div>
+<div class="line">./bootstrap_install.sh --upgrade-pip</div>
+<div class="line">./bootstrap_install.sh --install-shell-hook</div>
+<div class="line">./bootstrap_install.sh --no-venv</div>
 </div><!-- fragment --><p>Use <code>--no-venv</code> when your site requires Python packages to come from modules or a centrally managed environment. If the only visible interpreter is Python 3.6, load a newer Python module before the default bootstrap path; otherwise use <code>--no-venv</code> and site-approved package versions.</p>
 <p>Bootstrap does not upgrade pip during a normal install. This keeps routine updates smaller and avoids unnecessary package churn on quota-constrained cluster home directories. Pass <code>--upgrade-pip</code> when an explicit upgrade is needed.</p>
 <h1><a class="anchor" id="p01_install_tools_sec"></a>
@@ -187,7 +187,7 @@ $(function() {
 <div class="line"># PETSC_ARCH is optional for prefix installs from EasyBuild/Spack/system packages.</div>
 <div class="line"># export PETSC_ARCH=arch-linux-c-debug</div>
 <div class="line">source /path/to/PICurv/etc/picurv.sh</div>
-</div><!-- fragment --><p>The <code>etc/picurv.sh</code> script sets <code>PICURV_DIR</code>, exports <code>PICURV_PYTHON</code> when a managed venv or bootstrap-selected Python is available, adds <code>bin/</code> to your <code>PATH</code> for compiled executables, and also exposes <code>scripts/</code> as a fallback so <code>picurv</code> still resolves if <code>bin/picurv</code> is temporarily absent before a rebuild. It is idempotent and safe to source multiple times.</p>
+</div><!-- fragment --><p>The <code>etc/picurv.sh</code> script sets <code>PICURV_DIR</code>, exports <code>PICURV_PYTHON</code> when a managed venv or bootstrap-selected Python is available, adds <code>bin/</code> to your <code>PATH</code> for compiled executables, and also exposes <code>picurv_cli/</code> as a fallback so <code>picurv</code> still resolves if <code>bin/picurv</code> is temporarily absent before a rebuild. It is idempotent and safe to source multiple times.</p>
 <p>If you want bootstrap to add this setup to <code>~/.bashrc</code>, pass <code>--install-shell-hook</code>. The hook is written as a managed block, so rerunning the installer updates it instead of appending duplicate source lines. Use <code>--shell-rc &lt;path&gt;</code> to target another shell startup file.</p>
 <p>Reload and verify:</p>
 <div class="fragment"><div class="line">source ~/.bashrc</div>
@@ -203,18 +203,18 @@ $(function() {
 <div class="line">cd PICurv</div>
 </div><!-- fragment --><h1><a class="anchor" id="p01_build_sec"></a>
 7. Build with picurv</h1>
-<div class="fragment"><div class="line">./scripts/picurv build</div>
+<div class="fragment"><div class="line">./picurv_cli/picurv build</div>
 </div><!-- fragment --><p>Expected binaries:</p>
 <ul>
 <li><code>bin/simulator</code> (compiled C solver)</li>
 <li><code>bin/postprocessor</code> (compiled C post-processor)</li>
-<li><code>bin/picurv</code> (launcher → <code>scripts/picurv</code>)</li>
+<li><code>bin/picurv</code> (launcher → <code>picurv_cli/picurv</code>)</li>
 </ul>
 <p>Useful variants:</p>
-<div class="fragment"><div class="line">./scripts/picurv build clean-project</div>
-<div class="line">./scripts/picurv build SYSTEM=cluster</div>
+<div class="fragment"><div class="line">./picurv_cli/picurv build clean-project</div>
+<div class="line">./picurv_cli/picurv build SYSTEM=cluster</div>
 <div class="line">make audit-build</div>
-</div><!-- fragment --><p>After <code>source etc/picurv.sh</code>, use <code>picurv</code> directly from any directory. <code>./scripts/picurv build</code> writes <code>logs/build.log</code> in the source repo. If you are auditing compiler warnings from a direct Make invocation, use <code>make audit-build</code> to generate both <code>logs/build.log</code> and <code>logs/build.warnings.log</code>.</p>
+</div><!-- fragment --><p>After <code>source etc/picurv.sh</code>, use <code>picurv</code> directly from any directory. <code>./picurv_cli/picurv build</code> writes <code>logs/build.log</code> in the source repo. If you are auditing compiler warnings from a direct Make invocation, use <code>make audit-build</code> to generate both <code>logs/build.log</code> and <code>logs/build.warnings.log</code>.</p>
 <h1><a class="anchor" id="p01_verify_sec"></a>
 8. Verify Installation</h1>
 <div class="fragment"><div class="line">make doctor</div>

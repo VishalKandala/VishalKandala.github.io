@@ -102,7 +102,7 @@ $(function() {
 1. Where Initialization Happens</h1>
 <p>Startup sequence:</p>
 <ol type="1">
-<li><code>scripts/picurv</code> resolves built-in, file, or external-generator YAML.</li>
+<li><code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code> resolves built-in, file, or external-generator YAML.</li>
 <li>File-backed ICs are staged in the filename layout expected by <a class="el" href="io_8h.html#a570806d7e0694b5d996e0c6018b48908">ReadFieldData</a>.</li>
 <li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a> chooses fresh solve, restart load, or analytical initialization.</li>
 <li>On a fresh solve, <a class="el" href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a> populates <code>Ucont</code>; existing finalization then applies boundary values and derives the remaining velocity state.</li>
@@ -110,7 +110,7 @@ $(function() {
 </ol>
 <h1><a class="anchor" id="p33_euler_sec"></a>
 2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</h1>
-<p>The canonical contract has two modes: <code>generated</code> and <code>file</code>. Generated ICs may use a built-in C generator or the repository <code>scripts/ic.gen</code> utility. Both produce the same solver-facing result: one initial velocity field.</p>
+<p>The canonical contract has two modes: <code>generated</code> and <code>file</code>. Generated ICs may use a built-in C generator or the repository <code>generators/ic.gen</code> utility. Both produce the same solver-facing result: one initial velocity field.</p>
 <p>Built-in zero:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
@@ -155,10 +155,10 @@ $(function() {
 <div class="line">    generator: ic_gen</div>
 <div class="line">    params:</div>
 <div class="line">      field: Ucat</div>
-<div class="line">      script: tools/custom_ic.py  # optional; defaults to scripts/ic.gen</div>
+<div class="line">      script: tools/custom_ic.py  # optional; defaults to generators/ic.gen</div>
 <div class="line">      config_file: config/initial_conditions/expression.cfg</div>
 <div class="line">      output_file: config/initial_condition.generated.dat</div>
-</div><!-- fragment --><p>The launcher invokes <code>scripts/ic.gen</code> by default, or the optional case-relative/absolute <code>params.script</code> override, as:</p>
+</div><!-- fragment --><p>The launcher invokes <code>generators/ic.gen</code> by default, or the optional case-relative/absolute <code>params.script</code> override, as:</p>
 <div class="fragment"><div class="line">python &lt;ic-generator&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; --grid &lt;grid.run&gt; [cli_args...]</div>
 </div><!-- fragment --><p><code>picurv run --solve</code> materializes the result after grid preparation. <code>picurv precompute --case ...</code> materializes and stages the same artifact without running the solver.</p>
 <p>The repository <code>ic.gen</code> accepts an INI <code>[expression]</code> section. <code>Ucat</code> configs define <code>u</code>, <code>v</code>, and <code>w</code>, evaluated at actual cell centers with extrapolated dummy-cell centers. <code>Ucont</code> configs define <code>u_xi</code>, <code>u_eta</code>, and <code>u_zeta</code>, evaluated at their corresponding geometric face centers. Expressions may use <code>x/y/z</code>, normalized logical <code>xi/eta/zeta</code>, storage <code>i/j/k</code>, <code>pi</code>, and the documented numerical functions. The first implementation supports one block. The repository generator requires a staged PICGRID, so normal use selects <code>grid.mode: file</code> or <code>grid.mode: grid_gen</code>. A custom <code>params.script</code> may define its own behavior for <code>programmatic_c</code>.</p>

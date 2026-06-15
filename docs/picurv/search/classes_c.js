@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['userctx_0',['UserCtx',['../variables_8h.html#structUserCtx',1,'']]],
-  ['usermg_1',['UserMG',['../variables_8h.html#structUserMG',1,'']]]
+  ['scalingctx_0',['ScalingCtx',['../variables_8h.html#structScalingCtx',1,'']]],
+  ['searchmetricsstate_1',['SearchMetricsState',['../variables_8h.html#structSearchMetricsState',1,'']]],
+  ['simctx_2',['SimCtx',['../variables_8h.html#structSimCtx',1,'']]],
+  ['solutionconvergencedeterministicpass1_3',['SolutionConvergenceDeterministicPass1',['../logging_8c.html#structSolutionConvergenceDeterministicPass1',1,'']]],
+  ['solutionconvergencedeterministicpass2_4',['SolutionConvergenceDeterministicPass2',['../logging_8c.html#structSolutionConvergenceDeterministicPass2',1,'']]],
+  ['surfelmtinfo_5',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
 ];

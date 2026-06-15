@@ -1,5 +1,19 @@
 var searchData=
 [
-  ['_5fio_5fcontext_5fbuffer_0',['_io_context_buffer',['../variables_8h.html#ad2213f62ec653adf0020fd4a2f3de324',1,'SimCtx']]],
-  ['_5fthis_1',['_this',['../variables_8h.html#a4f7c5fd8843d026101b193e9236e1192',1,'UserCtx']]]
+  ['_5fbool_5fbc_5fparams_0',['_BOOL_BC_PARAMS',['../namespacepicurv__cli_1_1core.html#a10cbe56435d7fed993aa6098ec8d08fb',1,'picurv_cli::core']]],
+  ['_5fcase_5fschema_1',['_CASE_SCHEMA',['../namespacepicurv__cli_1_1core.html#ad5eef3ab589eef67debf0f15643678d9',1,'picurv_cli::core']]],
+  ['_5fcluster_5fschema_2',['_CLUSTER_SCHEMA',['../namespacepicurv__cli_1_1core.html#ac6f326fe5730b82df257ad626c165a48',1,'picurv_cli::core']]],
+  ['_5fconfig_5fsummary_5fwidth_3',['_CONFIG_SUMMARY_WIDTH',['../namespacepicurv__cli_1_1core.html#aae2fb9a4daf25da0ac9eb976a49cdd84',1,'picurv_cli::core']]],
+  ['_5ferror_5fhints_4',['_ERROR_HINTS',['../namespacepicurv__cli_1_1core.html#aa68647bc971d9fb4b02d7a0e556e2c89',1,'picurv_cli::core']]],
+  ['_5fio_5fcontext_5fbuffer_5',['_io_context_buffer',['../variables_8h.html#ad2213f62ec653adf0020fd4a2f3de324',1,'SimCtx']]],
+  ['_5fmatplotlib_5fpyplot_6',['_MATPLOTLIB_PYPLOT',['../namespacepicurv__cli_1_1core.html#acf51fd31730b7415ce611ab2b5008547',1,'picurv_cli::core']]],
+  ['_5fmonitor_5fschema_7',['_MONITOR_SCHEMA',['../namespacepicurv__cli_1_1core.html#a95e65f9cbda06fbf53a800eaff4a1426',1,'picurv_cli::core']]],
+  ['_5fnumeric_5fbc_5fparams_8',['_NUMERIC_BC_PARAMS',['../namespacepicurv__cli_1_1core.html#a7fc92fc5976a91558d69001408bcecbe',1,'picurv_cli::core']]],
+  ['_5fnumpy_5fmodule_9',['_NUMPY_MODULE',['../namespacepicurv__cli_1_1core.html#acac801137d07e9bc6338bb100f66abe6',1,'picurv_cli::core']]],
+  ['_5fpost_5fschema_10',['_POST_SCHEMA',['../namespacepicurv__cli_1_1core.html#a6dfd8e9b28cce5a00ed419ffd105efbb',1,'picurv_cli::core']]],
+  ['_5fsolver_5fschema_11',['_SOLVER_SCHEMA',['../namespacepicurv__cli_1_1core.html#a35a1a048f5a297817486206a3ec94edf',1,'picurv_cli::core']]],
+  ['_5fstudy_5fschema_12',['_STUDY_SCHEMA',['../namespacepicurv__cli_1_1core.html#ac914f8b6277e42ddccaf5fe3cdd3d926',1,'picurv_cli::core']]],
+  ['_5fsummary_5fnumeric_5fre_13',['_SUMMARY_NUMERIC_RE',['../namespacepicurv__cli_1_1core.html#a0aaaa5babe4ce31563e29377cd958e69',1,'picurv_cli::core']]],
+  ['_5fsummary_5fplot_5flog_5fscale_5ffields_14',['_SUMMARY_PLOT_LOG_SCALE_FIELDS',['../namespacepicurv__cli_1_1core.html#ac874a9d5400964c7c3b919e89a5f379d',1,'picurv_cli::core']]],
+  ['_5fthis_15',['_this',['../variables_8h.html#a4f7c5fd8843d026101b193e9236e1192',1,'UserCtx']]]
 ];

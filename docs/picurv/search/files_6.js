@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['analyticalsolutions_2ec_0',['AnalyticalSolutions.c',['../AnalyticalSolutions_8c.html',1,'']]],
-  ['analyticalsolutions_2eh_1',['AnalyticalSolutions.h',['../AnalyticalSolutions_8h.html',1,'']]],
-  ['audit_5ffunction_5fdocs_2epy_2',['audit_function_docs.py',['../audit__function__docs_8py.html',1,'']]],
-  ['audit_5fingress_2epy_3',['audit_ingress.py',['../audit__ingress_8py.html',1,'']]]
+  ['_5f_5finit_5f_5f_2epy_0',['__init__.py',['../____init_____8py.html',1,'']]]
 ];

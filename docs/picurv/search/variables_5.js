@@ -4,9 +4,18 @@ var searchData=
   ['elmtinfo_1',['elmtinfo',['../variables_8h.html#a4d5e8775b899743430a99dbc2a4f6bfc',1,'FSInfo']]],
   ['enabled_2',['enabled',['../variables_8h.html#a9b83197d0d2181197d58408a03dd84e6',1,'VerificationDiffusivityConfig::enabled'],['../variables_8h.html#a70c1cad588f331e1cf1e52a0602ea42b',1,'VerificationScalarConfig::enabled']]],
   ['endtime_3',['endTime',['../variables_8h.html#a76d29089d00d89348f32bbf0e2981497',1,'PostProcessParams']]],
-  ['eta_4',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
-  ['euler_5fsubdir_5',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
-  ['eulerianext_6',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
-  ['euleriansource_7',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
-  ['exec_5fmode_8',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
+  ['error_5fcode_5fcfg_5ffile_5fnot_5ffound_4',['ERROR_CODE_CFG_FILE_NOT_FOUND',['../namespacepicurv__cli_1_1core.html#ae616d9fe9248d17ec177589731074b85',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5fgrid_5fparse_5',['ERROR_CODE_CFG_GRID_PARSE',['../namespacepicurv__cli_1_1core.html#a2ec6d47eb89ab7748e4d37da8d6f2d03',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5finconsistent_5fcombo_6',['ERROR_CODE_CFG_INCONSISTENT_COMBO',['../namespacepicurv__cli_1_1core.html#a89da594338b0d433dbcfbbf94d2d78ea',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5finvalid_5ftype_7',['ERROR_CODE_CFG_INVALID_TYPE',['../namespacepicurv__cli_1_1core.html#af4372e4348a5e397c2f75d063f30365e',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5finvalid_5fvalue_8',['ERROR_CODE_CFG_INVALID_VALUE',['../namespacepicurv__cli_1_1core.html#ab8f13b2b3412ed2615b0da18eddcc71e',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5fmissing_5fkey_9',['ERROR_CODE_CFG_MISSING_KEY',['../namespacepicurv__cli_1_1core.html#a65e360cd4403909ce922bb9a733de666',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcfg_5fmissing_5fsection_10',['ERROR_CODE_CFG_MISSING_SECTION',['../namespacepicurv__cli_1_1core.html#af840430f7958eec0ccb1bd94b28ed12c',1,'picurv_cli::core']]],
+  ['error_5fcode_5fcli_5fusage_5finvalid_11',['ERROR_CODE_CLI_USAGE_INVALID',['../namespacepicurv__cli_1_1core.html#ac9845d87583d4a78d71e939b29534183',1,'picurv_cli::core']]],
+  ['error_5fcode_5fdependency_5fmissing_12',['ERROR_CODE_DEPENDENCY_MISSING',['../namespacepicurv__cli_1_1core.html#aea22d4a91aaa5d9bde54321a1c18e7da',1,'picurv_cli::core']]],
+  ['eta_13',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
+  ['euler_5fsubdir_14',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
+  ['eulerianext_15',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
+  ['euleriansource_16',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
+  ['exec_5fmode_17',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
 ];

@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['mainpage_2emd_0',['mainpage.md',['../mainpage_8md.html',1,'']]],
-  ['metric_2ec_1',['Metric.c',['../Metric_8c.html',1,'']]],
-  ['metric_2eh_2',['Metric.h',['../Metric_8h.html',1,'']]],
-  ['momentumsolvers_2ec_3',['momentumsolvers.c',['../momentumsolvers_8c.html',1,'']]],
-  ['momentumsolvers_2eh_4',['momentumsolvers.h',['../momentumsolvers_8h.html',1,'']]]
+  ['les_2ec_0',['les.c',['../les_8c.html',1,'']]],
+  ['les_2eh_1',['les.h',['../les_8h.html',1,'']]],
+  ['logging_2ec_2',['logging.c',['../logging_8c.html',1,'']]],
+  ['logging_2eh_3',['logging.h',['../logging_8h.html',1,'']]]
 ];

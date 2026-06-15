@@ -113,7 +113,7 @@ $(function() {
 <h1><a class="anchor" id="p05_usage_sec"></a>
 1. General Usage</h1>
 <div class="fragment"><div class="line">picurv [COMMAND] [ARGS...]</div>
-</div><!-- fragment --><p>After <code>make all</code>, <code>bin/picurv</code> is a launcher for <code>scripts/picurv</code> (the single source of truth). The launcher uses <code>.picurv-venv/bin/python</code> when bootstrap created a managed environment, then a bootstrap-recorded or user-provided <code>PICURV_PYTHON</code>, and finally <code>python3</code>. Source <code>etc/picurv.sh</code> to add <code>bin/</code> to your PATH and expose <code>scripts/</code> as a fallback so <code>picurv</code> works from any directory even if <code>bin/picurv</code> is temporarily absent before <code>make conductor</code> recreates the launcher. If <code>bin/picurv</code> does not exist yet, run <code>./scripts/picurv build</code> or <code>make conductor</code>.</p>
+</div><!-- fragment --><p>After <code>make all</code>, <code>bin/picurv</code> is a launcher for the stable <code>picurv_cli/picurv</code> source-tree entrypoint. The implementation lives in <code>picurv_cli/</code>. The launcher uses <code>.picurv-venv/bin/python</code> when bootstrap created a managed environment, then a bootstrap-recorded or user-provided <code>PICURV_PYTHON</code>, and finally <code>python3</code>. Source <code>etc/picurv.sh</code> to add <code>bin/</code> to your PATH and expose <code>picurv_cli/</code> as a fallback so <code>picurv</code> works from any directory even if <code>bin/picurv</code> is temporarily absent before <code>make conductor</code> recreates the launcher. If <code>bin/picurv</code> does not exist yet, run <code>./picurv_cli/picurv build</code> or <code>make conductor</code>.</p>
 <p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
@@ -138,7 +138,7 @@ $(function() {
 </ul>
 <p>Help: </p><div class="fragment"><div class="line">./bin/picurv --help</div>
 <div class="line">./bin/picurv init --help</div>
-<div class="line">./scripts/picurv build --help</div>
+<div class="line">./picurv_cli/picurv build --help</div>
 <div class="line">./bin/picurv sync-binaries --help</div>
 <div class="line">./bin/picurv sync-config --help</div>
 <div class="line">./bin/picurv pull-source --help</div>
@@ -175,7 +175,7 @@ $(function() {
 <div class="line">picurv init bent_channel --dest my_bent_case --pin-binaries</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_build_sec"></a>
 3. build: Build Project Executables</h1>
-<div class="fragment"><div class="line">./scripts/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
+<div class="fragment"><div class="line">./picurv_cli/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>calls the top-level <code>Makefile</code> via <code>make</code>,</li>
@@ -194,10 +194,10 @@ $(function() {
 <li><code>logs/build.warnings.log</code></li>
 </ul>
 <p>Examples:</p>
-<div class="fragment"><div class="line">./scripts/picurv build</div>
-<div class="line">./scripts/picurv build clean-project</div>
-<div class="line">./scripts/picurv build SYSTEM=cluster</div>
-<div class="line">./scripts/picurv build postprocessor</div>
+<div class="fragment"><div class="line">./picurv_cli/picurv build</div>
+<div class="line">./picurv_cli/picurv build clean-project</div>
+<div class="line">./picurv_cli/picurv build SYSTEM=cluster</div>
+<div class="line">./picurv_cli/picurv build postprocessor</div>
 <div class="line">./my_case/picurv build clean-project</div>
 <div class="line">make audit-build</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_sync_sec"></a>
@@ -326,7 +326,7 @@ $(function() {
 <li>timestep selectors read existing runtime artifacts and still require summary-capable logs,</li>
 <li>plain <code>summarize --run-dir ...</code> preserves the implicit latest-step health behavior,</li>
 <li><code>--list-plot-series</code> discovers numeric scalar histories available to <code>--plot</code>,</li>
-<li><code>--plot &lt;qualified-series&gt;</code> delegates time-history rendering to <code>scripts/plot.gen</code>,</li>
+<li><code>--plot &lt;qualified-series&gt;</code> delegates time-history rendering to <code>generators/plot.gen</code>,</li>
 <li>plotting requires <code>matplotlib</code>, which bootstrap installs in the managed PICurv environment by default,</li>
 <li>continued runs write <code># Continuation from step &lt;N&gt;</code> separators into append-only logs,</li>
 <li>plots use the latest continuation segment by default; <code>--last &lt;n&gt;</code> keeps its last N chronological records per line,</li>
@@ -346,10 +346,10 @@ $(function() {
 <div class="line">./bin/picurv summarize --run-dir runs/my_case_20260310-120000 --latest --format json</div>
 </div><!-- fragment --><p>Configuration summaries include configured values plus useful normalized and derived values such as Reynolds number, nondimensional timestep, normalized solver selections, effective monitoring cadence, and enabled diagnostics. Text output uses glanceable dashboards with aligned field groups and compact tables; use <code>--format json</code> for structured automation output.</p>
 <p>Plotting supports numeric scalar histories from continuity, particle metrics, momentum, Poisson, profiling, runtime memory, and solution-convergence logs. Block-based histories render one line per block and profiling histories render one line per function. Residual/norm series use logarithmic scaling when all values are positive; <code>--linear-y</code> forces linear scaling. Plot mode is standalone and does not combine with overview/config/selected-step selectors.</p>
-<p><code>scripts/plot.gen</code> is the standalone rendering layer. It accepts the versioned, normalized JSON request produced by <code>picurv</code> through stdin, and can also render a saved request directly:</p>
-<div class="fragment"><div class="line">python3 scripts/plot.gen --input request.json</div>
-<div class="line">cat request.json | python3 scripts/plot.gen --input -</div>
-<div class="line">python3 scripts/plot.gen --input request.json --output history.png</div>
+<p><code>generators/plot.gen</code> is the standalone rendering layer. It accepts the versioned, normalized JSON request produced by <code>picurv</code> through stdin, and can also render a saved request directly:</p>
+<div class="fragment"><div class="line">python3 generators/plot.gen --input request.json</div>
+<div class="line">cat request.json | python3 generators/plot.gen --input -</div>
+<div class="line">python3 generators/plot.gen --input request.json --output history.png</div>
 </div><!-- fragment --><p>The normalized request contains plot labels, scale selection, window metadata, and ordered labeled lines of numeric <code>[timestep, value]</code> points. <code>plot.gen</code> does not parse PICurv run directories or logs.</p>
 <p>Typical sources:</p>
 <ul>
@@ -393,9 +393,9 @@ $(function() {
 </div><!-- fragment --><p><code>precompute</code> materializes deterministic case artifacts without launching the solver. It uses the same <code>case.yml</code> generator settings as <code>run --solve</code>:</p>
 <ul>
 <li><code>grid.mode: grid_gen</code> writes the configured dimensional <code>PICGRID</code>; file and generated grids are also validated and staged as nondimensional <code>config/grid.run</code>,</li>
-<li><code>prescribed_flow.source.type: generated</code> delegates dimensional <code>.picslice</code> profile generation to <code>scripts/profile.gen</code> or optional <code>source.script</code> and writes <code>profile.info</code>,</li>
+<li><code>prescribed_flow.source.type: generated</code> delegates dimensional <code>.picslice</code> profile generation to <code>generators/profile.gen</code> or optional <code>source.script</code> and writes <code>profile.info</code>,</li>
 <li><code>prescribed_flow.source.type: field_slice</code> extracts a dimensional <code>.picslice</code> from an old Cartesian <code>ufield*.dat</code> plus its old <code>PICGRID</code>,</li>
-<li><code>initial_conditions.generator: ic_gen</code> runs <code>scripts/ic.gen</code> or optional <code>params.script</code> and stages its PETSc vector output after the run grid is available,</li>
+<li><code>initial_conditions.generator: ic_gen</code> runs <code>generators/ic.gen</code> or optional <code>params.script</code> and stages its PETSc vector output after the run grid is available,</li>
 <li><code>config/precompute.manifest.json</code> records generated paths, profile stats, and IC staging.</li>
 </ul>
 <p>The output layout mirrors <code>runs/&lt;run_id&gt;/config/</code> so inspected artifacts can be reused later with file-backed grid, profile, and initial-condition modes.</p>
@@ -494,7 +494,7 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="p05_command_matrix_sec"></a>
 8. Full Command and Option Matrix</h1>
-<p>This section is intentionally exhaustive and mirrors the current <code>argparse</code> contract in <code>scripts/picurv</code>. Use it as the authoritative option reference when writing docs, examples, wrappers, or CI jobs.</p>
+<p>This section is intentionally exhaustive and mirrors the current <code>argparse</code> contract in <code><a class="el" href="cli_8py.html">picurv_cli/cli.py</a></code>. Use it as the authoritative option reference when writing docs, examples, wrappers, or CI jobs.</p>
 <p><code>run</code>:</p><ul>
 <li>stages:<ul>
 <li><code>--solve</code> (requires <code>--case</code>, <code>--solver</code>, <code>--monitor</code>)</li>
@@ -697,7 +697,7 @@ $(function() {
 <li><code>post_num_procs_effective</code></li>
 <li><code>num_procs_effective</code> (currently mirrors solver count)</li>
 </ul>
-<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>scripts/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
+<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>generators/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
 <p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>
 <ul>
 <li><code>mode</code> (<code>local</code> or <code>slurm</code>)</li>
@@ -767,9 +767,9 @@ $(function() {
 <li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code> or <code>sync-binaries</code>), it is used first.</li>
 <li><b>Project <code>bin/</code> directory</b> — the default location after <code>make all</code>.</li>
 </ol>
-<p><code>bin/picurv</code> is a launcher for <code>scripts/picurv</code>. This means:</p>
+<p><code>bin/picurv</code> is a launcher for <code>picurv_cli/picurv</code>. This means:</p>
 <ul>
-<li>there is exactly one source file (<code>scripts/picurv</code>), so code changes never drift,</li>
+<li>there is one stable executable entrypoint backed by the <code>picurv_cli/</code> package,</li>
 <li><code>make conductor</code> recreates the launcher (idempotent),</li>
 <li>bootstrap-managed installs run with the repo-local <code>.picurv-venv</code> Python,</li>
 <li><code>etc/picurv.sh</code> adds <code>bin/</code> to PATH so <code>picurv</code> works from any directory.</li>
@@ -813,7 +813,7 @@ $(function() {
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
 <li>Extensibility: <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
 <li>First-run path: <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b></li>
-<li>Grid generator details: <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: scripts/grid.gen</a></b></li>
+<li>Grid generator details: <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b></li>
 <li>Modular examples and recipes: <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li>Troubleshooting map: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 <li>Smoke/CI verification details: <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
