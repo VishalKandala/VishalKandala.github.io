@@ -123,10 +123,12 @@ $(function() {
 <li><code>-pseudo_cfl</code>, <code>-min_pseudo_cfl</code>, <code>-max_pseudo_cfl</code></li>
 <li><code>-pseudo_cfl_growth_factor</code>, <code>-pseudo_cfl_reduction_factor</code></li>
 <li><code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code></li>
+<li><code>-mom_ratio_ema_alpha</code></li>
 </ul>
 <p>Defaults and final option ingestion are in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during startup parsing.</p>
-<p>For the dual-time Jameson solver, <code>max_iterations</code> counts total attempted trials, including rejected trials. When both residual tolerances are disabled, legacy update-only <code>absolute AND relative</code> convergence is preserved. Enabling either residual tolerance selects update <code>absolute OR relative</code>, combined with the enabled residual criteria.</p>
+<p>For the dual-time Jameson solver, <code>max_iterations</code> bounds <b>accepted</b> pseudo-iterations. A separate hard cap of <code>3 × max_iterations</code> limits total attempts (accepted plus rejected) to prevent infinite rejection loops. Convergence requires both the update pass (<code>|ΔU| ≤ atol</code> <b>AND</b> <code>|ΔU|/|ΔU₀| ≤ rtol</code>) and, when either residual tolerance is positive, at least one enabled residual criterion to hold.</p>
 <p>The dual-time controller uses one global pseudo-CFL and globally accepts or rolls back a complete four-stage trial. The selected next pseudo-CFL is carried directly into the next physical timestep. <code>step_tol</code>/<code>-imp_stol</code> remains accepted only as a deprecated compatibility input and is unused by active momentum solvers.</p>
+<p><code>pseudo_cfl.*</code> values are <b>dimensionless Courant numbers</b> (Phase 3+), not fractions of the physical timestep <code>dt</code>. The solver computes <code>dtau = pseudo_cfl / lambda_max</code> where <code>lambda_max</code> is the global maximum convective spectral radius of the current velocity field. This makes <code>pseudo_cfl</code> independent of <code>dt</code>, grid size, and flow speed. The stable range for the 4-stage Jameson RK smoother is <code>pseudo_cfl ≈ 0–2.83</code>; the shipped defaults are <code>initial: 0.5</code>, <code>maximum: 2.0</code>.</p>
 <h1><a class="anchor" id="p31_testing_sec"></a>
 4. Current test status</h1>
 <p>Current testing is uneven by solver path:</p>

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
+  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_2',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
   ['rank_5fxm_3',['rank_xm',['../variables_8h.html#a9419886ec15f30fb98c71804d563796c',1,'RankNeighbors']]],
@@ -183,7 +183,7 @@ var searchData=
   ['robustness_20metrics_20reference_180',['Search Robustness Metrics Reference',['../53_Search_Robustness_Metrics_Reference.html',1,'']]],
   ['role_20in_20current_20code_181',['3. Immersed-Boundary Role In Current Code',['../22_CURVIB_Method.html#p22_ibm_sec',1,'']]],
   ['roles_182',['roles',['../14_Config_Contract.html#p14_inputs_sec',1,'1. Required Input Roles'],['../02_Tutorial_Programmatic_Grid.html#p02_roles_sec',1,'3. Understand File Roles']]],
-  ['rollback_183',['2. Convergence and Adaptive Rollback',['../24_Dual_Time_Picard_Jameson_RK.html#p24_convergence_sec',1,'']]],
+  ['rollback_183',['3. Convergence and Adaptive Rollback',['../24_Dual_Time_Picard_Jameson_RK.html#p24_convergence_sec',1,'']]],
   ['rotateframe_184',['rotateframe',['../variables_8h.html#aecc33b61ded0b8c01e2524094af2504a',1,'SimCtx']]],
   ['rotatefsi_185',['rotatefsi',['../variables_8h.html#a6bbc45b8c4ff978d205c0a7b670b54f9',1,'SimCtx']]],
   ['roughness_5ftransition_5fyplus_186',['ROUGHNESS_TRANSITION_YPLUS',['../wallfunction_8c.html#a48114148da6b81a8b89ee04e46cf73af',1,'wallfunction.c']]],
@@ -226,7 +226,7 @@ var searchData=
   ['runtime_20and_20source_20architecture_223',['4. Runtime and Source Architecture',['../Documentation_Map.html#p47_runtime_axis_sec',1,'']]],
   ['runtime_20artifacts_224',['runtime artifacts',['../05_The_Conductor_Script.html#p05_artifacts_sec',1,'13. Generated Runtime Artifacts'],['../06_Simulation_Anatomy.html#p06_artifacts_sec',1,'3. YAML -&gt; Runtime Artifacts']]],
   ['runtime_20completion_20extensions_225',['4. Runtime Completion Extensions',['../17_Workflow_Extensibility.html#p17_completion_sec',1,'']]],
-  ['runtime_20controls_226',['runtime controls',['../24_Dual_Time_Picard_Jameson_RK.html#p24_config_sec',1,'3. YAML -&gt; Runtime Controls'],['../12_Capabilities_Summary.html#p12_bc_sec',1,'4. Boundary and Runtime Controls']]],
+  ['runtime_20controls_226',['runtime controls',['../12_Capabilities_Summary.html#p12_bc_sec',1,'4. Boundary and Runtime Controls'],['../24_Dual_Time_Picard_Jameson_RK.html#p24_config_sec',1,'4. YAML → Runtime Controls']]],
   ['runtime_20coverage_20map_227',['11. Runtime Coverage Map',['../40_Testing_and_Quality_Guide.html#p40_runtime_coverage_sec',1,'']]],
   ['runtime_20execution_20map_228',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
   ['runtime_20execution_20order_229',['2. Runtime Execution Order',['../21_Methods_Overview.html#p21_runtime_map_sec',1,'']]],

@@ -82,7 +82,7 @@ var searchData=
   ['dgf_5fy_79',['dgf_y',['../variables_8h.html#af2143bc1a9f6bb90236d624f4a45b4e2',1,'SimCtx']]],
   ['dgf_5fz_80',['dgf_z',['../variables_8h.html#a12ea69c9013845d392b1a2c3036d8042',1,'SimCtx']]],
   ['diagnostic_20counters_81',['4.3 Supporting Diagnostic Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_supporting',1,'']]],
-  ['diagnostics_82',['diagnostics',['../09_Monitor_Reference.html#p09_diagnostics_sec',1,'4. diagnostics'],['../24_Dual_Time_Picard_Jameson_RK.html#p24_logging_sec',1,'4. Logging and Diagnostics'],['../34_Particle_Model_Overview.html#p34_statistics_sec',1,'4. Statistics and Diagnostics']]],
+  ['diagnostics_82',['diagnostics',['../09_Monitor_Reference.html#p09_diagnostics_sec',1,'4. diagnostics'],['../34_Particle_Model_Overview.html#p34_statistics_sec',1,'4. Statistics and Diagnostics'],['../24_Dual_Time_Picard_Jameson_RK.html#p24_logging_sec',1,'5. Logging and Diagnostics']]],
   ['diagnostics_20and_20sanity_20checks_83',['7. Diagnostics and Sanity Checks',['../45_Particle_Initialization_and_Restart.html#p45_diagnostics_sec',1,'']]],
   ['diagnostics_20and_20tests_84',['5. Diagnostics and Tests',['../p54_geometric_periodic.html#p54_diag_sec',1,'']]],
   ['diagnostics_20to_20watch_85',['4. Diagnostics To Watch',['../23_Fractional_Step_Method.html#p23_runtime_sec',1,'']]],

@@ -83,12 +83,13 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p24_model_sec">1. Algorithmic Model</a></li>
-<li class="level1"><a href="#p24_convergence_sec">2. Convergence and Adaptive Rollback</a></li>
-<li class="level1"><a href="#p24_config_sec">3. YAML -&gt; Runtime Controls</a></li>
-<li class="level1"><a href="#p24_logging_sec">4. Logging and Diagnostics</a></li>
-<li class="level1"><a href="#p24_touchpoints_sec">5. Core Code Touchpoints</a></li>
-<li class="level1"><a href="#p24_practical_sec">6. Practical Tuning Guidance</a><ul><li class="level2"><a href="#autotoc_md88">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md89">What To Extract Before Changing A Case</a></li>
+<ul><li class="level1"><a href="#p24_when_to_use_sec">1. When to Use This Solver</a></li>
+<li class="level1"><a href="#p24_model_sec">2. Algorithmic Model</a></li>
+<li class="level1"><a href="#p24_convergence_sec">3. Convergence and Adaptive Rollback</a></li>
+<li class="level1"><a href="#p24_config_sec">4. YAML → Runtime Controls</a></li>
+<li class="level1"><a href="#p24_logging_sec">5. Logging and Diagnostics</a></li>
+<li class="level1"><a href="#p24_touchpoints_sec">6. Core Code Touchpoints</a></li>
+<li class="level1"><a href="#p24_practical_sec">7. Practical Tuning Guidance</a><ul><li class="level2"><a href="#autotoc_md88">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md89">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md90">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -97,8 +98,25 @@ $(function() {
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_Jameson_RK"></a> This page documents the currently active implicit-style momentum strategy in PICurv: dual-time Picard iteration with Jameson RK pseudo-time smoothing.</p>
+<h1><a class="anchor" id="p24_when_to_use_sec"></a>
+1. When to Use This Solver</h1>
+<p>This solver implements global pseudo-time explicit smoothing on top of an implicit BDF2 physical-time discretization. It is the recommended momentum solver when:</p>
+<ul>
+<li>The flow is <b>laminar or low-to-moderate Re (Re ≤ ~2000)</b> on body-fitted curvilinear grids.</li>
+<li>A <b>larger physical timestep</b> is required than explicit stability allows — typically 5–20× the explicit CFL limit.</li>
+<li>The flow geometry involves <b>curves, bends, or bodies</b> where curvilinear coordinates are essential and the explicit RK4 solver would need prohibitively small <code>dt</code>.</li>
+<li><b>5–30 pseudo-iterations per physical step</b> is an acceptable overhead (typical for smooth, slowly-varying flows).</li>
+<li><b>Robustness over throughput</b> is the priority: automatic CFL rollback and EMA-smoothed rejection reduce manual tuning for stable convergence.</li>
+</ul>
+<p>Use the <b>Explicit RK4</b> solver instead when:</p>
+<ul>
+<li>The explicit stability limit is affordable (coarse grid, short verification, or low-Re 1D-like flows).</li>
+<li>No pseudo-time truncation error is acceptable (verification against analytical solutions).</li>
+<li>Per-step throughput dominates cost and no implicit stability is needed.</li>
+</ul>
+<p><b>Pseudo-CFL semantics (Phase 3+):</b> the pseudo-time step is <code>dtau = pseudo_cfl / lambda_max</code>, where <code>lambda_max</code> is the global maximum convective spectral radius computed from the velocity field at the start of each physical timestep. This makes <code>pseudo_cfl</code> a true dimensionless Courant number independent of <code>dt</code>, grid size, or flow speed — <code>pseudo_cfl = 1.0</code> has the same physical meaning across all grids and all <code>dt</code>. The stable range for the 4-stage Jameson RK smoother is <code>pseudo_cfl ≈ 0–2.83</code>; default <code>initial: 0.5</code> gives a comfortable margin. See Section 2 for the spectral-radius estimation details.</p>
 <h1><a class="anchor" id="p24_model_sec"></a>
-1. Algorithmic Model</h1>
+2. Algorithmic Model</h1>
 <p>The solver enforces the physical-time momentum equation by iterating a pseudo-time equation:</p>
 <p class="formulaDsp">
 \[
@@ -108,51 +126,76 @@ $(function() {
 <p>Implementation details from <code>ComputeTotalResidual</code>:</p>
 <ul>
 <li><code>R_spatial</code> comes from <a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8">ComputeRHS</a></li>
-<li><code>R_time</code> uses BDF1/BDF2-style terms from <code>Ucont</code>, <code>Ucont_o</code>, and <code>Ucont_rm1</code>,</li>
-<li>Jameson RK smoothing stages use coefficients \(\{1/4,1/3,1/2,1\}\).</li>
-<li>Each stage evaluates a fresh residual at the previous stage state, then forms the next stage from the fixed pseudo-iteration base state. This is not classical fourth-order Runge-Kutta time integration.</li>
+<li><code>R_time</code> uses BDF2-style terms from <code>Ucont</code>, <code>Ucont_o</code>, and <code>Ucont_rm1</code> (BDF1 on the first physical step)</li>
+<li>Jameson RK smoothing stages use coefficients \(\{1/4,1/3,1/2,1\}\)</li>
+<li>Each stage evaluates a fresh residual at the previous stage state, then forms the next stage from the fixed pseudo-iteration base state — this is a 4-stage dissipation smoother, not classical 4th-order RK time integration</li>
+<li>The pseudo-time step is <code>dtau = pseudo_cfl / lambda_max</code>, where <code>lambda_max</code> is the global maximum convective spectral radius; stability requires <code>pseudo_cfl &lt; C_RK ≈ 2.83</code></li>
 </ul>
+<p><b>Spectral radius estimation</b> (<code>ComputeGlobalSpectralRadiusEstimate</code>): at the start of each physical timestep (after BCs and ghost synchronization), the solver computes per-cell:</p>
+<p class="formulaDsp">
+\[
+\lambda_{cell} = \left(|\tilde{U}_{x}| + |\tilde{U}_{y}| + |\tilde{U}_{z}|\right) \cdot J^{-1}
+\]
+</p>
+<p>where \(\tilde{U}\) components are the contravariant volume fluxes (<code>ucont</code>, units m³/s) and \(J^{-1} = 1/\text{volume}\) (<code>lAj</code>). The product yields units [1/s]. A global MPI <code>MAX</code> reduction gives <code>lambda_max</code>. A lower bound <code>PetscMax(lambda_max, 1.5/dt)</code> (the BDF2 accuracy coefficient divided by <code>dt</code>) prevents division by zero at startup or in zero-flow regions, falling back to <code>dtau ≈ pseudo_cfl × dt / 1.5</code>.</p>
 <h1><a class="anchor" id="p24_convergence_sec"></a>
-2. Convergence and Adaptive Rollback</h1>
+3. Convergence and Adaptive Rollback</h1>
 <p>Per pseudo-iteration, the solver tracks:</p>
 <ul>
-<li>\(\|\Delta U\|_\infty\),</li>
-<li>relative solution update \(\|\Delta U_k\|/\|\Delta U_0\|\),</li>
-<li>residual norms and growth ratios.</li>
+<li>\(\|\Delta U\|_\infty\) (solution update norm),</li>
+<li>\(\|\Delta U_k\|/\|\Delta U_0\|\) (relative update),</li>
+<li>residual norms and their step-to-step ratio (EMA-smoothed).</li>
 </ul>
-<p>Adaptive pseudo-CFL rollback is triggered when residual growth exceeds the configured noise allowance or a non-finite trial is detected, then:</p>
+<p>Adaptive pseudo-CFL rollback is triggered when the EMA-smoothed step-to-step residual ratio exceeds the configured noise allowance (<code>jameson_residual_noise_allowance_factor</code>, default 1.1), or a non-finite trial is detected:</p>
 <ol type="1">
-<li>state rolls back to the last accepted pseudo-state,</li>
-<li>pseudo-CFL is reduced,</li>
-<li>iteration retries from the restored state.</li>
+<li>State rolls back to the last accepted pseudo-state.</li>
+<li>Pseudo-CFL is multiplied by <code>reduction_factor</code>.</li>
+<li>Iteration retries from the restored state without consuming the accepted-iteration budget.</li>
 </ol>
-<p>Acceptance and rollback are global across blocks and MPI ranks. Rejected trials do not update accepted residual history, and <code>max_iterations</code> bounds total attempted trials rather than only accepted trials. A finite solve that exhausts its attempts exits with the last accepted finite state.</p>
-<p>Pseudo-CFL is adaptively ramped on successful trials, reduced on noisy accepted trials or rejection, and clamped by configured min/max bounds. The controller-selected next CFL carries directly into the next physical timestep; there is no separate end-of-step rebound.</p>
-<p>Convergence has a compatibility switch:</p>
+<p>Acceptance and rollback are global across blocks and MPI ranks. The <code>max_iterations</code> parameter bounds <b>accepted</b> pseudo-iterations. A separate hard cap of <code>3 × max_iterations</code> bounds total attempts (accepted plus rejected) to prevent infinite rejection loops. A finite solve that exhausts its accepted-iteration budget exits with the last accepted finite state.</p>
+<p>Pseudo-CFL is adaptively ramped on successful trials (ratio &lt; 0.90: immediate growth; 0.90–1.0: growth after 3 consecutive clean trials), reduced on noisy accepted trials or rejection, and clamped by configured min/max bounds. The controller-selected next CFL carries directly into the next physical timestep.</p>
+<p><b>Convergence criteria</b> (both must pass simultaneously):</p>
 <ul>
-<li>both residual tolerances disabled: update absolute <b>and</b> relative criteria,</li>
-<li>either residual tolerance enabled: update absolute <b>or</b> relative criterion, combined with the enabled residual absolute/relative criteria.</li>
+<li><b>Update pass</b>: <code>|ΔU| ≤ absolute_tol</code> <b>AND</b> <code>|ΔU|/|ΔU₀| ≤ relative_tol</code></li>
+<li><b>Residual pass</b> (only checked when either residual tolerance is set to a positive value): at least one of <code>|R| ≤ mom_resid_atol</code> or <code>|R|/|R₀| ≤ mom_resid_rtol</code> must hold</li>
 </ul>
+<p>Both update and residual passes must be true simultaneously for the solver to declare convergence.</p>
 <h1><a class="anchor" id="p24_config_sec"></a>
-3. YAML -&gt; Runtime Controls</h1>
+4. YAML → Runtime Controls</h1>
 <p>User-facing configuration (<code>solver.yml</code>) maps to:</p>
 <ul>
-<li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code></li>
-<li><code>tolerances.max_iterations</code> -&gt; <code>-mom_max_pseudo_steps</code></li>
-<li><code>tolerances.absolute_tol</code> -&gt; <code>-mom_atol</code></li>
-<li><code>tolerances.relative_tol</code> -&gt; <code>-mom_rtol</code></li>
-<li><code>tolerances.residual_absolute_tol</code> -&gt; <code>-mom_resid_atol</code></li>
-<li><code>tolerances.residual_relative_tol</code> -&gt; <code>-mom_resid_rtol</code></li>
-<li><code>momentum_solver.dual_time_picard_jameson_rk.pseudo_cfl.*</code> -&gt; pseudo-CFL flags</li>
-<li><code>jameson_residual_noise_allowance_factor</code> -&gt; <code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code></li>
+<li><code>strategy.momentum_solver</code> → <code>-mom_solver_type</code></li>
+<li><code>tolerances.max_iterations</code> → <code>-mom_max_pseudo_steps</code></li>
+<li><code>tolerances.absolute_tol</code> → <code>-mom_atol</code></li>
+<li><code>tolerances.relative_tol</code> → <code>-mom_rtol</code></li>
+<li><code>tolerances.residual_absolute_tol</code> → <code>-mom_resid_atol</code></li>
+<li><code>tolerances.residual_relative_tol</code> → <code>-mom_resid_rtol</code></li>
+<li><code>momentum_solver.dual_time_picard_jameson_rk.pseudo_cfl.*</code> → pseudo-CFL flags</li>
+<li><code>jameson_residual_noise_allowance_factor</code> → <code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code> (default: 1.1)</li>
+<li><code>ratio_ema_alpha</code> → <code>-mom_ratio_ema_alpha</code> (default: 0.3; range [0, 1])</li>
 </ul>
+<p>The <code>ratio_ema_alpha</code> parameter controls EMA smoothing of the step-to-step residual ratio before the rejection decision: </p><div class="fragment"><div class="line">smoothed = alpha × raw_ratio + (1 − alpha) × smoothed_prev</div>
+</div><!-- fragment --><p> <code>alpha = 1.0</code> recovers the original raw-ratio behavior (most aggressive rejection). <code>alpha = 0.3</code> (default) requires approximately 3–4 consecutive bad trials before triggering rejection, tolerating transient residual bumps common in convection-dominated flows.</p>
 <p>The former <code>Dual Time Picard RK4</code>, <code>dual_time_picard_rk4</code>, <code>rk4_residual_noise_allowance_factor</code>, <code>DUALTIME_PICARD_RK4</code>, and <code>-mom_dt_rk4_residual_norm_noise_allowance_factor</code> spellings remain deprecated compatibility aliases. Canonical configuration and generated controls use the Jameson names.</p>
 <p>Parsing and normalization are performed in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, with final option ingestion in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during setup. Only the currently implemented momentum solver values are exposed; add new ones only when the parser and dispatcher are extended in the same change.</p>
 <h1><a class="anchor" id="p24_logging_sec"></a>
-4. Logging and Diagnostics</h1>
-<p>The persistent momentum convergence-history format is unchanged. <code>PseudoIter(k)</code> now denotes total attempted trials, including rejected trials. Controller ratios, rollback decisions, CFL changes, and internal counters are available at <code>DEBUG</code>; finite nonconvergence is reported at <code>WARNING</code>; and each solve emits a concise final summary at <code>INFO</code>.</p>
+5. Logging and Diagnostics</h1>
+<p>The persistent momentum convergence-history format (<code>logs/Momentum_Solver_Convergence_History_Block_N.log</code>) includes per-trial fields:</p>
+<ul>
+<li><code>PseudoIter(k)</code>: total attempted trial index (includes rejected trials)</li>
+<li><code>dtau</code>: physical-time pseudo-step used for this trial [s] — equals <code>pseudo_cfl / lambda_max</code></li>
+<li><code>cfl_eff</code>: effective dimensionless Courant number for this trial — equals <code>dtau × lambda_max</code>; controlled by <code>pseudo_cfl.*</code> YAML keys</li>
+<li><code>|dUk|</code>, <code>|dUk|/|dU0|</code>: solution update norms</li>
+<li><code>|Rk|</code>, <code>|Rk|/|R0|</code>: residual norms</li>
+<li><code>trial_ratio</code>: raw step-to-step residual ratio</li>
+<li><code>smoothed_ratio</code>: EMA-smoothed ratio used for the rejection decision</li>
+<li><code>status</code>: <code>accepted</code> or <code>rejected</code></li>
+<li><code>dtau_after</code>: physical-time pseudo-step selected for the next trial [s]</li>
+<li><code>cfl_eff_after</code>: corresponding dimensionless Courant number for the next trial</li>
+</ul>
+<p>A startup INFO log line prints the active CFL bounds, rejection threshold, EMA alpha, growth/reduction factors, and iteration budget. Non-convergence (exhausted accepted-iteration budget) is reported unconditionally via <code>PetscPrintf</code>. Internal ratios, rollback decisions, and CFL changes are logged at DEBUG.</p>
 <h1><a class="anchor" id="p24_touchpoints_sec"></a>
-5. Core Code Touchpoints</h1>
+6. Core Code Touchpoints</h1>
 <ul>
 <li>implementation: <a class="el" href="momentumsolvers_8h.html#a173269bc83cefbbc44ef4869bd3fa753">MomentumSolver_DualTime_Picard_JamesonRK</a></li>
 <li>explicit comparator path: <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
@@ -160,14 +203,15 @@ $(function() {
 <li>options ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
 </ul>
 <h1><a class="anchor" id="p24_practical_sec"></a>
-6. Practical Tuning Guidance</h1>
+7. Practical Tuning Guidance</h1>
 <p>Common stability tuning order:</p>
 <ol type="1">
-<li>start from the shipped <code>growth_factor: 1.05</code> and <code>reduction_factor: 0.75</code>,</li>
-<li>reduce initial or maximum pseudo-CFL if trials repeatedly reject,</li>
-<li>use <code>residual_relative_tol: 1.0e-3</code> for robust profiles or <code>1.0e-2</code> for exploratory LES where looser inner convergence is acceptable,</li>
-<li>tighten/loosen residual-noise allowance slightly only after examining logs,</li>
-<li>revisit physical timestep, grid quality, and boundary consistency if instability persists.</li>
+<li>Start from the shipped defaults: <code>initial: 0.5</code>, <code>maximum: 2.0</code>, <code>growth_factor: 1.1</code>, <code>reduction_factor: 0.75</code>, <code>jameson_residual_noise_allowance_factor: 1.1</code>, <code>ratio_ema_alpha: 0.3</code>. <code>pseudo_cfl</code> is now a dimensionless Courant number (Phase 3+); <code>initial: 0.5</code> sits at ~18% of the 4-stage Jameson stability limit (2.83) and is a safe universal starting point regardless of <code>dt</code> or grid size.</li>
+<li>If trials repeatedly reject: reduce <code>pseudo_cfl.maximum</code> and/or <code>pseudo_cfl.initial</code>. For flows near the stability limit, try <code>maximum: 1.5</code> first; <code>pseudo_cfl = 2.83</code> is the theoretical convection-stability limit, so practical <code>maximum</code> should not exceed 2.5.</li>
+<li>If the residual history is non-monotonic (common for convection-dominated flows): raise <code>ratio_ema_alpha</code> toward 0.5–0.7 to make the EMA respond faster, or raise <code>jameson_residual_noise_allowance_factor</code> to 1.2–1.3.</li>
+<li>Use <code>residual_relative_tol: 1.0e-3</code> for robust production runs or <code>1.0e-2</code> for exploratory LES where looser inner convergence is acceptable.</li>
+<li>Tighten/loosen the residual-noise allowance only after examining the <code>smoothed_ratio</code> column in the convergence log.</li>
+<li>If instability persists after CFL tuning: revisit physical timestep, grid quality near bends or walls, and boundary condition consistency.</li>
 </ol>
 <p>For many cases, robust Poisson settings and sane initialization matter as much as dual-time tolerances.</p>
 <p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>

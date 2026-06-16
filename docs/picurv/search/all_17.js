@@ -119,7 +119,7 @@ var searchData=
   ['loggetcolumnreal_116',['LogGetColumnReal',['../test__logging_8c.html#ad1aa93a711750b0710bc98058401387b',1,'test_logging.c']]],
   ['loggetcolumntext_117',['LogGetColumnText',['../test__logging_8c.html#a0d02a43756e92a77f54289f0b1883f95',1,'test_logging.c']]],
   ['logging_118',['logging',['../09_Monitor_Reference.html#p09_logging_sec',1,'2. logging'],['../11_User_How_To_Guides.html#p11_logging_ssec',1,'3.4 Enable Targeted Debug Logging']]],
-  ['logging_20and_20diagnostics_119',['4. Logging and Diagnostics',['../24_Dual_Time_Picard_Jameson_RK.html#p24_logging_sec',1,'']]],
+  ['logging_20and_20diagnostics_119',['5. Logging and Diagnostics',['../24_Dual_Time_Picard_Jameson_RK.html#p24_logging_sec',1,'']]],
   ['logging_2ec_120',['logging.c',['../logging_8c.html',1,'']]],
   ['logging_2eh_121',['logging.h',['../logging_8h.html',1,'']]],
   ['loggingfrequency_122',['LoggingFrequency',['../variables_8h.html#af4e8e680314f5a935c26342d6dca13c8',1,'SimCtx']]],

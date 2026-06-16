@@ -88,6 +88,14 @@ Changelog</h1>
 <h2><a class="anchor" id="autotoc_md6"></a>
 Unreleased</h2>
 <ul>
+<li>Picard-Jameson spectral-radius pseudo-time step (semantic change):<ul>
+<li>changed the pseudo-time step from <code>dtau = pseudo_cfl × dt</code> to <code>dtau = pseudo_cfl / lambda_max</code>, where <code>lambda_max</code> is the global maximum convective spectral radius computed once per physical timestep. This makes <code>pseudo_cfl.*</code> true dimensionless Courant numbers, independent of <code>dt</code>, grid size, and flow speed.</li>
+<li>changed shipped defaults to <code>pseudo_cfl.initial: 0.5</code> and <code>pseudo_cfl.maximum: 2.0</code> (stable 4-stage Jameson range ~0–2.83); existing configs with <code>0.1</code>/<code>1.0</code> still run but now produce physically smaller, safer <code>dtau</code> values.</li>
+<li>added a BDF2 lower bound <code>lambda_max &gt;= COEF_TIME_ACCURACY/dt</code> so zero-flow startup yields a finite <code>dtau</code>.</li>
+<li>added the diagnostic field <code>mom_last_lambda_max</code> to the simulation context.</li>
+<li>changed the per-trial momentum convergence log fields from <code>Pseudo-cfl</code>/ <code>cfl_after</code> to <code>dtau</code>/<code>cfl_eff</code> and <code>dtau_after</code>/<code>cfl_eff_after</code>; <code>picurv summarize</code> parsing, JSON payload, console output, and plot series were updated to match.</li>
+</ul>
+</li>
 <li>Initial-condition contract and workflow:<ul>
 <li>replaced user-facing legacy IC selectors with canonical <code>generated</code> and <code>file</code> modes.</li>
 <li>added built-in zero, Cartesian constant, streamwise constant, and Poiseuille generators.</li>
