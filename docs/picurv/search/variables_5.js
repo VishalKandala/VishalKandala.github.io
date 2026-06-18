@@ -13,9 +13,10 @@ var searchData=
   ['error_5fcode_5fcfg_5fmissing_5fsection_10',['ERROR_CODE_CFG_MISSING_SECTION',['../namespacepicurv__cli_1_1core.html#af840430f7958eec0ccb1bd94b28ed12c',1,'picurv_cli::core']]],
   ['error_5fcode_5fcli_5fusage_5finvalid_11',['ERROR_CODE_CLI_USAGE_INVALID',['../namespacepicurv__cli_1_1core.html#ac9845d87583d4a78d71e939b29534183',1,'picurv_cli::core']]],
   ['error_5fcode_5fdependency_5fmissing_12',['ERROR_CODE_DEPENDENCY_MISSING',['../namespacepicurv__cli_1_1core.html#aea22d4a91aaa5d9bde54321a1c18e7da',1,'picurv_cli::core']]],
-  ['eta_13',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
-  ['euler_5fsubdir_14',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
-  ['eulerianext_15',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
-  ['euleriansource_16',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
-  ['exec_5fmode_17',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
+  ['estimate_5fincomplete_13',['estimate_incomplete',['../momentumsolvers_8h.html#a094b093f5f97b6ad03060f7f6354757c',1,'MomStabilityReport']]],
+  ['eta_14',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
+  ['euler_5fsubdir_15',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
+  ['eulerianext_16',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
+  ['euleriansource_17',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
+  ['exec_5fmode_18',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
 ];
