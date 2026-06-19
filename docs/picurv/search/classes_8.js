@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['mgctx_0',['MGCtx',['../variables_8h.html#structMGCtx',1,'']]],
-  ['migrationinfo_1',['MigrationInfo',['../variables_8h.html#structMigrationInfo',1,'']]],
-  ['momstabilityreport_2',['MomStabilityReport',['../momentumsolvers_8h.html#structMomStabilityReport',1,'']]]
+  ['list_0',['list',['../variables_8h.html#structlist',1,'']]],
+  ['list_5fnode_1',['list_node',['../variables_8h.html#structlist__node',1,'']]]
 ];

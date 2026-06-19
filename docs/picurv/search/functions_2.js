@@ -9,7 +9,7 @@ var searchData=
   ['boundarysystem_5fexecutestep_6',['boundarysystem_executestep',['../Boundaries_8h.html#ad2fb8398b76f81e8c846afbea638baef',1,'BoundarySystem_ExecuteStep(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#ad2fb8398b76f81e8c846afbea638baef',1,'BoundarySystem_ExecuteStep(UserCtx *user):&#160;Boundaries.c']]],
   ['boundarysystem_5finitialize_7',['boundarysystem_initialize',['../Boundaries_8h.html#a0e31d96fd68e70d568d4d12ddc4da619',1,'BoundarySystem_Initialize(UserCtx *user, const char *bcs_filename):&#160;Boundaries.c'],['../Boundaries_8c.html#a0e31d96fd68e70d568d4d12ddc4da619',1,'BoundarySystem_Initialize(UserCtx *user, const char *bcs_filename):&#160;Boundaries.c']]],
   ['boundarysystem_5frefreshubcs_8',['boundarysystem_refreshubcs',['../Boundaries_8h.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a73ef0b00c142dadc0385b2a6b415513b',1,'BoundarySystem_RefreshUbcs(UserCtx *user):&#160;Boundaries.c']]],
-  ['boundarysystem_5fvalidate_9',['boundarysystem_validate',['../Boundaries_8c.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8h.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c']]],
+  ['boundarysystem_5fvalidate_9',['boundarysystem_validate',['../Boundaries_8h.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c']]],
   ['broadcastallboundingboxes_10',['broadcastallboundingboxes',['../grid_8h.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c'],['../grid_8c.html#a325b9d5da4b9b2c79d278fb848215632',1,'BroadcastAllBoundingBoxes(UserCtx *user, BoundingBox **bboxlist):&#160;grid.c']]],
   ['build_5fcluster_5flaunch_5fcommand_11',['build_cluster_launch_command',['../namespacepicurv__cli_1_1core.html#aebe2c4e147f3d0b46786ac1b3ccb8aa8',1,'picurv_cli::core']]],
   ['build_5flocal_5flaunch_5fcommand_12',['build_local_launch_command',['../namespacepicurv__cli_1_1core.html#a905fd428ef00a0f8c2801c984e14e4c7',1,'picurv_cli::core']]],
@@ -24,8 +24,13 @@ var searchData=
   ['build_5fserial_5fpost_5fcluster_5fconfig_21',['build_serial_post_cluster_config',['../namespacepicurv__cli_1_1core.html#ad49e76fe6b710ee4216632fb9c45ca15',1,'picurv_cli::core']]],
   ['build_5ftrace_5fignoredirs_22',['build_trace_ignoredirs',['../namespacepython__coverage__gate.html#a531a48a4398058f2638ddc59f1c4be05',1,'python_coverage_gate']]],
   ['build_5fwalltime_5fguard_5fexports_23',['build_walltime_guard_exports',['../namespacepicurv__cli_1_1core.html#a1ba34c55972f82f03367e32c8cf67325',1,'picurv_cli::core']]],
-  ['buildcontextonly_24',['BuildContextOnly',['../test__setup__lifecycle_8c.html#a149c18c9de93b185ffd90089d7abfeb1',1,'test_setup_lifecycle.c']]],
-  ['buildheaderstring_25',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
-  ['buildlifecyclecontext_26',['BuildLifecycleContext',['../test__setup__lifecycle_8c.html#acd883b343f17c86871c52788a824948c',1,'test_setup_lifecycle.c']]],
-  ['buildrowformatstring_27',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]]
+  ['buildbasestate_24',['BuildBaseState',['../test__momentum__convective__candidates_8c.html#ab89000e395d94635a5b3a6cce0a3821a',1,'test_momentum_convective_candidates.c']]],
+  ['buildcontextonly_25',['BuildContextOnly',['../test__setup__lifecycle_8c.html#a149c18c9de93b185ffd90089d7abfeb1',1,'test_setup_lifecycle.c']]],
+  ['buildfdjacobian_26',['BuildFDJacobian',['../test__momentum__convective__candidates_8c.html#a7345c00050d70802b1c048536441236c',1,'test_momentum_convective_candidates.c']]],
+  ['buildheaderstring_27',['BuildHeaderString',['../logging_8c.html#a7b3c43abc3eb1a2e0a5c1c74a9143b65',1,'logging.c']]],
+  ['buildlifecyclecontext_28',['BuildLifecycleContext',['../test__setup__lifecycle_8c.html#acd883b343f17c86871c52788a824948c',1,'test_setup_lifecycle.c']]],
+  ['buildphijacobian_29',['BuildPhiJacobian',['../test__momentum__convective__candidates_8c.html#ae9d3c680ad480131a398bc62187c99c4',1,'test_momentum_convective_candidates.c']]],
+  ['buildrowformatstring_30',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]],
+  ['buildstagestates_31',['BuildStageStates',['../test__momentum__convective__candidates_8c.html#a9ec813d00c26013e51fde31b7f124821',1,'test_momentum_convective_candidates.c']]],
+  ['buildstagetangent_32',['BuildStageTangent',['../test__momentum__convective__candidates_8c.html#a5f993bc50e0319f8fc0d59246477ae0d',1,'test_momentum_convective_candidates.c']]]
 ];

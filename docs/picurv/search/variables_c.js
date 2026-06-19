@@ -7,7 +7,7 @@ var searchData=
   ['laj_4',['lAj',['../variables_8h.html#acb5123619f6844033498dbbd1f46b8d0',1,'UserCtx']]],
   ['lambda_5',['lambda',['../momentumsolvers_8h.html#ac84814c4a57f4df6d71d61b7c3fa2e96',1,'MomStabilityReport']]],
   ['lambda_5fb_6',['lambda_B',['../momentumsolvers_8h.html#ab95f6b1d7037567132cc93fa2a038f02',1,'MomStabilityReport']]],
-  ['lambda_5fc_7',['lambda_c',['../momentumsolvers_8h.html#a7175517f1958fbdba8c017f46dfef09a',1,'MomStabilityReport::lambda_C'],['../momentumsolvers_8h.html#a050539087451b2638b73678e6512fd36',1,'MomStabilityReport::lambda_c']]],
+  ['lambda_5fc_7',['lambda_c',['../momentumsolvers_8h.html#a050539087451b2638b73678e6512fd36',1,'MomStabilityReport::lambda_c'],['../momentumsolvers_8h.html#a7175517f1958fbdba8c017f46dfef09a',1,'MomStabilityReport::lambda_C']]],
   ['lambda_5fd_8',['lambda_D',['../momentumsolvers_8h.html#a03de358af48f5d414b7b9c4b1743c131',1,'MomStabilityReport']]],
   ['lambda_5ft_9',['lambda_t',['../momentumsolvers_8h.html#a9dd5268855bfeb4daf1089aeef0025d1',1,'MomStabilityReport']]],
   ['lambda_5fv_10',['lambda_v',['../momentumsolvers_8h.html#a3fc8445eca4f0c5297e2bec827d4e1be',1,'MomStabilityReport']]],

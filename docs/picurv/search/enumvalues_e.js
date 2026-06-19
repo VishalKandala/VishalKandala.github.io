@@ -18,5 +18,11 @@ var searchData=
   ['solution_5fconvergence_5fstatistical_5fsteady_15',['SOLUTION_CONVERGENCE_STATISTICAL_STEADY',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433ae6095657d98dedbdf9a11b04c577e830',1,'variables.h']]],
   ['solution_5fconvergence_5fsteady_5fdeterministic_16',['SOLUTION_CONVERGENCE_STEADY_DETERMINISTIC',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433af8d1485dbc97f10af72599e0ebaabd61',1,'variables.h']]],
   ['solution_5fconvergence_5ftransient_17',['SOLUTION_CONVERGENCE_TRANSIENT',['../variables_8h.html#adab80ecab65e3bc9047b69f9fcea8433a7184e5d0dc097511df6fc318c6882c09',1,'variables.h']]],
-  ['symmetry_18',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
+  ['stable_5fcfl_5fexceeds_5fscan_18',['STABLE_CFL_EXCEEDS_SCAN',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985aa586d352c2be0f8282cb48419ff09a44',1,'test_momentum_convective_candidates.c']]],
+  ['stable_5fcfl_5ffinite_19',['STABLE_CFL_FINITE',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985afcf3220ae26f697de6ee7579fd58b6da',1,'test_momentum_convective_candidates.c']]],
+  ['stable_5fcfl_5fnone_20',['STABLE_CFL_NONE',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985a1977f794f3a02fcfb07fec0fc6009660',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fa_21',['STATE_A',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608aa32486e6d0574321e0fedafe557c21fc',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fb_22',['STATE_B',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608a5ae62508b79893c526e0394ecb9eddde',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fc_23',['STATE_C',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608ae5efcaad582ca6fd418e8bcc8363d287',1,'test_momentum_convective_candidates.c']]],
+  ['symmetry_24',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
 ];

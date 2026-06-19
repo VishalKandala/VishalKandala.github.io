@@ -18,5 +18,6 @@ var searchData=
   ['euler_5fsubdir_15',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
   ['eulerianext_16',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
   ['euleriansource_17',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
-  ['exec_5fmode_18',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]]
+  ['exec_5fmode_18',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
+  ['expected_5fn_19',['expected_n',['../test__momentum__convective__candidates_8c.html#a609e063bf471a622efac7de56fcd0993',1,'DofMap']]]
 ];
