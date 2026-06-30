@@ -21,8 +21,14 @@ var searchData=
   ['stable_5fcfl_5fexceeds_5fscan_18',['STABLE_CFL_EXCEEDS_SCAN',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985aa586d352c2be0f8282cb48419ff09a44',1,'test_momentum_convective_candidates.c']]],
   ['stable_5fcfl_5ffinite_19',['STABLE_CFL_FINITE',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985afcf3220ae26f697de6ee7579fd58b6da',1,'test_momentum_convective_candidates.c']]],
   ['stable_5fcfl_5fnone_20',['STABLE_CFL_NONE',['../test__momentum__convective__candidates_8c.html#af292388e49218da0250b0baaa7728985a1977f794f3a02fcfb07fec0fc6009660',1,'test_momentum_convective_candidates.c']]],
-  ['state_5fa_21',['STATE_A',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608aa32486e6d0574321e0fedafe557c21fc',1,'test_momentum_convective_candidates.c']]],
-  ['state_5fb_22',['STATE_B',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608a5ae62508b79893c526e0394ecb9eddde',1,'test_momentum_convective_candidates.c']]],
-  ['state_5fc_23',['STATE_C',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608ae5efcaad582ca6fd418e8bcc8363d287',1,'test_momentum_convective_candidates.c']]],
-  ['symmetry_24',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
+  ['stage_5fcart_5fresid_21',['STAGE_CART_RESID',['../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93ad43c8bd96410fd91fc328f50163d2efc',1,'test_momentum_convective_candidates.c']]],
+  ['stage_5ffinal_22',['STAGE_FINAL',['../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93aa88632af4d7643b19c8e4a54c5d5a633',1,'test_momentum_convective_candidates.c']]],
+  ['stage_5frct_23',['STAGE_RCT',['../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93a27dcba6fb5b17885447ba83245e5ebeb',1,'test_momentum_convective_candidates.c']]],
+  ['stage_5fucat_24',['STAGE_UCAT',['../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93af7ccdec571b078404e35197babf776e8',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fa_25',['STATE_A',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608aa32486e6d0574321e0fedafe557c21fc',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fa_5fx_26',['STATE_A_X',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608afba06a1b4662c7a6cf2a79c38fb25bc6',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fa_5fy_27',['STATE_A_Y',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608afa1aa9c602c2c838273a66c0e7252313',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fb_28',['STATE_B',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608a5ae62508b79893c526e0394ecb9eddde',1,'test_momentum_convective_candidates.c']]],
+  ['state_5fc_29',['STATE_C',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608ae5efcaad582ca6fd418e8bcc8363d287',1,'test_momentum_convective_candidates.c']]],
+  ['symmetry_30',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
 ];

@@ -2230,7 +2230,7 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success, non-zero on failure.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>This function assumes the global vector associated with fieldName has already been populated with the desired data (including any boundary conditions). </dd>
+<dl class="section note"><dt>Note</dt><dd>This function assumes the global vector associated with fieldName has already been populated with the desired data (including any boundary conditions and periodic duplicate planes). It scatters that current global state into the local vector; it does not repair stale global periodic duplicate planes. </dd>
 <dd>
 Wider QUICK-style normal ghost layers require a separate dedicated exchange; this function repairs the adjacent layer used by central stencils.</dd></dl>
 <p>Updates the local vector (including ghost points) from its corresponding global vector.</p>
@@ -3827,7 +3827,7 @@ Here is the caller graph for this function:</div>
 <li>It averages the contravariant velocity components (U¹, U², U³) from the surrounding faces to get an estimate of the contravariant velocity at the cell center.</li>
 <li>It averages the metric vectors (Csi, Eta, Zet) from the surrounding faces to get an estimate of the metric tensor at the cell center. This tensor forms the transformation matrix.</li>
 <li>It solves the linear system <code>[MetricTensor] * [ucat] = [ucont]</code> for the Cartesian velocity vector <code>ucat = (u,v,w)</code> using Cramer's rule.</li>
-<li>The computed Cartesian velocity is stored in the global <code>user-&gt;Ucat</code> vector.</li>
+<li>The computed Cartesian velocity is stored only at independent owned cells in the global <code>user-&gt;Ucat</code> vector.</li>
 </ol>
 <p>The function operates on local, ghosted versions of the input vectors (<code>user-&gt;lUcont</code>, <code>user-&gt;lCsi</code>, etc.) to ensure stencils are valid across processor boundaries.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -3840,7 +3840,8 @@ Here is the caller graph for this function:</div>
 <dl class="section note"><dt>Note</dt><dd><ul>
 <li>This function should be called AFTER <code>user-&gt;lUcont</code> and all local metric vectors (<code>user-&gt;lCsi</code>, etc.) have been populated with up-to-date ghost values via <code>UpdateLocalGhosts</code>.</li>
 <li>It only computes <code>Ucat</code> for interior cells (not on physical boundaries) and for cells not marked as solid/blanked by <code>user-&gt;lNvert</code>.</li>
-<li>The caller is responsible for subsequently applying boundary conditions to <code>user-&gt;Ucat</code> and calling <code>UpdateLocalGhosts(user, "Ucat")</code> to populate <code>user-&gt;lUcat</code>.</li>
+<li>The function performs no communication, does not synchronize periodic duplicate planes, and does not refresh <code>user-&gt;lUcat</code>.</li>
+<li>Before stencil consumption, the caller must synchronize periodic cell values with <code>SynchronizePeriodicCellFields(user, 1, {"Ucat"})</code> and then call <code>UpdateLocalGhosts(user, "Ucat")</code>. The latter remains necessary for the fully nonperiodic case because periodic synchronization is then a no-op.</li>
 </ul>
 </dd></dl>
 <p>Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant velocity (Ucont) defined on cell faces.</p>
@@ -4000,7 +4001,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Convert the ghosted Cartesian velocity field to contravariant face fluxes. </p>
-<p>Interpolates <code>user-&gt;lUcat</code> to each logical face and dots it with the corresponding face-area metric vector. Writes <code>user-&gt;Ucont</code>.</p>
+<p>Interpolates <code>user-&gt;lUcat</code> to each logical face and dots it with the corresponding face-area metric vector. Writes independent entries of <code>user-&gt;Ucont</code>. Periodic and physical endpoint values in <code>user-&gt;lUcat</code> must be finalized and its MPI ghosts current before entry. The resulting <code>Ucont</code> is not synchronized; callers must use the staggered-field workflow before stencil use.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">user</td><td><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a> for the block; Ucont is written in place. </td></tr>
