@@ -11,5 +11,6 @@ var searchData=
   ['mom_5frow_8',['MOM_ROW',['../momentumsolvers_8c.html#a293a3ad70e699ec8f05461bd6f85fad5',1,'momentumsolvers.c']]],
   ['mom_5fskip_5fsolid_9',['MOM_SKIP_SOLID',['../momentumsolvers_8c.html#a3e65fbf5782ab7161691cfd9cf6dcc53',1,'momentumsolvers.c']]],
   ['mom_5fvisc_5fonesided_10',['MOM_VISC_ONESIDED',['../momentumsolvers_8c.html#a1ffe9a4bbf00c1160b222aaaf59ffbe3',1,'momentumsolvers.c']]],
-  ['momentumsolver_5fdualtime_5fpicard_5frk4_11',['MomentumSolver_DualTime_Picard_RK4',['../momentumsolvers_8h.html#a8cd365acf3fb49f865039f78c2a53c38',1,'momentumsolvers.h']]]
+  ['momentumsolver_5fdualtime_5fpicard_5frk4_11',['MomentumSolver_DualTime_Picard_RK4',['../momentumsolvers_8h.html#a8cd365acf3fb49f865039f78c2a53c38',1,'momentumsolvers.h']]],
+  ['momentumsolver_5fnewtonkrylov_12',['MomentumSolver_NewtonKrylov',['../test__momentum__newton__krylov_8c.html#a32dc9ee6a4a717c130ce26161695a3ac',1,'test_momentum_newton_krylov.c']]]
 ];
