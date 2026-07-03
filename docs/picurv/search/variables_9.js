@@ -33,7 +33,7 @@ var searchData=
   ['imp_5fstol_30',['imp_stol',['../variables_8h.html#a9ceb6475261683f406ad2961abaa0f3d',1,'SimCtx']]],
   ['index_31',['index',['../variables_8h.html#aa505a95bfac2ff1d51138d6869b243bc',1,'list_node']]],
   ['info_32',['info',['../variables_8h.html#acd99423029a666652ee1f5bf573619bc',1,'UserCtx']]],
-  ['initial_5fnorm_33',['initial_norm',['../momentum__newton__krylov_8c.html#a9c105fa7438123800598dc0faff01810',1,'MomentumNewtonKrylovContext']]],
+  ['initial_5fnorm_33',['initial_norm',['../momentum__newton__krylov_8c.html#a9c105fa7438123800598dc0faff01810',1,'MomentumNewtonKrylovContext::initial_norm'],['../test__momentum__newton__boundary__fixedpoint_8c.html#a9beb3f72bd5c6b93daaa105a5351eeed',1,'SolveMonitorCtx::initial_norm'],['../test__momentum__newton__boundary__fixedpoint_8c.html#a91d12f51da4f8b608fced8eec7d29188',1,'SolveResult::initial_norm']]],
   ['initialconditiondirectory_34',['initialConditionDirectory',['../variables_8h.html#abe9f3a1dc25faaa132465f5be0ceb583',1,'SimCtx']]],
   ['initialconditionfield_35',['initialConditionField',['../variables_8h.html#ae258934a773c7110160acc76dbf0c5c7',1,'SimCtx']]],
   ['initialconditionmode_36',['initialConditionMode',['../variables_8h.html#a3220e2d7bd31d0188b615b6399b65a8e',1,'SimCtx']]],
@@ -46,5 +46,6 @@ var searchData=
   ['invoked_5fscript_5fdir_43',['INVOKED_SCRIPT_DIR',['../namespacepicurv__cli_1_1core.html#ac29ba0430552705de4caed75d3c16755',1,'picurv_cli::core']]],
   ['isc_44',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
   ['ismastercontroller_45',['isMasterController',['../BC__Handlers_8c.html#a5cb060b42fdff55e2d016318d3b43ad4',1,'DrivenConstantData']]],
-  ['izet_46',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
+  ['its_46',['its',['../test__momentum__newton__boundary__fixedpoint_8c.html#a72427fbaf52be6462fb612fec6194bd9',1,'SolveResult']]],
+  ['izet_47',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
 ];

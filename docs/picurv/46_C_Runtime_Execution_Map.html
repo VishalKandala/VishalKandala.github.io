@@ -88,7 +88,9 @@ $(function() {
 <li class="level1"><a href="#p46_core_structs_sec">3. Core Runtime Structs</a></li>
 <li class="level1"><a href="#p46_init_branches_sec">4. Initialization Branches</a></li>
 <li class="level1"><a href="#p46_loop_sec">5. Timestep Loop (&lt;tt&gt;AdvanceSimulation&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#p46_boundaries_sec">6. Boundary System Runtime Hooks</a></li>
+<li class="level1"><a href="#p46_boundaries_sec">6. Boundary System Runtime Hooks</a><ul><li class="level2"><a href="#p46_residual_purity_sec">6a. Residual-Purity Invariant (Matrix-Free Solvers)</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p46_extension_sec">7. Safe Extension Workflow (C Side)</a></li>
 <li class="level1"><a href="#p46_debug_sec">8. Debugging Entry Points</a></li>
 <li class="level1"><a href="#p46_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md151">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md152">What To Extract Before Changing A Case</a></li>
@@ -219,6 +221,12 @@ $(function() {
 <li><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a></li>
 <li><a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a></li>
 </ul>
+<h2><a class="anchor" id="p46_residual_purity_sec"></a>
+6a. Residual-Purity Invariant (Matrix-Free Solvers)</h2>
+<p>Any field read by the momentum residual or its boundary handlers must be reconstructed or synchronized from the current SNES trial vector <b>before</b> it can influence <code>F(X)</code>. A matrix-free residual (<a class="el" href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a>) that reads stale state is not a deterministic function of <code>X</code>, which breaks the finite-difference Jacobian action and the line search.</p>
+<p>Concretely, the Cartesian velocity state must be seeded in dependency order at the top of each residual evaluation, before <a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a> runs (the conservation-outlet handler reads <code>lUcat</code> on its first pass):</p>
+<div class="fragment"><div class="line">X / Ucont -&gt; lUcont -&gt; Ucat -&gt; periodic Ucat finalization -&gt; lUcat -&gt; boundary application</div>
+</div><!-- fragment --><p><code><a class="el" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa" title="Reconstructs Cartesian velocity (Ucat) at cell centers from contravariant velocity (Ucont) defined on...">Contra2Cart()</a></code> alone is insufficient (it does not refresh <code>lUcat</code>), and the reconstruction inside <code><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187" title="Main boundary-condition orchestrator executed during solver timestepping.">ApplyBoundaryConditions()</a></code> runs after the first handler sweep, so it cannot prepare that sweep. When adding a new field read by the residual or a boundary handler, seed it from <code>X</code> here or expect residual-purity regressions. See <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>, Section 5.</p>
 <h1><a class="anchor" id="p46_extension_sec"></a>
 7. Safe Extension Workflow (C Side)</h1>
 <p>When adding or changing physics behavior:</p>

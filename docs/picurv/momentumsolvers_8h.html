@@ -542,7 +542,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="momentumsolvers_8h_aeae56a41737fb0952e07aa4bc8ebda44_icgraph.svg" width="100%" height="376"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="momentumsolvers_8h_aeae56a41737fb0952e07aa4bc8ebda44_icgraph.svg" width="100%" height="424"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -601,137 +601,137 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on convergence or an error after restoring the canonical entry state. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="momentum__newton__krylov_8c_source.html#l00403">403</a> of file <a class="el" href="momentum__newton__krylov_8c_source.html">momentum_newton_krylov.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  404</span>{</div>
-<div class="line"><span class="lineno">  405</span>    PetscErrorCode ierr = PETSC_SUCCESS, cleanup_ierr;</div>
-<div class="line"><span class="lineno">  406</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx;</div>
-<div class="line"><span class="lineno">  407</span>    SNES           snes = NULL;</div>
-<div class="line"><span class="lineno">  408</span>    Mat            J = NULL;</div>
-<div class="line"><span class="lineno">  409</span>    Vec            solution = NULL, entry_backup = NULL;</div>
-<div class="line"><span class="lineno">  410</span>    KSP            ksp = NULL;</div>
-<div class="line"><span class="lineno">  411</span>    PC             pc = NULL;</div>
-<div class="line"><span class="lineno">  412</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>    *pc_type = NULL;</div>
-<div class="line"><span class="lineno">  413</span>    PetscBool      pc_is_none = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  414</span>    PetscBool      restore_entry = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  415</span>    PetscBool      rhs_created = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  416</span>    PetscBool      solve_started = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  417</span>    PetscBool      committed = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  418</span>    SNESConvergedReason reason = SNES_CONVERGED_ITERATING;</div>
-<div class="line"><span class="lineno">  419</span>    PetscInt       nonlinear_its = 0, function_evals = 0, linear_its = 0;</div>
-<div class="line"><span class="lineno">  420</span>    PetscReal      final_norm = PETSC_MAX_REAL;</div>
-<div class="line"><span class="lineno">  421</span>    <a class="code hl_struct" href="momentum__newton__krylov_8c.html#structMomentumNewtonKrylovContext">MomentumNewtonKrylovContext</a> ctx = {0};</div>
-<div class="line"><span class="lineno">  422</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> *staggered_fields[] = {<span class="stringliteral">&quot;Ucont&quot;</span>};</div>
-<div class="line"><span class="lineno">  423</span> </div>
-<div class="line"><span class="lineno">  424</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  425</span>    PetscCall(<a class="code hl_function" href="momentum__newton__krylov_8c.html#ac7e3b1a4617192a35f290ca22068dbdd">MomentumNewtonKrylov_Validate</a>(user));</div>
-<div class="line"><span class="lineno">  426</span>    PetscCheck(ibm == NULL &amp;&amp; fsi == NULL, PETSC_COMM_WORLD, PETSC_ERR_SUP,</div>
-<div class="line"><span class="lineno">  427</span>               <span class="stringliteral">&quot;Newton Krylov version one does not accept IBM or FSI objects.&quot;</span>);</div>
-<div class="line"><span class="lineno">  428</span>    PetscCheck(user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a> == NULL, PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE,</div>
-<div class="line"><span class="lineno">  429</span>               <span class="stringliteral">&quot;Newton Krylov requires UserCtx::Rhs to be unallocated on entry.&quot;</span>);</div>
-<div class="line"><span class="lineno">  430</span>    simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">  431</span> </div>
-<div class="line"><span class="lineno">  432</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;solution); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  433</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;entry_backup); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  434</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  435</span>    rhs_created = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  436</span>    ierr = SNESCreate(PetscObjectComm((PetscObject)user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>), &amp;snes); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  437</span> </div>
-<div class="line"><span class="lineno">  438</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  439</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  440</span>    ierr = VecCopy(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, entry_backup); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  441</span>    restore_entry = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  442</span>    ierr = VecCopy(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, solution); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  443</span> </div>
-<div class="line"><span class="lineno">  444</span>    ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a44d13e4effe940bc8832905fcb2f96d7">user</a> = user;</div>
-<div class="line"><span class="lineno">  445</span>    ierr = SNESSetOptionsPrefix(snes, <span class="stringliteral">&quot;mom_nk_&quot;</span>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  446</span>    ierr = SNESSetType(snes, SNESNEWTONLS); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  447</span>    ierr = SNESSetDM(snes, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  448</span>    ierr = SNESSetFunction(snes, NULL, <a class="code hl_function" href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a>, &amp;ctx); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  449</span>    ierr = MatCreateSNESMF(snes, &amp;J); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  450</span>    ierr = SNESSetJacobian(snes, J, J, MatMFFDComputeJacobian, NULL); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  451</span>    ierr = SNESGetKSP(snes, &amp;ksp); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  452</span>    ierr = KSPSetType(ksp, KSPGMRES); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  453</span>    ierr = KSPGetPC(ksp, &amp;pc); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  454</span>    ierr = PCSetType(pc, PCNONE); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  455</span>    ierr = SNESSetFromOptions(snes); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  456</span>    ierr = SNESMonitorSet(snes, <a class="code hl_function" href="momentum__newton__krylov_8c.html#aee18bcba59997e2b041f3d4580dbe1fb">MomentumNewtonKrylov_Monitor</a>, &amp;ctx, NULL); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  457</span>    ierr = PCGetType(pc, &amp;pc_type); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  458</span>    ierr = PetscStrcmp(pc_type, PCNONE, &amp;pc_is_none); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  459</span>    <span class="keywordflow">if</span> (!pc_is_none) {</div>
-<div class="line"><span class="lineno">  460</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
-<div class="line"><span class="lineno">  461</span>            <span class="stringliteral">&quot;Newton Krylov version one requires PCNONE; option processing selected PC type &#39;%s&#39;.\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  462</span>            pc_type ? pc_type : <span class="stringliteral">&quot;(unset)&quot;</span>);</div>
-<div class="line"><span class="lineno">  463</span>        ierr = PETSC_ERR_SUP;</div>
-<div class="line"><span class="lineno">  464</span>        <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  465</span>    }</div>
-<div class="line"><span class="lineno">  466</span> </div>
-<div class="line"><span class="lineno">  467</span>    <a class="code hl_function" href="momentum__newton__krylov_8c.html#a7dced101aa2f3172df40e1508d6a3b4c">MomentumNewtonKrylov_OpenHistory</a>(&amp;ctx);</div>
-<div class="line"><span class="lineno">  468</span>    solve_started = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  469</span>    ierr = SNESSolve(snes, NULL, solution);</div>
-<div class="line"><span class="lineno">  470</span>    <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  471</span>    ierr = SNESGetConvergedReason(snes, &amp;reason); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  472</span>    ierr = SNESGetIterationNumber(snes, &amp;nonlinear_its); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  473</span>    ierr = SNESGetNumberFunctionEvals(snes, &amp;function_evals); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  474</span>    ierr = SNESGetLinearSolveIterations(snes, &amp;linear_its); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  475</span>    ierr = SNESGetFunctionNorm(snes, &amp;final_norm); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  476</span> </div>
-<div class="line"><span class="lineno">  477</span>    <span class="keywordflow">if</span> (reason &gt; 0) {</div>
-<div class="line"><span class="lineno">  478</span>        ierr = VecCopy(solution, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  479</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  480</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  481</span>        ierr = VecCopy(entry_backup, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  482</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  483</span>    }</div>
-<div class="line"><span class="lineno">  484</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  485</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
-<div class="line"><span class="lineno">  486</span>    restore_entry = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  487</span>    committed = (PetscBool)(reason &gt; 0);</div>
-<div class="line"><span class="lineno">  488</span> </div>
-<div class="line"><span class="lineno">  489</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
-<div class="line"><span class="lineno">  490</span>              <span class="stringliteral">&quot;Newton Krylov momentum solve: reason=%s (%d), Newton iterations=%d, residual evaluations=%d, Krylov iterations=%d, final norm=%.6e, state=%s.\n&quot;</span>,</div>
-<div class="line"><span class="lineno">  491</span>              SNESConvergedReasons[reason], (PetscInt)reason, nonlinear_its, function_evals,</div>
-<div class="line"><span class="lineno">  492</span>              linear_its, (<span class="keywordtype">double</span>)final_norm, reason &gt; 0 ? <span class="stringliteral">&quot;committed&quot;</span> : <span class="stringliteral">&quot;rolled back&quot;</span>);</div>
-<div class="line"><span class="lineno">  493</span>    <span class="keywordflow">if</span> (reason &lt;= 0) ierr = PETSC_ERR_CONV_FAILED;</div>
-<div class="line"><span class="lineno">  494</span> </div>
-<div class="line"><span class="lineno">  495</span>cleanup:</div>
-<div class="line"><span class="lineno">  496</span>    <span class="comment">/* A PETSc solve error can bypass the normal statistics path. Query whatever</span></div>
-<div class="line"><span class="lineno">  497</span><span class="comment">       SNES retained without replacing the primary error so a failed attempt is</span></div>
-<div class="line"><span class="lineno">  498</span><span class="comment">       still represented in the structured log. */</span></div>
-<div class="line"><span class="lineno">  499</span>    <span class="keywordflow">if</span> (solve_started &amp;&amp; snes) {</div>
-<div class="line"><span class="lineno">  500</span>        (void)SNESGetConvergedReason(snes, &amp;reason);</div>
-<div class="line"><span class="lineno">  501</span>        (void)SNESGetIterationNumber(snes, &amp;nonlinear_its);</div>
-<div class="line"><span class="lineno">  502</span>        (void)SNESGetNumberFunctionEvals(snes, &amp;function_evals);</div>
-<div class="line"><span class="lineno">  503</span>        (void)SNESGetLinearSolveIterations(snes, &amp;linear_its);</div>
-<div class="line"><span class="lineno">  504</span>        (void)SNESGetFunctionNorm(snes, &amp;final_norm);</div>
-<div class="line"><span class="lineno">  505</span>    }</div>
-<div class="line"><span class="lineno">  506</span>    <span class="keywordflow">if</span> (restore_entry &amp;&amp; entry_backup) {</div>
-<div class="line"><span class="lineno">  507</span>        cleanup_ierr = VecCopy(entry_backup, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>);</div>
-<div class="line"><span class="lineno">  508</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  509</span>        cleanup_ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields);</div>
-<div class="line"><span class="lineno">  510</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  511</span>        cleanup_ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user);</div>
-<div class="line"><span class="lineno">  512</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  513</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  514</span>        committed = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  515</span>    }</div>
-<div class="line"><span class="lineno">  516</span>    <span class="keywordflow">if</span> (ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a>) {</div>
-<div class="line"><span class="lineno">  517</span>        (void)fclose(ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a>);</div>
-<div class="line"><span class="lineno">  518</span>        ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a> = NULL;</div>
-<div class="line"><span class="lineno">  519</span>    }</div>
-<div class="line"><span class="lineno">  520</span>    <span class="keywordflow">if</span> (solve_started) {</div>
-<div class="line"><span class="lineno">  521</span>        <a class="code hl_function" href="momentum__newton__krylov_8c.html#a46e2e483be6f4ad8f46e7bfe15b4e922">MomentumNewtonKrylov_WriteSummary</a>(&amp;ctx, reason, nonlinear_its, function_evals,</div>
-<div class="line"><span class="lineno">  522</span>                                          linear_its, final_norm, committed);</div>
-<div class="line"><span class="lineno">  523</span>    }</div>
-<div class="line"><span class="lineno">  524</span>    <span class="keywordflow">if</span> (rhs_created) {</div>
-<div class="line"><span class="lineno">  525</span>        cleanup_ierr = VecDestroy(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a>);</div>
-<div class="line"><span class="lineno">  526</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  527</span>    }</div>
-<div class="line"><span class="lineno">  528</span>    cleanup_ierr = VecDestroy(&amp;entry_backup); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  529</span>    cleanup_ierr = VecDestroy(&amp;solution); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  530</span>    cleanup_ierr = MatDestroy(&amp;J); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  531</span>    cleanup_ierr = SNESDestroy(&amp;snes); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
-<div class="line"><span class="lineno">  532</span>    PetscFunctionReturn(ierr);</div>
-<div class="line"><span class="lineno">  533</span>}</div>
+<p class="definition">Definition at line <a class="el" href="momentum__newton__krylov_8c_source.html#l00459">459</a> of file <a class="el" href="momentum__newton__krylov_8c_source.html">momentum_newton_krylov.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  460</span>{</div>
+<div class="line"><span class="lineno">  461</span>    PetscErrorCode ierr = PETSC_SUCCESS, cleanup_ierr;</div>
+<div class="line"><span class="lineno">  462</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>        *simCtx;</div>
+<div class="line"><span class="lineno">  463</span>    SNES           snes = NULL;</div>
+<div class="line"><span class="lineno">  464</span>    Mat            J = NULL;</div>
+<div class="line"><span class="lineno">  465</span>    Vec            solution = NULL, entry_backup = NULL;</div>
+<div class="line"><span class="lineno">  466</span>    KSP            ksp = NULL;</div>
+<div class="line"><span class="lineno">  467</span>    PC             pc = NULL;</div>
+<div class="line"><span class="lineno">  468</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>    *pc_type = NULL;</div>
+<div class="line"><span class="lineno">  469</span>    PetscBool      pc_is_none = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  470</span>    PetscBool      restore_entry = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  471</span>    PetscBool      rhs_created = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  472</span>    PetscBool      solve_started = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  473</span>    PetscBool      committed = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  474</span>    SNESConvergedReason reason = SNES_CONVERGED_ITERATING;</div>
+<div class="line"><span class="lineno">  475</span>    PetscInt       nonlinear_its = 0, function_evals = 0, linear_its = 0;</div>
+<div class="line"><span class="lineno">  476</span>    PetscReal      final_norm = PETSC_MAX_REAL;</div>
+<div class="line"><span class="lineno">  477</span>    <a class="code hl_struct" href="momentum__newton__krylov_8c.html#structMomentumNewtonKrylovContext">MomentumNewtonKrylovContext</a> ctx = {0};</div>
+<div class="line"><span class="lineno">  478</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> *staggered_fields[] = {<span class="stringliteral">&quot;Ucont&quot;</span>};</div>
+<div class="line"><span class="lineno">  479</span> </div>
+<div class="line"><span class="lineno">  480</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  481</span>    PetscCall(<a class="code hl_function" href="momentum__newton__krylov_8c.html#ac7e3b1a4617192a35f290ca22068dbdd">MomentumNewtonKrylov_Validate</a>(user));</div>
+<div class="line"><span class="lineno">  482</span>    PetscCheck(ibm == NULL &amp;&amp; fsi == NULL, PETSC_COMM_WORLD, PETSC_ERR_SUP,</div>
+<div class="line"><span class="lineno">  483</span>               <span class="stringliteral">&quot;Newton Krylov version one does not accept IBM or FSI objects.&quot;</span>);</div>
+<div class="line"><span class="lineno">  484</span>    PetscCheck(user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a> == NULL, PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE,</div>
+<div class="line"><span class="lineno">  485</span>               <span class="stringliteral">&quot;Newton Krylov requires UserCtx::Rhs to be unallocated on entry.&quot;</span>);</div>
+<div class="line"><span class="lineno">  486</span>    simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">  487</span> </div>
+<div class="line"><span class="lineno">  488</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;solution); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  489</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;entry_backup); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  490</span>    ierr = VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  491</span>    rhs_created = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  492</span>    ierr = SNESCreate(PetscObjectComm((PetscObject)user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>), &amp;snes); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  493</span> </div>
+<div class="line"><span class="lineno">  494</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  495</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  496</span>    ierr = VecCopy(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, entry_backup); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  497</span>    restore_entry = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  498</span>    ierr = VecCopy(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>, solution); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  499</span> </div>
+<div class="line"><span class="lineno">  500</span>    ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a44d13e4effe940bc8832905fcb2f96d7">user</a> = user;</div>
+<div class="line"><span class="lineno">  501</span>    ierr = SNESSetOptionsPrefix(snes, <span class="stringliteral">&quot;mom_nk_&quot;</span>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  502</span>    ierr = SNESSetType(snes, SNESNEWTONLS); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  503</span>    ierr = SNESSetDM(snes, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  504</span>    ierr = SNESSetFunction(snes, NULL, <a class="code hl_function" href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a>, &amp;ctx); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  505</span>    ierr = MatCreateSNESMF(snes, &amp;J); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  506</span>    ierr = SNESSetJacobian(snes, J, J, MatMFFDComputeJacobian, NULL); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  507</span>    ierr = SNESGetKSP(snes, &amp;ksp); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  508</span>    ierr = KSPSetType(ksp, KSPGMRES); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  509</span>    ierr = KSPGetPC(ksp, &amp;pc); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  510</span>    ierr = PCSetType(pc, PCNONE); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  511</span>    ierr = SNESSetFromOptions(snes); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  512</span>    ierr = SNESMonitorSet(snes, <a class="code hl_function" href="momentum__newton__krylov_8c.html#aee18bcba59997e2b041f3d4580dbe1fb">MomentumNewtonKrylov_Monitor</a>, &amp;ctx, NULL); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  513</span>    ierr = PCGetType(pc, &amp;pc_type); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  514</span>    ierr = PetscStrcmp(pc_type, PCNONE, &amp;pc_is_none); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  515</span>    <span class="keywordflow">if</span> (!pc_is_none) {</div>
+<div class="line"><span class="lineno">  516</span>        <a class="code hl_define" href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a>,</div>
+<div class="line"><span class="lineno">  517</span>            <span class="stringliteral">&quot;Newton Krylov version one requires PCNONE; option processing selected PC type &#39;%s&#39;.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  518</span>            pc_type ? pc_type : <span class="stringliteral">&quot;(unset)&quot;</span>);</div>
+<div class="line"><span class="lineno">  519</span>        ierr = PETSC_ERR_SUP;</div>
+<div class="line"><span class="lineno">  520</span>        <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  521</span>    }</div>
+<div class="line"><span class="lineno">  522</span> </div>
+<div class="line"><span class="lineno">  523</span>    <a class="code hl_function" href="momentum__newton__krylov_8c.html#a7dced101aa2f3172df40e1508d6a3b4c">MomentumNewtonKrylov_OpenHistory</a>(&amp;ctx);</div>
+<div class="line"><span class="lineno">  524</span>    solve_started = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  525</span>    ierr = SNESSolve(snes, NULL, solution);</div>
+<div class="line"><span class="lineno">  526</span>    <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  527</span>    ierr = SNESGetConvergedReason(snes, &amp;reason); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  528</span>    ierr = SNESGetIterationNumber(snes, &amp;nonlinear_its); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  529</span>    ierr = SNESGetNumberFunctionEvals(snes, &amp;function_evals); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  530</span>    ierr = SNESGetLinearSolveIterations(snes, &amp;linear_its); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  531</span>    ierr = SNESGetFunctionNorm(snes, &amp;final_norm); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  532</span> </div>
+<div class="line"><span class="lineno">  533</span>    <span class="keywordflow">if</span> (reason &gt; 0) {</div>
+<div class="line"><span class="lineno">  534</span>        ierr = VecCopy(solution, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  535</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  536</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  537</span>        ierr = VecCopy(entry_backup, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  538</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  539</span>    }</div>
+<div class="line"><span class="lineno">  540</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  541</span>    ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user); <span class="keywordflow">if</span> (ierr) <span class="keywordflow">goto</span> cleanup;</div>
+<div class="line"><span class="lineno">  542</span>    restore_entry = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  543</span>    committed = (PetscBool)(reason &gt; 0);</div>
+<div class="line"><span class="lineno">  544</span> </div>
+<div class="line"><span class="lineno">  545</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>,</div>
+<div class="line"><span class="lineno">  546</span>              <span class="stringliteral">&quot;Newton Krylov momentum solve: reason=%s (%d), Newton iterations=%d, residual evaluations=%d, Krylov iterations=%d, final norm=%.6e, state=%s.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  547</span>              SNESConvergedReasons[reason], (PetscInt)reason, nonlinear_its, function_evals,</div>
+<div class="line"><span class="lineno">  548</span>              linear_its, (<span class="keywordtype">double</span>)final_norm, reason &gt; 0 ? <span class="stringliteral">&quot;committed&quot;</span> : <span class="stringliteral">&quot;rolled back&quot;</span>);</div>
+<div class="line"><span class="lineno">  549</span>    <span class="keywordflow">if</span> (reason &lt;= 0) ierr = PETSC_ERR_CONV_FAILED;</div>
+<div class="line"><span class="lineno">  550</span> </div>
+<div class="line"><span class="lineno">  551</span>cleanup:</div>
+<div class="line"><span class="lineno">  552</span>    <span class="comment">/* A PETSc solve error can bypass the normal statistics path. Query whatever</span></div>
+<div class="line"><span class="lineno">  553</span><span class="comment">       SNES retained without replacing the primary error so a failed attempt is</span></div>
+<div class="line"><span class="lineno">  554</span><span class="comment">       still represented in the structured log. */</span></div>
+<div class="line"><span class="lineno">  555</span>    <span class="keywordflow">if</span> (solve_started &amp;&amp; snes) {</div>
+<div class="line"><span class="lineno">  556</span>        (void)SNESGetConvergedReason(snes, &amp;reason);</div>
+<div class="line"><span class="lineno">  557</span>        (void)SNESGetIterationNumber(snes, &amp;nonlinear_its);</div>
+<div class="line"><span class="lineno">  558</span>        (void)SNESGetNumberFunctionEvals(snes, &amp;function_evals);</div>
+<div class="line"><span class="lineno">  559</span>        (void)SNESGetLinearSolveIterations(snes, &amp;linear_its);</div>
+<div class="line"><span class="lineno">  560</span>        (void)SNESGetFunctionNorm(snes, &amp;final_norm);</div>
+<div class="line"><span class="lineno">  561</span>    }</div>
+<div class="line"><span class="lineno">  562</span>    <span class="keywordflow">if</span> (restore_entry &amp;&amp; entry_backup) {</div>
+<div class="line"><span class="lineno">  563</span>        cleanup_ierr = VecCopy(entry_backup, user-&gt;<a class="code hl_variable" href="variables_8h.html#a69c3a361d1aac3bdc14f971bda57e032">Ucont</a>);</div>
+<div class="line"><span class="lineno">  564</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  565</span>        cleanup_ierr = <a class="code hl_function" href="Boundaries_8h.html#a6334cf7fa80fd29e87e04993a9f2da81">SynchronizePeriodicStaggeredFields</a>(user, 1, staggered_fields);</div>
+<div class="line"><span class="lineno">  566</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  567</span>        cleanup_ierr = <a class="code hl_function" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a>(user);</div>
+<div class="line"><span class="lineno">  568</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  569</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a45c581a2900098cda5a12f47707803dd">mom_last_converged</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  570</span>        committed = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  571</span>    }</div>
+<div class="line"><span class="lineno">  572</span>    <span class="keywordflow">if</span> (ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a>) {</div>
+<div class="line"><span class="lineno">  573</span>        (void)fclose(ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a>);</div>
+<div class="line"><span class="lineno">  574</span>        ctx.<a class="code hl_variable" href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">history_file</a> = NULL;</div>
+<div class="line"><span class="lineno">  575</span>    }</div>
+<div class="line"><span class="lineno">  576</span>    <span class="keywordflow">if</span> (solve_started) {</div>
+<div class="line"><span class="lineno">  577</span>        <a class="code hl_function" href="momentum__newton__krylov_8c.html#a46e2e483be6f4ad8f46e7bfe15b4e922">MomentumNewtonKrylov_WriteSummary</a>(&amp;ctx, reason, nonlinear_its, function_evals,</div>
+<div class="line"><span class="lineno">  578</span>                                          linear_its, final_norm, committed);</div>
+<div class="line"><span class="lineno">  579</span>    }</div>
+<div class="line"><span class="lineno">  580</span>    <span class="keywordflow">if</span> (rhs_created) {</div>
+<div class="line"><span class="lineno">  581</span>        cleanup_ierr = VecDestroy(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">Rhs</a>);</div>
+<div class="line"><span class="lineno">  582</span>        <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  583</span>    }</div>
+<div class="line"><span class="lineno">  584</span>    cleanup_ierr = VecDestroy(&amp;entry_backup); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  585</span>    cleanup_ierr = VecDestroy(&amp;solution); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  586</span>    cleanup_ierr = MatDestroy(&amp;J); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  587</span>    cleanup_ierr = SNESDestroy(&amp;snes); <span class="keywordflow">if</span> (!ierr) ierr = cleanup_ierr;</div>
+<div class="line"><span class="lineno">  588</span>    PetscFunctionReturn(ierr);</div>
+<div class="line"><span class="lineno">  589</span>}</div>
 <div class="ttc" id="alogging_8h_html_a672ff9c400e2307306b36415d4fefcb9"><div class="ttname"><a href="logging_8h.html#a672ff9c400e2307306b36415d4fefcb9">LOG</a></div><div class="ttdeci">#define LOG(scope, level, fmt,...)</div><div class="ttdoc">Logging macro for PETSc-based applications with scope control.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00083">logging.h:83</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a230506cce5c68c3bac5a821c42ed3473">LOG_ERROR</a></div><div class="ttdeci">@ LOG_ERROR</div><div class="ttdoc">Critical errors that may halt the program.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00028">logging.h:28</a></div></div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_a44d13e4effe940bc8832905fcb2f96d7"><div class="ttname"><a href="momentum__newton__krylov_8c.html#a44d13e4effe940bc8832905fcb2f96d7">MomentumNewtonKrylovContext::user</a></div><div class="ttdeci">UserCtx * user</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00004">momentum_newton_krylov.c:4</a></div></div>
@@ -739,7 +739,7 @@ Here is the caller graph for this function:</div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_a7dced101aa2f3172df40e1508d6a3b4c"><div class="ttname"><a href="momentum__newton__krylov_8c.html#a7dced101aa2f3172df40e1508d6a3b4c">MomentumNewtonKrylov_OpenHistory</a></div><div class="ttdeci">static void MomentumNewtonKrylov_OpenHistory(MomentumNewtonKrylovContext *ctx)</div><div class="ttdoc">Opens the optional rank-zero Newton iteration-history file.</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00064">momentum_newton_krylov.c:64</a></div></div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_a9874825fe312f850f31d798f30c1e9f3"><div class="ttname"><a href="momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3">MomentumNewtonKrylovContext::history_file</a></div><div class="ttdeci">FILE * history_file</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00005">momentum_newton_krylov.c:5</a></div></div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_ac7e3b1a4617192a35f290ca22068dbdd"><div class="ttname"><a href="momentum__newton__krylov_8c.html#ac7e3b1a4617192a35f290ca22068dbdd">MomentumNewtonKrylov_Validate</a></div><div class="ttdeci">static PetscErrorCode MomentumNewtonKrylov_Validate(UserCtx *user)</div><div class="ttdoc">Rejects configurations outside the audited version-one feature set.</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00146">momentum_newton_krylov.c:146</a></div></div>
-<div class="ttc" id="amomentum__newton__krylov_8c_html_ad4d70d3fdc2914eea7a69d760dd6f975"><div class="ttname"><a href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a></div><div class="ttdeci">static PetscErrorCode MomentumNewtonKrylov_FormResidual(SNES snes, Vec X, Vec F, void *ctx)</div><div class="ttdoc">Adapts a PETSc trial vector to the existing momentum residual path.</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00376">momentum_newton_krylov.c:376</a></div></div>
+<div class="ttc" id="amomentum__newton__krylov_8c_html_ad4d70d3fdc2914eea7a69d760dd6f975"><div class="ttname"><a href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a></div><div class="ttdeci">static PetscErrorCode MomentumNewtonKrylov_FormResidual(SNES snes, Vec X, Vec F, void *ctx)</div><div class="ttdoc">Adapts a PETSc trial vector to the existing momentum residual path.</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00392">momentum_newton_krylov.c:392</a></div></div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_aee18bcba59997e2b041f3d4580dbe1fb"><div class="ttname"><a href="momentum__newton__krylov_8c.html#aee18bcba59997e2b041f3d4580dbe1fb">MomentumNewtonKrylov_Monitor</a></div><div class="ttdeci">static PetscErrorCode MomentumNewtonKrylov_Monitor(SNES snes, PetscInt iteration, PetscReal norm, void *ctx)</div><div class="ttdoc">Captures SNES iteration norms and optionally writes PICurv history rows.</div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00041">momentum_newton_krylov.c:41</a></div></div>
 <div class="ttc" id="amomentum__newton__krylov_8c_html_structMomentumNewtonKrylovContext"><div class="ttname"><a href="momentum__newton__krylov_8c.html#structMomentumNewtonKrylovContext">MomentumNewtonKrylovContext</a></div><div class="ttdef"><b>Definition</b> <a href="momentum__newton__krylov_8c_source.html#l00003">momentum_newton_krylov.c:3</a></div></div>
 <div class="ttc" id="avariables_8h_html_a154e530f8443bc67858ba6e3c411c3d8"><div class="ttname"><a href="variables_8h.html#a154e530f8443bc67858ba6e3c411c3d8">UserCtx::Rhs</a></div><div class="ttdeci">Vec Rhs</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00912">variables.h:912</a></div></div>
@@ -1414,7 +1414,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="momentumsolvers_8h_a173269bc83cefbbc44ef4869bd3fa753_icgraph.svg" width="100%" height="376"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="momentumsolvers_8h_a173269bc83cefbbc44ef4869bd3fa753_icgraph.svg" width="100%" height="424"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

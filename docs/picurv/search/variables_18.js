@@ -10,8 +10,9 @@ var searchData=
   ['x_5fmax_7',['x_max',['../variables_8h.html#a73d51597c7f8f691d93d3cf23240a3a1',1,'IBMNodes']]],
   ['x_5fmidp_8',['x_midp',['../variables_8h.html#a8f0e2a8423d40c479c7a8556a3484107',1,'Cstart']]],
   ['x_5fmin_9',['x_min',['../variables_8h.html#aa9168bfa15123891002ebb7fa222abb2',1,'IBMNodes']]],
-  ['xm_5fcell_10',['xm_cell',['../variables_8h.html#a7b338865846c21925fbb6b968cdf385f',1,'RankCellInfo']]],
-  ['xmax_11',['xmax',['../variables_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart']]],
-  ['xmin_12',['xmin',['../variables_8h.html#a40467caea1532693e5662a0812d74c1c',1,'Cstart']]],
-  ['xs_5fcell_13',['xs_cell',['../variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]]
+  ['xfinal_10',['Xfinal',['../test__momentum__newton__boundary__fixedpoint_8c.html#a431a1aa90551ac5b05e971672b1a5f15',1,'SolveResult']]],
+  ['xm_5fcell_11',['xm_cell',['../variables_8h.html#a7b338865846c21925fbb6b968cdf385f',1,'RankCellInfo']]],
+  ['xmax_12',['xmax',['../variables_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart']]],
+  ['xmin_13',['xmin',['../variables_8h.html#a40467caea1532693e5662a0812d74c1c',1,'Cstart']]],
+  ['xs_5fcell_14',['xs_cell',['../variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]]
 ];

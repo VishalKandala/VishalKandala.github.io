@@ -84,6 +84,7 @@ $(function() {
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p31_selection_sec">1. Selection and Dispatch</a></li>
+<li class="level1"><a href="#p31_approaches_sec">1a. The Two Momentum-Solution Approaches</a></li>
 <li class="level1"><a href="#p31_status_sec">2. Implementation Status Matrix</a></li>
 <li class="level1"><a href="#p31_controls_sec">3. Numerical Controls In Use</a></li>
 <li class="level1"><a href="#p31_testing_sec">4. Current test status</a></li>
@@ -103,14 +104,27 @@ $(function() {
 <ul>
 <li><code>Explicit RK4</code> -&gt; <code>EXPLICIT_RK</code></li>
 <li><code>Dual Time Picard Jameson RK</code> -&gt; <code>DUALTIME_PICARD_JAMESON_RK</code></li>
+<li><code>Newton Krylov</code> -&gt; <code>newton_krylov</code></li>
 </ul>
 <p>Only implemented values are exposed in the enum, parser, and dispatcher. New solver values should be added only with a real implementation plus matching parser, docs, and test updates.</p>
 <p>For compatibility, the former <code>Dual Time Picard RK4</code> YAML display name and <code>DUALTIME_PICARD_RK4</code> C CLI value still select the Jameson solver. New configuration and code must use the Jameson names.</p>
+<h1><a class="anchor" id="p31_approaches_sec"></a>
+1a. The Two Momentum-Solution Approaches</h1>
+<p>Beyond the explicit RK4 verification path, PICurv provides <b>two distinct implicit-in-physical-time momentum-solution approaches</b>. They are genuinely different algorithms, not two names for the same method, and they have different numerical behavior, controls, and maturity. Choose one with <code>strategy.momentum_solver</code>.</p>
+<p><b>Dual-time Picard&ndash;Jameson</b> (<code>Dual Time Picard Jameson RK</code>) — the established, comparatively robust default. It advances the implicit BDF2 update with a fixed-point / pseudo-time iteration using staged Jameson RK smoothing. It is controlled through pseudo-CFL and pseudo-iteration settings, may need conservative pseudo-CFL values, and can converge slowly in demanding high-Reynolds-number or near-inviscid regimes. It does <b>not</b> use SNES/GMRES matrix-free Newton linearizations. Full details: <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a>.</p>
+<p><b>Newton&ndash;Krylov</b> (<code>Newton Krylov</code>) — a newer matrix-free nonlinear solver. It solves the momentum residual with PETSc <code>SNES</code>, using matrix-free Jacobian&ndash;vector products (finite-difference <code>Jv</code>), an inner GMRES Krylov solve, and a backtracking line search. It exposes nonlinear, line-search, GMRES, and preconditioner controls, currently supports the tested unpreconditioned path, and requires a deterministic residual (its Cartesian boundary state is reconstructed from the current trial vector before boundary conditions are applied). Its convergence diagnostics and failure modes (<code>SNES</code>/<code>KSP</code> reasons) differ from the Picard solver. It has a <b>narrower, explicitly validated scope</b> — see its dedicated page: <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>.</p>
+<p>Selection guidance (within the evidence available today):</p>
+<ul>
+<li>Prefer <b>Dual-time Picard&ndash;Jameson</b> for general production runs, complex geometries, and cases outside the Newton&ndash;Krylov version-one scope; it is the broadly exercised path.</li>
+<li>Consider <b>Newton&ndash;Krylov</b> on supported single-block cases when you want true Newton convergence behavior and <code>SNES</code>/<code>KSP</code>-style diagnostics, keeping its scope restrictions (Section 1 of <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>) in mind.</li>
+<li>Use <b>Explicit RK4</b> for verification or when the explicit stability limit is affordable.</li>
+</ul>
 <h1><a class="anchor" id="p31_status_sec"></a>
 2. Implementation Status Matrix</h1>
 <ul>
 <li><code>EXPLICIT_RK</code>: implemented by <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
 <li><code>DUALTIME_PICARD_JAMESON_RK</code>: implemented by <a class="el" href="momentumsolvers_8h.html#a173269bc83cefbbc44ef4869bd3fa753">MomentumSolver_DualTime_Picard_JamesonRK</a></li>
+<li><code>newton_krylov</code>: implemented by <a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a> (matrix-free PETSc SNES/GMRES; narrow validated version-one scope — see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>)</li>
 </ul>
 <h1><a class="anchor" id="p31_controls_sec"></a>
 3. Numerical Controls In Use</h1>
