@@ -174,6 +174,7 @@ strategy:
   # Accepted values:
   #   "Dual Time Picard Jameson RK"  -&gt; implicit dual-time pseudo-stepping (recommended)
   #   "Explicit RK4"                 -&gt; explicit fourth-order Runge-Kutta
+  #   "Newton Krylov"                -&gt; matrix-free PETSc SNES/KSP solve
   momentum_solver: "Dual Time Picard Jameson RK" # -&gt; -mom_solver_type
   central_diff: false # [true/false] -&gt; -central
 
@@ -224,6 +225,28 @@ momentum_solver:
     # alpha = 0.3  : moderate smoothing; ~3-4 consecutive bad trials needed to trigger rejection
     # alpha = 0.0  : ratio never updates (disables ratio-based rejection entirely)
     # Increase alpha if the solver rejects too conservatively on noisy residual histories.
+
+  # Solver-specific controls for Newton Krylov. Uncomment only when
+  # strategy.momentum_solver is "Newton Krylov". Omitted fields retain the
+  # defaults established by src/momentum_newton_krylov.c and PETSc.
+  # newton_krylov:
+  #   nonlinear_solver:
+  #     method: "newtonls"           # -&gt; -mom_nk_snes_type
+  #     absolute_tolerance: 1.0e-10  # -&gt; -mom_nk_snes_atol
+  #     relative_tolerance: 1.0e-8   # -&gt; -mom_nk_snes_rtol
+  #     step_tolerance: 1.0e-12      # -&gt; -mom_nk_snes_stol
+  #     max_iterations: 12           # -&gt; -mom_nk_snes_max_it
+  #     line_search:
+  #       type: "bt"                 # -&gt; -mom_nk_snes_linesearch_type
+  #   linear_solver:
+  #     method: "gmres"              # -&gt; -mom_nk_ksp_type
+  #     absolute_tolerance: 1.0e-10  # -&gt; -mom_nk_ksp_atol
+  #     relative_tolerance: 1.0e-6   # -&gt; -mom_nk_ksp_rtol
+  #     max_iterations: 400          # -&gt; -mom_nk_ksp_max_it
+  #     gmres:
+  #       restart: 80                # -&gt; -mom_nk_ksp_gmres_restart
+  #     preconditioner:
+  #       type: "none"               # -&gt; -mom_nk_pc_type; only none is supported
 
 # --- Physical Solution Convergence Logging ---
 # This layer is separate from the inner solver-health logs. It always records
@@ -333,7 +356,7 @@ petsc_passthrough_options:
   # when tuning sub-KSP/sub-PC options for your PETSc version.
 
   # --- Additional Momentum Controls (if you prefer passthrough style) ---
-  # Prefer the structured momentum_solver.dual_time_picard_jameson_rk block above.
+  # Prefer the structured momentum solver blocks above.
   # These passthrough flags override the structured block if both are present.
   # -pseudo_cfl: 0.5          # dimensionless CFL = dtau * lambda_max (spectral-radius-based)
   # -max_pseudo_cfl: 2.0
@@ -404,6 +427,28 @@ petsc_passthrough_options:
 <li><code>-mom_dt_jameson_residual_norm_noise_allowance_factor</code></li>
 </ul>
 <p>Rule: solver-specific blocks must match selected momentum solver type. Do not set canonical Jameson keys and their deprecated RK4 aliases together.</p>
+<p>For <code>strategy.momentum_solver: "Newton Krylov"</code>, the structured PETSc controls are:</p>
+<div class="fragment"><div class="line">momentum_solver:</div>
+<div class="line">  newton_krylov:</div>
+<div class="line">    nonlinear_solver:</div>
+<div class="line">      method: newtonls</div>
+<div class="line">      absolute_tolerance: 1.0e-10</div>
+<div class="line">      relative_tolerance: 1.0e-8</div>
+<div class="line">      step_tolerance: 1.0e-12</div>
+<div class="line">      max_iterations: 12</div>
+<div class="line">      line_search:</div>
+<div class="line">        type: bt</div>
+<div class="line">    linear_solver:</div>
+<div class="line">      method: gmres</div>
+<div class="line">      absolute_tolerance: 1.0e-10</div>
+<div class="line">      relative_tolerance: 1.0e-6</div>
+<div class="line">      max_iterations: 400</div>
+<div class="line">      gmres:</div>
+<div class="line">        restart: 80</div>
+<div class="line">      preconditioner:</div>
+<div class="line">        type: none</div>
+</div><!-- fragment --><p>Mappings are <code>nonlinear_solver.method/absolute_tolerance/relative_tolerance/step_tolerance/max_iterations</code> to <code>-mom_nk_snes_type/-mom_nk_snes_atol/-mom_nk_snes_rtol/-mom_nk_snes_stol/-mom_nk_snes_max_it</code>, <code>line_search.type</code> to <code>-mom_nk_snes_linesearch_type</code>, and the corresponding <code>linear_solver</code> fields to <code>-mom_nk_ksp_type/-mom_nk_ksp_atol/-mom_nk_ksp_rtol/-mom_nk_ksp_max_it</code>. <code>gmres.restart</code> maps to <code>-mom_nk_ksp_gmres_restart</code>, and <code>preconditioner.type</code> maps to <code>-mom_nk_pc_type</code>.</p>
+<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Version one accepts only <code>preconditioner.type: none</code>. Omitted fields preserve C/PETSc defaults. Raw <code>petsc_passthrough_options</code> are applied last and may override structured values.</p>
 <h1><a class="anchor" id="p08_poisson_sec"></a>
 5. poisson_solver</h1>
 <div class="fragment"><div class="line">poisson_solver:</div>

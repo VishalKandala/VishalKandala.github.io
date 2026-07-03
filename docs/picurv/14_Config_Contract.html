@@ -167,7 +167,7 @@ $(function() {
 <li><code>verification.sources.diffusivity.*</code> -&gt; <code>-verification_diffusivity_*</code></li>
 <li><code>verification.sources.scalar.*</code> -&gt; <code>-verification_scalar_*</code></li>
 <li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code> via normalized names.</li>
-<li>Solver-specific block support currently includes <code>momentum_solver.dual_time_picard_jameson_rk</code>.</li>
+<li>Solver-specific block support includes <code>momentum_solver.dual_time_picard_jameson_rk</code> and <code>momentum_solver.newton_krylov</code>.</li>
 <li>Deprecated <code>dual_time_picard_rk4</code> and <code>rk4_residual_noise_allowance_factor</code> spellings are accepted only as compatibility aliases and normalize to Jameson controls.</li>
 <li><code>momentum_solver.dual_time_picard_jameson_rk</code> controls and their C-side flags:<ul>
 <li><code>max_pseudo_steps</code> -&gt; <code>-mom_max_pseudo_steps</code> (default 50): maximum accepted pseudo-time iterations per physical step; rejected iterations are counted separately.</li>
@@ -184,6 +184,8 @@ $(function() {
 </ul>
 </li>
 <li><code>solution_convergence.*</code> -&gt; <code>-solution_convergence_*</code> for physical solution drift logging.</li>
+<li><code>momentum_solver.newton_krylov.nonlinear_solver.*</code> -&gt; prefixed <code>-mom_nk_snes_*</code> options, including <code>line_search.type</code> -&gt; <code>-mom_nk_snes_linesearch_type</code>.</li>
+<li><code>momentum_solver.newton_krylov.linear_solver.*</code> -&gt; prefixed <code>-mom_nk_ksp_*</code> options and <code>preconditioner.type</code> -&gt; <code>-mom_nk_pc_type</code>. Version one permits only <code>preconditioner.type: none</code>; GMRES restart is GMRES-family-only.</li>
 <li><code>interpolation.method</code> -&gt; <code>-interpolation_method</code>. Defaults to <code>Trilinear</code> (direct cell-center, second-order). Set to <code>CornerAveraged</code> for the legacy two-stage path.</li>
 <li><code>petsc_passthrough_options</code> remains the escape hatch for advanced PETSc/C flags.</li>
 <li><code>scalar_transport.schmidt_number</code> and <code>scalar_transport.turbulent_schmidt_number</code> are the structured scalar/Brownian transport controls; do not use passthrough for ordinary Schmidt-number tuning.</li>
@@ -235,6 +237,7 @@ $(function() {
 <li><code>diagnostics.petsc</code> -&gt; PETSc startup arguments on solver/postprocessor commands</li>
 <li><code>diagnostics.runtime_memory_log</code> -&gt; <code>-runtime_memory_log_enabled/-runtime_memory_log_file</code></li>
 <li><code>solver_monitoring.poisson.*</code> maps readable monitor keys into prefixed Poisson KSP flags.</li>
+<li><code>solver_monitoring.momentum.*</code> maps readable Newton history/SNES/KSP monitor booleans into bare <code>-mom_nk_*</code> switches.</li>
 <li><code>solver_monitoring.petsc_passthrough_options</code> maps raw PETSc flags directly into control output.</li>
 </ul>
 <h1><a class="anchor" id="p14_post_sec"></a>
@@ -318,7 +321,8 @@ $(function() {
 <li><code>monitor.solver_monitoring.petsc_passthrough_options</code></li>
 </ul>
 </li>
-<li>Prefer structured keys first: use <code>solver.poisson_solver</code> for pressure-solver KSP/MG setup and <code>monitor.diagnostics.petsc</code> for PETSc startup diagnostics.</li>
+<li>Prefer structured keys first: use <code>solver.momentum_solver.newton_krylov</code> for ordinary Newton SNES/KSP setup, <code>solver.poisson_solver</code> for pressure-solver KSP/MG setup, and <code>monitor.diagnostics.petsc</code> for PETSc startup diagnostics.</li>
+<li>In both solver and monitor PETSc passthrough maps, Boolean <code>true</code> emits a bare switch, Boolean <code>false</code> emits nothing, and other values emit <code>flag value</code>.</li>
 <li>Default post input/output extension is <code>dat</code> unless overridden.</li>
 </ul>
 <p>Launcher defaults vs C defaults:</p>

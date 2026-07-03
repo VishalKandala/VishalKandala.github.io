@@ -224,7 +224,7 @@ io:
     particle_subdir: "particles" # [string] -&gt; -particle_subdir
 
 # ==============================================================================
-# 5. SOLVER MONITORING (PASSTHROUGH)
+# 5. SOLVER MONITORING
 # ==============================================================================
 #
 # This section exposes common solver-monitor controls with readable names.
@@ -239,6 +239,10 @@ solver_monitoring:
     # PICurv structured nonlinear history (does not enable PETSc stdout monitors).
     # The Newton summary log is unconditional, like the Jameson/Poisson logs.
     newton_krylov_history: false  # -&gt; -mom_nk_pic_monitor
+    snes_monitor: false           # -&gt; -mom_nk_snes_monitor
+    snes_converged_reason: false  # -&gt; -mom_nk_snes_converged_reason
+    ksp_monitor: false            # -&gt; -mom_nk_ksp_monitor
+    ksp_converged_reason: false   # -&gt; -mom_nk_ksp_converged_reason
   poisson:
     # Custom PICurv pressure-correction residual monitor.
     pic_true_residual: true       # -&gt; -ps_ksp_pic_monitor_true_residual
@@ -372,6 +376,12 @@ solver_monitoring:
 5. solver_monitoring</h1>
 <p>Human-readable solver monitor controls. PICurv maps these keys to the raw C/PETSc flags written into the generated <code>.control</code> file:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
+<div class="line">  momentum:</div>
+<div class="line">    newton_krylov_history: false</div>
+<div class="line">    snes_monitor: true</div>
+<div class="line">    snes_converged_reason: true</div>
+<div class="line">    ksp_monitor: true</div>
+<div class="line">    ksp_converged_reason: true</div>
 <div class="line">  poisson:</div>
 <div class="line">    pic_true_residual: true</div>
 <div class="line">    true_residual: false</div>
@@ -380,13 +390,18 @@ solver_monitoring:
 <div class="line">  petsc_passthrough_options:</div>
 <div class="line">    -ps_pc_svd_monitor: false</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>momentum.newton_krylov_history</code> -&gt; <code>-mom_nk_pic_monitor</code></li>
+<li><code>momentum.snes_monitor</code> -&gt; <code>-mom_nk_snes_monitor</code></li>
+<li><code>momentum.snes_converged_reason</code> -&gt; <code>-mom_nk_snes_converged_reason</code></li>
+<li><code>momentum.ksp_monitor</code> -&gt; <code>-mom_nk_ksp_monitor</code></li>
+<li><code>momentum.ksp_converged_reason</code> -&gt; <code>-mom_nk_ksp_converged_reason</code></li>
 <li><code>poisson.pic_true_residual</code> -&gt; <code>-ps_ksp_pic_monitor_true_residual</code></li>
 <li><code>poisson.true_residual</code> -&gt; <code>-ps_ksp_monitor_true_residual</code></li>
 <li><code>poisson.converged_reason</code> -&gt; <code>-ps_ksp_converged_reason</code></li>
 <li><code>poisson.view</code> -&gt; <code>-ps_ksp_view</code></li>
 </ul>
 <p>Rules:</p><ul>
-<li>The structured <code>poisson.*</code> keys are booleans.</li>
+<li>The structured <code>momentum.*</code> and <code>poisson.*</code> keys are booleans. <code>true</code> emits a bare switch and <code>false</code> emits nothing; no Boolean monitor is serialized as a numeric viewer argument.</li>
 <li><code>petsc_passthrough_options</code> remains available for raw PETSc flags not yet exposed as structured YAML. In passthrough, <code>true</code> emits a switch-only flag, <code>false</code> omits the flag, and non-boolean values emit <code>flag value</code>.</li>
 <li><code>solver_monitoring</code> is written into the generated <code>.control</code> file and consumed during solver setup, while <code>diagnostics.petsc</code> is placed on the executable command line for PETSc initialization-time diagnostics.</li>
 <li>Legacy direct flag entries under <code>solver_monitoring</code> are still accepted for compatibility, but new profiles should prefer the structured form above.</li>
