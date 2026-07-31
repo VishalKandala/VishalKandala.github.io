@@ -44,7 +44,7 @@ var searchData=
   ['outcomes_41',['5. Expected Outcomes',['../43_Developer_Portal_Index.html#p43_developer_outcomes_sec',1,'']]],
   ['outcomes_20after_20completing_20this_20path_42',['4. Expected Outcomes After Completing This Path',['../41_Getting_Started_Index.html#p41_outputs_sec',1,'']]],
   ['outlet_43',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]],
-  ['output_44',['7. Monitors and Log Output',['../55_Newton_Krylov_Momentum_Solver.html#p55_monitors_sec',1,'']]],
+  ['output_44',['output',['../55_Newton_Krylov_Momentum_Solver.html#p55_monitors_sec',1,'7. Monitors and Log Output'],['../09_Monitor_Reference.html#p09_startup_banner_sec',1,'Startup banner and solver-specific output']]],
   ['output_20contract_45',['10. Structured Error Output Contract',['../05_The_Conductor_Script.html#p05_structured_errors_sec',1,'']]],
   ['output_20files_46',['1. Understanding Your Output Files',['../04_Visualization_Tutorial.html#p04_files_sec',1,'']]],
   ['output_20msd_47',['4.3 Enable Statistics Output (MSD)',['../11_User_How_To_Guides.html#p11_stats_ssec',1,'']]],

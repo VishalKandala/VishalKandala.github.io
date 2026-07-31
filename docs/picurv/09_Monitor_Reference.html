@@ -86,6 +86,7 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p09_io_sec">1. io</a></li>
 <li class="level1"><a href="#p09_logging_sec">2. logging</a></li>
+<li class="level1"><a href="#p09_startup_banner_sec">Startup banner and solver-specific output</a></li>
 <li class="level1"><a href="#p09_profiling_sec">3. profiling</a></li>
 <li class="level1"><a href="#p09_diagnostics_sec">4. diagnostics</a></li>
 <li class="level1"><a href="#p09_solver_monitoring_sec">5. solver_monitoring</a></li>
@@ -311,6 +312,18 @@ solver_monitoring:
 <li><code>TRACE</code></li>
 <li><code>VERBOSE</code></li>
 </ul>
+<h1><a class="anchor" id="p09_startup_banner_sec"></a>
+Startup banner and solver-specific output</h1>
+<p>The rank-zero <code>CASE SUMMARY</code> is an effective-configuration report, rather than a dump of every possible option. It is printed independently of <code>logging.verbosity</code> so a quiet production profile still records the run identity, I/O cadence, walltime-guard status, and active state source.</p>
+<ul>
+<li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> cadence, row sampling, restart mode, initialization mode, and interpolation are shown only when particles are configured.</li>
+<li>Eulerian source details distinguish a fresh initial condition, a restart, and <code>load</code> authority.</li>
+<li><code>Initial Pseudo-CFL (Courant)</code> appears only for <code>Dual Time Picard Jameson RK</code>. It is intentionally absent for <code>Newton Krylov</code> and explicit RK, where that controller is not active.</li>
+<li>Newton&ndash;Krylov iteration detail is controlled by <code>solver_monitoring.momentum</code> below and its structured solver controls are documented in <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b> and <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b>.</li>
+<li>The banner also records the effective console log level, profiling mode and final-summary setting, runtime-memory-log state, and the selected solution convergence mode. Periodic and statistical convergence modes additionally show their active period or window; those fields are omitted otherwise.</li>
+</ul>
+<p>The C <code>unit-io</code> contract test verifies these conditional banner fields, while <code>unit-logging</code> verifies the logging behavior described on this page. Both are included in the runtime layer of <code>make certify-docs</code>; the GitHub documentation workflow runs the dependency-free structural documentation checks on every main push and every third day.</p>
+<p>The structural certification also runs a user-facing reporting audit. It rejects raw C console emissions outside the approved banner/logging/bootstrap/progress surfaces and verifies that the C banner plus CLI and <code>picurv summarize</code> retain their solver-specific reporting branches. The checked-in <code>tests/tooling/user_facing_reporting_contract.json</code> also declares every CLI command's parser, handler, and context marker, including submission and plot paths.</p>
 <h1><a class="anchor" id="p09_profiling_sec"></a>
 3. profiling</h1>
 <div class="fragment"><div class="line">profiling:</div>
