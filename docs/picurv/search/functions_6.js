@@ -39,6 +39,7 @@ var searchData=
   ['freeslip_36',['freeslip',['../wallfunction_8h.html#aff1f948f001ff19d905d3d824ac0884a',1,'freeslip(UserCtx *user, double distance_reference, double distance_boundary, Cmpnts velocity_wall, Cmpnts velocity_reference, Cmpnts *velocity_boundary, double normal_x, double normal_y, double normal_z):&#160;wallfunction.c'],['../wallfunction_8c.html#aff1f948f001ff19d905d3d824ac0884a',1,'freeslip(UserCtx *user, double distance_reference, double distance_boundary, Cmpnts velocity_wall, Cmpnts velocity_reference, Cmpnts *velocity_boundary, double normal_x, double normal_y, double normal_z):&#160;wallfunction.c']]],
   ['frozenmomentumjacobian_5fassemblepointblocks_37',['FrozenMomentumJacobian_AssemblePointBlocks',['../momentum__newton__krylov_8c.html#a8cd0c64e3f463e52df88f6b072888dbf',1,'momentum_newton_krylov.c']]],
   ['frozenmomentumjacobian_5fdescribepointblock_38',['FrozenMomentumJacobian_DescribePointBlock',['../momentum__newton__krylov_8c.html#a17c37d1e135994cab74b2f65987b4697',1,'momentum_newton_krylov.c']]],
-  ['frozenmomentumjacobian_5fpointblock_39',['FrozenMomentumJacobian_PointBlock',['../momentum__newton__krylov_8c.html#a4f7a216233dd5e012f25568c584ac50b',1,'momentum_newton_krylov.c']]],
-  ['fullyblocked_40',['FullyBlocked',['../poisson_8c.html#acec4f661c9ad6c6e8992f84d44ac462d',1,'poisson.c']]]
+  ['frozenmomentumjacobian_5fmetricnormsquared_39',['FrozenMomentumJacobian_MetricNormSquared',['../momentum__newton__krylov_8c.html#a309032d3e9dd9c54cfb8acd0df2208a1',1,'momentum_newton_krylov.c']]],
+  ['frozenmomentumjacobian_5fpointblock_40',['FrozenMomentumJacobian_PointBlock',['../momentum__newton__krylov_8c.html#a4f7a216233dd5e012f25568c584ac50b',1,'momentum_newton_krylov.c']]],
+  ['fullyblocked_41',['FullyBlocked',['../poisson_8c.html#acec4f661c9ad6c6e8992f84d44ac462d',1,'poisson.c']]]
 ];

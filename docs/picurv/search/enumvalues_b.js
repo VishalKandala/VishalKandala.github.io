@@ -1,5 +1,10 @@
 var searchData=
 [
   ['ogrid_0',['OGRID',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faadd03a62c8db17bc188262f525a1f4871',1,'variables.h']]],
-  ['outlet_1',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]]
+  ['oracle_5fcenter_5faj_1',['ORACLE_CENTER_AJ',['../test__momentum__newton__krylov_8c.html#adf764cbdea00d65edcd07bb9953ad2b7a00063d2d28cca11dfa921e24e1fdf49c',1,'test_momentum_newton_krylov.c']]],
+  ['oracle_5fcenter_5ftransverse_5fmetrics_2',['ORACLE_CENTER_TRANSVERSE_METRICS',['../test__momentum__newton__krylov_8c.html#adf764cbdea00d65edcd07bb9953ad2b7a526ca49bc7122a26387b351da8fcc15f',1,'test_momentum_newton_krylov.c']]],
+  ['oracle_5fcenter_5fvelocity_3',['ORACLE_CENTER_VELOCITY',['../test__momentum__newton__krylov_8c.html#adf764cbdea00d65edcd07bb9953ad2b7a1c5663f1c1b8fef52aff25c7059a9ed0',1,'test_momentum_newton_krylov.c']]],
+  ['oracle_5flegacy_5fsign_4',['ORACLE_LEGACY_SIGN',['../test__momentum__newton__krylov_8c.html#adf764cbdea00d65edcd07bb9953ad2b7a484f3e0f62bedcaa29dfb4389a19b552',1,'test_momentum_newton_krylov.c']]],
+  ['oracle_5fomit_5fa5_5',['ORACLE_OMIT_A5',['../test__momentum__newton__krylov_8c.html#adf764cbdea00d65edcd07bb9953ad2b7a7b4afa86612b7c083abcb92e87982988',1,'test_momentum_newton_krylov.c']]],
+  ['outlet_6',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]]
 ];
