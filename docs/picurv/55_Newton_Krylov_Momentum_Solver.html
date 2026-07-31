@@ -85,13 +85,13 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p55_scope_sec">1. Purpose and Current Scope</a></li>
 <li class="level1"><a href="#p55_equation_sec">2. What Is Being Solved</a></li>
-<li class="level1"><a href="#p55_snes_sec">3. SNES, Matrix-Free Jacobian, and Krylov Solve</a></li>
+<li class="level1"><a href="#p55_snes_sec">3. Residual, Jacobian, Preconditioning Matrix, and PC</a></li>
 <li class="level1"><a href="#p55_residual_sec">4. Residual Evaluation and Boundary Application</a></li>
 <li class="level1"><a href="#p55_seed_sec">5. Deterministic Cartesian Seeding (Why It Is Required)</a></li>
 <li class="level1"><a href="#p55_config_sec">6. Configuration</a></li>
 <li class="level1"><a href="#p55_monitors_sec">7. Monitors and Log Output</a></li>
 <li class="level1"><a href="#p55_reasons_sec">8. Convergence Reasons and Failure Modes</a></li>
-<li class="level1"><a href="#p55_precond_sec">9. Preconditioning Status and Limitations</a></li>
+<li class="level1"><a href="#p55_precond_sec">9. Preconditioning Architecture and Status</a></li>
 <li class="level1"><a href="#p55_validation_sec">10. Validation Coverage</a></li>
 <li class="level1"><a href="#p55_vs_jameson_sec">11. Differences from Dual-Time Picard&ndash;Jameson</a></li>
 <li class="level1"><a href="#p55_refs_sec">12. Related Pages</a></li>
@@ -127,12 +127,14 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 </ul>
 <p>Order selection is centralized in <code><a class="el" href="momentumsolvers_8h.html#a5412d0e8054e8e59c1f184597296046e" title="Returns whether the current physical step uses the BDF2 discretization.">MomentumUsesBDF2()</a></code>/<code><a class="el" href="momentumsolvers_8h.html#a73b51839534885f5e85a597ce050ed95" title="Returns the BDF physical-time coefficient a0 for the current step.">MomentumBDFCoefficient()</a></code>, shared with the momentum stability estimate. The Newton solver does <b>not</b> change the residual arithmetic, BDF coefficients, conservation-outlet formulas, or the number of boundary passes; it only changes how the resulting nonlinear system is solved.</p>
 <h1><a class="anchor" id="p55_snes_sec"></a>
-3. SNES, Matrix-Free Jacobian, and Krylov Solve</h1>
+3. Residual, Jacobian, Preconditioning Matrix, and PC</h1>
+<p>The four layers have distinct roles. \(F(U)=0\) is the unchanged nonlinear equation. The Jacobian operator approximates \(dF/dU\) and is the operator GMRES uses for the Newton correction. The preconditioning matrix is a cheaper mathematical approximation to that operator. Finally, the PETSc <code>PC</code> is an internal algorithm that approximately applies the inverse of the supplied preconditioning matrix.</p>
 <p>The solver builds a per-step <code>SNES</code> (<a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a>):</p>
 <ul>
 <li>**<code>SNESNEWTONLS</code>** with a backtracking (<code>bt</code>) line search;</li>
-<li>a <b>matrix-free operator</b> from <code>MatCreateSNESMF</code>, whose action is the finite-difference directional derivative \(J\mathbf{v} \approx [F(\mathbf{X}+h\mathbf{v}) - F(\mathbf{X})]/h\) (<code>MatMFFDComputeJacobian</code>). No Jacobian is assembled;</li>
-<li>an inner **<code>KSPGMRES</code>** linear solve with <code>PCNONE</code> (unpreconditioned). <code>PCNONE</code> is required in version one and is enforced: option processing that selects any other preconditioner is rejected.</li>
+<li>a <b>matrix-free Jacobian operator</b> from <code>MatCreateSNESMF</code>, whose action is the finite-difference directional derivative \(J\mathbf{v} \approx [F(\mathbf{X}+h\mathbf{v}) - F(\mathbf{X})]/h\) (<code>MatMFFDComputeJacobian</code>); this is always authoritative;</li>
+<li>by default the preconditioning-matrix argument aliases the Jacobian operator and the inner **<code>KSPGMRES</code>** uses <code>PCNONE</code>;</li>
+<li>optionally, a separately assembled AIJ preconditioning matrix contains the provisional frozen-momentum point blocks; its validated internal PETSc backend is <code>PCPBJACOBI</code>.</li>
 </ul>
 <p>Because the Jacobian action is a finite difference of the residual, the residual <b>must be a deterministic function of the trial vector</b> <code>X</code> (see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_seed_sec">5. Deterministic Cartesian Seeding (Why It Is Required)</a>). GMRES uses PETSc's default classical Gram&ndash;Schmidt orthogonalization; modified Gram&ndash;Schmidt is <b>not</b> required and is not enabled.</p>
 <p>The Newton loop is: evaluate <code>F(X)</code> → form Krylov solve of <code>J dX = -F</code> → line search along <code>dX</code> → repeat until an <code>SNES</code> convergence test fires. On convergence the solution is committed into <code>Ucont</code>; on failure the entry state is restored (rollback) and the physical step is reported as not converged (<code>simCtx-&gt;mom_last_converged</code>).</p>
@@ -179,6 +181,12 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <div class="line"> </div>
 <div class="line">momentum_solver:</div>
 <div class="line">  newton_krylov:</div>
+<div class="line">    jacobian:</div>
+<div class="line">      type: &quot;finite_difference&quot;</div>
+<div class="line">      finite_difference:</div>
+<div class="line">        mode: &quot;matrix_free&quot;</div>
+<div class="line">    preconditioner:</div>
+<div class="line">      model: &quot;none&quot;</div>
 <div class="line">    nonlinear_solver:</div>
 <div class="line">      method: &quot;newtonls&quot;             # -&gt; -mom_nk_snes_type</div>
 <div class="line">      absolute_tolerance: 1.0e-10    # -&gt; -mom_nk_snes_atol</div>
@@ -194,14 +202,50 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <div class="line">      max_iterations: 400            # -&gt; -mom_nk_ksp_max_it</div>
 <div class="line">      gmres:</div>
 <div class="line">        restart: 80                  # -&gt; -mom_nk_ksp_gmres_restart</div>
-<div class="line">      preconditioner:</div>
-<div class="line">        type: &quot;none&quot;                 # -&gt; -mom_nk_pc_type (only &quot;none&quot; is supported)</div>
-</div><!-- fragment --><p>Field-by-field mappings and validation rules (nonnegative tolerances, positive iteration/restart counts, <code>preconditioner.type: none</code> only) are the authoritative configuration reference in <a class="el" href="08_Solver_Reference.html">Solver Reference</a>, section 4. The complete annotated template is <code>examples/master_template/master_solver.yml</code>.</p>
+</div><!-- fragment --><p>The point-block alternative replaces the <code>preconditioner</code> block with:</p>
+<div class="fragment"><div class="line">preconditioner:</div>
+<div class="line">  model: &quot;frozen_momentum_jacobian&quot;</div>
+<div class="line">  structure:</div>
+<div class="line">    type: &quot;point_block&quot;</div>
+</div><!-- fragment --><p><code>jacobian.type: finite_difference</code> means that the complete deterministic nonlinear residual \(F(U)\) is differentiated numerically. <code>jacobian.finite_difference.mode: matrix_free</code> means PETSc evaluates directional products on demand and does not assemble the Jacobian. Finite difference is the construction type; matrix free is one mode within that type.</p>
+<p>The planned second finite-difference mode is <code>colored_sparse</code>, which would assemble a sparse numerical Jacobian using coloring. It is future syntax and is rejected today:</p>
+<div class="fragment"><div class="line">jacobian:</div>
+<div class="line">  type: finite_difference</div>
+<div class="line">  finite_difference:</div>
+<div class="line">    mode: colored_sparse</div>
+</div><!-- fragment --><p>Planned frozen-momentum approximations are a different Jacobian type, not storage modes of finite difference. Their future forms are:</p>
+<div class="fragment"><div class="line">jacobian:</div>
+<div class="line">  type: frozen_momentum_approximation</div>
+<div class="line">  frozen_momentum_approximation:</div>
+<div class="line">    structure: diagonal</div>
+</div><!-- fragment --><p>or:</p>
+<div class="fragment"><div class="line">jacobian:</div>
+<div class="line">  type: frozen_momentum_approximation</div>
+<div class="line">  frozen_momentum_approximation:</div>
+<div class="line">    structure: full_sparse</div>
+</div><!-- fragment --><p>Those forms are also rejected today.</p>
+<p>The Jacobian fields map to <code>-mom_nk_jacobian_type finite_difference</code> and <code>-mom_nk_jacobian_fd_mode matrix_free</code>. The preconditioner fields map to application-owned <code>-mom_nk_preconditioner_*</code> selectors. They do not emit a user-selected PETSc PC type. The released <code>linear_solver.preconditioner.type: none</code> spelling is accepted as a deprecated compatibility alias; it conflicts with a non-none new model. Field-by-field mappings and validation rules (nonnegative tolerances and positive iteration/restart counts) are the authoritative configuration reference in <a class="el" href="08_Solver_Reference.html">Solver Reference</a>, section 4. The complete annotated template is <code>examples/master_template/master_solver.yml</code>.</p>
+<p>The planned operator-intent correspondence with legacy selectors is:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Modern configuration   </th><th class="markdownTableHeadNone">Legacy operator coverage    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>finite_difference / matrix_free + none</code>   </td><td class="markdownTableBodyNone">top-level <code>-imp 4</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>finite_difference / matrix_free + frozen point block</code>   </td><td class="markdownTableBodyNone"><code>-imp 5 -imp_type 2</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>finite_difference / colored_sparse</code>   </td><td class="markdownTableBodyNone">future <code>-imp 5 -imp_type 1</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>frozen momentum / diagonal</code>   </td><td class="markdownTableBodyNone">future <code>-imp 5 -imp_type 3</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>frozen momentum / full_sparse</code>   </td><td class="markdownTableBodyNone">future <code>-imp 5 -imp_type 4</code>   </td></tr>
+</table>
+<p>This table maps numerical operator intent only. It does not reproduce legacy defects, lifecycle, mutable-residual behavior, or historically unknown PETSc runtime options.</p>
 <p>Three configuration layers interact, in increasing precedence:</p>
 <ol type="1">
 <li><b>User-facing YAML</b> (<code>momentum_solver.newton_krylov.*</code>) — the supported surface.</li>
 <li><b>C/PETSc defaults</b> — used for any field you omit.</li>
-<li>**<code>petsc_passthrough_options</code>** — raw PETSc options applied last; they can override structured values and are an advanced escape hatch.</li>
+<li>**<code>petsc_passthrough_options</code>** — raw PETSc options applied last. A raw PC type must match the backend derived by the preconditioning engine or setup fails with an explicit incompatibility error.</li>
 </ol>
 <p>The tolerances above are a reasonable starting point. Interpretation:</p>
 <ul>
@@ -220,7 +264,7 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <p>Independently of PETSc monitors, the solver writes structured rank-zero logs into <code>log_dir</code>:</p>
 <ul>
 <li><code>Momentum_Solver_Newton_Krylov_History_Block_&lt;b&gt;.log</code>: one row per Newton iteration (<code>step | block | newton | nonlinear_norm</code>);</li>
-<li><code>Momentum_Solver_Newton_Krylov_Summary_Block_&lt;b&gt;.log</code>: one row per physical step (<code>SNES reason</code>, Newton iterations, residual evaluations, Krylov iterations, initial/final norm, and whether the result was committed or rolled back).</li>
+<li><code>Momentum_Solver_Newton_Krylov_Summary_Block_&lt;b&gt;.log</code>: one row per physical step (the mathematical Jacobian and preconditioner selections, <code>SNES reason</code>, Newton iterations, residual evaluations, Krylov iterations, initial/final norm, and whether the result was committed or rolled back).</li>
 </ul>
 <p>A healthy solve on the validated duct case shows the nonlinear norm dropping by several orders of magnitude in about two Newton iterations with accepted line search <code>lambda = 1</code>.</p>
 <h1><a class="anchor" id="p55_reasons_sec"></a>
@@ -236,13 +280,16 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 </ul>
 <p>Troubleshooting workflow: enable <code>snes_monitor</code> + <code>snes_converged_reason</code> + <code>ksp_converged_reason</code>, reproduce on a short run, and classify by reason before changing tolerances. If you observe <code>DIVERGED_LINE_SEARCH</code> or non-repeatable nonlinear norms, suspect residual determinism (Section 5) rather than the Krylov settings.</p>
 <h1><a class="anchor" id="p55_precond_sec"></a>
-9. Preconditioning Status and Limitations</h1>
-<p>Version one supports and validates <b>only the unpreconditioned path</b> (<code>preconditioner.type: none</code>, <code>PCNONE</code>), enforced at runtime. There is no assembled operator to precondition against, so a matrix-free preconditioner would be required; this is future work and is intentionally not exposed. Other current limitations are the version-one scope restrictions in Section 1.</p>
+9. Preconditioning Architecture and Status</h1>
+<p>The Jacobian interface owns creation, registration, update, naming, and cleanup of the finite-difference/matrix-free operator. The preconditioner model interface only describes a matrix structure and inserts interior physical coefficients. The common engine owns matrix creation/preallocation, repeated zeroing and assembly, constraint and periodic rows, PETSc backend selection, alias/ownership tracking, and cleanup.</p>
+<p>The optional frozen-momentum/point-block matrix is a separate AIJ matrix. For physical rows it retains only the same-cell 3x3 block from the existing provisional approximation; for constraint rows it inserts the exact modern derivative (+1 identity for fixed rows, or +1/-1 for periodic duplicates). It intentionally omits pressure, LES/RANS viscosity values and derivatives, nonorthogonal viscous cross-couplings, boundary-map and IBM derivatives, and body-force derivatives.</p>
+<p>The point-block coefficient formula is still undergoing an independent numerical reproduction audit. This iteration preserves its arithmetic and does not claim that it exactly reproduces a historical block or improves performance. <code>PCPBJACOBI</code> is only the current internal backend mapping; it is not a user-facing numerical model and is not a historically proven legacy setting.</p>
+<p>Future additions are localized as follows: add a Jacobian type/mode beside <code>MomentumNewtonJacobian_Create/Update</code>; add a coefficient provider through <code><a class="el" href="structMomentumPreconditionerModelOps.html">MomentumPreconditionerModelOps</a></code>; add matrix metadata through <code><a class="el" href="momentum__newton__krylov_8c.html#structMomentumPreconditionerDescription">MomentumPreconditionerDescription</a></code>; and add a validated structure-to-PETSc backend mapping in <code>MomentumPreconditionerEngine_Create</code>. No placeholder modes are exposed before their implementations exist.</p>
 <h1><a class="anchor" id="p55_validation_sec"></a>
 10. Validation Coverage</h1>
 <p>The Newton&ndash;Krylov path is covered at two levels:</p>
 <ul>
-<li><b>Default suite</b> (<code>unit-newton-krylov</code>, part of <code>make check</code>): constraint-row Jacobian structure, matrix-free vs direct differencing, small solve/rollback, and residual repeatability. The conservation-outlet conditioned-row derivative test doubles as a <b>seed-removal detector</b>: removing the deterministic Cartesian seed makes that row's self-derivative revert to the decoupled artifact and the test fails.</li>
+<li><b>Default suite</b> (<code>unit-newton-krylov</code>, part of <code>make check</code>): constraint-row Jacobian structure, matrix-free vs direct differencing, preconditioning-engine model/backend/ownership wiring, small solve/rollback, and residual repeatability. The conservation-outlet conditioned-row derivative test doubles as a <b>seed-removal detector</b>: removing the deterministic Cartesian seed makes that row's self-derivative revert to the decoupled artifact and the test fails.</li>
 <li><b>Opt-in integration regression</b> (<code>make unit-momentum-newton-boundary-fixedpoint</code>, one and four ranks): on the production-sized straight duct it advances a real physical step 1, then verifies (i) residual purity at the step-2 state (immediate and after real MFFD products), (ii) a complete step-2 solve with the default classical Gram&ndash;Schmidt, (iii) that the converged three-pass solution also zeros the 24-pass outlet residual, and (iv) clean pressure projection.</li>
 </ul>
 <p>Validated behavior on that case: convergence in about two Newton iterations from the true projected step-1 state, identical results with classical and modified Gram&ndash;Schmidt, and divergence-free projection, on both one and four ranks.</p>

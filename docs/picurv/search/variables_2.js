@@ -14,13 +14,14 @@ var searchData=
   ['blkpbc_11',['blkpbc',['../variables_8h.html#a2892b7742faefb81b542c6fdd2351e68',1,'SimCtx']]],
   ['block_5fid_12',['block_id',['../logging_8h.html#aeb27d528b5c766bb8c213bb2112a79f6',1,'DualMonitorCtx']]],
   ['block_5fnumber_13',['block_number',['../variables_8h.html#a22580e0e52ca8ddccc76d24c96f00e4a',1,'SimCtx']]],
-  ['bnorm_14',['bnorm',['../logging_8h.html#a5f81613b3f10140c09097044c39eb0f7',1,'DualMonitorCtx']]],
-  ['boundary_5ffaces_15',['boundary_faces',['../variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443',1,'UserCtx']]],
-  ['boundaryclampcount_16',['boundaryClampCount',['../variables_8h.html#a3d9a093e9ab28579a523e6223a69fc9d',1,'SearchMetricsState']]],
-  ['boundaryvelocitycorrection_17',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
-  ['brownianmotionrng_18',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
-  ['bulkvelocitycorrection_19',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
-  ['bvel_5fu_20',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
-  ['bvel_5fv_21',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
-  ['bvel_5fw_22',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
+  ['block_5fsize_14',['block_size',['../momentum__newton__krylov_8c.html#a2e5f0209a828dee211638a39d7bfaf0e',1,'MomentumPreconditionerDescription']]],
+  ['bnorm_15',['bnorm',['../logging_8h.html#a5f81613b3f10140c09097044c39eb0f7',1,'DualMonitorCtx']]],
+  ['boundary_5ffaces_16',['boundary_faces',['../variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443',1,'UserCtx']]],
+  ['boundaryclampcount_17',['boundaryClampCount',['../variables_8h.html#a3d9a093e9ab28579a523e6223a69fc9d',1,'SearchMetricsState']]],
+  ['boundaryvelocitycorrection_18',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
+  ['brownianmotionrng_19',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
+  ['bulkvelocitycorrection_20',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
+  ['bvel_5fu_21',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
+  ['bvel_5fv_22',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
+  ['bvel_5fw_23',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
 ];

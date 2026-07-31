@@ -51,10 +51,12 @@ var searchData=
   ['statistics_5foutput_5fprefix_48',['statistics_output_prefix',['../variables_8h.html#a08e66ab63514af87f312d46142a32364',1,'PostProcessParams']]],
   ['statistics_5fpipeline_49',['statistics_pipeline',['../variables_8h.html#a7b479999a17f6ee81158cc074ec6193f',1,'PostProcessParams']]],
   ['status_50',['status',['../test__momentum__convective__candidates_8c.html#a9009dab7f83ba87bd9fb4984cecfb3de',1,'StableCFLResult']]],
-  ['step_51',['step',['../logging_8h.html#a64100408e773bad5a0c07581dc3ab039',1,'DualMonitorCtx::step'],['../variables_8h.html#ac9684d6e871566d55c997416270b5b99',1,'SimCtx::step']]],
-  ['stepstorun_52',['StepsToRun',['../variables_8h.html#a55ce12cdec83e590169b333b5dc84009',1,'SimCtx']]],
-  ['strong_5fcoupling_53',['STRONG_COUPLING',['../variables_8h.html#a82348af36047097defe3692225145edc',1,'SimCtx']]],
-  ['summationrhs_54',['summationRHS',['../variables_8h.html#aee7757dd3f6e9566fc1206526625e000',1,'SimCtx']]],
-  ['swarm_55',['swarm',['../variables_8h.html#a1675749ea3b2429f00405a1ee3203d18',1,'UserCtx']]],
-  ['symbol_56',['symbol',['../classaudit__function__docs_1_1AuditFinding.html#af250bdc46701c7aafc0fadfd798eabf1',1,'audit_function_docs::AuditFinding']]]
+  ['stencil_5fwidth_51',['stencil_width',['../momentum__newton__krylov_8c.html#a5e7838a805fbf8996d63c0bd361c6a36',1,'MomentumPreconditionerDescription']]],
+  ['step_52',['step',['../logging_8h.html#a64100408e773bad5a0c07581dc3ab039',1,'DualMonitorCtx::step'],['../variables_8h.html#ac9684d6e871566d55c997416270b5b99',1,'SimCtx::step']]],
+  ['stepstorun_53',['StepsToRun',['../variables_8h.html#a55ce12cdec83e590169b333b5dc84009',1,'SimCtx']]],
+  ['strong_5fcoupling_54',['STRONG_COUPLING',['../variables_8h.html#a82348af36047097defe3692225145edc',1,'SimCtx']]],
+  ['structure_55',['structure',['../momentum__newton__krylov_8c.html#a8c4f1327d8fcb4662371302953421bfe',1,'MomentumPreconditionerDescription']]],
+  ['summationrhs_56',['summationRHS',['../variables_8h.html#aee7757dd3f6e9566fc1206526625e000',1,'SimCtx']]],
+  ['swarm_57',['swarm',['../variables_8h.html#a1675749ea3b2429f00405a1ee3203d18',1,'UserCtx']]],
+  ['symbol_58',['symbol',['../classaudit__function__docs_1_1AuditFinding.html#af250bdc46701c7aafc0fadfd798eabf1',1,'audit_function_docs::AuditFinding']]]
 ];

@@ -23,7 +23,7 @@ var searchData=
   ['turbine_20',['turbine',['../variables_8h.html#a04c849d5fadc93b99bd328df1b90adce',1,'SimCtx']]],
   ['turbulent_5fschmidt_5fnumber_21',['Turbulent_schmidt_number',['../variables_8h.html#a1ca58b821a5431bd0c474fccc41e85f9',1,'SimCtx']]],
   ['twod_22',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
-  ['type_23',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition']]],
+  ['type_23',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition::type'],['../momentum__newton__krylov_8c.html#a58b1a6c266c94c0d39e12ee564b2ea83',1,'MomentumNewtonJacobian::type']]],
   ['typedef_5fend_5fre_24',['TYPEDEF_END_RE',['../namespacegenerate__doxygen__fallback__indexes.html#adac8641254e10cfe2c77e196ad1041c0',1,'generate_doxygen_fallback_indexes']]],
   ['typedef_5fstart_5fre_25',['TYPEDEF_START_RE',['../namespacegenerate__doxygen__fallback__indexes.html#a1782d19a48ed4594cce7d85ffdadd14d',1,'generate_doxygen_fallback_indexes']]]
 ];

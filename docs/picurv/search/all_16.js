@@ -27,14 +27,13 @@ var searchData=
   ['km_24',['KM',['../variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904',1,'UserCtx']]],
   ['knobs_25',['6.1 Useful Smoke Knobs',['../40_Testing_and_Quality_Guide.html#p40_smoke_knobs_ssec',1,'']]],
   ['krylov_20momentum_20solver_26',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]],
-  ['krylov_20solve_27',['3. SNES, Matrix-Free Jacobian, and Krylov Solve',['../55_Newton_Krylov_Momentum_Solver.html#p55_snes_sec',1,'']]],
-  ['ksc_28',['ksc',['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc'],['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc']]],
-  ['kske_29',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
-  ['ksp_30',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
-  ['ksp_20stack_20in_20code_31',['2. Multigrid/KSP Stack In Code',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_mg_sec',1,'']]],
-  ['ksp_5ftotal_32',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
-  ['kx_33',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
-  ['ky_34',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
-  ['kz_35',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
-  ['kzet_36',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
+  ['ksc_27',['ksc',['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc'],['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc']]],
+  ['kske_28',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
+  ['ksp_29',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
+  ['ksp_20stack_20in_20code_30',['2. Multigrid/KSP Stack In Code',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_mg_sec',1,'']]],
+  ['ksp_5ftotal_31',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
+  ['kx_32',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
+  ['ky_33',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
+  ['kz_34',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
+  ['kzet_35',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
 ];

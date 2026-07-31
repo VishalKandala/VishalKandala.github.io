@@ -230,6 +230,16 @@ momentum_solver:
   # strategy.momentum_solver is "Newton Krylov". Omitted fields retain the
   # defaults established by src/momentum_newton_krylov.c and PETSc.
   # newton_krylov:
+  #   jacobian:
+  #     type: "finite_difference"
+  #     finite_difference:
+  #       mode: "matrix_free"
+  #   preconditioner:
+  #     model: "none"
+  #     # To enable the provisional point-block approximation, use:
+  #     # model: "frozen_momentum_jacobian"
+  #     # structure:
+  #     #   type: "point_block"
   #   nonlinear_solver:
   #     method: "newtonls"           # -&gt; -mom_nk_snes_type
   #     absolute_tolerance: 1.0e-10  # -&gt; -mom_nk_snes_atol
@@ -245,8 +255,6 @@ momentum_solver:
   #     max_iterations: 400          # -&gt; -mom_nk_ksp_max_it
   #     gmres:
   #       restart: 80                # -&gt; -mom_nk_ksp_gmres_restart
-  #     preconditioner:
-  #       type: "none"               # -&gt; -mom_nk_pc_type; only none is supported
 
 # --- Physical Solution Convergence Logging ---
 # This layer is separate from the inner solver-health logs. It always records
@@ -430,6 +438,12 @@ petsc_passthrough_options:
 <p>For <code>strategy.momentum_solver: "Newton Krylov"</code>, the structured PETSc controls are:</p>
 <div class="fragment"><div class="line">momentum_solver:</div>
 <div class="line">  newton_krylov:</div>
+<div class="line">    jacobian:</div>
+<div class="line">      type: finite_difference</div>
+<div class="line">      finite_difference:</div>
+<div class="line">        mode: matrix_free</div>
+<div class="line">    preconditioner:</div>
+<div class="line">      model: none</div>
 <div class="line">    nonlinear_solver:</div>
 <div class="line">      method: newtonls</div>
 <div class="line">      absolute_tolerance: 1.0e-10</div>
@@ -445,10 +459,8 @@ petsc_passthrough_options:
 <div class="line">      max_iterations: 400</div>
 <div class="line">      gmres:</div>
 <div class="line">        restart: 80</div>
-<div class="line">      preconditioner:</div>
-<div class="line">        type: none</div>
-</div><!-- fragment --><p>Mappings are <code>nonlinear_solver.method/absolute_tolerance/relative_tolerance/step_tolerance/max_iterations</code> to <code>-mom_nk_snes_type/-mom_nk_snes_atol/-mom_nk_snes_rtol/-mom_nk_snes_stol/-mom_nk_snes_max_it</code>, <code>line_search.type</code> to <code>-mom_nk_snes_linesearch_type</code>, and the corresponding <code>linear_solver</code> fields to <code>-mom_nk_ksp_type/-mom_nk_ksp_atol/-mom_nk_ksp_rtol/-mom_nk_ksp_max_it</code>. <code>gmres.restart</code> maps to <code>-mom_nk_ksp_gmres_restart</code>, and <code>preconditioner.type</code> maps to <code>-mom_nk_pc_type</code>.</p>
-<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Version one accepts only <code>preconditioner.type: none</code>. Omitted fields preserve C/PETSc defaults. Raw <code>petsc_passthrough_options</code> are applied last and may override structured values.</p>
+</div><!-- fragment --><p>Mappings are <code>nonlinear_solver.method/absolute_tolerance/relative_tolerance/step_tolerance/max_iterations</code> to <code>-mom_nk_snes_type/-mom_nk_snes_atol/-mom_nk_snes_rtol/-mom_nk_snes_stol/-mom_nk_snes_max_it</code>, <code>line_search.type</code> to <code>-mom_nk_snes_linesearch_type</code>, and the corresponding <code>linear_solver</code> fields to <code>-mom_nk_ksp_type/-mom_nk_ksp_atol/-mom_nk_ksp_rtol/-mom_nk_ksp_max_it</code>. <code>gmres.restart</code> maps to <code>-mom_nk_ksp_gmres_restart</code>. The Jacobian fields map to <code>-mom_nk_jacobian_type/-mom_nk_jacobian_fd_mode</code>; the preconditioner fields map to <code>-mom_nk_preconditioner_model/-mom_nk_preconditioner_structure</code>.</p>
+<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Supported combinations are finite difference/matrix free with either no preconditioner or frozen momentum Jacobian/point block. The released <code>linear_solver.preconditioner.type: none</code> remains a deprecated alias for the no-preconditioner model. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime. The Jacobian block is a strict discriminated configuration: an explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>. <code>colored_sparse</code>, <code>frozen_momentum_approximation</code>, and irrelevant sibling configuration are rejected because their implementations are not present.</p>
 <h1><a class="anchor" id="p08_poisson_sec"></a>
 5. poisson_solver</h1>
 <div class="fragment"><div class="line">poisson_solver:</div>

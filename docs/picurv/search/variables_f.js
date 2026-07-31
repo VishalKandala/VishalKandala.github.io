@@ -10,5 +10,6 @@ var searchData=
   ['output_5ffields_5faveraged_7',['output_fields_averaged',['../variables_8h.html#a47a8b39d145cff36aa25d8588976156e',1,'PostProcessParams']]],
   ['output_5ffields_5finstantaneous_8',['output_fields_instantaneous',['../variables_8h.html#a835edfe1a83c23f4e7708f5134ff02fb',1,'PostProcessParams']]],
   ['output_5fprefix_9',['output_prefix',['../variables_8h.html#a3a5ab7e0a0271c6cec0e2150f9beb1d4',1,'PostProcessParams']]],
-  ['outputparticles_10',['outputParticles',['../variables_8h.html#ab954ff749a6b034b8cef53a508787b24',1,'PostProcessParams']]]
+  ['outputparticles_10',['outputParticles',['../variables_8h.html#ab954ff749a6b034b8cef53a508787b24',1,'PostProcessParams']]],
+  ['owns_5fpreconditioning_5fmatrix_11',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]]
 ];
