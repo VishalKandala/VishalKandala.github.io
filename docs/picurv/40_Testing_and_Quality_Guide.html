@@ -170,6 +170,7 @@ $(function() {
 2. Quick Start</h1>
 <p>Fast local checks:</p>
 <div class="fragment"><div class="line">python3 tests/tooling/audit_function_docs.py</div>
+<div class="line">python3 tests/tooling/audit_starter_content.py</div>
 <div class="line">make test</div>
 <div class="line">make coverage-python</div>
 <div class="line">make audit-build</div>
@@ -188,6 +189,7 @@ $(function() {
 <li>Use <code>python3 <a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">tests/tooling/audit_function_docs.py</a></code> when changing C/Python function signatures, docstrings, or test helpers. It scans production code, generators, tests, and tooling; it rejects missing documentation and name-only descriptions such as “helper function” or “internal helper implementation.”</li>
 <li>Use <code>make test</code> when working on <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, schemas, or repository metadata.</li>
 <li>Use <code>python3 <a class="el" href="check__markdown__links_8py.html">tests/tooling/check_markdown_links.py</a></code> when changing docs/examples.</li>
+<li>Use <code>python3 <a class="el" href="audit__starter__content_8py.html">tests/tooling/audit_starter_content.py</a></code> when changing <code>examples/</code> or <code>config/</code>. It checks the complete top-level template and configuration inventories, validates every declared composition, and verifies that <code>picurv init</code> faithfully copies each template without carrying a site-specific execution sample into the new case.</li>
 <li>Use <code>make audit-build</code> when you want a clean compilation audit with <code>logs/build.log</code> and <code>logs/build.warnings.log</code> captured under the repo <code>logs/</code> directory.</li>
 <li>Use <code>make doctor</code> after provisioning PETSc on a new machine.</li>
 <li>Use <code>make unit-setup</code> when changing setup, teardown, initialization, or rank-info lifecycle code.</li>
@@ -210,6 +212,7 @@ $(function() {
 <div class="fragment"><div class="line">make install-git-hooks</div>
 </div><!-- fragment --><p>The hook runs <code>make certify-docs</code>, which requires a clean worktree and includes the PETSc/MPI runtime tier, whenever runtime-relevant files changed. For Markdown, documentation-site, hook, and workflow-only changes it instead runs <code>make certify-docs-fast</code> only if a full certificate for an ancestor of the target commit exists in local <code>logs/</code> and is no more than three days old. Missing or stale certificates always cause a full run. Override the interval for a single push with <code>PICURV_FULL_CERT_MAX_AGE_DAYS=&lt;days&gt;</code>.</p>
 <p>The hook deliberately rejects a push that maps some other local commit directly to <code>main</code>, because it can only certify the exact checked-out <code>HEAD</code>. This is a local safeguard: Git permits bypassing hooks with <code>git push --no-verify</code>, so the post-push GitHub documentation gates remain a separate redundancy layer.</p>
+<p><code>make certify-docs</code> includes Markdown-link, function-documentation, user-facing-reporting, starter-template/configuration, option-ingress, example/configuration regression, and zero-warning Doxygen gates before the PETSc/MPI <code>make check-full</code> tier. Therefore, with the tracked hook enabled, a normal push to <code>main</code> cannot publish the checked-out commit until all applicable local gates pass. The starter-content gate specifically rejects an unregistered example directory/YAML, an unregistered <code>config/</code> asset, a broken declared composition, or a template that <code>picurv init</code> does not copy faithfully.</p>
 <h1><a class="anchor" id="p40_python_sec"></a>
 3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</h1>
 <p>Purpose:</p>
@@ -266,6 +269,7 @@ $(function() {
 <li>validates canonical example bundles with <code>picurv validate</code></li>
 <li>scans docs/examples/tests for forbidden stale contract terms</li>
 <li>runs the repository-wide function documentation audit (<code><a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">tests/tooling/audit_function_docs.py</a></code>)</li>
+<li>runs the starter-content inventory and composition audit (<code><a class="el" href="audit__starter__content_8py.html">tests/tooling/audit_starter_content.py</a></code>)</li>
 </ul>
 </li>
 </ul>

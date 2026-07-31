@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R']]],
+  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_2',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
   ['rank_5fxm_3',['rank_xm',['../variables_8h.html#a9419886ec15f30fb98c71804d563796c',1,'RankNeighbors']]],
@@ -21,7 +21,7 @@ var searchData=
   ['reference_5fspeed_5fsum_18',['reference_speed_sum',['../logging_8c.html#afd53369363808d11b046d2321e59dddc',1,'SolutionConvergenceDeterministicPass1']]],
   ['ren_19',['ren',['../variables_8h.html#a4897d17394963da4ac73b9856fac48c5',1,'SimCtx']]],
   ['repo_5fblob_5furl_20',['REPO_BLOB_URL',['../namespacegenerate__doxygen__fallback__indexes.html#a12a0570c80cb1098ecac3acc39c8473b',1,'generate_doxygen_fallback_indexes']]],
-  ['repo_5froot_21',['repo_root',['../namespacestamp__docs__revision.html#a2b5b9ebb6575163984db43b16d75e77a',1,'stamp_docs_revision.REPO_ROOT'],['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate.REPO_ROOT'],['../namespacecertify__documentation.html#ada2458d86849bc62cc43014cb213cbf7',1,'certify_documentation.REPO_ROOT'],['../namespaceaudit__user__facing__reporting.html#a1e59fca64a3f71308be00aeaefdc475c',1,'audit_user_facing_reporting.REPO_ROOT'],['../namespaceaudit__function__docs.html#ac65217d5896858efa2494a1f41351edd',1,'audit_function_docs.REPO_ROOT']]],
+  ['repo_5froot_21',['repo_root',['../namespacestamp__docs__revision.html#a2b5b9ebb6575163984db43b16d75e77a',1,'stamp_docs_revision.REPO_ROOT'],['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate.REPO_ROOT'],['../namespacecertify__documentation.html#ada2458d86849bc62cc43014cb213cbf7',1,'certify_documentation.REPO_ROOT'],['../namespaceaudit__user__facing__reporting.html#a1e59fca64a3f71308be00aeaefdc475c',1,'audit_user_facing_reporting.REPO_ROOT'],['../namespaceaudit__starter__content.html#a01138ded60eff01ad3f9f1b897d6392b',1,'audit_starter_content.REPO_ROOT'],['../namespaceaudit__function__docs.html#ac65217d5896858efa2494a1f41351edd',1,'audit_function_docs.REPO_ROOT']]],
   ['researchcount_22',['reSearchCount',['../variables_8h.html#a74a89971a5640f80a0579a3766d38756',1,'SearchMetricsState']]],
   ['restart_5fdir_23',['restart_dir',['../variables_8h.html#af09e3f546ff8fa1192338e746391aa22',1,'SimCtx']]],
   ['returncode_24',['returncode',['../classpicurv__cli_1_1core_1_1CommandExecutionError.html#ab3d7257bf21b416c75863956a60e9976',1,'picurv_cli::core::CommandExecutionError']]],
@@ -33,13 +33,14 @@ var searchData=
   ['rstart_5ffsi_30',['rstart_fsi',['../variables_8h.html#a5d62bb83d782192bfb7a04b985d1b8aa',1,'SimCtx']]],
   ['runtime_5fexecution_5fconfig_5ffilename_31',['RUNTIME_EXECUTION_CONFIG_FILENAME',['../namespacepicurv__cli_1_1core.html#a830e9310bb0a6a7e830e9e4e3ad5896e',1,'picurv_cli::core']]],
   ['runtime_5fexecution_5fconfig_5ffilenames_32',['RUNTIME_EXECUTION_CONFIG_FILENAMES',['../namespacepicurv__cli_1_1core.html#a08ac716baeadb191836d3f31672fa458',1,'picurv_cli::core']]],
-  ['runtime_5fexecution_5fexample_5ffilename_33',['RUNTIME_EXECUTION_EXAMPLE_FILENAME',['../namespacepicurv__cli_1_1core.html#ad7ee5187b91eea844034d55d4a1db194',1,'picurv_cli::core']]],
-  ['runtimememorylogenabled_34',['runtimeMemoryLogEnabled',['../variables_8h.html#a39d780017d47dd98456e1b05d5ff2d42',1,'SimCtx']]],
-  ['runtimememorylogfile_35',['runtimeMemoryLogFile',['../variables_8h.html#a543082a23c10272ae26ebca05f87d677',1,'SimCtx']]],
-  ['runtimememoryloghasprevious_36',['runtimeMemoryLogHasPrevious',['../variables_8h.html#aaab42722ec6a189f479b9637a719faf6',1,'SimCtx']]],
-  ['runtimememorylogpreviousprocessmb_37',['runtimeMemoryLogPreviousProcessMB',['../variables_8h.html#ac8f6c09ebbf4a97fbffa1b5a88675f87',1,'SimCtx']]],
-  ['runtimememorylogstarted_38',['runtimeMemoryLogStarted',['../variables_8h.html#a5479290d05da608eeaf1dd2d948e54d6',1,'SimCtx']]],
-  ['rx_39',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
-  ['ry_40',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
-  ['rz_41',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
+  ['runtime_5fexecution_5fexample_33',['RUNTIME_EXECUTION_EXAMPLE',['../namespaceaudit__starter__content.html#ac1130822b90d1ac1abf448e23e097272',1,'audit_starter_content']]],
+  ['runtime_5fexecution_5fexample_5ffilename_34',['RUNTIME_EXECUTION_EXAMPLE_FILENAME',['../namespacepicurv__cli_1_1core.html#ad7ee5187b91eea844034d55d4a1db194',1,'picurv_cli::core']]],
+  ['runtimememorylogenabled_35',['runtimeMemoryLogEnabled',['../variables_8h.html#a39d780017d47dd98456e1b05d5ff2d42',1,'SimCtx']]],
+  ['runtimememorylogfile_36',['runtimeMemoryLogFile',['../variables_8h.html#a543082a23c10272ae26ebca05f87d677',1,'SimCtx']]],
+  ['runtimememoryloghasprevious_37',['runtimeMemoryLogHasPrevious',['../variables_8h.html#aaab42722ec6a189f479b9637a719faf6',1,'SimCtx']]],
+  ['runtimememorylogpreviousprocessmb_38',['runtimeMemoryLogPreviousProcessMB',['../variables_8h.html#ac8f6c09ebbf4a97fbffa1b5a88675f87',1,'SimCtx']]],
+  ['runtimememorylogstarted_39',['runtimeMemoryLogStarted',['../variables_8h.html#a5479290d05da608eeaf1dd2d948e54d6',1,'SimCtx']]],
+  ['rx_40',['rx',['../variables_8h.html#ade80a8abea8047bfe4b83bd9363df589',1,'UserCtx']]],
+  ['ry_41',['ry',['../variables_8h.html#a540dc135c4299ebf7fcbb33ecd8ca096',1,'UserCtx']]],
+  ['rz_42',['rz',['../variables_8h.html#a94c6d4cf5f0820de35ff6ee1909fd0d6',1,'UserCtx']]]
 ];

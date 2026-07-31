@@ -4,5 +4,6 @@ var searchData=
   ['analyticalsolutions_2eh_1',['AnalyticalSolutions.h',['../AnalyticalSolutions_8h.html',1,'']]],
   ['audit_5ffunction_5fdocs_2epy_2',['audit_function_docs.py',['../audit__function__docs_8py.html',1,'']]],
   ['audit_5fingress_2epy_3',['audit_ingress.py',['../audit__ingress_8py.html',1,'']]],
-  ['audit_5fuser_5ffacing_5freporting_2epy_4',['audit_user_facing_reporting.py',['../audit__user__facing__reporting_8py.html',1,'']]]
+  ['audit_5fstarter_5fcontent_2epy_4',['audit_starter_content.py',['../audit__starter__content_8py.html',1,'']]],
+  ['audit_5fuser_5ffacing_5freporting_2epy_5',['audit_user_facing_reporting.py',['../audit__user__facing__reporting_8py.html',1,'']]]
 ];
