@@ -59,7 +59,7 @@ var searchData=
   ['_5fextract_5fkey_5fpath_56',['_extract_key_path',['../namespacepicurv__cli_1_1core.html#ae27c3c3548f41e9f39156089c628abd7',1,'picurv_cli::core']]],
   ['_5fextract_5fnumeric_5ftuple_57',['_extract_numeric_tuple',['../namespacepicurv__cli_1_1core.html#a4d2b8e1d612b4ef32e7c2a7c39b018c4',1,'picurv_cli::core']]],
   ['_5fface_5fartifact_5ftoken_58',['_face_artifact_token',['../namespacepicurv__cli_1_1core.html#a21e81d5aa27e76b2e354dee42cc866ae',1,'picurv_cli::core']]],
-  ['_5ffind_5fattached_5fdoxygen_5fblock_59',['_find_attached_doxygen_block',['../namespaceaudit__function__docs.html#ab7cec5af8f3a9fc0c00e56a2d7df9c5e',1,'audit_function_docs']]],
+  ['_5ffind_5fattached_5fcomment_5fblock_59',['_find_attached_comment_block',['../namespaceaudit__function__docs.html#a2682e629b3f8b291582ca30aa6526c82',1,'audit_function_docs']]],
   ['_5ffind_5fparticle_5fsnapshot_5ffor_5fstep_60',['_find_particle_snapshot_for_step',['../namespacepicurv__cli_1_1core.html#adfbf08c075317e804f572d067e31f54f',1,'picurv_cli::core']]],
   ['_5ffind_5fprevious_5fsnapshot_5fstep_61',['_find_previous_snapshot_step',['../namespacepicurv__cli_1_1core.html#a49f58b9c7f5b1101cfe5da42038e7021',1,'picurv_cli::core']]],
   ['_5ffind_5fsolver_5fstream_5flog_5fcandidates_62',['_find_solver_stream_log_candidates',['../namespacepicurv__cli_1_1core.html#aa4e0b33103714386259284241717a7f4',1,'picurv_cli::core']]],

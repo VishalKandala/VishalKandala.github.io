@@ -21,6 +21,7 @@ MathJax.Hub.Config({
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
+<script src="picurv-docs-revision.js"></script>
 <script type="text/javascript" src="theme-sync.js"></script>
 </head>
 <body>
@@ -85,6 +86,7 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p40_taxonomy_sec">1. Testing Taxonomy</a></li>
 <li class="level1"><a href="#p40_quickstart_sec">2. Quick Start</a></li>
+<li class="level1"><a href="#p40_main_prepush_sec">2.1 Main-Branch Pre-Push Certification</a></li>
 <li class="level1"><a href="#p40_python_sec">3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</a><ul><li class="level2"><a href="#p40_python_files_ssec">3.1 Python Test File Matrix</a></li>
 </ul>
 </li>
@@ -156,6 +158,7 @@ $(function() {
 <li><code>make check-mpi-matrix</code></li>
 <li><code>make check-full</code></li>
 <li><code>make check-stress</code></li>
+<li><code>make install-git-hooks</code></li>
 </ul>
 <p>Compatibility aliases remain available:</p>
 <ul>
@@ -199,7 +202,14 @@ $(function() {
 <li>Use <code>make check-mpi</code> when multi-rank MPI behavior is in scope.</li>
 <li>Use <code>make check-full</code> for comprehensive branch/CI/release validation that must cover all MPI layers.</li>
 <li>Use <code>make check-stress</code> when you want the full default gate plus the stress tier in one pass.</li>
+<li>Run <code>make install-git-hooks</code> once per clone to make <code>make certify-docs</code> an automatic pre-push gate for updates to remote <code>main</code>. The hook validates only the checked-out commit and blocks the push on failure; GitHub Actions then repeats the lighter structural documentation checks after the push.</li>
 </ul>
+<h1><a class="anchor" id="p40_main_prepush_sec"></a>
+2.1 Main-Branch Pre-Push Certification</h1>
+<p>The tracked <code>.githooks/pre-push</code> hook enforces a commit-scoped documentation certificate before a local Git client updates <code>refs/heads/main</code>. Enable it in each clone with:</p>
+<div class="fragment"><div class="line">make install-git-hooks</div>
+</div><!-- fragment --><p>The hook runs <code>make certify-docs</code>, which requires a clean worktree and includes the PETSc/MPI runtime tier, whenever runtime-relevant files changed. For Markdown, documentation-site, hook, and workflow-only changes it instead runs <code>make certify-docs-fast</code> only if a full certificate for an ancestor of the target commit exists in local <code>logs/</code> and is no more than three days old. Missing or stale certificates always cause a full run. Override the interval for a single push with <code>PICURV_FULL_CERT_MAX_AGE_DAYS=&lt;days&gt;</code>.</p>
+<p>The hook deliberately rejects a push that maps some other local commit directly to <code>main</code>, because it can only certify the exact checked-out <code>HEAD</code>. This is a local safeguard: Git permits bypassing hooks with <code>git push --no-verify</code>, so the post-push GitHub documentation gates remain a separate redundancy layer.</p>
 <h1><a class="anchor" id="p40_python_sec"></a>
 3. Python Suite (&lt;tt&gt;test-python&lt;/tt&gt;)</h1>
 <p>Purpose:</p>

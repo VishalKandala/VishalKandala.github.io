@@ -21,6 +21,7 @@ MathJax.Hub.Config({
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
+<script src="picurv-docs-revision.js"></script>
 <script type="text/javascript" src="theme-sync.js"></script>
 </head>
 <body>
@@ -112,7 +113,7 @@ $(function() {
 1a. The Two Momentum-Solution Approaches</h1>
 <p>Beyond the explicit RK4 verification path, PICurv provides <b>two distinct implicit-in-physical-time momentum-solution approaches</b>. They are genuinely different algorithms, not two names for the same method, and they have different numerical behavior, controls, and maturity. Choose one with <code>strategy.momentum_solver</code>.</p>
 <p><b>Dual-time Picard&ndash;Jameson</b> (<code>Dual Time Picard Jameson RK</code>) — the established, comparatively robust default. It advances the implicit BDF2 update with a fixed-point / pseudo-time iteration using staged Jameson RK smoothing. It is controlled through pseudo-CFL and pseudo-iteration settings, may need conservative pseudo-CFL values, and can converge slowly in demanding high-Reynolds-number or near-inviscid regimes. It does <b>not</b> use SNES/GMRES matrix-free Newton linearizations. Full details: <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a>.</p>
-<p><b>Newton&ndash;Krylov</b> (<code>Newton Krylov</code>) — a newer matrix-free nonlinear solver. It solves the momentum residual with PETSc <code>SNES</code>, using matrix-free Jacobian&ndash;vector products (finite-difference <code>Jv</code>), an inner GMRES Krylov solve, and a backtracking line search. It exposes nonlinear, line-search, GMRES, and preconditioner controls, currently supports the tested unpreconditioned path, and requires a deterministic residual (its Cartesian boundary state is reconstructed from the current trial vector before boundary conditions are applied). Its convergence diagnostics and failure modes (<code>SNES</code>/<code>KSP</code> reasons) differ from the Picard solver. It has a <b>narrower, explicitly validated scope</b> — see its dedicated page: <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>.</p>
+<p><b>Newton&ndash;Krylov</b> (<code>Newton Krylov</code>) — a newer matrix-free nonlinear solver. It solves the momentum residual with PETSc <code>SNES</code>, using matrix-free Jacobian&ndash;vector products (finite-difference <code>Jv</code>), an inner GMRES Krylov solve, and a backtracking line search. It exposes nonlinear, line-search, GMRES, and preconditioner controls. The supported baseline is unpreconditioned matrix-free differencing; the supported alternative is a provisional frozen-momentum point-block preconditioner, whose PETSc block-Jacobi backend is chosen internally. It requires a deterministic residual (its Cartesian boundary state is reconstructed from the current trial vector before boundary conditions are applied). Its convergence diagnostics and failure modes (<code>SNES</code>/<code>KSP</code> reasons) differ from the Picard solver. It has a <b>narrower, explicitly validated scope</b> — see its dedicated page: <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>.</p>
 <p>Selection guidance (within the evidence available today):</p>
 <ul>
 <li>Prefer <b>Dual-time Picard&ndash;Jameson</b> for general production runs, complex geometries, and cases outside the Newton&ndash;Krylov version-one scope; it is the broadly exercised path.</li>
@@ -124,7 +125,7 @@ $(function() {
 <ul>
 <li><code>EXPLICIT_RK</code>: implemented by <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
 <li><code>DUALTIME_PICARD_JAMESON_RK</code>: implemented by <a class="el" href="momentumsolvers_8h.html#a173269bc83cefbbc44ef4869bd3fa753">MomentumSolver_DualTime_Picard_JamesonRK</a></li>
-<li><code>newton_krylov</code>: implemented by <a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a> (matrix-free PETSc SNES/GMRES; narrow validated version-one scope — see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>)</li>
+<li><code>newton_krylov</code>: implemented by <a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a> (matrix-free PETSc SNES/GMRES; <code>none</code> or frozen-momentum/point-block preconditioning; narrow validated version-one scope — see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a>)</li>
 </ul>
 <h1><a class="anchor" id="p31_controls_sec"></a>
 3. Numerical Controls In Use</h1>

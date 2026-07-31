@@ -28,7 +28,7 @@ var searchData=
   ['6_20practical_20checks_25',['6. Practical Checks',['../33_Initial_Conditions.html#p33_checks_sec',1,'']]],
   ['6_20references_26',['6. References',['../19_Nondimensionalization.html#p19_links_sec',1,'']]],
   ['6_20related_20documentation_27',['6. Related Documentation',['../30_Repository_Navigation.html#p30_related_sec',1,'']]],
-  ['6_20related_20pages_28',['6 related pages',['../22_CURVIB_Method.html#p22_refs_sec',1,'6. Related Pages'],['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages'],['../34_Particle_Model_Overview.html#p34_refs_sec',1,'6. Related Pages'],['../p54_geometric_periodic.html#p54_refs_sec',1,'6. Related Pages']]],
+  ['6_20related_20pages_28',['6 related pages',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages'],['../34_Particle_Model_Overview.html#p34_refs_sec',1,'6. Related Pages'],['../22_CURVIB_Method.html#p22_refs_sec',1,'6. Related Pages'],['../p54_geometric_periodic.html#p54_refs_sec',1,'6. Related Pages']]],
   ['6_20repository_20and_20documentation_20navigation_29',['6. Repository and Documentation Navigation',['../Documentation_Map.html#p47_repo_axis_sec',1,'']]],
   ['6_20run_20level_20reductions_20and_20percentiles_30',['4.6 Run-Level Reductions and Percentiles',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_reductions',1,'']]],
   ['6_20sandbox_20policy_31',['6. Sandbox Policy',['../29_Maintenance_Backlog.html#p29_sandbox_sec',1,'']]],
@@ -38,6 +38,7 @@ var searchData=
   ['6_20sweep_20studies_35',['6. Sweep Studies',['../11_User_How_To_Guides.html#p11_sweep_sec',1,'']]],
   ['6_20sweep_3a_20parameter_20study_20via_20slurm_20arrays_36',['6. sweep: Parameter Study via Slurm Arrays',['../05_The_Conductor_Script.html#p05_sweep_sec',1,'']]],
   ['6_20using_20tt_20grid_20gen_20tt_20through_20tt_20case_20yml_20tt_37',['6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;',['../48_Grid_Generator_Guide.html#p48_case_sec',1,'']]],
-  ['6_20worked_20example_20classes_38',['6. Worked Example Classes',['../53_Search_Robustness_Metrics_Reference.html#p53_examples_sec',1,'']]],
-  ['6a_20residual_20purity_20invariant_20matrix_20free_20solvers_39',['6a. Residual-Purity Invariant (Matrix-Free Solvers)',['../46_C_Runtime_Execution_Map.html#p46_residual_purity_sec',1,'']]]
+  ['6_20what_20makes_20a_20method_20page_20authoritative_38',['6. What Makes a Method Page Authoritative',['../21_Methods_Overview.html#p21_authority_sec',1,'']]],
+  ['6_20worked_20example_20classes_39',['6. Worked Example Classes',['../53_Search_Robustness_Metrics_Reference.html#p53_examples_sec',1,'']]],
+  ['6a_20residual_20purity_20invariant_20matrix_20free_20solvers_40',['6a. Residual-Purity Invariant (Matrix-Free Solvers)',['../46_C_Runtime_Execution_Map.html#p46_residual_purity_sec',1,'']]]
 ];
