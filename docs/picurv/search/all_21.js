@@ -17,7 +17,7 @@ var searchData=
   ['validate_5fparticle_5fcheckpoint_14',['validate_particle_checkpoint',['../namespacepicurv__cli_1_1core.html#aecf4b487468587b24e32d571b547994f',1,'picurv_cli::core']]],
   ['validate_5fpetsc_5fvec_5fbinary_15',['validate_petsc_vec_binary',['../namespacepicurv__cli_1_1core.html#aaa8f8785084c3a49978aa3d33bdd31c2',1,'picurv_cli::core']]],
   ['validate_5fpost_5fconfig_16',['validate_post_config',['../namespacepicurv__cli_1_1core.html#aaa345d81b32e75af619c4a7c9890fd6c',1,'picurv_cli::core']]],
-  ['validate_5fprogrammatic_5fic_5fgen_5fgrid_5fsettings_17',['validate_programmatic_ic_gen_grid_settings',['../namespacepicurv__cli_1_1core.html#af72c5aff92104b38b73817e0d7c3b07e',1,'picurv_cli::core']]],
+  ['validate_5fprogrammatic_5fgenerated_5fic_5fgrid_5fsettings_17',['validate_programmatic_generated_ic_grid_settings',['../namespacepicurv__cli_1_1core.html#a4a9c7804e97fdd34493f7835d742b167',1,'picurv_cli::core']]],
   ['validate_5fsolver_5fconfigs_18',['validate_solver_configs',['../namespacepicurv__cli_1_1core.html#aa361b69d8425c533940a916974f19cdc',1,'picurv_cli::core']]],
   ['validate_5fstudy_5fconfig_19',['validate_study_config',['../namespacepicurv__cli_1_1core.html#a0fa0191e5c9188b91a3d20d999743789',1,'picurv_cli::core']]],
   ['validate_5fworkflow_20',['validate_workflow',['../namespacepicurv__cli_1_1core.html#a068f9134a2449c213fe602e660d2cce4',1,'picurv_cli::core']]],

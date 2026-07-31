@@ -1,7 +1,7 @@
 var searchData=
 [
   ['_5f_5fgetattr_5f_5f_0',['__getattr__',['../classpicurv__cli_1_1core_1_1__LazyNumpyProxy.html#ad4249bd07f9c665961071ae2098d4c88',1,'picurv_cli::core::_LazyNumpyProxy']]],
-  ['_5f_5finit_5f_5f_1',['__init__',['../classpicurv__cli_1_1core_1_1CommandExecutionError.html#ac240fb45f03120c4ba919eb84a22a428',1,'picurv_cli::core::CommandExecutionError']]],
+  ['_5f_5finit_5f_5f_1',['__init__',['../classpicurv__cli_1_1core_1_1CommandExecutionError.html#ac240fb45f03120c4ba919eb84a22a428',1,'picurv_cli.core.CommandExecutionError.__init__()'],['../classpython__coverage__gate_1_1PathAwareIgnore.html#af3b61f9c42d4918710090ddb25d60ccd',1,'python_coverage_gate.PathAwareIgnore.__init__()']]],
   ['_5fadd_5fbuild_5fparser_2',['_add_build_parser',['../namespacepicurv__cli_1_1cli.html#a2c391b8903c609e107ce488dfe99d0d9',1,'picurv_cli::cli']]],
   ['_5fadd_5fcancel_5fparser_3',['_add_cancel_parser',['../namespacepicurv__cli_1_1cli.html#a845d012f0423426a77f23690f16ed1aa',1,'picurv_cli::cli']]],
   ['_5fadd_5finit_5fparser_4',['_add_init_parser',['../namespacepicurv__cli_1_1cli.html#a329869a27415f28385b5f4953d1cd8ee',1,'picurv_cli::cli']]],
@@ -102,7 +102,7 @@ var searchData=
   ['_5fprint_5fconfig_5fheader_99',['_print_config_header',['../namespacepicurv__cli_1_1core.html#a88ece90dba877ad9dcb29df57a33faf9',1,'picurv_cli::core']]],
   ['_5fprint_5ffindings_100',['_print_findings',['../namespaceaudit__function__docs.html#a86ae031938f0324ef5630b77b319052f',1,'audit_function_docs']]],
   ['_5fprint_5fvalidation_5ferrors_101',['_print_validation_errors',['../namespacepicurv__cli_1_1core.html#aab3121aae093f1e8c06baf0473dc6022',1,'picurv_cli::core']]],
-  ['_5fprofilingend_102',['_profilingend',['../logging_8c.html#a9c70e2531bc267a24b49832bd6683181',1,'_ProfilingEnd(const char *func_name):&#160;logging.c'],['../logging_8h.html#a9c70e2531bc267a24b49832bd6683181',1,'_ProfilingEnd(const char *func_name):&#160;logging.c']]],
+  ['_5fprofilingend_102',['_profilingend',['../logging_8h.html#a9c70e2531bc267a24b49832bd6683181',1,'_ProfilingEnd(const char *func_name):&#160;logging.c'],['../logging_8c.html#a9c70e2531bc267a24b49832bd6683181',1,'_ProfilingEnd(const char *func_name):&#160;logging.c']]],
   ['_5fprofilingstart_103',['_profilingstart',['../logging_8h.html#af85d22d104cdcdeb5014361278b25fdb',1,'_ProfilingStart(const char *func_name):&#160;logging.c'],['../logging_8c.html#af85d22d104cdcdeb5014361278b25fdb',1,'_ProfilingStart(const char *func_name):&#160;logging.c']]],
   ['_5fprune_5fincompatible_5fpython_5fsite_5fpaths_104',['_prune_incompatible_python_site_paths',['../namespacepicurv__cli_1_1core.html#ad8ce96363bb12d18d64e31c2b9ffb873',1,'picurv_cli::core']]],
   ['_5fpython_5fparameter_5fnames_105',['_python_parameter_names',['../namespaceaudit__function__docs.html#a06a8f3a764e1cb7449213b46d6a22898',1,'audit_function_docs']]],
@@ -142,8 +142,9 @@ var searchData=
   ['_5fsummary_5fdisplay_5fvalue_139',['_summary_display_value',['../namespacepicurv__cli_1_1core.html#a60657f38adf121376ea0e1f2a25f9a1f',1,'picurv_cli::core']]],
   ['_5fsummary_5fsource_5fmtime_140',['_summary_source_mtime',['../namespacepicurv__cli_1_1core.html#ad6e5230019d6741269c1dbe998819496',1,'picurv_cli::core']]],
   ['_5fto_5fbool_141',['_to_bool',['../namespacepicurv__cli_1_1core.html#a6602e0eedc947c3c75940224e5aff0ff',1,'picurv_cli::core']]],
-  ['_5fto_5ffloat_142',['_to_float',['../namespacepicurv__cli_1_1core.html#a727c9b88547f1f908b391c2251928c2d',1,'picurv_cli::core']]],
-  ['_5fvalidate_5fyaml_5fschema_5fkeys_143',['_validate_yaml_schema_keys',['../namespacepicurv__cli_1_1core.html#a9db31b0e2e36cf5a10d00ca2adf01b6f',1,'picurv_cli::core']]],
-  ['_5fworking_5ftree_5fhas_5ftracked_5fchanges_144',['_working_tree_has_tracked_changes',['../namespacepicurv__cli_1_1core.html#a1758344ad0ef7e1da2c7544e953a4b66',1,'picurv_cli::core']]],
-  ['_5fwrite_5fsubmission_5ftarget_5fmetadata_145',['_write_submission_target_metadata',['../namespacepicurv__cli_1_1core.html#a05300981092ca49a79c146c86fdf2995',1,'picurv_cli::core']]]
+  ['_5fto_5ffinite_5ffloat_142',['_to_finite_float',['../namespacepicurv__cli_1_1core.html#ac6a8b1f57185b35e84f95babfedd7510',1,'picurv_cli::core']]],
+  ['_5fto_5ffloat_143',['_to_float',['../namespacepicurv__cli_1_1core.html#a727c9b88547f1f908b391c2251928c2d',1,'picurv_cli::core']]],
+  ['_5fvalidate_5fyaml_5fschema_5fkeys_144',['_validate_yaml_schema_keys',['../namespacepicurv__cli_1_1core.html#a9db31b0e2e36cf5a10d00ca2adf01b6f',1,'picurv_cli::core']]],
+  ['_5fworking_5ftree_5fhas_5ftracked_5fchanges_145',['_working_tree_has_tracked_changes',['../namespacepicurv__cli_1_1core.html#a1758344ad0ef7e1da2c7544e953a4b66',1,'picurv_cli::core']]],
+  ['_5fwrite_5fsubmission_5ftarget_5fmetadata_146',['_write_submission_target_metadata',['../namespacepicurv__cli_1_1core.html#a05300981092ca49a79c146c86fdf2995',1,'picurv_cli::core']]]
 ];
