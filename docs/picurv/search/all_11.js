@@ -115,7 +115,7 @@ var searchData=
   ['fluxoutsum_112',['FluxOutSum',['../variables_8h.html#a35819a5678c9c37c2f8b55c2091a9a05',1,'SimCtx']]],
   ['fluxsum_113',['Fluxsum',['../variables_8h.html#ab6ee189c80a939393b9cfd780774966e',1,'SimCtx']]],
   ['fn_114',['fn',['../test__support_8h.html#aed1fee72dbe89304b50c8ae7fcc265b8',1,'PicurvTestCase']]],
-  ['follow_20up_20snapshot_202026_2003_2020_115',['8.1 Coverage Follow-Up Snapshot (2026-03-20)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
+  ['follow_20up_20snapshot_202026_2007_2031_115',['8.1 Coverage Follow-Up Snapshot (2026-07-31)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
   ['for_116',['1. What &lt;tt&gt;grid.gen&lt;/tt&gt; Is For',['../48_Grid_Generator_Guide.html#p48_role_sec',1,'']]],
   ['for_20any_20selector_117',['1. Standard Checklist For Any Selector',['../50_Modular_Selector_Extension_Guide.html#p50_general_sec',1,'']]],
   ['for_20cell_20centered_20variables_20tt_20ucat_20tt_20tt_20p_20tt_118',['4. The Shifted Index Architecture for Cell-Centered Variables (&lt;tt&gt;ucat&lt;/tt&gt;, &lt;tt&gt;P&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md68',1,'']]],

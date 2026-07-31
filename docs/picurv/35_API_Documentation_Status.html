@@ -105,7 +105,7 @@ $(function() {
 <li>C implementations in <code>src/</code>,</li>
 <li>C tests in <code>tests/c/</code>,</li>
 <li>Python product code in <code>picurv_cli/</code> and <code>generators/</code>,</li>
-<li>Python tests in <code>tests/</code>.</li>
+<li>Python tests and documentation tooling in <code>tests/</code>.</li>
 </ul>
 <p>The current repository contract requires every executable function to have an attached descriptive comment/docstring. Public C headers own the rendered Doxygen API contract, including <code>@brief</code>, exact parameter coverage, and documented return values where applicable; implementation comments preserve local intent without duplicating public parameter documentation.</p>
 <h1><a class="anchor" id="p35_warning_sec"></a>
@@ -123,6 +123,7 @@ $(function() {
 <li><code><a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">tests/tooling/audit_function_docs.py</a></code></li>
 </ul>
 <p>GitHub Actions quality CI also runs the audit explicitly before <code>pytest -q</code> on pull requests and pushes to <code>main</code>.</p>
+<p>The audit requires a meaningful explanation, not merely a tag or symbol label: public C declarations must have a specific Doxygen brief, private C helpers must have a specific attached implementation comment, and Python functions must have a specific brief docstring. It scans production code, generators, tests, and documentation tooling.</p>
 <p><code>make build-docs</code> remains useful for rendered output verification, but the audit script is the primary completeness gate for function comments. For a commit-scoped claim that the documentation is current, use <code>make certify-docs</code>. It requires a clean worktree, runs link/API/ingress/configuration/Doxygen gates plus <code>make check-full</code>, and writes an ignored certificate named <code>logs/documentation-certificate-&lt;full-sha&gt;.md</code>. The certificate is valid only through that exact Git commit.</p>
 <p>Every rendered Doxygen page also carries a bottom banner linking to the commit whose source tree produced it. The banner identifies the documentation revision; the full certificate records whether the PETSc/MPI runtime gate was included.</p>
 <h1><a class="anchor" id="p35_expected_sec"></a>
@@ -135,9 +136,10 @@ $(function() {
 <li>cross-module dependencies should be explicit when non-obvious,</li>
 <li>Python functions must use Doxygen-compatible docstrings, not plain one-line docstrings.</li>
 </ol>
-<p>For C test files, concise briefs are acceptable, but they should still say what the test/helper verifies or sets up. Placeholder summaries like <code>Test-local routine.</code> remain tolerated in untouched legacy tests, but newly added or modified tests should use descriptive <code>@brief</code> text.</p>
+<p>For C test files, concise briefs are acceptable, but they must still say what the test/helper verifies or sets up. Placeholder summaries like <code>Test-local routine.</code> are rejected.</p>
 <p>Minimum acceptable quality is interface correctness and discoverability, even when deep theoretical derivation is documented elsewhere.</p>
 <p>For nontrivial numerical APIs, the header must also identify the coordinate or field convention, ownership/ghost-state preconditions, and output meaning when those facts determine correct use. A parameter name by itself is not a contract.</p>
+<p>Inside a function, comment only the information that code cannot communicate reliably by itself: numerical rationale, invariant or unit convention, distributed-memory/ownership boundary, intentionally surprising early return, or error-handling constraint. Do not add line-by-line narration of obvious assignments or assertions. These in-body explanations are reviewed with the code change; the automated gate enforces the function-level baseline and rejects known stub language.</p>
 <h1><a class="anchor" id="p35_workflow_sec"></a>
 4. Practical Cleanup Workflow</h1>
 <ol type="1">

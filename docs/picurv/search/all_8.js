@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['8_201_20coverage_20follow_20up_20snapshot_202026_2003_2020_0',['8.1 Coverage Follow-Up Snapshot (2026-03-20)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
+  ['8_201_20coverage_20follow_20up_20snapshot_202026_2007_2031_0',['8.1 Coverage Follow-Up Snapshot (2026-07-31)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
   ['8_20adding_20a_20new_20c_20unit_20suite_1',['8. Adding A New C Unit Suite',['../51_C_Test_Suite_Developer_Guide.html#p51_extending_sec',1,'']]],
   ['8_20common_20failure_20modes_2',['8. Common Failure Modes',['../44_Boundary_Conditions_Guide.html#p44_troubleshoot_sec',1,'']]],
   ['8_20contributor_20extension_20points_3',['8. Contributor Extension Points',['../45_Particle_Initialization_and_Restart.html#p45_extension_sec',1,'']]],

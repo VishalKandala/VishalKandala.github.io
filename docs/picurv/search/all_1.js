@@ -19,7 +19,7 @@ var searchData=
   ['1_20cfd_20restart_20new_20run_20continue_20solving_16',['5.1 CFD Restart (New Run, Continue Solving)',['../52_Run_Lifecycle_Guide.html#p52_restart_cfd',1,'']]],
   ['1_20core_20search_20concept_17',['1. Core Search Concept',['../26_Walking_Search_Method.html#p26_concept_sec',1,'']]],
   ['1_20core_20workflow_20idea_18',['1. Core Workflow Idea',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_idea_sec',1,'']]],
-  ['1_20coverage_20follow_20up_20snapshot_202026_2003_2020_19',['8.1 Coverage Follow-Up Snapshot (2026-03-20)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
+  ['1_20coverage_20follow_20up_20snapshot_202026_2007_2031_19',['8.1 Coverage Follow-Up Snapshot (2026-07-31)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
   ['1_20current_20next_20gap_20priorities_20',['5.1 Current next-gap priorities',['../51_C_Test_Suite_Developer_Guide.html#p51_gap_ssec',1,'']]],
   ['1_20current_20status_21',['1. Current Status',['../35_API_Documentation_Status.html#p35_status_sec',1,'']]],
   ['1_20curvilinear_20formulation_20context_22',['1. Curvilinear Formulation Context',['../22_CURVIB_Method.html#p22_formulation_sec',1,'']]],

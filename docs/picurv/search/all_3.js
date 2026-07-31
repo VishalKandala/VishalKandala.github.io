@@ -74,13 +74,14 @@ var searchData=
   ['3_20yaml_20mapping_20and_20petsc_20options_71',['3. YAML Mapping and PETSc Options',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_config_sec',1,'']]],
   ['3_20yaml_20runtime_20artifacts_72',['3. YAML -&gt; Runtime Artifacts',['../06_Simulation_Anatomy.html#p06_artifacts_sec',1,'']]],
   ['30_5frepository_5fnavigation_2emd_73',['30_Repository_Navigation.md',['../30__Repository__Navigation_8md.html',1,'']]],
-  ['31_5fmomentum_5fsolvers_2emd_74',['31_Momentum_Solvers.md',['../31__Momentum__Solvers_8md.html',1,'']]],
-  ['32_5fanalytical_5fsolutions_2emd_75',['32_Analytical_Solutions.md',['../32__Analytical__Solutions_8md.html',1,'']]],
-  ['33_5finitial_5fconditions_2emd_76',['33_Initial_Conditions.md',['../33__Initial__Conditions_8md.html',1,'']]],
-  ['34_5fparticle_5fmodel_5foverview_2emd_77',['34_Particle_Model_Overview.md',['../34__Particle__Model__Overview_8md.html',1,'']]],
-  ['35_5fapi_5fdocumentation_5fstatus_2emd_78',['35_API_Documentation_Status.md',['../35__API__Documentation__Status_8md.html',1,'']]],
-  ['36_5fcluster_5frun_5fguide_2emd_79',['36_Cluster_Run_Guide.md',['../36__Cluster__Run__Guide_8md.html',1,'']]],
-  ['37_5fsweep_5fstudies_5fguide_2emd_80',['37_Sweep_Studies_Guide.md',['../37__Sweep__Studies__Guide_8md.html',1,'']]],
-  ['39_5fcommon_5ffatal_5ferrors_2emd_81',['39_Common_Fatal_Errors.md',['../39__Common__Fatal__Errors_8md.html',1,'']]],
-  ['3b_20sync_20binaries_20sync_20config_20pull_20source_20status_20source_82',['3b. sync-binaries / sync-config / pull-source / status-source',['../05_The_Conductor_Script.html#p05_sync_sec',1,'']]]
+  ['31_74',['8.1 Coverage Follow-Up Snapshot (2026-07-31)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
+  ['31_5fmomentum_5fsolvers_2emd_75',['31_Momentum_Solvers.md',['../31__Momentum__Solvers_8md.html',1,'']]],
+  ['32_5fanalytical_5fsolutions_2emd_76',['32_Analytical_Solutions.md',['../32__Analytical__Solutions_8md.html',1,'']]],
+  ['33_5finitial_5fconditions_2emd_77',['33_Initial_Conditions.md',['../33__Initial__Conditions_8md.html',1,'']]],
+  ['34_5fparticle_5fmodel_5foverview_2emd_78',['34_Particle_Model_Overview.md',['../34__Particle__Model__Overview_8md.html',1,'']]],
+  ['35_5fapi_5fdocumentation_5fstatus_2emd_79',['35_API_Documentation_Status.md',['../35__API__Documentation__Status_8md.html',1,'']]],
+  ['36_5fcluster_5frun_5fguide_2emd_80',['36_Cluster_Run_Guide.md',['../36__Cluster__Run__Guide_8md.html',1,'']]],
+  ['37_5fsweep_5fstudies_5fguide_2emd_81',['37_Sweep_Studies_Guide.md',['../37__Sweep__Studies__Guide_8md.html',1,'']]],
+  ['39_5fcommon_5ffatal_5ferrors_2emd_82',['39_Common_Fatal_Errors.md',['../39__Common__Fatal__Errors_8md.html',1,'']]],
+  ['3b_20sync_20binaries_20sync_20config_20pull_20source_20status_20source_83',['3b. sync-binaries / sync-config / pull-source / status-source',['../05_The_Conductor_Script.html#p05_sync_sec',1,'']]]
 ];

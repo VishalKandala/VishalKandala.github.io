@@ -98,7 +98,7 @@ $(function() {
 </ul>
 </li>
 <li class="level1"><a href="#p40_aggregate_sec">7. Aggregate Validation Gates (&lt;tt&gt;check*&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#p40_coverage_impl_sec">8. Coverage Gate Implementation Notes</a><ul><li class="level2"><a href="#p40_coverage_followup_ssec">8.1 Coverage Follow-Up Snapshot (2026-03-20)</a></li>
+<li class="level1"><a href="#p40_coverage_impl_sec">8. Coverage Gate Implementation Notes</a><ul><li class="level2"><a href="#p40_coverage_followup_ssec">8.1 Coverage Follow-Up Snapshot (2026-07-31)</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p40_troubleshooting_sec">9. Common Failure Modes</a></li>
@@ -185,7 +185,7 @@ $(function() {
 <div class="line">make check-full</div>
 </div><!-- fragment --><p>Guidance:</p>
 <ul>
-<li>Use <code>python3 <a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">tests/tooling/audit_function_docs.py</a></code> when changing C/Python function signatures, docstrings, or test helpers.</li>
+<li>Use <code>python3 <a class="el" href="audit__function__docs_8py.html" title="Audits C and Python function documentation coverage across the repository.">tests/tooling/audit_function_docs.py</a></code> when changing C/Python function signatures, docstrings, or test helpers. It scans production code, generators, tests, and tooling; it rejects missing documentation and name-only descriptions such as “helper function” or “internal helper implementation.”</li>
 <li>Use <code>make test</code> when working on <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, schemas, or repository metadata.</li>
 <li>Use <code>python3 <a class="el" href="check__markdown__links_8py.html">tests/tooling/check_markdown_links.py</a></code> when changing docs/examples.</li>
 <li>Use <code>make audit-build</code> when you want a clean compilation audit with <code>logs/build.log</code> and <code>logs/build.warnings.log</code> captured under the repo <code>logs/</code> directory.</li>
@@ -441,23 +441,22 @@ $(function() {
 <li>C summary: <code>coverage/c/summary.txt</code></li>
 </ul>
 <h2><a class="anchor" id="p40_coverage_followup_ssec"></a>
-8.1 Coverage Follow-Up Snapshot (2026-03-20)</h2>
-<p>This dated snapshot records non-periodic C sources that still look thinly exercised after the <code>2026-03-20</code> local audit. Treat these numbers as test-readiness guidance for future work, not as evidence of confirmed product defects.</p>
+8.1 Coverage Follow-Up Snapshot (2026-07-31)</h2>
+<p>This dated snapshot records non-periodic C sources that still look thinly exercised after the <code>2026-07-31</code> local audit. Treat these numbers as test-readiness guidance for future work, not as evidence of confirmed product defects.</p>
 <ul>
-<li><code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>: <code>11.69%</code></li>
-<li><code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code>: <code>23.93%</code></li>
-<li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) turbulence models.">src/les.c</a></code>: <code>22.58%</code></li>
-<li><code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>: <code>45.66%</code></li>
-<li><code><a class="el" href="rhs_8c.html">src/rhs.c</a></code>: <code>61.95%</code></li>
-<li><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>: <code>64.76%</code></li>
-<li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>68.10%</code></li>
+<li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) turbulence models.">src/les.c</a></code>: <code>29.46%</code>. Add a direct dynamic-Smagorinsky fixture that executes the filtered-stress procedure, rather than only the constant-model and eddy-viscosity paths.</li>
+<li><code><a class="el" href="poisson_8c.html">src/poisson.c</a></code>: <code>47.61%</code>. Add multigrid-cycle, periodic/IBM, solid-aware restriction/interpolation, and driven-flux correction cases.</li>
+<li><code><a class="el" href="momentum__newton__krylov_8c.html">src/momentum_newton_krylov.c</a></code>: <code>62.50%</code>. The focused residual/constraint/Jacobian/rollback suite is strong; extend it across less-common solver-option and nonlinear-error branches.</li>
+<li><code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>: <code>66.46%</code>. Add controlled live-run coverage for signal receipt and automatic walltime-guard shutdown/restart output.</li>
+<li><code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code>: <code>69.42%</code>. Add malformed/empty/unknown pipeline-stage and optional-field combination coverage.</li>
 </ul>
 <p>Next test work priorities from this snapshot:</p>
-<ul>
-<li>analytical/body-force/LES model paths need more direct unit coverage rather than relying mainly on indirect runtime exercise</li>
-<li>Poisson/RHS/runtime orchestration paths need deeper nontrivial-branch coverage beyond the current helper-heavy surface</li>
-<li>boundary coverage is close to the gate threshold but still thin outside the stable non-periodic path</li>
-</ul>
+<ol type="1">
+<li>dynamic LES and Poisson multigrid/stencil cases,</li>
+<li>runtime signal and walltime-guard integration coverage,</li>
+<li>postprocessor pipeline error-path coverage,</li>
+<li>remaining Newton&ndash;Krylov option/error-path coverage.</li>
+</ol>
 <h1><a class="anchor" id="p40_troubleshooting_sec"></a>
 9. Common Failure Modes</h1>
 <p>Common issues:</p>
@@ -577,14 +576,7 @@ $(function() {
 <li>deeper <code>PoissonSolver_MG</code> and periodic/IBM stencil behavior checks beyond the current helper-level <code>unit-poisson-rhs</code> surface</li>
 <li>broader richer-runtime fixture variants so grid/setup/metric tests cover more than the tiny Cartesian baseline</li>
 <li>broaden the MPI rank matrix to larger optional decompositions (for example <code>SMOKE_MPI_MATRIX_NPROCS="2 3 4 6"</code>) in CI/nightly profiles</li>
-<li>coverage follow-up from the <code>2026-03-20</code> audit:<ul>
-<li>add direct harnesses for <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code> (<code>23.93%</code>) and <code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code> (<code>11.69%</code>)</li>
-<li>broaden LES-model-path tests for <code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) turbulence models.">src/les.c</a></code> (<code>22.58%</code>)</li>
-<li>deepen direct Poisson/RHS coverage for <code><a class="el" href="poisson_8c.html">src/poisson.c</a></code> (<code>45.66%</code>) and <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code> (<code>61.95%</code>)</li>
-<li>expand runtime orchestration branch coverage for <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code> (<code>64.76%</code>)</li>
-<li>add more non-periodic boundary edge-case coverage for <code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code> (<code>68.10%</code>)</li>
-</ul>
-</li>
+<li>coverage follow-up from the <code>2026-07-31</code> audit: dynamic LES, Poisson multigrid/stencils, live walltime/signal shutdown, postprocessor pipeline errors, and remaining Newton&ndash;Krylov option/error paths (see section 8.1 for measured coverage and scope).</li>
 </ul>
 <p>P2 (deeper hardening):</p>
 <ul>

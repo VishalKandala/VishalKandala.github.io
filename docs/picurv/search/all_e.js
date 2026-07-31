@@ -327,7 +327,7 @@ var searchData=
   ['coupling_324',['5. Early-Step Settlement and Coupling',['../45_Particle_Initialization_and_Restart.html#p45_settle_sec',1,'']]],
   ['coupling_20overview_325',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
   ['coverage_326',['10. Validation Coverage',['../55_Newton_Krylov_Momentum_Solver.html#p55_validation_sec',1,'']]],
-  ['coverage_20follow_20up_20snapshot_202026_2003_2020_327',['8.1 Coverage Follow-Up Snapshot (2026-03-20)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
+  ['coverage_20follow_20up_20snapshot_202026_2007_2031_327',['8.1 Coverage Follow-Up Snapshot (2026-07-31)',['../40_Testing_and_Quality_Guide.html#p40_coverage_followup_ssec',1,'']]],
   ['coverage_20gate_20implementation_20notes_328',['8. Coverage Gate Implementation Notes',['../40_Testing_and_Quality_Guide.html#p40_coverage_impl_sec',1,'']]],
   ['coverage_20lens_329',['5.2 Source-to-Test Coverage Lens',['../13_Code_Architecture.html#p13_source_to_tests_ssec',1,'']]],
   ['coverage_20map_330',['11. Runtime Coverage Map',['../40_Testing_and_Quality_Guide.html#p40_runtime_coverage_sec',1,'']]],

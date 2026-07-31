@@ -218,54 +218,58 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   39</span> </div>
 <div class="line"><span class="lineno">   40</span>    PetscFunctionBeginUser;</div>
 <div class="line"><span class="lineno">   41</span> </div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="verification__sources_8c.html#a73f52bf769cc6037474e02d6cd6f4133">VerificationDiffusivityOverrideActive</a>(simCtx)) PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   43</span> </div>
-<div class="line"><span class="lineno">   44</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2">Diffusivity</a>, &amp;diff_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   45</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad744b47ca3c5f3df2d1b737e432d6f07">Cent</a>, &amp;cent); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   46</span> </div>
-<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm; ++k) {</div>
-<div class="line"><span class="lineno">   48</span>        <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym; ++j) {</div>
-<div class="line"><span class="lineno">   49</span>            <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm; ++i) {</div>
-<div class="line"><span class="lineno">   50</span>                <span class="keyword">const</span> PetscReal gamma =</div>
-<div class="line"><span class="lineno">   51</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ab20cb67a1aeed934cc1f424e4ae16468">gamma0</a> +</div>
-<div class="line"><span class="lineno">   52</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#a9163091b27bcc37b9e84367db1acebc7">slope_x</a> * cent[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><span class="lineno">   53</span>                diff_arr[k][j][i] = gamma;</div>
-<div class="line"><span class="lineno">   54</span>                min_gamma = PetscMin(min_gamma, gamma);</div>
-<div class="line"><span class="lineno">   55</span>            }</div>
-<div class="line"><span class="lineno">   56</span>        }</div>
-<div class="line"><span class="lineno">   57</span>    }</div>
-<div class="line"><span class="lineno">   58</span> </div>
-<div class="line"><span class="lineno">   59</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad744b47ca3c5f3df2d1b737e432d6f07">Cent</a>, &amp;cent); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   60</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2">Diffusivity</a>, &amp;diff_arr); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>    {</div>
-<div class="line"><span class="lineno">   63</span>        PetscReal global_min_gamma = 0.0;</div>
-<div class="line"><span class="lineno">   64</span>        ierr = MPI_Allreduce(&amp;min_gamma, &amp;global_min_gamma, 1, MPIU_REAL, MPI_MIN, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
-<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">if</span> (global_min_gamma &lt;= 0.0) {</div>
-<div class="line"><span class="lineno">   66</span>            SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG,</div>
-<div class="line"><span class="lineno">   67</span>                    <span class="stringliteral">&quot;verification diffusivity override produced non-positive Gamma values (min=%g).&quot;</span>,</div>
-<div class="line"><span class="lineno">   68</span>                    (<span class="keywordtype">double</span>)global_min_gamma);</div>
-<div class="line"><span class="lineno">   69</span>        }</div>
-<div class="line"><span class="lineno">   70</span>    }</div>
-<div class="line"><span class="lineno">   71</span> </div>
-<div class="line"><span class="lineno">   72</span>    {</div>
-<div class="line"><span class="lineno">   73</span>        <span class="keyword">const</span> <span class="keywordtype">char</span> *periodic_fields[] = {<span class="stringliteral">&quot;Diffusivity&quot;</span>};</div>
-<div class="line"><span class="lineno">   74</span>        ierr = <a class="code hl_function" href="Boundaries_8h.html#acdfbfcd4e24444990f804eaa0314a1c9">SynchronizePeriodicCellFields</a>(user, 1, periodic_fields); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   75</span>        ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Diffusivity&quot;</span>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   76</span>    }</div>
-<div class="line"><span class="lineno">   77</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno">   78</span>              <span class="stringliteral">&quot;Applied verification diffusivity override profile &#39;%s&#39; (gamma0=%g, slope_x=%g).\n&quot;</span>,</div>
-<div class="line"><span class="lineno">   79</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ad77bfe26c43b5af9b4884e973e0a83c7">profile</a>,</div>
-<div class="line"><span class="lineno">   80</span>              (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ab20cb67a1aeed934cc1f424e4ae16468">gamma0</a>,</div>
-<div class="line"><span class="lineno">   81</span>              (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#a9163091b27bcc37b9e84367db1acebc7">slope_x</a>);</div>
-<div class="line"><span class="lineno">   82</span> </div>
-<div class="line"><span class="lineno">   83</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   84</span>}</div>
+<div class="line"><span class="lineno">   42</span>    <span class="comment">// Leave the production diffusivity untouched unless this verification mode is selected.</span></div>
+<div class="line"><span class="lineno">   43</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="verification__sources_8c.html#a73f52bf769cc6037474e02d6cd6f4133">VerificationDiffusivityOverrideActive</a>(simCtx)) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   44</span> </div>
+<div class="line"><span class="lineno">   45</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2">Diffusivity</a>, &amp;diff_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   46</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad744b47ca3c5f3df2d1b737e432d6f07">Cent</a>, &amp;cent); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   47</span> </div>
+<div class="line"><span class="lineno">   48</span>    <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm; ++k) {</div>
+<div class="line"><span class="lineno">   49</span>        <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym; ++j) {</div>
+<div class="line"><span class="lineno">   50</span>            <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm; ++i) {</div>
+<div class="line"><span class="lineno">   51</span>                <span class="comment">// The manufactured profile is affine in the physical x coordinate.</span></div>
+<div class="line"><span class="lineno">   52</span>                <span class="keyword">const</span> PetscReal gamma =</div>
+<div class="line"><span class="lineno">   53</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ab20cb67a1aeed934cc1f424e4ae16468">gamma0</a> +</div>
+<div class="line"><span class="lineno">   54</span>                  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#a9163091b27bcc37b9e84367db1acebc7">slope_x</a> * cent[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><span class="lineno">   55</span>                diff_arr[k][j][i] = gamma;</div>
+<div class="line"><span class="lineno">   56</span>                min_gamma = PetscMin(min_gamma, gamma);</div>
+<div class="line"><span class="lineno">   57</span>            }</div>
+<div class="line"><span class="lineno">   58</span>        }</div>
+<div class="line"><span class="lineno">   59</span>    }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad744b47ca3c5f3df2d1b737e432d6f07">Cent</a>, &amp;cent); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   62</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2">Diffusivity</a>, &amp;diff_arr); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   63</span> </div>
+<div class="line"><span class="lineno">   64</span>    {</div>
+<div class="line"><span class="lineno">   65</span>        PetscReal global_min_gamma = 0.0;</div>
+<div class="line"><span class="lineno">   66</span>        ierr = MPI_Allreduce(&amp;min_gamma, &amp;global_min_gamma, 1, MPIU_REAL, MPI_MIN, PETSC_COMM_WORLD); CHKERRMPI(ierr);</div>
+<div class="line"><span class="lineno">   67</span>        <span class="comment">// Diffusivity must remain positive on every rank for the PDE operator to be valid.</span></div>
+<div class="line"><span class="lineno">   68</span>        <span class="keywordflow">if</span> (global_min_gamma &lt;= 0.0) {</div>
+<div class="line"><span class="lineno">   69</span>            SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONG,</div>
+<div class="line"><span class="lineno">   70</span>                    <span class="stringliteral">&quot;verification diffusivity override produced non-positive Gamma values (min=%g).&quot;</span>,</div>
+<div class="line"><span class="lineno">   71</span>                    (<span class="keywordtype">double</span>)global_min_gamma);</div>
+<div class="line"><span class="lineno">   72</span>        }</div>
+<div class="line"><span class="lineno">   73</span>    }</div>
+<div class="line"><span class="lineno">   74</span> </div>
+<div class="line"><span class="lineno">   75</span>    {</div>
+<div class="line"><span class="lineno">   76</span>        <span class="keyword">const</span> <span class="keywordtype">char</span> *periodic_fields[] = {<span class="stringliteral">&quot;Diffusivity&quot;</span>};</div>
+<div class="line"><span class="lineno">   77</span>        <span class="comment">// Make the analytic field coherent across periodic seams before ghost updates.</span></div>
+<div class="line"><span class="lineno">   78</span>        ierr = <a class="code hl_function" href="Boundaries_8h.html#acdfbfcd4e24444990f804eaa0314a1c9">SynchronizePeriodicCellFields</a>(user, 1, periodic_fields); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   79</span>        ierr = <a class="code hl_function" href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a>(user, <span class="stringliteral">&quot;Diffusivity&quot;</span>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   80</span>    }</div>
+<div class="line"><span class="lineno">   81</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno">   82</span>              <span class="stringliteral">&quot;Applied verification diffusivity override profile &#39;%s&#39; (gamma0=%g, slope_x=%g).\n&quot;</span>,</div>
+<div class="line"><span class="lineno">   83</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ad77bfe26c43b5af9b4884e973e0a83c7">profile</a>,</div>
+<div class="line"><span class="lineno">   84</span>              (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#ab20cb67a1aeed934cc1f424e4ae16468">gamma0</a>,</div>
+<div class="line"><span class="lineno">   85</span>              (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394">verificationDiffusivity</a>.<a class="code hl_variable" href="variables_8h.html#a9163091b27bcc37b9e84367db1acebc7">slope_x</a>);</div>
+<div class="line"><span class="lineno">   86</span> </div>
+<div class="line"><span class="lineno">   87</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   88</span>}</div>
 <div class="ttc" id="aBoundaries_8h_html_acdfbfcd4e24444990f804eaa0314a1c9"><div class="ttname"><a href="Boundaries_8h.html#acdfbfcd4e24444990f804eaa0314a1c9">SynchronizePeriodicCellFields</a></div><div class="ttdeci">PetscErrorCode SynchronizePeriodicCellFields(UserCtx *user, PetscInt num_fields, const char *field_names[])</div><div class="ttdoc">Synchronizes periodic endpoint cells for a list of cell-centered fields.</div><div class="ttdef"><b>Definition</b> <a href="Boundaries_8c_source.html#l01673">Boundaries.c:1673</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
-<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01755">setup.c:1755</a></div></div>
+<div class="ttc" id="asetup_8h_html_ad5f82951adcce74b3d37cb5880acf43a"><div class="ttname"><a href="setup_8h.html#ad5f82951adcce74b3d37cb5880acf43a">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, const char *fieldName)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01752">setup.c:1752</a></div></div>
 <div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00879">variables.h:879</a></div></div>
 <div class="ttc" id="avariables_8h_html_a69966d928601d61d4f526636f84396c5"><div class="ttname"><a href="variables_8h.html#a69966d928601d61d4f526636f84396c5">UserCtx::fda</a></div><div class="ttdeci">DM fda</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00882">variables.h:882</a></div></div>
 <div class="ttc" id="avariables_8h_html_a718a09fbedf450248eaf7019a980e139"><div class="ttname"><a href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">Cmpnts::x</a></div><div class="ttdeci">PetscScalar x</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00101">variables.h:101</a></div></div>
@@ -312,19 +316,20 @@ Here is the caller graph for this function:</div>
 <p>Populates the particle <code>Psi</code> field from a verification-only source override.</p>
 <p>See <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> for the public parameter and return contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="verification__sources_8c_source.html#l00090">90</a> of file <a class="el" href="verification__sources_8c_source.html">verification_sources.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   91</span>{</div>
-<div class="line"><span class="lineno">   92</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx cannot be NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno">   94</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="verification__sources_8c.html#a917b6e45b12efc141b799860fb171d2d">VerificationScalarOverrideActive</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>)) PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>    PetscCall(<a class="code hl_function" href="AnalyticalSolutions_8h.html#a1b2ab2e1ce0548aaf13769ae619e35ee">SetAnalyticalScalarFieldOnParticles</a>(user, <span class="stringliteral">&quot;Psi&quot;</span>));</div>
-<div class="line"><span class="lineno">   97</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
-<div class="line"><span class="lineno">   98</span>              <span class="stringliteral">&quot;Applied verification scalar override profile &#39;%s&#39; to particle field &#39;Psi&#39;.\n&quot;</span>,</div>
-<div class="line"><span class="lineno">   99</span>              user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a8239d0a566d87f37bbaa925bf90e9d72">verificationScalar</a>.<a class="code hl_variable" href="variables_8h.html#ad99db7698477bada0a1c77e149192a2a">profile</a>);</div>
-<div class="line"><span class="lineno">  100</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  101</span>}</div>
-<div class="ttc" id="aAnalyticalSolutions_8h_html_a1b2ab2e1ce0548aaf13769ae619e35ee"><div class="ttname"><a href="AnalyticalSolutions_8h.html#a1b2ab2e1ce0548aaf13769ae619e35ee">SetAnalyticalScalarFieldOnParticles</a></div><div class="ttdeci">PetscErrorCode SetAnalyticalScalarFieldOnParticles(UserCtx *user, const char *swarm_field_name)</div><div class="ttdoc">Writes the configured verification scalar profile onto a particle swarm scalar field.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00630">AnalyticalSolutions.c:630</a></div></div>
+<p class="definition">Definition at line <a class="el" href="verification__sources_8c_source.html#l00094">94</a> of file <a class="el" href="verification__sources_8c_source.html">verification_sources.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   95</span>{</div>
+<div class="line"><span class="lineno">   96</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">   97</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx cannot be NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno">   98</span>    <span class="comment">// The normal particle model owns Psi unless the verification override is enabled.</span></div>
+<div class="line"><span class="lineno">   99</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="verification__sources_8c.html#a917b6e45b12efc141b799860fb171d2d">VerificationScalarOverrideActive</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>)) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  100</span> </div>
+<div class="line"><span class="lineno">  101</span>    PetscCall(<a class="code hl_function" href="AnalyticalSolutions_8h.html#a1b2ab2e1ce0548aaf13769ae619e35ee">SetAnalyticalScalarFieldOnParticles</a>(user, <span class="stringliteral">&quot;Psi&quot;</span>));</div>
+<div class="line"><span class="lineno">  102</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,</div>
+<div class="line"><span class="lineno">  103</span>              <span class="stringliteral">&quot;Applied verification scalar override profile &#39;%s&#39; to particle field &#39;Psi&#39;.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  104</span>              user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>-&gt;<a class="code hl_variable" href="variables_8h.html#a8239d0a566d87f37bbaa925bf90e9d72">verificationScalar</a>.<a class="code hl_variable" href="variables_8h.html#ad99db7698477bada0a1c77e149192a2a">profile</a>);</div>
+<div class="line"><span class="lineno">  105</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  106</span>}</div>
+<div class="ttc" id="aAnalyticalSolutions_8h_html_a1b2ab2e1ce0548aaf13769ae619e35ee"><div class="ttname"><a href="AnalyticalSolutions_8h.html#a1b2ab2e1ce0548aaf13769ae619e35ee">SetAnalyticalScalarFieldOnParticles</a></div><div class="ttdeci">PetscErrorCode SetAnalyticalScalarFieldOnParticles(UserCtx *user, const char *swarm_field_name)</div><div class="ttdoc">Writes the configured verification scalar profile onto a particle swarm scalar field.</div><div class="ttdef"><b>Definition</b> <a href="AnalyticalSolutions_8c_source.html#l00625">AnalyticalSolutions.c:625</a></div></div>
 <div class="ttc" id="avariables_8h_html_ad99db7698477bada0a1c77e149192a2a"><div class="ttname"><a href="variables_8h.html#ad99db7698477bada0a1c77e149192a2a">VerificationScalarConfig::profile</a></div><div class="ttdeci">char profile[32]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00225">variables.h:225</a></div></div>
 <div class="ttc" id="averification__sources_8c_html_a917b6e45b12efc141b799860fb171d2d"><div class="ttname"><a href="verification__sources_8c.html#a917b6e45b12efc141b799860fb171d2d">VerificationScalarOverrideActive</a></div><div class="ttdeci">PetscBool VerificationScalarOverrideActive(const SimCtx *simCtx)</div><div class="ttdoc">Reports whether the verification-only scalar override is enabled.</div><div class="ttdef"><b>Definition</b> <a href="verification__sources_8c_source.html#l00021">verification_sources.c:21</a></div></div>
 </div><!-- fragment --><div class="dynheader">

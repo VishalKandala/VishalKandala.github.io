@@ -53,7 +53,7 @@ var searchData=
   ['generator_20selector_50',['9. Grid Selector / Generator Selector',['../50_Modular_Selector_Extension_Guide.html#p50_grid_sec',1,'']]],
   ['generators_20grid_20gen_51',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
   ['generators_5fpath_52',['GENERATORS_PATH',['../namespacepicurv__cli_1_1core.html#ad18e1397d4cdd7b7fc12fcba154cf9fa',1,'picurv_cli::core']]],
-  ['generic_5fpublic_5fbrief_5fre_53',['GENERIC_PUBLIC_BRIEF_RE',['../namespaceaudit__function__docs.html#a2861ed1f1fac6629553b818e433a22b5',1,'audit_function_docs']]],
+  ['generic_5fdescription_5fre_53',['GENERIC_DESCRIPTION_RE',['../namespaceaudit__function__docs.html#a3a00bca6b1d60463a5f7fe7dfc481be7',1,'audit_function_docs']]],
   ['generic_5fpublic_5fparam_5fre_54',['GENERIC_PUBLIC_PARAM_RE',['../namespaceaudit__function__docs.html#a1b21bacc1a1c8e99c95364681491f376',1,'audit_function_docs']]],
   ['geometric_20foundation_3a_20nodes_20and_20cells_55',['2. The Geometric Foundation: Nodes and Cells',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md64',1,'']]],
   ['geometric_20periodic_20boundaries_56',['Geometric Periodic Boundaries',['../p54_geometric_periodic.html',1,'']]],

@@ -19,7 +19,7 @@ var searchData=
   ['generate_5fgrid_16',['generate_grid',['../variables_8h.html#a98a90e3a55a0a0da6e392f44ebf50dad',1,'SimCtx']]],
   ['generated_5fprofile_5fgenerators_17',['GENERATED_PROFILE_GENERATORS',['../namespacepicurv__cli_1_1core.html#a2340c17b93d9ccb33dd5697ce6d4e56f',1,'picurv_cli::core']]],
   ['generators_5fpath_18',['GENERATORS_PATH',['../namespacepicurv__cli_1_1core.html#ad18e1397d4cdd7b7fc12fcba154cf9fa',1,'picurv_cli::core']]],
-  ['generic_5fpublic_5fbrief_5fre_19',['GENERIC_PUBLIC_BRIEF_RE',['../namespaceaudit__function__docs.html#a2861ed1f1fac6629553b818e433a22b5',1,'audit_function_docs']]],
+  ['generic_5fdescription_5fre_19',['GENERIC_DESCRIPTION_RE',['../namespaceaudit__function__docs.html#a3a00bca6b1d60463a5f7fe7dfc481be7',1,'audit_function_docs']]],
   ['generic_5fpublic_5fparam_5fre_20',['GENERIC_PUBLIC_PARAM_RE',['../namespaceaudit__function__docs.html#a1b21bacc1a1c8e99c95364681491f376',1,'audit_function_docs']]],
   ['geometric_5fperiodic_5fbcs_21',['geometric_periodic_bcs',['../test__momentum__newton__krylov_8c.html#a876e7b094c44a4196ac70c465d384a98',1,'test_momentum_newton_krylov.c']]],
   ['global_5ffarfield_5finflow_5fsum_22',['global_farfield_inflow_sum',['../variables_8h.html#aafcbd65cec9c463e2cce14ef9114cca1',1,'BCContext']]],

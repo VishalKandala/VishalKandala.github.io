@@ -1,1 +1,1 @@
-window.PICURV_DOCS_REVISION = {"clean": true, "commit_url": "https://github.com/VishalKandala/PICurv/commit/942217f1553b41fd6d4b6f3eb842673c86bcd966", "sha": "942217f1553b41fd6d4b6f3eb842673c86bcd966", "short_sha": "942217f1553b"};
+window.PICURV_DOCS_REVISION = {"clean": true, "commit_url": "https://github.com/VishalKandala/PICurv/commit/f512c58a9206ea1ecb31ddcf3b2ea8620b13a335", "sha": "f512c58a9206ea1ecb31ddcf3b2ea8620b13a335", "short_sha": "f512c58a9206"};
