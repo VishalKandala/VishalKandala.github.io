@@ -30785,41 +30785,45 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">15036</span>        use_graceful_signal = graceful <span class="keywordflow">and</span> <span class="stringliteral">&quot;solve&quot;</span> <span class="keywordflow">in</span> stage_names</div>
 <div class="line"><span class="lineno">15037</span>        scancel_cmd = [<span class="stringliteral">&quot;scancel&quot;</span>]</div>
 <div class="line"><span class="lineno">15038</span>        <span class="keywordflow">if</span> use_graceful_signal:</div>
-<div class="line"><span class="lineno">15039</span>            scancel_cmd.append(<span class="stringliteral">&quot;--signal=USR1&quot;</span>)</div>
-<div class="line"><span class="lineno">15040</span>        scancel_cmd.append(job_id)</div>
-<div class="line"><span class="lineno">15041</span> </div>
-<div class="line"><span class="lineno">15042</span>        <span class="keywordflow">if</span> args.dry_run:</div>
-<div class="line"><span class="lineno">15043</span>            print(f<span class="stringliteral">&quot;[DRY-RUN] Would run: {&#39; &#39;.join(scancel_cmd)}  # stage(s): {joined_stage_names}&quot;</span>)</div>
-<div class="line"><span class="lineno">15044</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">15039</span>            <span class="comment"># A directly launched ``mpirun`` replaces the batch shell (via ``exec``)</span></div>
+<div class="line"><span class="lineno">15040</span>            <span class="comment"># and is therefore not necessarily a Slurm job step.  ``--full`` also</span></div>
+<div class="line"><span class="lineno">15041</span>            <span class="comment"># signals the batch process and its children, so the MPI launcher can</span></div>
+<div class="line"><span class="lineno">15042</span>            <span class="comment"># forward SIGUSR1 to the solver ranks.</span></div>
+<div class="line"><span class="lineno">15043</span>            scancel_cmd.extend([<span class="stringliteral">&quot;--signal=USR1&quot;</span>, <span class="stringliteral">&quot;--full&quot;</span>])</div>
+<div class="line"><span class="lineno">15044</span>        scancel_cmd.append(job_id)</div>
 <div class="line"><span class="lineno">15045</span> </div>
-<div class="line"><span class="lineno">15046</span>        result = subprocess.run(scancel_cmd, text=<span class="keyword">True</span>, capture_output=<span class="keyword">True</span>, check=<span class="keyword">False</span>)</div>
-<div class="line"><span class="lineno">15047</span>        stderr_text = (result.stderr <span class="keywordflow">or</span> <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">15048</span>        stdout_text = (result.stdout <span class="keywordflow">or</span> <span class="stringliteral">&quot;&quot;</span>).strip()</div>
-<div class="line"><span class="lineno">15049</span>        <span class="keywordflow">if</span> result.returncode == 0:</div>
-<div class="line"><span class="lineno">15050</span>            <span class="keywordflow">if</span> use_graceful_signal:</div>
-<div class="line"><span class="lineno">15051</span>                print(</div>
-<div class="line"><span class="lineno">15052</span>                    f<span class="stringliteral">&quot;[SUCCESS] Requested graceful shutdown for Slurm job {job_id} for stage(s): {joined_stage_names}. &quot;</span></div>
-<div class="line"><span class="lineno">15053</span>                    <span class="stringliteral">&quot;Solver jobs trap SIGUSR1 and write the latest safe off-cadence step at the next checkpoint.&quot;</span></div>
-<div class="line"><span class="lineno">15054</span>                )</div>
-<div class="line"><span class="lineno">15055</span>            <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno">15056</span>                print(f<span class="stringliteral">&quot;[SUCCESS] Canceled Slurm job {job_id} for stage(s): {joined_stage_names}&quot;</span>)</div>
-<div class="line"><span class="lineno">15057</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno">15058</span> </div>
-<div class="line"><span class="lineno">15059</span>        detail = stderr_text <span class="keywordflow">or</span> stdout_text <span class="keywordflow">or</span> <span class="stringliteral">&quot;unknown scancel failure&quot;</span></div>
-<div class="line"><span class="lineno">15060</span>        failures.append((job_id, joined_stage_names, detail, result.returncode))</div>
-<div class="line"><span class="lineno">15061</span>        print(</div>
-<div class="line"><span class="lineno">15062</span>            f<span class="stringliteral">&quot;[ERROR] Failed to cancel Slurm job {job_id} for stage(s) {joined_stage_names}: {detail}&quot;</span>,</div>
-<div class="line"><span class="lineno">15063</span>            file=sys.stderr,</div>
-<div class="line"><span class="lineno">15064</span>        )</div>
-<div class="line"><span class="lineno">15065</span> </div>
-<div class="line"><span class="lineno">15066</span>    <span class="keywordflow">if</span> args.dry_run:</div>
-<div class="line"><span class="lineno">15067</span>        print(<span class="stringliteral">&quot;[INFO] Dry-run only. No jobs were canceled.&quot;</span>)</div>
-<div class="line"><span class="lineno">15068</span>        <span class="keywordflow">return</span></div>
+<div class="line"><span class="lineno">15046</span>        <span class="keywordflow">if</span> args.dry_run:</div>
+<div class="line"><span class="lineno">15047</span>            print(f<span class="stringliteral">&quot;[DRY-RUN] Would run: {&#39; &#39;.join(scancel_cmd)}  # stage(s): {joined_stage_names}&quot;</span>)</div>
+<div class="line"><span class="lineno">15048</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">15049</span> </div>
+<div class="line"><span class="lineno">15050</span>        result = subprocess.run(scancel_cmd, text=<span class="keyword">True</span>, capture_output=<span class="keyword">True</span>, check=<span class="keyword">False</span>)</div>
+<div class="line"><span class="lineno">15051</span>        stderr_text = (result.stderr <span class="keywordflow">or</span> <span class="stringliteral">&quot;&quot;</span>).strip()</div>
+<div class="line"><span class="lineno">15052</span>        stdout_text = (result.stdout <span class="keywordflow">or</span> <span class="stringliteral">&quot;&quot;</span>).strip()</div>
+<div class="line"><span class="lineno">15053</span>        <span class="keywordflow">if</span> result.returncode == 0:</div>
+<div class="line"><span class="lineno">15054</span>            <span class="keywordflow">if</span> use_graceful_signal:</div>
+<div class="line"><span class="lineno">15055</span>                print(</div>
+<div class="line"><span class="lineno">15056</span>                    f<span class="stringliteral">&quot;[SUCCESS] Requested graceful shutdown for Slurm job {job_id} for stage(s): {joined_stage_names}. &quot;</span></div>
+<div class="line"><span class="lineno">15057</span>                    <span class="stringliteral">&quot;Solver jobs trap SIGUSR1 and write the latest safe off-cadence step at the next checkpoint.&quot;</span></div>
+<div class="line"><span class="lineno">15058</span>                )</div>
+<div class="line"><span class="lineno">15059</span>            <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno">15060</span>                print(f<span class="stringliteral">&quot;[SUCCESS] Canceled Slurm job {job_id} for stage(s): {joined_stage_names}&quot;</span>)</div>
+<div class="line"><span class="lineno">15061</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">15062</span> </div>
+<div class="line"><span class="lineno">15063</span>        detail = stderr_text <span class="keywordflow">or</span> stdout_text <span class="keywordflow">or</span> <span class="stringliteral">&quot;unknown scancel failure&quot;</span></div>
+<div class="line"><span class="lineno">15064</span>        failures.append((job_id, joined_stage_names, detail, result.returncode))</div>
+<div class="line"><span class="lineno">15065</span>        print(</div>
+<div class="line"><span class="lineno">15066</span>            f<span class="stringliteral">&quot;[ERROR] Failed to cancel Slurm job {job_id} for stage(s) {joined_stage_names}: {detail}&quot;</span>,</div>
+<div class="line"><span class="lineno">15067</span>            file=sys.stderr,</div>
+<div class="line"><span class="lineno">15068</span>        )</div>
 <div class="line"><span class="lineno">15069</span> </div>
-<div class="line"><span class="lineno">15070</span>    <span class="keywordflow">if</span> failures:</div>
-<div class="line"><span class="lineno">15071</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15072</span> </div>
+<div class="line"><span class="lineno">15070</span>    <span class="keywordflow">if</span> args.dry_run:</div>
+<div class="line"><span class="lineno">15071</span>        print(<span class="stringliteral">&quot;[INFO] Dry-run only. No jobs were canceled.&quot;</span>)</div>
+<div class="line"><span class="lineno">15072</span>        <span class="keywordflow">return</span></div>
 <div class="line"><span class="lineno">15073</span> </div>
+<div class="line"><span class="lineno">15074</span>    <span class="keywordflow">if</span> failures:</div>
+<div class="line"><span class="lineno">15075</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15076</span> </div>
+<div class="line"><span class="lineno">15077</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -30857,93 +30861,93 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15074">15074</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">15074</span><span class="keyword">def </span>init_case(args):</div>
-<div class="line"><span class="lineno">15075</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">15076</span><span class="stringliteral">    @brief Implements the &#39;init&#39; command.</span></div>
-<div class="line"><span class="lineno">15077</span><span class="stringliteral">    @details Creates a new case study directory by copying a template.</span></div>
-<div class="line"><span class="lineno">15078</span><span class="stringliteral">             Runtime binaries are resolved from the project bin/ directory</span></div>
-<div class="line"><span class="lineno">15079</span><span class="stringliteral">             via PATH; use &#39;sync-binaries&#39; to pin specific versions locally.</span></div>
-<div class="line"><span class="lineno">15080</span><span class="stringliteral">    @param[in] args The command-line arguments parsed by argparse.</span></div>
-<div class="line"><span class="lineno">15081</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">15082</span>    context = resolve_case_origin_context(source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>))</div>
-<div class="line"><span class="lineno">15083</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15084</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;init&quot;</span>)</div>
-<div class="line"><span class="lineno">15085</span>        template_path = resolve_template_directory(source_project_root, args.template_name)</div>
-<div class="line"><span class="lineno">15086</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15087</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15088</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15089</span> </div>
-<div class="line"><span class="lineno">15090</span>    <span class="comment"># The destination path is relative to the current working directory.</span></div>
-<div class="line"><span class="lineno">15091</span>    dest_path = os.path.abspath(os.path.join(os.getcwd(), args.dest_name <span class="keywordflow">if</span> args.dest_name <span class="keywordflow">else</span> args.template_name))</div>
-<div class="line"><span class="lineno">15092</span> </div>
-<div class="line"><span class="lineno">15093</span>    <span class="keywordflow">if</span> os.path.exists(dest_path):</div>
-<div class="line"><span class="lineno">15094</span>        print(f<span class="stringliteral">&quot;[FATAL] Destination directory &#39;{dest_path}&#39; already exists.&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15095</span>        sys.exit(1)</div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15078">15078</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">15078</span><span class="keyword">def </span>init_case(args):</div>
+<div class="line"><span class="lineno">15079</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">15080</span><span class="stringliteral">    @brief Implements the &#39;init&#39; command.</span></div>
+<div class="line"><span class="lineno">15081</span><span class="stringliteral">    @details Creates a new case study directory by copying a template.</span></div>
+<div class="line"><span class="lineno">15082</span><span class="stringliteral">             Runtime binaries are resolved from the project bin/ directory</span></div>
+<div class="line"><span class="lineno">15083</span><span class="stringliteral">             via PATH; use &#39;sync-binaries&#39; to pin specific versions locally.</span></div>
+<div class="line"><span class="lineno">15084</span><span class="stringliteral">    @param[in] args The command-line arguments parsed by argparse.</span></div>
+<div class="line"><span class="lineno">15085</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">15086</span>    context = resolve_case_origin_context(source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>))</div>
+<div class="line"><span class="lineno">15087</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15088</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;init&quot;</span>)</div>
+<div class="line"><span class="lineno">15089</span>        template_path = resolve_template_directory(source_project_root, args.template_name)</div>
+<div class="line"><span class="lineno">15090</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15091</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15092</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15093</span> </div>
+<div class="line"><span class="lineno">15094</span>    <span class="comment"># The destination path is relative to the current working directory.</span></div>
+<div class="line"><span class="lineno">15095</span>    dest_path = os.path.abspath(os.path.join(os.getcwd(), args.dest_name <span class="keywordflow">if</span> args.dest_name <span class="keywordflow">else</span> args.template_name))</div>
 <div class="line"><span class="lineno">15096</span> </div>
-<div class="line"><span class="lineno">15097</span>    print(f<span class="stringliteral">&quot;[INFO] Initializing new case &#39;{os.path.basename(dest_path)}&#39; from template &#39;{args.template_name}&#39;...&quot;</span>)</div>
-<div class="line"><span class="lineno">15098</span>    </div>
-<div class="line"><span class="lineno">15099</span>    shutil.copytree(template_path, dest_path)</div>
-<div class="line"><span class="lineno">15100</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Copied template files to: {dest_path}&quot;</span>)</div>
-<div class="line"><span class="lineno">15101</span> </div>
-<div class="line"><span class="lineno">15102</span>    copied_runtime_example = os.path.join(dest_path, RUNTIME_EXECUTION_EXAMPLE_FILENAME)</div>
-<div class="line"><span class="lineno">15103</span>    <span class="keywordflow">if</span> os.path.isfile(copied_runtime_example):</div>
-<div class="line"><span class="lineno">15104</span>        os.remove(copied_runtime_example)</div>
+<div class="line"><span class="lineno">15097</span>    <span class="keywordflow">if</span> os.path.exists(dest_path):</div>
+<div class="line"><span class="lineno">15098</span>        print(f<span class="stringliteral">&quot;[FATAL] Destination directory &#39;{dest_path}&#39; already exists.&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15099</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15100</span> </div>
+<div class="line"><span class="lineno">15101</span>    print(f<span class="stringliteral">&quot;[INFO] Initializing new case &#39;{os.path.basename(dest_path)}&#39; from template &#39;{args.template_name}&#39;...&quot;</span>)</div>
+<div class="line"><span class="lineno">15102</span>    </div>
+<div class="line"><span class="lineno">15103</span>    shutil.copytree(template_path, dest_path)</div>
+<div class="line"><span class="lineno">15104</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Copied template files to: {dest_path}&quot;</span>)</div>
 <div class="line"><span class="lineno">15105</span> </div>
-<div class="line"><span class="lineno">15106</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15107</span>        runtime_result = ensure_case_runtime_execution_config(dest_path, source_project_root, overwrite=<span class="keyword">True</span>)</div>
-<div class="line"><span class="lineno">15108</span>        print(f<span class="stringliteral">&quot;[INFO] Wrote optional runtime launcher config: {os.path.relpath(runtime_result[&#39;path&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15109</span>        <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>] <span class="keywordflow">and</span> os.path.basename(runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>]) == RUNTIME_EXECUTION_CONFIG_FILENAME:</div>
-<div class="line"><span class="lineno">15110</span>            print(<span class="stringliteral">&quot;       Seeded from repo-local &#39;.picurv-execution.yml&#39;.&quot;</span>)</div>
-<div class="line"><span class="lineno">15111</span>        print(<span class="stringliteral">&quot;       Leave it unchanged for ordinary local runs; edit it only if your site needs custom MPI launcher tokens.&quot;</span>)</div>
-<div class="line"><span class="lineno">15112</span>    <span class="keywordflow">except</span> Exception <span class="keyword">as</span> e:</div>
-<div class="line"><span class="lineno">15113</span>        print(f<span class="stringliteral">&quot;[ERROR] Failed to write runtime execution config: {e}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15114</span> </div>
-<div class="line"><span class="lineno">15115</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15116</span>        metadata_path, _ = write_case_origin_metadata(</div>
-<div class="line"><span class="lineno">15117</span>            dest_path,</div>
-<div class="line"><span class="lineno">15118</span>            source_project_root,</div>
-<div class="line"><span class="lineno">15119</span>            template_name=args.template_name,</div>
-<div class="line"><span class="lineno">15120</span>            template_managed_files=list_template_relative_files(</div>
-<div class="line"><span class="lineno">15121</span>                template_path,</div>
-<div class="line"><span class="lineno">15122</span>                excluded_rel_paths={RUNTIME_EXECUTION_EXAMPLE_FILENAME},</div>
-<div class="line"><span class="lineno">15123</span>            ),</div>
-<div class="line"><span class="lineno">15124</span>        )</div>
-<div class="line"><span class="lineno">15125</span>        print(f<span class="stringliteral">&quot;[INFO] Wrote case origin metadata: {os.path.relpath(metadata_path)}&quot;</span>)</div>
-<div class="line"><span class="lineno">15126</span>    <span class="keywordflow">except</span> Exception <span class="keyword">as</span> e:</div>
-<div class="line"><span class="lineno">15127</span>        print(f<span class="stringliteral">&quot;[ERROR] Failed to write case origin metadata: {e}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15128</span> </div>
-<div class="line"><span class="lineno">15129</span>    cluster_profile_candidates = sorted(</div>
-<div class="line"><span class="lineno">15130</span>        {</div>
-<div class="line"><span class="lineno">15131</span>            os.path.basename(path)</div>
-<div class="line"><span class="lineno">15132</span>            <span class="keywordflow">for</span> pattern <span class="keywordflow">in</span> (<span class="stringliteral">&quot;*cluster*.yml&quot;</span>, <span class="stringliteral">&quot;*cluster*.yaml&quot;</span>)</div>
-<div class="line"><span class="lineno">15133</span>            <span class="keywordflow">for</span> path <span class="keywordflow">in</span> glob.glob(os.path.join(dest_path, pattern))</div>
-<div class="line"><span class="lineno">15134</span>        }</div>
-<div class="line"><span class="lineno">15135</span>    )</div>
-<div class="line"><span class="lineno">15136</span>    <span class="keywordflow">if</span> cluster_profile_candidates:</div>
-<div class="line"><span class="lineno">15137</span>        print(<span class="stringliteral">&quot;[INFO] Cluster profile sample(s) copied with this case:&quot;</span>)</div>
-<div class="line"><span class="lineno">15138</span>        <span class="keywordflow">for</span> profile_name <span class="keywordflow">in</span> cluster_profile_candidates:</div>
-<div class="line"><span class="lineno">15139</span>            print(f<span class="stringliteral">&quot;  - {profile_name}&quot;</span>)</div>
-<div class="line"><span class="lineno">15140</span>        print(<span class="stringliteral">&quot;       Edit account/partition/module_setup and any batch-specific launcher overrides before using --cluster.&quot;</span>)</div>
-<div class="line"><span class="lineno">15141</span> </div>
-<div class="line"><span class="lineno">15142</span>    <span class="keywordflow">if</span> getattr(args, <span class="stringliteral">&quot;pin_binaries&quot;</span>, <span class="keyword">False</span>):</div>
-<div class="line"><span class="lineno">15143</span>        print(<span class="stringliteral">&quot;[INFO] Pinning runtime binaries into case directory...&quot;</span>)</div>
-<div class="line"><span class="lineno">15144</span>        <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15145</span>            copied_binaries = sync_case_binaries(dest_path, source_project_root)</div>
-<div class="line"><span class="lineno">15146</span>            <span class="keywordflow">for</span> dest_file_path <span class="keywordflow">in</span> copied_binaries:</div>
-<div class="line"><span class="lineno">15147</span>                print(f<span class="stringliteral">&quot;  - Pinned &#39;{os.path.basename(dest_file_path)}&#39;&quot;</span>)</div>
-<div class="line"><span class="lineno">15148</span>            print(<span class="stringliteral">&quot;[SUCCESS] Case directory is ready with pinned binaries.&quot;</span>)</div>
-<div class="line"><span class="lineno">15149</span>            print(<span class="stringliteral">&quot;          These local copies will be used instead of bin/ originals.&quot;</span>)</div>
-<div class="line"><span class="lineno">15150</span>        <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15151</span>            print(f<span class="stringliteral">&quot;[WARNING] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15152</span>            print(<span class="stringliteral">&quot;          No binaries were pinned. Run &#39;picurv build&#39; first.&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15153</span>    <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno">15154</span>        print(<span class="stringliteral">&quot;[SUCCESS] Case directory is ready.&quot;</span>)</div>
-<div class="line"><span class="lineno">15155</span>        print(<span class="stringliteral">&quot;          Runtime binaries (simulator, postprocessor) are resolved from bin/ automatically.&quot;</span>)</div>
-<div class="line"><span class="lineno">15156</span>        print(<span class="stringliteral">&quot;          To pin specific binary versions, re-run with --pin-binaries or use: picurv sync-binaries&quot;</span>)</div>
-<div class="line"><span class="lineno">15157</span>    print(<span class="stringliteral">&quot;          Ensure &#39;picurv&#39; is on your PATH (source etc/picurv.sh) to run from any directory.&quot;</span>)</div>
-<div class="line"><span class="lineno">15158</span> </div>
-<div class="line"><span class="lineno">15159</span> </div>
+<div class="line"><span class="lineno">15106</span>    copied_runtime_example = os.path.join(dest_path, RUNTIME_EXECUTION_EXAMPLE_FILENAME)</div>
+<div class="line"><span class="lineno">15107</span>    <span class="keywordflow">if</span> os.path.isfile(copied_runtime_example):</div>
+<div class="line"><span class="lineno">15108</span>        os.remove(copied_runtime_example)</div>
+<div class="line"><span class="lineno">15109</span> </div>
+<div class="line"><span class="lineno">15110</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15111</span>        runtime_result = ensure_case_runtime_execution_config(dest_path, source_project_root, overwrite=<span class="keyword">True</span>)</div>
+<div class="line"><span class="lineno">15112</span>        print(f<span class="stringliteral">&quot;[INFO] Wrote optional runtime launcher config: {os.path.relpath(runtime_result[&#39;path&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15113</span>        <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>] <span class="keywordflow">and</span> os.path.basename(runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>]) == RUNTIME_EXECUTION_CONFIG_FILENAME:</div>
+<div class="line"><span class="lineno">15114</span>            print(<span class="stringliteral">&quot;       Seeded from repo-local &#39;.picurv-execution.yml&#39;.&quot;</span>)</div>
+<div class="line"><span class="lineno">15115</span>        print(<span class="stringliteral">&quot;       Leave it unchanged for ordinary local runs; edit it only if your site needs custom MPI launcher tokens.&quot;</span>)</div>
+<div class="line"><span class="lineno">15116</span>    <span class="keywordflow">except</span> Exception <span class="keyword">as</span> e:</div>
+<div class="line"><span class="lineno">15117</span>        print(f<span class="stringliteral">&quot;[ERROR] Failed to write runtime execution config: {e}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15118</span> </div>
+<div class="line"><span class="lineno">15119</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15120</span>        metadata_path, _ = write_case_origin_metadata(</div>
+<div class="line"><span class="lineno">15121</span>            dest_path,</div>
+<div class="line"><span class="lineno">15122</span>            source_project_root,</div>
+<div class="line"><span class="lineno">15123</span>            template_name=args.template_name,</div>
+<div class="line"><span class="lineno">15124</span>            template_managed_files=list_template_relative_files(</div>
+<div class="line"><span class="lineno">15125</span>                template_path,</div>
+<div class="line"><span class="lineno">15126</span>                excluded_rel_paths={RUNTIME_EXECUTION_EXAMPLE_FILENAME},</div>
+<div class="line"><span class="lineno">15127</span>            ),</div>
+<div class="line"><span class="lineno">15128</span>        )</div>
+<div class="line"><span class="lineno">15129</span>        print(f<span class="stringliteral">&quot;[INFO] Wrote case origin metadata: {os.path.relpath(metadata_path)}&quot;</span>)</div>
+<div class="line"><span class="lineno">15130</span>    <span class="keywordflow">except</span> Exception <span class="keyword">as</span> e:</div>
+<div class="line"><span class="lineno">15131</span>        print(f<span class="stringliteral">&quot;[ERROR] Failed to write case origin metadata: {e}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15132</span> </div>
+<div class="line"><span class="lineno">15133</span>    cluster_profile_candidates = sorted(</div>
+<div class="line"><span class="lineno">15134</span>        {</div>
+<div class="line"><span class="lineno">15135</span>            os.path.basename(path)</div>
+<div class="line"><span class="lineno">15136</span>            <span class="keywordflow">for</span> pattern <span class="keywordflow">in</span> (<span class="stringliteral">&quot;*cluster*.yml&quot;</span>, <span class="stringliteral">&quot;*cluster*.yaml&quot;</span>)</div>
+<div class="line"><span class="lineno">15137</span>            <span class="keywordflow">for</span> path <span class="keywordflow">in</span> glob.glob(os.path.join(dest_path, pattern))</div>
+<div class="line"><span class="lineno">15138</span>        }</div>
+<div class="line"><span class="lineno">15139</span>    )</div>
+<div class="line"><span class="lineno">15140</span>    <span class="keywordflow">if</span> cluster_profile_candidates:</div>
+<div class="line"><span class="lineno">15141</span>        print(<span class="stringliteral">&quot;[INFO] Cluster profile sample(s) copied with this case:&quot;</span>)</div>
+<div class="line"><span class="lineno">15142</span>        <span class="keywordflow">for</span> profile_name <span class="keywordflow">in</span> cluster_profile_candidates:</div>
+<div class="line"><span class="lineno">15143</span>            print(f<span class="stringliteral">&quot;  - {profile_name}&quot;</span>)</div>
+<div class="line"><span class="lineno">15144</span>        print(<span class="stringliteral">&quot;       Edit account/partition/module_setup and any batch-specific launcher overrides before using --cluster.&quot;</span>)</div>
+<div class="line"><span class="lineno">15145</span> </div>
+<div class="line"><span class="lineno">15146</span>    <span class="keywordflow">if</span> getattr(args, <span class="stringliteral">&quot;pin_binaries&quot;</span>, <span class="keyword">False</span>):</div>
+<div class="line"><span class="lineno">15147</span>        print(<span class="stringliteral">&quot;[INFO] Pinning runtime binaries into case directory...&quot;</span>)</div>
+<div class="line"><span class="lineno">15148</span>        <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15149</span>            copied_binaries = sync_case_binaries(dest_path, source_project_root)</div>
+<div class="line"><span class="lineno">15150</span>            <span class="keywordflow">for</span> dest_file_path <span class="keywordflow">in</span> copied_binaries:</div>
+<div class="line"><span class="lineno">15151</span>                print(f<span class="stringliteral">&quot;  - Pinned &#39;{os.path.basename(dest_file_path)}&#39;&quot;</span>)</div>
+<div class="line"><span class="lineno">15152</span>            print(<span class="stringliteral">&quot;[SUCCESS] Case directory is ready with pinned binaries.&quot;</span>)</div>
+<div class="line"><span class="lineno">15153</span>            print(<span class="stringliteral">&quot;          These local copies will be used instead of bin/ originals.&quot;</span>)</div>
+<div class="line"><span class="lineno">15154</span>        <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15155</span>            print(f<span class="stringliteral">&quot;[WARNING] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15156</span>            print(<span class="stringliteral">&quot;          No binaries were pinned. Run &#39;picurv build&#39; first.&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15157</span>    <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno">15158</span>        print(<span class="stringliteral">&quot;[SUCCESS] Case directory is ready.&quot;</span>)</div>
+<div class="line"><span class="lineno">15159</span>        print(<span class="stringliteral">&quot;          Runtime binaries (simulator, postprocessor) are resolved from bin/ automatically.&quot;</span>)</div>
+<div class="line"><span class="lineno">15160</span>        print(<span class="stringliteral">&quot;          To pin specific binary versions, re-run with --pin-binaries or use: picurv sync-binaries&quot;</span>)</div>
+<div class="line"><span class="lineno">15161</span>    print(<span class="stringliteral">&quot;          Ensure &#39;picurv&#39; is on your PATH (source etc/picurv.sh) to run from any directory.&quot;</span>)</div>
+<div class="line"><span class="lineno">15162</span> </div>
+<div class="line"><span class="lineno">15163</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -30981,38 +30985,38 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15160">15160</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">15160</span><span class="keyword">def </span>sync_case_binaries_command(args):</div>
-<div class="line"><span class="lineno">15161</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">15162</span><span class="stringliteral">    @brief Refresh case-local executables from the source repository bin directory.</span></div>
-<div class="line"><span class="lineno">15163</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
-<div class="line"><span class="lineno">15164</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">15165</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15166</span>        context = resolve_case_origin_context(</div>
-<div class="line"><span class="lineno">15167</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15168</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15169</span>        )</div>
-<div class="line"><span class="lineno">15170</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;sync-binaries&quot;</span>)</div>
-<div class="line"><span class="lineno">15171</span>        case_dir = require_existing_case_dir(context[<span class="stringliteral">&quot;case_dir&quot;</span>], <span class="stringliteral">&quot;sync-binaries&quot;</span>, source_project_root)</div>
-<div class="line"><span class="lineno">15172</span>        copied = sync_case_binaries(case_dir, source_project_root)</div>
-<div class="line"><span class="lineno">15173</span>        metadata_path, metadata = write_case_origin_metadata(</div>
-<div class="line"><span class="lineno">15174</span>            case_dir,</div>
-<div class="line"><span class="lineno">15175</span>            source_project_root,</div>
-<div class="line"><span class="lineno">15176</span>            template_name=context.get(<span class="stringliteral">&quot;template_name&quot;</span>),</div>
-<div class="line"><span class="lineno">15177</span>            existing=context.get(<span class="stringliteral">&quot;metadata&quot;</span>),</div>
-<div class="line"><span class="lineno">15178</span>        )</div>
-<div class="line"><span class="lineno">15179</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15180</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15181</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15182</span> </div>
-<div class="line"><span class="lineno">15183</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Refreshed {len(copied)} binaries in: {case_dir}&quot;</span>)</div>
-<div class="line"><span class="lineno">15184</span>    <span class="keywordflow">for</span> dest_path <span class="keywordflow">in</span> copied:</div>
-<div class="line"><span class="lineno">15185</span>        print(f<span class="stringliteral">&quot;  - {os.path.basename(dest_path)}&quot;</span>)</div>
-<div class="line"><span class="lineno">15186</span>    print(f<span class="stringliteral">&quot;[INFO] Case origin metadata refreshed: {os.path.relpath(metadata_path)}&quot;</span>)</div>
-<div class="line"><span class="lineno">15187</span>    <span class="keywordflow">if</span> metadata.get(<span class="stringliteral">&quot;last_known_source_git_commit&quot;</span>):</div>
-<div class="line"><span class="lineno">15188</span>        print(f<span class="stringliteral">&quot;[INFO] Source commit recorded: {metadata[&#39;last_known_source_git_commit&#39;]}&quot;</span>)</div>
-<div class="line"><span class="lineno">15189</span> </div>
-<div class="line"><span class="lineno">15190</span> </div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15164">15164</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">15164</span><span class="keyword">def </span>sync_case_binaries_command(args):</div>
+<div class="line"><span class="lineno">15165</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">15166</span><span class="stringliteral">    @brief Refresh case-local executables from the source repository bin directory.</span></div>
+<div class="line"><span class="lineno">15167</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
+<div class="line"><span class="lineno">15168</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">15169</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15170</span>        context = resolve_case_origin_context(</div>
+<div class="line"><span class="lineno">15171</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15172</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15173</span>        )</div>
+<div class="line"><span class="lineno">15174</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;sync-binaries&quot;</span>)</div>
+<div class="line"><span class="lineno">15175</span>        case_dir = require_existing_case_dir(context[<span class="stringliteral">&quot;case_dir&quot;</span>], <span class="stringliteral">&quot;sync-binaries&quot;</span>, source_project_root)</div>
+<div class="line"><span class="lineno">15176</span>        copied = sync_case_binaries(case_dir, source_project_root)</div>
+<div class="line"><span class="lineno">15177</span>        metadata_path, metadata = write_case_origin_metadata(</div>
+<div class="line"><span class="lineno">15178</span>            case_dir,</div>
+<div class="line"><span class="lineno">15179</span>            source_project_root,</div>
+<div class="line"><span class="lineno">15180</span>            template_name=context.get(<span class="stringliteral">&quot;template_name&quot;</span>),</div>
+<div class="line"><span class="lineno">15181</span>            existing=context.get(<span class="stringliteral">&quot;metadata&quot;</span>),</div>
+<div class="line"><span class="lineno">15182</span>        )</div>
+<div class="line"><span class="lineno">15183</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15184</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15185</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15186</span> </div>
+<div class="line"><span class="lineno">15187</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Refreshed {len(copied)} binaries in: {case_dir}&quot;</span>)</div>
+<div class="line"><span class="lineno">15188</span>    <span class="keywordflow">for</span> dest_path <span class="keywordflow">in</span> copied:</div>
+<div class="line"><span class="lineno">15189</span>        print(f<span class="stringliteral">&quot;  - {os.path.basename(dest_path)}&quot;</span>)</div>
+<div class="line"><span class="lineno">15190</span>    print(f<span class="stringliteral">&quot;[INFO] Case origin metadata refreshed: {os.path.relpath(metadata_path)}&quot;</span>)</div>
+<div class="line"><span class="lineno">15191</span>    <span class="keywordflow">if</span> metadata.get(<span class="stringliteral">&quot;last_known_source_git_commit&quot;</span>):</div>
+<div class="line"><span class="lineno">15192</span>        print(f<span class="stringliteral">&quot;[INFO] Source commit recorded: {metadata[&#39;last_known_source_git_commit&#39;]}&quot;</span>)</div>
+<div class="line"><span class="lineno">15193</span> </div>
+<div class="line"><span class="lineno">15194</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -31050,59 +31054,59 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15191">15191</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">15191</span><span class="keyword">def </span>sync_case_config_command(args):</div>
-<div class="line"><span class="lineno">15192</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">15193</span><span class="stringliteral">    @brief Refresh template-managed config/docs files in a case directory.</span></div>
-<div class="line"><span class="lineno">15194</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
-<div class="line"><span class="lineno">15195</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">15196</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15197</span>        context = resolve_case_origin_context(</div>
-<div class="line"><span class="lineno">15198</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15199</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15200</span>            template_name_override=getattr(args, <span class="stringliteral">&quot;template_name&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15201</span>        )</div>
-<div class="line"><span class="lineno">15202</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;sync-config&quot;</span>)</div>
-<div class="line"><span class="lineno">15203</span>        case_dir = require_existing_case_dir(context[<span class="stringliteral">&quot;case_dir&quot;</span>], <span class="stringliteral">&quot;sync-config&quot;</span>, source_project_root)</div>
-<div class="line"><span class="lineno">15204</span>        template_name = context.get(<span class="stringliteral">&quot;template_name&quot;</span>)</div>
-<div class="line"><span class="lineno">15205</span>        template_dir = resolve_template_directory(source_project_root, template_name)</div>
-<div class="line"><span class="lineno">15206</span>        existing_managed = context.get(<span class="stringliteral">&quot;metadata&quot;</span>, {}).get(<span class="stringliteral">&quot;template_managed_files&quot;</span>)</div>
-<div class="line"><span class="lineno">15207</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(existing_managed, list):</div>
-<div class="line"><span class="lineno">15208</span>            existing_managed = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">15209</span>        summary = sync_case_template_files(</div>
-<div class="line"><span class="lineno">15210</span>            case_dir,</div>
-<div class="line"><span class="lineno">15211</span>            template_dir,</div>
-<div class="line"><span class="lineno">15212</span>            overwrite=getattr(args, <span class="stringliteral">&quot;overwrite&quot;</span>, <span class="keyword">False</span>),</div>
-<div class="line"><span class="lineno">15213</span>            prune=getattr(args, <span class="stringliteral">&quot;prune&quot;</span>, <span class="keyword">False</span>),</div>
-<div class="line"><span class="lineno">15214</span>            managed_rel_paths=existing_managed,</div>
-<div class="line"><span class="lineno">15215</span>        )</div>
-<div class="line"><span class="lineno">15216</span>        metadata_path, _ = write_case_origin_metadata(</div>
-<div class="line"><span class="lineno">15217</span>            case_dir,</div>
-<div class="line"><span class="lineno">15218</span>            source_project_root,</div>
-<div class="line"><span class="lineno">15219</span>            template_name=template_name,</div>
-<div class="line"><span class="lineno">15220</span>            existing=context.get(<span class="stringliteral">&quot;metadata&quot;</span>),</div>
-<div class="line"><span class="lineno">15221</span>            template_managed_files=summary[<span class="stringliteral">&quot;template_managed_files&quot;</span>],</div>
-<div class="line"><span class="lineno">15222</span>        )</div>
-<div class="line"><span class="lineno">15223</span>        runtime_result = ensure_case_runtime_execution_config(case_dir, source_project_root, overwrite=<span class="keyword">False</span>)</div>
-<div class="line"><span class="lineno">15224</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15225</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15226</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15227</span> </div>
-<div class="line"><span class="lineno">15228</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Synced template files from &#39;{template_name}&#39; into: {case_dir}&quot;</span>)</div>
-<div class="line"><span class="lineno">15229</span>    print(f<span class="stringliteral">&quot;[INFO] Copied new files     : {len(summary[&#39;copied&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15230</span>    print(f<span class="stringliteral">&quot;[INFO] Overwritten files   : {len(summary[&#39;overwritten&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15231</span>    print(f<span class="stringliteral">&quot;[INFO] Skipped modified    : {len(summary[&#39;skipped_modified&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15232</span>    print(f<span class="stringliteral">&quot;[INFO] Already unchanged   : {len(summary[&#39;unchanged&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15233</span>    print(f<span class="stringliteral">&quot;[INFO] Pruned stale files  : {len(summary[&#39;pruned&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15234</span>    <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;created&quot;</span>]:</div>
-<div class="line"><span class="lineno">15235</span>        print(f<span class="stringliteral">&quot;[INFO] Created runtime launcher config: {os.path.relpath(runtime_result[&#39;path&#39;])}&quot;</span>)</div>
-<div class="line"><span class="lineno">15236</span>        <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>] <span class="keywordflow">and</span> os.path.basename(runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>]) == RUNTIME_EXECUTION_CONFIG_FILENAME:</div>
-<div class="line"><span class="lineno">15237</span>            print(<span class="stringliteral">&quot;[INFO] Seed source              : repo-local .picurv-execution.yml&quot;</span>)</div>
-<div class="line"><span class="lineno">15238</span>    <span class="keywordflow">if</span> summary.get(<span class="stringliteral">&quot;prune_requested_without_tracking&quot;</span>):</div>
-<div class="line"><span class="lineno">15239</span>        print(<span class="stringliteral">&quot;[WARNING] Prune tracking unavailable for this case; no removed template files were deleted.&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15240</span>    print(f<span class="stringliteral">&quot;[INFO] Case origin metadata refreshed: {os.path.relpath(metadata_path)}&quot;</span>)</div>
-<div class="line"><span class="lineno">15241</span> </div>
-<div class="line"><span class="lineno">15242</span> </div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15195">15195</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">15195</span><span class="keyword">def </span>sync_case_config_command(args):</div>
+<div class="line"><span class="lineno">15196</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">15197</span><span class="stringliteral">    @brief Refresh template-managed config/docs files in a case directory.</span></div>
+<div class="line"><span class="lineno">15198</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
+<div class="line"><span class="lineno">15199</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">15200</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15201</span>        context = resolve_case_origin_context(</div>
+<div class="line"><span class="lineno">15202</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15203</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15204</span>            template_name_override=getattr(args, <span class="stringliteral">&quot;template_name&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15205</span>        )</div>
+<div class="line"><span class="lineno">15206</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;sync-config&quot;</span>)</div>
+<div class="line"><span class="lineno">15207</span>        case_dir = require_existing_case_dir(context[<span class="stringliteral">&quot;case_dir&quot;</span>], <span class="stringliteral">&quot;sync-config&quot;</span>, source_project_root)</div>
+<div class="line"><span class="lineno">15208</span>        template_name = context.get(<span class="stringliteral">&quot;template_name&quot;</span>)</div>
+<div class="line"><span class="lineno">15209</span>        template_dir = resolve_template_directory(source_project_root, template_name)</div>
+<div class="line"><span class="lineno">15210</span>        existing_managed = context.get(<span class="stringliteral">&quot;metadata&quot;</span>, {}).get(<span class="stringliteral">&quot;template_managed_files&quot;</span>)</div>
+<div class="line"><span class="lineno">15211</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(existing_managed, list):</div>
+<div class="line"><span class="lineno">15212</span>            existing_managed = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">15213</span>        summary = sync_case_template_files(</div>
+<div class="line"><span class="lineno">15214</span>            case_dir,</div>
+<div class="line"><span class="lineno">15215</span>            template_dir,</div>
+<div class="line"><span class="lineno">15216</span>            overwrite=getattr(args, <span class="stringliteral">&quot;overwrite&quot;</span>, <span class="keyword">False</span>),</div>
+<div class="line"><span class="lineno">15217</span>            prune=getattr(args, <span class="stringliteral">&quot;prune&quot;</span>, <span class="keyword">False</span>),</div>
+<div class="line"><span class="lineno">15218</span>            managed_rel_paths=existing_managed,</div>
+<div class="line"><span class="lineno">15219</span>        )</div>
+<div class="line"><span class="lineno">15220</span>        metadata_path, _ = write_case_origin_metadata(</div>
+<div class="line"><span class="lineno">15221</span>            case_dir,</div>
+<div class="line"><span class="lineno">15222</span>            source_project_root,</div>
+<div class="line"><span class="lineno">15223</span>            template_name=template_name,</div>
+<div class="line"><span class="lineno">15224</span>            existing=context.get(<span class="stringliteral">&quot;metadata&quot;</span>),</div>
+<div class="line"><span class="lineno">15225</span>            template_managed_files=summary[<span class="stringliteral">&quot;template_managed_files&quot;</span>],</div>
+<div class="line"><span class="lineno">15226</span>        )</div>
+<div class="line"><span class="lineno">15227</span>        runtime_result = ensure_case_runtime_execution_config(case_dir, source_project_root, overwrite=<span class="keyword">False</span>)</div>
+<div class="line"><span class="lineno">15228</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15229</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15230</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15231</span> </div>
+<div class="line"><span class="lineno">15232</span>    print(f<span class="stringliteral">&quot;[SUCCESS] Synced template files from &#39;{template_name}&#39; into: {case_dir}&quot;</span>)</div>
+<div class="line"><span class="lineno">15233</span>    print(f<span class="stringliteral">&quot;[INFO] Copied new files     : {len(summary[&#39;copied&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15234</span>    print(f<span class="stringliteral">&quot;[INFO] Overwritten files   : {len(summary[&#39;overwritten&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15235</span>    print(f<span class="stringliteral">&quot;[INFO] Skipped modified    : {len(summary[&#39;skipped_modified&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15236</span>    print(f<span class="stringliteral">&quot;[INFO] Already unchanged   : {len(summary[&#39;unchanged&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15237</span>    print(f<span class="stringliteral">&quot;[INFO] Pruned stale files  : {len(summary[&#39;pruned&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15238</span>    <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;created&quot;</span>]:</div>
+<div class="line"><span class="lineno">15239</span>        print(f<span class="stringliteral">&quot;[INFO] Created runtime launcher config: {os.path.relpath(runtime_result[&#39;path&#39;])}&quot;</span>)</div>
+<div class="line"><span class="lineno">15240</span>        <span class="keywordflow">if</span> runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>] <span class="keywordflow">and</span> os.path.basename(runtime_result[<span class="stringliteral">&quot;seed_source&quot;</span>]) == RUNTIME_EXECUTION_CONFIG_FILENAME:</div>
+<div class="line"><span class="lineno">15241</span>            print(<span class="stringliteral">&quot;[INFO] Seed source              : repo-local .picurv-execution.yml&quot;</span>)</div>
+<div class="line"><span class="lineno">15242</span>    <span class="keywordflow">if</span> summary.get(<span class="stringliteral">&quot;prune_requested_without_tracking&quot;</span>):</div>
+<div class="line"><span class="lineno">15243</span>        print(<span class="stringliteral">&quot;[WARNING] Prune tracking unavailable for this case; no removed template files were deleted.&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15244</span>    print(f<span class="stringliteral">&quot;[INFO] Case origin metadata refreshed: {os.path.relpath(metadata_path)}&quot;</span>)</div>
+<div class="line"><span class="lineno">15245</span> </div>
+<div class="line"><span class="lineno">15246</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -31140,47 +31144,47 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15243">15243</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">15243</span><span class="keyword">def </span>pull_source_repo(args):</div>
-<div class="line"><span class="lineno">15244</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">15245</span><span class="stringliteral">    @brief Refresh source branches in the repository resolved from a case directory.</span></div>
-<div class="line"><span class="lineno">15246</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
-<div class="line"><span class="lineno">15247</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">15248</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15249</span>        context = resolve_case_origin_context(</div>
-<div class="line"><span class="lineno">15250</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15251</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15252</span>        )</div>
-<div class="line"><span class="lineno">15253</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;pull-source&quot;</span>)</div>
-<div class="line"><span class="lineno">15254</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15255</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15256</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15257</span> </div>
-<div class="line"><span class="lineno">15258</span>    rebase = <span class="keywordflow">not</span> getattr(args, <span class="stringliteral">&quot;no_rebase&quot;</span>, <span class="keyword">False</span>)</div>
-<div class="line"><span class="lineno">15259</span>    remote = getattr(args, <span class="stringliteral">&quot;remote&quot;</span>, <span class="keywordtype">None</span>)</div>
-<div class="line"><span class="lineno">15260</span>    branch = getattr(args, <span class="stringliteral">&quot;branch&quot;</span>, <span class="keywordtype">None</span>)</div>
-<div class="line"><span class="lineno">15261</span>    current_branch_only = (</div>
-<div class="line"><span class="lineno">15262</span>        getattr(args, <span class="stringliteral">&quot;current_branch_only&quot;</span>, <span class="keyword">False</span>)</div>
-<div class="line"><span class="lineno">15263</span>        <span class="keywordflow">or</span> remote <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">15264</span>        <span class="keywordflow">or</span> branch <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">15265</span>    )</div>
-<div class="line"><span class="lineno">15266</span> </div>
-<div class="line"><span class="lineno">15267</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> current_branch_only:</div>
-<div class="line"><span class="lineno">15268</span>        pull_all_source_branches(source_project_root, <span class="stringliteral">&quot;pull-source.log&quot;</span>, rebase=rebase)</div>
-<div class="line"><span class="lineno">15269</span>        <span class="keywordflow">return</span></div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15247">15247</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">15247</span><span class="keyword">def </span>pull_source_repo(args):</div>
+<div class="line"><span class="lineno">15248</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">15249</span><span class="stringliteral">    @brief Refresh source branches in the repository resolved from a case directory.</span></div>
+<div class="line"><span class="lineno">15250</span><span class="stringliteral">    @param[in] args Command-line style argument list supplied to the function.</span></div>
+<div class="line"><span class="lineno">15251</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">15252</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15253</span>        context = resolve_case_origin_context(</div>
+<div class="line"><span class="lineno">15254</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15255</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15256</span>        )</div>
+<div class="line"><span class="lineno">15257</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;pull-source&quot;</span>)</div>
+<div class="line"><span class="lineno">15258</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15259</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15260</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15261</span> </div>
+<div class="line"><span class="lineno">15262</span>    rebase = <span class="keywordflow">not</span> getattr(args, <span class="stringliteral">&quot;no_rebase&quot;</span>, <span class="keyword">False</span>)</div>
+<div class="line"><span class="lineno">15263</span>    remote = getattr(args, <span class="stringliteral">&quot;remote&quot;</span>, <span class="keywordtype">None</span>)</div>
+<div class="line"><span class="lineno">15264</span>    branch = getattr(args, <span class="stringliteral">&quot;branch&quot;</span>, <span class="keywordtype">None</span>)</div>
+<div class="line"><span class="lineno">15265</span>    current_branch_only = (</div>
+<div class="line"><span class="lineno">15266</span>        getattr(args, <span class="stringliteral">&quot;current_branch_only&quot;</span>, <span class="keyword">False</span>)</div>
+<div class="line"><span class="lineno">15267</span>        <span class="keywordflow">or</span> remote <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">15268</span>        <span class="keywordflow">or</span> branch <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">15269</span>    )</div>
 <div class="line"><span class="lineno">15270</span> </div>
-<div class="line"><span class="lineno">15271</span>    command = [<span class="stringliteral">&quot;git&quot;</span>, <span class="stringliteral">&quot;pull&quot;</span>]</div>
-<div class="line"><span class="lineno">15272</span>    <span class="keywordflow">if</span> rebase:</div>
-<div class="line"><span class="lineno">15273</span>        command.append(<span class="stringliteral">&quot;--rebase&quot;</span>)</div>
-<div class="line"><span class="lineno">15274</span>    <span class="keywordflow">if</span> remote:</div>
-<div class="line"><span class="lineno">15275</span>        command.append(remote)</div>
-<div class="line"><span class="lineno">15276</span>        <span class="keywordflow">if</span> branch:</div>
-<div class="line"><span class="lineno">15277</span>            command.append(branch)</div>
-<div class="line"><span class="lineno">15278</span>    <span class="keywordflow">elif</span> branch:</div>
-<div class="line"><span class="lineno">15279</span>        command.extend([<span class="stringliteral">&quot;origin&quot;</span>, branch])</div>
-<div class="line"><span class="lineno">15280</span> </div>
-<div class="line"><span class="lineno">15281</span>    execute_command(command, source_project_root, <span class="stringliteral">&quot;pull-source.log&quot;</span>, {})</div>
-<div class="line"><span class="lineno">15282</span> </div>
+<div class="line"><span class="lineno">15271</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> current_branch_only:</div>
+<div class="line"><span class="lineno">15272</span>        pull_all_source_branches(source_project_root, <span class="stringliteral">&quot;pull-source.log&quot;</span>, rebase=rebase)</div>
+<div class="line"><span class="lineno">15273</span>        <span class="keywordflow">return</span></div>
+<div class="line"><span class="lineno">15274</span> </div>
+<div class="line"><span class="lineno">15275</span>    command = [<span class="stringliteral">&quot;git&quot;</span>, <span class="stringliteral">&quot;pull&quot;</span>]</div>
+<div class="line"><span class="lineno">15276</span>    <span class="keywordflow">if</span> rebase:</div>
+<div class="line"><span class="lineno">15277</span>        command.append(<span class="stringliteral">&quot;--rebase&quot;</span>)</div>
+<div class="line"><span class="lineno">15278</span>    <span class="keywordflow">if</span> remote:</div>
+<div class="line"><span class="lineno">15279</span>        command.append(remote)</div>
+<div class="line"><span class="lineno">15280</span>        <span class="keywordflow">if</span> branch:</div>
+<div class="line"><span class="lineno">15281</span>            command.append(branch)</div>
+<div class="line"><span class="lineno">15282</span>    <span class="keywordflow">elif</span> branch:</div>
+<div class="line"><span class="lineno">15283</span>        command.extend([<span class="stringliteral">&quot;origin&quot;</span>, branch])</div>
+<div class="line"><span class="lineno">15284</span> </div>
+<div class="line"><span class="lineno">15285</span>    execute_command(command, source_project_root, <span class="stringliteral">&quot;pull-source.log&quot;</span>, {})</div>
+<div class="line"><span class="lineno">15286</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -31218,50 +31222,50 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15283">15283</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">15283</span><span class="keyword">def </span>build_project(args):</div>
-<div class="line"><span class="lineno">15284</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">15285</span><span class="stringliteral">    @brief Implements the &#39;build&#39; command.</span></div>
-<div class="line"><span class="lineno">15286</span><span class="stringliteral">    @details Executes the top-level Makefile directly, passing through any</span></div>
-<div class="line"><span class="lineno">15287</span><span class="stringliteral">             additional arguments to `make`. This allows for building,</span></div>
-<div class="line"><span class="lineno">15288</span><span class="stringliteral">             cleaning, and other Makefile targets via the orchestrator</span></div>
-<div class="line"><span class="lineno">15289</span><span class="stringliteral">             without maintaining a separate build wrapper script.</span></div>
-<div class="line"><span class="lineno">15290</span><span class="stringliteral">    @param[in] args The command-line arguments parsed by argparse.</span></div>
-<div class="line"><span class="lineno">15291</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">15292</span> </div>
-<div class="line"><span class="lineno">15293</span>    print(<span class="stringliteral">&quot;\n&quot;</span> + <span class="stringliteral">&quot;=&quot;</span>*27 + <span class="stringliteral">&quot; BUILD STAGE &quot;</span> + <span class="stringliteral">&quot;=&quot;</span>*27)</div>
-<div class="line"><span class="lineno">15294</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">15295</span>        context = resolve_case_origin_context(</div>
-<div class="line"><span class="lineno">15296</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15297</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
-<div class="line"><span class="lineno">15298</span>        )</div>
-<div class="line"><span class="lineno">15299</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;build&quot;</span>)</div>
-<div class="line"><span class="lineno">15300</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">15301</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15302</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15303</span> </div>
-<div class="line"><span class="lineno">15304</span>    makefile_path = os.path.join(source_project_root, <span class="stringliteral">&quot;Makefile&quot;</span>)</div>
-<div class="line"><span class="lineno">15305</span> </div>
-<div class="line"><span class="lineno">15306</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.isfile(makefile_path):</div>
-<div class="line"><span class="lineno">15307</span>        print(f<span class="stringliteral">&quot;[FATAL] Makefile not found at expected location: {makefile_path}&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15308</span>        print(<span class="stringliteral">&quot;        Please ensure the project root contains a valid Makefile.&quot;</span>, file=sys.stderr)</div>
-<div class="line"><span class="lineno">15309</span>        sys.exit(1)</div>
-<div class="line"><span class="lineno">15310</span> </div>
-<div class="line"><span class="lineno">15311</span>    make_args = <a class="code hl_struct" href="variables_8h.html#structlist">list</a>(args.make_args <span class="keywordflow">or</span> [])</div>
-<div class="line"><span class="lineno">15312</span>    <span class="keywordflow">if</span> make_args_include_explicit_goal(make_args):</div>
-<div class="line"><span class="lineno">15313</span>        command = [<span class="stringliteral">&quot;make&quot;</span>] + make_args</div>
-<div class="line"><span class="lineno">15314</span>    <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno">15315</span>        command = [<span class="stringliteral">&quot;make&quot;</span>, <span class="stringliteral">&quot;all&quot;</span>] + make_args</div>
-<div class="line"><span class="lineno">15316</span>        print(<span class="stringliteral">&quot;[INFO] No explicit make target supplied; defaulting to &#39;all&#39;.&quot;</span>)</div>
-<div class="line"><span class="lineno">15317</span>        print(<span class="stringliteral">&quot;       Use &#39;picurv build clean-project ...&#39; or another target when you want a non-build make action.&quot;</span>)</div>
-<div class="line"><span class="lineno">15318</span>    <span class="comment"># For the build process, we don&#39;t have a monitor.yml, so we pass an empty</span></div>
-<div class="line"><span class="lineno">15319</span>    <span class="comment"># dict to execute_command. The command should be run in the project root.</span></div>
-<div class="line"><span class="lineno">15320</span>    execute_command(command, source_project_root, <span class="stringliteral">&quot;build.log&quot;</span>, {})</div>
-<div class="line"><span class="lineno">15321</span>   </div>
-<div class="line"><span class="lineno">15322</span> </div>
-<div class="line"><span class="lineno">15323</span> </div>
-<div class="line"><span class="lineno">15324</span> </div>
-<div class="line"><span class="lineno">15325</span><span class="comment"># ==============================================================================</span></div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l15287">15287</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">15287</span><span class="keyword">def </span>build_project(args):</div>
+<div class="line"><span class="lineno">15288</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">15289</span><span class="stringliteral">    @brief Implements the &#39;build&#39; command.</span></div>
+<div class="line"><span class="lineno">15290</span><span class="stringliteral">    @details Executes the top-level Makefile directly, passing through any</span></div>
+<div class="line"><span class="lineno">15291</span><span class="stringliteral">             additional arguments to `make`. This allows for building,</span></div>
+<div class="line"><span class="lineno">15292</span><span class="stringliteral">             cleaning, and other Makefile targets via the orchestrator</span></div>
+<div class="line"><span class="lineno">15293</span><span class="stringliteral">             without maintaining a separate build wrapper script.</span></div>
+<div class="line"><span class="lineno">15294</span><span class="stringliteral">    @param[in] args The command-line arguments parsed by argparse.</span></div>
+<div class="line"><span class="lineno">15295</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">15296</span> </div>
+<div class="line"><span class="lineno">15297</span>    print(<span class="stringliteral">&quot;\n&quot;</span> + <span class="stringliteral">&quot;=&quot;</span>*27 + <span class="stringliteral">&quot; BUILD STAGE &quot;</span> + <span class="stringliteral">&quot;=&quot;</span>*27)</div>
+<div class="line"><span class="lineno">15298</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">15299</span>        context = resolve_case_origin_context(</div>
+<div class="line"><span class="lineno">15300</span>            case_dir_hint=getattr(args, <span class="stringliteral">&quot;case_dir&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15301</span>            source_root_override=getattr(args, <span class="stringliteral">&quot;source_root&quot;</span>, <span class="keywordtype">None</span>),</div>
+<div class="line"><span class="lineno">15302</span>        )</div>
+<div class="line"><span class="lineno">15303</span>        source_project_root = require_project_root(context[<span class="stringliteral">&quot;source_project_root&quot;</span>], <span class="stringliteral">&quot;build&quot;</span>)</div>
+<div class="line"><span class="lineno">15304</span>    <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">15305</span>        print(f<span class="stringliteral">&quot;[FATAL] {exc}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15306</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15307</span> </div>
+<div class="line"><span class="lineno">15308</span>    makefile_path = os.path.join(source_project_root, <span class="stringliteral">&quot;Makefile&quot;</span>)</div>
+<div class="line"><span class="lineno">15309</span> </div>
+<div class="line"><span class="lineno">15310</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.isfile(makefile_path):</div>
+<div class="line"><span class="lineno">15311</span>        print(f<span class="stringliteral">&quot;[FATAL] Makefile not found at expected location: {makefile_path}&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15312</span>        print(<span class="stringliteral">&quot;        Please ensure the project root contains a valid Makefile.&quot;</span>, file=sys.stderr)</div>
+<div class="line"><span class="lineno">15313</span>        sys.exit(1)</div>
+<div class="line"><span class="lineno">15314</span> </div>
+<div class="line"><span class="lineno">15315</span>    make_args = <a class="code hl_struct" href="variables_8h.html#structlist">list</a>(args.make_args <span class="keywordflow">or</span> [])</div>
+<div class="line"><span class="lineno">15316</span>    <span class="keywordflow">if</span> make_args_include_explicit_goal(make_args):</div>
+<div class="line"><span class="lineno">15317</span>        command = [<span class="stringliteral">&quot;make&quot;</span>] + make_args</div>
+<div class="line"><span class="lineno">15318</span>    <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno">15319</span>        command = [<span class="stringliteral">&quot;make&quot;</span>, <span class="stringliteral">&quot;all&quot;</span>] + make_args</div>
+<div class="line"><span class="lineno">15320</span>        print(<span class="stringliteral">&quot;[INFO] No explicit make target supplied; defaulting to &#39;all&#39;.&quot;</span>)</div>
+<div class="line"><span class="lineno">15321</span>        print(<span class="stringliteral">&quot;       Use &#39;picurv build clean-project ...&#39; or another target when you want a non-build make action.&quot;</span>)</div>
+<div class="line"><span class="lineno">15322</span>    <span class="comment"># For the build process, we don&#39;t have a monitor.yml, so we pass an empty</span></div>
+<div class="line"><span class="lineno">15323</span>    <span class="comment"># dict to execute_command. The command should be run in the project root.</span></div>
+<div class="line"><span class="lineno">15324</span>    execute_command(command, source_project_root, <span class="stringliteral">&quot;build.log&quot;</span>, {})</div>
+<div class="line"><span class="lineno">15325</span>   </div>
+<div class="line"><span class="lineno">15326</span> </div>
+<div class="line"><span class="lineno">15327</span> </div>
+<div class="line"><span class="lineno">15328</span> </div>
+<div class="line"><span class="lineno">15329</span><span class="comment"># ==============================================================================</span></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
