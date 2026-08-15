@@ -1,7 +1,7 @@
 var searchData=
 [
   ['absolutize_5fcase_5fexternal_5fpaths_0',['absolutize_case_external_paths',['../namespacepicurv__cli_1_1core.html#a238fc2f0f4a1a848ddb88e50bca3dc63',1,'picurv_cli::core']]],
-  ['accumulateparticlefield_1',['AccumulateParticleField',['../group__scatter__module__internal.html#gaa0d28beb3e582a9140180983a227bc1c',1,'interpolation.c']]],
+  ['accumulateparticlefield_1',['AccumulateParticleField',['../group__scatter__module__internal.html#ga65b0ad52e9e8f8c328e8b031201d7a05',1,'interpolation.c']]],
   ['activestats_2',['ActiveStats',['../test__momentum__convective__candidates_8c.html#acaafdd740473d6d7a4641c9405d212bd',1,'test_momentum_convective_candidates.c']]],
   ['add_5fplanned_5fgrid_5fartifacts_3',['add_planned_grid_artifacts',['../namespacepicurv__cli_1_1core.html#adcb3728af67839dd3a01916627f541a3',1,'picurv_cli::core']]],
   ['add_5fplanned_5finitial_5fcondition_5fartifacts_4',['add_planned_initial_condition_artifacts',['../namespacepicurv__cli_1_1core.html#aa9642c7647a8d1c031d889da5998bcf7',1,'picurv_cli::core']]],
@@ -52,7 +52,7 @@ var searchData=
   ['assertnewtonlog_49',['AssertNewtonLog',['../test__momentum__newton__krylov_8c.html#ab5fc26ca0035d3c2364d7d2785ce2f13',1,'test_momentum_newton_krylov.c']]],
   ['assertperiodicpreconditionerrow_50',['AssertPeriodicPreconditionerRow',['../test__momentum__newton__krylov_8c.html#a48b312dc8913344fd1e0ec55e1dacbac',1,'test_momentum_newton_krylov.c']]],
   ['assignallgridcoordinates_51',['assignallgridcoordinates',['../grid_8h.html#ab2aef4bb6fc2d2223a52ff6a45c7c600',1,'AssignAllGridCoordinates(SimCtx *simCtx):&#160;grid.c'],['../grid_8c.html#ab2aef4bb6fc2d2223a52ff6a45c7c600',1,'AssignAllGridCoordinates(SimCtx *simCtx):&#160;grid.c']]],
-  ['assigninitialfieldtoswarm_52',['AssignInitialFieldToSwarm',['../ParticleSwarm_8c.html#a38c3c55ea49021ac59eea87b61e942d1',1,'ParticleSwarm.c']]],
+  ['assigninitialfieldtoswarm_52',['AssignInitialFieldToSwarm',['../ParticleSwarm_8c.html#a557a1baaec9845d39a38103c079f6836',1,'ParticleSwarm.c']]],
   ['assigninitialpropertiestoswarm_53',['assigninitialpropertiestoswarm',['../ParticleSwarm_8h.html#af2b3080ee0e5c8e0175ac594a2c497b5',1,'AssignInitialPropertiesToSwarm(UserCtx *user, PetscInt particlesPerProcess, PetscRandom *rand_phys_x, PetscRandom *rand_phys_y, PetscRandom *rand_phys_z, PetscRandom *rand_logic_i, PetscRandom *rand_logic_j, PetscRandom *rand_logic_k, BoundingBox *bboxlist):&#160;ParticleSwarm.c'],['../ParticleSwarm_8c.html#af2b3080ee0e5c8e0175ac594a2c497b5',1,'AssignInitialPropertiesToSwarm(UserCtx *user, PetscInt particlesPerProcess, PetscRandom *rand_phys_x, PetscRandom *rand_phys_y, PetscRandom *rand_phys_z, PetscRandom *rand_logic_i, PetscRandom *rand_logic_j, PetscRandom *rand_logic_k, BoundingBox *bboxlist):&#160;ParticleSwarm.c']]],
   ['audit_5fcli_5fcontract_54',['audit_cli_contract',['../namespaceaudit__user__facing__reporting.html#a7d0d94a6e29b0b4720f7385598af1b36',1,'audit_user_facing_reporting']]],
   ['audit_5fdirect_5fc_5foutput_55',['audit_direct_c_output',['../namespaceaudit__user__facing__reporting.html#ae530d7dc0383a2b27d367eaeb6eb8768',1,'audit_user_facing_reporting']]],

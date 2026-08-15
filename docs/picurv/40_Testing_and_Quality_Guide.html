@@ -104,8 +104,8 @@ $(function() {
 <li class="level1"><a href="#p40_troubleshooting_sec">9. Common Failure Modes</a></li>
 <li class="level1"><a href="#p40_extend_sec">10. Extending The Test Suite</a></li>
 <li class="level1"><a href="#p40_runtime_coverage_sec">11. Runtime Coverage Map</a></li>
-<li class="level1"><a href="#p40_exhaustive_backlog_sec">12. Exhaustive-Readiness Backlog</a><ul><li class="level2"><a href="#autotoc_md133">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md134">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md135">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p40_exhaustive_backlog_sec">12. Exhaustive-Readiness Backlog</a><ul><li class="level2"><a href="#autotoc_md135">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md136">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md137">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -193,6 +193,7 @@ $(function() {
 <li>Use <code>make audit-build</code> when you want a clean compilation audit with <code>logs/build.log</code> and <code>logs/build.warnings.log</code> captured under the repo <code>logs/</code> directory.</li>
 <li>Use <code>make doctor</code> after provisioning PETSc on a new machine.</li>
 <li>Use <code>make unit-setup</code> when changing setup, teardown, initialization, or rank-info lifecycle code.</li>
+<li>Use <code>make unit-setup</code> when changing <code>FieldId</code>, <code><a class="el" href="field__catalog_8h.html#structFieldDescriptor" title="Immutable metadata for one field identity.">FieldDescriptor</a></code>, runtime field views, or the typed ghost-update interface; it directly checks catalog completeness, bindings, failure behavior, and representative layouts.</li>
 <li>Use <code>make unit-simulation</code> for the normal simulation-core debugging loop (<code>unit-boundaries + unit-solver + unit-poisson-rhs + unit-runtime + unit-particles</code>).</li>
 <li>Use <code>make unit-&lt;area&gt;</code> while changing a subsystem in isolation.</li>
 <li>Use <code>make smoke</code> after building binaries to execute tiny real solve/post/restart workflows.</li>
@@ -523,6 +524,7 @@ $(function() {
 <li><code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>: <code>unit-solver</code>, <code>unit-poisson-rhs</code>, <code>S1</code>, <code>S2</code></li>
 <li><code><a class="el" href="Boundaries_8c.html">src/Boundaries.c</a></code>: <code>unit-boundaries</code>, <code>unit-periodic</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S5</code>, <code>S6</code>, <code>S7</code>, <code>S8</code></li>
 <li><code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">src/Filter.c</a></code>: <code>unit-solver</code></li>
+<li><code><a class="el" href="field__catalog_8c.html" title="Authoritative persistent-Eulerian-field catalog and runtime view resolver.">src/field_catalog.c</a></code>, <code><a class="el" href="particle__field__catalog_8c.html" title="Persistent solver-particle-field catalog implementation.">src/particle_field_catalog.c</a></code>: <code>unit-setup</code>, <code>unit-periodic</code>, <code>unit-runtime</code>, <code>unit-solver</code>, <code>unit-logging</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code>, <code>S6</code>, <code>S8</code></li>
 <li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code>: <code>unit-metric</code>, <code>unit-grid</code>, <code>S1</code>, <code>S1b</code>, <code>S2</code>, <code>S5</code>, <code>S6</code></li>
 <li><code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
 <li><code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code>: <code>unit-runtime</code>, <code>S2</code>, <code>S3</code>, <code>S4</code>, <code>S5</code></li>
@@ -588,11 +590,11 @@ $(function() {
 <li>numerical oracle/golden-output tolerance checks for more physical scenarios</li>
 <li>performance regression gates (runtime/memory envelopes)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md133"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Testing and Validation Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md134"></a>
+<h3><a class="anchor" id="autotoc_md136"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -600,7 +602,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md135"></a>
+<h3><a class="anchor" id="autotoc_md137"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>

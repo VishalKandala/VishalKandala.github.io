@@ -112,7 +112,7 @@ $(function() {
 <li>Solver executable entry: <code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">src/simulator.c</a></code></li>
 <li>Postprocessor executable entry: <code><a class="el" href="postprocessor_8c.html" title="Phase 2 implementation of the post-processing tool.">src/postprocessor.c</a></code></li>
 </ul>
-<p>Both rely on shared setup/context infrastructure from <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, and <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">variables.h</a></code>.</p>
+<p>Both rely on shared setup/context infrastructure from <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">io.c</a></code>, and <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">variables.h</a></code>. Persistent Eulerian field identity/runtime DM-Vec binding and separate solver-particle DMSwarm identity are shared through <code><a class="el" href="field__catalog_8c.html" title="Authoritative persistent-Eulerian-field catalog and runtime view resolver.">field_catalog.c</a></code>, <code><a class="el" href="particle__field__catalog_8c.html" title="Persistent solver-particle-field catalog implementation.">particle_field_catalog.c</a></code>, and their headers; see <a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a>.</p>
 <h1><a class="anchor" id="p13_solver_flow_sec"></a>
 2. Solver Runtime Flow (simulator.c)</h1>
 <p>High-level stages:</p>
@@ -163,6 +163,11 @@ $(function() {
 <li><code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code></li>
 </ul>
 </li>
+<li>Field identity/storage binding:<ul>
+<li><code><a class="el" href="field__catalog_8c.html" title="Authoritative persistent-Eulerian-field catalog and runtime view resolver.">src/field_catalog.c</a></code></li>
+<li><code><a class="el" href="particle__field__catalog_8c.html" title="Persistent solver-particle-field catalog implementation.">src/particle_field_catalog.c</a></code></li>
+</ul>
+</li>
 <li>Grid and metrics:<ul>
 <li><code><a class="el" href="grid_8c.html">src/grid.c</a></code></li>
 <li><code><a class="el" href="Metric_8c.html">src/Metric.c</a></code></li>
@@ -200,8 +205,8 @@ $(function() {
 <p>For contributor orientation, the table below lists high-value public entry points per subsystem. Function names come from <code>include/*.h</code> and represent the safest integration seams.</p>
 <ul>
 <li>startup/context:<ul>
-<li>files: <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">simulator.c</a></code></li>
-<li>APIs: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a>, <a class="el" href="setup_8h.html#a3ed7edc1ce3c1b4aae8e30f9a75bdce8">SetupSimulationEnvironment</a>, <a class="el" href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a>, <a class="el" href="setup_8h.html#af138b6bc4bee9b2ac33881372691b90e">FinalizeSimulation</a></li>
+<li>files: <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">setup.c</a></code>, <code><a class="el" href="field__catalog_8c.html" title="Authoritative persistent-Eulerian-field catalog and runtime view resolver.">field_catalog.c</a></code>, <code><a class="el" href="particle__field__catalog_8c.html" title="Persistent solver-particle-field catalog implementation.">particle_field_catalog.c</a></code>, <code><a class="el" href="simulator_8c.html" title="Main driver for the unified CFD and Lagrangian particle solver.">simulator.c</a></code></li>
+<li>APIs: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a>, <a class="el" href="setup_8h.html#a3ed7edc1ce3c1b4aae8e30f9a75bdce8">SetupSimulationEnvironment</a>, <a class="el" href="setup_8h.html#a2be2815aeb79afe9b95caf39c7b3312c">SetupGridAndSolvers</a>, <a class="el" href="field__catalog_8h.html#af63f334e53a107f8f499473db992d486">FieldGetDescriptor</a>, <a class="el" href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a>, <a class="el" href="setup_8h.html#af138b6bc4bee9b2ac33881372691b90e">FinalizeSimulation</a></li>
 </ul>
 </li>
 <li>runtime loop:<ul>
@@ -236,7 +241,7 @@ $(function() {
 </li>
 <li>analytical/init:<ul>
 <li>files: <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">AnalyticalSolutions.c</a></code>, <code><a class="el" href="initialcondition_8c.html" title="// Setup the Initial conditions for different cases.">initialcondition.c</a></code></li>
-<li>APIs: <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a>, <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>, <a class="el" href="initialcondition_8h.html#a62dfa993750dc34d1729c575bb1dde66">SetInitialInteriorField</a></li>
+<li>APIs: <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a>, <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>, <a class="el" href="initialcondition_8h.html#a4fc27923bed538788611f9a76099369d">SetInitialInteriorField</a></li>
 </ul>
 </li>
 </ul>
@@ -299,6 +304,7 @@ $(function() {
 <li>Initial-condition index: <b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li>Particle-model index: <b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li>API docs quality status: <b><a class="el" href="35_API_Documentation_Status.html">API Documentation Status</a></b></li>
+<li>Field identity/layout catalog: <b><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a></b></li>
 <li>Low-priority fix queue: <b><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a></b></li>
 </ul>
 <h2><a class="anchor" id="autotoc_md44"></a>

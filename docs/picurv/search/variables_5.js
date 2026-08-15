@@ -16,8 +16,9 @@ var searchData=
   ['estimate_5fincomplete_13',['estimate_incomplete',['../momentumsolvers_8h.html#a094b093f5f97b6ad03060f7f6354757c',1,'MomStabilityReport']]],
   ['eta_14',['Eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx']]],
   ['euler_5fsubdir_15',['euler_subdir',['../variables_8h.html#a303d468bcc4a1a86c019b9a7a2469008',1,'SimCtx']]],
-  ['eulerianext_16',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
-  ['euleriansource_17',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
-  ['exec_5fmode_18',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
-  ['expected_5fn_19',['expected_n',['../test__momentum__convective__candidates_8c.html#a609e063bf471a622efac7de56fcd0993',1,'DofMap']]]
+  ['eulerian_5fscatter_5ftarget_16',['eulerian_scatter_target',['../particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632',1,'ParticleFieldDescriptor']]],
+  ['eulerianext_17',['eulerianExt',['../variables_8h.html#a8a4eac7d8dd754a6dbb71f93cb0fbde3',1,'PostProcessParams']]],
+  ['euleriansource_18',['eulerianSource',['../variables_8h.html#a9a4abdb6db61216c4276e2d111a4d73d',1,'SimCtx']]],
+  ['exec_5fmode_19',['exec_mode',['../variables_8h.html#ae27e734d789eb2f07918d6bae3969480',1,'SimCtx']]],
+  ['expected_5fn_20',['expected_n',['../test__momentum__convective__candidates_8c.html#a609e063bf471a622efac7de56fcd0993',1,'DofMap']]]
 ];

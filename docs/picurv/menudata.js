@@ -28,6 +28,7 @@ var menudata={children:[
 {text:"Config Contracts",url:"14_Config_Contract.html"},
 {text:"Methods",url:"21_Methods_Overview.html"},
 {text:"Runtime Internals",url:"46_C_Runtime_Execution_Map.html"},
+{text:"Field Catalog",url:"56_Field_Identity_and_Layout_Catalog.html"},
 {text:"File List",url:"files_structured.html"},
 {text:"Data Structures",url:"annotated_structured.html"},
 {text:"Projects Home",url:"/projects/"}]}

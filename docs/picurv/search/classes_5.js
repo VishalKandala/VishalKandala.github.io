@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['flowwave_0',['FlowWave',['../variables_8h.html#structFlowWave',1,'']]],
-  ['fpsnapshot_1',['FpSnapshot',['../test__momentum__newton__boundary__fixedpoint_8c.html#structFpSnapshot',1,'']]],
-  ['fsinfo_2',['FSInfo',['../variables_8h.html#structFSInfo',1,'']]]
+  ['fielddescriptor_0',['FieldDescriptor',['../field__catalog_8h.html#structFieldDescriptor',1,'']]],
+  ['fieldview_1',['FieldView',['../field__catalog_8h.html#structFieldView',1,'']]],
+  ['flowwave_2',['FlowWave',['../variables_8h.html#structFlowWave',1,'']]],
+  ['fpsnapshot_3',['FpSnapshot',['../test__momentum__newton__boundary__fixedpoint_8c.html#structFpSnapshot',1,'']]],
+  ['fsinfo_4',['FSInfo',['../variables_8h.html#structFSInfo',1,'']]]
 ];
