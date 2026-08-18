@@ -12,12 +12,15 @@ var searchData=
   ['solver_20documentation_9',['PICurv Solver Documentation',['../index.html',1,'']]],
   ['solver_20implementations_10',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
   ['solver_20yaml_11',['Configuration Reference: Solver YAML',['../08_Solver_Reference.html',1,'']]],
-  ['started_12',['Getting Started',['../41_Getting_Started_Index.html',1,'']]],
-  ['statistical_20averaging_13',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
-  ['status_14',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
-  ['step_20projection_20method_15',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['study_20guide_16',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['suite_20developer_20guide_17',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
-  ['summary_18',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['sweep_20and_20study_20guide_19',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
+  ['specification_12',['specification',['../58_Turbulence_Statistics_Pipeline_Specification.html',1,'Field Statistics Pipeline Specification'],['../59_Function_Identity_and_Observability_Specification.html',1,'Function Identity and Observability Specification']]],
+  ['specifications_13',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
+  ['started_14',['Getting Started',['../41_Getting_Started_Index.html',1,'']]],
+  ['statistical_20averaging_15',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
+  ['statistics_20pipeline_20specification_16',['Field Statistics Pipeline Specification',['../58_Turbulence_Statistics_Pipeline_Specification.html',1,'']]],
+  ['status_17',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
+  ['step_20projection_20method_18',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
+  ['study_20guide_19',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['suite_20developer_20guide_20',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
+  ['summary_21',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
+  ['sweep_20and_20study_20guide_22',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
 ];

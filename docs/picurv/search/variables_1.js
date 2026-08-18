@@ -27,6 +27,5 @@ var searchData=
   ['assigneda_24',['assignedA',['../variables_8h.html#a41951f47cfbe9c08def29998a76dc791',1,'UserCtx']]],
   ['atk_25',['atk',['../variables_8h.html#a78d9c3f94b95f552e7b97557d97c8925',1,'FSInfo']]],
   ['atk_5fo_26',['atk_o',['../variables_8h.html#af82c226d2e3807e6b8f7e9aee68080ac',1,'FSInfo']]],
-  ['availability_27',['availability',['../field__catalog_8h.html#a7c9e045637f7ae7312d9b324fdc88324',1,'FieldDescriptor']]],
-  ['averaging_28',['averaging',['../variables_8h.html#a61f9f685923b2b7b99434b6100cc10d7',1,'SimCtx']]]
+  ['availability_27',['availability',['../field__catalog_8h.html#a7c9e045637f7ae7312d9b324fdc88324',1,'FieldDescriptor']]]
 ];

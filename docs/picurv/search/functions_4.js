@@ -32,7 +32,7 @@ var searchData=
   ['destroyuservectors_29',['destroyuservectors',['../setup_8h.html#ad0742173ea399929e164fb489da6d945',1,'DestroyUserVectors(UserCtx *user):&#160;setup.c'],['../setup_8c.html#ad0742173ea399929e164fb489da6d945',1,'DestroyUserVectors(UserCtx *user):&#160;setup.c']]],
   ['destroyvecifset_30',['DestroyVecIfSet',['../test__support_8c.html#a8622a6649f49da80c16160d3335402f0',1,'test_support.c']]],
   ['detect_5fcase_5fcompletion_5fstatus_31',['detect_case_completion_status',['../namespacepicurv__cli_1_1core.html#a1c1ddba02475f01d4ed7659a2a93e2d1',1,'picurv_cli::core']]],
-  ['detect_5flast_5fcheckpoint_5fstep_32',['detect_last_checkpoint_step',['../namespacepicurv__cli_1_1core.html#a98aa5af5b5859a5622b068fc4044ccbe',1,'picurv_cli::core']]],
+  ['detect_5flast_5fcheckpoint_5fstep_32',['detect_last_checkpoint_step',['../namespacepicurv__cli_1_1core.html#aab4be1cbd5bf0f217cb1e2865eca5145',1,'picurv_cli::core']]],
   ['detect_5fpost_5fcompleted_5ffrontier_33',['detect_post_completed_frontier',['../namespacepicurv__cli_1_1core.html#a6fc5d8dbda9cfe9d4e059197524a6db5',1,'picurv_cli::core']]],
   ['detect_5fpost_5fsource_5ffrontier_34',['detect_post_source_frontier',['../namespacepicurv__cli_1_1core.html#a6b73331959d97dc2fde5b8d7ff68cbba',1,'picurv_cli::core']]],
   ['determineperiodicity_35',['determineperiodicity',['../io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa',1,'DeterminePeriodicity(SimCtx *simCtx):&#160;io.c'],['../io_8c.html#a9315186ed2f12d35b8a46dd3ce94d1aa',1,'DeterminePeriodicity(SimCtx *simCtx):&#160;io.c']]],

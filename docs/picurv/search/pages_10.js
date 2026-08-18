@@ -8,12 +8,13 @@ var searchData=
   ['picard_20jameson_20rk_20momentum_20solver_5',['Dual-Time Picard Jameson RK Momentum Solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'']]],
   ['picurv_6',['The Conductor Script: picurv',['../05_The_Conductor_Script.html',1,'']]],
   ['picurv_20solver_20documentation_7',['PICurv Solver Documentation',['../index.html',1,'']]],
-  ['playbook_8',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
-  ['poisson_20gmres_20and_20multigrid_9',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
-  ['portal_10',['Developer Portal',['../43_Developer_Portal_Index.html',1,'']]],
-  ['postprocessor_20yaml_11',['Configuration Reference: Postprocessor YAML',['../10_Post_Processing_Reference.html',1,'']]],
-  ['pressure_20poisson_20gmres_20and_20multigrid_12',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
-  ['priority_20fixes_13',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
-  ['projection_14',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['projection_20method_15',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]]
+  ['pipeline_20specification_8',['Field Statistics Pipeline Specification',['../58_Turbulence_Statistics_Pipeline_Specification.html',1,'']]],
+  ['playbook_9',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
+  ['poisson_20gmres_20and_20multigrid_10',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['portal_11',['Developer Portal',['../43_Developer_Portal_Index.html',1,'']]],
+  ['postprocessor_20yaml_12',['Configuration Reference: Postprocessor YAML',['../10_Post_Processing_Reference.html',1,'']]],
+  ['pressure_20poisson_20gmres_20and_20multigrid_13',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['priority_20fixes_14',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
+  ['projection_15',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['projection_20method_16',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]]
 ];

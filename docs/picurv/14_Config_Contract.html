@@ -184,7 +184,6 @@ $(function() {
 <li><code>pseudo_cfl.reduction_factor</code> -&gt; <code>-pseudo_cfl_reduction_factor</code> (default 0.75, must be in (0,1)): factor applied to the pseudo-CFL after a rejected trial.</li>
 </ul>
 </li>
-<li><code>solution_convergence.*</code> -&gt; <code>-solution_convergence_*</code> for physical solution drift logging.</li>
 <li><code>momentum_solver.newton_krylov.nonlinear_solver.*</code> -&gt; prefixed <code>-mom_nk_snes_*</code> options, including <code>line_search.type</code> -&gt; <code>-mom_nk_snes_linesearch_type</code>.</li>
 <li><code>momentum_solver.newton_krylov.jacobian.*</code> and <code>.preconditioner.*</code> -&gt; application-owned <code>-mom_nk_jacobian_*</code> and <code>-mom_nk_preconditioner_*</code> mathematical selectors.</li>
 <li><code>momentum_solver.newton_krylov.linear_solver.*</code> -&gt; prefixed <code>-mom_nk_ksp_*</code> options; GMRES restart is GMRES-family-only. The PETSc PC backend is derived internally and is not a normal structured YAML choice.</li>
@@ -206,27 +205,6 @@ $(function() {
 <li><code>verification.sources.scalar</code> prescribes particle <code>Psi</code> and drives the runtime diagnostic <code>logs/scatter_metrics.csv</code> while leaving ordinary production runs unchanged when absent.</li>
 <li>new verification source overrides belong in <code>verification_sources.*</code>, with production call sites kept as thin delegation points.</li>
 </ul>
-<p>Solution-convergence rule:</p>
-<ul>
-<li><code>solver.yml -&gt; solution_convergence</code> is an optional override block for the always-on runtime solution-convergence logger.</li>
-<li>the runtime always writes <code>logs/solution_convergence.log</code> once per physical timestep, defaulting to <code>steady_deterministic</code> mode when the block is omitted.</li>
-<li>it complements, rather than replaces, the inner solver-health logs:<ul>
-<li><code>logs/Momentum_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/Poisson_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/Continuity_Metrics.log</code></li>
-</ul>
-</li>
-<li>supported modes are:<ul>
-<li><code>steady_deterministic</code></li>
-<li><code>periodic_deterministic</code></li>
-<li><code>statistical_steady</code></li>
-<li><code>transient</code></li>
-</ul>
-</li>
-<li><code>periodic_deterministic.period_steps</code> is required only when <code>mode: periodic_deterministic</code>.</li>
-<li><code>statistical_steady.window_steps</code> is required only when <code>mode: statistical_steady</code>.</li>
-<li>nested mode blocks are rejected when they do not match the selected <code>mode</code>.</li>
-</ul>
 <h1><a class="anchor" id="p14_monitor_sec"></a>
 5. Monitor Contract Highlights</h1>
 <ul>
@@ -234,10 +212,14 @@ $(function() {
 <li><code>io.particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code> (defaults to <code>data_output_frequency</code> when omitted)</li>
 <li><code>io.particle_log_interval</code> -&gt; <code>-logfreq</code></li>
 <li><code>io.directories.output/restart/log</code> -&gt; <code>-output_dir/-restart_dir/-log_dir</code></li>
-<li><code>io.directories.eulerian_subdir/particle_subdir</code> -&gt; <code>-euler_subdir/-particle_subdir</code></li>
+<li>checkpoint-internal directory and payload names are fixed; monitor YAML does not expose Eulerian or particle checkpoint subdirectory overrides</li>
 <li><code>profiling.timestep_output</code> -&gt; <code>profile.run</code> when <code>mode: selected</code>, plus profiling control flags</li>
 <li><code>diagnostics.petsc</code> -&gt; PETSc startup arguments on solver/postprocessor commands</li>
 <li><code>diagnostics.runtime_memory_log</code> -&gt; <code>-runtime_memory_log_enabled/-runtime_memory_log_file</code></li>
+<li><code>solution_monitoring.convergence.*</code> maps directly into the generated master control as the existing <code>-solution_convergence_*</code> options and retains the existing log writer. <code>enabled</code> is explicit; sampling occurs every completed timestep and has no exposed cadence option.</li>
+<li><code>control</code> remains the single generated C-ingress artifact for physical solution monitoring; there is no observation-plan sidecar.</li>
+<li>scientific Eulerian field-statistics YAML is intentionally not accepted until accumulation, checkpoint continuation, and postprocessing are complete end to end.</li>
+<li>the old <code>case.models.statistics.time_averaging</code>, <code>-averaging</code>, and <code>solver.solution_convergence</code> ingress locations are rejected rather than translated.</li>
 <li><code>solver_monitoring.poisson.*</code> maps readable monitor keys into prefixed Poisson KSP flags.</li>
 <li><code>solver_monitoring.momentum.*</code> maps readable Newton history/SNES/KSP monitor booleans into bare <code>-mom_nk_*</code> switches.</li>
 <li><code>solver_monitoring.petsc_passthrough_options</code> maps raw PETSc flags directly into control output.</li>
@@ -247,7 +229,6 @@ $(function() {
 <ul>
 <li>Pipelines are serialized into semicolon-delimited C pipeline strings.</li>
 <li><code>io.eulerian_fields</code> -&gt; <code>output_fields_instantaneous</code></li>
-<li><code>io.eulerian_fields_averaged</code> -&gt; <code>output_fields_averaged</code> (reserved/no-op in current writer path)</li>
 <li><code>io.particle_fields</code> -&gt; <code>particle_fields_instantaneous</code></li>
 <li><code>io.input_extensions.eulerian/particle</code> -&gt; <code>eulerianExt/particleExt</code> for post input readers</li>
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>

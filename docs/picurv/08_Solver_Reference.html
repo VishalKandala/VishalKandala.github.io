@@ -89,7 +89,7 @@ $(function() {
 <li class="level1"><a href="#p08_tol_sec">3. tolerances</a></li>
 <li class="level1"><a href="#p08_msolver_sec">4. momentum_solver (Solver-Specific Block)</a></li>
 <li class="level1"><a href="#p08_poisson_sec">5. poisson_solver</a></li>
-<li class="level1"><a href="#p08_solution_conv_sec">6. solution_convergence</a></li>
+<li class="level1"><a href="#p08_solution_conv_sec">6. Physical-solution convergence monitoring</a></li>
 <li class="level1"><a href="#p08_interp_sec">7. interpolation</a></li>
 <li class="level1"><a href="#p08_scalar_transport_sec">8. scalar_transport</a></li>
 <li class="level1"><a href="#p08_verification_sec">9. verification</a></li>
@@ -256,21 +256,6 @@ momentum_solver:
   #     max_iterations: 400          # -&gt; -mom_nk_ksp_max_it
   #     gmres:
   #       restart: 80                # -&gt; -mom_nk_ksp_gmres_restart
-
-# --- Physical Solution Convergence Logging ---
-# This layer is separate from the inner solver-health logs. It always records
-# physical solution drift into logs/solution_convergence.csv without changing
-# solver stopping behavior. The optional block below only overrides the mode.
-# solution_convergence:
-#   # enabled: true                # [true/false] Omit or set true to activate logging (default active).
-#   mode: "steady_deterministic"   # -&gt; -solution_convergence_mode
-#                                  # Options: "steady_deterministic" | "periodic_deterministic" | "statistical_steady"
-#   # For periodic runs, compare each timestep to the same phase in the previous cycle.
-#   # periodic_deterministic:
-#   #   period_steps: 200          # -&gt; -solution_convergence_period_steps
-#   # For statistical-steady runs, compare adjacent windows of scalar observables.
-#   # statistical_steady:
-#   #   window_steps: 500          # -&gt; -solution_convergence_window_steps
 
 # ==============================================================================
 # 3. POISSON SOLVER CONFIGURATION
@@ -517,44 +502,8 @@ petsc_passthrough_options:
 <li>Advanced PETSc tuning remains available through <code>petsc_passthrough_options</code>; common examples include <code>-ps_mg_levels_N_pc_sor_omega</code> for SOR and <code>-ps_mg_levels_N_pc_factor_shift_amount</code> / <code>-ps_mg_levels_N_pc_factor_levels</code> for factor PCs.</li>
 </ul>
 <h1><a class="anchor" id="p08_solution_conv_sec"></a>
-6. solution_convergence</h1>
-<div class="fragment"><div class="line">solution_convergence:</div>
-<div class="line">  enabled: true                  # optional; set false to disable without removing the block</div>
-<div class="line">  mode: &quot;steady_deterministic&quot;   # steady_deterministic | periodic_deterministic | statistical_steady | transient</div>
-<div class="line">  periodic_deterministic:</div>
-<div class="line">    period_steps: 200</div>
-<div class="line">  statistical_steady:</div>
-<div class="line">    window_steps: 500</div>
-</div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>enabled</code> — when <code>false</code>, suppresses all <code>-solution_convergence_*</code> flags; default <code>true</code></li>
-<li><code>mode</code> -&gt; <code>-solution_convergence_mode</code></li>
-<li><code>periodic_deterministic.period_steps</code> -&gt; <code>-solution_convergence_period_steps</code></li>
-<li><code>statistical_steady.window_steps</code> -&gt; <code>-solution_convergence_window_steps</code></li>
-</ul>
-<p>Rules:</p><ul>
-<li>the <code>solution_convergence</code> block is optional; when omitted, the runtime still logs <code>logs/solution_convergence.log</code> once per physical timestep using the default <code>steady_deterministic</code> mode.</li>
-<li>it is logging-only in the current implementation.</li>
-<li>it does not replace the existing inner solver-health logs:<ul>
-<li><code>logs/Momentum_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/Poisson_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/Continuity_Metrics.log</code></li>
-</ul>
-</li>
-<li><code>periodic_deterministic.period_steps</code> is required only when <code>mode: "periodic_deterministic"</code>.</li>
-<li><code>statistical_steady.window_steps</code> is required only when <code>mode: "statistical_steady"</code>.</li>
-<li>nested mode blocks are rejected when they do not match the selected <code>mode</code>.</li>
-</ul>
-<p>Mode intent:</p><ul>
-<li><code>steady_deterministic</code>: timestep-to-timestep physical field drift for runs expected to settle to a fixed state.</li>
-<li><code>periodic_deterministic</code>: phase-aligned cycle drift using one stored period of field snapshots.</li>
-<li><code>statistical_steady</code>: adjacent-window drift of global observables for runs whose instantaneous fields should not settle pointwise.</li>
-<li><code>transient</code>: logs the same deterministic drift family for diagnosis, but without any implied steady-state interpretation.</li>
-</ul>
-<p>Future completion semantics:</p><ul>
-<li><code>steady_deterministic</code> is the intended home for future convergence-based completion criteria for fixed-state runs, such as stopping or marking a run complete once field-drift metrics remain below configured tolerances for a required dwell period.</li>
-<li><code>transient</code> should remain diagnostic-only for physically evolving runs, even though it currently logs the same deterministic drift columns as <code>steady_deterministic</code>.</li>
-<li>any future automatic stop feature should be opt-in, tolerance-driven, and routed through the same safe checkpoint/final-write path used by existing runtime shutdown guards.</li>
-</ul>
+6. Physical-solution convergence monitoring</h1>
+<p>Physical-solution convergence is observation policy rather than a numerical solver selection. Its user configuration therefore moved to <code>monitor.yml -&gt; solution_monitoring.convergence</code>. The old top-level <code>solver.yml -&gt; solution_convergence</code> key is rejected with a direct migration message. See <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b> for modes, mappings, and defaults. The monitor records every completed timestep; cadence is not a user setting.</p>
 <h1><a class="anchor" id="p08_interp_sec"></a>
 7. interpolation</h1>
 <div class="fragment"><div class="line">interpolation:</div>

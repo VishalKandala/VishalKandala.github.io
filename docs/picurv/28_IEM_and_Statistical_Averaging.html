@@ -87,8 +87,9 @@ $(function() {
 <ul><li class="level1"><a href="#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
 <li class="level1"><a href="#p28_dataflow_sec">2. Required Dataflow For IEM</a></li>
 <li class="level1"><a href="#p28_stats_sec">3. Statistics Pipeline (Postprocessor)</a></li>
-<li class="level1"><a href="#p28_terminology_sec">4. Averaging Terminology In PICurv</a></li>
-<li class="level1"><a href="#p28_refs_sec">5. Related Pages</a><ul><li class="level2"><a href="#autotoc_md102">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md103">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p28_field_observations_sec">4. Eulerian Field Statistics Status</a></li>
+<li class="level1"><a href="#p28_terminology_sec">5. Averaging Terminology In PICurv</a></li>
+<li class="level1"><a href="#p28_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md102">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md103">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md104">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -96,7 +97,7 @@ $(function() {
 </li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_IEM_and_Statistical_Averaging"></a> PICurv currently couples a particle scalar micromixing model (IEM-style) with separate statistics/averaging utilities in solver and post-processing stages.</p>
+<div class="textblock"><p><a class="anchor" id="_IEM_and_Statistical_Averaging"></a> PICurv couples a particle scalar micromixing model (IEM-style) with particle statistics postprocessing. The planned Eulerian field-statistics pipeline is a separate system.</p>
 <h1><a class="anchor" id="p28_iem_sec"></a>
 1. IEM Mixing Update In Current Code</h1>
 <p>For <code>Psi</code>, <a class="el" href="ParticlePhysics_8h.html#a78ac6f5c27a2539a823133e8e30c7200">UpdateParticleField</a> uses:</p>
@@ -145,21 +146,27 @@ r_{theory} = \sqrt{6Dt},
 \]
 </p>
 <p>with global MPI reductions and CSV output per statistics call.</p>
+<h1><a class="anchor" id="p28_field_observations_sec"></a>
+4. Eulerian Field Statistics Status</h1>
+<p>Eulerian scientific statistics are not currently exposed in active YAML. The old <code>models.statistics.time_averaging</code>, raw <code>su0</code>/<code>su1</code>/<code>su2</code>/<code>sp</code> state, and reserved averaged-field post output were removed rather than retained as a second workflow. Until the replacement is complete, users can compute offline statistics only from the instantaneous states they elected to save.</p>
+<p>The replacement design uses field-catalog-aware pointwise weighted centered first and second moments with independent state per named window. Reynolds stress, RMS, and TKE remain postprocessor-derived quantities. See the authoritative future specification for the full contract and staged status.</p>
+<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD remains under the existing postprocessor <code>statistics_pipeline</code>. It is not an Eulerian field window and does not share accumulator state.</p>
 <h1><a class="anchor" id="p28_terminology_sec"></a>
-4. Averaging Terminology In PICurv</h1>
+5. Averaging Terminology In PICurv</h1>
 <p>"Averaging" appears in multiple contexts:</p>
 <ul>
 <li>particle-&gt;grid count-normalized scatter,</li>
-<li>solver-side optional field averaging toggles,</li>
+<li>future Eulerian field-statistics windows,</li>
 <li>postprocessing global statistical reductions.</li>
 </ul>
 <p>Treat these as distinct workflows with different configuration points.</p>
 <h1><a class="anchor" id="p28_refs_sec"></a>
-5. Related Pages</h1>
+6. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
+<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b></li>
 </ul>
 <h2><a class="anchor" id="autotoc_md102"></a>
 CFD Reader Guidance and Practical Use</h2>

@@ -151,7 +151,7 @@ $(function() {
 <ul>
 <li><code>runs/&lt;run_id&gt;/config/</code>: generated <code>.control</code>, BC files, copied YAML inputs, and <code>post.run</code></li>
 <li><code>runs/&lt;run_id&gt;/logs/</code>: solver/postprocessor runtime logs and metrics written by PICurv itself</li>
-<li><code>runs/&lt;run_id&gt;/output/</code>: solver outputs when monitor paths use the default layout</li>
+<li><code>runs/&lt;run_id&gt;/output/checkpoints/step_&lt;12 digits&gt;/</code>: immutable committed solver checkpoints when monitor paths use the default layout</li>
 <li><code>runs/&lt;run_id&gt;/scheduler/</code>: generated Slurm scripts, <code>submission.json</code>, and cluster stdout/stderr in cluster mode</li>
 <li><code>runs/&lt;run_id&gt;/manifest.json</code>: top-level run metadata</li>
 </ul>
@@ -203,7 +203,7 @@ $(function() {
 </ul>
 <p>Operational meaning:</p>
 <ul>
-<li>PICurv copies the checkpoint from <code>runs/old_run</code> into the new run's <code>restart/</code> directory,</li>
+<li>PICurv validates the requested committed bundle and copies that whole bundle into the new run's <code>restart/checkpoints/</code> directory,</li>
 <li>the solver loads that checkpoint and continues from step 501,</li>
 <li>all new output is written into a fresh <code>runs/&lt;new_run_id&gt;/</code> directory.</li>
 </ul>
@@ -231,9 +231,9 @@ $(function() {
 </div><!-- fragment --><p>Operational meaning:</p>
 <ul>
 <li><code>case.yml -&gt; run_control.start_step</code> must be the saved checkpoint step and must be greater than zero; use a normal run without <code>--continue</code> for a fresh start at step zero,</li>
-<li>PICurv copies the latest checkpoint from <code>output/</code> to <code>restart/</code> inside <code>runs/my_run/</code>,</li>
+<li>PICurv validates and reads the requested immutable bundle directly from <code>output/checkpoints/</code>; it does not create a second in-place copy,</li>
 <li>the solver resumes from that checkpoint,</li>
-<li>logs append to the existing log files,</li>
+<li>logs append to the existing log files and remain independent of checkpoint payloads,</li>
 <li>all output stays within the same <code>runs/my_run/</code> directory.</li>
 </ul>
 <h2><a class="anchor" id="p52_restart_notes"></a>
@@ -241,10 +241,11 @@ $(function() {
 <p>When <code>start_step &gt; 0</code>, the initial Eulerian state is always loaded from the restart source regardless of the <code>eulerian_field_source</code> setting. The <code>eulerian_field_source</code> value only controls what happens on subsequent steps: <code>"solve"</code> advances the fields, <code>"load"</code> reads pre-computed fields.</p>
 <p>Before launching any restart or continuation:</p>
 <ul>
-<li>verify restart source files exist for the requested step,</li>
+<li>verify a committed bundle exists for the requested step,</li>
 <li>use <code>start_step</code> equal to the saved checkpoint step, not the next desired step,</li>
-<li>verify <code>monitor.yml</code> directory names match the source run layout.</li>
+<li>do not edit bundle contents or generated control files by hand.</li>
 </ul>
+<p><code>--continue</code> is for the same physical case. It permits changes to run-control time settings, solver parameters/type, monitoring, postprocessing, and resource settings. Other <code>case.yml</code> changes are rejected; use <code>--restart-from</code> to create a new branch. <code>--restart-from</code> may change case physics, but C still requires the same grid geometry/layout. A newly enabled optional subsystem such as particles uses its normal initialization path unless its restart mode explicitly requests saved state; subsequent checkpoints then include that subsystem.</p>
 <h1><a class="anchor" id="p52_post_sec"></a>
 6. Postprocess An Existing Run</h1>
 <p>When solver outputs already exist, reuse the run directory directly:</p>
@@ -321,6 +322,7 @@ $(function() {
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
+<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> (committed-checkpoint and future field-statistics contract)</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md171"></a>
 CFD Reader Guidance and Practical Use</h2>

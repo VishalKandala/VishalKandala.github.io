@@ -146,6 +146,7 @@ $(function() {
 <li><code>grid.run</code> (for file/grid_gen paths),</li>
 <li><code>post.run</code> (postprocessor path).</li>
 </ul>
+<p>Physical-solution monitoring is normalized by <code>picurv</code> and written directly into <code>*.control</code> as <code>-solution_convergence_*</code> options. There is no separate observation-plan sidecar. Scientific field-statistics ingress will only be added when the runtime, checkpoint, and postprocessor implementation is ready as one usable feature.</p>
 <h1><a class="anchor" id="p46_core_structs_sec"></a>
 3. Core Runtime Structs</h1>
 <p>Most solver-wide state flows through:</p>
@@ -191,15 +192,16 @@ $(function() {
 <li><a class="el" href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a> and <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a>,</li>
 </ul>
 </li>
+<li>write the configured physical-solution convergence observation through the existing logger (unless disabled),</li>
 <li>update history vectors,</li>
-<li>write outputs on configured cadence.</li>
+<li>commit a checkpoint bundle on configured cadence.</li>
 </ol>
-<p>Concrete output calls in the loop are:</p>
+<p>The loop calls <a class="el" href="io_8h.html#ae2d695dc275057d7e9a9e68bc5b65789">WriteCheckpointBundle</a>. That thin coordinator delegates payload I/O to:</p>
 <ul>
-<li><a class="el" href="io_8h.html#a6228caf497c8e6134362aab6ba62828c">WriteSimulationFields</a></li>
-<li><a class="el" href="io_8h.html#a07b0fa84e3d8c749c5e337aba7c0366a">WriteAllSwarmFields</a></li>
-<li><a class="el" href="logging_8h.html#a978573fa0efe93903add0890fb1ccb08">ProfilingLogTimestepSummary</a></li>
+<li><a class="el" href="io_8h.html#a64bf39306341645a6ba341217efb908c">WriteSimulationFields</a></li>
+<li><a class="el" href="io_8h.html#a2914eb0b40f800ab9c8a727a1974bc11">WriteAllSwarmFields</a></li>
 </ul>
+<p><a class="el" href="logging_8h.html#a978573fa0efe93903add0890fb1ccb08">ProfilingLogTimestepSummary</a> and all other persistent logging remain separate loop services and are not checkpoint payloads.</p>
 <p>Loop-time branch notes:</p>
 <ul>
 <li>Eulerian source mode is selected once per step (<code>solve</code>, <code>load</code>, or <code>analytical</code>), then particle coupling follows.</li>
@@ -270,6 +272,8 @@ $(function() {
 <li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
+<li><b><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a></b></li>
+<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> (proposed runtime extension)</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md153"></a>
 CFD Reader Guidance and Practical Use</h2>

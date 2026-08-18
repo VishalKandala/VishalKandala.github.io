@@ -84,13 +84,14 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p09_io_sec">1. io</a></li>
-<li class="level1"><a href="#p09_logging_sec">2. logging</a></li>
+<ul><li class="level1"><a href="#p09_solution_monitoring_sec">1. solution_monitoring</a></li>
+<li class="level1"><a href="#p09_io_sec">2. io</a></li>
+<li class="level1"><a href="#p09_logging_sec">3. logging</a></li>
 <li class="level1"><a href="#p09_startup_banner_sec">Startup banner and solver-specific output</a></li>
-<li class="level1"><a href="#p09_profiling_sec">3. profiling</a></li>
-<li class="level1"><a href="#p09_diagnostics_sec">4. diagnostics</a></li>
-<li class="level1"><a href="#p09_solver_monitoring_sec">5. solver_monitoring</a></li>
-<li class="level1"><a href="#p09_next_steps_sec">6. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p09_profiling_sec">4. profiling</a></li>
+<li class="level1"><a href="#p09_diagnostics_sec">5. diagnostics</a></li>
+<li class="level1"><a href="#p09_solver_monitoring_sec">6. solver_monitoring</a></li>
+<li class="level1"><a href="#p09_next_steps_sec">7. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md34">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -109,8 +110,8 @@ $(function() {
 # detailed monitoring of the numerical solvers.
 #
 # IMPORTANT:
-# Changing this file will NEVER change the scientific result of the simulation.
-# It only changes what is observed and recorded.
+# This file does not change the solved flow equations. It only changes what is
+# observed, recorded, and written to disk.
 #
 # ==============================================================================
 
@@ -193,7 +194,24 @@ diagnostics:
     file: "Runtime_Memory.log"
 
 # ==============================================================================
-# 4. I/O AND DATA MANAGEMENT
+# 4. PHYSICAL-SOLUTION MONITORING
+#    Controls convergence reporting for the completed flow state.
+# ==============================================================================
+solution_monitoring:
+  convergence:
+    # Preserves the existing logs/solution_convergence.log writer and records
+    # every completed timestep.
+    enabled: true
+    mode: "steady_deterministic"
+    # Options: steady_deterministic | periodic_deterministic |
+    #          statistical_steady | transient
+    # periodic_deterministic:
+    #   period_steps: 200
+    # statistical_steady:
+    #   window_steps: 500
+
+# ==============================================================================
+# 5. I/O AND DATA MANAGEMENT
 #    Controls data file generation and locations for the SOLVER.
 # ==============================================================================
 io:
@@ -222,11 +240,9 @@ io:
     output: "output"    # [string] -&gt; -output_dir
     restart: "restart"  # [string] -&gt; -restart_dir
     log: "logs"         # [string] -&gt; -log_dir
-    eulerian_subdir: "eulerian"  # [string] -&gt; -euler_subdir
-    particle_subdir: "particles" # [string] -&gt; -particle_subdir
 
 # ==============================================================================
-# 5. SOLVER MONITORING
+# 6. SOLVER MONITORING
 # ==============================================================================
 #
 # This section exposes common solver-monitor controls with readable names.
@@ -260,9 +276,29 @@ solver_monitoring:
     # Boolean true emits a switch-only flag; false omits it.
     # -ps_pc_svd_monitor: true
     # -ts_monitor: true
-</pre><p><code>monitor.yml</code> controls observability, diagnostics, and run I/O behavior.</p>
+</pre><p><code>monitor.yml</code> controls runtime monitoring, diagnostics, profiling, and run I/O behavior. Scientific Eulerian field statistics are not exposed in the active configuration until their accumulation, checkpoint, and postprocessing path is complete end to end.</p>
+<h1><a class="anchor" id="p09_solution_monitoring_sec"></a>
+1. solution_monitoring</h1>
+<p>Physical-solution convergence uses the existing runtime monitor through this contract:</p>
+<div class="fragment"><div class="line">solution_monitoring:</div>
+<div class="line">  convergence:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    mode: statistical_steady</div>
+<div class="line">    statistical_steady:</div>
+<div class="line">      window_steps: 100</div>
+</div><!-- fragment --><p>PICurv writes the normalized settings directly into the generated master <code>.control</code> file as the existing <code>-solution_convergence_*</code> options. It retains <code>logs/solution_convergence.log</code>, its columns, and its current observable loops. <code>enabled: false</code> disables that writer and its private history allocation. The default remains enabled <code>steady_deterministic</code> monitoring. Convergence is observed after every completed timestep; there is no user-facing cadence key.</p>
+<p>Mode-specific rules:</p>
+<ul>
+<li><code>periodic_deterministic</code> requires <code>periodic_deterministic.period_steps &gt; 0</code>;</li>
+<li><code>statistical_steady</code> requires <code>statistical_steady.window_steps &gt; 0</code>;</li>
+<li><code>steady_deterministic</code> and <code>transient</code> take no nested mode block; and</li>
+<li>a nested block for a different mode is rejected.</li>
+</ul>
+<p>There is no <code>observations.run</code> sidecar and no observation-plan schema/version at this boundary. <code>control</code> remains the single generated C-ingress artifact for these settings.</p>
+<p>The planned <code>field_statistics</code> contract is documented in <b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b>, but is not active YAML. Saved instantaneous fields remain the supported input for offline Eulerian statistics until that feature is complete.</p>
+<p>The removed <code>case.yml -&gt; models.statistics.time_averaging</code> and <code>-averaging</code> surface is not compatible input and is not translated into a replacement workflow.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
-1. io</h1>
+2. io</h1>
 <div class="fragment"><div class="line">io:</div>
 <div class="line">  data_output_frequency: 100</div>
 <div class="line">  particle_console_output_frequency: 100</div>
@@ -271,8 +307,6 @@ solver_monitoring:
 <div class="line">    output: &quot;output&quot;</div>
 <div class="line">    restart: &quot;restart&quot;</div>
 <div class="line">    log: &quot;logs&quot;</div>
-<div class="line">    eulerian_subdir: &quot;eulerian&quot;</div>
-<div class="line">    particle_subdir: &quot;particles&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>data_output_frequency</code> -&gt; <code>-tio</code></li>
 <li><code>particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code></li>
@@ -280,18 +314,17 @@ solver_monitoring:
 <li><code>directories.output</code> -&gt; <code>-output_dir</code></li>
 <li><code>directories.restart</code> -&gt; <code>-restart_dir</code></li>
 <li><code>directories.log</code> -&gt; <code>-log_dir</code></li>
-<li><code>directories.eulerian_subdir</code> -&gt; <code>-euler_subdir</code></li>
-<li><code>directories.particle_subdir</code> -&gt; <code>-particle_subdir</code></li>
 </ul>
 <p>Semantics:</p><ul>
-<li><code>data_output_frequency</code> controls file/restart output cadence.</li>
+<li><code>data_output_frequency</code> controls committed-checkpoint cadence. Initial and final completed states are also checkpointed, including an off-cadence final state.</li>
+<li>Checkpoint-internal <code>eulerian/</code> and <code>particles/</code> names are fixed and are not user configuration. See <a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html#p58_checkpoint_sec">12. Committed Checkpoint Contract</a>.</li>
 <li><code>particle_console_output_frequency</code> controls how often particle snapshots are printed to the main log.</li>
 <li><code>particle_log_interval</code> controls row subsampling within each particle snapshot.</li>
 <li>If <code>particle_console_output_frequency</code> is omitted, <code>picurv</code> defaults it to <code>data_output_frequency</code>.</li>
 <li>If <code>particle_console_output_frequency</code> is <code>0</code>, periodic particle console snapshots are disabled.</li>
 </ul>
 <h1><a class="anchor" id="p09_logging_sec"></a>
-2. logging</h1>
+3. logging</h1>
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;WARNING&quot;</div>
 <div class="line">  enabled_functions: []</div>
@@ -325,7 +358,7 @@ Startup banner and solver-specific output</h1>
 <p>The C <code>unit-io</code> contract test verifies these conditional banner fields, while <code>unit-logging</code> verifies the logging behavior described on this page. Both are included in the runtime layer of <code>make certify-docs</code>; the GitHub documentation workflow runs the dependency-free structural documentation checks on every main push and every third day.</p>
 <p>The structural certification also runs a user-facing reporting audit. It rejects raw C console emissions outside the approved banner/logging/bootstrap/progress surfaces and verifies that the C banner plus CLI and <code>picurv summarize</code> retain their solver-specific reporting branches. The checked-in <code>tests/tooling/user_facing_reporting_contract.json</code> also declares every CLI command's parser, handler, and context marker, including submission and plot paths.</p>
 <h1><a class="anchor" id="p09_profiling_sec"></a>
-3. profiling</h1>
+4. profiling</h1>
 <div class="fragment"><div class="line">profiling:</div>
 <div class="line">  timestep_output:</div>
 <div class="line">    mode: &quot;selected&quot;</div>
@@ -347,7 +380,7 @@ Startup banner and solver-specific output</h1>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
 <h1><a class="anchor" id="p09_diagnostics_sec"></a>
-4. diagnostics</h1>
+5. diagnostics</h1>
 <p>Structured diagnostics for PETSc memory/object/function debugging plus a compact PICurv runtime memory log:</p>
 <div class="fragment"><div class="line">diagnostics:</div>
 <div class="line">  petsc:</div>
@@ -387,7 +420,7 @@ Startup banner and solver-specific output</h1>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
 </ul>
 <h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
-5. solver_monitoring</h1>
+6. solver_monitoring</h1>
 <p>Human-readable solver monitor controls. PICurv maps these keys to the raw C/PETSc flags written into the generated <code>.control</code> file:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
 <div class="line">  momentum:</div>
@@ -421,12 +454,13 @@ Startup banner and solver-specific output</h1>
 <li>Legacy direct flag entries under <code>solver_monitoring</code> are still accepted for compatibility, but new profiles should prefer the structured form above.</li>
 </ul>
 <h1><a class="anchor" id="p09_next_steps_sec"></a>
-6. Next Steps</h1>
+7. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b>.</p>
 <p>Also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
+<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b></li>
 </ul>
 <h2><a class="anchor" id="autotoc_md32"></a>
 CFD Reader Guidance and Practical Use</h2>

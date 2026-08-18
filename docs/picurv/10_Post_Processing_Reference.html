@@ -248,10 +248,6 @@ io:
     - 'Qcrit'
     - 'P_nodal'
 
-  # (Optional) Reserved for future averaged-field writer support.
-  # Maps to 'output_fields_averaged' in post.run.
-  eulerian_fields_averaged: []
-
   # (Optional) A master switch for all particle-related output. Defaults to false.
   # Maps to 'output_particles' in post.run.
   output_particles: true
@@ -271,12 +267,13 @@ io:
   # Maps to 'particle_output_freq' in post.run.
   particle_subsampling_frequency: 1
 
-  # (Optional) Input file extensions used by the C post reader (without dot preferred).
-  # Maps to 'eulerianExt' and 'particleExt' in post.run.
+  # (Optional) Checkpoint payload extension contract. Committed bundles use
+  # fixed PETSc-vector .dat payloads, so both values must remain "dat".
   input_extensions:
     eulerian: "dat"
     particle: "dat"
 </pre><p><code>post.yml</code> defines postprocessing input range, processing pipelines, statistics tasks, and VTK output selection.</p>
+<p>The current <code>statistics_pipeline</code> is the particle-reduction path. The proposed online Eulerian field-statistics system will use a separate <code>field_statistics</code> recipe so particle MSD and resolved turbulence statistics are not conflated. That future contract is specified in <b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> and is not yet implemented.</p>
 <h1><a class="anchor" id="p10_structure_sec"></a>
 1. File Structure</h1>
 <div class="fragment"><div class="line">run_control:</div>
@@ -331,7 +328,7 @@ io:
 <ul>
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
 <li><code>&lt;solver_output_dir&gt;</code> is a supported placeholder resolved by <code>picurv</code>.</li>
-<li>for live post-processing while the solver is still running, PICurv treats a timestep as source-available only when the full required source set for the current recipe exists. For Eulerian-only recipes that means the mandatory field files; for particle/statistics recipes it also requires the particle position file for that timestep.</li>
+<li>for live post-processing while the solver is still running, PICurv treats a timestep as source-available only when its checkpoint bundle has a valid <code>checkpoint.meta</code>/<code>COMMITTED</code> pair and complete payload inventory. A recipe that needs particles also requires committed particle state.</li>
 </ul>
 <h1><a class="anchor" id="p10_pipelines_sec"></a>
 4. Processing Pipelines</h1>
@@ -365,12 +362,10 @@ io:
 <li><code>output_particles</code> -&gt; <code>output_particles</code></li>
 <li><code>particle_subsampling_frequency</code> -&gt; <code>particle_output_freq</code></li>
 <li><code>eulerian_fields</code> -&gt; <code>output_fields_instantaneous</code></li>
-<li><code>eulerian_fields_averaged</code> -&gt; <code>output_fields_averaged</code> (reserved)</li>
 <li><code>particle_fields</code> -&gt; <code>particle_fields_instantaneous</code> — <b>must be non-empty when <code>output_particles: true</code></b>; an empty list produces no particle VTP output even if particle output is enabled. Standard swarm field names: <code>position</code>, <code>velocity</code>, <code>pid</code>, <code>CellID</code>, <code>weight</code>.</li>
-<li><code>input_extensions.eulerian</code> -&gt; <code>eulerianExt</code></li>
-<li><code>input_extensions.particle</code> -&gt; <code>particleExt</code></li>
+<li><code>input_extensions.eulerian/particle</code>, when present, must be <code>dat</code>; committed bundle payload names are fixed</li>
 </ul>
-<p>Default post input extension remains <code>dat</code> unless overridden. <code>statistics_pipeline.output_prefix</code> is independent of <code>io.output_directory</code>; bare basenames default under <code>&lt;monitor output&gt;/statistics/</code>, while explicit relative or absolute paths are preserved. When the same timestep is post-processed again, PICurv now rewrites same-step VTK/VTP outputs and rewrites same-step statistics rows so the final CSV still contains one row per step.</p>
+<p>The postprocessor reads the catalogued <code>.dat</code> PETSc vectors inventoried by each committed checkpoint; input extensions are not runtime-selectable. <code>statistics_pipeline.output_prefix</code> is independent of <code>io.output_directory</code>; bare basenames default under <code>&lt;monitor output&gt;/statistics/</code>, while explicit relative or absolute paths are preserved. When the same timestep is post-processed again, PICurv now rewrites same-step VTK/VTP outputs and rewrites same-step statistics rows so the final CSV still contains one row per step.</p>
 <h1><a class="anchor" id="p10_next_steps_sec"></a>
 7. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> for goal-oriented recipes.</p>
@@ -378,6 +373,7 @@ io:
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
+<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> (proposed future contract)</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md35"></a>
 CFD Reader Guidance and Practical Use</h2>
