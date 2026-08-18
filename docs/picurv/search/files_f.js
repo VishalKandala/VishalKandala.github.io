@@ -1,20 +1,10 @@
 var searchData=
 [
-  ['particle_5ffield_5fcatalog_2ec_0',['particle_field_catalog.c',['../particle__field__catalog_8c.html',1,'']]],
-  ['particle_5ffield_5fcatalog_2eh_1',['particle_field_catalog.h',['../particle__field__catalog_8h.html',1,'']]],
-  ['particle_5fstatistics_2ec_2',['particle_statistics.c',['../particle__statistics_8c.html',1,'']]],
-  ['particle_5fstatistics_2eh_3',['particle_statistics.h',['../particle__statistics_8h.html',1,'']]],
-  ['particlemotion_2ec_4',['ParticleMotion.c',['../ParticleMotion_8c.html',1,'']]],
-  ['particlemotion_2eh_5',['ParticleMotion.h',['../ParticleMotion_8h.html',1,'']]],
-  ['particlephysics_2ec_6',['ParticlePhysics.c',['../ParticlePhysics_8c.html',1,'']]],
-  ['particlephysics_2eh_7',['ParticlePhysics.h',['../ParticlePhysics_8h.html',1,'']]],
-  ['particleswarm_2ec_8',['ParticleSwarm.c',['../ParticleSwarm_8c.html',1,'']]],
-  ['particleswarm_2eh_9',['ParticleSwarm.h',['../ParticleSwarm_8h.html',1,'']]],
-  ['poisson_2ec_10',['poisson.c',['../poisson_8c.html',1,'']]],
-  ['poisson_2eh_11',['poisson.h',['../poisson_8h.html',1,'']]],
-  ['postprocessing_5fkernels_2ec_12',['postprocessing_kernels.c',['../postprocessing__kernels_8c.html',1,'']]],
-  ['postprocessing_5fkernels_2eh_13',['postprocessing_kernels.h',['../postprocessing__kernels_8h.html',1,'']]],
-  ['postprocessor_2ec_14',['postprocessor.c',['../postprocessor_8c.html',1,'']]],
-  ['postprocessor_2eh_15',['postprocessor.h',['../postprocessor_8h.html',1,'']]],
-  ['python_5fcoverage_5fgate_2epy_16',['python_coverage_gate.py',['../python__coverage__gate_8py.html',1,'']]]
+  ['main_2epy_0',['main.py',['../main_8py.html',1,'']]],
+  ['mainpage_2emd_1',['mainpage.md',['../mainpage_8md.html',1,'']]],
+  ['metric_2ec_2',['Metric.c',['../Metric_8c.html',1,'']]],
+  ['metric_2eh_3',['Metric.h',['../Metric_8h.html',1,'']]],
+  ['momentum_5fnewton_5fkrylov_2ec_4',['momentum_newton_krylov.c',['../momentum__newton__krylov_8c.html',1,'']]],
+  ['momentumsolvers_2ec_5',['momentumsolvers.c',['../momentumsolvers_8c.html',1,'']]],
+  ['momentumsolvers_2eh_6',['momentumsolvers.h',['../momentumsolvers_8h.html',1,'']]]
 ];

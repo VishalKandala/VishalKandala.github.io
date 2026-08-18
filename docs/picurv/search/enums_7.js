@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['particlefieldcapabilities_0',['ParticleFieldCapabilities',['../particle__field__catalog_8h.html#a5f5321ac4344ab24b3873c0a98dd878c',1,'particle_field_catalog.h']]],
-  ['particlefieldid_1',['ParticleFieldId',['../particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93',1,'particle_field_catalog.h']]],
-  ['particlefieldregistration_2',['ParticleFieldRegistration',['../particle__field__catalog_8h.html#a933036d0115bf3c3fb2ee710e678ee5f',1,'particle_field_catalog.h']]],
-  ['particleinitializationtype_3',['ParticleInitializationType',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cd',1,'variables.h']]],
-  ['particlelocationstatus_4',['ParticleLocationStatus',['../variables_8h.html#a347829443e8a679209e21f7f04f51581',1,'variables.h']]],
-  ['pmetric_5',['PMetric',['../test__momentum__convective__candidates_8c.html#af016cf8cfc124ddd84d2343bbc523190',1,'test_momentum_convective_candidates.c']]]
+  ['momentumnewtonfinitedifferencemode_0',['MomentumNewtonFiniteDifferenceMode',['../momentum__newton__krylov_8c.html#ada1ed674e9b802a779fca274bfeded51',1,'momentum_newton_krylov.c']]],
+  ['momentumnewtonjacobiantype_1',['MomentumNewtonJacobianType',['../momentum__newton__krylov_8c.html#a91f0769ca66c7d8f2382b31588446422',1,'momentum_newton_krylov.c']]],
+  ['momentumnewtonkrylovrowtype_2',['MomentumNewtonKrylovRowType',['../momentum__newton__krylov_8c.html#ac59f6707f15976c97f25bb2a3aa14217',1,'momentum_newton_krylov.c']]],
+  ['momentumpreconditionermodel_3',['MomentumPreconditionerModel',['../momentum__newton__krylov_8c.html#afd759b66cf82b8d6dcd16898bb92bf6f',1,'momentum_newton_krylov.c']]],
+  ['momentumpreconditionerstructure_4',['MomentumPreconditionerStructure',['../momentum__newton__krylov_8c.html#a33c9a8b769581119ef9f078273904556',1,'momentum_newton_krylov.c']]],
+  ['momentumsolvertype_5',['MomentumSolverType',['../variables_8h.html#a6f9f5b1b6f265e06f92b418a011dc3c3',1,'variables.h']]],
+  ['momstabcandidate_6',['MomStabCandidate',['../momentumsolvers_8h.html#abb53f050d94302f9c9ac4714640b62d8',1,'momentumsolvers.h']]],
+  ['momstablimiter_7',['MomStabLimiter',['../momentumsolvers_8h.html#a1e6260654057e2d2fdbcaa5f940a6c39',1,'momentumsolvers.h']]]
 ];

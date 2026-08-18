@@ -23,5 +23,14 @@ var searchData=
   ['particle_5finit_5fsurface_5fedges_20',['PARTICLE_INIT_SURFACE_EDGES',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cda46e4df77c68a1ecc18ea7cc90f8a09f0',1,'variables.h']]],
   ['particle_5finit_5fsurface_5frandom_21',['PARTICLE_INIT_SURFACE_RANDOM',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cda12209a19cff6c246ff6c3efdcbc8f396',1,'variables.h']]],
   ['particle_5finit_5fvolume_22',['PARTICLE_INIT_VOLUME',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cda7d1eb66ef9e0184a8eb2cad339a5a42c',1,'variables.h']]],
-  ['periodic_23',['PERIODIC',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae4379d044711537d9ce3b3b58c575c58',1,'variables.h']]]
+  ['periodic_23',['PERIODIC',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae4379d044711537d9ce3b3b58c575c58',1,'variables.h']]],
+  ['picurv_5fcadence_5fstep_24',['PICURV_CADENCE_STEP',['../statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658ada23859933a896698ea08c8ad2dd281c',1,'statistics_window.h']]],
+  ['picurv_5fcadence_5ftime_25',['PICURV_CADENCE_TIME',['../statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658a46af41bf5568480ec25b4ac4c7081fc3',1,'statistics_window.h']]],
+  ['picurv_5fstatistics_5fmask_5ffluid_26',['PICURV_STATISTICS_MASK_FLUID',['../statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434',1,'statistics_target.h']]],
+  ['picurv_5ftarget_5fpointwise_27',['PICURV_TARGET_POINTWISE',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39ca0c17ddf9970a81423766ec574a6574b6',1,'statistics_target.h']]],
+  ['picurv_5fweighting_5fphysical_5ftime_28',['PICURV_WEIGHTING_PHYSICAL_TIME',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57a396fdf5734087712d084f9a26210fa20',1,'statistics_window.h']]],
+  ['picurv_5fweighting_5fsample_29',['PICURV_WEIGHTING_SAMPLE',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57af2a814ca432bac7ad244d5676789bcb8',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5factive_30',['PICURV_WINDOW_ACTIVE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006ad60e3ff16a868084bf1d12dc786ee913',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fcomplete_31',['PICURV_WINDOW_COMPLETE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a517c33dfff15dc9f496e9a82a607a0f3',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fpending_32',['PICURV_WINDOW_PENDING',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a2fd006842f93beebc7b529f0cc9f0870',1,'statistics_window.h']]]
 ];

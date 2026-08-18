@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['executionmode_0',['ExecutionMode',['../variables_8h.html#ad14b0c6d4ed8fcadff6dcf39c5cf17fd',1,'variables.h']]]
+  ['derivedkind_0',['DerivedKind',['../statistics__accumulator_8c.html#a70970d7bb1966983c33c96d915f2c448',1,'statistics_accumulator.c']]]
 ];

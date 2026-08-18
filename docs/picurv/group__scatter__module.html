@@ -175,102 +175,102 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success. Errors on NULL input, unrecognized field name, or incompatible target vector. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01818">1818</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1821</span>{</div>
-<div class="line"><span class="lineno"> 1822</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 1823</span>    DM             targetDM = NULL;       <span class="comment">// Will point to user-&gt;da or user-&gt;fda</span></div>
-<div class="line"><span class="lineno"> 1824</span>    PetscInt       expected_dof = 0;      <span class="comment">// Will be 1 or 3</span></div>
-<div class="line"><span class="lineno"> 1825</span>    <span class="keywordtype">char</span>           msg[<a class="code hl_define" href="interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">ERROR_MSG_BUFFER_SIZE</a>]; <span class="comment">// Buffer for formatted error messages</span></div>
-<div class="line"><span class="lineno"> 1826</span>    <span class="keyword">const</span> <a class="code hl_struct" href="particle__field__catalog_8h.html#structParticleFieldDescriptor">ParticleFieldDescriptor</a> *particle_descriptor = NULL;</div>
-<div class="line"><span class="lineno"> 1827</span>    <span class="keyword">const</span> <a class="code hl_struct" href="field__catalog_8h.html#structFieldDescriptor">FieldDescriptor</a> *eulerian_descriptor = NULL;</div>
-<div class="line"><span class="lineno"> 1828</span>    <a class="code hl_struct" href="field__catalog_8h.html#structFieldView">FieldView</a>       target_view;</div>
-<div class="line"><span class="lineno"> 1829</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *particleFieldName = NULL;</div>
-<div class="line"><span class="lineno"> 1830</span> </div>
-<div class="line"><span class="lineno"> 1831</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1832</span> </div>
-<div class="line"><span class="lineno"> 1833</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 1834</span> </div>
-<div class="line"><span class="lineno"> 1835</span>    <span class="comment">// --- Essential Input Validation ---</span></div>
-<div class="line"><span class="lineno"> 1836</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx pointer is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1837</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx-&gt;swarm is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1838</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx-&gt;ParticleCount is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1839</span>    <span class="keywordflow">if</span> (!eulerFieldAverageVec) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;Output eulerFieldAverageVec is NULL.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1840</span>    ierr = <a class="code hl_function" href="particle__field__catalog_8h.html#aa830c8a458fdac82862196d3f6daac86">ParticleFieldGetDescriptor</a>(particle_field_id, &amp;particle_descriptor); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1841</span>    PetscCheck((particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#a3b26af57a59dfa54e2f1ede2c2f5f6a1">capabilities</a> &amp; <a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a5f5321ac4344ab24b3873c0a98dd878cab1ebd24daf01ce2ce99bb983c58cc024">PARTICLE_FIELD_CAPABILITY_EULERIAN_SCATTER</a>) != 0,</div>
-<div class="line"><span class="lineno"> 1842</span>               PETSC_COMM_SELF, PETSC_ERR_SUP,</div>
-<div class="line"><span class="lineno"> 1843</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; has no registered Eulerian scatter target.&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1844</span>               particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>);</div>
-<div class="line"><span class="lineno"> 1845</span>    PetscCheck(particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a> != <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2abc4a9dfc88d7d99c755c93a8c29dfe4b">FIELD_ID_INVALID</a>,</div>
-<div class="line"><span class="lineno"> 1846</span>               PETSC_COMM_SELF, PETSC_ERR_PLIB,</div>
-<div class="line"><span class="lineno"> 1847</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; advertises scatter support without an Eulerian target.&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1848</span>               particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>);</div>
-<div class="line"><span class="lineno"> 1849</span>    particleFieldName = particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>;</div>
-<div class="line"><span class="lineno"> 1850</span>    expected_dof = particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#a320b1a7dc9793a9e94e62238b84cd03a">components</a>;</div>
-<div class="line"><span class="lineno"> 1851</span>    ierr = <a class="code hl_function" href="field__catalog_8h.html#af63f334e53a107f8f499473db992d486">FieldGetDescriptor</a>(particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a>, &amp;eulerian_descriptor); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1852</span>    PetscCheck(eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">dof</a> == expected_dof, PETSC_COMM_SELF, PETSC_ERR_PLIB,</div>
-<div class="line"><span class="lineno"> 1853</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; has %d components but Eulerian target &#39;%s&#39; has %d.&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1854</span>               particleFieldName, expected_dof, eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ada1361f33edd4d574f8a1861beaa4ca7">canonical_name</a>, eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">dof</a>);</div>
-<div class="line"><span class="lineno"> 1855</span>    ierr = <a class="code hl_function" href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a>(user, particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a>, &amp;target_view); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1856</span>    targetDM = target_view.<a class="code hl_variable" href="field__catalog_8h.html#ab0b7be7cac6895b085ce7cdda32881d1">dm</a>;</div>
-<div class="line"><span class="lineno"> 1857</span> </div>
-<div class="line"><span class="lineno"> 1858</span>    <span class="comment">// --- Validate the provided Target Vec&#39;s Compatibility ---</span></div>
-<div class="line"><span class="lineno"> 1859</span>    DM vec_dm;</div>
-<div class="line"><span class="lineno"> 1860</span>    PetscInt vec_dof;</div>
-<div class="line"><span class="lineno"> 1861</span>    <span class="comment">// Check that the provided average vector has a DM associated with it</span></div>
-<div class="line"><span class="lineno"> 1862</span>    ierr = VecGetDM(eulerFieldAverageVec, &amp;vec_dm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1863</span>    <span class="keywordflow">if</span> (!vec_dm) {</div>
-<div class="line"><span class="lineno"> 1864</span>         PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Provided eulerFieldAverageVec for field &#39;%s&#39; does not have an associated DM.&quot;</span>, particleFieldName);</div>
-<div class="line"><span class="lineno"> 1865</span>         SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
+<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01802">1802</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1805</span>{</div>
+<div class="line"><span class="lineno"> 1806</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 1807</span>    DM             targetDM = NULL;       <span class="comment">// Will point to user-&gt;da or user-&gt;fda</span></div>
+<div class="line"><span class="lineno"> 1808</span>    PetscInt       expected_dof = 0;      <span class="comment">// Will be 1 or 3</span></div>
+<div class="line"><span class="lineno"> 1809</span>    <span class="keywordtype">char</span>           msg[<a class="code hl_define" href="interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">ERROR_MSG_BUFFER_SIZE</a>]; <span class="comment">// Buffer for formatted error messages</span></div>
+<div class="line"><span class="lineno"> 1810</span>    <span class="keyword">const</span> <a class="code hl_struct" href="particle__field__catalog_8h.html#structParticleFieldDescriptor">ParticleFieldDescriptor</a> *particle_descriptor = NULL;</div>
+<div class="line"><span class="lineno"> 1811</span>    <span class="keyword">const</span> <a class="code hl_struct" href="field__catalog_8h.html#structFieldDescriptor">FieldDescriptor</a> *eulerian_descriptor = NULL;</div>
+<div class="line"><span class="lineno"> 1812</span>    <a class="code hl_struct" href="field__catalog_8h.html#structFieldView">FieldView</a>       target_view;</div>
+<div class="line"><span class="lineno"> 1813</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>     *particleFieldName = NULL;</div>
+<div class="line"><span class="lineno"> 1814</span> </div>
+<div class="line"><span class="lineno"> 1815</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1816</span> </div>
+<div class="line"><span class="lineno"> 1817</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 1818</span> </div>
+<div class="line"><span class="lineno"> 1819</span>    <span class="comment">// --- Essential Input Validation ---</span></div>
+<div class="line"><span class="lineno"> 1820</span>    <span class="keywordflow">if</span> (!user) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx pointer is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1821</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx-&gt;swarm is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1822</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;UserCtx-&gt;ParticleCount is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1823</span>    <span class="keywordflow">if</span> (!eulerFieldAverageVec) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;Output eulerFieldAverageVec is NULL.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1824</span>    ierr = <a class="code hl_function" href="particle__field__catalog_8h.html#aa830c8a458fdac82862196d3f6daac86">ParticleFieldGetDescriptor</a>(particle_field_id, &amp;particle_descriptor); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1825</span>    PetscCheck((particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#a3b26af57a59dfa54e2f1ede2c2f5f6a1">capabilities</a> &amp; <a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a5f5321ac4344ab24b3873c0a98dd878cab1ebd24daf01ce2ce99bb983c58cc024">PARTICLE_FIELD_CAPABILITY_EULERIAN_SCATTER</a>) != 0,</div>
+<div class="line"><span class="lineno"> 1826</span>               PETSC_COMM_SELF, PETSC_ERR_SUP,</div>
+<div class="line"><span class="lineno"> 1827</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; has no registered Eulerian scatter target.&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1828</span>               particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>);</div>
+<div class="line"><span class="lineno"> 1829</span>    PetscCheck(particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a> != <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2abc4a9dfc88d7d99c755c93a8c29dfe4b">FIELD_ID_INVALID</a>,</div>
+<div class="line"><span class="lineno"> 1830</span>               PETSC_COMM_SELF, PETSC_ERR_PLIB,</div>
+<div class="line"><span class="lineno"> 1831</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; advertises scatter support without an Eulerian target.&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1832</span>               particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>);</div>
+<div class="line"><span class="lineno"> 1833</span>    particleFieldName = particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">canonical_name</a>;</div>
+<div class="line"><span class="lineno"> 1834</span>    expected_dof = particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#a320b1a7dc9793a9e94e62238b84cd03a">components</a>;</div>
+<div class="line"><span class="lineno"> 1835</span>    ierr = <a class="code hl_function" href="field__catalog_8h.html#af63f334e53a107f8f499473db992d486">FieldGetDescriptor</a>(particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a>, &amp;eulerian_descriptor); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1836</span>    PetscCheck(eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">dof</a> == expected_dof, PETSC_COMM_SELF, PETSC_ERR_PLIB,</div>
+<div class="line"><span class="lineno"> 1837</span>               <span class="stringliteral">&quot;Particle field &#39;%s&#39; has %d components but Eulerian target &#39;%s&#39; has %d.&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1838</span>               particleFieldName, expected_dof, eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ada1361f33edd4d574f8a1861beaa4ca7">canonical_name</a>, eulerian_descriptor-&gt;<a class="code hl_variable" href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">dof</a>);</div>
+<div class="line"><span class="lineno"> 1839</span>    ierr = <a class="code hl_function" href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a>(user, particle_descriptor-&gt;<a class="code hl_variable" href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">eulerian_scatter_target</a>, &amp;target_view); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1840</span>    targetDM = target_view.<a class="code hl_variable" href="field__catalog_8h.html#ab0b7be7cac6895b085ce7cdda32881d1">dm</a>;</div>
+<div class="line"><span class="lineno"> 1841</span> </div>
+<div class="line"><span class="lineno"> 1842</span>    <span class="comment">// --- Validate the provided Target Vec&#39;s Compatibility ---</span></div>
+<div class="line"><span class="lineno"> 1843</span>    DM vec_dm;</div>
+<div class="line"><span class="lineno"> 1844</span>    PetscInt vec_dof;</div>
+<div class="line"><span class="lineno"> 1845</span>    <span class="comment">// Check that the provided average vector has a DM associated with it</span></div>
+<div class="line"><span class="lineno"> 1846</span>    ierr = VecGetDM(eulerFieldAverageVec, &amp;vec_dm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1847</span>    <span class="keywordflow">if</span> (!vec_dm) {</div>
+<div class="line"><span class="lineno"> 1848</span>         PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Provided eulerFieldAverageVec for field &#39;%s&#39; does not have an associated DM.&quot;</span>, particleFieldName);</div>
+<div class="line"><span class="lineno"> 1849</span>         SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
+<div class="line"><span class="lineno"> 1850</span>    }</div>
+<div class="line"><span class="lineno"> 1851</span>    <span class="comment">// Get the block size (DOF) of the provided vector</span></div>
+<div class="line"><span class="lineno"> 1852</span>    ierr = VecGetBlockSize(eulerFieldAverageVec, &amp;vec_dof); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1853</span>    <span class="comment">// Compare the vector&#39;s associated DM with the one determined by the field name</span></div>
+<div class="line"><span class="lineno"> 1854</span>    <span class="keywordflow">if</span> (vec_dm != targetDM) {</div>
+<div class="line"><span class="lineno"> 1855</span>        <span class="keyword">const</span> <span class="keywordtype">char</span> *target_dm_name = <span class="stringliteral">&quot;targetDM&quot;</span>, *vec_dm_name = <span class="stringliteral">&quot;vec_dm&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1856</span>        <span class="comment">// Get actual names if possible for a more informative error message</span></div>
+<div class="line"><span class="lineno"> 1857</span>        PetscObjectGetName((PetscObject)targetDM, &amp;target_dm_name);</div>
+<div class="line"><span class="lineno"> 1858</span>        PetscObjectGetName((PetscObject)vec_dm, &amp;vec_dm_name);</div>
+<div class="line"><span class="lineno"> 1859</span>        PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Provided eulerFieldAverageVec associated with DM &#39;%s&#39;, but field &#39;%s&#39; requires scatter to DM &#39;%s&#39;.&quot;</span>, vec_dm_name, particleFieldName, target_dm_name);</div>
+<div class="line"><span class="lineno"> 1860</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
+<div class="line"><span class="lineno"> 1861</span>    }</div>
+<div class="line"><span class="lineno"> 1862</span>    <span class="comment">// Compare the vector&#39;s DOF with the one expected for the field name</span></div>
+<div class="line"><span class="lineno"> 1863</span>    <span class="keywordflow">if</span> (vec_dof != expected_dof) {</div>
+<div class="line"><span class="lineno"> 1864</span>         PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Field &#39;%s&#39; requires DOF %d, but provided eulerFieldAverageVec has DOF %d.&quot;</span>, particleFieldName, expected_dof, vec_dof);</div>
+<div class="line"><span class="lineno"> 1865</span>         SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
 <div class="line"><span class="lineno"> 1866</span>    }</div>
-<div class="line"><span class="lineno"> 1867</span>    <span class="comment">// Get the block size (DOF) of the provided vector</span></div>
-<div class="line"><span class="lineno"> 1868</span>    ierr = VecGetBlockSize(eulerFieldAverageVec, &amp;vec_dof); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1869</span>    <span class="comment">// Compare the vector&#39;s associated DM with the one determined by the field name</span></div>
-<div class="line"><span class="lineno"> 1870</span>    <span class="keywordflow">if</span> (vec_dm != targetDM) {</div>
-<div class="line"><span class="lineno"> 1871</span>        <span class="keyword">const</span> <span class="keywordtype">char</span> *target_dm_name = <span class="stringliteral">&quot;targetDM&quot;</span>, *vec_dm_name = <span class="stringliteral">&quot;vec_dm&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1872</span>        <span class="comment">// Get actual names if possible for a more informative error message</span></div>
-<div class="line"><span class="lineno"> 1873</span>        PetscObjectGetName((PetscObject)targetDM, &amp;target_dm_name);</div>
-<div class="line"><span class="lineno"> 1874</span>        PetscObjectGetName((PetscObject)vec_dm, &amp;vec_dm_name);</div>
-<div class="line"><span class="lineno"> 1875</span>        PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Provided eulerFieldAverageVec associated with DM &#39;%s&#39;, but field &#39;%s&#39; requires scatter to DM &#39;%s&#39;.&quot;</span>, vec_dm_name, particleFieldName, target_dm_name);</div>
-<div class="line"><span class="lineno"> 1876</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
-<div class="line"><span class="lineno"> 1877</span>    }</div>
-<div class="line"><span class="lineno"> 1878</span>    <span class="comment">// Compare the vector&#39;s DOF with the one expected for the field name</span></div>
-<div class="line"><span class="lineno"> 1879</span>    <span class="keywordflow">if</span> (vec_dof != expected_dof) {</div>
-<div class="line"><span class="lineno"> 1880</span>         PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;Field &#39;%s&#39; requires DOF %d, but provided eulerFieldAverageVec has DOF %d.&quot;</span>, particleFieldName, expected_dof, vec_dof);</div>
-<div class="line"><span class="lineno"> 1881</span>         SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
-<div class="line"><span class="lineno"> 1882</span>    }</div>
-<div class="line"><span class="lineno"> 1883</span> </div>
-<div class="line"><span class="lineno"> 1884</span>    <span class="comment">// --- Perform Scatter using Internal Helper ---</span></div>
-<div class="line"><span class="lineno"> 1885</span>    <span class="comment">// Log intent before calling the core logic</span></div>
-<div class="line"><span class="lineno"> 1886</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Scattering field &#39;%s&#39; (DOF=%d).\n&quot;</span>, particleFieldName, expected_dof);</div>
-<div class="line"><span class="lineno"> 1887</span>    ierr = <a class="code hl_function" href="group__scatter__module.html#gaec2331ab16c72436e3c667e84cb37a80">ScatterParticleFieldToEulerField_Internal</a>(user, <span class="comment">// Pass user context</span></div>
-<div class="line"><span class="lineno"> 1888</span>                                                     particle_field_id,</div>
-<div class="line"><span class="lineno"> 1889</span>                                                     targetDM, <span class="comment">// Determined target DM (da or fda)</span></div>
-<div class="line"><span class="lineno"> 1890</span>                                                     expected_dof, <span class="comment">// Determined DOF (1 or 3)</span></div>
-<div class="line"><span class="lineno"> 1891</span>                                                     eulerFieldAverageVec); <span class="comment">// The output vector</span></div>
-<div class="line"><span class="lineno"> 1892</span>    CHKERRQ(ierr); <span class="comment">// Handle potential errors from the internal function</span></div>
-<div class="line"><span class="lineno"> 1893</span> </div>
-<div class="line"><span class="lineno"> 1894</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Successfully scattered field &#39;%s&#39;.\n&quot;</span>, particleFieldName);</div>
-<div class="line"><span class="lineno"> 1895</span>   </div>
-<div class="line"><span class="lineno"> 1896</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 1897</span>   </div>
-<div class="line"><span class="lineno"> 1898</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1899</span>}</div>
-<div class="ttc" id="afield__catalog_8h_html_a8e973bba212aed4167b3f294d220384e"><div class="ttname"><a href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a></div><div class="ttdeci">PetscErrorCode FieldGetView(UserCtx *user, FieldId field_id, FieldView *view)</div><div class="ttdoc">Resolve the existing DM and global/local vectors for one field.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00236">field_catalog.c:236</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_ab0b7be7cac6895b085ce7cdda32881d1"><div class="ttname"><a href="field__catalog_8h.html#ab0b7be7cac6895b085ce7cdda32881d1">FieldView::dm</a></div><div class="ttdeci">DM dm</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00133">field_catalog.h:133</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_ab38e6386123804a31015b2f3604f1780"><div class="ttname"><a href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">FieldDescriptor::dof</a></div><div class="ttdeci">PetscInt dof</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00120">field_catalog.h:120</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_ada1361f33edd4d574f8a1861beaa4ca7"><div class="ttname"><a href="field__catalog_8h.html#ada1361f33edd4d574f8a1861beaa4ca7">FieldDescriptor::canonical_name</a></div><div class="ttdeci">const char * canonical_name</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00117">field_catalog.h:117</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_af63f334e53a107f8f499473db992d486"><div class="ttname"><a href="field__catalog_8h.html#af63f334e53a107f8f499473db992d486">FieldGetDescriptor</a></div><div class="ttdeci">PetscErrorCode FieldGetDescriptor(FieldId field_id, const FieldDescriptor **descriptor)</div><div class="ttdoc">Return immutable metadata for a valid field identifier.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00155">field_catalog.c:155</a></div></div>
+<div class="line"><span class="lineno"> 1867</span> </div>
+<div class="line"><span class="lineno"> 1868</span>    <span class="comment">// --- Perform Scatter using Internal Helper ---</span></div>
+<div class="line"><span class="lineno"> 1869</span>    <span class="comment">// Log intent before calling the core logic</span></div>
+<div class="line"><span class="lineno"> 1870</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Scattering field &#39;%s&#39; (DOF=%d).\n&quot;</span>, particleFieldName, expected_dof);</div>
+<div class="line"><span class="lineno"> 1871</span>    ierr = <a class="code hl_function" href="group__scatter__module.html#gaec2331ab16c72436e3c667e84cb37a80">ScatterParticleFieldToEulerField_Internal</a>(user, <span class="comment">// Pass user context</span></div>
+<div class="line"><span class="lineno"> 1872</span>                                                     particle_field_id,</div>
+<div class="line"><span class="lineno"> 1873</span>                                                     targetDM, <span class="comment">// Determined target DM (da or fda)</span></div>
+<div class="line"><span class="lineno"> 1874</span>                                                     expected_dof, <span class="comment">// Determined DOF (1 or 3)</span></div>
+<div class="line"><span class="lineno"> 1875</span>                                                     eulerFieldAverageVec); <span class="comment">// The output vector</span></div>
+<div class="line"><span class="lineno"> 1876</span>    CHKERRQ(ierr); <span class="comment">// Handle potential errors from the internal function</span></div>
+<div class="line"><span class="lineno"> 1877</span> </div>
+<div class="line"><span class="lineno"> 1878</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Successfully scattered field &#39;%s&#39;.\n&quot;</span>, particleFieldName);</div>
+<div class="line"><span class="lineno"> 1879</span>   </div>
+<div class="line"><span class="lineno"> 1880</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 1881</span>   </div>
+<div class="line"><span class="lineno"> 1882</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1883</span>}</div>
+<div class="ttc" id="afield__catalog_8h_html_a8e973bba212aed4167b3f294d220384e"><div class="ttname"><a href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a></div><div class="ttdeci">PetscErrorCode FieldGetView(UserCtx *user, FieldId field_id, FieldView *view)</div><div class="ttdoc">Resolve the existing DM and global/local vectors for one field.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00259">field_catalog.c:259</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_ab0b7be7cac6895b085ce7cdda32881d1"><div class="ttname"><a href="field__catalog_8h.html#ab0b7be7cac6895b085ce7cdda32881d1">FieldView::dm</a></div><div class="ttdeci">DM dm</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00137">field_catalog.h:137</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_ab38e6386123804a31015b2f3604f1780"><div class="ttname"><a href="field__catalog_8h.html#ab38e6386123804a31015b2f3604f1780">FieldDescriptor::dof</a></div><div class="ttdeci">PetscInt dof</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00124">field_catalog.h:124</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_ada1361f33edd4d574f8a1861beaa4ca7"><div class="ttname"><a href="field__catalog_8h.html#ada1361f33edd4d574f8a1861beaa4ca7">FieldDescriptor::canonical_name</a></div><div class="ttdeci">const char * canonical_name</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00121">field_catalog.h:121</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_af63f334e53a107f8f499473db992d486"><div class="ttname"><a href="field__catalog_8h.html#af63f334e53a107f8f499473db992d486">FieldGetDescriptor</a></div><div class="ttdeci">PetscErrorCode FieldGetDescriptor(FieldId field_id, const FieldDescriptor **descriptor)</div><div class="ttdoc">Return immutable metadata for a valid field identifier.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00178">field_catalog.c:178</a></div></div>
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2abc4a9dfc88d7d99c755c93a8c29dfe4b"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2abc4a9dfc88d7d99c755c93a8c29dfe4b">FIELD_ID_INVALID</a></div><div class="ttdeci">@ FIELD_ID_INVALID</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00024">field_catalog.h:24</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_structFieldDescriptor"><div class="ttname"><a href="field__catalog_8h.html#structFieldDescriptor">FieldDescriptor</a></div><div class="ttdoc">Immutable metadata for one field identity.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00115">field_catalog.h:115</a></div></div>
-<div class="ttc" id="afield__catalog_8h_html_structFieldView"><div class="ttname"><a href="field__catalog_8h.html#structFieldView">FieldView</a></div><div class="ttdoc">Non-owning runtime objects resolved for one field and UserCtx.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00131">field_catalog.h:131</a></div></div>
-<div class="ttc" id="agroup__scatter__module_html_gaec2331ab16c72436e3c667e84cb37a80"><div class="ttname"><a href="group__scatter__module.html#gaec2331ab16c72436e3c667e84cb37a80">ScatterParticleFieldToEulerField_Internal</a></div><div class="ttdeci">static PetscErrorCode ScatterParticleFieldToEulerField_Internal(UserCtx *user, ParticleFieldId particle_field_id, DM targetDM, PetscInt expected_dof, Vec eulerFieldAverageVec)</div><div class="ttdoc">Accumulate one particle field onto the Eulerian grid using the selected scatter stencil.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01731">interpolation.c:1731</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_structFieldDescriptor"><div class="ttname"><a href="field__catalog_8h.html#structFieldDescriptor">FieldDescriptor</a></div><div class="ttdoc">Immutable metadata for one field identity.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00119">field_catalog.h:119</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_structFieldView"><div class="ttname"><a href="field__catalog_8h.html#structFieldView">FieldView</a></div><div class="ttdoc">Non-owning runtime objects resolved for one field and UserCtx.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00135">field_catalog.h:135</a></div></div>
+<div class="ttc" id="agroup__scatter__module_html_gaec2331ab16c72436e3c667e84cb37a80"><div class="ttname"><a href="group__scatter__module.html#gaec2331ab16c72436e3c667e84cb37a80">ScatterParticleFieldToEulerField_Internal</a></div><div class="ttdeci">static PetscErrorCode ScatterParticleFieldToEulerField_Internal(UserCtx *user, ParticleFieldId particle_field_id, DM targetDM, PetscInt expected_dof, Vec eulerFieldAverageVec)</div><div class="ttdoc">Accumulate one particle field onto the Eulerian grid using the selected scatter stencil.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01715">interpolation.c:1715</a></div></div>
 <div class="ttc" id="ainterpolation_8c_html_a8a60be44abd6bcc3c5912e23b8b940c4"><div class="ttname"><a href="interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">ERROR_MSG_BUFFER_SIZE</a></div><div class="ttdeci">#define ERROR_MSG_BUFFER_SIZE</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l00016">interpolation.c:16</a></div></div>
-<div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
-<div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00199">logging.h:199</a></div></div>
-<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00827">logging.h:827</a></div></div>
-<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
-<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
-<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00818">logging.h:818</a></div></div>
+<div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00046">logging.h:46</a></div></div>
+<div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00200">logging.h:200</a></div></div>
+<div class="ttc" id="alogging_8h_html_a5fe7257f46131945aacf9a35e9de5874"><div class="ttname"><a href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a></div><div class="ttdeci">#define PROFILE_FUNCTION_END</div><div class="ttdoc">Marks the end of a profiled code block.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00859">logging.h:859</a></div></div>
+<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a></div><div class="ttdeci">@ LOG_INFO</div><div class="ttdoc">Informational messages about program execution.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00031">logging.h:31</a></div></div>
+<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00032">logging.h:32</a></div></div>
+<div class="ttc" id="alogging_8h_html_ace99f3e207ccb2e46e9b782f9e57732e"><div class="ttname"><a href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a></div><div class="ttdeci">#define PROFILE_FUNCTION_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled code block (typically a function).</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00850">logging.h:850</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a320b1a7dc9793a9e94e62238b84cd03a"><div class="ttname"><a href="particle__field__catalog_8h.html#a320b1a7dc9793a9e94e62238b84cd03a">ParticleFieldDescriptor::components</a></div><div class="ttdeci">PetscInt components</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00059">particle_field_catalog.h:59</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a3b26af57a59dfa54e2f1ede2c2f5f6a1"><div class="ttname"><a href="particle__field__catalog_8h.html#a3b26af57a59dfa54e2f1ede2c2f5f6a1">ParticleFieldDescriptor::capabilities</a></div><div class="ttdeci">unsigned int capabilities</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00062">particle_field_catalog.h:62</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a5f5321ac4344ab24b3873c0a98dd878cab1ebd24daf01ce2ce99bb983c58cc024"><div class="ttname"><a href="particle__field__catalog_8h.html#a5f5321ac4344ab24b3873c0a98dd878cab1ebd24daf01ce2ce99bb983c58cc024">PARTICLE_FIELD_CAPABILITY_EULERIAN_SCATTER</a></div><div class="ttdeci">@ PARTICLE_FIELD_CAPABILITY_EULERIAN_SCATTER</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00049">particle_field_catalog.h:49</a></div></div>
@@ -278,8 +278,8 @@ Functions</h2></td></tr>
 <div class="ttc" id="aparticle__field__catalog_8h_html_ab357d38be41d13bfb32414166bce489f"><div class="ttname"><a href="particle__field__catalog_8h.html#ab357d38be41d13bfb32414166bce489f">ParticleFieldDescriptor::canonical_name</a></div><div class="ttdeci">const char * canonical_name</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00056">particle_field_catalog.h:56</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_aebe124f644060c6ea1a2d015d503d632"><div class="ttname"><a href="particle__field__catalog_8h.html#aebe124f644060c6ea1a2d015d503d632">ParticleFieldDescriptor::eulerian_scatter_target</a></div><div class="ttdeci">FieldId eulerian_scatter_target</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00064">particle_field_catalog.h:64</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_structParticleFieldDescriptor"><div class="ttname"><a href="particle__field__catalog_8h.html#structParticleFieldDescriptor">ParticleFieldDescriptor</a></div><div class="ttdoc">Immutable metadata for one persistent particle field.</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00054">particle_field_catalog.h:54</a></div></div>
-<div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00946">variables.h:946</a></div></div>
-<div class="ttc" id="avariables_8h_html_aa194db376ea0f68ec7090718804488ab"><div class="ttname"><a href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">UserCtx::ParticleCount</a></div><div class="ttdeci">Vec ParticleCount</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00948">variables.h:948</a></div></div>
+<div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00984">variables.h:984</a></div></div>
+<div class="ttc" id="avariables_8h_html_aa194db376ea0f68ec7090718804488ab"><div class="ttname"><a href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">UserCtx::ParticleCount</a></div><div class="ttdeci">Vec ParticleCount</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00986">variables.h:986</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -319,65 +319,65 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success. Errors if prerequisites (like ParticleCount) are missing or if underlying scatter calls fail. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01904">1904</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1905</span>{</div>
-<div class="line"><span class="lineno"> 1906</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 1907</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1908</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 1909</span> </div>
-<div class="line"><span class="lineno"> 1910</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Starting scattering of specified particle fields to Eulerian grids.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1911</span> </div>
-<div class="line"><span class="lineno"> 1912</span>    <span class="comment">// --- Pre-computation Check: Ensure Particle Counts are Ready ---</span></div>
-<div class="line"><span class="lineno"> 1913</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>) {</div>
-<div class="line"><span class="lineno"> 1914</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;UserCtx-&gt;ParticleCount is NULL. Compute counts before calling ScatterAllParticleFieldsToEulerFields.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1915</span>    }</div>
-<div class="line"><span class="lineno"> 1916</span> </div>
-<div class="line"><span class="lineno"> 1917</span>    <span class="comment">// --- Scatter Particle Field &quot;Psi&quot; -&gt; Eulerian Field user-&gt;Psi (on da) ---</span></div>
-<div class="line"><span class="lineno"> 1918</span>    <span class="comment">// Check if the target Eulerian vector &#39;user-&gt;Psi&#39; exists.</span></div>
-<div class="line"><span class="lineno"> 1919</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>) {</div>
-<div class="line"><span class="lineno"> 1920</span>        </div>
-<div class="line"><span class="lineno"> 1921</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Scattering particle field &#39;Psi&#39; to user-&gt;Psi.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1922</span>        <span class="comment">// Zero the target vector before accumulating the new average for this step/call.</span></div>
-<div class="line"><span class="lineno"> 1923</span> </div>
-<div class="line"><span class="lineno"> 1924</span>    <span class="comment">// Debug Verification ------------------------------------------------</span></div>
-<div class="line"><span class="lineno"> 1925</span>    Vec swarm_Psi;</div>
-<div class="line"><span class="lineno"> 1926</span>    PetscReal Avg_Psi,Avg_swarm_Psi;</div>
-<div class="line"><span class="lineno"> 1927</span>         </div>
-<div class="line"><span class="lineno"> 1928</span>    ierr = VecMean(user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>,&amp;Avg_Psi);</div>
-<div class="line"><span class="lineno"> 1929</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Scalar(Psi) before scatter: %.4f.\n&quot;</span>,Avg_Psi);</div>
-<div class="line"><span class="lineno"> 1930</span>         </div>
-<div class="line"><span class="lineno"> 1931</span>    ierr = DMSwarmCreateGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(<a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>), &amp;swarm_Psi);</div>
-<div class="line"><span class="lineno"> 1932</span>    ierr = VecMean(swarm_Psi,&amp;Avg_swarm_Psi);</div>
-<div class="line"><span class="lineno"> 1933</span> </div>
-<div class="line"><span class="lineno"> 1934</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Particle Scalar(Psi): %.4f.\n&quot;</span>,Avg_swarm_Psi);</div>
-<div class="line"><span class="lineno"> 1935</span> </div>
-<div class="line"><span class="lineno"> 1936</span>    ierr = DMSwarmDestroyGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(<a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>), &amp;swarm_Psi);</div>
-<div class="line"><span class="lineno"> 1937</span>    <span class="comment">// Debug----------------------------------------------------------------</span></div>
-<div class="line"><span class="lineno"> 1938</span>      </div>
-<div class="line"><span class="lineno"> 1939</span>    <span class="comment">//ierr = VecSet(user-&gt;P, 0.0); CHKERRQ(ierr);</span></div>
-<div class="line"><span class="lineno"> 1940</span>        <span class="comment">// Call the unified scatter function. It will handle DM determination and validation.</span></div>
-<div class="line"><span class="lineno"> 1941</span>        <span class="comment">// It will also error out if the *particle* field &quot;Psi&quot; doesn&#39;t exist in the swarm.</span></div>
-<div class="line"><span class="lineno"> 1942</span>        ierr = <a class="code hl_function" href="group__scatter__module.html#ga085a6a4b4021533c28abd006b659a981">ScatterParticleFieldToEulerField</a>(user, <a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1943</span>    ierr = VecMean(user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>,&amp;Avg_Psi);</div>
-<div class="line"><span class="lineno"> 1944</span>    </div>
-<div class="line"><span class="lineno"> 1945</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Scalar(Psi) after  scatter: %.4f.\n&quot;</span>,Avg_Psi);</div>
-<div class="line"><span class="lineno"> 1946</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 1947</span>        <span class="comment">// Only log a warning if the target Eulerian field is missing in the context.</span></div>
-<div class="line"><span class="lineno"> 1948</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Skipping scatter for &#39;Psi&#39;: UserCtx-&gt;Psi is NULL.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1949</span>    }</div>
-<div class="line"><span class="lineno"> 1950</span> </div>
-<div class="line"><span class="lineno"> 1951</span>    <span class="comment">// Additional scatterable particle fields require an explicit catalog entry</span></div>
-<div class="line"><span class="lineno"> 1952</span>    <span class="comment">// with a compatible persistent Eulerian target.</span></div>
-<div class="line"><span class="lineno"> 1953</span> </div>
-<div class="line"><span class="lineno"> 1954</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Finished scattering specified particle fields.\n&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1955</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 1956</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1957</span>}</div>
-<div class="ttc" id="agroup__scatter__module_html_ga085a6a4b4021533c28abd006b659a981"><div class="ttname"><a href="group__scatter__module.html#ga085a6a4b4021533c28abd006b659a981">ScatterParticleFieldToEulerField</a></div><div class="ttdeci">PetscErrorCode ScatterParticleFieldToEulerField(UserCtx *user, ParticleFieldId particle_field_id, Vec eulerFieldAverageVec)</div><div class="ttdoc">Scatters a particle field (scalar or vector) to the corresponding Eulerian field average.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01818">interpolation.c:1818</a></div></div>
-<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00029">logging.h:29</a></div></div>
+<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01888">1888</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1889</span>{</div>
+<div class="line"><span class="lineno"> 1890</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 1891</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1892</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 1893</span> </div>
+<div class="line"><span class="lineno"> 1894</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Starting scattering of specified particle fields to Eulerian grids.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1895</span> </div>
+<div class="line"><span class="lineno"> 1896</span>    <span class="comment">// --- Pre-computation Check: Ensure Particle Counts are Ready ---</span></div>
+<div class="line"><span class="lineno"> 1897</span>    <span class="keywordflow">if</span> (!user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>) {</div>
+<div class="line"><span class="lineno"> 1898</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, <span class="stringliteral">&quot;UserCtx-&gt;ParticleCount is NULL. Compute counts before calling ScatterAllParticleFieldsToEulerFields.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1899</span>    }</div>
+<div class="line"><span class="lineno"> 1900</span> </div>
+<div class="line"><span class="lineno"> 1901</span>    <span class="comment">// --- Scatter Particle Field &quot;Psi&quot; -&gt; Eulerian Field user-&gt;Psi (on da) ---</span></div>
+<div class="line"><span class="lineno"> 1902</span>    <span class="comment">// Check if the target Eulerian vector &#39;user-&gt;Psi&#39; exists.</span></div>
+<div class="line"><span class="lineno"> 1903</span>    <span class="keywordflow">if</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>) {</div>
+<div class="line"><span class="lineno"> 1904</span>        </div>
+<div class="line"><span class="lineno"> 1905</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Scattering particle field &#39;Psi&#39; to user-&gt;Psi.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1906</span>        <span class="comment">// Zero the target vector before accumulating the new average for this step/call.</span></div>
+<div class="line"><span class="lineno"> 1907</span> </div>
+<div class="line"><span class="lineno"> 1908</span>    <span class="comment">// Debug Verification ------------------------------------------------</span></div>
+<div class="line"><span class="lineno"> 1909</span>    Vec swarm_Psi;</div>
+<div class="line"><span class="lineno"> 1910</span>    PetscReal Avg_Psi,Avg_swarm_Psi;</div>
+<div class="line"><span class="lineno"> 1911</span>         </div>
+<div class="line"><span class="lineno"> 1912</span>    ierr = VecMean(user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>,&amp;Avg_Psi);</div>
+<div class="line"><span class="lineno"> 1913</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Scalar(Psi) before scatter: %.4f.\n&quot;</span>,Avg_Psi);</div>
+<div class="line"><span class="lineno"> 1914</span>         </div>
+<div class="line"><span class="lineno"> 1915</span>    ierr = DMSwarmCreateGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(<a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>), &amp;swarm_Psi);</div>
+<div class="line"><span class="lineno"> 1916</span>    ierr = VecMean(swarm_Psi,&amp;Avg_swarm_Psi);</div>
+<div class="line"><span class="lineno"> 1917</span> </div>
+<div class="line"><span class="lineno"> 1918</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Particle Scalar(Psi): %.4f.\n&quot;</span>,Avg_swarm_Psi);</div>
+<div class="line"><span class="lineno"> 1919</span> </div>
+<div class="line"><span class="lineno"> 1920</span>    ierr = DMSwarmDestroyGlobalVectorFromField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(<a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>), &amp;swarm_Psi);</div>
+<div class="line"><span class="lineno"> 1921</span>    <span class="comment">// Debug----------------------------------------------------------------</span></div>
+<div class="line"><span class="lineno"> 1922</span>      </div>
+<div class="line"><span class="lineno"> 1923</span>    <span class="comment">//ierr = VecSet(user-&gt;P, 0.0); CHKERRQ(ierr);</span></div>
+<div class="line"><span class="lineno"> 1924</span>        <span class="comment">// Call the unified scatter function. It will handle DM determination and validation.</span></div>
+<div class="line"><span class="lineno"> 1925</span>        <span class="comment">// It will also error out if the *particle* field &quot;Psi&quot; doesn&#39;t exist in the swarm.</span></div>
+<div class="line"><span class="lineno"> 1926</span>        ierr = <a class="code hl_function" href="group__scatter__module.html#ga085a6a4b4021533c28abd006b659a981">ScatterParticleFieldToEulerField</a>(user, <a class="code hl_enumvalue" href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1927</span>    ierr = VecMean(user-&gt;<a class="code hl_variable" href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">Psi</a>,&amp;Avg_Psi);</div>
+<div class="line"><span class="lineno"> 1928</span>    </div>
+<div class="line"><span class="lineno"> 1929</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>,<a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot; Average of Scalar(Psi) after  scatter: %.4f.\n&quot;</span>,Avg_Psi);</div>
+<div class="line"><span class="lineno"> 1930</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 1931</span>        <span class="comment">// Only log a warning if the target Eulerian field is missing in the context.</span></div>
+<div class="line"><span class="lineno"> 1932</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>, <span class="stringliteral">&quot;Skipping scatter for &#39;Psi&#39;: UserCtx-&gt;Psi is NULL.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1933</span>    }</div>
+<div class="line"><span class="lineno"> 1934</span> </div>
+<div class="line"><span class="lineno"> 1935</span>    <span class="comment">// Additional scatterable particle fields require an explicit catalog entry</span></div>
+<div class="line"><span class="lineno"> 1936</span>    <span class="comment">// with a compatible persistent Eulerian target.</span></div>
+<div class="line"><span class="lineno"> 1937</span> </div>
+<div class="line"><span class="lineno"> 1938</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a6e98ff471e3ce6c4ef2d75c37ee51837">LOG_INFO</a>, <span class="stringliteral">&quot;Finished scattering specified particle fields.\n&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1939</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 1940</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1941</span>}</div>
+<div class="ttc" id="agroup__scatter__module_html_ga085a6a4b4021533c28abd006b659a981"><div class="ttname"><a href="group__scatter__module.html#ga085a6a4b4021533c28abd006b659a981">ScatterParticleFieldToEulerField</a></div><div class="ttdeci">PetscErrorCode ScatterParticleFieldToEulerField(UserCtx *user, ParticleFieldId particle_field_id, Vec eulerFieldAverageVec)</div><div class="ttdoc">Scatters a particle field (scalar or vector) to the corresponding Eulerian field average.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01802">interpolation.c:1802</a></div></div>
+<div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a038097897ab5a52461e0ee47bd2b7bb8"><div class="ttname"><a href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a></div><div class="ttdeci">const char * ParticleFieldName(ParticleFieldId field_id)</div><div class="ttdoc">Return the canonical PETSc DMSwarm name for an ID.</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8c_source.html#l00111">particle_field_catalog.c:111</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8"><div class="ttname"><a href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93a86aee97dd38d1ba0995061d3af6400e8">PARTICLE_FIELD_ID_PSI</a></div><div class="ttdeci">@ PARTICLE_FIELD_ID_PSI</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00031">particle_field_catalog.h:31</a></div></div>
-<div class="ttc" id="avariables_8h_html_af8df0703ce4dab73db61fa500a7c5f2b"><div class="ttname"><a href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">UserCtx::Psi</a></div><div class="ttdeci">Vec Psi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00949">variables.h:949</a></div></div>
+<div class="ttc" id="avariables_8h_html_af8df0703ce4dab73db61fa500a7c5f2b"><div class="ttname"><a href="variables_8h.html#af8df0703ce4dab73db61fa500a7c5f2b">UserCtx::Psi</a></div><div class="ttdeci">Vec Psi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00987">variables.h:987</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -445,88 +445,88 @@ Here is the caller graph for this function:</div>
 
 <p>Accumulate one particle field onto the Eulerian grid using the selected scatter stencil. </p>
 
-<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01731">1731</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1736</span>{</div>
-<div class="line"><span class="lineno"> 1737</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 1738</span>    PetscInt       target_dof = 0;</div>
-<div class="line"><span class="lineno"> 1739</span>    Vec            globalsumVec = NULL;</div>
-<div class="line"><span class="lineno"> 1740</span>    Vec            localsumVec = NULL;</div>
-<div class="line"><span class="lineno"> 1741</span>    <span class="keywordtype">char</span>           msg[<a class="code hl_define" href="interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">ERROR_MSG_BUFFER_SIZE</a>]; <span class="comment">// Buffer for formatted error messages</span></div>
-<div class="line"><span class="lineno"> 1742</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>    *particleFieldName = <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(particle_field_id);</div>
-<div class="line"><span class="lineno"> 1743</span> </div>
-<div class="line"><span class="lineno"> 1744</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1745</span> </div>
-<div class="line"><span class="lineno"> 1746</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l01715">1715</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1720</span>{</div>
+<div class="line"><span class="lineno"> 1721</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 1722</span>    PetscInt       target_dof = 0;</div>
+<div class="line"><span class="lineno"> 1723</span>    Vec            globalsumVec = NULL;</div>
+<div class="line"><span class="lineno"> 1724</span>    Vec            localsumVec = NULL;</div>
+<div class="line"><span class="lineno"> 1725</span>    <span class="keywordtype">char</span>           msg[<a class="code hl_define" href="interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4">ERROR_MSG_BUFFER_SIZE</a>]; <span class="comment">// Buffer for formatted error messages</span></div>
+<div class="line"><span class="lineno"> 1726</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>    *particleFieldName = <a class="code hl_function" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>(particle_field_id);</div>
+<div class="line"><span class="lineno"> 1727</span> </div>
+<div class="line"><span class="lineno"> 1728</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1729</span> </div>
+<div class="line"><span class="lineno"> 1730</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 1731</span> </div>
+<div class="line"><span class="lineno"> 1732</span>    <span class="keywordflow">if</span> (!user || !user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a> || !user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a> || !targetDM || !eulerFieldAverageVec)</div>
+<div class="line"><span class="lineno"> 1733</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;NULL input provided to ScatterParticleFieldToEulerField_Internal.&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1734</span> </div>
+<div class="line"><span class="lineno"> 1735</span>    ierr = DMDAGetInfo(targetDM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &amp;target_dof, NULL, NULL, NULL, NULL, NULL); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1736</span>    <span class="keywordflow">if</span> (target_dof != expected_dof) {</div>
+<div class="line"><span class="lineno"> 1737</span>        PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg),</div>
+<div class="line"><span class="lineno"> 1738</span>                      <span class="stringliteral">&quot;Field &#39;%s&#39; expects DOF %d but targetDM reports DOF %d.&quot;</span>,</div>
+<div class="line"><span class="lineno"> 1739</span>                      particleFieldName, expected_dof, target_dof);</div>
+<div class="line"><span class="lineno"> 1740</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
+<div class="line"><span class="lineno"> 1741</span>    }</div>
+<div class="line"><span class="lineno"> 1742</span>    </div>
+<div class="line"><span class="lineno"> 1743</span>    <span class="comment">// --- Check if Particle Field Exists ---</span></div>
+<div class="line"><span class="lineno"> 1744</span>    <span class="comment">// Attempt a GetField call; if it fails, the field doesn&#39;t exist.</span></div>
+<div class="line"><span class="lineno"> 1745</span>    <span class="comment">// We let CHKERRQ handle the error directly if the field doesn&#39;t exist OR</span></div>
+<div class="line"><span class="lineno"> 1746</span>    <span class="comment">// we catch it specifically to provide a more tailored message.</span></div>
 <div class="line"><span class="lineno"> 1747</span> </div>
-<div class="line"><span class="lineno"> 1748</span>    <span class="keywordflow">if</span> (!user || !user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a> || !user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a> || !targetDM || !eulerFieldAverageVec)</div>
-<div class="line"><span class="lineno"> 1749</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;NULL input provided to ScatterParticleFieldToEulerField_Internal.&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1750</span> </div>
-<div class="line"><span class="lineno"> 1751</span>    ierr = DMDAGetInfo(targetDM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &amp;target_dof, NULL, NULL, NULL, NULL, NULL); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1752</span>    <span class="keywordflow">if</span> (target_dof != expected_dof) {</div>
-<div class="line"><span class="lineno"> 1753</span>        PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg),</div>
-<div class="line"><span class="lineno"> 1754</span>                      <span class="stringliteral">&quot;Field &#39;%s&#39; expects DOF %d but targetDM reports DOF %d.&quot;</span>,</div>
-<div class="line"><span class="lineno"> 1755</span>                      particleFieldName, expected_dof, target_dof);</div>
-<div class="line"><span class="lineno"> 1756</span>        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_INCOMP, <span class="stringliteral">&quot;%s&quot;</span>, msg);</div>
-<div class="line"><span class="lineno"> 1757</span>    }</div>
+<div class="line"><span class="lineno"> 1748</span>    <span class="comment">/*</span></div>
+<div class="line"><span class="lineno"> 1749</span><span class="comment">    LOG_ALLOW(GLOBAL,LOG_DEBUG,&quot;Field %s being accessed to check existence \n&quot;,particleFieldName);</span></div>
+<div class="line"><span class="lineno"> 1750</span><span class="comment">    ierr = DMSwarmGetField(user-&gt;swarm, particleFieldName, NULL, NULL, NULL);</span></div>
+<div class="line"><span class="lineno"> 1751</span><span class="comment">    if (ierr) { // If GetField returns an error</span></div>
+<div class="line"><span class="lineno"> 1752</span><span class="comment">        PetscSNPrintf(msg, sizeof(msg), &quot;Particle field &#39;%s&#39; not found in DMSwarm for scattering.&quot;, particleFieldName);</span></div>
+<div class="line"><span class="lineno"> 1753</span><span class="comment">        // Directly set the error, overwriting the one from GetField</span></div>
+<div class="line"><span class="lineno"> 1754</span><span class="comment">        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, msg);</span></div>
+<div class="line"><span class="lineno"> 1755</span><span class="comment">    }</span></div>
+<div class="line"><span class="lineno"> 1756</span><span class="comment">    ierr = DMSwarmRestoreField(user-&gt;swarm, particleFieldName, NULL, NULL, NULL);</span></div>
+<div class="line"><span class="lineno"> 1757</span><span class="comment">    */</span></div>
 <div class="line"><span class="lineno"> 1758</span>    </div>
-<div class="line"><span class="lineno"> 1759</span>    <span class="comment">// --- Check if Particle Field Exists ---</span></div>
-<div class="line"><span class="lineno"> 1760</span>    <span class="comment">// Attempt a GetField call; if it fails, the field doesn&#39;t exist.</span></div>
-<div class="line"><span class="lineno"> 1761</span>    <span class="comment">// We let CHKERRQ handle the error directly if the field doesn&#39;t exist OR</span></div>
-<div class="line"><span class="lineno"> 1762</span>    <span class="comment">// we catch it specifically to provide a more tailored message.</span></div>
-<div class="line"><span class="lineno"> 1763</span> </div>
-<div class="line"><span class="lineno"> 1764</span>    <span class="comment">/*</span></div>
-<div class="line"><span class="lineno"> 1765</span><span class="comment">    LOG_ALLOW(GLOBAL,LOG_DEBUG,&quot;Field %s being accessed to check existence \n&quot;,particleFieldName);</span></div>
-<div class="line"><span class="lineno"> 1766</span><span class="comment">    ierr = DMSwarmGetField(user-&gt;swarm, particleFieldName, NULL, NULL, NULL);</span></div>
-<div class="line"><span class="lineno"> 1767</span><span class="comment">    if (ierr) { // If GetField returns an error</span></div>
-<div class="line"><span class="lineno"> 1768</span><span class="comment">        PetscSNPrintf(msg, sizeof(msg), &quot;Particle field &#39;%s&#39; not found in DMSwarm for scattering.&quot;, particleFieldName);</span></div>
-<div class="line"><span class="lineno"> 1769</span><span class="comment">        // Directly set the error, overwriting the one from GetField</span></div>
-<div class="line"><span class="lineno"> 1770</span><span class="comment">        SETERRQ(PETSC_COMM_SELF, PETSC_ERR_ARG_WRONGSTATE, msg);</span></div>
-<div class="line"><span class="lineno"> 1771</span><span class="comment">    }</span></div>
-<div class="line"><span class="lineno"> 1772</span><span class="comment">    ierr = DMSwarmRestoreField(user-&gt;swarm, particleFieldName, NULL, NULL, NULL);</span></div>
-<div class="line"><span class="lineno"> 1773</span><span class="comment">    */</span></div>
-<div class="line"><span class="lineno"> 1774</span>    </div>
-<div class="line"><span class="lineno"> 1775</span>    <span class="comment">// --- Setup Temporary Sum Vector ---</span></div>
-<div class="line"><span class="lineno"> 1776</span>    ierr = VecDuplicate(eulerFieldAverageVec, &amp;globalsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1777</span>    ierr = VecSet(globalsumVec, 0.0); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1778</span>    ierr = PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;TempSum_%s&quot;</span>, particleFieldName); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1779</span>    ierr = PetscObjectSetName((PetscObject)globalsumVec, msg); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1780</span> </div>
-<div class="line"><span class="lineno"> 1781</span>    <span class="comment">// create local vector for accumulation</span></div>
-<div class="line"><span class="lineno"> 1782</span>    ierr = DMGetLocalVector(targetDM, &amp;localsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1783</span>    ierr = VecSet(localsumVec, 0.0); CHKERRQ(ierr);  <span class="comment">// Must be zeroed before accumulation</span></div>
-<div class="line"><span class="lineno"> 1784</span>    ierr = PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;LocalTempSum_%s&quot;</span>, particleFieldName); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1785</span>    ierr = PetscObjectSetName((PetscObject)localsumVec, msg); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1786</span> </div>
-<div class="line"><span class="lineno"> 1787</span>    <span class="comment">// --- Accumulate ---</span></div>
-<div class="line"><span class="lineno"> 1788</span>    <span class="comment">// This will call DMSwarmGetField again. If it failed above, it will likely fail here too,</span></div>
-<div class="line"><span class="lineno"> 1789</span>    <span class="comment">// unless the error was cleared somehow between the check and here (unlikely).</span></div>
-<div class="line"><span class="lineno"> 1790</span>    <span class="comment">// If the check above was skipped (Option 1), this is where the error for non-existent</span></div>
-<div class="line"><span class="lineno"> 1791</span>    <span class="comment">// field will be caught by CHKERRQ.</span></div>
-<div class="line"><span class="lineno"> 1792</span>    ierr = <a class="code hl_function" href="group__scatter__module__internal.html#ga65b0ad52e9e8f8c328e8b031201d7a05">AccumulateParticleField</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, particle_field_id, targetDM, localsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1793</span> </div>
-<div class="line"><span class="lineno"> 1794</span>    <span class="comment">// --- Local to Global Sum ---</span></div>
-<div class="line"><span class="lineno"> 1795</span>    ierr = DMLocalToGlobalBegin(targetDM, localsumVec, ADD_VALUES, globalsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1796</span>    ierr = DMLocalToGlobalEnd(targetDM, localsumVec, ADD_VALUES, globalsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1797</span>    <span class="comment">// Return local vector to DM</span></div>
-<div class="line"><span class="lineno"> 1798</span>    ierr = DMRestoreLocalVector(targetDM, &amp;localsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1799</span> </div>
-<div class="line"><span class="lineno"> 1800</span>    <span class="comment">// Calculate the number of particles per cell.</span></div>
-<div class="line"><span class="lineno"> 1801</span>    ierr = <a class="code hl_function" href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a>(user); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1802</span>    <span class="comment">// --- Normalize ---</span></div>
-<div class="line"><span class="lineno"> 1803</span>    ierr = <a class="code hl_function" href="group__scatter__module__internal.html#ga95939f29ec3dfbb729bcceee7f138958">NormalizeGridVectorByCount</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, targetDM, globalsumVec, eulerFieldAverageVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1804</span> </div>
-<div class="line"><span class="lineno"> 1805</span>    <span class="comment">// --- Cleanup ---</span></div>
-<div class="line"><span class="lineno"> 1806</span>    ierr = VecDestroy(&amp;globalsumVec); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 1807</span> </div>
-<div class="line"><span class="lineno"> 1808</span> </div>
-<div class="line"><span class="lineno"> 1809</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 1810</span> </div>
-<div class="line"><span class="lineno"> 1811</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1812</span>}</div>
+<div class="line"><span class="lineno"> 1759</span>    <span class="comment">// --- Setup Temporary Sum Vector ---</span></div>
+<div class="line"><span class="lineno"> 1760</span>    ierr = VecDuplicate(eulerFieldAverageVec, &amp;globalsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1761</span>    ierr = VecSet(globalsumVec, 0.0); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1762</span>    ierr = PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;TempSum_%s&quot;</span>, particleFieldName); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1763</span>    ierr = PetscObjectSetName((PetscObject)globalsumVec, msg); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1764</span> </div>
+<div class="line"><span class="lineno"> 1765</span>    <span class="comment">// create local vector for accumulation</span></div>
+<div class="line"><span class="lineno"> 1766</span>    ierr = DMGetLocalVector(targetDM, &amp;localsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1767</span>    ierr = VecSet(localsumVec, 0.0); CHKERRQ(ierr);  <span class="comment">// Must be zeroed before accumulation</span></div>
+<div class="line"><span class="lineno"> 1768</span>    ierr = PetscSNPrintf(msg, <span class="keyword">sizeof</span>(msg), <span class="stringliteral">&quot;LocalTempSum_%s&quot;</span>, particleFieldName); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1769</span>    ierr = PetscObjectSetName((PetscObject)localsumVec, msg); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1770</span> </div>
+<div class="line"><span class="lineno"> 1771</span>    <span class="comment">// --- Accumulate ---</span></div>
+<div class="line"><span class="lineno"> 1772</span>    <span class="comment">// This will call DMSwarmGetField again. If it failed above, it will likely fail here too,</span></div>
+<div class="line"><span class="lineno"> 1773</span>    <span class="comment">// unless the error was cleared somehow between the check and here (unlikely).</span></div>
+<div class="line"><span class="lineno"> 1774</span>    <span class="comment">// If the check above was skipped (Option 1), this is where the error for non-existent</span></div>
+<div class="line"><span class="lineno"> 1775</span>    <span class="comment">// field will be caught by CHKERRQ.</span></div>
+<div class="line"><span class="lineno"> 1776</span>    ierr = <a class="code hl_function" href="group__scatter__module__internal.html#ga65b0ad52e9e8f8c328e8b031201d7a05">AccumulateParticleField</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, particle_field_id, targetDM, localsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1777</span> </div>
+<div class="line"><span class="lineno"> 1778</span>    <span class="comment">// --- Local to Global Sum ---</span></div>
+<div class="line"><span class="lineno"> 1779</span>    ierr = DMLocalToGlobalBegin(targetDM, localsumVec, ADD_VALUES, globalsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1780</span>    ierr = DMLocalToGlobalEnd(targetDM, localsumVec, ADD_VALUES, globalsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1781</span>    <span class="comment">// Return local vector to DM</span></div>
+<div class="line"><span class="lineno"> 1782</span>    ierr = DMRestoreLocalVector(targetDM, &amp;localsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1783</span> </div>
+<div class="line"><span class="lineno"> 1784</span>    <span class="comment">// Calculate the number of particles per cell.</span></div>
+<div class="line"><span class="lineno"> 1785</span>    ierr = <a class="code hl_function" href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a>(user); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1786</span>    <span class="comment">// --- Normalize ---</span></div>
+<div class="line"><span class="lineno"> 1787</span>    ierr = <a class="code hl_function" href="group__scatter__module__internal.html#ga95939f29ec3dfbb729bcceee7f138958">NormalizeGridVectorByCount</a>(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa194db376ea0f68ec7090718804488ab">ParticleCount</a>, targetDM, globalsumVec, eulerFieldAverageVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1788</span> </div>
+<div class="line"><span class="lineno"> 1789</span>    <span class="comment">// --- Cleanup ---</span></div>
+<div class="line"><span class="lineno"> 1790</span>    ierr = VecDestroy(&amp;globalsumVec); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 1791</span> </div>
+<div class="line"><span class="lineno"> 1792</span> </div>
+<div class="line"><span class="lineno"> 1793</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 1794</span> </div>
+<div class="line"><span class="lineno"> 1795</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1796</span>}</div>
 <div class="ttc" id="aParticleMotion_8h_html_a81cfdf7b32472d8f614b44e30005ec6c"><div class="ttname"><a href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a></div><div class="ttdeci">PetscErrorCode CalculateParticleCountPerCell(UserCtx *user)</div><div class="ttdoc">Counts particles in each cell of the DMDA 'da' and stores the result in user-&gt;ParticleCount.</div><div class="ttdef"><b>Definition</b> <a href="ParticleMotion_8c_source.html#l00504">ParticleMotion.c:504</a></div></div>
-<div class="ttc" id="agroup__scatter__module__internal_html_ga65b0ad52e9e8f8c328e8b031201d7a05"><div class="ttname"><a href="group__scatter__module__internal.html#ga65b0ad52e9e8f8c328e8b031201d7a05">AccumulateParticleField</a></div><div class="ttdeci">PetscErrorCode AccumulateParticleField(DM swarm, ParticleFieldId particle_field_id, DM gridSumDM, Vec gridSumVec)</div><div class="ttdoc">Accumulates a particle field (scalar or vector) into a target grid sum vector.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01494">interpolation.c:1494</a></div></div>
-<div class="ttc" id="agroup__scatter__module__internal_html_ga95939f29ec3dfbb729bcceee7f138958"><div class="ttname"><a href="group__scatter__module__internal.html#ga95939f29ec3dfbb729bcceee7f138958">NormalizeGridVectorByCount</a></div><div class="ttdeci">PetscErrorCode NormalizeGridVectorByCount(DM countDM, Vec countVec, DM dataDM, Vec sumVec, Vec avgVec)</div><div class="ttdoc">Normalizes a grid vector of sums by a grid vector of counts to produce an average.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01616">interpolation.c:1616</a></div></div>
-<div class="ttc" id="avariables_8h_html_af031acb43b014d5ac788aa9003491e75"><div class="ttname"><a href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">UserCtx::da</a></div><div class="ttdeci">DM da</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00881">variables.h:881</a></div></div>
+<div class="ttc" id="agroup__scatter__module__internal_html_ga65b0ad52e9e8f8c328e8b031201d7a05"><div class="ttname"><a href="group__scatter__module__internal.html#ga65b0ad52e9e8f8c328e8b031201d7a05">AccumulateParticleField</a></div><div class="ttdeci">PetscErrorCode AccumulateParticleField(DM swarm, ParticleFieldId particle_field_id, DM gridSumDM, Vec gridSumVec)</div><div class="ttdoc">Accumulates a particle field (scalar or vector) into a target grid sum vector.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01478">interpolation.c:1478</a></div></div>
+<div class="ttc" id="agroup__scatter__module__internal_html_ga95939f29ec3dfbb729bcceee7f138958"><div class="ttname"><a href="group__scatter__module__internal.html#ga95939f29ec3dfbb729bcceee7f138958">NormalizeGridVectorByCount</a></div><div class="ttdeci">PetscErrorCode NormalizeGridVectorByCount(DM countDM, Vec countVec, DM dataDM, Vec sumVec, Vec avgVec)</div><div class="ttdoc">Normalizes a grid vector of sums by a grid vector of counts to produce an average.</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01600">interpolation.c:1600</a></div></div>
+<div class="ttc" id="avariables_8h_html_af031acb43b014d5ac788aa9003491e75"><div class="ttname"><a href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">UserCtx::da</a></div><div class="ttdeci">DM da</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00902">variables.h:902</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

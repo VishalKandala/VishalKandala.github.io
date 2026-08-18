@@ -3,9 +3,18 @@ var searchData=
   ['particle_0',['Particle',['../variables_8h.html#structParticle',1,'']]],
   ['particlefielddescriptor_1',['ParticleFieldDescriptor',['../particle__field__catalog_8h.html#structParticleFieldDescriptor',1,'']]],
   ['pathawareignore_2',['PathAwareIgnore',['../classpython__coverage__gate_1_1PathAwareIgnore.html',1,'python_coverage_gate']]],
-  ['picurvsha256context_3',['PicurvSHA256Context',['../checksum_8h.html#structPicurvSHA256Context',1,'']]],
-  ['picurvtestcase_4',['PicurvTestCase',['../test__support_8h.html#structPicurvTestCase',1,'']]],
-  ['plotdependencyerror_5',['PlotDependencyError',['../classpicurv__cli_1_1core_1_1PlotDependencyError.html',1,'picurv_cli::core']]],
-  ['postprocessparams_6',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
-  ['profiledfunction_7',['ProfiledFunction',['../logging_8c.html#structProfiledFunction',1,'']]]
+  ['picurvcomomentstate_3',['PicurvCoMomentState',['../statistics__moments_8h.html#structPicurvCoMomentState',1,'']]],
+  ['picurvderivedfield_4',['PicurvDerivedField',['../statistics__accumulator_8h.html#structPicurvDerivedField',1,'']]],
+  ['picurvmomentstate_5',['PicurvMomentState',['../statistics__moments_8h.html#structPicurvMomentState',1,'']]],
+  ['picurvsha256context_6',['PicurvSHA256Context',['../checksum_8h.html#structPicurvSHA256Context',1,'']]],
+  ['picurvstatisticspayload_7',['PicurvStatisticsPayload',['../statistics__accumulator_8h.html#structPicurvStatisticsPayload',1,'']]],
+  ['picurvtestcase_8',['PicurvTestCase',['../test__support_8h.html#structPicurvTestCase',1,'']]],
+  ['picurvwindow_9',['PicurvWindow',['../statistics__window_8h.html#structPicurvWindow',1,'']]],
+  ['picurvwindowcovariancerequest_10',['PicurvWindowCovarianceRequest',['../statistics__window_8h.html#structPicurvWindowCovarianceRequest',1,'']]],
+  ['picurvwindowdefinition_11',['PicurvWindowDefinition',['../statistics__window_8h.html#structPicurvWindowDefinition',1,'']]],
+  ['picurvwindowfieldrequest_12',['PicurvWindowFieldRequest',['../statistics__window_8h.html#structPicurvWindowFieldRequest',1,'']]],
+  ['picurvwindowstorage_13',['PicurvWindowStorage',['../statistics__accumulator_8h.html#structPicurvWindowStorage',1,'']]],
+  ['plotdependencyerror_14',['PlotDependencyError',['../classpicurv__cli_1_1core_1_1PlotDependencyError.html',1,'picurv_cli::core']]],
+  ['postprocessparams_15',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
+  ['profiledfunction_16',['ProfiledFunction',['../logging_8c.html#structProfiledFunction',1,'']]]
 ];

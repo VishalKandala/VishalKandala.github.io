@@ -177,13 +177,8 @@ $(function() {
 <div class="line">    - name: production</div>
 <div class="line">      start_time: 50.0</div>
 <div class="line">      end_time: 250.0</div>
-<div class="line">      include_initial: false</div>
-<div class="line">      schedule:</div>
-<div class="line">        every_steps: 1</div>
 <div class="line">      weighting: physical_time</div>
-<div class="line">      target:</div>
-<div class="line">        kind: pointwise</div>
-<div class="line">        mask: fluid</div>
+<div class="line">      step_cadence: 1</div>
 <div class="line">      fields:</div>
 <div class="line">        - field: Ucat</div>
 <div class="line">          moments: [first, second]</div>
@@ -195,7 +190,6 @@ $(function() {
 <li><code>start_time</code> is required and <code>end_time</code> may be open;</li>
 <li>one positive step- or physical-time schedule is selected;</li>
 <li>weighting is <code>sample</code> or <code>physical_time</code>;</li>
-<li>initial-state inclusion is explicit and defaults to false;</li>
 <li>fields resolve once through the typed field catalog;</li>
 <li>requested products must be scientifically compatible with field locations;</li>
 <li>changing products, layouts, masks, weighting, or schedule starts a new named window; and</li>
@@ -235,7 +229,7 @@ $(function() {
 <li>A bounded window stops at its configured end; physical-time weighting clips the final represented interval to that bound.</li>
 </ul>
 <p>Sample weighting assigns equal weight to accepted states. Physical-time weighting uses the represented interval between accepted states, including variable <code>dt</code> and a clipped final interval. <code>sample_count</code> and represented time are never inferred from the global timestep number.</p>
-<p>The precise endpoint quadrature rule and closing-event behavior must be fixed in the Phase 2 implementation spec and validated with analytic variable-step signals before the YAML is released.</p>
+<p>The precise endpoint quadrature rule and closing-event behavior are fixed in <a class="el" href="60_Field_Statistics_Phase2_Implementation_Specification.html">Field Statistics Phase 2 Implementation Specification</a>: physical-time weighting uses the right-rectangle rule, so an accepted state carries the interval ending at it, and a bounded window clips its final interval to the requested end. A state representing a zero-length interval is not a sample, which makes initial-state handling identical under both weightings and removes the need for a user control.</p>
 <h1><a class="anchor" id="p58_centered_sec"></a>
 7. Centered Accumulator Contract</h1>
 <p>For a scalar sample <code>x</code> with positive weight <code>w</code>, a point stores sample count, total weight <code>W</code>, optional squared-weight sum <code>W2</code>, mean <code>mu</code>, and centered second-moment sum <code>M2</code>. The stable weighted update is:</p>
@@ -272,7 +266,7 @@ S_x=W\mu,\qquad Q_{xx}=M_2+W\mu^2.
 <h1><a class="anchor" id="p58_spatial_sec"></a>
 9. Spatial Targets and Future Bins</h1>
 <p>The first implementation is pointwise because it preserves the greatest spatial information: one centered state at every valid source location. Postprocessing can merge those states with volume or area measures to produce many spatial summaries without rerunning the solve.</p>
-<p>The backend must nevertheless use a general <code>SpatialTargetPlan</code> abstraction. Its initial pointwise mapping is the identity mapping from a physical location to its accumulator. Later implementations may map locations into:</p>
+<p>The backend must nevertheless use a general <code><a class="el" href="statistics__target_8h.html#structSpatialTargetPlan" title="Resolved iteration domain for one field on one block.">SpatialTargetPlan</a></code> abstraction. Its initial pointwise mapping is the identity mapping from a physical location to its accumulator. Later implementations may map locations into:</p>
 <ul>
 <li>one global domain bin;</li>
 <li>one bin per computational or physical-coordinate profile layer;</li>
@@ -317,7 +311,15 @@ saved accumulator scientifically the same window state requested now?"</p>
 <div class="line">    position.dat</div>
 <div class="line">    velocity.dat</div>
 <div class="line">    ...catalogued restart fields...</div>
+<div class="line">  statistics/                # only when a field-statistics window is configured</div>
+<div class="line">    window_0000/</div>
+<div class="line">      block_0000/</div>
+<div class="line">        count.dat</div>
+<div class="line">        weight.dat</div>
+<div class="line">        weight_sq.dat</div>
+<div class="line">        ...one payload per accumulated mean, product, and co-moment...</div>
 </div><!-- fragment --><p>The format identity in metadata is <code>picurv-checkpoint</code>, version 1. <code>picurv</code> is the project name in the format identifier; it is not a new binary encoding. Every <code>.dat</code> payload remains an ordinary PETSc binary vector and is written and read through the existing generic field/swarm I/O functions. Eulerian vectors use natural ordering, so compatible grid data are independent of the MPI decomposition used to write them.</p>
+<p>Statistics payloads are block scoped like Eulerian ones, with a window level above the block level, because each named window owns independent accumulator state on every block. Their exact layout, naming, and per-window metadata are fixed in <a class="el" href="60_Field_Statistics_Phase2_Implementation_Specification.html">Field Statistics Phase 2 Implementation Specification</a> section 9.</p>
 <p>Eulerian payloads are block scoped: each block writes its own <code>eulerian/block_%04d</code> subdirectory and each inventory entry records its block index. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> payloads are deliberately <b>not</b> block scoped. PICurv carries a single swarm for the whole simulation rather than one swarm per block, so <code>particles/</code> sits directly under the bundle root and its inventory entries record block <code>-1</code>, meaning "not owned by any single block". This is a stated limitation of version 1 of the format rather than an oversight. Introducing per-block swarms would require an additional directory level and a format version bump, exactly as the Eulerian side already carries.</p>
 <p><code>checkpoint.meta</code> is a small PETSc-options text manifest. It records at least:</p>
 <ul>

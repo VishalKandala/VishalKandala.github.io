@@ -21,11 +21,12 @@ var searchData=
   ['boundary_5ffaces_18',['boundary_faces',['../variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443',1,'UserCtx']]],
   ['boundaryclampcount_19',['boundaryClampCount',['../variables_8h.html#a3d9a093e9ab28579a523e6223a69fc9d',1,'SearchMetricsState']]],
   ['boundaryvelocitycorrection_20',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
-  ['brownianmotionrng_21',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
-  ['buffer_22',['buffer',['../checksum_8h.html#a0e753b2664a8fac25a8479718219d15b',1,'PicurvSHA256Context']]],
-  ['buffer_5fsize_23',['buffer_size',['../checksum_8h.html#ae3c53e90107269943a7b104539f0a2f8',1,'PicurvSHA256Context']]],
-  ['bulkvelocitycorrection_24',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
-  ['bvel_5fu_25',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
-  ['bvel_5fv_26',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
-  ['bvel_5fw_27',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
+  ['bounded_21',['bounded',['../statistics__window_8h.html#abbbfbb9677ef438e4b3478f09c4a5731',1,'PicurvWindowDefinition']]],
+  ['brownianmotionrng_22',['BrownianMotionRNG',['../variables_8h.html#acb97fc86ee6b50390ccecc269b734023',1,'SimCtx']]],
+  ['buffer_23',['buffer',['../checksum_8h.html#a0e753b2664a8fac25a8479718219d15b',1,'PicurvSHA256Context']]],
+  ['buffer_5fsize_24',['buffer_size',['../checksum_8h.html#ae3c53e90107269943a7b104539f0a2f8',1,'PicurvSHA256Context']]],
+  ['bulkvelocitycorrection_25',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
+  ['bvel_5fu_26',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
+  ['bvel_5fv_27',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
+  ['bvel_5fw_28',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
 ];

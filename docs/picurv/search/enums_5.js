@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['lesmodeltype_0',['LESModelType',['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2',1,'variables.h']]],
-  ['loglevel_1',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
+  ['initialconditionfield_0',['InitialConditionField',['../variables_8h.html#ad06cc90e2fd10f213e50fa675ae956b1',1,'variables.h']]],
+  ['initialconditionmode_1',['InitialConditionMode',['../variables_8h.html#ac32580406a549b6a79d66cd4efbc9191',1,'variables.h']]],
+  ['interpolationmethod_2',['InterpolationMethod',['../variables_8h.html#aa0081e804011c551ea0f4a596a64b284',1,'variables.h']]]
 ];

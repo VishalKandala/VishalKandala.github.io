@@ -8,6 +8,7 @@ var searchData=
   ['solutionconvergencedeterministicpass2_5',['SolutionConvergenceDeterministicPass2',['../logging_8c.html#structSolutionConvergenceDeterministicPass2',1,'']]],
   ['solvemonitorctx_6',['SolveMonitorCtx',['../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveMonitorCtx',1,'']]],
   ['solveresult_7',['SolveResult',['../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveResult',1,'']]],
-  ['stablecflresult_8',['StableCFLResult',['../test__momentum__convective__candidates_8c.html#structStableCFLResult',1,'']]],
-  ['surfelmtinfo_9',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
+  ['spatialtargetplan_8',['SpatialTargetPlan',['../statistics__target_8h.html#structSpatialTargetPlan',1,'']]],
+  ['stablecflresult_9',['StableCFLResult',['../test__momentum__convective__candidates_8c.html#structStableCFLResult',1,'']]],
+  ['surfelmtinfo_10',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
 ];

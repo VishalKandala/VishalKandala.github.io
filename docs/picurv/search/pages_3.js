@@ -1,28 +1,8 @@
 var searchData=
 [
-  ['c_20runtime_20execution_20map_0',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
-  ['c_20test_20suite_20developer_20guide_1',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
-  ['capabilities_20summary_2',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['case_20yaml_3',['Configuration Reference: Case YAML',['../07_Case_Reference.html',1,'']]],
-  ['catalog_4',['Field Identity and Layout Catalog',['../56_Field_Identity_and_Layout_Catalog.html',1,'']]],
-  ['cell_20and_20variable_20architecture_20guide_5',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
-  ['changelog_6',['Changelog',['../18_Changelog.html',1,'']]],
-  ['channel_7',['channel',['../03_Tutorial_File-Based_Grid.html',1,'Tutorial: Using a File-Based Grid (Bent Channel)'],['../02_Tutorial_Programmatic_Grid.html',1,'Tutorial: Your First Simulation (Flat Channel)']]],
-  ['cluster_20run_20guide_20slurm_8',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['code_20architecture_9',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
-  ['common_20fatal_20errors_20and_20fixes_10',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
-  ['condition_20modes_11',['Initial Condition Modes',['../33_Initial_Conditions.html',1,'']]],
-  ['conditions_20guide_12',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]],
-  ['conductor_20script_3a_20picurv_13',['The Conductor Script: picurv',['../05_The_Conductor_Script.html',1,'']]],
-  ['config_20cookbook_14',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
-  ['configuration_20contract_20yaml_20generated_20artifacts_20runtime_15',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['configuration_20extension_20playbook_16',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
-  ['configuration_20reference_3a_20case_20yaml_17',['Configuration Reference: Case YAML',['../07_Case_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20monitor_20yaml_18',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20postprocessor_20yaml_19',['Configuration Reference: Postprocessor YAML',['../10_Post_Processing_Reference.html',1,'']]],
-  ['configuration_20reference_3a_20solver_20yaml_20',['Configuration Reference: Solver YAML',['../08_Solver_Reference.html',1,'']]],
-  ['contract_20yaml_20generated_20artifacts_20runtime_21',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['cookbook_22',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
-  ['coupling_20overview_23',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
-  ['curvib_20method_20overview_24',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
+  ['backlog_20and_20low_20priority_20fixes_0',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
+  ['based_20grid_20bent_20channel_1',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['bent_20channel_2',['Tutorial: Using a File-Based Grid (Bent Channel)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['boundaries_3',['Geometric Periodic Boundaries',['../p54_geometric_periodic.html',1,'']]],
+  ['boundary_20conditions_20guide_4',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]]
 ];

@@ -18,6 +18,10 @@ var searchData=
   ['walltimeguardwarmupaverageseconds_15',['walltimeGuardWarmupAverageSeconds',['../variables_8h.html#ac26d484064518f2755717d8bd3acfcf8',1,'SimCtx']]],
   ['walltimeguardwarmupsteps_16',['walltimeGuardWarmupSteps',['../variables_8h.html#a9e55b50656b415ceb01e424a80e8c003',1,'SimCtx']]],
   ['walltimeguardwarmuptotalseconds_17',['walltimeGuardWarmupTotalSeconds',['../variables_8h.html#a30648fac102d9e7ac7077a1f36208a2f',1,'SimCtx']]],
-  ['weights_18',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
-  ['wing_19',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]]
+  ['want_5fsecond_18',['want_second',['../statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41',1,'PicurvWindowFieldRequest']]],
+  ['weight_19',['weight',['../statistics__accumulator_8h.html#a04a25a1b0dc80a0a3bd07a1d22fafd0e',1,'PicurvWindowStorage::weight'],['../statistics__moments_8h.html#a39ddefed36bfd498511eac3b5e834186',1,'PicurvMomentState::weight'],['../statistics__moments_8h.html#acaa5291a6fc821cdeee2bcca861e1851',1,'PicurvCoMomentState::weight']]],
+  ['weight_5fsq_20',['weight_sq',['../statistics__accumulator_8h.html#a17c14364b590e3237fd757999ef0ad49',1,'PicurvWindowStorage::weight_sq'],['../statistics__moments_8h.html#a1142c512a49eeac30d501ad05eee9c59',1,'PicurvMomentState::weight_sq'],['../statistics__moments_8h.html#a1e37ac45763a57616ecb7fa1d68fe6be',1,'PicurvCoMomentState::weight_sq']]],
+  ['weighting_21',['weighting',['../statistics__window_8h.html#aff366ea4b51210605ba10041a7ecafa1',1,'PicurvWindowDefinition']]],
+  ['weights_22',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
+  ['wing_23',['wing',['../variables_8h.html#aff67a9b22db3995c8a1acf0ccbcb3eb7',1,'SimCtx']]]
 ];

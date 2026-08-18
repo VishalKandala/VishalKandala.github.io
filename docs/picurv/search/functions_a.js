@@ -6,7 +6,7 @@ var searchData=
   ['list_5fsource_5fbinaries_3',['list_source_binaries',['../namespacepicurv__cli_1_1core.html#a94d5849116030a4637a63153d22ac052',1,'picurv_cli::core']]],
   ['list_5ftemplate_5frelative_5ffiles_4',['list_template_relative_files',['../namespacepicurv__cli_1_1core.html#a10cdd05293d1418226f24ab702841fe1',1,'picurv_cli::core']]],
   ['load_5fcase_5forigin_5fmetadata_5',['load_case_origin_metadata',['../namespacepicurv__cli_1_1core.html#ae1b43fd9939cb4acbacaf6e53c34e1f5',1,'picurv_cli::core']]],
-  ['load_5fmanifest_6',['load_manifest',['../namespaceaudit__ingress.html#a84eaf118b04f5e4753eb67d9911d166d',1,'audit_ingress']]],
+  ['load_5fmanifest_6',['load_manifest',['../namespaceaudit__ingress.html#affa688ebbd6781373661db682b4c1db3',1,'audit_ingress']]],
   ['load_5fruntime_5fexecution_5fconfig_7',['load_runtime_execution_config',['../namespacepicurv__cli_1_1core.html#ad301024f93226ba505b10d9abded23ef',1,'picurv_cli::core']]],
   ['loadallowedfunctionsfromfile_8',['loadallowedfunctionsfromfile',['../logging_8h.html#a6c0ddc8d3a828f3ab26c557ba0aedf75',1,'LoadAllowedFunctionsFromFile(const char filename[], char ***funcsOut, PetscInt *nOut):&#160;logging.c'],['../logging_8c.html#a6c0ddc8d3a828f3ab26c557ba0aedf75',1,'LoadAllowedFunctionsFromFile(const char filename[], char ***funcsOut, PetscInt *nOut):&#160;logging.c']]],
   ['loadinitialucont_9',['LoadInitialUcont',['../initialcondition_8c.html#a647ac733a35218cfd0582b68df0caf60',1,'initialcondition.c']]],
@@ -15,7 +15,7 @@ var searchData=
   ['locateparticleorfindmigrationtarget_12',['locateparticleorfindmigrationtarget',['../walkingsearch_8h.html#a185fb4b04004f734e515310527e63e40',1,'LocateParticleOrFindMigrationTarget(UserCtx *user, Particle *particle, ParticleLocationStatus *status_out):&#160;walkingsearch.c'],['../walkingsearch_8c.html#a185fb4b04004f734e515310527e63e40',1,'LocateParticleOrFindMigrationTarget(UserCtx *user, Particle *particle, ParticleLocationStatus *status_out):&#160;walkingsearch.c']]],
   ['log_5fcell_5fvertices_13',['log_cell_vertices',['../logging_8h.html#ad2278570e8ce1a71bb269a51f9a20d88',1,'LOG_CELL_VERTICES(const Cell *cell, PetscMPIInt rank):&#160;logging.c'],['../logging_8c.html#ad2278570e8ce1a71bb269a51f9a20d88',1,'LOG_CELL_VERTICES(const Cell *cell, PetscMPIInt rank):&#160;logging.c']]],
   ['log_5fcontinuity_5fmetrics_14',['log_continuity_metrics',['../logging_8h.html#ab2315d3303d45c97ca55836603a8acd3',1,'LOG_CONTINUITY_METRICS(UserCtx *user):&#160;logging.c'],['../logging_8c.html#ab2315d3303d45c97ca55836603a8acd3',1,'LOG_CONTINUITY_METRICS(UserCtx *user):&#160;logging.c']]],
-  ['log_5fcorner_5ffield_5fanatomy_15',['log_corner_field_anatomy',['../logging_8h.html#a21b463324f964418994c7ccba91c9374',1,'LOG_CORNER_FIELD_ANATOMY(UserCtx *user, const char *stage_name):&#160;logging.c'],['../logging_8c.html#a21b463324f964418994c7ccba91c9374',1,'LOG_CORNER_FIELD_ANATOMY(UserCtx *user, const char *stage_name):&#160;logging.c']]],
+  ['log_5fcorner_5ffield_5fanatomy_15',['log_corner_field_anatomy',['../logging_8h.html#ab30503f15add1fc0cb8b1832d91d117a',1,'LOG_CORNER_FIELD_ANATOMY(UserCtx *user, FieldId corner_field_id, const char *stage_name):&#160;logging.c'],['../logging_8c.html#ab30503f15add1fc0cb8b1832d91d117a',1,'LOG_CORNER_FIELD_ANATOMY(UserCtx *user, FieldId corner_field_id, const char *stage_name):&#160;logging.c']]],
   ['log_5fface_5fdistances_16',['log_face_distances',['../logging_8h.html#a9baaed9103be8264832b39c7dbb2ce1a',1,'LOG_FACE_DISTANCES(PetscReal *d):&#160;logging.c'],['../logging_8c.html#a9baaed9103be8264832b39c7dbb2ce1a',1,'LOG_FACE_DISTANCES(PetscReal *d):&#160;logging.c']]],
   ['log_5ffield_5fanatomy_17',['log_field_anatomy',['../logging_8h.html#aba2c470ea56d1294d379ea05b8200620',1,'LOG_FIELD_ANATOMY(UserCtx *user, FieldId field_id, const char *stage_name):&#160;logging.c'],['../logging_8c.html#aba2c470ea56d1294d379ea05b8200620',1,'LOG_FIELD_ANATOMY(UserCtx *user, FieldId field_id, const char *stage_name):&#160;logging.c']]],
   ['log_5ffield_5fmin_5fmax_18',['log_field_min_max',['../logging_8h.html#a068287aa1fb3992a4bedcb4f97699874',1,'LOG_FIELD_MIN_MAX(UserCtx *user, FieldId field_id):&#160;logging.c'],['../logging_8c.html#a068287aa1fb3992a4bedcb4f97699874',1,'LOG_FIELD_MIN_MAX(UserCtx *user, FieldId field_id):&#160;logging.c']]],
@@ -29,5 +29,6 @@ var searchData=
   ['logfindcolumnindex_26',['LogFindColumnIndex',['../test__logging_8c.html#ac4931effe3a9e59b7c371cdd29765706',1,'test_logging.c']]],
   ['loggetcolumnint_27',['LogGetColumnInt',['../test__logging_8c.html#addc90004395f95fcad0aa50a4a5d3aae',1,'test_logging.c']]],
   ['loggetcolumnreal_28',['LogGetColumnReal',['../test__logging_8c.html#ad1aa93a711750b0710bc98058401387b',1,'test_logging.c']]],
-  ['loggetcolumntext_29',['LogGetColumnText',['../test__logging_8c.html#a0d02a43756e92a77f54289f0b1883f95',1,'test_logging.c']]]
+  ['loggetcolumntext_29',['LogGetColumnText',['../test__logging_8c.html#a0d02a43756e92a77f54289f0b1883f95',1,'test_logging.c']]],
+  ['logresolvedwindow_30',['LogResolvedWindow',['../statistics__config_8c.html#a7c5a4551c99abb5f5aa6eb139c4808ca',1,'statistics_config.c']]]
 ];

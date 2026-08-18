@@ -7,8 +7,17 @@ var searchData=
   ['picurv_5fcheckpoints_5fdirectory_4',['PICURV_CHECKPOINTS_DIRECTORY',['../io_8c.html#a24aa24cdb3cb35a947401d51a1232aa8',1,'io.c']]],
   ['picurv_5feulerian_5fdirectory_5',['PICURV_EULERIAN_DIRECTORY',['../io_8c.html#ae34bd66f9f3b5ee82dbbf90f9445ed7a',1,'io.c']]],
   ['picurv_5fparticle_5fdirectory_6',['PICURV_PARTICLE_DIRECTORY',['../io_8c.html#a2bdd0578305954ae0cc00a427c3d31ae',1,'io.c']]],
-  ['picurv_5ftest_5ferr_5fenvironment_7',['PICURV_TEST_ERR_ENVIRONMENT',['../test__install__check_8c.html#a99c268433ad99616cf4cf2a0eeba1285',1,'test_install_check.c']]],
-  ['piecewiselinearinterpolation_8',['PieceWiseLinearInterpolation',['../interpolation_8h.html#ab36f15645b4460e25ec6ace7aba17dd8',1,'interpolation.h']]],
-  ['profile_5ffunction_5fbegin_9',['PROFILE_FUNCTION_BEGIN',['../logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e',1,'logging.h']]],
-  ['profile_5ffunction_5fend_10',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]]
+  ['picurv_5fstatistics_5fdirectory_7',['PICURV_STATISTICS_DIRECTORY',['../io_8c.html#a358214bfe34712e3e058eae82329b0a3',1,'io.c']]],
+  ['picurv_5fstatistics_5ffluid_5fthreshold_8',['PICURV_STATISTICS_FLUID_THRESHOLD',['../statistics__target_8h.html#a0c88deefc249a4667d22a2a37a175fd0',1,'statistics_target.h']]],
+  ['picurv_5fstatistics_5fpayload_5fname_5flength_9',['PICURV_STATISTICS_PAYLOAD_NAME_LENGTH',['../statistics__accumulator_8h.html#a128561af1eb17563de339a0562d8adbc',1,'statistics_accumulator.h']]],
+  ['picurv_5fstatistics_5frequire_10',['PICURV_STATISTICS_REQUIRE',['../io_8c.html#af8eadfa0f780f12a449f8d78f2f32a13',1,'io.c']]],
+  ['picurv_5fstatistics_5fvariance_5ffloor_11',['PICURV_STATISTICS_VARIANCE_FLOOR',['../statistics__accumulator_8h.html#a3bfc996cc9a6910ddaba8b2cd2cb4301',1,'statistics_accumulator.h']]],
+  ['picurv_5ftest_5ferr_5fenvironment_12',['PICURV_TEST_ERR_ENVIRONMENT',['../test__install__check_8c.html#a99c268433ad99616cf4cf2a0eeba1285',1,'test_install_check.c']]],
+  ['picurv_5fwindow_5fhash_5fgroup_5fcount_13',['PICURV_WINDOW_HASH_GROUP_COUNT',['../statistics__window_8h.html#a2a82a031074f5c3dd347e92f4eabc3f7',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fhash_5fgroup_5flength_14',['PICURV_WINDOW_HASH_GROUP_LENGTH',['../statistics__window_8h.html#a34061814a8f2d50b1953ff98e5491b1a',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fmax_5frequests_15',['PICURV_WINDOW_MAX_REQUESTS',['../statistics__window_8h.html#aeb05becae7bb23ba8ffbef68ce6f00c0',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fname_5flength_16',['PICURV_WINDOW_NAME_LENGTH',['../statistics__window_8h.html#a941bf9e9e702ab5685723ded07e8b860',1,'statistics_window.h']]],
+  ['piecewiselinearinterpolation_17',['PieceWiseLinearInterpolation',['../interpolation_8h.html#ab36f15645b4460e25ec6ace7aba17dd8',1,'interpolation.h']]],
+  ['profile_5ffunction_5fbegin_18',['PROFILE_FUNCTION_BEGIN',['../logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e',1,'logging.h']]],
+  ['profile_5ffunction_5fend_19',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]]
 ];
