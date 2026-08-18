@@ -91,22 +91,24 @@ $(function() {
 <li class="level1"><a href="#p57_branch_sec">5. Branch Policy</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Future_Architecture_Specifications"></a> This page records phased architectural direction and is retained for explicit review and approval. It prevents design decisions from being lost between independently reviewed branches. A specification on this page is not a statement that its YAML or file format is currently accepted by PICurv.</p>
+<div class="textblock"><p><a class="anchor" id="_Future_Architecture_Specifications"></a> This page indexes architectural work that is proposed rather than built, and records the dependency order between the pieces. It prevents design decisions from being lost between independently reviewed branches.</p>
+<p>Being listed here is not a statement that a YAML or file format is accepted. The status column is authoritative: a specification is proposed until its own page says otherwise.</p>
 <h1><a class="anchor" id="p57_status_sec"></a>
 1. Status and Dependency Order</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Specification   </th><th class="markdownTableHeadNone">Status   </th><th class="markdownTableHeadNone">Dependency    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a>   </td><td class="markdownTableBodyNone">implemented on <code>main</code>   </td><td class="markdownTableBodyNone">none    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a>   </td><td class="markdownTableBodyNone">implemented   </td><td class="markdownTableBodyNone">none    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a>   </td><td class="markdownTableBodyNone">Phase 1 implemented, awaiting review and merge; Phase 2 specified but not implemented   </td><td class="markdownTableBodyNone">field catalog    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="58_Field_Statistics.html">Field Statistics</a>   </td><td class="markdownTableBodyNone">implemented   </td><td class="markdownTableBodyNone">field catalog    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Phase2_Implementation_Specification.html">Field Statistics Phase 2 Implementation Specification</a>   </td><td class="markdownTableBodyNone">specification complete, awaiting implementation   </td><td class="markdownTableBodyNone">statistics pipeline    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a>   </td><td class="markdownTableBodyNone">proposed   </td><td class="markdownTableBodyNone">field statistics    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a>   </td><td class="markdownTableBodyNone">deferred, independently benchmarked   </td><td class="markdownTableBodyNone">none   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a>   </td><td class="markdownTableBodyNone">deferred, benchmark-gated   </td><td class="markdownTableBodyNone">none   </td></tr>
 </table>
-<p>The field-catalog phase established typed Eulerian and particle identities, layout metadata, and existing-vector views without changing vector ownership. That is the required correctness foundation for statistics on shifted, face-centered, and component-staggered fields.</p>
+<p>The typed field catalog established Eulerian and particle identities, layout metadata, and non-owning views over existing vectors without changing vector ownership. That is the correctness foundation statistics rely on for shifted, face-centered, and component-staggered fields, which is why it had to land first.</p>
+<p>Field statistics build directly on it and are implemented; what remains proposed for that subsystem is indexed at <b><a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a></b>, which carries its own dependency order.</p>
 <h1><a class="anchor" id="p57_rules_sec"></a>
 2. Rules Shared by Future Work</h1>
 <p>Future architectural work must:</p>
@@ -122,9 +124,9 @@ $(function() {
 <p>Strings remain correct at true ingress and presentation boundaries. Runtime systems resolve them once into the typed identity appropriate to that system; PICurv does not use one universal ID namespace for fields, functions, boundary handlers, and postprocessing operations.</p>
 <h1><a class="anchor" id="p57_stats_summary_sec"></a>
 3. Statistics Direction</h1>
-<p>The statistics work will add reusable completed-state scheduling and field-layout-aware reducers shared where useful by scientific statistics and rolling physical-solution monitoring. It will preserve existing logger formats and PETSc monitors, accumulate numerically stable centered primitive moments online, and derive Reynolds stresses, RMS, TKE, turbulent fluxes, and normalized outputs in postprocessing.</p>
-<p>The current Phase 1 foundation keeps <code>control</code> as the single generated C-ingress artifact, moves convergence policy to <code>monitor.yml -&gt; solution_monitoring.convergence</code>, and removes rather than wraps the legacy <code>-averaging</code>/<code>su*</code> system. It deliberately exposes no scientific window YAML before the accumulator, checkpoint, and postprocessor path is usable. The committed-checkpoint contract and its coordinator, validator, and restart discovery are implemented, which completes Phase 1.</p>
-<p>The authoritative design, YAML placement, checkpoint naming, restart rules, and implementation phases are in <b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b>. The Phase 2 implementation contracts, settled quadrature rule, ingress scheme, and staged plan are in <b><a class="el" href="60_Field_Statistics_Phase2_Implementation_Specification.html">Field Statistics Phase 2 Implementation Specification</a></b>.</p>
+<p>Field statistics are implemented. Windows accumulate numerically stable centered moments online, ride in the committed checkpoint bundle, resume on continuation, and are derived into Reynolds stresses, RMS, turbulent kinetic energy, and fluxes in post-processing. The contract is at <b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b>.</p>
+<p>The direction the remaining work follows is a shared, field-layout-aware reducer: the same traversal serving spatial targets, reduced statistics, and eventually the rolling physical-solution monitor, instead of one implementation per consumer. That replacement is permitted only where tests demonstrate identical results. Existing logger formats and PETSc monitors are preserved throughout.</p>
+<p>The proposed extensions and their dependency order are at <b><a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a></b>.</p>
 <h1><a class="anchor" id="p57_functions_summary_sec"></a>
 4. Function Identity Direction</h1>
 <p>Function logging/profiling identity is deliberately separate. It may replace repeated function-name scans with compile-time IDs or cached handles only after benchmarks show that the lookup overhead is material. It does not block the statistics pipeline. See <b><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a></b>.</p>

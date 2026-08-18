@@ -88,9 +88,10 @@ $(function() {
 <li class="level1"><a href="#p10_run_control_sec">2. run_control</a></li>
 <li class="level1"><a href="#p10_source_sec">3. source_data</a></li>
 <li class="level1"><a href="#p10_pipelines_sec">4. Processing Pipelines</a></li>
-<li class="level1"><a href="#p10_stats_sec">5. Statistics Pipeline</a></li>
-<li class="level1"><a href="#p10_io_sec">6. io</a></li>
-<li class="level1"><a href="#p10_next_steps_sec">7. Next Steps</a><ul><li class="level2"><a href="#autotoc_md35">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md36">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p10_stats_sec">5. Particle Statistics Pipeline</a></li>
+<li class="level1"><a href="#p10_field_stats_sec">6. field_statistics</a></li>
+<li class="level1"><a href="#p10_io_sec">7. io</a></li>
+<li class="level1"><a href="#p10_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md35">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md36">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md37">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -216,6 +217,42 @@ statistics_pipeline:
 # specify the statistics CSV prefix. Use statistics_pipeline.output_prefix instead.
 # statistics_output_prefix: "Stats"
 
+# --- Eulerian Field Statistics Recipe ---
+# Derives saved accumulator state into scientific turbulence quantities. This is
+# a separate contract from statistics_pipeline above: that one reduces particle
+# trajectories, this one reads the field windows the solver accumulated through
+# monitor.yml -&gt; field_statistics.
+#
+# The recipe names windows rather than redescribing them, because the window
+# definitions already reach the post-processor through the run's solver control.
+# Omit this block to derive nothing.
+# field_statistics:
+#   # Window names, matching monitor.yml. Each window writes its own files, so a
+#   # name may not be repeated.
+#   windows: ["production"]
+#
+#   # Read every window's state from this step instead of from the step being
+#   # processed. Omit to follow the processed step, which is what makes the CSV
+#   # a convergence history rather than one row repeated.
+#   # source_step: 4000
+#
+#   # Which derived quantities to write. Each resolves against what the window
+#   # actually accumulated: a window keeping only first moments has no stresses,
+#   # RMS, or TKE to give, and a recipe that would produce an empty file is
+#   # rejected before the run rather than after it.
+#   #   mean            -&gt; the window mean of every accumulated field
+#   #   reynolds_stress -&gt; centered second moments; six components for a vector
+#   #   rms             -&gt; per-component root mean square of the fluctuation
+#   #   tke             -&gt; turbulent kinetic energy, for vector fields
+#   #   flux            -&gt; the cross-field co-moments listed under covariances
+#   outputs: ["mean", "reynolds_stress", "rms", "tke", "flux"]
+#
+#   # vtk writes the derived fields as one .vts per window per processed step.
+#   # csv appends one row per processed step to a per-window convergence history,
+#   # recording sample count, weight, represented time, mask coverage, and the
+#   # domain-mean TKE when the window has one.
+#   formats: ["vtk", "csv"]
+
 # ==============================================================================
 # SECTION 4: OUTPUT CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -273,7 +310,7 @@ io:
     eulerian: "dat"
     particle: "dat"
 </pre><p><code>post.yml</code> defines postprocessing input range, processing pipelines, statistics tasks, and VTK output selection.</p>
-<p>The current <code>statistics_pipeline</code> is the particle-reduction path. The proposed online Eulerian field-statistics system will use a separate <code>field_statistics</code> recipe so particle MSD and resolved turbulence statistics are not conflated. That future contract is specified in <b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> and is not yet implemented.</p>
+<p>It carries two separate statistics contracts, which are deliberately not combined. <code>statistics_pipeline</code> reduces particle trajectories; <code>field_statistics</code> derives the Eulerian field windows the solver accumulated. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD and resolved turbulence statistics answer different questions and share no state.</p>
 <h1><a class="anchor" id="p10_structure_sec"></a>
 1. File Structure</h1>
 <div class="fragment"><div class="line">run_control:</div>
@@ -302,6 +339,11 @@ io:
 <div class="line">  output_prefix: &quot;Stats&quot;</div>
 <div class="line">  tasks:</div>
 <div class="line">    - task: msd</div>
+<div class="line"> </div>
+<div class="line">field_statistics:</div>
+<div class="line">  windows: [production]</div>
+<div class="line">  outputs: [mean, reynolds_stress, rms, tke, flux]</div>
+<div class="line">  formats: [vtk, csv]</div>
 <div class="line"> </div>
 <div class="line">io:</div>
 <div class="line">  output_directory: &quot;viz&quot;</div>
@@ -344,7 +386,8 @@ io:
 <li><code>specific_ke</code> -&gt; <code>ComputeSpecificKE:&lt;in&gt;&gt;&lt;out&gt;</code></li>
 </ul>
 <h1><a class="anchor" id="p10_stats_sec"></a>
-5. Statistics Pipeline</h1>
+5. Particle Statistics Pipeline</h1>
+<p>This is the particle-reduction path. For Eulerian turbulence statistics see <a class="el" href="10_Post_Processing_Reference.html#p10_field_stats_sec">6. field_statistics</a>.</p>
 <p><code>statistics_pipeline</code> supports either:</p><ul>
 <li>list form, or</li>
 <li>mapping with <code>tasks</code> and optional <code>output_prefix</code></li>
@@ -354,8 +397,43 @@ io:
 <li>tasks -&gt; <code>statistics_pipeline</code></li>
 <li><code>output_prefix</code> -&gt; <code>statistics_output_prefix</code></li>
 </ul>
+<h1><a class="anchor" id="p10_field_stats_sec"></a>
+6. field_statistics</h1>
+<p>Derives the accumulated field windows configured at <code>monitor.yml -&gt; field_statistics</code> into scientific turbulence quantities. Omit the block to derive nothing.</p>
+<div class="fragment"><div class="line">field_statistics:</div>
+<div class="line">  windows: [production]</div>
+<div class="line">  source_step: 4000        # optional; defaults to the step being processed</div>
+<div class="line">  outputs: [mean, reynolds_stress, rms, tke, flux]</div>
+<div class="line">  formats: [vtk, csv]</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>windows</code> -&gt; <code>field_statistics_windows</code></li>
+<li><code>outputs</code> -&gt; <code>field_statistics_outputs</code></li>
+<li><code>formats</code> -&gt; <code>field_statistics_formats</code></li>
+<li><code>source_step</code> -&gt; <code>field_statistics_source_step</code></li>
+</ul>
+<p>The recipe <b>names</b> windows rather than redescribing them. The post-processor is launched with the run's own control file and resolves the window definitions through the same parser the solver used, so there is no second description to fall out of step with the first.</p>
+<p>Available outputs, each resolved against what the window actually accumulated:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Output   </th><th class="markdownTableHeadNone">Produces   </th><th class="markdownTableHeadNone">Requires    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>mean</code>   </td><td class="markdownTableBodyNone">the window mean of every accumulated field   </td><td class="markdownTableBodyNone">—    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>reynolds_stress</code>   </td><td class="markdownTableBodyNone">centered second moments; six components for a vector   </td><td class="markdownTableBodyNone"><code>moments: [second]</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>rms</code>   </td><td class="markdownTableBodyNone">per-component root mean square of the fluctuation   </td><td class="markdownTableBodyNone"><code>moments: [second]</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>tke</code>   </td><td class="markdownTableBodyNone">turbulent kinetic energy   </td><td class="markdownTableBodyNone"><code>moments: [second]</code> on a vector    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>flux</code>   </td><td class="markdownTableBodyNone">the cross-field co-moments   </td><td class="markdownTableBodyNone">a <code>covariances</code> entry   </td></tr>
+</table>
+<p>A recipe that would produce an empty file — asking for <code>rms</code> from a window that kept only first moments, for instance — is rejected before the run rather than after it.</p>
+<p><code>vtk</code> writes one <code>.vts</code> per window per processed step. <code>csv</code> appends one row per processed step to a per-window convergence history recording sample count, accumulated weight, represented time, mask coverage, and the domain-mean TKE. The CSV is what answers whether a window has run long enough; no single snapshot can.</p>
+<p>Because the pipeline runs once per processed step, a recipe spanning a range produces a history. Pinning <code>source_step</code> reads every processed step's output from that one bundle instead, collapsing the history to a single answer.</p>
+<p>Each window writes its own files, so a window name may not be listed twice.</p>
+<p><b>Derived statistics are not dimensionalized</b>, even under <code>global_operations.dimensionalize</code>. A Reynolds stress scales as velocity squared and a co-moment as the product of two different scales, and the per-field scaling table expresses neither. See <a class="el" href="58_Field_Statistics.html#p58_derived_sec">8. Derived Quantities and Post-Processing</a>.</p>
 <h1><a class="anchor" id="p10_io_sec"></a>
-6. io</h1>
+7. io</h1>
 <p>Mappings:</p><ul>
 <li><code>output_directory</code> + <code>output_filename_prefix</code> -&gt; <code>output_prefix</code></li>
 <li><code>output_directory</code> + <code>particle_filename_prefix</code> -&gt; <code>particle_output_prefix</code></li>
@@ -367,13 +445,13 @@ io:
 </ul>
 <p>The postprocessor reads the catalogued <code>.dat</code> PETSc vectors inventoried by each committed checkpoint; input extensions are not runtime-selectable. <code>statistics_pipeline.output_prefix</code> is independent of <code>io.output_directory</code>; bare basenames default under <code>&lt;monitor output&gt;/statistics/</code>, while explicit relative or absolute paths are preserved. When the same timestep is post-processed again, PICurv now rewrites same-step VTK/VTP outputs and rewrites same-step statistics rows so the final CSV still contains one row per step.</p>
 <h1><a class="anchor" id="p10_next_steps_sec"></a>
-7. Next Steps</h1>
+8. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> for goal-oriented recipes.</p>
 <p>For mapping and extension details:</p><ul>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
-<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> (proposed future contract)</li>
+<li><b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b> (window semantics and derived-quantity definitions)</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md35"></a>
 CFD Reader Guidance and Practical Use</h2>

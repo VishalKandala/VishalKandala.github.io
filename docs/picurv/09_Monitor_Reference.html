@@ -86,12 +86,18 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p09_solution_monitoring_sec">1. solution_monitoring</a></li>
 <li class="level1"><a href="#p09_io_sec">2. io</a></li>
-<li class="level1"><a href="#p09_logging_sec">3. logging</a></li>
+<li class="level1"><a href="#p09_field_statistics_sec">3. field_statistics</a><ul><li class="level2"><a href="#p09_fs_windows_sub">3.1 Windows</a></li>
+<li class="level2"><a href="#p09_fs_fields_sub">3.2 Fields and covariances</a></li>
+<li class="level2"><a href="#p09_fs_validation_sub">3.3 Validation</a></li>
+<li class="level2"><a href="#p09_fs_reading_sub">3.4 What a run produces</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p09_logging_sec">4. logging</a></li>
 <li class="level1"><a href="#p09_startup_banner_sec">Startup banner and solver-specific output</a></li>
-<li class="level1"><a href="#p09_profiling_sec">4. profiling</a></li>
-<li class="level1"><a href="#p09_diagnostics_sec">5. diagnostics</a></li>
-<li class="level1"><a href="#p09_solver_monitoring_sec">6. solver_monitoring</a></li>
-<li class="level1"><a href="#p09_next_steps_sec">7. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p09_profiling_sec">5. profiling</a></li>
+<li class="level1"><a href="#p09_diagnostics_sec">6. diagnostics</a></li>
+<li class="level1"><a href="#p09_solver_monitoring_sec">7. solver_monitoring</a></li>
+<li class="level1"><a href="#p09_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md34">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -211,7 +217,74 @@ solution_monitoring:
     #   window_steps: 500
 
 # ==============================================================================
-# 5. I/O AND DATA MANAGEMENT
+# 5. SCIENTIFIC FIELD STATISTICS
+#    Accumulates weighted centered moments of Eulerian fields while the solver
+#    runs, so turbulence statistics do not depend on how many instantaneous
+#    states happened to be saved. Windows are independent, are carried across a
+#    restart, and are derived into Reynolds stresses, RMS, TKE, and fluxes by
+#    post.yml -&gt; field_statistics.
+#
+#    Omit this block entirely to accumulate nothing: no storage is allocated and
+#    no statistics output is produced.
+# ==============================================================================
+field_statistics:
+  # Master switch. When false the windows below are ignored.
+  # [Boolean] -&gt; -field_statistics_enabled
+  enabled: false
+
+  # One independent accumulator per named window. A name identifies the window's
+  # saved state across a restart, so it must be unique and stable.
+  # [List] -&gt; -field_statistics_window_count
+  windows:
+    - # [String] -&gt; -field_statistics_window_&lt;i&gt;_name
+      name: "production"
+
+      # Physical time at which the window starts accumulating. The first accepted
+      # state anchors the window; it contributes no interval of its own.
+      # [Number] -&gt; -field_statistics_window_&lt;i&gt;_start_time
+      start_time: 1.0
+
+      # Physical time at which the window stops. Omit for an open-ended window
+      # that keeps accumulating until the run ends.
+      # [Number] -&gt; -field_statistics_window_&lt;i&gt;_end_time
+      # end_time: 10.0
+
+      # How an accepted state is weighted.
+      #   sample        -&gt; every accepted state counts equally
+      #   physical_time -&gt; a state is weighted by the interval it represents,
+      #                    which is what a variable timestep requires
+      # [Enum] -&gt; -field_statistics_window_&lt;i&gt;_weighting
+      weighting: "physical_time"
+
+      # Exactly one of step_cadence and time_cadence. step_cadence samples every
+      # N completed steps from activation; time_cadence takes the first state at
+      # or past each multiple of the interval.
+      # [Positive Integer] -&gt; -field_statistics_window_&lt;i&gt;_step_cadence
+      step_cadence: 10
+      # [Positive Number] -&gt; -field_statistics_window_&lt;i&gt;_time_cadence
+      # time_cadence: 0.05
+
+      # Fields to accumulate. The first moment is always kept, because every
+      # centered product is measured against it; list "second" as well to keep
+      # the centered second moment that Reynolds stresses, RMS, and TKE need.
+      # Available fields: Ucat, P, Nvert, Phi, Psi, ParticleCount, Nu_t, CS.
+      # Psi and ParticleCount require particles; Nu_t requires a turbulence
+      # model; CS requires LES. A field whose subsystem is inactive is rejected
+      # at validation rather than accumulated as zeros.
+      # [List] -&gt; -field_statistics_window_&lt;i&gt;_field_&lt;j&gt;_name / _moments
+      fields:
+        - {field: "Ucat", moments: ["first", "second"]}
+        - {field: "P", moments: ["first"]}
+
+      # Cross-field co-moments, for fluxes such as &lt;u'p'&gt;. Both members must also
+      # appear in fields above, because a co-moment is centered against their
+      # means. Pairing a field with itself belongs in moments: ["second"].
+      # [List of pairs] -&gt; -field_statistics_window_&lt;i&gt;_covariance_&lt;k&gt;
+      covariances:
+        - ["Ucat", "P"]
+
+# ==============================================================================
+# 6. I/O AND DATA MANAGEMENT
 #    Controls data file generation and locations for the SOLVER.
 # ==============================================================================
 io:
@@ -228,6 +301,13 @@ io:
   # [Non-negative Integer] -&gt; -particle_console_output_freq
   particle_console_output_frequency: 100
 
+  # Frequency for printing a one-line-per-window field-statistics snapshot into
+  # the main solver log. Reports window progress only; it never dumps field data.
+  # Snapshots also require logging.verbosity of INFO or finer. Set to 0, or omit,
+  # to disable them without affecting what is accumulated.
+  # [Non-negative Integer] -&gt; -statistics_console_output_freq
+  statistics_console_output_frequency: 100
+
   # --- Particle Tracking Row Subsampling ---
   # Within each particle console snapshot, print only every Nth particle row.
   # [Integer] -&gt; -logfreq
@@ -242,7 +322,7 @@ io:
     log: "logs"         # [string] -&gt; -log_dir
 
 # ==============================================================================
-# 6. SOLVER MONITORING
+# 7. SOLVER MONITORING
 # ==============================================================================
 #
 # This section exposes common solver-monitor controls with readable names.
@@ -276,7 +356,7 @@ solver_monitoring:
     # Boolean true emits a switch-only flag; false omits it.
     # -ps_pc_svd_monitor: true
     # -ts_monitor: true
-</pre><p><code>monitor.yml</code> controls runtime monitoring, diagnostics, profiling, and run I/O behavior. Scientific Eulerian field statistics are not exposed in the active configuration until their accumulation, checkpoint, and postprocessing path is complete end to end.</p>
+</pre><p><code>monitor.yml</code> controls runtime monitoring, diagnostics, profiling, run I/O behavior, and scientific Eulerian field statistics.</p>
 <h1><a class="anchor" id="p09_solution_monitoring_sec"></a>
 1. solution_monitoring</h1>
 <p>Physical-solution convergence uses the existing runtime monitor through this contract:</p>
@@ -295,13 +375,14 @@ solver_monitoring:
 <li>a nested block for a different mode is rejected.</li>
 </ul>
 <p>There is no <code>observations.run</code> sidecar and no observation-plan schema/version at this boundary. <code>control</code> remains the single generated C-ingress artifact for these settings.</p>
-<p>The <code>field_statistics</code> contract is designed in <b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b> and specified in <b><a class="el" href="60_Field_Statistics_Phase2_Implementation_Specification.html">Field Statistics Phase 2 Implementation Specification</a></b>. The key is accepted and accumulates online, but its postprocessing stage and its shipped template are not finished, so it is not yet a released contract and is documented only on those pages. Saved instantaneous fields remain the supported input for offline Eulerian statistics until it is.</p>
+<p>Scientific field statistics are configured separately, under <code>field_statistics</code>; see <a class="el" href="09_Monitor_Reference.html#p09_field_statistics_sec">3. field_statistics</a>. Solution monitoring answers whether the run has converged, field statistics answer what the converged flow is, and they share no state.</p>
 <p>The removed <code>case.yml -&gt; models.statistics.time_averaging</code> and <code>-averaging</code> surface is not compatible input and is not translated into a replacement workflow.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
 2. io</h1>
 <div class="fragment"><div class="line">io:</div>
 <div class="line">  data_output_frequency: 100</div>
 <div class="line">  particle_console_output_frequency: 100</div>
+<div class="line">  statistics_console_output_frequency: 100</div>
 <div class="line">  particle_log_interval: 10</div>
 <div class="line">  directories:</div>
 <div class="line">    output: &quot;output&quot;</div>
@@ -310,6 +391,7 @@ solver_monitoring:
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>data_output_frequency</code> -&gt; <code>-tio</code></li>
 <li><code>particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code></li>
+<li><code>statistics_console_output_frequency</code> -&gt; <code>-statistics_console_output_freq</code></li>
 <li><code>particle_log_interval</code> -&gt; <code>-logfreq</code></li>
 <li><code>directories.output</code> -&gt; <code>-output_dir</code></li>
 <li><code>directories.restart</code> -&gt; <code>-restart_dir</code></li>
@@ -317,15 +399,87 @@ solver_monitoring:
 </ul>
 <p>Semantics:</p><ul>
 <li><code>data_output_frequency</code> controls committed-checkpoint cadence. Initial and final completed states are also checkpointed, including an off-cadence final state.</li>
-<li>Checkpoint-internal <code>eulerian/</code>, <code>particles/</code>, and <code>statistics/</code> names are fixed and are not user configuration. See <a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html#p58_checkpoint_sec">12. Committed Checkpoint Contract</a>.</li>
+<li>Checkpoint-internal <code>eulerian/</code>, <code>particles/</code>, and <code>statistics/</code> names are fixed and are not user configuration. See <a class="el" href="58_Field_Statistics.html#p58_checkpoint_sec">7. Checkpoints, Restart, and Continuation</a>.</li>
 <li><code>statistics_console_output_frequency</code> controls how often field-statistics window snapshots are printed to the main log. It defaults to <code>data_output_frequency</code>, and <code>0</code> disables the snapshot without disabling accumulation. It is reporting only: changing it cannot change any accumulated result.</li>
 <li><code>particle_console_output_frequency</code> controls how often particle snapshots are printed to the main log.</li>
 <li><code>particle_log_interval</code> controls row subsampling within each particle snapshot.</li>
 <li>If <code>particle_console_output_frequency</code> is omitted, <code>picurv</code> defaults it to <code>data_output_frequency</code>.</li>
 <li>If <code>particle_console_output_frequency</code> is <code>0</code>, periodic particle console snapshots are disabled.</li>
 </ul>
+<h1><a class="anchor" id="p09_field_statistics_sec"></a>
+3. field_statistics</h1>
+<p>Accumulates weighted centered moments of Eulerian fields while the solver runs. Omit the block entirely to accumulate nothing: no storage is allocated and no statistics output is produced.</p>
+<div class="fragment"><div class="line">field_statistics:</div>
+<div class="line">  enabled: true</div>
+<div class="line">  windows:</div>
+<div class="line">    - name: production</div>
+<div class="line">      start_time: 50.0</div>
+<div class="line">      end_time: 250.0          # optional; open-ended when omitted</div>
+<div class="line">      weighting: physical_time # or: sample</div>
+<div class="line">      step_cadence: 10         # exactly one of step_cadence / time_cadence</div>
+<div class="line">      fields:</div>
+<div class="line">        - {field: Ucat, moments: [first, second]}</div>
+<div class="line">        - {field: P, moments: [first]}</div>
+<div class="line">      covariances:</div>
+<div class="line">        - [Ucat, P]</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>enabled</code> -&gt; <code>-field_statistics_enabled</code></li>
+<li>window count -&gt; <code>-field_statistics_window_count</code></li>
+<li>per window <code>&lt;i&gt;</code> -&gt; <code>-field_statistics_window_&lt;i&gt;_name</code>, <code>_start_time</code>, <code>_end_time</code>, <code>_weighting</code>, <code>_step_cadence</code> or <code>_time_cadence</code>, <code>_field_count</code>, <code>_field_&lt;j&gt;_name</code>, <code>_field_&lt;j&gt;_moments</code>, <code>_covariance_count</code>, <code>_covariance_&lt;k&gt;</code></li>
+</ul>
+<p><code>end_time</code> is omitted from the control file rather than given a sentinel, because its absence is what makes a window open-ended.</p>
+<h2><a class="anchor" id="p09_fs_windows_sub"></a>
+3.1 Windows</h2>
+<p>Each window is an independent average. Windows may overlap; each owns its state. The name identifies a window's saved state across a restart, so it must be unique within the file and stable across runs.</p>
+<ul>
+<li><code>start_time</code> is when the window begins. The first state at or after it anchors the window without being sampled; see <a class="el" href="58_Field_Statistics.html#p58_bounds_sub">2.2 Bounds, Clipping, and the First State</a>.</li>
+<li><code>end_time</code> is optional. A bounded window completes when it passes it and stops changing; an open window accumulates until the run ends.</li>
+<li><code>weighting</code> is <code>sample</code> (every accepted state counts equally) or <code>physical_time</code> (a state is weighted by the interval it represents). Use <code>physical_time</code> whenever the timestep can vary. On a constant timestep the two agree exactly.</li>
+<li>Exactly one of <code>step_cadence</code> (positive integer) and <code>time_cadence</code> (positive number) must be set.</li>
+</ul>
+<h2><a class="anchor" id="p09_fs_fields_sub"></a>
+3.2 Fields and covariances</h2>
+<p><code>fields</code> lists what to accumulate. The first moment is always kept, because every centered product is measured against it; adding <code>second</code> keeps the centered second moment that Reynolds stresses, RMS, and TKE are derived from.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Field   </th><th class="markdownTableHeadNone">Components   </th><th class="markdownTableHeadNone">Requires    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Ucat</code>   </td><td class="markdownTableBodyNone">3   </td><td class="markdownTableBodyNone">—    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>P</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">—    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Nvert</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">—    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Phi</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">—    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Psi</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">particles    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>ParticleCount</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">particles    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Nu_t</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">a turbulence model    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>CS</code>   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">LES   </td></tr>
+</table>
+<p><code>covariances</code> lists cross-field co-moments, such as <code>[Ucat, P]</code> for a pressure-velocity flux. A vector's own Reynolds stresses are <b>not</b> a covariance; they come from <code>moments: [second]</code> on that field.</p>
+<h2><a class="anchor" id="p09_fs_validation_sub"></a>
+3.3 Validation</h2>
+<p><code>picurv validate</code> rejects, naming the offending window:</p>
+<ul>
+<li>a duplicate window name;</li>
+<li><code>start_time</code> greater than or equal to <code>end_time</code>;</li>
+<li>neither or both of <code>step_cadence</code> and <code>time_cadence</code>, or a non-positive value;</li>
+<li><code>weighting</code> outside <code>{sample, physical_time}</code>;</li>
+<li>an empty <code>fields</code> list, a repeated field, or an empty or unknown <code>moments</code> entry;</li>
+<li>a field name that is not accumulable, or whose subsystem is inactive for the run;</li>
+<li>a covariance whose members are not both listed in <code>fields</code>, that names one field twice, that pairs two vector fields, or that is requested twice.</li>
+</ul>
+<p>Combining <code>--restart-from</code> with enabled statistics is also rejected: a branch may follow a different trajectory than the samples already collected, so the windows would silently restart from zero. Use <code>--continue</code> to resume in place, or disable statistics to branch without them.</p>
+<h2><a class="anchor" id="p09_fs_reading_sub"></a>
+3.4 What a run produces</h2>
+<p>Accumulated state is written into each committed checkpoint under <code>statistics/window_&lt;n&gt;/block_&lt;n&gt;/</code>, and is restored on <code>--continue</code>. Nothing is derived at solve time; <a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a> turns saved state into Reynolds stresses, RMS, TKE, and fluxes.</p>
+<p>While the run is live, <code>io.statistics_console_output_frequency</code> prints one line per window with its state, sample count, accumulated weight, represented time, progress, and mask coverage. <a class="el" href="58_Field_Statistics.html">Field Statistics</a> explains the semantics behind each of those numbers, and <a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a> records what is not built yet.</p>
 <h1><a class="anchor" id="p09_logging_sec"></a>
-3. logging</h1>
+4. logging</h1>
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;WARNING&quot;</div>
 <div class="line">  enabled_functions: []</div>
@@ -355,11 +509,12 @@ Startup banner and solver-specific output</h1>
 <li><code>Initial Pseudo-CFL (Courant)</code> appears only for <code>Dual Time Picard Jameson RK</code>. It is intentionally absent for <code>Newton Krylov</code> and explicit RK, where that controller is not active.</li>
 <li>Newton&ndash;Krylov iteration detail is controlled by <code>solver_monitoring.momentum</code> below and its structured solver controls are documented in <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b> and <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b>.</li>
 <li>The banner also records the effective console log level, profiling mode and final-summary setting, runtime-memory-log state, and the selected solution convergence mode. Periodic and statistical convergence modes additionally show their active period or window; those fields are omitted otherwise.</li>
+<li><code>Statistics Console Cadence</code> is always present. It reports the configured cadence, or <code>DISABLED</code> distinguishing a silenced console over accumulating windows from a run that configured none, so a log is never ambiguous about whether statistics were being collected.</li>
 </ul>
 <p>The C <code>unit-io</code> contract test verifies these conditional banner fields, while <code>unit-logging</code> verifies the logging behavior described on this page. Both are included in the runtime layer of <code>make certify-docs</code>; the GitHub documentation workflow runs the dependency-free structural documentation checks on every main push and every third day.</p>
 <p>The structural certification also runs a user-facing reporting audit. It rejects raw C console emissions outside the approved banner/logging/bootstrap/progress surfaces and verifies that the C banner plus CLI and <code>picurv summarize</code> retain their solver-specific reporting branches. The checked-in <code>tests/tooling/user_facing_reporting_contract.json</code> also declares every CLI command's parser, handler, and context marker, including submission and plot paths.</p>
 <h1><a class="anchor" id="p09_profiling_sec"></a>
-4. profiling</h1>
+5. profiling</h1>
 <div class="fragment"><div class="line">profiling:</div>
 <div class="line">  timestep_output:</div>
 <div class="line">    mode: &quot;selected&quot;</div>
@@ -381,7 +536,7 @@ Startup banner and solver-specific output</h1>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
 <h1><a class="anchor" id="p09_diagnostics_sec"></a>
-5. diagnostics</h1>
+6. diagnostics</h1>
 <p>Structured diagnostics for PETSc memory/object/function debugging plus a compact PICurv runtime memory log:</p>
 <div class="fragment"><div class="line">diagnostics:</div>
 <div class="line">  petsc:</div>
@@ -421,7 +576,7 @@ Startup banner and solver-specific output</h1>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
 </ul>
 <h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
-6. solver_monitoring</h1>
+7. solver_monitoring</h1>
 <p>Human-readable solver monitor controls. PICurv maps these keys to the raw C/PETSc flags written into the generated <code>.control</code> file:</p>
 <div class="fragment"><div class="line">solver_monitoring:</div>
 <div class="line">  momentum:</div>
@@ -455,13 +610,13 @@ Startup banner and solver-specific output</h1>
 <li>Legacy direct flag entries under <code>solver_monitoring</code> are still accepted for compatibility, but new profiles should prefer the structured form above.</li>
 </ul>
 <h1><a class="anchor" id="p09_next_steps_sec"></a>
-7. Next Steps</h1>
+8. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b>.</p>
 <p>Also see:</p><ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
-<li><b><a class="el" href="58_Turbulence_Statistics_Pipeline_Specification.html">Field Statistics Pipeline Specification</a></b></li>
+<li><b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b></li>
 </ul>
 <h2><a class="anchor" id="autotoc_md32"></a>
 CFD Reader Guidance and Practical Use</h2>

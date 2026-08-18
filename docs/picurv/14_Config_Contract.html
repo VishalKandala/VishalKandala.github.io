@@ -218,7 +218,9 @@ $(function() {
 <li><code>diagnostics.runtime_memory_log</code> -&gt; <code>-runtime_memory_log_enabled/-runtime_memory_log_file</code></li>
 <li><code>solution_monitoring.convergence.*</code> maps directly into the generated master control as the existing <code>-solution_convergence_*</code> options and retains the existing log writer. <code>enabled</code> is explicit; sampling occurs every completed timestep and has no exposed cadence option.</li>
 <li><code>control</code> remains the single generated C-ingress artifact for physical solution monitoring; there is no observation-plan sidecar.</li>
-<li>scientific Eulerian field-statistics YAML is intentionally not accepted until accumulation, checkpoint continuation, and postprocessing are complete end to end.</li>
+<li><code>field_statistics.enabled</code> -&gt; <code>-field_statistics_enabled</code>, and each window is serialized under the <code>-field_statistics_window_&lt;i&gt;_*</code> family: name, start time, optional end time, weighting, exactly one cadence, and its resolved field and covariance entries. An omitted <code>end_time</code> is absent from the control file rather than given a sentinel, because absence is what makes a window open-ended.</li>
+<li><code>io.statistics_console_output_frequency</code> -&gt; <code>-statistics_console_output_freq</code>. It governs reporting only and is excluded from the window identity hash, so changing it cannot change an accumulated result.</li>
+<li>window definitions are resolved and hashed in C, and the post-processor reads the same generated control file, so a derived-statistics recipe names windows rather than redescribing them.</li>
 <li>the old <code>case.models.statistics.time_averaging</code>, <code>-averaging</code>, and <code>solver.solution_convergence</code> ingress locations are rejected rather than translated.</li>
 <li><code>solver_monitoring.poisson.*</code> maps readable monitor keys into prefixed Poisson KSP flags.</li>
 <li><code>solver_monitoring.momentum.*</code> maps readable Newton history/SNES/KSP monitor booleans into bare <code>-mom_nk_*</code> switches.</li>
@@ -232,6 +234,7 @@ $(function() {
 <li><code>io.particle_fields</code> -&gt; <code>particle_fields_instantaneous</code></li>
 <li><code>io.input_extensions.eulerian/particle</code> -&gt; <code>eulerianExt/particleExt</code> for post input readers</li>
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
+<li><code>field_statistics.windows/outputs/formats/source_step</code> -&gt; <code>field_statistics_windows</code>, <code>field_statistics_outputs</code>, <code>field_statistics_formats</code>, <code>field_statistics_source_step</code>. This is a distinct contract from <code>statistics_pipeline</code>, which reduces particle trajectories.</li>
 </ul>
 <h1><a class="anchor" id="p14_cluster_sec"></a>
 7. Cluster Contract Highlights (cluster.yml)</h1>
