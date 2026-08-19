@@ -486,7 +486,9 @@ solver_monitoring:
 </div><!-- fragment --><ul>
 <li><code>verbosity</code> maps to environment variable <code>LOG_LEVEL</code> via <code>picurv</code> launcher.</li>
 <li><code>enabled_functions</code> is serialized into <code>whitelist.run</code> only when non-empty.</li>
-<li>If <code>enabled_functions</code> is empty, <code>picurv</code> omits <code>whitelist.run</code> and the C runtime falls back to its default allow-list.</li>
+<li>If <code>enabled_functions</code> is empty, <code>picurv</code> omits <code>whitelist.run</code> and the C runtime falls back to its default allow-list, which is <code>main</code> and <code>CreateSimulationContext</code> only.</li>
+<li>Console output is two-tiered by design. <b>Operator reporting</b> — the startup banner, progress, graceful-shutdown notices, and the periodic particle and statistics console snapshots — is gated by <code>verbosity</code> alone, so a run always reports what it is doing. <b>Code-level diagnostics</b> are dual-gated on <code>verbosity</code> <em>and</em> this allow list, so instrumenting one function for debugging does not drag every other function's output along with it.</li>
+<li>Raising <code>verbosity</code> therefore does not surface a function's diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
 <li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
 <li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>logs/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>

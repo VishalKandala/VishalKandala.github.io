@@ -21,7 +21,7 @@ var searchData=
   ['validate_5fpetsc_5fvec_5fbinary_18',['validate_petsc_vec_binary',['../namespacepicurv__cli_1_1core.html#aaa8f8785084c3a49978aa3d33bdd31c2',1,'picurv_cli::core']]],
   ['validate_5fpost_5fconfig_19',['validate_post_config',['../namespacepicurv__cli_1_1core.html#af4bbc60dc833dc2df225f44586e8f112',1,'picurv_cli::core']]],
   ['validate_5fprogrammatic_5fgenerated_5fic_5fgrid_5fsettings_20',['validate_programmatic_generated_ic_grid_settings',['../namespacepicurv__cli_1_1core.html#a4a9c7804e97fdd34493f7835d742b167',1,'picurv_cli::core']]],
-  ['validate_5fsolver_5fconfigs_21',['validate_solver_configs',['../namespacepicurv__cli_1_1core.html#aa361b69d8425c533940a916974f19cdc',1,'picurv_cli::core']]],
+  ['validate_5fsimulation_5fconfigs_21',['validate_simulation_configs',['../namespacepicurv__cli_1_1core.html#a3e5bd11c78f74e04d6d15fe9c6413f20',1,'picurv_cli::core']]],
   ['validate_5fstudy_5fconfig_22',['validate_study_config',['../namespacepicurv__cli_1_1core.html#a0fa0191e5c9188b91a3d20d999743789',1,'picurv_cli::core']]],
   ['validate_5fworkflow_23',['validate_workflow',['../namespacepicurv__cli_1_1core.html#a068f9134a2449c213fe602e660d2cce4',1,'picurv_cli::core']]],
   ['validatebchandlerforbctype_24',['validatebchandlerforbctype',['../io_8c.html#a5fe767286174b757deb2d404f2b4843f',1,'ValidateBCHandlerForBCType(BCType type, BCHandlerType handler):&#160;io.c'],['../io_8h.html#a5fe767286174b757deb2d404f2b4843f',1,'ValidateBCHandlerForBCType(BCType type, BCHandlerType handler):&#160;io.c']]],

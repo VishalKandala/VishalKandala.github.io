@@ -268,7 +268,25 @@ k = \tfrac{1}{2}\left(R_{xx}+R_{yy}+R_{zz}\right),\qquad
 <p>The key sits under <code>io</code> rather than inside <code>field_statistics</code> because it controls reporting rather than science. Changing it must not alter any accumulated result, which is why it is excluded from the definition hash — and is verified by running one field series at two cadences and requiring bit-identical accumulator state.</p>
 <p>Each snapshot reports, per window: name, state, sample count, total weight, represented time, progress toward a bounded end, and the range of per-point valid fraction. These are window-level scalars; <b>the snapshot never dumps field data</b>. The valid-fraction range is the mask-health indicator: a minimum of one means every targeted point saw every state, below one means a moving body excluded some points for part of the window, and zero means some point contributed nothing and its mean is undefined. That last case cannot be seen by reading the mean field, because an untouched point holds a zero that looks like a value, so it is also reported once as a warning when the window completes. Computing the range is a collective reduction, so it runs on the console cadence and at completion, never per step.</p>
 <p>The startup banner always carries a statistics line — the configured cadence, or <code>DISABLED</code> distinguishing a silenced console from a run with no window — so a log records whether monitoring was active rather than leaving its absence ambiguous.</p>
-<p>Lifecycle logging uses <code>LOG_ALLOW</code> at the levels the rest of the codebase uses: <code>LOG_INFO</code> for once-per-run and once-per-window events, <code>LOG_DEBUG</code> for per-event bookkeeping including states an active window did not sample, <code>LOG_WARNING</code> only for conditions an operator must act on, and <code>LOG_TRACE</code> for per-point detail. Because <code>LOG_ALLOW</code> is gated by the per-function allow list, those lines appear only when their functions are named in <code>logging.enabled_functions</code>. That is why the console snapshot uses <code>LOG</code> instead: an accumulating window is an operator-facing report that must not depend on naming an internal function.</p>
+<p>Lifecycle logging uses <code>LOG_ALLOW</code> at the levels the rest of the codebase uses: <code>LOG_INFO</code> for once-per-run and once-per-window events, <code>LOG_DEBUG</code> for per-event bookkeeping including states an active window did not sample, <code>LOG_WARNING</code> only for conditions an operator must act on, and <code>LOG_TRACE</code> for per-point detail. <code>LOG_ALLOW</code> carries the codebase's usual dual gate; see <a class="el" href="09_Monitor_Reference.html#p09_logging_sec">4. logging</a> for the mechanism and <a class="el" href="11_User_How_To_Guides.html#p11_logging_ssec">3.4 Enable Targeted Debug Logging</a> for the workflow. The console snapshot is the exception that uses plain <code>LOG</code>, because an accumulating window is an operator-facing report rather than an instrument for debugging the code.</p>
+<p>The functions to name in <code>logging.enabled_functions</code> when tracing this subsystem:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Add to <code>logging.enabled_functions</code>   </th><th class="markdownTableHeadNone">Reports    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>LogResolvedWindow</code>   </td><td class="markdownTableBodyNone">each window definition as resolved at startup    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>PicurvWindowStorageCreate</code>   </td><td class="markdownTableBodyNone">accumulator storage allocated per window    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>FieldStatisticsUpdateWindows</code>   </td><td class="markdownTableBodyNone">window activation and completion, and each accepted or skipped state    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>WriteStatisticsFields</code>   </td><td class="markdownTableBodyNone">window state written into a checkpoint bundle    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>ReadStatisticsWindowState</code>, <code>RestoreFieldStatisticsState</code>   </td><td class="markdownTableBodyNone">window state read back on continuation    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>FieldStatisticsPipeline</code>   </td><td class="markdownTableBodyNone">per-step derivation and output during post-processing   </td></tr>
+</table>
+<p>The filter matches the function containing the call, so <code>LogResolvedWindow</code> is the name to use for the resolved definitions rather than the configuration entry point that calls it.</p>
 <p>Accumulation sits on the timestep path, so debug-level paths perform no collective reduction unless the level is already active.</p>
 <h1><a class="anchor" id="p58_architecture_sec"></a>
 10. Architecture and Extension Points</h1>

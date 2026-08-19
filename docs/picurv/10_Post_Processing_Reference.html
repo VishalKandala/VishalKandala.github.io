@@ -140,10 +140,14 @@ run_control:
   # Maps to 'endTime' in the generated C-side post.run recipe.
   end_step: -1
 
-  # (Optional) The interval for processing steps (e.g., 10 means process
-  # steps 0, 10, 20...). Defaults to 1.
+  # (Optional) The interval for processing steps (e.g., 100 means process
+  # steps 0, 100, 200...). Defaults to 1.
+  # Must be a multiple of monitor.yml -&gt; io.data_output_frequency: the solver only
+  # commits a checkpoint at that cadence, so a finer stride names steps that were
+  # never written. Validation rejects a mismatch rather than letting the run stop
+  # at the first missing step.
   # Maps to 'timeStep' in the generated C-side post.run recipe.
-  step_interval: 1
+  step_interval: 100
 
 # ==============================================================================
 # SECTION 2: GLOBAL OPERATIONS
@@ -359,6 +363,7 @@ io:
 <li><code>end_step</code> -&gt; <code>endTime</code></li>
 <li><code>step_interval</code> -&gt; <code>timeStep</code></li>
 </ul>
+<p><b>Requested steps must be steps the solver committed.</b> The solver writes a checkpoint every <code>monitor.yml -&gt; io.data_output_frequency</code> completed steps, plus the initial and final states. <code>step_interval</code> must therefore be a multiple of that cadence; a finer stride names steps that were never written, and post-processing stops at the first one it cannot find rather than skipping it. <code>picurv validate</code> rejects a mismatch, and warns when <code>start_step</code> is off cadence — that one is only valid if it is the run's own starting step, which is committed off cadence.</p>
 <p>Operational semantics when launched through <code>picurv</code>:</p><ul>
 <li>keep <code>start_step</code> and <code>end_step</code> as the full logical analysis window you want the recipe to represent.</li>
 <li><code>picurv run --post-process --continue --run-dir ... --post post.yml</code> computes an internal effective start step for the same recipe lineage, so you do not need to keep editing <code>start_step</code> during batch catch-up.</li>
