@@ -84,94 +84,131 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p60_order_sec">1. Dependency Order</a></li>
-<li class="level1"><a href="#p60_view_sec">2. A View Bindable To An Explicit Vector Pair</a></li>
-<li class="level1"><a href="#p60_targets_sec">3. Spatial Targets Beyond Pointwise</a></li>
-<li class="level1"><a href="#p60_products_sec">4. Further Products</a></li>
-<li class="level1"><a href="#p60_ess_sec">5. Effective Sample Size Reporting</a></li>
-<li class="level1"><a href="#p60_history_sec">6. Histories, PDFs, and Higher Moments</a></li>
-<li class="level1"><a href="#p60_reducer_sec">7. One Reducer Behind Flow Observables</a></li>
-<li class="level1"><a href="#p60_dimensional_sec">8. Dimensional Derived Statistics</a></li>
-<li class="level1"><a href="#p60_notplanned_sec">9. Not Planned</a></li>
-<li class="level1"><a href="#p60_related_sec">10. Related Pages</a></li>
+<ul><li class="level1"><a href="#p60_principle_sec">1. What Must Be Online, And What Must Not</a></li>
+<li class="level1"><a href="#p60_order_sec">2. Dependency Order</a></li>
+<li class="level1"><a href="#p60_view_sec">3. A View Bindable To An Explicit Vector Pair</a></li>
+<li class="level1"><a href="#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a></li>
+<li class="level1"><a href="#p60_targets_sec">5. Online Targets For The Non-Commuting Cases</a></li>
+<li class="level1"><a href="#p60_order_extension_sec">6. Raising The Accumulated Moment Order</a></li>
+<li class="level1"><a href="#p60_pdf_sec">7. Distributions, Deferred</a></li>
+<li class="level1"><a href="#p60_products_sec">8. Further Products</a></li>
+<li class="level1"><a href="#p60_ess_sec">9. Effective Sample Size Reporting</a></li>
+<li class="level1"><a href="#p60_reducer_sec">10. One Reducer Behind Flow Observables</a></li>
+<li class="level1"><a href="#p60_dimensional_sec">11. Dimensional Derived Statistics</a></li>
+<li class="level1"><a href="#p60_notplanned_sec">12. Not Planned</a></li>
+<li class="level1"><a href="#p60_related_sec">13. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Field_Statistics_Planned_Extensions"></a> <a class="el" href="58_Field_Statistics.html">Field Statistics</a> describes what the statistics pipeline does today: pointwise weighted centered first and second moments, accumulated per named window, carried across a restart, and derived into Reynolds stresses, RMS, turbulent kinetic energy, and fluxes.</p>
-<p>This page records what it deliberately does not do, why each extension was left out, and what it depends on. Each is opt-in and builds on the target and product abstractions that already exist, so none of them requires reworking what is there. Configuration written against the current contract keeps working through all of them.</p>
+<p>This page records what it deliberately does not do, why each extension was left out, and what it depends on. Each is opt-in and builds on the abstractions that already exist, so none of them requires reworking what is there. Configuration written against the current contract keeps working through all of them.</p>
+<h1><a class="anchor" id="p60_principle_sec"></a>
+1. What Must Be Online, And What Must Not</h1>
+<p>One rule decides where each extension belongs, and it is worth stating before the list because it removes more work than it adds.</p>
+<p><b>Averaging commutes with linear operations and not with anything else.</b></p>
+<p>A spatial reduction over accumulated pointwise state is linear, so it is exact after the fact. Reducing per-point accumulators over a region reproduces the region-wide centered moment about the region mean, including the spatial variance of the local means, through the same weighted combination <code>PicurvMomentStateMerge</code> already implements:</p>
+<p class="formulaDsp">
+\[
+M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
+\]
+</p>
+<p>That identity extends to higher orders, so whatever order is accumulated pointwise can be reduced to any spatial subset at that order or below without approximation. <b>Bins, profiles, regions, and clipping are therefore post-processing operations, not accumulator kinds.</b> They need no online machinery, no additional checkpoint state, and no monitor-side configuration.</p>
+<p>What genuinely must happen online is everything the identity does not reach:</p>
+<ul>
+<li><b>The moment order.</b> Order cannot be raised after the fact; the second moment is what is accumulated today.</li>
+<li><b>Which products.</b> A cross-moment is not derivable from its marginals, so a pair not requested at solve time is unavailable afterwards.</li>
+<li><b>Statistics of nonlinear or interpolated quantities.</b> For a probe or surface value built from a stencil, \(P = \sum_i w_i u_i\), the mean interpolates but the variance does not: \(\mathrm{Var}(P)\) needs the covariance <em>between</em> neighbouring points, which pointwise state does not hold. The same applies to the statistics of any derived nonlinear field.</li>
+<li><b>Conditional sampling.</b> Unconditional weights cannot be split afterwards.</li>
+</ul>
+<p>Memory is the one remaining argument for accumulating a reduced quantity online rather than reducing later, and it is stratified: negligible for moments, decisive for per-point histograms, prohibitive for retained histories.</p>
+<p>A physical caveat applies to spatial reduction however it is computed: merging across points is only <em>meaningful</em> where those points are statistically equivalent. Over an inhomogeneous region the result is a well-defined total variance that mixes in the spatial variation of the mean, which is rarely what was wanted. Homogeneous-direction averaging is the case this serves.</p>
 <h1><a class="anchor" id="p60_order_sec"></a>
-1. Dependency Order</h1>
+2. Dependency Order</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Extension   </th><th class="markdownTableHeadNone">Depends on   </th><th class="markdownTableHeadNone">Unlocks    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_view_sec">2. A View Bindable To An Explicit Vector Pair</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">nodal statistics output, accumulator field logging    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">profiles, regions, bins, clipping    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">3. Spatial Targets Beyond Pointwise</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">bins, profiles, regions, surfaces, probes    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_view_sec">3. A View Bindable To An Explicit Vector Pair</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">nodal statistics output, accumulator field logging    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_products_sec">4. Further Products</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">3. Spatial Targets Beyond Pointwise</a> for face targets   </td><td class="markdownTableBodyNone">face-flux and single-component products    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_ess_sec">9. Effective Sample Size Reporting</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">uncertainty reporting under unequal weights    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_ess_sec">5. Effective Sample Size Reporting</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">uncertainty reporting under unequal weights    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_order_extension_sec">6. Raising The Accumulated Moment Order</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">skewness, flatness, and their spatial reductions    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_history_sec">6. Histories, PDFs, and Higher Moments</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">3. Spatial Targets Beyond Pointwise</a>   </td><td class="markdownTableBodyNone">histories, PDFs, higher moments    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_products_sec">8. Further Products</a>   </td><td class="markdownTableBodyNone">online face targets, for the face case   </td><td class="markdownTableBodyNone">face-flux and single-component products    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reducer_sec">7. One Reducer Behind Flow Observables</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">3. Spatial Targets Beyond Pointwise</a>   </td><td class="markdownTableBodyNone">one reducer behind flow observables    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">5. Online Targets For The Non-Commuting Cases</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_view_sec">3. A View Bindable To An Explicit Vector Pair</a> for surface output   </td><td class="markdownTableBodyNone">surfaces, probes, conditional sampling    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_dimensional_sec">8. Dimensional Derived Statistics</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">dimensional derived statistics   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reducer_sec">10. One Reducer Behind Flow Observables</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a>   </td><td class="markdownTableBodyNone">one reducer behind flow observables    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_dimensional_sec">11. Dimensional Derived Statistics</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">dimensional derived statistics   </td></tr>
 </table>
-<p>The view extension is listed first because it is the only one that two separate surfaces are already waiting on, and because it is self-contained.</p>
+<p>Spatial reduction is listed first because it is the largest capability for the least new code: the kernel it needs is already written and tested, and it has no online counterpart to design.</p>
 <h1><a class="anchor" id="p60_view_sec"></a>
-2. A View Bindable To An Explicit Vector Pair</h1>
+3. A View Bindable To An Explicit Vector Pair</h1>
 <p><b>What is missing.</b> <code>UpdateLocalGhosts</code> resolves its vectors through a field view built on compile-time <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> offsets recorded in the catalog, and the nodal averaging kernel maps fixed field names onto fixed members. Per-window accumulators are counted from configuration and therefore have no compile-time offset, so neither routine accepts one.</p>
 <p><b>Current workaround.</b> Derived results are staged through two catalogued scratch fields: a derived quantity is written there, reached by catalogued name, converted to nodal values, and copied out before the next quantity reuses the buffer. This works with the offset constraint rather than against it, and follows the precedent of the corner-staging buffers, which are also workspace rather than simulation state.</p>
 <p><b>What the extension is.</b> A <code><a class="el" href="field__catalog_8h.html#structFieldView" title="Non-owning runtime objects resolved for one field and UserCtx.">FieldView</a></code> that can be bound to an explicitly supplied global and local vector pair, carrying its own degree of freedom, layout, and synchronization class rather than reading them from a compile-time table. After that the whole ghost path applies to an accumulator unchanged.</p>
 <p><b>Why it is worth doing.</b> Two surfaces depend on it at once. Nodal statistics output stops needing a staging round trip, and accumulator vectors become addressable by the field-anatomy and min/max loggers, which today can only report window-level scalars. A statistics-specific logging path would solve half of that and add a second mechanism doing what the first already does.</p>
-<h1><a class="anchor" id="p60_targets_sec"></a>
-3. Spatial Targets Beyond Pointwise</h1>
-<p><code><a class="el" href="statistics__target_8h.html#structSpatialTargetPlan" title="Resolved iteration domain for one field on one block.">SpatialTargetPlan</a></code> exists as an abstraction with only the pointwise identity mapping implemented, so these extend it rather than retrofit it.</p>
-<p>Planned target kinds:</p>
+<h1><a class="anchor" id="p60_reduction_sec"></a>
+4. Spatial Reduction In Post-Processing</h1>
+<p>Profiles, regions, bins, and clipping are derived from the pointwise state a window already holds, by the reduction described in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a>. This is where the majority of the remaining scientific capability lives, and it needs no new online state.</p>
+<p>What it requires:</p>
 <ul>
-<li><b>Bins</b> over a coordinate direction or a derived coordinate.</li>
-<li><b>Profile layers</b>, the wall-normal case that channel and boundary-layer work needs.</li>
-<li><b>Named regions</b>, an axis-aligned or geometric subset accumulated as one reduced quantity.</li>
-<li><b>Grid and immersed surfaces</b>, accumulating over a boundary rather than a volume.</li>
-<li><b>Point probes</b>, a small named set of locations sampled at every accepted state.</li>
+<li><b>A region selector in the post recipe.</b> Coordinate ranges, index ranges, a homogeneous-direction collapse such as averaging over <code>i</code> and <code>k</code> at fixed <code>j</code>, or a named region. This sits in <code>post.yml</code> because the choice is made after the run, not committed at solve time.</li>
+<li><b>A reduction driver</b> that walks the selected points and combines their accumulators through the existing weighted merge, in a pairwise or tree order rather than sequentially, so the combination stays well conditioned across a large point count. <code>PicurvWindowSpatialMean</code> is the shape to follow; it already performs the domain-wide case of exactly this reduction, and it already excludes points the mask never sampled.</li>
+<li><b>An output form for reduced results.</b> A profile is a one-dimensional table rather than a field, so it belongs in a CSV alongside the convergence history rather than in the <code>.vts</code>.</li>
 </ul>
-<p>Each is a different mapping from field storage indices to accumulator slots, which is exactly what the plan abstraction is for. The reduction they need is the weighted parallel-combination form that already exists and is tested but has no production caller yet.</p>
-<p><b>The YAML is already reserved for this compatibly.</b> A <code>target:</code> block with <code>kind</code> and <code>mask</code> arrives as <b>optional</b> keys defaulting to current behaviour, so no configuration written today breaks. They are not exposed now because a single-valued key reserves syntax without earning it.</p>
-<p><b>The identity hash is already prepared.</b> The mask occupies its own hash group even though exactly one mask is resolved today, so adding a mask key extends that group rather than renumbering the groups after it and invalidating every saved window.</p>
+<p>The practical gain beyond cost is that regions are chosen <em>after</em> the solve. Because the pointwise state is checkpointed, a wake window or a wall-normal profile that nobody anticipated can be extracted from a completed run without re-solving, and revised as often as the analysis demands.</p>
+<h1><a class="anchor" id="p60_targets_sec"></a>
+5. Online Targets For The Non-Commuting Cases</h1>
+<p>A target must be resolved online only where <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a> says the reduction cannot follow:</p>
+<ul>
+<li><b>Immersed and grid surfaces</b>, where the quantity is interpolated onto a surface that cuts through cells. The surface mean can be interpolated from pointwise means, but its variance cannot, because that needs the covariance between the stencil points.</li>
+<li><b>Point probes at off-grid locations</b>, for the same reason.</li>
+<li><b>Conditional sampling</b>, where a state is accumulated only when a condition holds, since unconditional weights cannot be split afterwards.</li>
+</ul>
+<p><code><a class="el" href="statistics__target_8h.html#structSpatialTargetPlan" title="Resolved iteration domain for one field on one block.">SpatialTargetPlan</a></code> exists as an abstraction with only the pointwise identity mapping implemented, so these extend it rather than retrofit it, and the identity hash already reserves its own group for the mask so a later mask key extends that group instead of renumbering the groups after it and invalidating every saved window.</p>
+<p>The user-facing surface for these is a <code>target:</code> block with <code>kind</code> and <code>mask</code> as <b>optional</b> keys defaulting to current behaviour, so no configuration written today breaks. They are not exposed now because a single-valued key reserves syntax without earning it.</p>
+<h1><a class="anchor" id="p60_order_extension_sec"></a>
+6. Raising The Accumulated Moment Order</h1>
+<p>The second moment is what is accumulated today, which fixes the ceiling on what any later reduction can produce: order cannot be raised after the fact. Raising it to the third and fourth moments would make skewness and flatness available, and — because the merge identity extends to higher orders — would make them available for every spatial reduction at the same time, not only for the whole domain.</p>
+<p>What this needs: additional per-point state, the higher-order terms of the weighted combination, the corresponding checkpoint payloads, and moment entries in the window definition so the requested order is part of the identity hash. The per-point cost is one additional field per order per accumulated quantity, which is modest next to what a per-point histogram would cost.</p>
+<p>This is the extension that most enlarges what post-processing can do, because it raises the ceiling rather than adding a mechanism.</p>
+<h1><a class="anchor" id="p60_pdf_sec"></a>
+7. Distributions, Deferred</h1>
+<p>Per-point probability density functions and histograms are deferred rather than designed. They would reduce spatially without difficulty — histograms over shared bin edges are additive, so a region histogram is the sum of its points' — but the per-point cost is one field per bin per quantity, which is one to two orders of magnitude above the moment path. That cost, not the mathematics, is what defers them.</p>
+<p>Should they arrive, bin edges must be fixed and global rather than per-point adaptive, since additivity is what makes the spatial reduction exact.</p>
+<p>Retained time histories remain outside this pipeline at any point. Whatever retains history must stay bounded, for reduced probes or regions only; turning the statistics manager into a second full-field output system is not on this list. A run that needs the states themselves selects ordinary instantaneous field output.</p>
 <h1><a class="anchor" id="p60_products_sec"></a>
-4. Further Products</h1>
+8. Further Products</h1>
 <p><b>Explicit <code>Ucont</code> face-flux products.</b> <code>Ucont</code> is component-staggered, so pairs involving it are rejected on layout compatibility today. Face-flux statistics need a face target and a product definition that respects which component lives on which face, not a relaxation of the compatibility check.</p>
 <p><b>Single-component products.</b> Requesting one component of a vector's self-product rather than all six, for a run that needs only a shear stress and cannot afford the rest.</p>
 <p><b>Vector-vector cross products.</b> These need a full nine-component carrier, which nothing currently allocates. The symmetric six-component form exists precisely because a self-product is symmetric; a cross product between two different vectors is not.</p>
 <h1><a class="anchor" id="p60_ess_sec"></a>
-5. Effective Sample Size Reporting</h1>
+9. Effective Sample Size Reporting</h1>
 <p>Under physical-time weighting the weights are unequal, so a raw sample count overstates how much independent information a window holds. The Kish effective sample size \(W^2/W_2\) is the right quantity to report instead, and the kernel that computes it already exists and is tested.</p>
 <p>What is missing is plumbing rather than mathematics: a window-level sum of squared weights, which means a new checkpoint metadata field and a restore path for it. Per-point squared weight is already accumulated and checkpointed; only the window-level scalar is absent.</p>
-<h1><a class="anchor" id="p60_history_sec"></a>
-6. Histories, PDFs, and Higher Moments</h1>
-<p>Reduced time histories, probability density functions, and moments beyond the second <b>cannot be recovered from centered state after the fact</b>. They require their own accumulation, and are therefore additions rather than derivations.</p>
-<p>They are constrained by a boundary that must hold: whatever retains history must stay bounded, for reduced probes or regions only. Turning the statistics manager into a second full-field output system is not on this list at any point. A run that needs the states themselves selects ordinary instantaneous field output.</p>
 <h1><a class="anchor" id="p60_reducer_sec"></a>
-7. One Reducer Behind Flow Observables</h1>
-<p><code>ComputeCurrentFlowObservables</code> computes its own domain reductions for the runtime convergence monitor. The spatial reducer these extensions introduce would be able to serve it, removing a second implementation of the same traversal.</p>
+10. One Reducer Behind Flow Observables</h1>
+<p><code>ComputeCurrentFlowObservables</code> computes its own domain reductions for the runtime convergence monitor. The reduction driver in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a> performs the same traversal, so it could serve that monitor too and remove one of the two implementations.</p>
 <p>This is permitted <b>only after tests demonstrate identical results</b>, and the replacement must correctly follow field layout, periodicity, masks, blocks, and MPI ownership. It is listed last among the functional extensions because the existing implementation is correct and the gain is structural.</p>
 <p>Function-level logging, logging allow-lists, PETSc monitors, and performance profiling are not subsumed into scientific statistics at any point.</p>
 <h1><a class="anchor" id="p60_dimensional_sec"></a>
-8. Dimensional Derived Statistics</h1>
+11. Dimensional Derived Statistics</h1>
 <p>Derived statistics are written in nondimensional form even when <code>global_operations.dimensionalize</code> is set. A Reynolds stress scales as velocity squared, and a co-moment as the product of two different scales; the existing per-field scaling table expresses neither.</p>
 <p>The extension is a scaling rule per derived quantity rather than per field, so a product knows the scales of both its factors. Applying the velocity scale as things stand would be wrong rather than merely incomplete, which is why the current behaviour is to leave derived output nondimensional and say so.</p>
 <h1><a class="anchor" id="p60_notplanned_sec"></a>
-9. Not Planned</h1>
+12. Not Planned</h1>
 <p>These are recorded so they are not proposed again as gaps.</p>
 <ul>
 <li><b>A legacy <code>su0</code>/<code>su1</code>/<code>su2</code>/<code>sp</code> importer.</b> The old averaging state was removed rather than retained as a second workflow, and no reader, writer, or converter for it is planned.</li>
 <li><b>A dual-write period or compatibility workflow</b> between the old averaging surface and field statistics.</li>
 <li><b>Relabelling modelled turbulence quantities.</b> <code>Nu_t</code> and <code>CS</code> can be averaged like any other field, but modelled <code>k</code> is never presented as turbulent kinetic energy derived from resolved fluctuations.</li>
-<li><b>Full-field time histories</b>, as above.</li>
+<li><b>Full-field time histories</b>, as above. Per-point distributions are a different matter: they are deferred on cost rather than ruled out, and <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_pdf_sec">7. Distributions, Deferred</a> records the terms under which they could arrive.</li>
 </ul>
 <h1><a class="anchor" id="p60_related_sec"></a>
-10. Related Pages</h1>
+13. Related Pages</h1>
 <ul>
 <li><a class="el" href="58_Field_Statistics.html">Field Statistics</a> — what the pipeline does today</li>
 <li><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a> — the catalog these extensions build on</li>
