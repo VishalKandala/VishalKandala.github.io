@@ -95,8 +95,14 @@ $(function() {
 <li class="level1"><a href="#p60_ess_sec">9. Effective Sample Size Reporting</a></li>
 <li class="level1"><a href="#p60_reducer_sec">10. One Reducer Behind Flow Observables</a></li>
 <li class="level1"><a href="#p60_dimensional_sec">11. Dimensional Derived Statistics</a></li>
-<li class="level1"><a href="#p60_notplanned_sec">12. Not Planned</a></li>
-<li class="level1"><a href="#p60_related_sec">13. Related Pages</a></li>
+<li class="level1"><a href="#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a><ul><li class="level2"><a href="#p60_spectra_partial_shape_sub">The reduction is the choice, not the topology</a></li>
+<li class="level2"><a href="#p60_spectra_partial_cost_sub">What it costs</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a></li>
+<li class="level1"><a href="#p60_spectra_online_sec">14. Online Spatial Spectral Accumulation</a></li>
+<li class="level1"><a href="#p60_notplanned_sec">15. Not Planned</a></li>
+<li class="level1"><a href="#p60_related_sec">16. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Field_Statistics_Planned_Extensions"></a> <a class="el" href="58_Field_Statistics.html">Field Statistics</a> describes what the statistics pipeline does today: pointwise weighted centered first and second moments, accumulated per named window, carried across a restart, and derived into Reynolds stresses, RMS, turbulent kinetic energy, and fluxes.</p>
@@ -141,7 +147,13 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reducer_sec">10. One Reducer Behind Flow Observables</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a>   </td><td class="markdownTableBodyNone">one reducer behind flow observables    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_dimensional_sec">11. Dimensional Derived Statistics</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">dimensional derived statistics   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_dimensional_sec">11. Dimensional Derived Statistics</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">dimensional derived statistics    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">spectra for channels, ducts, and boundary layers    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a>   </td><td class="markdownTableBodyNone">bounded probe history   </td><td class="markdownTableBodyNone">frequency spectra where nothing is homogeneous    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_online_sec">14. Online Spatial Spectral Accumulation</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a> for the transpose   </td><td class="markdownTableBodyNone">spatial spectra without a snapshot series   </td></tr>
 </table>
 <p>Spatial reduction is listed first because it is the largest capability for the least new code: the kernel it needs is already written and tested, and it has no online counterpart to design.</p>
 <h1><a class="anchor" id="p60_view_sec"></a>
@@ -198,8 +210,64 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 11. Dimensional Derived Statistics</h1>
 <p>Derived statistics are written in nondimensional form even when <code>global_operations.dimensionalize</code> is set. A Reynolds stress scales as velocity squared, and a co-moment as the product of two different scales; the existing per-field scaling table expresses neither.</p>
 <p>The extension is a scaling rule per derived quantity rather than per field, so a product knows the scales of both its factors. Applying the velocity scale as things stand would be wrong rather than merely incomplete, which is why the current behaviour is to leave derived output nondimensional and say so.</p>
+<h1><a class="anchor" id="p60_spectra_partial_sec"></a>
+12. Offline Line And Plane Spectra</h1>
+<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> implements one task, <code>shell_spectrum</code>, which requires all three directions to be periodic and homogeneous. See <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">7. spectra</a>.</p>
+<p><b>What is missing.</b> Everything between "homogeneous in three directions" and "homogeneous in none": a channel homogeneous in two directions and bounded in the third, a straight duct homogeneous in one, a spatially developing boundary layer homogeneous in the spanwise direction alone. This is the most common wall-bounded turbulence configuration there is, and it is presently unserved — a channel has a perfectly good spatial spectrum that the pipeline cannot produce.</p>
+<p>Note this is <em>not</em> what <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a> covers. That section is for geometries with no homogeneous direction at all, where only a frequency spectrum is defined. A channel has homogeneous directions, and what is wanted there is a wavenumber spectrum resolving scales, not a frequency spectrum at a probe.</p>
+<p><b>Why it is first among the three spectral extensions.</b> It needs no new online state, no retained history, no FFT in the solver, and no MPI transpose. It reuses the offline stage exactly as it stands: read a committed checkpoint, transform, bin, write. Of the three, it is the only one that is purely additive to machinery already running.</p>
+<h2><a class="anchor" id="p60_spectra_partial_shape_sub"></a>
+The reduction is the choice, not the topology</h2>
+<p>The obvious design — infer the task from how many directions are periodic — does not survive contact with what people actually want. Two homogeneous directions admit at least four distinct deliverables, and they answer different questions:</p>
+<ul>
+<li>\(E(k_x)\) at each wall-normal station,</li>
+<li>\(E(k_z)\) at each wall-normal station,</li>
+<li>the full two-dimensional \(E(k_x, k_z)\) at one chosen station,</li>
+<li>premultiplied \(k E(k)\), which is what log-layer scaling is read from.</li>
+</ul>
+<p>The most common channel deliverable is not "the plane spectrum" at all: it is a plane transform <em>reduced two different ways</em>. So the map from topology to task is one-to-many, and the topology cannot pick for the user.</p>
+<p><b>Periodicity is also necessary rather than sufficient.</b> The pairwise consistency check in <code>validate_and_prepare_boundary_conditions</code> makes "this axis is periodic" a reliable, already-validated property, but homogeneity is the real requirement. An immersed body inside a periodic box breaks it while every boundary condition still reads <code>PERIODIC</code>, and the <code>Nvert</code> mask that reveals it is a runtime property that moves with the body, so no configuration-time inference can see it.</p>
+<p><b>What may be inferred.</b> The <em>direction</em> may, where it is unambiguous: a <code>line_spectrum</code> on a case with exactly one periodic axis has only one sensible <code>direction</code>, and defaulting it removes real tedium without removing a scientific decision. The <em>task</em> may not, for the reasons above.</p>
+<p>That distinction matters beyond convenience. The value of the precondition gate is that it refuses: ask for something undefined and the reason is named before any compute is spent. Inferring the task inverts that — when the inference is right a configuration line is saved, and when it is wrong there is no error at all, only a plausible curve. A pipeline built on <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a> should not trade a loud failure for a silent one to save a line of YAML.</p>
+<p>What is worth doing instead is making the refusal constructive: a case whose spanwise axis is periodic could be told that <code>line_spectrum</code> along that axis would be valid, rather than only being told what is wrong.</p>
+<h2><a class="anchor" id="p60_spectra_partial_cost_sub"></a>
+What it costs</h2>
+<p>The transform is the easy part. What genuinely changes:</p>
+<ul>
+<li><b>Output stops being one-dimensional.</b> <code>shell_spectrum</code> yields \(E(k)\) per step. A line spectrum yields \(E(k_1)\) per retained index, a plane spectrum \(E(k_x,k_z)\) per station. The long-format CSV generalizes with an index column; the plot does not, because "a spectrum at every wall-normal station" is a family or a contour rather than a curve. <code>--plot-spectrum</code> needs a station selector.</li>
+<li><b>Masking becomes per-line.</b> <code>shell_spectrum</code> sidesteps immersed boundaries by refusing them outright. A line spectrum must test each transform line for blanked points and drop or refuse that line individually.</li>
+<li><b>Serial memory becomes the ceiling.</b> <code>generators/spectra.gen</code> reads whole fields in Python. A 64-cubed box is under seven megabytes; a 512-cubed channel is a few gigabytes per snapshot. For channel-scale cases this, rather than sample count, is what eventually forces <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_online_sec">14. Online Spatial Spectral Accumulation</a>.</li>
+</ul>
+<p><b>Test case.</b> <code>examples/flat_channel</code>, which is homogeneous in the streamwise and spanwise directions. Not <code>examples/bent_channel</code>: a 90-degree bend develops streamwise and is bounded on all four sides, so it has no homogeneous direction and belongs to <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a>.</p>
+<h1><a class="anchor" id="p60_spectra_temporal_sec"></a>
+13. Temporal Spectra From Bounded Probe Histories</h1>
+<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> measures spatial spectra offline from the instantaneous velocity in each committed checkpoint, documented in <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">7. spectra</a>. The one implemented task, <code>shell_spectrum</code>, requires a triply periodic uniform Cartesian box.</p>
+<p><b>What is missing, and why it is not a gap in the above.</b> A spatial spectrum needs a direction that is uniformly spaced, periodic, and statistically homogeneous. A curved duct, a wall-bounded channel section, or any immersed geometry supplies none of the three: the streamwise direction develops, and the cross-stream directions are bounded. For these the meaningful quantity is a <b>frequency</b> spectrum \(E(f)\) at a point, which needs no homogeneity at all and is what resolves shedding and Strouhal content.</p>
+<p>A frequency spectrum needs the signal itself, retained in time. That is the one thing <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_pdf_sec">7. Distributions, Deferred</a> rules out at full-field scale and explicitly leaves open at reduced scale: <em>whatever retains history must stay bounded, for reduced probes or regions only</em>. A handful of probes sampled every step is kilobytes; the same information as full-field snapshots is terabytes.</p>
+<p><b>Why the snapshot path cannot substitute.</b> A temporal transform of the existing checkpoint series is limited to \(f_{\max} = 1/(2\,\Delta t\,\texttt{data\_output\_frequency})\). Reaching a useful band means writing full three-dimensional fields every step or two, which is precisely the cost this extension avoids. The snapshot series can reach a low-frequency peak; it cannot reach an inertial range.</p>
+<p>What it requires:</p>
+<ul>
+<li><b>A probe set in the monitor configuration</b>, since retaining history is a solve-time decision rather than a post-processing one.</li>
+<li><b>Bounded per-probe history</b>, appended as the run proceeds, with the sampling cadence fixed at configuration time so the transform has a uniform time base.</li>
+<li><b>Interpolation for off-grid probes.</b> Note that the caveat in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_targets_sec">5. Online Targets For The Non-Commuting Cases</a> does not apply here: that section concerns the <em>variance</em> of an interpolated quantity, which needs the covariance between stencil points. A retained time series holds the actual interpolated values, so its spectrum is exact.</li>
+<li><b>A <code>temporal_spectrum</code> task</b> in the spectra recipe, with Welch averaging over segments and a window function, since a finite record is not periodic in time.</li>
+</ul>
+<p>This is the extension that unlocks spectra for every geometry the spatial tasks refuse, and it is the smaller of the two remaining spectral pieces.</p>
+<h1><a class="anchor" id="p60_spectra_online_sec"></a>
+14. Online Spatial Spectral Accumulation</h1>
+<p><b>What is missing.</b> Spatial spectra are measured offline from written snapshots, so the number of independent samples is bounded by how many full fields a run can afford to write, and the snapshot cadence has to be chosen before the run.</p>
+<p><b>What the extension is.</b> Accumulate \(\langle |\hat{u}(k)|^2 \rangle\) online: transform along the homogeneous direction each accepted state and add the modulus squared into a per-wavenumber accumulator.</p>
+<p><b>Why it must be online rather than derived later.</b> The transform is linear, so a time-averaged \(\hat{u}\) is recoverable from a time-averaged field. The modulus squared is not: \(\langle |\hat{u}|^2 \rangle \neq |\langle \hat{u} \rangle|^2\). This is the same rule <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a> states, applied in Fourier space, and it is also why no reduction of the existing pointwise accumulators can yield a spectrum — a spectrum is the transform of a two-point correlation, and pointwise state holds no covariance between distinct points.</p>
+<p><b>Why it is nonetheless second in priority.</b> It is an efficiency change, not a capability change: it produces spectra the snapshot path already produces, for runs where writing the snapshots is the binding constraint. <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a> produces spectra that are otherwise unavailable at all.</p>
+<p>What it requires:</p>
+<ul>
+<li><b>A spectral target kind and product</b>, slotting into the existing window machinery. Scheduling, weighting, restart merging, and checkpointing all apply unchanged; the accumulator is a new product, not a new lifecycle.</li>
+<li><b>An FFT in the solver.</b> PETSc's <code>MatCreateFFT</code> needs an FFTW-enabled build, which the current configuration does not have. A single-direction transform is cheap enough that gathering the pencil and transforming directly is a viable alternative.</li>
+<li><b>A transpose or line gather</b> when the homogeneous direction is distributed across ranks.</li>
+</ul>
+<p>Storage is negligible — wavenumber by wall-normal index by component — which is orders of magnitude below the per-point histograms <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_pdf_sec">7. Distributions, Deferred</a> defers.</p>
 <h1><a class="anchor" id="p60_notplanned_sec"></a>
-12. Not Planned</h1>
+15. Not Planned</h1>
 <p>These are recorded so they are not proposed again as gaps.</p>
 <ul>
 <li><b>A legacy <code>su0</code>/<code>su1</code>/<code>su2</code>/<code>sp</code> importer.</b> The old averaging state was removed rather than retained as a second workflow, and no reader, writer, or converter for it is planned.</li>
@@ -208,9 +276,10 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 <li><b>Full-field time histories</b>, as above. Per-point distributions are a different matter: they are deferred on cost rather than ruled out, and <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_pdf_sec">7. Distributions, Deferred</a> records the terms under which they could arrive.</li>
 </ul>
 <h1><a class="anchor" id="p60_related_sec"></a>
-13. Related Pages</h1>
+16. Related Pages</h1>
 <ul>
 <li><a class="el" href="58_Field_Statistics.html">Field Statistics</a> — what the pipeline does today</li>
+<li><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a> — the spectra recipe these two extend</li>
 <li><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a> — the catalog these extensions build on</li>
 <li><a class="el" href="57_Future_Architecture_Specifications.html">Future Architecture Specifications</a> — status and sequencing of proposed architecture</li>
 <li><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a> — open validation items </li>

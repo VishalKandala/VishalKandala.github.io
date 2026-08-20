@@ -236,6 +236,8 @@ $(function() {
 <li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
 <li><code>run_control.step_interval</code> must be a multiple of <code>monitor.io.data_output_frequency</code>. The two files are validated together because neither can rule the combination out alone: the monitor decides which steps exist and the post recipe decides which are asked for.</li>
 <li><code>field_statistics.windows/outputs/formats/source_step</code> -&gt; <code>field_statistics_windows</code>, <code>field_statistics_outputs</code>, <code>field_statistics_formats</code>, <code>field_statistics_source_step</code>. This is a distinct contract from <code>statistics_pipeline</code>, which reduces particle trajectories.</li>
+<li><code>spectra.tasks[*]</code> is consumed by the conductor rather than by the C post-processor: it becomes <code>generators/spectra.gen</code> invocations against the committed checkpoints. Only a digest, <code>spectra_signature</code>, reaches <code>post.run</code>, and the post-processor accepts and ignores it; it exists so a changed spectra recipe reaches the recipe fingerprint that <code>--continue</code> compares.</li>
+<li>Each spectra task declares preconditions that are checked against <code>case.yml</code> before any field is read. <code>shell_spectrum</code> requires every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid, because a shell-averaged spectrum is only defined for a triply periodic homogeneous box. Validation therefore needs both files together, and a recipe validated without a case checks only its own internal consistency.</li>
 </ul>
 <h1><a class="anchor" id="p14_cluster_sec"></a>
 7. Cluster Contract Highlights (cluster.yml)</h1>

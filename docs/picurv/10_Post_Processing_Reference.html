@@ -90,8 +90,16 @@ $(function() {
 <li class="level1"><a href="#p10_pipelines_sec">4. Processing Pipelines</a></li>
 <li class="level1"><a href="#p10_stats_sec">5. Particle Statistics Pipeline</a></li>
 <li class="level1"><a href="#p10_field_stats_sec">6. field_statistics</a></li>
-<li class="level1"><a href="#p10_io_sec">7. io</a></li>
-<li class="level1"><a href="#p10_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md35">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md36">What To Extract Before Changing A Case</a></li>
+<li class="level1"><a href="#p10_spectra_sec">7. spectra</a><ul><li class="level2"><a href="#p10_spectra_only_sub">Running spectra alone</a></li>
+<li class="level2"><a href="#p10_spectra_preconditions_sub">Preconditions</a></li>
+<li class="level2"><a href="#p10_spectra_keys_sub">Keys</a></li>
+<li class="level2"><a href="#p10_spectra_outputs_sub">Outputs</a></li>
+<li class="level2"><a href="#p10_spectra_crosscheck_sub">Cross-checking against field statistics</a></li>
+<li class="level2"><a href="#p10_spectra_plot_sub">Viewing them</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p10_io_sec">8. io</a></li>
+<li class="level1"><a href="#p10_next_steps_sec">9. Next Steps</a><ul><li class="level2"><a href="#autotoc_md35">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md36">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md37">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
@@ -314,7 +322,7 @@ io:
     eulerian: "dat"
     particle: "dat"
 </pre><p><code>post.yml</code> defines postprocessing input range, processing pipelines, statistics tasks, and VTK output selection.</p>
-<p>It carries two separate statistics contracts, which are deliberately not combined. <code>statistics_pipeline</code> reduces particle trajectories; <code>field_statistics</code> derives the Eulerian field windows the solver accumulated. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD and resolved turbulence statistics answer different questions and share no state.</p>
+<p>It carries two separate statistics contracts, which are deliberately not combined. <code>statistics_pipeline</code> reduces particle trajectories; <code>field_statistics</code> derives the Eulerian field windows the solver accumulated. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD and resolved turbulence statistics answer different questions and share no state. A third block, <code>spectra</code>, measures energy spectra from the instantaneous velocity; unlike every other block here it runs in the conductor rather than in the C post-processor.</p>
 <h1><a class="anchor" id="p10_structure_sec"></a>
 1. File Structure</h1>
 <div class="fragment"><div class="line">run_control:</div>
@@ -348,6 +356,12 @@ io:
 <div class="line">  windows: [production]</div>
 <div class="line">  outputs: [mean, reynolds_stress, rms, tke, flux]</div>
 <div class="line">  formats: [vtk, csv]</div>
+<div class="line"> </div>
+<div class="line">spectra:</div>
+<div class="line">  output_prefix: &quot;Spectrum&quot;</div>
+<div class="line">  tasks:</div>
+<div class="line">    - task: shell_spectrum</div>
+<div class="line">      field: Ucat</div>
 <div class="line"> </div>
 <div class="line">io:</div>
 <div class="line">  output_directory: &quot;viz&quot;</div>
@@ -437,8 +451,92 @@ io:
 <p>Because the pipeline runs once per processed step, a recipe spanning a range produces a history. Pinning <code>source_step</code> reads every processed step's output from that one bundle instead, collapsing the history to a single answer.</p>
 <p>Each window writes its own files, so a window name may not be listed twice.</p>
 <p><b>Derived statistics are not dimensionalized</b>, even under <code>global_operations.dimensionalize</code>. A Reynolds stress scales as velocity squared and a co-moment as the product of two different scales, and the per-field scaling table expresses neither. See <a class="el" href="58_Field_Statistics.html#p58_derived_sec">8. Derived Quantities and Post-Processing</a>.</p>
+<h1><a class="anchor" id="p10_spectra_sec"></a>
+7. spectra</h1>
+<p>Measures turbulent energy spectra from the instantaneous velocity in each committed checkpoint. Omit the block to measure nothing.</p>
+<div class="fragment"><div class="line">spectra:</div>
+<div class="line">  output_prefix: &quot;Spectrum&quot;</div>
+<div class="line">  tasks:</div>
+<div class="line">    - task: shell_spectrum</div>
+<div class="line">      field: Ucat</div>
+<div class="line">      block: 0</div>
+<div class="line">      symbol: continuum          # continuum | discrete</div>
+<div class="line">      subtract_mean: none        # none | domain | window:&lt;name&gt;</div>
+<div class="line">      mean_source_step: 4000     # optional; only with window:&lt;name&gt;</div>
+</div><!-- fragment --><p>Unlike every other block on this page, spectra are <b>not</b> computed by the C post-processor. They are measured by <code>generators/spectra.gen</code>, which the conductor runs against the raw checkpoint payloads, so the stage needs no field output and does not depend on <code>eulerian_pipeline</code>. The only key that reaches the C recipe is <code>spectra_signature</code>, a digest the post-processor accepts and ignores; it exists so a changed spectra recipe reaches the recipe fingerprint that <code>--continue</code> compares.</p>
+<h2><a class="anchor" id="p10_spectra_only_sub"></a>
+Running spectra alone</h2>
+<div class="fragment"><div class="line">picurv run --post-process --only spectra --run-dir runs/my_run --post post.yml</div>
+</div><!-- fragment --><p><code>--only</code> selects among the post stages, <code>fields</code> (the field post-processor) and <code>spectra</code>, and defaults to both. Re-measuring a spectrum is cheap; rebuilding the field output is not, so the analysis loop belongs behind <code>--only spectra</code>.</p>
+<h2><a class="anchor" id="p10_spectra_preconditions_sub"></a>
+Preconditions</h2>
+<p>A spectrum is only defined where the transform direction is uniformly spaced, periodic, and statistically homogeneous. Each task declares what it needs, and <code>picurv validate</code> checks it against the case <b>before any field is read</b>:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Task   </th><th class="markdownTableHeadNone">Status   </th><th class="markdownTableHeadNone">Requires    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>shell_spectrum</code>   </td><td class="markdownTableBodyNone">implemented   </td><td class="markdownTableBodyNone">every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">two periodic axes; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>line_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">one periodic axis; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>temporal_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">no homogeneous direction needed; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a>   </td></tr>
+</table>
+<p>Only <code>shell_spectrum</code> exists today, so a case homogeneous in one or two directions — a channel, a straight duct, a boundary layer — has a spatial spectrum the pipeline cannot yet produce. The task table is built to hold the others; the reservation is recorded rather than implied.</p>
+<p>Boundary conditions and block count are checked from <code>case.yml</code>; grid uniformity is checked by the generator against the staged PICGRID, which is the only place the node coordinates are known. A wall-bounded or curvilinear case is refused by name rather than yielding a curve with no meaning:</p>
+<div class="fragment"><div class="line">spectra task &#39;shell_spectrum&#39; requires every face of block 0 to be PERIODIC,</div>
+<div class="line">because a shell-averaged spectrum is only defined for a triply periodic</div>
+<div class="line">homogeneous box. Non-periodic faces: [&#39;+Eta&#39;, &#39;+Xi&#39;, ...].</div>
+</div><!-- fragment --><p>This is why a 90-degree bend cannot produce a spatial spectrum at all: it develops streamwise and is bounded on all four sides, so it has no homogeneous direction and needs <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a>. A <em>straight</em> duct or channel is a different case — it does have homogeneous directions, and awaits <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a> rather than the temporal path.</p>
+<h2><a class="anchor" id="p10_spectra_keys_sub"></a>
+Keys</h2>
+<ul>
+<li><code>symbol</code> selects the binning abscissa. <code>continuum</code> bins by \(|k|\); <code>discrete</code> bins by the centered-difference symbol \(\sin(k\,\Delta x)/\Delta x\), which is what the solver's own operator resolves. Comparing a measured rolloff against the continuum abscissa alone will attribute the scheme's damping to physics.</li>
+<li><code>subtract_mean</code> chooses the fluctuation. <code>none</code> transforms the field as stored; <code>domain</code> removes the volume mean of that snapshot; <code>window:&lt;name&gt;</code> subtracts the accumulated mean of a field-statistics window, which is the better estimate wherever the flow is not homogeneous. A window mean is only defined where the window actually sampled, so a window that has not accumulated over the domain is refused rather than subtracted as zero.</li>
+<li><code>mean_source_step</code> pins the bundle the window mean is read from, independently of the step being transformed. It applies only to <code>window:&lt;name&gt;</code>. Left unset, each step reads its own bundle, whose mean is the <em>running</em> mean at that step — undefined at the moment the window activates, and built from few samples shortly after. Pin it to a step at or after the window closes to subtract the converged mean, which is almost always what is wanted. This mirrors <code>field_statistics.source_step</code>.</li>
+<li><code>block</code> selects the block; <code>field</code> is <code>Ucat</code>. <code>Ucont</code> is component-staggered and has no single cell-centered spectrum, per <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_products_sec">8. Further Products</a>.</li>
+</ul>
+<p>Two tasks differing in task, field, block, or symbol write different files and may coexist; two identical tasks are refused, since the second would overwrite the first.</p>
+<h2><a class="anchor" id="p10_spectra_outputs_sub"></a>
+Outputs</h2>
+<p>Each task writes two CSVs under <code>&lt;monitor output&gt;/spectra/</code>:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">File   </th><th class="markdownTableHeadNone">Columns   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>&lt;prefix&gt;_&lt;task&gt;_&lt;field&gt;_block&lt;nnnn&gt;_&lt;symbol&gt;.csv</code>   </td><td class="markdownTableBodyNone"><code>step,time,k,energy</code>   </td><td class="markdownTableBodyNone">the spectra themselves, long format    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>..._history.csv</code>   </td><td class="markdownTableBodyNone"><code>step,time,</code> then the scalars below   </td><td class="markdownTableBodyNone">one row per processed step   </td></tr>
+</table>
+<p>The spectrum file is long format so a family of curves stays one file, which is also what makes comparison across a sweep a glob rather than a special case.</p>
+<p>Recorded per step: <code>resolved_kinetic_energy</code>, <code>spectrum_total_energy</code>, <code>parseval_residual</code>, <code>spectrum_peak_k</code>, <code>zero_mode_energy</code>, <code>integral_length_scale</code>, <code>taylor_microscale</code>, and <code>dissipation_over_viscosity</code>.</p>
+<p><code>parseval_residual</code> is a self-check rather than an input: summed shell energy must equal the resolved kinetic energy of the transformed field, and a residual above round-off means the measurement is wrong.</p>
+<p>Dissipation is reported <b>divided by the kinematic viscosity</b> — \(\varepsilon = \nu \times\) <code>dissipation_over_viscosity</code> — because the measurement needs no fluid properties. Both length scales need none either; \(\nu\) cancels out of their isotropic definitions.</p>
+<h2><a class="anchor" id="p10_spectra_crosscheck_sub"></a>
+Cross-checking against field statistics</h2>
+<p><code>parseval_residual</code> verifies the transform against itself. An independent check is available against <a class="el" href="10_Post_Processing_Reference.html#p10_field_stats_sec">6. field_statistics</a>, which computes the same turbulent kinetic energy through an entirely separate path — a C accumulator over every accepted state rather than a Python transform of written snapshots:</p>
+<div class="fragment"><div class="line">field_statistics:</div>
+<div class="line">  windows: [early_decay]</div>
+<div class="line">  outputs: [tke]</div>
+<div class="line">  formats: [csv]</div>
+<div class="line">  source_step: 400</div>
+<div class="line">spectra:</div>
+<div class="line">  tasks:</div>
+<div class="line">    - task: shell_spectrum</div>
+<div class="line">      field: Ucat</div>
+<div class="line">      subtract_mean: window:early_decay</div>
+<div class="line">      mean_source_step: 400</div>
+</div><!-- fragment --><p>Time-average the spectra history's <code>resolved_kinetic_energy</code> across the window and compare with <code>mean_tke</code> in the statistics CSV. Weight by the represented interval, not by sample: the window itself weights by physical time, and a plain mean over a curved history is biased by its endpoints.</p>
+<p>Exact agreement is not expected and is not the point. The window accepts states at its own <code>step_cadence</code>, while spectra can only read the steps a checkpoint exists at, so the two sides average different sample sets. Agreement to a few percent confirms the paths measure the same quantity; a large gap does not.</p>
+<h2><a class="anchor" id="p10_spectra_plot_sub"></a>
+Viewing them</h2>
+<div class="fragment"><div class="line">picurv summarize --run-dir runs/my_run --plot-spectrum</div>
+<div class="line">picurv summarize --run-dir runs/my_run --plot spectra.resolved_kinetic_energy</div>
+</div><!-- fragment --><p><code>--plot-spectrum</code> draws one curve per processed step on log-log axes, overlaid on <code>diagnostics/initial_condition_spectrum.csv</code> when the run has one. Pass a task-name substring when a recipe measured more than one spectrum. The per-step scalars are ordinary series, so <code>--list-plot-series</code> finds them and <code>--plot</code> draws them.</p>
+<p><b>A decaying flow is a different statistical state at every step</b>, so the family is plotted rather than averaged, and the stage never averages across steps. Smoothing a spectrum comes from ensembling over seeds at matched times, not from pooling times.</p>
 <h1><a class="anchor" id="p10_io_sec"></a>
-7. io</h1>
+8. io</h1>
 <p>Mappings:</p><ul>
 <li><code>output_directory</code> + <code>output_filename_prefix</code> -&gt; <code>output_prefix</code></li>
 <li><code>output_directory</code> + <code>particle_filename_prefix</code> -&gt; <code>particle_output_prefix</code></li>
@@ -450,7 +548,7 @@ io:
 </ul>
 <p>The postprocessor reads the catalogued <code>.dat</code> PETSc vectors inventoried by each committed checkpoint; input extensions are not runtime-selectable. <code>statistics_pipeline.output_prefix</code> is independent of <code>io.output_directory</code>; bare basenames default under <code>&lt;monitor output&gt;/statistics/</code>, while explicit relative or absolute paths are preserved. When the same timestep is post-processed again, PICurv now rewrites same-step VTK/VTP outputs and rewrites same-step statistics rows so the final CSV still contains one row per step.</p>
 <h1><a class="anchor" id="p10_next_steps_sec"></a>
-8. Next Steps</h1>
+9. Next Steps</h1>
 <p>Proceed to <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> for goal-oriented recipes.</p>
 <p>For mapping and extension details:</p><ul>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>

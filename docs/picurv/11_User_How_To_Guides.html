@@ -102,6 +102,7 @@ $(function() {
 <li class="level1"><a href="#p11_post_sec">4. Post-Processing Recipes</a><ul><li class="level2"><a href="#p11_post_existing_ssec">4.1 Postprocess an Existing Run</a></li>
 <li class="level2"><a href="#p11_qcrit_ssec">4.2 Add Q-Criterion to Eulerian Pipeline</a></li>
 <li class="level2"><a href="#p11_stats_ssec">4.3 Enable Statistics Output (MSD)</a></li>
+<li class="level2"><a href="#p11_spectra_ssec">4.4 Measure Turbulent Energy Spectra</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p11_init_sec">5. Case Initialization and Binary Management</a><ul><li class="level2"><a href="#p11_init_basic_ssec">5.1 Initialize a New Case</a></li>
@@ -394,6 +395,32 @@ Re = \frac{\rho U L}{\mu}
 </div><!-- fragment --><p>Verification:</p>
 <ul>
 <li>check <code>output/statistics/Stats_msd.csv</code> by default, unless <code>statistics_pipeline.output_prefix</code> includes an explicit relative or absolute path.</li>
+</ul>
+<h2><a class="anchor" id="p11_spectra_ssec"></a>
+4.4 Measure Turbulent Energy Spectra</h2>
+<div class="fragment"><div class="line">spectra:</div>
+<div class="line">  output_prefix: &quot;Spectrum&quot;</div>
+<div class="line">  tasks:</div>
+<div class="line">    - task: shell_spectrum</div>
+<div class="line">      field: Ucat</div>
+<div class="line">      symbol: continuum</div>
+<div class="line">      subtract_mean: none      # or window:&lt;name&gt; where the flow is inhomogeneous</div>
+</div><!-- fragment --><div class="fragment"><div class="line">./bin/picurv run --post-process --only spectra \</div>
+<div class="line">  --run-dir runs/dit_20240401-153000 \</div>
+<div class="line">  --post my_study/post.yml</div>
+<div class="line"> </div>
+<div class="line">./bin/picurv summarize --run-dir runs/dit_20240401-153000 --plot-spectrum</div>
+</div><!-- fragment --><p><code>--only spectra</code> skips the field post-processor, so re-measuring after changing the binning or the fluctuation definition costs seconds rather than a full rebuild of the <code>.vts</code> output.</p>
+<p>Verification:</p>
+<ul>
+<li><code>output/spectra/Spectrum_shell_spectrum_Ucat_block0000_continuum.csv</code> holds <code>step,time,k,energy</code>, one row per shell per processed step.</li>
+<li>the <code>_history.csv</code> beside it holds one row per step; <code>parseval_residual</code> there must stay at round-off, since summed shell energy must equal the resolved kinetic energy.</li>
+</ul>
+<p><code>shell_spectrum</code> requires a triply periodic, single-block, uniform Cartesian box, and <code>picurv validate --case ... --post ...</code> refuses a case that is not one <b>before any field is read</b>.</p>
+<p>For anything else, which spectrum applies depends on how many directions are statistically homogeneous:</p>
+<ul>
+<li><b>one or two</b> — a channel, a straight duct, a boundary layer. A spatial spectrum is well defined along the homogeneous directions, but the <code>line_spectrum</code> and <code>plane_spectrum</code> tasks are planned rather than implemented; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">12. Offline Line And Plane Spectra</a>.</li>
+<li><b>none</b> — a bend, a wake, an immersed geometry. No spatial spectrum exists; what is wanted is a frequency spectrum at a probe, also planned; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">13. Temporal Spectra From Bounded Probe Histories</a>.</li>
 </ul>
 <h1><a class="anchor" id="p11_init_sec"></a>
 5. Case Initialization and Binary Management</h1>
