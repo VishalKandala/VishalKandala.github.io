@@ -24,7 +24,7 @@ var searchData=
   ['highlights_21',['highlights',['../14_Config_Contract.html#p14_case_sec',1,'3. Case Contract Highlights'],['../14_Config_Contract.html#p14_solver_sec',1,'4. Solver Contract Highlights'],['../14_Config_Contract.html#p14_monitor_sec',1,'5. Monitor Contract Highlights'],['../14_Config_Contract.html#p14_post_sec',1,'6. Post Contract Highlights']]],
   ['highlights_20cluster_20yml_22',['7. Cluster Contract Highlights (cluster.yml)',['../14_Config_Contract.html#p14_cluster_sec',1,'']]],
   ['highlights_20study_20yml_23',['8. Study Contract Highlights (study.yml)',['../14_Config_Contract.html#p14_study_sec',1,'']]],
-  ['histories_24',['13. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
+  ['histories_24',['14. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
   ['history_5ffile_25',['history_file',['../momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3',1,'MomentumNewtonKrylovContext']]],
   ['hooks_26',['6. Boundary System Runtime Hooks',['../46_C_Runtime_Execution_Map.html#p46_boundaries_sec',1,'']]],
   ['how_20it_20is_20validated_27',['11. How It Is Validated',['../58_Field_Statistics.html#p58_validation_sec',1,'']]],

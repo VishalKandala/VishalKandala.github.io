@@ -18,10 +18,11 @@ var searchData=
   ['execute_5fcommand_15',['execute_command',['../namespacepicurv__cli_1_1core.html#a2977d0ec013f157f6c18b6dbb65d85e5',1,'picurv_cli::core']]],
   ['expand_5fparameter_5fmatrix_16',['expand_parameter_matrix',['../namespacepicurv__cli_1_1core.html#a08234b43e7a08279a3b0389f5d984a4b',1,'picurv_cli::core']]],
   ['expand_5fstudy_5fparameter_5fcombinations_17',['expand_study_parameter_combinations',['../namespacepicurv__cli_1_1core.html#a4afd355f953c268b43fb18b1ff0a33be',1,'picurv_cli::core']]],
-  ['extract_5ffamilies_18',['extract_families',['../namespaceaudit__ingress.html#a25bf3b3f2d477a69e7b5b96a7b3076fc',1,'audit_ingress']]],
-  ['extract_5fmetric_5ffrom_5fcsv_19',['extract_metric_from_csv',['../namespacepicurv__cli_1_1core.html#a1abb3a91e1e203f3920b5944c247cac3',1,'picurv_cli::core']]],
-  ['extract_5fmetric_5ffrom_5flog_20',['extract_metric_from_log',['../namespacepicurv__cli_1_1core.html#ae1a2320ac02746b51d39612734cc6904',1,'picurv_cli::core']]],
-  ['extract_5fstruct_5fnames_21',['extract_struct_names',['../namespacegenerate__doxygen__fallback__indexes.html#abbcf809e03674add958ef31299e24ca8',1,'generate_doxygen_fallback_indexes']]],
-  ['extractactivevector_22',['ExtractActiveVector',['../test__momentum__convective__candidates_8c.html#aae4ef586f35de78aab290f8c2b4a4c1d',1,'test_momentum_convective_candidates.c']]],
-  ['extractlocalactivevector_23',['ExtractLocalActiveVector',['../test__momentum__convective__candidates_8c.html#ad7f8c7dfd7a7f6ed4760ccebd1d62227',1,'test_momentum_convective_candidates.c']]]
+  ['extendtolayoutboundary_18',['extendtolayoutboundary',['../postprocessing__kernels_8h.html#a72573a989c7f44e12e8f1aa6cfcaddd4',1,'ExtendToLayoutBoundary(UserCtx *user, Vec global, PetscInt components):&#160;postprocessing_kernels.c'],['../postprocessing__kernels_8c.html#a72573a989c7f44e12e8f1aa6cfcaddd4',1,'ExtendToLayoutBoundary(UserCtx *user, Vec global, PetscInt components):&#160;postprocessing_kernels.c']]],
+  ['extract_5ffamilies_19',['extract_families',['../namespaceaudit__ingress.html#a25bf3b3f2d477a69e7b5b96a7b3076fc',1,'audit_ingress']]],
+  ['extract_5fmetric_5ffrom_5fcsv_20',['extract_metric_from_csv',['../namespacepicurv__cli_1_1core.html#a1abb3a91e1e203f3920b5944c247cac3',1,'picurv_cli::core']]],
+  ['extract_5fmetric_5ffrom_5flog_21',['extract_metric_from_log',['../namespacepicurv__cli_1_1core.html#ae1a2320ac02746b51d39612734cc6904',1,'picurv_cli::core']]],
+  ['extract_5fstruct_5fnames_22',['extract_struct_names',['../namespacegenerate__doxygen__fallback__indexes.html#abbcf809e03674add958ef31299e24ca8',1,'generate_doxygen_fallback_indexes']]],
+  ['extractactivevector_23',['ExtractActiveVector',['../test__momentum__convective__candidates_8c.html#aae4ef586f35de78aab290f8c2b4a4c1d',1,'test_momentum_convective_candidates.c']]],
+  ['extractlocalactivevector_24',['ExtractLocalActiveVector',['../test__momentum__convective__candidates_8c.html#ad7f8c7dfd7a7f6ed4760ccebd1d62227',1,'test_momentum_convective_candidates.c']]]
 ];

@@ -63,7 +63,7 @@ var searchData=
   ['lifecycle_20means_60',['1. What A Run Lifecycle Means',['../52_Run_Lifecycle_Guide.html#p52_scope_sec',1,'']]],
   ['limiter_61',['limiter',['../momentumsolvers_8h.html#a357e1b7b4e505042fb92510cd6634c08',1,'MomStabilityReport']]],
   ['line_62',['line',['../classaudit__function__docs_1_1AuditFinding.html#a9941a4aea3d84d412b4c17bc9f4be0b6',1,'audit_function_docs::AuditFinding']]],
-  ['line_20and_20plane_20spectra_63',['12. Offline Line And Plane Spectra',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec',1,'']]],
+  ['line_20and_20plane_20spectra_63',['13. Offline Line And Plane Spectra',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec',1,'']]],
   ['line_5fre_64',['LINE_RE',['../namespacec__coverage__gate.html#a286cc95a365319e06ae9294ecb01a6d0',1,'c_coverage_gate']]],
   ['link_5fpattern_65',['LINK_PATTERN',['../namespacecheck__markdown__links.html#a0d49004cb489a8adbc8baec917b6e745',1,'check_markdown_links']]],
   ['links_66',['2. Top-Level Guide Links',['../30_Repository_Navigation.html#p30_top_links_sec',1,'']]],

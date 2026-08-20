@@ -18,10 +18,11 @@ var searchData=
   ['uold_15',['uold',['../variables_8h.html#a527e6b332c27519b8b8130092c2152b0',1,'IBMNodes::uold'],['../variables_8h.html#ad7014b3dc4fc7917a25981f1cb452908',1,'IBMVNodes::uold']]],
   ['updateubcs_16',['UpdateUbcs',['../structBoundaryCondition.html#aef72fac9d199da100309915f586c305f',1,'BoundaryCondition']]],
   ['urm1_17',['urm1',['../variables_8h.html#af9f4d9e8e8d826b857c4a29003dfb75e',1,'IBMNodes::urm1'],['../variables_8h.html#a042de1127487e0957e2d1f3f7f4daf84',1,'IBMVNodes::urm1']]],
-  ['usecfg_18',['useCfg',['../variables_8h.html#ab342b9a07bb00be469836bd6974b0c93',1,'SimCtx']]],
-  ['useprofilingselectedfuncscfg_19',['useProfilingSelectedFuncsCfg',['../variables_8h.html#a9e2b8b5d5e24da89966e2118688459b3',1,'SimCtx']]],
-  ['user_20',['user',['../variables_8h.html#a7823a7fc52af3c6fe103457cf85fdcce',1,'BCContext::user'],['../variables_8h.html#a0e8eb238051c8b5f37a260a8cde481c4',1,'MGCtx::user'],['../momentum__newton__krylov_8c.html#a44d13e4effe940bc8832905fcb2f96d7',1,'MomentumNewtonKrylovContext::user']]],
-  ['user_5fc_21',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
-  ['user_5ff_22',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
-  ['usermg_23',['usermg',['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx']]]
+  ['usage_18',['USAGE',['../namespacecheck__statistics__nodal__consistency.html#a81fb80a439a6f0872dec5be0f3ff8865',1,'check_statistics_nodal_consistency']]],
+  ['usecfg_19',['useCfg',['../variables_8h.html#ab342b9a07bb00be469836bd6974b0c93',1,'SimCtx']]],
+  ['useprofilingselectedfuncscfg_20',['useProfilingSelectedFuncsCfg',['../variables_8h.html#a9e2b8b5d5e24da89966e2118688459b3',1,'SimCtx']]],
+  ['user_21',['user',['../variables_8h.html#a7823a7fc52af3c6fe103457cf85fdcce',1,'BCContext::user'],['../variables_8h.html#a0e8eb238051c8b5f37a260a8cde481c4',1,'MGCtx::user'],['../momentum__newton__krylov_8c.html#a44d13e4effe940bc8832905fcb2f96d7',1,'MomentumNewtonKrylovContext::user']]],
+  ['user_5fc_22',['user_c',['../variables_8h.html#a8420a45c7f75054e71e9d8530e52ee8e',1,'UserCtx']]],
+  ['user_5ff_23',['user_f',['../variables_8h.html#a2deb96128ed850632f645128e26e229e',1,'UserCtx']]],
+  ['usermg_24',['usermg',['../variables_8h.html#a41a6127b3c012c516a7dcc56c3696a84',1,'SimCtx']]]
 ];
