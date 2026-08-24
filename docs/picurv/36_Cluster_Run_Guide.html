@@ -88,8 +88,8 @@ $(function() {
 <li class="level1"><a href="#p36_command_sec">2. Core Command Patterns</a></li>
 <li class="level1"><a href="#p36_artifacts_sec">3. Generated Scheduler Artifacts</a></li>
 <li class="level1"><a href="#p36_flow_sec">4. Submission Flow</a></li>
-<li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a><ul><li class="level2"><a href="#autotoc_md126">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md127">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md128">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a><ul><li class="level2"><a href="#autotoc_md127">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md128">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md129">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -133,8 +133,7 @@ $(function() {
 <ul>
 <li><code>--scheduler</code> is optional and only valid with <code>--cluster</code>.</li>
 <li>if provided, it must match <code>cluster.yml:scheduler.type</code>.</li>
-<li>in cluster mode, solver stage rank count is resolved from <code>cluster.yml</code> (<code>nodes * ntasks_per_node</code>).</li>
-<li>post stage is forced to single-task scheduling (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) and a single-rank launcher command even when solver stage is multi-rank.</li>
+<li>in cluster mode, solver and field postprocessor rank counts are resolved from <code>cluster.yml</code> (<code>nodes * ntasks_per_node</code>).</li>
 <li><code>cluster.yml</code> does not currently name the run directory. <code>picurv</code> generates <code>run_id</code> as <code>&lt;case_basename&gt;_&lt;timestamp&gt;</code>, then derives Slurm job names like <code>&lt;run_id&gt;_solve</code> and <code>&lt;run_id&gt;_post</code>.</li>
 <li>batch launcher precedence is: <code>cluster.yml.execution</code> first, then nearest <code>.picurv-execution.yml</code> (<code>cluster_execution</code>, then <code>default_execution</code>), then built-in <code>srun</code>.</li>
 </ul>
@@ -175,9 +174,8 @@ $(function() {
 </li>
 <li>Override that policy in <code>cluster.yml -&gt; execution.walltime_guard</code> only when the defaults do not fit your timestep variability or filesystem overhead.</li>
 <li>Keep an early signal in <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> as fallback protection: <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
-<li>Solver stage uses <code>cluster.yml</code> resources directly.</li>
-<li>Post stage is always rendered as a single-task job (<code>nodes=1</code>, <code>ntasks_per_node=1</code>) in generated <code>post.sbatch</code>.</li>
-<li>When the selected launcher is MPI-aware (<code>srun</code>, <code>mpirun</code>, <code>mpiexec</code>), PICurv also strips conflicting size flags and forces the post launch to rank <code>1</code>.</li>
+<li>Solver and field postprocessor stages use <code>cluster.yml</code> resources directly.</li>
+<li>When the selected launcher is MPI-aware (<code>srun</code>, <code>mpirun</code>, <code>mpiexec</code>), PICurv strips conflicting size flags and forces the post launch to <code>nodes * ntasks_per_node</code> ranks.</li>
 <li>Slurm stdout/stderr lives under <code>scheduler/</code>; solver-generated runtime logs still live under <code>logs/</code>.</li>
 <li><code>picurv init</code> now creates <code>.picurv-execution.yml</code> in each new case with inert defaults.</li>
 <li>If your cluster needs the same MPI launcher tokens for login-node and batch runs, edit that file and let <code>cluster.yml</code> override only when batch jobs differ.</li>
@@ -197,11 +195,11 @@ $(function() {
 <li><b><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md126"></a>
+<h2><a class="anchor" id="autotoc_md127"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Cluster Run Guide (Slurm)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md127"></a>
+<h3><a class="anchor" id="autotoc_md128"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -209,7 +207,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md128"></a>
+<h3><a class="anchor" id="autotoc_md129"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>

@@ -91,8 +91,8 @@ $(function() {
 <li class="level1"><a href="#p37_operations_sec">5. Operational Workflow</a></li>
 <li class="level1"><a href="#p37_continue_sec">6. Continuing a Partially-Completed Study</a></li>
 <li class="level1"><a href="#p37_reaggregate_sec">7. Manual Metrics Re-Aggregation</a></li>
-<li class="level1"><a href="#p37_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md129">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md130">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md131">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p37_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md130">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md131">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md132">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -200,7 +200,7 @@ $(function() {
 <li><code>scheduler/submission.json</code> is the study-directory contract consumed by <code>picurv submit --study-dir ...</code>.</li>
 <li>generator/file grid external paths are rewritten to absolute paths during case materialization so they remain valid in <code>studies/&lt;study_id&gt;/cases/...</code>.</li>
 <li>generated <code>solver_array.sbatch</code> exports walltime metadata for the runtime walltime guard, while <code>post_array.sbatch</code> remains a plain post-processing launcher.</li>
-<li><code>post_array.sbatch</code> is rendered with <code>nodes=1</code>, <code>ntasks_per_node=1</code>, and a single-rank launcher command even if the solver array uses more tasks or the cluster launcher args include <code>-n</code>/<code>-np</code>.</li>
+<li><code>post_array.sbatch</code> uses the same <code>nodes * ntasks_per_node</code> allocation as the solver array; conflicting launcher <code>-n</code>/<code>-np</code> flags are rewritten to that task count.</li>
 </ul>
 <h1><a class="anchor" id="p37_continue_sec"></a>
 6. Continuing a Partially-Completed Study</h1>
@@ -231,11 +231,11 @@ $(function() {
 <li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
 <li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md129"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Sweep and Study Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md130"></a>
+<h3><a class="anchor" id="autotoc_md131"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -243,7 +243,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md131"></a>
+<h3><a class="anchor" id="autotoc_md132"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>

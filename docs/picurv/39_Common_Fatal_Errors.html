@@ -87,8 +87,8 @@ $(function() {
 <ul><li class="level1"><a href="#p39_structured_sec">1. Structured Validation Errors (ERROR &lt;CODE&gt;)</a></li>
 <li class="level1"><a href="#p39_legacy_sec">2. High-Frequency Fatal Messages (Runtime Paths)</a></li>
 <li class="level1"><a href="#p39_restart_sec">3. Restart Mistakes To Check First</a></li>
-<li class="level1"><a href="#p39_workflow_sec">4. Recommended Debug Workflow</a><ul><li class="level2"><a href="#autotoc_md132">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md133">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md134">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p39_workflow_sec">4. Recommended Debug Workflow</a><ul><li class="level2"><a href="#autotoc_md133">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md134">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md135">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -157,8 +157,10 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">[FATAL] Unsupported scheduler '&lt;x&gt;'. Only Slurm is supported in v1.   </td><td class="markdownTableBodyNone">cluster.yml has unsupported scheduler type   </td><td class="markdownTableBodyNone">Set cluster.yml -&gt; scheduler.type: slurm.    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">[FATAL] In cluster mode, &ndash;num-procs applies to the solver stage and must be 1 (auto) or exactly nodes*ntasks_per_node (...)   </td><td class="markdownTableBodyNone">Solver MPI count mismatch against cluster resources   </td><td class="markdownTableBodyNone">Set -n 1 or set solver -n to nodes * ntasks_per_node.    </td></tr>
+<td class="markdownTableBodyNone">[FATAL] In cluster mode, &ndash;num-procs must be 1 (auto) or exactly nodes*ntasks_per_node (...)   </td><td class="markdownTableBodyNone">MPI count mismatch against cluster resources   </td><td class="markdownTableBodyNone">Set -n 1 or set -n to nodes * ntasks_per_node.    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Local x-width of domain x 2 is smaller than stencil width s 3</code> (or the y/z variants)   </td><td class="markdownTableBodyNone"><code>poisson_solver.multigrid.levels</code> is too deep for the MPI rank layout. The coarsest level halves down to fewer nodes per rank than the stencil width, which is 3 whenever any axis is periodic. Aborts during DM creation, before the first timestep.   </td><td class="markdownTableBodyNone">Lower <code>multigrid.levels</code> and delete the now-unused <code>level_solvers.level_N</code> entry, or reduce the rank count. Constraint is <code>floor((N / 2^(levels-1) + 1) / ranks_per_axis) &gt;= stencil_width</code>; worked maxima are tabulated in <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">&lsquo;libgfortran.so.5: version 'GFORTRAN_10&rsquo; not found<code>or</code>libstdc++.so.6: version 'GLIBCXX_3.4.29' not found<code>\ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; PETSc was built with a newer GCC toolchain than the runtime libraries found by the dynamic loader. On module-based clusters this usually means the solver ranks are launching without the matching compiler runtime library path, a stale</code>.picurv-python-env<code>prepended</code>/lib64<code>, or the binary was built under a different module stack. \ilinebr &lt;/td&gt; &lt;td class="markdownTableBodyNone"&gt; Reload the same compiler/MPI/PETSc modules used for the build, rebuild from clean objects, then verify</code>ldd bin/simulator<code>resolves</code>libgfortran<code>and</code>libstdc++<code>to the module tree instead of</code>/lib64<code>. If</code>ldd<code>is correct but</code>picurv run<code>still fails, inspect</code>.picurv-python-env<code>and remove generic system dirs such as</code>/lib64<code>; then check</code>mpirun -n 1 env<code>and export</code>LD_LIBRARY_PATH` to MPI ranks explicitly if needed.   </td></tr>
 </table>
 <h1><a class="anchor" id="p39_restart_sec"></a>
@@ -195,11 +197,11 @@ $(function() {
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
 <li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md132"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Common Fatal Errors and Fixes</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&amp;lt;run_id&amp;gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md133"></a>
+<h3><a class="anchor" id="autotoc_md134"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -207,7 +209,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md134"></a>
+<h3><a class="anchor" id="autotoc_md135"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>

@@ -30,11 +30,12 @@ var searchData=
   ['kproductsecond_27',['kProductSecond',['../statistics__accumulator_8c.html#aa6dde91a4c7207d721057e73bcb58c5e',1,'statistics_accumulator.c']]],
   ['kroundconstants_28',['kRoundConstants',['../checksum_8c.html#adc809017365449fc221aeb4facfef827',1,'checksum.c']]],
   ['ksc_29',['ksc',['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc'],['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc']]],
-  ['kske_30',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
-  ['ksp_31',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
-  ['ksp_5ftotal_32',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
-  ['kx_33',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
-  ['ky_34',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
-  ['kz_35',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
-  ['kzet_36',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
+  ['ksentinel_30',['kSentinel',['../test__post__compute__mpi_8c.html#a23e7a89e842a119b9a49ab98779f1b90',1,'test_post_compute_mpi.c']]],
+  ['kske_31',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
+  ['ksp_32',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
+  ['ksp_5ftotal_33',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
+  ['kx_34',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
+  ['ky_35',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
+  ['kz_36',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
+  ['kzet_37',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
 ];

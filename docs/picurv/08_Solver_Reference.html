@@ -282,6 +282,14 @@ poisson_solver:
   # --- Geometric Multigrid (PCMG) Settings ---
   multigrid:
     levels: 3         # [Integer] -&gt; -mg_level
+    # NOTE: levels is bounded by the MPI rank layout, not chosen freely. Every
+    # level must leave each rank at least stencil_width nodes per axis, and the
+    # stencil width is 3 whenever ANY axis is periodic (2 otherwise). Exceeding
+    # it aborts during DM creation with:
+    #   Local x-width of domain x 2 is smaller than stencil width s 3
+    # Constraint: floor((cells_per_axis / 2^(levels-1) + 1) / ranks_per_axis) &gt;= stencil_width
+    # picurv validate cannot catch this; it does not see the rank layout.
+    # Worked maxima: docs/pages/25_Pressure_Poisson_GMRES_Multigrid.md
     pre_sweeps: 2     # [Integer] -&gt; -mg_pre_it
     post_sweeps: 2    # [Integer] -&gt; -mg_post_it
     # Current PETSc binding applies one smoother count; if these differ,
@@ -497,6 +505,7 @@ petsc_passthrough_options:
 <p>Rules:</p><ul>
 <li><code>pressure_solver</code> is accepted as a legacy alias, but <code>poisson_solver</code> is preferred because the linear solve computes pressure correction <code>Phi</code>.</li>
 <li>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest level and larger numbers are finer.</li>
+<li><code>multigrid.levels</code> is bounded by the MPI decomposition, not chosen freely: every level must leave each rank at least <code>stencil_width</code> nodes per axis (3 when any axis is periodic, 2 otherwise). Exceeding it aborts during DM creation with <code>Local x-width of domain ... is smaller than stencil width</code>, and <code>picurv validate</code> cannot catch it because it does not see the rank layout. Formula and worked maxima: <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li>The outer Poisson preconditioner is multigrid-only in the current runtime.</li>
 <li>The current PETSc binding applies one MG smoother count; when <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</li>
 <li>Advanced PETSc tuning remains available through <code>petsc_passthrough_options</code>; common examples include <code>-ps_mg_levels_N_pc_sor_omega</code> for SOR and <code>-ps_mg_levels_N_pc_factor_shift_amount</code> / <code>-ps_mg_levels_N_pc_factor_levels</code> for factor PCs.</li>
