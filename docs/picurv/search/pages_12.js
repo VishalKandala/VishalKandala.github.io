@@ -20,8 +20,9 @@ var searchData=
   ['statistics_20planned_20extensions_17',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]],
   ['status_18',['API Documentation Status',['../35_API_Documentation_Status.html',1,'']]],
   ['step_20projection_20method_19',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['study_20guide_20',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['suite_20developer_20guide_21',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
-  ['summary_22',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['sweep_20and_20study_20guide_23',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
+  ['storage_20management_20guide_20',['Storage Management Guide',['../61_Storage_Management_Guide.html',1,'']]],
+  ['study_20guide_21',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['suite_20developer_20guide_22',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
+  ['summary_23',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
+  ['sweep_20and_20study_20guide_24',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]]
 ];

@@ -15,5 +15,6 @@ var searchData=
   ['statistics_5ftarget_2ec_12',['statistics_target.c',['../statistics__target_8c.html',1,'']]],
   ['statistics_5ftarget_2eh_13',['statistics_target.h',['../statistics__target_8h.html',1,'']]],
   ['statistics_5fwindow_2ec_14',['statistics_window.c',['../statistics__window_8c.html',1,'']]],
-  ['statistics_5fwindow_2eh_15',['statistics_window.h',['../statistics__window_8h.html',1,'']]]
+  ['statistics_5fwindow_2eh_15',['statistics_window.h',['../statistics__window_8h.html',1,'']]],
+  ['storage_2epy_16',['storage.py',['../storage_8py.html',1,'']]]
 ];

@@ -10,5 +10,6 @@ var searchData=
   ['solveresult_7',['SolveResult',['../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveResult',1,'']]],
   ['spatialtargetplan_8',['SpatialTargetPlan',['../statistics__target_8h.html#structSpatialTargetPlan',1,'']]],
   ['stablecflresult_9',['StableCFLResult',['../test__momentum__convective__candidates_8c.html#structStableCFLResult',1,'']]],
-  ['surfelmtinfo_10',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
+  ['storageerror_10',['StorageError',['../classpicurv__cli_1_1storage_1_1StorageError.html',1,'picurv_cli::storage']]],
+  ['surfelmtinfo_11',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]]
 ];
