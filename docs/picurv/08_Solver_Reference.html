@@ -182,9 +182,11 @@ strategy:
 # --- Convergence Criteria for the Momentum Solver ---
 tolerances:
   max_iterations: 50   # [Integer] -&gt; -mom_max_pseudo_steps
-  absolute_tol: 1.0e-8 # [Float] -&gt; -mom_atol
+  # absolute_tol: 1.0e-8   # DEPRECATED -&gt; -mom_atol. Takes no part while a
+  #                        # residual tolerance is active (the default).
   relative_tol: 1.0e-5 # [Float] -&gt; -mom_rtol
-  residual_absolute_tol: 0.0 # Disabled when non-positive
+  residual_absolute_tol: 1.0e-8 # [Float] -&gt; -mom_resid_atol. DIMENSIONLESS:
+                                # converges when |R| &lt;= this * a0*|Ucont|_inf/dt. Sufficient alone.
   residual_relative_tol: 1.0e-3 # Use 1.0e-2 for looser exploratory LES
   # Step-change tolerance: stop inner loop when ||u_n+1 - u_n|| &lt; step_tol.
   # Non-positive or omitted = disabled.
@@ -197,7 +199,8 @@ momentum_solver:
   # Note: 'dual_time_picard_rk4' is an accepted deprecated alias for this block.
   dual_time_picard_jameson_rk:
     max_pseudo_steps: 50         # -&gt; -mom_max_pseudo_steps
-    absolute_tol: 1.0e-8         # -&gt; -mom_atol
+    # absolute_tol: 1.0e-8   # DEPRECATED -&gt; -mom_atol. Takes no part while a
+    #                        # residual tolerance is active (the default).
     relative_tol: 1.0e-5         # -&gt; -mom_rtol
     # Step-change tolerance (optional, mirrors tolerances.step_tol):
     # step_tol: 0.0              # -&gt; -imp_stol
@@ -427,24 +430,25 @@ petsc_passthrough_options:
 3. tolerances</h1>
 <div class="fragment"><div class="line">tolerances:</div>
 <div class="line">  max_iterations: 50</div>
-<div class="line">  absolute_tol: 1.0e-7</div>
 <div class="line">  relative_tol: 1.0e-4</div>
-<div class="line">  residual_absolute_tol: 0.0</div>
+<div class="line">  residual_absolute_tol: 1.0e-8   # dimensionless (see below)</div>
 <div class="line">  residual_relative_tol: 1.0e-3</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>max_iterations</code> -&gt; <code>-mom_max_pseudo_steps</code></li>
-<li><code>absolute_tol</code> -&gt; <code>-mom_atol</code></li>
 <li><code>relative_tol</code> -&gt; <code>-mom_rtol</code></li>
 <li><code>residual_absolute_tol</code> -&gt; <code>-mom_resid_atol</code></li>
 <li><code>residual_relative_tol</code> -&gt; <code>-mom_resid_rtol</code></li>
 </ul>
-<p>When both residual tolerances are non-positive, the solver preserves its existing update-only convergence criterion. <code>step_tol</code>/<code>-imp_stol</code> remains accepted as a deprecated compatibility option but is unused by active momentum solvers.</p>
+<p><code>absolute_tol</code> -&gt; <code>-mom_atol</code> is <b>deprecated</b> and no longer appears in the shipped configs. It is still accepted, but the CLI warns that it takes no part in convergence while a residual tolerance is active; it survives only for the legacy update-only branch.</p>
+<p>Both residual tolerances now <b>default to enabled</b> (<code>-mom_resid_atol</code> 1e-8, <code>-mom_resid_rtol</code> 1e-3). Setting both non-positive is an explicit opt-out that selects the legacy update-only branch, which can converge falsely when <code>dtau</code> collapses; prefer not to.</p>
+<p>When either residual tolerance is positive it decides convergence: the absolute test is sufficient on its own, and the relative test is paired with <code>relative_tol</code> as a guard. <code>absolute_tol</code> then takes no part, because <code>|dU| &lt;= absolute_tol</code> is the disguised, step-size-dependent residual bound <code>|R| &lt;= absolute_tol/dtau</code>. When both residual tolerances are non-positive, the solver preserves its existing update-only convergence criterion (<code>absolute_tol</code> <b>and</b> <code>relative_tol</code>). See <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html#p24_convergence_sec">3. Convergence and Adaptive Rollback</a>.</p>
+<p><code>residual_absolute_tol</code> is <b>dimensionless</b>. The residual carries units of volumetric flux per time, so a raw bound on <code>|R|</code> would need retuning for every grid, velocity scale and timestep; across the shipped cases <code>|R|</code> at step 1 spans 1.2e-2 (plane channels) to 2.0 (driven duct). The test applied is </p><pre class="fragment">|R| &lt;= residual_absolute_tol * resid_ref,   resid_ref = a0 * |Ucont|_inf / dt
+</pre><p> where <code>resid_ref</code> is the magnitude of the residual's own BDF term, recomputed each physical step. Normalising by it removes the <code>dt</code> and velocity-scale factors that dominate that spread, so one value is portable. <code>resid_ref</code> is reported on the per-step <code>Dual-time solver:</code> log line. <code>step_tol</code>/<code>-imp_stol</code> remains accepted as a deprecated compatibility option but is unused by active momentum solvers.</p>
 <h1><a class="anchor" id="p08_msolver_sec"></a>
 4. momentum_solver (Solver-Specific Block)</h1>
 <div class="fragment"><div class="line">momentum_solver:</div>
 <div class="line">  dual_time_picard_jameson_rk:</div>
 <div class="line">    max_pseudo_steps: 50</div>
-<div class="line">    absolute_tol: 1.0e-8</div>
 <div class="line">    relative_tol: 1.0e-5</div>
 <div class="line">    pseudo_cfl:           # dimensionless Courant number: dtau = pseudo_cfl / lambda_max</div>
 <div class="line">      initial: 0.5</div>

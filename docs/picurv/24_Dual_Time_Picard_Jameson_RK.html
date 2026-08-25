@@ -152,23 +152,51 @@ $(function() {
 <ol type="1">
 <li>State rolls back to the last accepted pseudo-state.</li>
 <li>Pseudo-CFL is multiplied by <code>reduction_factor</code>.</li>
+<li>The EMA-smoothed ratio rolls back too — see below.</li>
+<li>The failed pseudo-CFL is remembered, and the controller will not grow back to it.</li>
 <li>Iteration retries from the restored state without consuming the accepted-iteration budget.</li>
 </ol>
+<p><b>The smoothed ratio is rolled back with the state.</b> It is only a candidate until its trial is accepted. A rejected trial never happened as far as the solution is concerned, so letting its ratio persist into the next decision is a state leak. Measured on the laminar channel: a diverging trial at <code>cfl 2.0</code> (raw ratio 3.97) pushed the EMA to 1.61, and the <em>next</em> trial at <code>cfl 1.5</code> was rejected as well — despite a raw ratio of 0.994, i.e. despite the residual actually decreasing. That false rejection discarded four <code>ComputeRHS</code> calls and drove the pseudo-CFL down to 1.125. The <code>reduction_factor</code> on the rejection path already carries the information; the EMA does not need to carry it as well.</p>
+<p><b>Failed pseudo-CFLs are remembered.</b> Without this the controller re-discovers the stability limit on every physical step: on the laminar channel it climbed 1.36 → 2.00, rejected, recovered, and climbed straight back, with 28.8% of all trials spent above the limit. A dimensionless cap tightens to <code>MOM_CFL_CAP_SAFETY ×</code> the failed CFL and then relaxes by <code>MOM_CFL_CAP_RELAX</code> per accepted trial, so a rejection caused by a transient does not hold the solve down for the rest of the run. The cap is carried in CFL rather than <code>dtau</code> so it stays meaningful as <code>lambda_max</code> evolves.</p>
+<p>Measured effect at the shipped ceiling, rejection rate and total pseudo-iterations:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">case   </th><th class="markdownTableHeadNone">before   </th><th class="markdownTableHeadNone">after    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">laminar 17x33x17   </td><td class="markdownTableBodyNone">233 trials, 13.3% rejected   </td><td class="markdownTableBodyNone">226, 4.9%    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">plane channel 33^3   </td><td class="markdownTableBodyNone">340, 20.6%   </td><td class="markdownTableBodyNone">308, 6.5%    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">flat channel 25x25x97   </td><td class="markdownTableBodyNone">155, 7.7%   </td><td class="markdownTableBodyNone">151, 5.3%   </td></tr>
+</table>
+<p>Rejections roughly halve; total work falls 3–9%. The remaining cost is not rejection handling: the pseudo-CFL that converges fastest lies well below the stability limit, because the Jameson scheme is a smoother and smoothers damp worst near their limit. A stability-triggered cap cannot find that optimum — on the LES reτ180 case, which rejects nothing either before or after, the controller is unaffected.</p>
 <p>Acceptance and rollback are global across blocks and MPI ranks. The <code>max_iterations</code> parameter bounds <b>accepted</b> pseudo-iterations. A separate hard cap of <code>3 × max_iterations</code> bounds total attempts (accepted plus rejected) to prevent infinite rejection loops. A finite solve that exhausts its accepted-iteration budget exits with the last accepted finite state.</p>
 <p>Pseudo-CFL is adaptively ramped on successful trials (ratio &lt; 0.90: immediate growth; 0.90–1.0: growth after 3 consecutive clean trials), reduced on noisy accepted trials or rejection, and clamped by configured min/max bounds. The controller-selected next CFL carries directly into the next physical timestep.</p>
-<p><b>Convergence criteria</b> (both must pass simultaneously):</p>
-<ul>
-<li><b>Update pass</b>: <code>|ΔU| ≤ absolute_tol</code> <b>AND</b> <code>|ΔU|/|ΔU₀| ≤ relative_tol</code></li>
-<li><b>Residual pass</b> (only checked when either residual tolerance is set to a positive value): at least one of <code>|R| ≤ mom_resid_atol</code> or <code>|R|/|R₀| ≤ mom_resid_rtol</code> must hold</li>
+<p><b>Convergence criteria.</b> When a residual tolerance is configured, the residual is what decides — only the residual states that the momentum equations are satisfied at the current state. The update norms measure progress, not correctness. </p><pre class="fragment">converged = residual_abs_pass  OR  (residual_rel_pass AND update_pass)
+</pre><ul>
+<li>**<code>residual_abs_pass</code>**: <code>|R| ≤ residual_absolute_tol · resid_ref</code>. <b>Sufficient on its own</b> — it states outright that the equations are satisfied to the configured level, which is what an absolute tolerance means and how PETSc's SNES and KSP already behave. <code>residual_absolute_tol</code> is <b>dimensionless</b>; see the note below.</li>
+<li>**<code>residual_rel_pass</code>**: <code>|R|/|R₀| ≤ residual_relative_tol</code>. Weaker evidence — a 1000× reduction says the iteration made progress from wherever it started, not that the result is small, and <code>|R₀|</code> itself collapses near steady state. Paired with the update guard.</li>
+<li>**<code>update_pass</code>**: <code>|ΔU|/|ΔU₀| ≤ relative_tol</code>, a stagnation guard, disabled by setting <code>relative_tol</code> to zero.</li>
 </ul>
-<p>Both update and residual passes must be true simultaneously for the solver to declare convergence.</p>
+<p>The update norm is <b>never sufficient by itself</b> in either branch. <code>|ΔU| ≈ dtau·|R|</code>, so it goes small whenever <code>dtau</code> goes small — observed as <code>|ΔU|</code> falling only ~10% over 100 pseudo-iterations of a completely frozen iteration.</p>
+<p>Requiring <code>update_pass</code> alongside the absolute branch is what previously made the floor unable to fire. Measured on the laminar channel at step 793: <code>|R|</code> fell below the floor at pseudo-iteration 8, and the step still ran to 20 waiting on <code>|ΔU|/|ΔU₀|</code> — 60% of the step spent after the equations were already satisfied to specification.</p>
+<p>That same identity is why <code>absolute_tol</code> takes no part in the decision once a residual tolerance exists. <code>|ΔU| ≤ absolute_tol</code> is really <code>|R| ≤ absolute_tol/dtau</code>, a disguised residual bound that <em>tightens</em> as the adaptive controller succeeds in growing <code>dtau</code>. It duplicated the explicit residual test while pulling against it, and in practice it, rather than <code>residual_relative_tol</code>, was the criterion that gated convergence — the shipped laminar channel satisfied <code>residual_relative_tol: 1.0e-3</code> at pseudo-iteration 10 and then ran to 15 waiting on <code>absolute_tol: 1.0e-8</code>.</p>
+<p><b>With no residual tolerance configured</b> — both set non-positive, which is now an explicit opt-out since the defaults enable them — the update norms are the only information available and the legacy test is retained unchanged: <code>|ΔU| ≤ absolute_tol</code> <b>AND</b> <code>|ΔU|/|ΔU₀| ≤ relative_tol</code>. That branch carries a false-convergence mode: <code>|ΔU| ≤ absolute_tol</code> can pass purely because <code>dtau</code> collapsed, converging on a state that does not satisfy the equations. It is retained only for backward compatibility and should not be selected deliberately.</p>
+<p><b>Why the absolute residual tolerance is normalised.</b> <code>|R₀|</code> is the residual at the <em>previous timestep's</em> solution, so it shrinks as a run approaches steady state — measured on the laminar channel it falls four orders of magnitude over 500 steps, from 1.2e-2 to 1.1e-6. A purely relative criterion therefore keeps demanding a further 1000× reduction of an ever-smaller number, and the pseudo-iteration count climbs back up (9 → 15 over the same stretch). <code>residual_absolute_tol</code> is the floor that stops that climb.</p>
+<p>It cannot be a raw bound on <code>|R|</code>, because <code>R</code> carries units of volumetric flux per time: across the shipped cases <code>|R|</code> at step 1 spans 1.2e-2 for the plane channels to 2.0 for the driven duct, a factor of ~165 that is almost entirely <code>dt</code> and velocity scale. The test is therefore</p>
+<p class="formulaDsp">
+\[ |R| \le \texttt{residual\_absolute\_tol} \cdot R_{ref}, \qquad
+    R_{ref} = a_0 \, \|U_{cont}\|_\infty / \Delta t \]
+</p>
+<p><code>R_ref</code> is the magnitude of the residual's own BDF term, recomputed each physical step. Normalising by it collapses that 165× spread to roughly 4×, so a single dimensionless value is portable across cases. <code>R_ref</code> is deliberately <b>not</b> <code>|R₀|</code> — the relative test already uses that, and it is exactly the quantity that collapses near steady state. Being derived from the current state, <code>R_ref</code> also needs no checkpoint plumbing and is identical across a restart. A stagnant field gives <code>R_ref = 0</code>, in which case the absolute test is skipped rather than dividing by zero, leaving the relative test in sole charge.</p>
+<p>Because the two residual tests are OR'd, a <code>residual_absolute_tol</code> set too high would satisfy convergence at pseudo-iteration 1. The shipped value of 1.0e-8 sits about six orders below the step-1 normalised residual of the laminar channel (~0.17), so it stays inert through the transient and only takes effect near steady state.</p>
 <h1><a class="anchor" id="p24_config_sec"></a>
 4. YAML → Runtime Controls</h1>
 <p>User-facing configuration (<code>solver.yml</code>) maps to:</p>
 <ul>
 <li><code>strategy.momentum_solver</code> → <code>-mom_solver_type</code></li>
 <li><code>tolerances.max_iterations</code> → <code>-mom_max_pseudo_steps</code></li>
-<li><code>tolerances.absolute_tol</code> → <code>-mom_atol</code></li>
+<li><code>tolerances.absolute_tol</code> → <code>-mom_atol</code> (<b>deprecated</b>; removed from the shipped configs, still accepted with a CLI warning, inactive while a residual tolerance is set)</li>
 <li><code>tolerances.relative_tol</code> → <code>-mom_rtol</code></li>
 <li><code>tolerances.residual_absolute_tol</code> → <code>-mom_resid_atol</code></li>
 <li><code>tolerances.residual_relative_tol</code> → <code>-mom_resid_rtol</code></li>
@@ -203,10 +231,13 @@ $(function() {
 <li>explicit comparator path: <a class="el" href="momentumsolvers_8h.html#aeae56a41737fb0952e07aa4bc8ebda44">MomentumSolver_Explicit_RungeKutta4</a></li>
 <li>runtime dispatch: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
 <li>options ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
+<li>residual row contract: <a class="el" href="Boundaries_8h.html#a3553445185958b8c1aa913e5e2d478eb">ClassifyMomentumRow</a>, applied by <a class="el" href="Boundaries_8h.html#a45e61f1a6980c1f8ec768d76827ff208">EnforceRHSBoundaryConditions</a></li>
 </ul>
 <h1><a class="anchor" id="p24_rhs_state_sec"></a>
 6a. RHS State and Pseudo-Iteration Cadence</h1>
 <p><code><a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8" title="Computes the Right-Hand Side (RHS) of the momentum equations.">ComputeRHS()</a></code> runs once per Jameson RK stage, so it executes many times per physical timestep and the count varies with the pseudo-iteration and rollback behaviour described in section 3. The shadow-Jacobian estimate assumes body forces are a constant forcing with zero velocity Jacobian, which only holds if nothing inside the RHS advances per-timestep state on each call. Gate any such state on <code>simCtx-&gt;step</code>. Full rationale, and a worked case where this was violated in two places at once: <a class="el" href="31_Momentum_Solvers.html#p31_rhs_cadence_sec">6. Call Cadence of the Shared RHS (Read Before Adding State)</a>.</p>
+<p>The same cadence makes the residual's <em>constrained rows</em> a state hazard, not just its physics. <code><a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8" title="Computes the Right-Hand Side (RHS) of the momentum equations.">ComputeRHS()</a></code> writes only the rows it owns and leaves the rest of the vector alone, so any row it skips retains whatever the previous call left there, while <code><a class="el" href="momentumsolvers_8h.html#abf87d606ec601bee4d2df09925b75a51" title="Computes the shared spatial-plus-BDF momentum residual in user-&gt;Rhs.">ComputeTotalResidual()</a></code> adds the BDF term over the whole vector on top. A skipped row that nothing zeroes is therefore an accumulator: it grows by |dU|/dt on every evaluation regardless of the state, the adaptive controller reads that growth as divergence, and <code>dtau</code> collapses to its floor without any timestep converging. Reducing <code>dt</code> or raising <code>max_iterations</code> cannot help, because the increment does not depend on <code>dtau</code>.</p>
+<p>Which rows are constrained is therefore not a detail to restate locally. It is answered in one place, <a class="el" href="Boundaries_8h.html#a3553445185958b8c1aa913e5e2d478eb">ClassifyMomentumRow</a>, and <a class="el" href="Boundaries_8h.html#a45e61f1a6980c1f8ec768d76827ff208">EnforceRHSBoundaryConditions</a> zeroes every row it does not classify as <code>MOM_ROW_PHYSICAL</code>. The matrix-free Newton path shares that classification and substitutes explicit equations instead of zeros, because a zeroed row would leave a zero Jacobian row. Periodic duplicate columns are the case most easily missed: <code><a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8" title="Computes the Right-Hand Side (RHS) of the momentum equations.">ComputeRHS()</a></code> writes only their face-normal component, so the transverse components must be zeroed here.</p>
 <h1><a class="anchor" id="p24_practical_sec"></a>
 7. Practical Tuning Guidance</h1>
 <p>Common stability tuning order:</p>
