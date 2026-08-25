@@ -46,8 +46,9 @@ var searchData=
   ['interpolationmethod_43',['interpolationMethod',['../variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f',1,'SimCtx']]],
   ['invicid_44',['invicid',['../variables_8h.html#a7af448f97fbebfd44e5989614b982a93',1,'SimCtx']]],
   ['invoked_5fscript_5fdir_45',['INVOKED_SCRIPT_DIR',['../namespacepicurv__cli_1_1core.html#ac29ba0430552705de4caed75d3c16755',1,'picurv_cli::core']]],
-  ['isc_46',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
-  ['ismastercontroller_47',['isMasterController',['../BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48',1,'DrivenFluxData']]],
-  ['its_48',['its',['../test__momentum__newton__boundary__fixedpoint_8c.html#a72427fbaf52be6462fb612fec6194bd9',1,'SolveResult']]],
-  ['izet_49',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
+  ['is_5fartifact_5fcold_46',['is_artifact_cold',['../namespacepicurv__cli_1_1core.html#ab7284b99cae135c090bfcdf30e36ee40',1,'picurv_cli::core']]],
+  ['isc_47',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
+  ['ismastercontroller_48',['isMasterController',['../BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48',1,'DrivenFluxData']]],
+  ['its_49',['its',['../test__momentum__newton__boundary__fixedpoint_8c.html#a72427fbaf52be6462fb612fec6194bd9',1,'SolveResult']]],
+  ['izet_50',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
 ];

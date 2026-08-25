@@ -71,11 +71,13 @@ var searchData=
   ['storage_5flock_5ffilename_68',['STORAGE_LOCK_FILENAME',['../namespacepicurv__cli_1_1storage.html#aae5503476273c0eea41bb9776d879de6',1,'picurv_cli::storage']]],
   ['storage_5fschema_5fversion_69',['STORAGE_SCHEMA_VERSION',['../namespacepicurv__cli_1_1storage.html#aa075bf00c68497bdfbd80a8bdf5d3686',1,'picurv_cli::storage']]],
   ['storage_5fstate_5ffilename_70',['STORAGE_STATE_FILENAME',['../namespacepicurv__cli_1_1storage.html#a1303a23e1184770c012bc927dc48f821',1,'picurv_cli::storage']]],
-  ['strong_5fcoupling_71',['STRONG_COUPLING',['../variables_8h.html#a82348af36047097defe3692225145edc',1,'SimCtx']]],
-  ['structure_72',['structure',['../momentum__newton__krylov_8c.html#a8c4f1327d8fcb4662371302953421bfe',1,'MomentumPreconditionerDescription']]],
-  ['stub_5fimplementation_5fre_73',['STUB_IMPLEMENTATION_RE',['../namespaceaudit__function__docs.html#afb3a1ef4c7095186a849bcc655d9cd2d',1,'audit_function_docs']]],
-  ['summationrhs_74',['summationRHS',['../variables_8h.html#aee7757dd3f6e9566fc1206526625e000',1,'SimCtx']]],
-  ['swarm_75',['swarm',['../variables_8h.html#a1675749ea3b2429f00405a1ee3203d18',1,'UserCtx']]],
-  ['symbol_76',['symbol',['../classaudit__function__docs_1_1AuditFinding.html#af250bdc46701c7aafc0fadfd798eabf1',1,'audit_function_docs::AuditFinding']]],
-  ['sync_5fclass_77',['sync_class',['../field__catalog_8h.html#ae99c2ba910b76be68ed1a442e314c643',1,'FieldDescriptor']]]
+  ['storage_5fstate_5fsummary_71',['storage_state_summary',['../namespacepicurv__cli_1_1core.html#a7ba9e2a8e03894d7cd870499d8bb06bd',1,'picurv_cli::core']]],
+  ['storageerror_72',['StorageError',['../namespacepicurv__cli_1_1core.html#acd06f5ac8841f8571672d2205e959b3f',1,'picurv_cli::core']]],
+  ['strong_5fcoupling_73',['STRONG_COUPLING',['../variables_8h.html#a82348af36047097defe3692225145edc',1,'SimCtx']]],
+  ['structure_74',['structure',['../momentum__newton__krylov_8c.html#a8c4f1327d8fcb4662371302953421bfe',1,'MomentumPreconditionerDescription']]],
+  ['stub_5fimplementation_5fre_75',['STUB_IMPLEMENTATION_RE',['../namespaceaudit__function__docs.html#afb3a1ef4c7095186a849bcc655d9cd2d',1,'audit_function_docs']]],
+  ['summationrhs_76',['summationRHS',['../variables_8h.html#aee7757dd3f6e9566fc1206526625e000',1,'SimCtx']]],
+  ['swarm_77',['swarm',['../variables_8h.html#a1675749ea3b2429f00405a1ee3203d18',1,'UserCtx']]],
+  ['symbol_78',['symbol',['../classaudit__function__docs_1_1AuditFinding.html#af250bdc46701c7aafc0fadfd798eabf1',1,'audit_function_docs::AuditFinding']]],
+  ['sync_5fclass_79',['sync_class',['../field__catalog_8h.html#ae99c2ba910b76be68ed1a442e314c643',1,'FieldDescriptor']]]
 ];
