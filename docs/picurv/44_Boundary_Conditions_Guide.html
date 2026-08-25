@@ -85,7 +85,9 @@ $(function() {
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p44_grammar_sec">1. Boundary-Condition Grammar</a></li>
-<li class="level1"><a href="#p44_supported_sec">2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p44_supported_sec">2. Supported User-Facing Combinations (&lt;tt&gt;picurv&lt;/tt&gt;)</a><ul><li class="level2"><a href="#p44_driven_ssec">2.1 The two driven periodic handlers</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p44_nondim_sec">3. Non-Dimensionalization Before C Input</a><ul><li class="level2"><a href="#p44_picslice_ssec">3.1 Prescribed Inlet Profile Files</a></li>
 </ul>
 </li>
@@ -94,8 +96,8 @@ $(function() {
 <li class="level1"><a href="#p44_c_gap_sec">6. Exposed vs Latent Options</a></li>
 <li class="level1"><a href="#p44_examples_sec">7. Authoring Examples</a></li>
 <li class="level1"><a href="#p44_troubleshoot_sec">8. Common Failure Modes</a></li>
-<li class="level1"><a href="#p44_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md148">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md149">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md150">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p44_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md154">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md155">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md156">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -134,14 +136,25 @@ $(function() {
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>geometric</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone">n/a    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>constant_flux</code>   </td><td class="markdownTableBodyNone"><code>target_flux</code>   </td><td class="markdownTableBodyNone"><code>apply_trim</code>   </td><td class="markdownTableBodyNone">m^3/s   </td></tr>
+<td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>constant_flux</code>   </td><td class="markdownTableBodyNone"><code>target_flux</code>   </td><td class="markdownTableBodyNone"><code>enforce_seam_flux</code>   </td><td class="markdownTableBodyNone">m^3/s    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>PERIODIC</code>   </td><td class="markdownTableBodyNone"><code>initial_flux</code>   </td><td class="markdownTableBodyNone">none   </td><td class="markdownTableBodyNone"><code>enforce_seam_flux</code>   </td><td class="markdownTableBodyNone">n/a   </td></tr>
 </table>
 <p>Notes:</p>
 <ul>
 <li>legacy <code>params.vector</code> and <code>params.velocity</code> are rejected; use scalar <code>vx/vy/vz</code>,</li>
 <li>unknown params are rejected per handler,</li>
-<li><code>constant_flux</code> must be configured on both faces of the periodic pair.</li>
+<li>a driven handler (<code>constant_flux</code> or <code>initial_flux</code>) must be configured, with the same handler, on both faces of the periodic pair.</li>
 </ul>
+<h2><a class="anchor" id="p44_driven_ssec"></a>
+2.1 The two driven periodic handlers</h2>
+<p><code>constant_flux</code> and <code>initial_flux</code> are the same controller wired to different targets, and choosing between them is a question of where the flux comes from.</p>
+<ul>
+<li>**<code>constant_flux</code>** drives to a flux <b>you prescribe</b>. <code>target_flux</code> is required, and it is a <em>volumetric</em> flux - <code>U_b</code> times the cross-sectional area - not a velocity. Use it when the flux is the thing you are specifying, for instance to match a literature bulk Reynolds number. The target is re-read from the bcs file on every run, so editing it between restart segments takes effect.</li>
+<li>**<code>initial_flux</code>** drives to the flux <b>it measures</b> from the field the run starts with, and then holds that. It takes no <code>target_flux</code>; supplying one is a configuration error rather than something quietly ignored, because the two handlers would otherwise be indistinguishable in a case file. Use it when you have seeded a field whose flux is already what you want - a developed field carried in from a precursor - and you want it preserved rather than restated. The measured target is written to the checkpoint and restored on restart, so a resumed run holds the original target instead of re-measuring a drifted one.</li>
+</ul>
+<p><code>enforce_seam_flux</code> is optional on both and defaults to false (<code>apply_trim</code> is accepted as a deprecated alias). It enables a <b>second, local actuator</b>: on top of the body force that sustains the flow everywhere, it adds a correction directly into the face fluxes of the single periodic seam plane to hold the flux through <em>that plane</em> on target. Off by default because it can reintroduce divergence the pressure solve just removed and because it injects the noisy single-plane flux signal into the solution at one location. The correction is recorded in <code>Bcs.Uch</code> whether or not it is applied, so you can inspect whether you need it before enabling it. Full rationale: <a class="el" href="p54_geometric_periodic.html#p54_driven_trim_sub">5.3 The seam trim (<code>enforce_seam_flux</code>)</a>.</p>
+<p>Full treatment of the control law, the update cadence and its consequences for both momentum solvers, the restart contract, and the worked validation cases: <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>.</p>
 <h1><a class="anchor" id="p44_nondim_sec"></a>
 3. Non-Dimensionalization Before C Input</h1>
 <p><code>picurv</code> converts physical BC values to solver-scale values before writing <code>bcs.run</code>:</p>
@@ -229,7 +242,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><code>(-Xi,+Xi)</code>, <code>(-Eta,+Eta)</code>, <code>(-Zeta,+Zeta)</code> are both periodic or both non-periodic.</li>
 </ul>
 </li>
-<li>driven periodic handler (<code>constant_flux</code>) must match on both faces of a periodic pair.</li>
+<li>a driven periodic handler (<code>constant_flux</code> or <code>initial_flux</code>) must match on both faces of a periodic pair.</li>
 <li>incomplete face sets fail validation immediately.</li>
 </ol>
 <p>The C side derives periodic axes from those pairs in <a class="el" href="io_8h.html#a9315186ed2f12d35b8a46dd3ce94d1aa">DeterminePeriodicity</a>, before DMDA creation. There are no independent YAML periodic flags.</p>
@@ -266,7 +279,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 6. Exposed vs Latent Options</h1>
 <p>Important contributor note:</p>
 <ul>
-<li>C enums include additional BC categories and handlers (for example symmetry-family and <code>initial_flux</code> enum entries),</li>
+<li>C enums include additional BC categories and handlers (for example symmetry-family entries, and <code>BC_HANDLER_INLET_INTERP_FROM_FILE</code>, which is declared but implemented nowhere),</li>
 <li>but the current end-to-end user contract intentionally exposes the validated subset listed above.</li>
 <li><code>source.type: field_slice</code> is Python-side preprocessing only: it creates the same staged <code>source_file</code> contract used by file-backed and generated profiles.</li>
 </ul>
@@ -304,11 +317,11 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="line">  - face: &quot;-Xi&quot;</div>
 <div class="line">    type: PERIODIC</div>
 <div class="line">    handler: constant_flux</div>
-<div class="line">    params: { target_flux: 0.02, apply_trim: true }</div>
+<div class="line">    params: { target_flux: 0.02, enforce_seam_flux: true }</div>
 <div class="line">  - face: &quot;+Xi&quot;</div>
 <div class="line">    type: PERIODIC</div>
 <div class="line">    handler: constant_flux</div>
-<div class="line">    params: { target_flux: 0.02, apply_trim: true }</div>
+<div class="line">    params: { target_flux: 0.02, enforce_seam_flux: true }</div>
 <div class="line">  - face: &quot;-Eta&quot;</div>
 <div class="line">    type: WALL</div>
 <div class="line">    handler: noslip</div>
@@ -335,13 +348,13 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
-<li><b><a class="el" href="p54_geometric_periodic.html">Geometric Periodic Boundaries</a></b></li>
+<li><b><a class="el" href="p54_geometric_periodic.html">Periodic Boundaries and Driven Flows</a></b></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md148"></a>
+<h2><a class="anchor" id="autotoc_md154"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Boundary Conditions Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md149"></a>
+<h3><a class="anchor" id="autotoc_md155"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -349,7 +362,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md150"></a>
+<h3><a class="anchor" id="autotoc_md156"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>

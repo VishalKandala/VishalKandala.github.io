@@ -84,7 +84,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p55_scope_sec">1. Purpose and Current Scope</a></li>
+<ul><li class="level1"><a href="#p55_scope_sec">1. Purpose and Current Scope</a><ul><li class="level2"><a href="#p55_driven_ssec">1.1 Driven periodic faces</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p55_equation_sec">2. What Is Being Solved</a></li>
 <li class="level1"><a href="#p55_snes_sec">3. Residual, Jacobian, Preconditioning Matrix, and PC</a></li>
 <li class="level1"><a href="#p55_residual_sec">4. Residual Evaluation and Boundary Application</a></li>
@@ -108,9 +110,20 @@ $(function() {
 <li><b>no RANS, Clark, TwoD masking, or wall functions</b>;</li>
 <li>fresh starts and Eulerian field restarts (including <code>--continue</code>); the first solved restart step uses BDF1 because only the checkpoint state is available;</li>
 <li>no masked solid cells (<code>Nvert</code> must be fluid everywhere);</li>
-<li>boundary handlers limited to no-slip walls, the constant/parabolic/file inlets, the conservation outlet, and geometric periodic faces (with paired periodic axes).</li>
+<li>boundary handlers limited to no-slip walls, the constant/parabolic/file inlets, the conservation outlet, and periodic faces (with paired periodic axes) using the <code>geometric</code>, <code>constant_flux</code>, or <code>initial_flux</code> handler.</li>
 </ul>
 <p>Within that scope it is a drop-in alternative to the dual-time Picard&ndash;Jameson solver and shares the same fractional-step projection, BDF time discretization, boundary system, and pressure solve.</p>
+<h2><a class="anchor" id="p55_driven_ssec"></a>
+1.1 Driven periodic faces</h2>
+<p>The two driven periodic handlers are inside the validated scope. What makes them admissible is that their momentum source is <b>frozen for the whole timestep</b>. That takes two independent gates, both keyed on <code>simCtx-&gt;step</code>, because two pieces of state sit between the flux measurement and the applied force:</p>
+<ol type="1">
+<li><code>bulkVelocityCorrection</code>, computed in the handler's <code>PreStep</code> from the field at the start of the step (<code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>);</li>
+<li>the 50/50 exponential moving average that smooths the force against the previous step, held in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> and applied in <code><a class="el" href="BodyForces_8h.html#a808919a50bffc7db7c6e7f902c9add13" title="Applies a momentum source term to drive flow in a periodic channel or pipe.">ComputeDrivenChannelFlowSource()</a></code> (<code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>).</li>
+</ol>
+<p>Both functions run once per residual evaluation, so gating only the first still leaves the applied force walking toward its target across evaluations. With both gated, every residual evaluation in the Newton solve sees the same body force.</p>
+<p>This is worth stating explicitly because it is not automatic. <a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a> runs the handler <code>PreStep</code> sweep three times per call, and the residual callback calls it on <b>every</b> evaluation - so a handler that recomputed its source in <code>PreStep</code> would let that source drift with the trial vector, silently changing the operator the Newton solve is converging on and invalidating the finite-difference Jacobian action. The per-timestep freeze in <code>PreStep_PeriodicDrivenConstant</code> is what prevents that. The boundary trim (<code>boundaryVelocityCorrection</code>) is deliberately <em>not</em> frozen, but it acts on boundary fluxes rather than on the momentum source; see <a class="el" href="p54_geometric_periodic.html#p54_driven_cadence_sub">5.2 Update cadence, and why it matters</a>.</p>
+<p>Because the source is frozen at the start of a step, the flux controller lags the target by one step - first order in <code>dt</code>. Halving <code>dt</code> halves the lag. That is the same lag the Picard solver sees, so results from the two solvers are comparable.</p>
+<p>The paired-face checks below still apply: both faces of the driven axis must be <code>PERIODIC</code> and must carry the same handler.</p>
 <h1><a class="anchor" id="p55_equation_sec"></a>
 2. What Is Being Solved</h1>
 <p>Each physical timestep advances the contravariant velocity <code>Ucont</code> by solving the discrete momentum residual to zero:</p>
@@ -146,7 +159,7 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <li>copy the trial <code>X</code> into the global <code>Ucont</code>;</li>
 <li>synchronize periodic staggered <code>Ucont</code> and refresh local <code>lUcont</code> ghosts;</li>
 <li><b>deterministic Cartesian seed</b> (Section 5): reconstruct <code>Ucat</code> from the current <code>lUcont</code>, finalize periodic <code>Ucat</code>, and refresh <code>lUcat</code> ghosts;</li>
-<li><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a> — the standard <b>three internal boundary passes</b> (inlet/farfield/wall/conservation-outlet handlers, then Cartesian reconstruction, dummy/periodic/corner updates) per call;</li>
+<li><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187">ApplyBoundaryConditions</a> — the standard <b>three internal boundary passes</b> (inlet/farfield/wall/conservation-outlet handlers, then Cartesian reconstruction, dummy/periodic/corner updates) per call. Note that this includes each handler's <code>PreStep</code>, so a handler carrying per-timestep controller state must guard it against being advanced here; see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_driven_ssec">1.1 Driven periodic faces</a>;</li>
 <li><a class="el" href="momentumsolvers_8h.html#abf87d606ec601bee4d2df09925b75a51">ComputeTotalResidual</a> — spatial RHS + BDF time terms + residual boundary enforcement;</li>
 <li><code>F = -Rhs</code>, then a <b>constrained-row</b> pass that replaces every non-independent row (fixed boundary-normal, homogeneous dummy/tangential, and periodic-duplicate rows) with an explicit algebraic equation so the matrix-free operator has no zero Jacobian rows.</li>
 </ol>

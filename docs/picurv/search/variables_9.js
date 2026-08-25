@@ -46,7 +46,7 @@ var searchData=
   ['invicid_43',['invicid',['../variables_8h.html#a7af448f97fbebfd44e5989614b982a93',1,'SimCtx']]],
   ['invoked_5fscript_5fdir_44',['INVOKED_SCRIPT_DIR',['../namespacepicurv__cli_1_1core.html#ac29ba0430552705de4caed75d3c16755',1,'picurv_cli::core']]],
   ['isc_45',['isc',['../variables_8h.html#ad8d0e4be4001d491cbb8fccdd03803d4',1,'UserMG::isc'],['../variables_8h.html#a03772da847da737415fd5a86a97147bd',1,'UserCtx::isc']]],
-  ['ismastercontroller_46',['isMasterController',['../BC__Handlers_8c.html#a5cb060b42fdff55e2d016318d3b43ad4',1,'DrivenConstantData']]],
+  ['ismastercontroller_46',['isMasterController',['../BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48',1,'DrivenFluxData']]],
   ['its_47',['its',['../test__momentum__newton__boundary__fixedpoint_8c.html#a72427fbaf52be6462fb612fec6194bd9',1,'SolveResult']]],
   ['izet_48',['IZet',['../variables_8h.html#a3791d5150655979c702ff538e0c2d0a5',1,'UserCtx']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
+  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['rank_2',['rank',['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx']]],
   ['rank_5fxm_3',['rank_xm',['../variables_8h.html#a9419886ec15f30fb98c71804d563796c',1,'RankNeighbors']]],
@@ -22,7 +22,7 @@ var searchData=
   ['registration_19',['registration',['../particle__field__catalog_8h.html#a3edf54bc0dfa491e6b35150abb179418',1,'ParticleFieldDescriptor']]],
   ['ren_20',['ren',['../variables_8h.html#a4897d17394963da4ac73b9856fac48c5',1,'SimCtx']]],
   ['repo_5fblob_5furl_21',['REPO_BLOB_URL',['../namespacegenerate__doxygen__fallback__indexes.html#a12a0570c80cb1098ecac3acc39c8473b',1,'generate_doxygen_fallback_indexes']]],
-  ['repo_5froot_22',['repo_root',['../namespacestamp__docs__revision.html#a2b5b9ebb6575163984db43b16d75e77a',1,'stamp_docs_revision.REPO_ROOT'],['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate.REPO_ROOT'],['../namespacecertify__documentation.html#ada2458d86849bc62cc43014cb213cbf7',1,'certify_documentation.REPO_ROOT'],['../namespaceaudit__user__facing__reporting.html#a1e59fca64a3f71308be00aeaefdc475c',1,'audit_user_facing_reporting.REPO_ROOT'],['../namespaceaudit__starter__content.html#a01138ded60eff01ad3f9f1b897d6392b',1,'audit_starter_content.REPO_ROOT'],['../namespaceaudit__function__docs.html#ac65217d5896858efa2494a1f41351edd',1,'audit_function_docs.REPO_ROOT']]],
+  ['repo_5froot_22',['repo_root',['../namespacestamp__docs__revision.html#a2b5b9ebb6575163984db43b16d75e77a',1,'stamp_docs_revision.REPO_ROOT'],['../namespacepython__coverage__gate.html#aa335000bb1a85dae724c926b1df7a4b1',1,'python_coverage_gate.REPO_ROOT'],['../namespacecertify__documentation.html#ada2458d86849bc62cc43014cb213cbf7',1,'certify_documentation.REPO_ROOT'],['../namespaceaudit__user__facing__reporting.html#a1e59fca64a3f71308be00aeaefdc475c',1,'audit_user_facing_reporting.REPO_ROOT'],['../namespaceaudit__starter__content.html#a01138ded60eff01ad3f9f1b897d6392b',1,'audit_starter_content.REPO_ROOT'],['../namespaceaudit__function__docs.html#ac65217d5896858efa2494a1f41351edd',1,'audit_function_docs.REPO_ROOT'],['../namespacewall__normal__profile.html#a56e84e51f73ff1439f50d92eafa99735',1,'wall_normal_profile.REPO_ROOT']]],
   ['represented_5ftime_23',['represented_time',['../statistics__window_8h.html#af5b9cd2683b889ec37b16d4e854f5fba',1,'PicurvWindow']]],
   ['researchcount_24',['reSearchCount',['../variables_8h.html#a74a89971a5640f80a0579a3766d38756',1,'SearchMetricsState']]],
   ['restart_5fcount_25',['restart_count',['../statistics__window_8h.html#a7380022b9578d66ba3e33466e540c2e5',1,'PicurvWindow']]],

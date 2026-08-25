@@ -90,6 +90,7 @@ $(function() {
 <li class="level1"><a href="#p24_config_sec">4. YAML → Runtime Controls</a></li>
 <li class="level1"><a href="#p24_logging_sec">5. Logging and Diagnostics</a></li>
 <li class="level1"><a href="#p24_touchpoints_sec">6. Core Code Touchpoints</a></li>
+<li class="level1"><a href="#p24_rhs_state_sec">6a. RHS State and Pseudo-Iteration Cadence</a></li>
 <li class="level1"><a href="#p24_practical_sec">7. Practical Tuning Guidance</a><ul><li class="level2"><a href="#autotoc_md90">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md91">What To Extract Before Changing A Case</a></li>
 <li class="level3"><a href="#autotoc_md92">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
@@ -203,6 +204,9 @@ $(function() {
 <li>runtime dispatch: <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a></li>
 <li>options ingestion: <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a></li>
 </ul>
+<h1><a class="anchor" id="p24_rhs_state_sec"></a>
+6a. RHS State and Pseudo-Iteration Cadence</h1>
+<p><code><a class="el" href="rhs_8h.html#af191235c93d0d91fa83f8e3b0e9274d8" title="Computes the Right-Hand Side (RHS) of the momentum equations.">ComputeRHS()</a></code> runs once per Jameson RK stage, so it executes many times per physical timestep and the count varies with the pseudo-iteration and rollback behaviour described in section 3. The shadow-Jacobian estimate assumes body forces are a constant forcing with zero velocity Jacobian, which only holds if nothing inside the RHS advances per-timestep state on each call. Gate any such state on <code>simCtx-&gt;step</code>. Full rationale, and a worked case where this was violated in two places at once: <a class="el" href="31_Momentum_Solvers.html#p31_rhs_cadence_sec">6. Call Cadence of the Shared RHS (Read Before Adding State)</a>.</p>
 <h1><a class="anchor" id="p24_practical_sec"></a>
 7. Practical Tuning Guidance</h1>
 <p>Common stability tuning order:</p>

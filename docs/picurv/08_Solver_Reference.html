@@ -282,6 +282,15 @@ poisson_solver:
   # --- Geometric Multigrid (PCMG) Settings ---
   multigrid:
     levels: 3         # [Integer] -&gt; -mg_level
+    # Choose levels so the COARSEST grid lands at roughly 1e3-1e4 unknowns.
+    # The coarse solver below replicates an LU factor on every rank, so a
+    # coarse grid that is too large costs memory and time on all ranks; a
+    # coarse grid that is too small wastes a level. As a rule of thumb a 5M
+    # cell grid wants 5 levels, not 4.
+    # Coarsenability: each level halves a direction as IM -&gt; (IM+1)/2, so IM
+    # must stay odd at every level for the coarsening to be exact. An even IM
+    # logs "can't be consistently coarsened further" and keeps going on a
+    # slightly misaligned coarse grid.
     # NOTE: levels is bounded by the MPI rank layout, not chosen freely. Every
     # level must leave each rank at least stencil_width nodes per axis, and the
     # stencil width is 3 whenever ANY axis is periodic (2 otherwise). Exceeding
@@ -311,12 +320,32 @@ poisson_solver:
     # Supported direct keys include ksp_type, pc_type, ksp_max_it, ksp_rtol, ksp_atol.
     level_solvers:
       level_0:
-        # The coarsest level often uses a more robust solver.
-        method: "fgmres"          # -&gt; -ps_mg_coarse_ksp_type
-        preconditioner: "bjacobi" # -&gt; -ps_mg_coarse_pc_type
+        # level_0 is the COARSE SOLVE at the base of the V-cycle, not a
+        # smoother. The smoothers on level_1..N kill high-frequency error;
+        # this solve kills the low-frequency error they are blind to.
+        #
+        # Because it sits inside a preconditioner, it must be a FIXED LINEAR
+        # operator: the same input vector must always produce the same output.
+        # Krylov methods (gmres, fgmres, cg, bcgs) are not - their subspace
+        # adapts to the input, which makes the whole MG preconditioner
+        # nonlinear. The outer FGMRES then tolerates it for constructing the
+        # solution, but its Arnoldi recurrence decouples from the true
+        # residual and the convergence test starts passing on a number that no
+        # longer describes b-Ax. Pinning ksp_max_it does NOT fix this.
+        # PICurv logs a warning at startup if you configure one here.
+        #
+        # Recommended by coarse-grid size:
+        #   &lt;= ~1e4 unknowns : preonly + redundant   (replicated direct LU)
+        #   larger           : preonly + telescope   (LU on a rank subset)
+        #   last resort      : a Krylov method with tolerances set against the
+        #                      TRUE residual, not the tracked one
+        method: "preonly"           # -&gt; -ps_mg_coarse_ksp_type
+        preconditioner: "redundant" # -&gt; -ps_mg_coarse_pc_type
         # ksp_max_it: 30           # -&gt; -ps_mg_coarse_ksp_max_it
         # ksp_rtol: 1.0e-3         # -&gt; -ps_mg_coarse_ksp_rtol
         # ksp_atol: 1.0e-8         # -&gt; -ps_mg_coarse_ksp_atol
+      # level_1..N are SMOOTHERS. Richardson, Jacobi, Chebyshev and SOR are all
+      # fixed linear operators, which is exactly why they belong here.
       level_1:
         method: "richardson"
         preconditioner: "bjacobi"
@@ -479,8 +508,8 @@ petsc_passthrough_options:
 <div class="line">      k: true</div>
 <div class="line">    level_solvers:</div>
 <div class="line">      level_0:</div>
-<div class="line">        method: &quot;fgmres&quot;</div>
-<div class="line">        preconditioner: &quot;bjacobi&quot;</div>
+<div class="line">        method: &quot;preonly&quot;</div>
+<div class="line">        preconditioner: &quot;redundant&quot;</div>
 <div class="line">      level_1:</div>
 <div class="line">        method: &quot;richardson&quot;</div>
 <div class="line">        preconditioner: &quot;bjacobi&quot;</div>
@@ -498,13 +527,15 @@ petsc_passthrough_options:
 <li><code>multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
 <li><code>multigrid.post_sweeps</code> -&gt; <code>-mg_post_it</code></li>
 <li><code>multigrid.semi_coarsening.i/j/k</code> -&gt; <code>-mg_i_semi/-mg_j_semi/-mg_k_semi</code></li>
-<li><code>multigrid.level_solvers.level_N.method</code> -&gt; <code>-ps_mg_levels_N_ksp_type</code></li>
-<li><code>multigrid.level_solvers.level_N.preconditioner</code> -&gt; <code>-ps_mg_levels_N_pc_type</code></li>
+<li><code>multigrid.level_solvers.level_N.method</code> -&gt; <code>-ps_mg_levels_N_ksp_type</code> for <code>N &gt; 0</code></li>
+<li><code>multigrid.level_solvers.level_N.preconditioner</code> -&gt; <code>-ps_mg_levels_N_pc_type</code> for <code>N &gt; 0</code></li>
+<li><code>multigrid.level_solvers.level_0.*</code> -&gt; <code>-ps_mg_coarse_*</code>; PETSc names the coarsest solver separately from the positive levels</li>
 <li><code>multigrid.cycle</code> and <code>multigrid.mode</code> are validated structured keys; current supported values are <code>v</code> and <code>multiplicative</code>.</li>
 </ul>
 <p>Rules:</p><ul>
 <li><code>pressure_solver</code> is accepted as a legacy alias, but <code>poisson_solver</code> is preferred because the linear solve computes pressure correction <code>Phi</code>.</li>
 <li>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest level and larger numbers are finer.</li>
+<li><code>level_0</code> is the multigrid <b>coarse solve</b>, not a smoother, and the naming hides that. <code>level_1..N</code> are smoothers; <code>level_0</code> sits at the base of the V-cycle and removes the smooth error the smoothers cannot see. Because multigrid is used here as a preconditioner, <code>level_0</code> must be a <b>fixed linear operator</b>. A Krylov method there (<code>gmres</code>, <code>fgmres</code>, <code>cg</code>, <code>bcgs</code>, ...) makes the whole preconditioner nonlinear, which decouples the outer FGMRES tracked residual from the true residual <code>b - Ax</code>: the solver then reports convergence on a number that no longer describes the constraint. Pinning <code>ksp_max_it</code> does not fix it. PICurv logs a startup warning if you configure one. Use <code>{method: preonly, preconditioner: redundant}</code> for coarse grids up to roughly 1e4 unknowns, <code>telescope</code> above that. Full discussion, the worked tracked-vs-true residual table, and the level-count sizing rule: <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li><code>multigrid.levels</code> is bounded by the MPI decomposition, not chosen freely: every level must leave each rank at least <code>stencil_width</code> nodes per axis (3 when any axis is periodic, 2 otherwise). Exceeding it aborts during DM creation with <code>Local x-width of domain ... is smaller than stencil width</code>, and <code>picurv validate</code> cannot catch it because it does not see the rank layout. Formula and worked maxima: <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li>The outer Poisson preconditioner is multigrid-only in the current runtime.</li>
 <li>The current PETSc binding applies one MG smoother count; when <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</li>

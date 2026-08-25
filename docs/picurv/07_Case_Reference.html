@@ -472,7 +472,14 @@ boundary_conditions:
 #     type: PERIODIC
 #     params:
 #       target_flux: 1.0              Target non-dimensional volumetric flux [m^3/s / (U_ref * L_ref^2)].
-#       apply_trim: false             [true/false] Optional. Trim residual flux imbalance after correction.
+#       enforce_seam_flux: false      [true/false] Optional, default false. Adds a local
+#                                     correction to the face fluxes of the periodic SEAM PLANE
+#                                     so the flux through that one plane matches the target.
+#                                     The body force already holds the bulk flux; this only
+#                                     addresses the seam. Leave false unless Bcs.Uch shows a
+#                                     persistently large seam mismatch - enabling it can
+#                                     reintroduce divergence and injects single-plane noise.
+#                                     `apply_trim` is accepted as a deprecated alias.
 
 # --- Example for a 2-Block Case (syntax example; all handlers shown are currently supported) ---
 # boundary_conditions:
@@ -722,7 +729,8 @@ boundary_conditions:
 <li><code>OUTLET</code> + <code>conservation</code></li>
 <li><code>WALL</code> + <code>noslip</code></li>
 <li><code>PERIODIC</code> + <code>geometric</code></li>
-<li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>apply_trim</code>)</li>
+<li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>enforce_seam_flux</code>; <code>apply_trim</code> is a deprecated alias)</li>
+<li><code>PERIODIC</code> + <code>initial_flux</code> (no params; optional <code>enforce_seam_flux</code>) - target measured from the initial condition</li>
 </ul>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
 <p>Generated profile example:</p>

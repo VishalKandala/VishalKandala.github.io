@@ -89,8 +89,9 @@ $(function() {
 <li class="level1"><a href="#p31_status_sec">2. Implementation Status Matrix</a></li>
 <li class="level1"><a href="#p31_controls_sec">3. Numerical Controls In Use</a></li>
 <li class="level1"><a href="#p31_testing_sec">4. Current test status</a></li>
-<li class="level1"><a href="#p31_extension_sec">5. Adding A New Momentum Solver</a><ul><li class="level2"><a href="#autotoc_md112">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md113">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md114">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p31_rhs_cadence_sec">6. Call Cadence of the Shared RHS (Read Before Adding State)</a></li>
+<li class="level1"><a href="#p31_extension_sec">7. Adding A New Momentum Solver</a><ul><li class="level2"><a href="#autotoc_md118">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md119">What To Extract Before Changing A Case</a></li>
+<li class="level3"><a href="#autotoc_md120">Practical CFD Troubleshooting Pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -153,8 +154,31 @@ $(function() {
 <li><code>MomentumSolver_Explicit_RungeKutta4</code> still needs a direct positive-path harness</li>
 </ul>
 <p>That means the momentum stack is currently a stronger regression gate than bespoke debugging surface.</p>
+<h1><a class="anchor" id="p31_rhs_cadence_sec"></a>
+6. Call Cadence of the Shared RHS (Read Before Adding State)</h1>
+<p>Both momentum solvers are built on one residual implementation:</p>
+<div class="fragment"><div class="line">ComputeTotalResidual()            (src/momentumsolvers.c)</div>
+<div class="line">  └─ ComputeRHS()                 (src/rhs.c)</div>
+<div class="line">       └─ ComputeBodyForces()     → individual body forces</div>
+</div><!-- fragment --><p>Picard reaches it once per Jameson RK stage; Newton&ndash;Krylov reaches it once per residual evaluation, including every finite-difference probe of the matrix-free Jacobian. <b>Neither calls it once per physical timestep</b>, and the ratio is not fixed: it varies with pseudo-iteration count, line-search backtracks, and Krylov iterations.</p>
+<p>That makes the shared RHS a hazardous place to keep state. Anything advanced on each call - a filter, a ramp, a moving average, an integral controller term, a relaxation counter - becomes a function of <em>how many</em> evaluations happened before it rather than of the solution. Two things break:</p>
+<ul>
+<li><code><a class="el" href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975" title="Adapts a PETSc trial vector to the existing momentum residual path.">MomentumNewtonKrylov_FormResidual()</a></code> requires <code>F(X)</code> to be a deterministic function of the trial vector alone; otherwise the finite-difference Jacobian action <code>(F(X+hv) - F(X))/h</code> is inconsistent.</li>
+<li>The Picard shadow-Jacobian estimate treats body forces as constant forcing with zero velocity Jacobian.</li>
+</ul>
+<p>The rule is to gate every such update on <code>simCtx-&gt;step</code> and reuse the resolved value for the rest of the step. The same hazard applies to boundary handlers, because <code><a class="el" href="Boundaries_8h.html#ab71102c91cda49857fd1f6c33dccf187" title="Main boundary-condition orchestrator executed during solver timestepping.">ApplyBoundaryConditions()</a></code> runs each handler's <code>PreStep</code> three times per call and is itself called from inside both solvers' iteration loops.</p>
+<p><b>Worked example.</b> The driven periodic flow controller had this defect in two places at once, and fixing only the first was not enough:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">State   </th><th class="markdownTableHeadNone">Location   </th><th class="markdownTableHeadNone">Symptom when ungated    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>bulkVelocityCorrection</code>   </td><td class="markdownTableBodyNone"><code>PreStep</code> in <code><a class="el" href="BC__Handlers_8c.html">src/BC_Handlers.c</a></code>   </td><td class="markdownTableBodyNone">source recomputed from the trial vector mid-solve    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">smoothing EMA on the force   </td><td class="markdownTableBodyNone"><code><a class="el" href="BodyForces_8h.html#a808919a50bffc7db7c6e7f902c9add13" title="Applies a momentum source term to drive flow in a periodic channel or pipe.">ComputeDrivenChannelFlowSource()</a></code>, <code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code>   </td><td class="markdownTableBodyNone">applied force walked 0.5, 0.75, 0.875 ... toward target within one step   </td></tr>
+</table>
+<p>Measured on a 4-step run: 379 force evaluations produced <b>42 distinct force values</b> before the fix and <b>3</b> after - one per timestep. <code>tests/smoke/run_driven_periodic_regression.sh</code> asserts the force is piecewise constant per step. See <a class="el" href="p54_geometric_periodic.html#p54_driven_cadence_sub">5.2 Update cadence, and why it matters</a> and the contract in <code><a class="el" href="BodyForces_8h.html" title="Momentum source terms added to the contravariant RHS.">include/BodyForces.h</a></code>.</p>
 <h1><a class="anchor" id="p31_extension_sec"></a>
-5. Adding A New Momentum Solver</h1>
+7. Adding A New Momentum Solver</h1>
 <p>Required steps:</p>
 <ol type="1">
 <li>define solver implementation function in <code><a class="el" href="momentumsolvers_8c.html">src/momentumsolvers.c</a></code>,</li>
@@ -170,11 +194,11 @@ $(function() {
 <li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md112"></a>
+<h2><a class="anchor" id="autotoc_md118"></a>
 CFD Reader Guidance and Practical Use</h2>
 <p>This page describes <b>Momentum Solver Implementations</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
 <p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md113"></a>
+<h3><a class="anchor" id="autotoc_md119"></a>
 What To Extract Before Changing A Case</h3>
 <ul>
 <li>Identify which YAML role or runtime stage this page governs.</li>
@@ -182,7 +206,7 @@ What To Extract Before Changing A Case</h3>
 <li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
 <li>Record failure signals that require rollback or parameter isolation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md114"></a>
+<h3><a class="anchor" id="autotoc_md120"></a>
 Practical CFD Troubleshooting Pattern</h3>
 <ol type="1">
 <li>Reproduce the issue on a tiny case or narrow timestep window.</li>
