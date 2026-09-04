@@ -10,9 +10,10 @@ var searchData=
   ['restart_20guide_7',['Particle Initialization and Restart Guide',['../45_Particle_Initialization_and_Restart.html',1,'']]],
   ['results_8',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
   ['rk_20momentum_20solver_9',['Dual-Time Picard Jameson RK Momentum Solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'']]],
-  ['robustness_20metrics_20reference_10',['Search Robustness Metrics Reference',['../53_Search_Robustness_Metrics_Reference.html',1,'']]],
-  ['run_20artifact_20lifecycle_20contract_11',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
-  ['run_20guide_20slurm_12',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['runtime_13',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['runtime_20execution_20map_14',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
+  ['robustness_10',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['robustness_20metrics_20reference_11',['Search Robustness Metrics Reference',['../53_Search_Robustness_Metrics_Reference.html',1,'']]],
+  ['run_20artifact_20lifecycle_20contract_12',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
+  ['run_20guide_20slurm_13',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['runtime_14',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['runtime_20execution_20map_15',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
 ];

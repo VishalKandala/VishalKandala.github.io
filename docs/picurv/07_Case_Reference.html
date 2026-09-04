@@ -272,16 +272,17 @@ grid:
   # --- Option B: Grid via Python Grid Generator (generators/grid.gen) ---
   # Use this for complex curvilinear meshes generated before solver launch.
   # generator:
-  #   config_file: "config/grids/coarse_square_tube_curved.cfg"    # Required today. Relative to case.yml or absolute.
-  #   grid_type: "cpipe"               # Optional override: cpipe | pipe | warp
+  #   config_file: "config/grids/plane_channel_retau180.cfg"       # Required today. Relative to case.yml or absolute.
+  #   grid_type: "box"                 # Optional override: box | sweep
+  #   # `box` is a Cartesian block whose walls may be shaped; `sweep` carries a
+  #   # cross-section along a centreline. See 48_Grid_Generator_Guide.
   #   cli_args:                        # Optional raw CLI token list
   #     - "--ncells-i"
   #     - "96"
   #     - "--ncells-j"
   #     - "96"
-  #   output_file: "config/grid.generated.picgrid"  # Optional; relative to run dir.
-  #   stats_file: "config/grid.generated.info"      # Optional.
-  #   vts_file: "config/grid.generated.vts"         # Optional.
+  # Destinations are not configurable: PICurv writes the grid, its .vts preview,
+  # and its .info quality report into the run's own asset store.
 
   # --- Option D: Legacy Grid Conversion ---
   # Converts an older column-text grid file to the .picgrid format before solver launch.
@@ -813,7 +814,7 @@ boundary_conditions:
 <div class="line">  mode: grid_gen</div>
 <div class="line">  generator:</div>
 <div class="line">    config_file: config/grids/coarse_square_tube_curved.cfg</div>
-<div class="line">    grid_type: cpipe</div>
+<div class="line">    grid_type: sweep</div>
 <div class="line">    cli_args: [&quot;--ncells-i&quot;, &quot;96&quot;, &quot;--ncells-j&quot;, &quot;96&quot;]</div>
 </div><!-- fragment --><p>This runs <code>generators/grid.gen</code> before solver launch and stages generated grid artifacts into the run config. <code>grid.generator.config_file</code> is required today; <code>picurv</code> does not synthesize a temporary grid config. <code>grid.gen</code> accepts cell-count inputs (<code>ncells_*</code> / <code>--ncells-*</code>) and writes node counts into the generated <code>.picgrid</code> header.</p>
 <p>For direct <code>grid.gen</code> usage, generator types, and config-file structure, see <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b>.</p>
@@ -838,7 +839,7 @@ file</h2>
 <p><b>Parameters it owns.</b> <code>grid.source_file</code> -&gt; the staged <code>.picgrid</code> path. Global DMDA hints <code>grid.da_processors_x/y/z</code> apply here as to every mode.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>programmatic_c</code> and <code>grid_gen</code>. Compatible with the <code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> analytical sources; <code>TGV3D</code> is not, because it needs the programmatic Cartesian box.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved grid source. A missing or unreadable file is a fatal <code>picurv validate</code> error naming the path, not a runtime failure.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> runs from a staged <code>.picgrid</code>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/search_robustness</code> runs from a staged <code>.picgrid</code>. It carries the only grid file the examples still ship: <code>bent_channel</code> moved to <code>grid_gen</code> once the generator could express its geometry, which removed a duplicate of the same 2.9 MB file.</p>
 <p><b>Limitations.</b> <code>picurv</code> does not inspect the mesh beyond existence and header validity, so a geometrically wrong but well-formed file is accepted here and only shows up in metric or Jacobian diagnostics.</p>
 <h2><a class="anchor" id="p07_cap_gridmode_programmatic_c_sub"></a>
 programmatic_c</h2>

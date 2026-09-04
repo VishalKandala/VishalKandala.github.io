@@ -22,7 +22,7 @@ var searchData=
   ['ymax_19',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
   ['ymin_20',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
   ['yml_21',['yml',['../14_Config_Contract.html#p14_cluster_sec',1,'7. Cluster Contract Highlights (cluster.yml)'],['../14_Config_Contract.html#p14_study_sec',1,'8. Study Contract Highlights (study.yml)']]],
-  ['yml_20tt_22',['yml tt',['../45_Particle_Initialization_and_Restart.html#p45_contract_sec',1,'1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_case_sec',1,'6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_file_legacy_ssec',1,'6.2 Legacy File Conversion Through &lt;tt&gt;case.yml&lt;/tt&gt;']]],
+  ['yml_20tt_22',['yml tt',['../45_Particle_Initialization_and_Restart.html#p45_contract_sec',1,'1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;'],['../48_Grid_Generator_Guide.html#p48_case_sec',1,'6. Using &lt;tt&gt;grid.gen&lt;/tt&gt; Through &lt;tt&gt;case.yml&lt;/tt&gt;']]],
   ['yoshizawa_5fci_23',['yoshizawa_ci',['../variables_8h.html#a0ae932453fa67ae626aea2aa9f94d860',1,'LESConfig']]],
   ['you_20can_20change_20and_20how_20to_20continue_24',['8. What You Can Change, And How To Continue',['../52_Run_Artifact_Lifecycle_Contract.html#p52_compat_sec',1,'']]],
   ['you_20should_20gain_25',['6. Competencies You Should Gain',['../42_User_Guide_Index.html#p42_outcomes_sec',1,'']]],

@@ -129,7 +129,7 @@ var searchData=
   ['not_5frun_5fowned_5fprefixes_126',['NOT_RUN_OWNED_PREFIXES',['../namespaceaudit__path__literals.html#a3fe63501bae3a434cef5beb83bf89bf0',1,'audit_path_literals']]],
   ['note_127',['4. Data-Driven Closure Model Note',['../16_Config_Extension_Playbook.html#p16_data_driven_sec',1,'']]],
   ['notes_128',['notes',['../36_Cluster_Run_Guide.html#p36_notes_sec',1,'5. Operational Notes'],['../19_Nondimensionalization.html#p19_notes_sec',1,'5. Practical Notes'],['../04_Visualization_Tutorial.html#p04_practical_notes_sec',1,'5.1 Practical Notes'],['../52_Run_Artifact_Lifecycle_Contract.html#p52_restart_notes',1,'5.4 Notes'],['../40_Testing_and_Quality_Guide.html#p40_coverage_impl_sec',1,'8. Coverage Gate Implementation Notes'],['../md_tests_2guide.html#autotoc_md38',1,'Notes']]],
-  ['np_129',['np',['../variables_8h.html#a5eedf611da6dd4f59cc65753b777b957',1,'SimCtx::np'],['../poisson_8c.html#ab04c88bedc6b2be8ddfe7aa8d3e93f06',1,'NP:&#160;poisson.c'],['../namespacepicurv__cli_1_1core.html#a39ca7ec3f17d711e2680089a6a2d44da',1,'picurv_cli.core.np']]],
+  ['np_129',['np',['../variables_8h.html#a5eedf611da6dd4f59cc65753b777b957',1,'SimCtx::np'],['../namespacepicurv__cli_1_1core.html#a39ca7ec3f17d711e2680089a6a2d44da',1,'picurv_cli.core.np'],['../poisson_8c.html#ab04c88bedc6b2be8ddfe7aa8d3e93f06',1,'NP:&#160;poisson.c']]],
   ['npoints_130',['npoints',['../variables_8h.html#a1284d7ce4801cbe00fa3068be7682014',1,'VTKMetaData']]],
   ['nprofilingselectedfuncs_131',['nProfilingSelectedFuncs',['../variables_8h.html#abb0f48c5337200ed7c5fa14cf4a532e2',1,'SimCtx']]],
   ['ns_5fx_132',['ns_x',['../variables_8h.html#a96617b9963af54eff8582ab79321a151',1,'IBMNodes']]],
