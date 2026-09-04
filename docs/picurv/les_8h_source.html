@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -44,22 +61,6 @@ MathJax.Hub.Config({
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
 var searchBox = new SearchBox("searchBox", "search/",'.html');
-/* @license-end */
-</script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function() { init_codefold(0); });
 /* @license-end */
 </script>
 <!-- window showing the filter options -->
@@ -101,45 +102,327 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="setup_8h.html">setup.h</a>&quot;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="Filter_8h.html">Filter.h</a>&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="Boundaries_8h.html">Boundaries.h</a>&quot;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"></span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * @brief Computes the dynamic Smagorinsky constant (Cs) for the LES model.</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * This function implements the dynamic procedure for calculating the Smagorinsky</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> * constant at each grid point. It involves test-filtering the velocity field and</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * strain rate tensor to determine the constant locally. The calculation can be</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * computationally expensive and is typically run less frequently than every</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * time step, controlled by `simCtx-&gt;dynamic_freq`.</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">/*================================================================================*</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> *              SYMMETRIC TENSOR KERNELS (no LES-specific knowledge)              *</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> *================================================================================*/</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"></span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * @brief Forms a symmetric tensor from a vector&#39;s outer product with itself.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * Used to build the resolved velocity products the Leonard stress subtracts.</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * @param user The user context for a single computational block.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"></span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * @brief Computes the turbulent eddy viscosity (Nu_t) for the LES model.</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * Using the Smagorinsky constant (Cs) computed by `ComputeSmagorinskyConstant`,</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * this function calculates the eddy viscosity at each grid point based on the</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> * local strain rate magnitude and filter width.</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * nu_t = (Cs * filter_width)^2 * |S|*</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * @param user The user context for a single computational block.</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#endif </span><span class="comment">// LES_H</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * @param[in] v Vector to square.</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> * @return The tensor `v_i v_j`.</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> <a class="code hl_function" href="les_8h.html#a2c3773f929e983edb93fcd3aa8efe713">SymTensorSelfOuter</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> v);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"></span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * @brief Forms the linear combination `a*x + b*y`.</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * One primitive covers addition, subtraction, and scaling, so tensor algebra at the</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * call sites reads as algebra instead of six repeated component expressions.</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> * @param[in] a Scalar multiplying @p x.</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> * @param[in] x First tensor.</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * @param[in] b Scalar multiplying @p y.</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * @param[in] y Second tensor.</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * @return The combined tensor.</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> <a class="code hl_function" href="les_8h.html#a25141ecdfacc7daccf0e7b3dbc536b15">SymTensorCombine</a>(PetscReal a, <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> x, PetscReal b, <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> y);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment"></span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> * @brief Returns the trace `t_kk`.</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * @param[in] t Tensor to trace.</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * @return Sum of the three diagonal components.</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>PetscReal <a class="code hl_function" href="les_8h.html#a46ee151709e2f907fedd874be4119baa">SymTensorTrace</a>(<a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> t);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment"></span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment"> * @brief Removes the isotropic part, returning `t_ij - (1/3) delta_ij t_kk`.</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"> * The Germano model tensor must be deviatoric so that the trace of the Leonard</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment"> * stress, which the incompressible pressure absorbs, cannot enter the contraction</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> * through discrete divergence error.</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> * @param[in] t Tensor to project.</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> * @return The trace-free part of @p t.</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> <a class="code hl_function" href="les_8h.html#a381c7335cafe1a874e3c09bbf56c8731">SymTensorDeviator</a>(<a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> t);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"></span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> * @brief Contracts two symmetric tensors as `a_ij b_ij`.</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> * Only six components are stored, so the three off-diagonal products are counted</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> * twice. Centralising that factor is the point: written out at each call site it is</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> * a silent error whenever one term is missed.</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> * @param[in] a First tensor.</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> * @param[in] b Second tensor.</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * @return The full nine-term contraction.</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>PetscReal <a class="code hl_function" href="les_8h.html#aa4f6dfc437aaa42ae0e6ee3d2c58d40f">SymTensorContract</a>(<a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> a, <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> b);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"></span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> * @brief Applies a symmetric tensor to a vector, returning `t_ij v_j`.</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"> * The three stored off-diagonal components each stand for two entries of the full</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"> * tensor, so a caller writing this out by hand has six chances to reference the wrong</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"> * one. Centralising it is the same reason `SymTensorContract()` exists.</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> * @param[in] t Tensor to apply.</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> * @param[in] v Vector to apply it to.</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * @return The resulting vector.</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> <a class="code hl_function" href="les_8h.html#a021863760739ee79965d9f6d508c9600">SymTensorTimesVector</a>(<a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> t, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> v);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"></span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * @brief Returns the squared Frobenius norm `t_ij t_ij`.</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> * @param[in] t Tensor to measure.</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment"> * @return The self-contraction of @p t.</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>PetscReal <a class="code hl_function" href="les_8h.html#a0cbbb087429ad627712acc7212b102dc">SymTensorNormSq</a>(<a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> t);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment">/*================================================================================*</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> *                        STRAIN RATE AND FILTER WIDTH                            *</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> *================================================================================*/</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"></span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * @brief Builds the strain-rate tensor and its magnitude from a velocity gradient.</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> * `S_ij = 0.5 (du_i/dx_j + du_j/dx_i)` and `|S| = sqrt(2 S_ij S_ij)`. This is the</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"> * single definition of both quantities; the dynamic procedure and the eddy-viscosity</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * assembly consume it rather than each expanding the algebra themselves.</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> * @param[in]  dudx  Gradient of the x velocity component.</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> * @param[in]  dvdx  Gradient of the y velocity component.</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> * @param[in]  dwdx  Gradient of the z velocity component.</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="comment"> * @param[out] strain Resolved strain-rate tensor; may be NULL if only the magnitude is wanted.</span></div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span><span class="comment"> * @param[out] magnitude Strain-rate magnitude `|S|`; may be NULL.</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#a6973a221ec840633a63a4f462ee5c3a1">StrainRateFromGradients</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dudx, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dvdx, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> dwdx,</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                                       <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> *strain, PetscReal *magnitude);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"></span> </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> * @brief Computes one cell&#39;s grid filter width under the selected width model.</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * ::LES_FILTER_WIDTH_CUBE_ROOT_VOLUME uses the cell volume alone and so ignores</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> * anisotropy; the other models take the Cartesian cell extents from</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment"> * @ref ComputeCellCharacteristicLengthScale and therefore grow with cell stretching.</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment"> * @param[in]  model Width model to apply.</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment"> * @param[in]  aj    Inverse cell volume (the Jacobian determinant) at the cell.</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"> * @param[in]  csi   Xi-direction metric vector at the cell.</span></div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment"> * @param[in]  eta   Eta-direction metric vector at the cell.</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> * @param[in]  zet   Zeta-direction metric vector at the cell.</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> * @param[out] delta Resolved filter width.</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * @return PetscErrorCode 0 on success, or `PETSC_ERR_ARG_OUTOFRANGE` for a</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *         non-positive Jacobian.</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#a65e9cab329abc016cff5d5a59d43fd83">ComputeCellFilterWidth</a>(<a class="code hl_enumeration" href="variables_8h.html#af496c30781324575c1af9f01b4f278da">LESFilterWidthModel</a> model, PetscReal aj,</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                                      <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> csi, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> eta, <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> zet, PetscReal *delta);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment">/*================================================================================*</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="comment"> *                        GERMANO IDENTITY KERNELS                                *</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment"> *================================================================================*/</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"></span> </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> * @brief Forms the Leonard stress `L_ij = (u_i u_j)^ - u^_i u^_j`.</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment"> * `L_ij` is the stress carried by the scales between the grid filter and the test</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment"> * filter. It is computable entirely from the resolved field, which is what makes the</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="comment"> * dynamic procedure possible.</span></div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="comment"> * @param[in] velocity_filtered        Test-filtered resolved velocity `u^_i`.</span></div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment"> * @param[in] velocity_product_filtered Test filter of the products `(u_i u_j)^`.</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment"> * @return The Leonard stress tensor.</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> <a class="code hl_function" href="les_8h.html#a87a8a35c5326c8ae91dbf8b3f7688b69">LeonardStress</a>(<a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> velocity_filtered, <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> velocity_product_filtered);</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment"></span> </div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> * @brief Forms the deviatoric Germano model tensor `M_ij`.</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment"> * `M_ij = -2 Delta^2 ( alpha |S^| S^_ij - (|S| S_ij)^ )`, made trace-free.</span></div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment"> * The two terms are structurally different and must stay so. The first is the model</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"> * evaluated on the test-filtered strain, the product of separately filtered</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="comment"> * quantities. The second is the grid-level model formed pointwise and then</span></div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment"> * test-filtered, that is, the filter of a product. Their difference is the entire</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment"> * information content of the dynamic procedure: collapsing them into the same</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment"> * expression yields a well-scaled, flow-responsive, and wrong coefficient that is</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="comment"> * not the Germano-Lilly coefficient and cannot be cited as one.</span></div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment"> * @param[in] delta                Grid filter width at the cell.</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="comment"> * @param[in] alpha                Squared test-to-grid filter width ratio.</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="comment"> * @param[in] strain_magnitude_filtered Test-filtered strain magnitude `|S|^`.</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="comment"> * @param[in] strain_filtered      Test-filtered strain tensor `S^_ij`.</span></div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment"> * @param[in] strain_product_filtered Test filter of the product `(|S| S_ij)^`.</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="comment"> * @return The deviatoric model tensor.</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> <a class="code hl_function" href="les_8h.html#a4cbb5cc2008450de162cae95f35603e2">GermanoModelTensor</a>(PetscReal delta, PetscReal alpha,</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>                             PetscReal strain_magnitude_filtered,</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>                             <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> strain_filtered,</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>                             <a class="code hl_struct" href="variables_8h.html#structSymTensor">SymTensor</a> strain_product_filtered);</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment">/*================================================================================*</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> *                     COEFFICIENT AVERAGING AND LIMITING                         *</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment"> *================================================================================*/</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"></span> </div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="comment"> * @brief Resolves which logical directions the dynamic coefficient is averaged over.</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment"> * The resulting selector is passed to `PicurvSpatialRatioAverage()`, which performs</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment"> * the reduction; this routine only decides which directions it spans.</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"> * ::LES_AVERAGING_LOCAL selects none, ::LES_AVERAGING_GLOBAL selects all three, and</span></div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment"> * ::LES_AVERAGING_HOMOGENEOUS uses the directions the configuration names, defaulting</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * to the block&#39;s periodic axes when it names none. Periodicity is read from the</span></div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment"> * boundary face configuration, which is the same source the periodic field</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> * synchronization uses.</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment"> * @param[in]  user      Block context supplying configuration and boundary faces.</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment"> * @param[out] direction Per-direction averaging flags in `(xi, eta, zeta)` order.</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="comment"> * @return PetscErrorCode 0 on success, or `PETSC_ERR_ARG_WRONGSTATE` when</span></div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> *         homogeneous averaging is requested but no direction can be resolved.</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#a7d78ef5025ab1d759c6371b557d59c81">ResolveLESAveragingDirections</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user, PetscBool direction[3]);</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"></span> </div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="comment"> * @brief Applies the configured admissible range to one model coefficient.</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment"> * The coefficient carries the sign of `&lt;L:M&gt;`; a negative value is backscatter,</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment"> * energy returning from the unresolved scales, not an error. ::LES_CLIP_NONE keeps</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="comment"> * it, leaving stability to the total-viscosity floor applied downstream.</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="comment"> * @param[in]  coefficient Raw coefficient from the Germano contraction.</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment"> * @param[in]  config      LES configuration supplying the mode and ceiling.</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment"> * @param[out] limited     Set to `PETSC_TRUE` when the value was modified; may be NULL.</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span><span class="comment"> * @return The coefficient after limiting.</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>PetscReal <a class="code hl_function" href="les_8h.html#a61639a31dec10708de938f1d84fac37f">ClipModelCoefficient</a>(PetscReal coefficient, <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structLESConfig">LESConfig</a> *config, PetscBool *limited);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="comment"></span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment"> * @brief Builds the eddy viscosity from a model coefficient.</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><span class="comment"> * `nu_t = C Delta^2 |S|`, floored so that `nu + nu_t &gt;= min_viscosity_ratio * nu`.</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span><span class="comment"> * The floor constrains the quantity that must stay positive for the momentum</span></div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span><span class="comment"> * operator to remain well posed, which is why backscatter is limited here rather</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="comment"> * than by forcing the coefficient positive.</span></div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="comment"> * @param[in] coefficient         Model coefficient, signed.</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="comment"> * @param[in] delta               Grid filter width at the cell.</span></div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span><span class="comment"> * @param[in] strain_magnitude    Resolved strain magnitude `|S|`.</span></div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="comment"> * @param[in] molecular_viscosity Molecular kinematic viscosity.</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment"> * @param[in] min_viscosity_ratio Lower bound on total viscosity as a multiple of molecular.</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="comment"> * @return The admissible eddy viscosity.</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>PetscReal <a class="code hl_function" href="les_8h.html#a4b24a9b855b6f0c642dff3a89c467fd7">EddyViscosityFromCoefficient</a>(PetscReal coefficient, PetscReal delta,</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>                                       PetscReal strain_magnitude,</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                                       PetscReal molecular_viscosity,</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>                                       PetscReal min_viscosity_ratio);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="comment"></span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="comment"> * @brief Returns the modelled subgrid kinetic energy at a cell.</span></div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="comment"> * Uses the Yoshizawa relation `k_sgs = 2 C_I Delta^2 |S|^2`. Reported as a</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="comment"> * diagnostic: compared against the resolved turbulent kinetic energy from the</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="comment"> * field-statistics pipeline it measures how much of the energy the grid resolves.</span></div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="comment"> * @param[in] yoshizawa_ci     Yoshizawa constant `C_I`.</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="comment"> * @param[in] delta            Grid filter width at the cell.</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="comment"> * @param[in] strain_magnitude Resolved strain magnitude `|S|`.</span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="comment"> * @return The modelled subgrid kinetic energy.</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>PetscReal <a class="code hl_function" href="les_8h.html#a3a4a66e2c3ca2b3075832b8dcfaf6ab4">SubgridKineticEnergy</a>(PetscReal yoshizawa_ci, PetscReal delta, PetscReal strain_magnitude);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="comment">/*================================================================================*</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="comment"> *                              RUNTIME ENTRY POINTS                              *</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="comment"> *================================================================================*/</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="comment"></span> </div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment"> * @brief Computes the dynamic Smagorinsky coefficient field for one block.</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="comment"> * Runs the Germano-Lilly procedure: test-filters the resolved field, forms the</span></div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="comment"> * Leonard stress and the model tensor, contracts them, averages the two</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="comment"> * contractions over the configured directions, limits the quotient, and stores it in</span></div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="comment"> * `UserCtx::CS`.</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="comment"> * The stored quantity is the coefficient `C` that multiplies `Delta^2 |S|` in the</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="comment"> * eddy viscosity, that is, `Cs^2` rather than `Cs`. It is signed under</span></div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="comment"> * ::LES_CLIP_NONE. Reported values are converted to `Cs` at the diagnostic boundary,</span></div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="comment"> * where the familiar target near 0.16 applies.</span></div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="comment"> * Only ::DYNAMIC_SMAGORINSKY reaches this routine; the constant model prescribes its</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="comment"> * coefficient from configuration and allocates no field. Callers honour</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="comment"> * `LESConfig::dynamic_frequency`, and the caller must have refreshed `UserCtx::lUcat`</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="comment"> * and its periodic images beforehand.</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="comment"> * @param[in,out] user The user context for a single computational block.</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="comment"></span> </div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="comment"> * @brief Computes the turbulent eddy viscosity for one block.</span></div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="comment"> * Evaluates `nu_t = C Delta^2 |S|` at every fluid cell and stores it in</span></div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="comment"> * `UserCtx::Nu_t`. The coefficient comes from `UserCtx::lCs` for the dynamic model</span></div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment"> * and directly from `LESConfig::constant_cs` for the constant model, which therefore</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="comment"> * needs no coefficient field at all.</span></div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="comment"> * @param[in,out] user The user context for a single computational block.</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"></span> </div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="comment"> * @brief Appends one row of LES coefficient statistics to the run&#39;s log directory.</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="comment"> * Writes `les_coefficient.csv`: the effective coefficient reported as `Cs`, its</span></div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment"> * spatial spread, eddy-viscosity levels, the modelled subgrid energy, and the</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="comment"> * fractions of the domain that were backscattering or limited before this step&#39;s</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="comment"> * clipping. Those last two describe the pre-clipping state, which no stored field</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment"> * preserves.</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="comment"> * Values are instantaneous volume statistics, not time averages; window averages of</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="comment"> * the same model&#39;s fields come from the field-statistics pipeline instead.</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment"> * @param[in] user The user context for a single computational block.</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="comment"> * @return PetscErrorCode 0 on success.</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>PetscErrorCode <a class="code hl_function" href="les_8h.html#ab0db57f6573fd8836b9a53c0483181a4">LogLESDiagnostics</a>(<a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user);</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="preprocessor">#endif </span><span class="comment">// LES_H</span></div>
 <div class="ttc" id="aBoundaries_8h_html"><div class="ttname"><a href="Boundaries_8h.html">Boundaries.h</a></div></div>
 <div class="ttc" id="aFilter_8h_html"><div class="ttname"><a href="Filter_8h.html">Filter.h</a></div></div>
 <div class="ttc" id="aMetric_8h_html"><div class="ttname"><a href="Metric_8h.html">Metric.h</a></div></div>
-<div class="ttc" id="ales_8h_html_a224bc22e175dc737ed50c556c5ee4c05"><div class="ttname"><a href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a></div><div class="ttdeci">PetscErrorCode ComputeEddyViscosityLES(UserCtx *user)</div><div class="ttdoc">Computes the turbulent eddy viscosity (Nu_t) for the LES model.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00327">les.c:327</a></div></div>
-<div class="ttc" id="ales_8h_html_adcc07934d96b59bbddd67f5bb4662df4"><div class="ttname"><a href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a></div><div class="ttdeci">PetscErrorCode ComputeSmagorinskyConstant(UserCtx *user)</div><div class="ttdoc">Computes the dynamic Smagorinsky constant (Cs) for the LES model.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00042">les.c:42</a></div></div>
+<div class="ttc" id="ales_8h_html_a021863760739ee79965d9f6d508c9600"><div class="ttname"><a href="les_8h.html#a021863760739ee79965d9f6d508c9600">SymTensorTimesVector</a></div><div class="ttdeci">Cmpnts SymTensorTimesVector(SymTensor t, Cmpnts v)</div><div class="ttdoc">Applies a symmetric tensor to a vector, returning t_ij v_j.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00232">les.c:232</a></div></div>
+<div class="ttc" id="ales_8h_html_a0cbbb087429ad627712acc7212b102dc"><div class="ttname"><a href="les_8h.html#a0cbbb087429ad627712acc7212b102dc">SymTensorNormSq</a></div><div class="ttdeci">PetscReal SymTensorNormSq(SymTensor t)</div><div class="ttdoc">Returns the squared Frobenius norm t_ij t_ij.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00250">les.c:250</a></div></div>
+<div class="ttc" id="ales_8h_html_a224bc22e175dc737ed50c556c5ee4c05"><div class="ttname"><a href="les_8h.html#a224bc22e175dc737ed50c556c5ee4c05">ComputeEddyViscosityLES</a></div><div class="ttdeci">PetscErrorCode ComputeEddyViscosityLES(UserCtx *user)</div><div class="ttdoc">Computes the turbulent eddy viscosity for one block.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00851">les.c:851</a></div></div>
+<div class="ttc" id="ales_8h_html_a25141ecdfacc7daccf0e7b3dbc536b15"><div class="ttname"><a href="les_8h.html#a25141ecdfacc7daccf0e7b3dbc536b15">SymTensorCombine</a></div><div class="ttdeci">SymTensor SymTensorCombine(PetscReal a, SymTensor x, PetscReal b, SymTensor y)</div><div class="ttdoc">Forms the linear combination a*x + b*y.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00165">les.c:165</a></div></div>
+<div class="ttc" id="ales_8h_html_a2c3773f929e983edb93fcd3aa8efe713"><div class="ttname"><a href="les_8h.html#a2c3773f929e983edb93fcd3aa8efe713">SymTensorSelfOuter</a></div><div class="ttdeci">SymTensor SymTensorSelfOuter(Cmpnts v)</div><div class="ttdoc">Forms a symmetric tensor from a vector's outer product with itself.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00144">les.c:144</a></div></div>
+<div class="ttc" id="ales_8h_html_a381c7335cafe1a874e3c09bbf56c8731"><div class="ttname"><a href="les_8h.html#a381c7335cafe1a874e3c09bbf56c8731">SymTensorDeviator</a></div><div class="ttdeci">SymTensor SymTensorDeviator(SymTensor t)</div><div class="ttdoc">Removes the isotropic part, returning t_ij - (1/3) delta_ij t_kk.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00199">les.c:199</a></div></div>
+<div class="ttc" id="ales_8h_html_a3a4a66e2c3ca2b3075832b8dcfaf6ab4"><div class="ttname"><a href="les_8h.html#a3a4a66e2c3ca2b3075832b8dcfaf6ab4">SubgridKineticEnergy</a></div><div class="ttdeci">PetscReal SubgridKineticEnergy(PetscReal yoshizawa_ci, PetscReal delta, PetscReal strain_magnitude)</div><div class="ttdoc">Returns the modelled subgrid kinetic energy at a cell.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00503">les.c:503</a></div></div>
+<div class="ttc" id="ales_8h_html_a46ee151709e2f907fedd874be4119baa"><div class="ttname"><a href="les_8h.html#a46ee151709e2f907fedd874be4119baa">SymTensorTrace</a></div><div class="ttdeci">PetscReal SymTensorTrace(SymTensor t)</div><div class="ttdoc">Returns the trace t_kk.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00186">les.c:186</a></div></div>
+<div class="ttc" id="ales_8h_html_a4b24a9b855b6f0c642dff3a89c467fd7"><div class="ttname"><a href="les_8h.html#a4b24a9b855b6f0c642dff3a89c467fd7">EddyViscosityFromCoefficient</a></div><div class="ttdeci">PetscReal EddyViscosityFromCoefficient(PetscReal coefficient, PetscReal delta, PetscReal strain_magnitude, PetscReal molecular_viscosity, PetscReal min_viscosity_ratio)</div><div class="ttdoc">Builds the eddy viscosity from a model coefficient.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00480">les.c:480</a></div></div>
+<div class="ttc" id="ales_8h_html_a4cbb5cc2008450de162cae95f35603e2"><div class="ttname"><a href="les_8h.html#a4cbb5cc2008450de162cae95f35603e2">GermanoModelTensor</a></div><div class="ttdeci">SymTensor GermanoModelTensor(PetscReal delta, PetscReal alpha, PetscReal strain_magnitude_filtered, SymTensor strain_filtered, SymTensor strain_product_filtered)</div><div class="ttdoc">Forms the deviatoric Germano model tensor M_ij.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00357">les.c:357</a></div></div>
+<div class="ttc" id="ales_8h_html_a61639a31dec10708de938f1d84fac37f"><div class="ttname"><a href="les_8h.html#a61639a31dec10708de938f1d84fac37f">ClipModelCoefficient</a></div><div class="ttdeci">PetscReal ClipModelCoefficient(PetscReal coefficient, const LESConfig *config, PetscBool *limited)</div><div class="ttdoc">Applies the configured admissible range to one model coefficient.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00449">les.c:449</a></div></div>
+<div class="ttc" id="ales_8h_html_a65e9cab329abc016cff5d5a59d43fd83"><div class="ttname"><a href="les_8h.html#a65e9cab329abc016cff5d5a59d43fd83">ComputeCellFilterWidth</a></div><div class="ttdeci">PetscErrorCode ComputeCellFilterWidth(LESFilterWidthModel model, PetscReal aj, Cmpnts csi, Cmpnts eta, Cmpnts zet, PetscReal *delta)</div><div class="ttdoc">Computes one cell's grid filter width under the selected width model.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00296">les.c:296</a></div></div>
+<div class="ttc" id="ales_8h_html_a6973a221ec840633a63a4f462ee5c3a1"><div class="ttname"><a href="les_8h.html#a6973a221ec840633a63a4f462ee5c3a1">StrainRateFromGradients</a></div><div class="ttdeci">PetscErrorCode StrainRateFromGradients(Cmpnts dudx, Cmpnts dvdx, Cmpnts dwdx, SymTensor *strain, PetscReal *magnitude)</div><div class="ttdoc">Builds the strain-rate tensor and its magnitude from a velocity gradient.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00267">les.c:267</a></div></div>
+<div class="ttc" id="ales_8h_html_a7d78ef5025ab1d759c6371b557d59c81"><div class="ttname"><a href="les_8h.html#a7d78ef5025ab1d759c6371b557d59c81">ResolveLESAveragingDirections</a></div><div class="ttdeci">PetscErrorCode ResolveLESAveragingDirections(UserCtx *user, PetscBool direction[3])</div><div class="ttdoc">Resolves which logical directions the dynamic coefficient is averaged over.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00393">les.c:393</a></div></div>
+<div class="ttc" id="ales_8h_html_a87a8a35c5326c8ae91dbf8b3f7688b69"><div class="ttname"><a href="les_8h.html#a87a8a35c5326c8ae91dbf8b3f7688b69">LeonardStress</a></div><div class="ttdeci">SymTensor LeonardStress(Cmpnts velocity_filtered, SymTensor velocity_product_filtered)</div><div class="ttdoc">Forms the Leonard stress L_ij = (u_i u_j)^ - u^_i u^_j.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00342">les.c:342</a></div></div>
+<div class="ttc" id="ales_8h_html_aa4f6dfc437aaa42ae0e6ee3d2c58d40f"><div class="ttname"><a href="les_8h.html#aa4f6dfc437aaa42ae0e6ee3d2c58d40f">SymTensorContract</a></div><div class="ttdeci">PetscReal SymTensorContract(SymTensor a, SymTensor b)</div><div class="ttdoc">Contracts two symmetric tensors as a_ij b_ij.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00217">les.c:217</a></div></div>
+<div class="ttc" id="ales_8h_html_ab0db57f6573fd8836b9a53c0483181a4"><div class="ttname"><a href="les_8h.html#ab0db57f6573fd8836b9a53c0483181a4">LogLESDiagnostics</a></div><div class="ttdeci">PetscErrorCode LogLESDiagnostics(UserCtx *user)</div><div class="ttdoc">Appends one row of LES coefficient statistics to the run's log directory.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00931">les.c:931</a></div></div>
+<div class="ttc" id="ales_8h_html_adcc07934d96b59bbddd67f5bb4662df4"><div class="ttname"><a href="les_8h.html#adcc07934d96b59bbddd67f5bb4662df4">ComputeSmagorinskyConstant</a></div><div class="ttdeci">PetscErrorCode ComputeSmagorinskyConstant(UserCtx *user)</div><div class="ttdoc">Computes the dynamic Smagorinsky coefficient field for one block.</div><div class="ttdef"><b>Definition</b> <a href="les_8c_source.html#l00623">les.c:623</a></div></div>
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Logging utilities and macros for PETSc-based applications.</div></div>
 <div class="ttc" id="asetup_8h_html"><div class="ttname"><a href="setup_8h.html">setup.h</a></div></div>
 <div class="ttc" id="avariables_8h_html"><div class="ttname"><a href="variables_8h.html">variables.h</a></div><div class="ttdoc">Main header file for a complex fluid dynamics solver.</div></div>
-<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00906">variables.h:906</a></div></div>
+<div class="ttc" id="avariables_8h_html_af496c30781324575c1af9f01b4f278da"><div class="ttname"><a href="variables_8h.html#af496c30781324575c1af9f01b4f278da">LESFilterWidthModel</a></div><div class="ttdeci">LESFilterWidthModel</div><div class="ttdoc">Selects how a cell's grid filter width is derived from its metrics.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00582">variables.h:582</a></div></div>
+<div class="ttc" id="avariables_8h_html_structCmpnts"><div class="ttname"><a href="variables_8h.html#structCmpnts">Cmpnts</a></div><div class="ttdoc">A 3D point or vector with PetscScalar components.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00120">variables.h:120</a></div></div>
+<div class="ttc" id="avariables_8h_html_structLESConfig"><div class="ttname"><a href="variables_8h.html#structLESConfig">LESConfig</a></div><div class="ttdoc">Every user-selectable parameter of the LES closure.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00632">variables.h:632</a></div></div>
+<div class="ttc" id="avariables_8h_html_structSymTensor"><div class="ttname"><a href="variables_8h.html#structSymTensor">SymTensor</a></div><div class="ttdoc">A symmetric second-order tensor stored by its six independent components.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00137">variables.h:137</a></div></div>
+<div class="ttc" id="avariables_8h_html_structUserCtx"><div class="ttname"><a href="variables_8h.html#structUserCtx">UserCtx</a></div><div class="ttdoc">User-defined context containing data specific to a single computational grid level.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01071">variables.h:1071</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

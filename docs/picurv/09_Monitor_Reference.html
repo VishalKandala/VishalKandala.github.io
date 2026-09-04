@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -97,12 +103,7 @@ $(function() {
 <li class="level1"><a href="#p09_profiling_sec">5. profiling</a></li>
 <li class="level1"><a href="#p09_diagnostics_sec">6. diagnostics</a></li>
 <li class="level1"><a href="#p09_solver_monitoring_sec">7. solver_monitoring</a></li>
-<li class="level1"><a href="#p09_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md32">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md33">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md34">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p09_next_steps_sec">8. Next Steps</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Monitor_Reference"></a> For the full commented template, see:</p>
@@ -313,13 +314,8 @@ io:
   # [Integer] -&gt; -logfreq
   particle_log_interval: 50
 
-  # --- Directory Management ---
-  # Specifies subdirectory names within the run folder. If omitted, C-code
-  # defaults will be used.
-  directories:
-    output: "output"    # [string] -&gt; -output_dir
-    restart: "restart"  # [string] -&gt; -restart_dir
-    log: "logs"         # [string] -&gt; -log_dir
+  # Run directories are fixed by the workspace contract: output/, inputs/restart/,
+  # logs/, and output/analysis/. They are intentionally not configurable here.
 
 # ==============================================================================
 # 7. SOLVER MONITORING
@@ -366,7 +362,7 @@ solver_monitoring:
 <div class="line">    mode: statistical_steady</div>
 <div class="line">    statistical_steady:</div>
 <div class="line">      window_steps: 100</div>
-</div><!-- fragment --><p>PICurv writes the normalized settings directly into the generated master <code>.control</code> file as the existing <code>-solution_convergence_*</code> options. It retains <code>logs/solution_convergence.log</code>, its columns, and its current observable loops. <code>enabled: false</code> disables that writer and its private history allocation. The default remains enabled <code>steady_deterministic</code> monitoring. Convergence is observed after every completed timestep; there is no user-facing cadence key.</p>
+</div><!-- fragment --><p>PICurv writes the normalized settings directly into the generated master <code>.control</code> file as the existing <code>-solution_convergence_*</code> options. It retains <code>&lt;run.runtime_logs&gt;/solution_convergence.log</code>, its columns, and its current observable loops. <code>enabled: false</code> disables that writer and its private history allocation. The default remains enabled <code>steady_deterministic</code> monitoring. Convergence is observed after every completed timestep; there is no user-facing cadence key.</p>
 <p>Mode-specific rules:</p>
 <ul>
 <li><code>periodic_deterministic</code> requires <code>periodic_deterministic.period_steps &gt; 0</code>;</li>
@@ -379,23 +375,17 @@ solver_monitoring:
 <p>The removed <code>case.yml -&gt; models.statistics.time_averaging</code> and <code>-averaging</code> surface is not compatible input and is not translated into a replacement workflow.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
 2. io</h1>
+<p><code>io</code> controls output cadence and console sampling. Directory selection is not a monitor option: every run uses the fixed homes declared by the workspace contract. Solver state goes under <code>&lt;run.solver_output&gt;</code>, checkpoints under <code>&lt;run.checkpoints&gt;</code>, runtime logs under <code>&lt;run.runtime_logs&gt;</code>, and restart materializations under <code>&lt;run.inputs&gt;/restart</code>. A <code>directories</code> block is rejected as unsupported input.</p>
 <div class="fragment"><div class="line">io:</div>
 <div class="line">  data_output_frequency: 100</div>
 <div class="line">  particle_console_output_frequency: 100</div>
 <div class="line">  statistics_console_output_frequency: 100</div>
 <div class="line">  particle_log_interval: 10</div>
-<div class="line">  directories:</div>
-<div class="line">    output: &quot;output&quot;</div>
-<div class="line">    restart: &quot;restart&quot;</div>
-<div class="line">    log: &quot;logs&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>data_output_frequency</code> -&gt; <code>-tio</code></li>
 <li><code>particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code></li>
 <li><code>statistics_console_output_frequency</code> -&gt; <code>-statistics_console_output_freq</code></li>
 <li><code>particle_log_interval</code> -&gt; <code>-logfreq</code></li>
-<li><code>directories.output</code> -&gt; <code>-output_dir</code></li>
-<li><code>directories.restart</code> -&gt; <code>-restart_dir</code></li>
-<li><code>directories.log</code> -&gt; <code>-log_dir</code></li>
 </ul>
 <p>Semantics:</p><ul>
 <li><code>data_output_frequency</code> controls committed-checkpoint cadence. Initial and final completed states are also checkpointed, including an off-cadence final state.</li>
@@ -491,8 +481,11 @@ solver_monitoring:
 <li>Raising <code>verbosity</code> therefore does not surface a function's diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
 <li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
-<li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>logs/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
+<li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>&lt;run.runtime_logs&gt;/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
+<li>LES runs with <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> write <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
+<li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.runtime_logs&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
 <li>Use <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b> for the exact metric definitions and formulas.</li>
+<li>Every one of these runtime files is opened for append, not truncated, and carries its column header only once. A run continued in place therefore extends the file it already has rather than replacing it, and the seam is marked with a <code># Continuation from step N</code> comment on the first row the continuation produces. That marker is what lets a reader - and <code>picurv summarize --plot</code> - treat the segments either as one history or as separate series, instead of inferring a restart from a discontinuity in the data. A restart into a <em>new</em> run directory starts fresh files, because the log directory is new.</li>
 </ul>
 <p>Supported verbosity strings:</p><ul>
 <li><code>ERROR</code></li>
@@ -508,6 +501,7 @@ Startup banner and solver-specific output</h1>
 <ul>
 <li><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> cadence, row sampling, restart mode, initialization mode, and interpolation are shown only when particles are configured.</li>
 <li>Eulerian source details distinguish a fresh initial condition, a restart, and <code>load</code> authority.</li>
+<li>Turbulence lines report the resolved closure rather than the model name alone: the filter width, test filter, dynamic cadence, averaging mode and directions, limiting mode and ceiling, viscosity floor, gradient term, and diagnostics state, followed by the wall-function model and its roughness height. A setting can therefore be confirmed to have landed without re-reading the generated control file.</li>
 <li><code>Initial Pseudo-CFL (Courant)</code> appears only for <code>Dual Time Picard Jameson RK</code>. It is intentionally absent for <code>Newton Krylov</code> and explicit RK, where that controller is not active.</li>
 <li>Newton&ndash;Krylov iteration detail is controlled by <code>solver_monitoring.momentum</code> below and its structured solver controls are documented in <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b> and <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b>.</li>
 <li>The banner also records the effective console log level, profiling mode and final-summary setting, runtime-memory-log state, and the selected solution convergence mode. Periodic and statistical convergence modes additionally show their active period or window; those fields are omitted otherwise.</li>
@@ -534,7 +528,7 @@ Startup banner and solver-specific output</h1>
 </ul>
 </li>
 <li><code>timestep_output.functions</code> is required only when <code>mode: selected</code></li>
-<li><code>timestep_output.file</code> sets the filename written under the run <code>logs/</code> directory</li>
+<li><code>timestep_output.file</code> sets the filename written under <code>&lt;run.runtime_logs&gt;/</code></li>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
 <h1><a class="anchor" id="p09_diagnostics_sec"></a>
@@ -569,10 +563,10 @@ Startup banner and solver-specific output</h1>
 </div><!-- fragment --><p>adds PETSc startup arguments like:</p>
 <div class="fragment"><div class="line">-malloc_debug -log_view :runs/&lt;run_id&gt;/logs/PETSc_LogView_Solver.log -objects_dump all</div>
 </div><!-- fragment --><p>for the solver stage, with analogous <code>PostProcessor</code> log names for post runs.</p><ul>
-<li><code>malloc_view</code>, <code>log_view</code>, and <code>log_trace</code> accept <code>false</code>, <code>true</code>, or a non-empty PETSc viewer/path string. When set to <code>true</code>, PICurv writes run-local defaults such as <code>logs/PETSc_MallocView_Solver.log</code>, <code>logs/PETSc_LogView_Solver.log</code>, and matching <code>PostProcessor</code> files.</li>
+<li><code>malloc_view</code>, <code>log_view</code>, and <code>log_trace</code> accept <code>false</code>, <code>true</code>, or a non-empty PETSc viewer/path string. When set to <code>true</code>, PICurv writes run-local defaults such as <code>&lt;run.runtime_logs&gt;/PETSc_MallocView_Solver.log</code>, <code>&lt;run.runtime_logs&gt;/PETSc_LogView_Solver.log</code>, and matching <code>PostProcessor</code> files.</li>
 <li><code>objects_dump</code> accepts <code>false</code>, <code>true</code>, or <code>all</code>.</li>
 <li><code>options_left</code> accepts <code>true</code>, <code>false</code>, or <code>null</code>; use <code>null</code> to omit the PETSc option entirely.</li>
-<li>PETSc diagnostics that support output files use run-local defaults under <code>logs/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
+<li>PETSc diagnostics that support output files use run-local defaults under <code>&lt;run.runtime_logs&gt;/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
 <li><code>runtime_memory_log</code> writes a rank-reduced, terminal-readable log with max process/PETSc allocation signals per step.</li>
 <li><code>picurv summarize</code> reports the latest runtime memory signals when the log is present.</li>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
@@ -618,28 +612,8 @@ Startup banner and solver-specific output</h1>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
-<li><b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b></li>
+<li><b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md32"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Configuration Reference: Monitor YAML</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md33"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md34"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

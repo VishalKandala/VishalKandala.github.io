@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['stamp_5fdocs_5frevision_0',['stamp_docs_revision',['../namespacestamp__docs__revision.html',1,'']]]
+  ['inject_5ftheme_5fsync_0',['inject_theme_sync',['../namespaceinject__theme__sync.html',1,'']]]
 ];

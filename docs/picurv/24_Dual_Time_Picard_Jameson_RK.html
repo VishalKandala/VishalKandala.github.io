@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -91,12 +97,7 @@ $(function() {
 <li class="level1"><a href="#p24_logging_sec">5. Logging and Diagnostics</a></li>
 <li class="level1"><a href="#p24_touchpoints_sec">6. Core Code Touchpoints</a></li>
 <li class="level1"><a href="#p24_rhs_state_sec">6a. RHS State and Pseudo-Iteration Cadence</a></li>
-<li class="level1"><a href="#p24_practical_sec">7. Practical Tuning Guidance</a><ul><li class="level2"><a href="#autotoc_md90">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md91">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md92">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p24_practical_sec">7. Practical Tuning Guidance</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_Jameson_RK"></a> This page documents one of PICurv's two implicit-in-physical-time momentum strategies: the <b>dual-time Picard fixed-point / pseudo-time</b> solver, using Jameson RK pseudo-time smoothing. It is the established, broadly exercised default. For the alternative matrix-free Newton solver and for selection guidance between the two, see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a> and <a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a>.</p>
@@ -210,7 +211,7 @@ $(function() {
 <p>Parsing and normalization are performed in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, with final option ingestion in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during setup. Only the currently implemented momentum solver values are exposed; add new ones only when the parser and dispatcher are extended in the same change.</p>
 <h1><a class="anchor" id="p24_logging_sec"></a>
 5. Logging and Diagnostics</h1>
-<p>The persistent momentum convergence-history format (<code>logs/Momentum_Solver_Convergence_History_Block_N.log</code>) includes per-trial fields:</p>
+<p>The persistent momentum convergence-history format (<code>&lt;run.runtime_logs&gt;/Momentum_Solver_Convergence_History_Block_N.log</code>) includes per-trial fields:</p>
 <ul>
 <li><code>PseudoIter(k)</code>: total attempted trial index (includes rejected trials)</li>
 <li><code>dtau</code>: physical-time pseudo-step used for this trial [s] — equals <code>pseudo_cfl / lambda_max</code></li>
@@ -250,27 +251,7 @@ $(function() {
 <li>If instability persists after CFL tuning: revisit physical timestep, grid quality near bends or walls, and boundary condition consistency.</li>
 </ol>
 <p>For many cases, robust Poisson settings and sane initialization matter as much as dual-time tolerances.</p>
-<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
-<h2><a class="anchor" id="autotoc_md90"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Dual-Time Picard Jameson RK Momentum Solver</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md91"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md92"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
+<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

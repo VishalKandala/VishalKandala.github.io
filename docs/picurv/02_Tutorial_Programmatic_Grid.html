@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -93,15 +99,11 @@ $(function() {
 <li class="level1"><a href="#p02_checks_sec">7. First Validation Checks</a></li>
 <li class="level1"><a href="#p02_viz_sec">8. Visualize in ParaView</a></li>
 <li class="level1"><a href="#p02_troubleshooting_sec">9. Common First-Run Issues</a></li>
-<li class="level1"><a href="#p02_next_steps_sec">10. Next Steps</a><ul><li class="level2"><a href="#autotoc_md11">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md12">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md13">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p02_next_steps_sec">10. Next Steps</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Tutorial_Programmatic_Grid"></a> This is the complete first simulation walkthrough for PICurv using the <code>flat_channel</code> template. This is the canonical first-simulation walkthrough with both commands and reasoning.</p>
+<div class="textblock"><p><a class="anchor" id="_Tutorial_Programmatic_Grid"></a>  <div class="pic-pagemeta"><span class="pic-pagemeta-item"><b>Type</b> Tutorial</span><span class="pic-pagemeta-item"><b>For</b>  New users</span><span class="pic-pagemeta-item"><b>Status</b>  Verified against current `main`</span></div></p>
+<p>This is the complete first simulation walkthrough for PICurv using the <code>flat_channel</code> template. This is the canonical first-simulation walkthrough with both commands and reasoning.</p>
 <h1><a class="anchor" id="p02_goal_sec"></a>
 1. Tutorial Goal</h1>
 <p>By the end of this tutorial you will have:</p>
@@ -159,25 +161,30 @@ $(function() {
 <div class="fragment"><div class="line">runs/</div>
 <div class="line">`- flat_channel_YYYYMMDD-HHMMSS/</div>
 <div class="line">   |- config/</div>
+<div class="line">   |- inputs/</div>
 <div class="line">   |- logs/</div>
 <div class="line">   |- output/</div>
-<div class="line">   `- viz/</div>
+<div class="line">   |  |- checkpoints/</div>
+<div class="line">   |  |- analysis/</div>
+<div class="line">   |  `- visualization/</div>
+<div class="line">   |- scheduler/</div>
+<div class="line">   `- manifest.json</div>
 </div><!-- fragment --><p>Interpretation:</p>
 <ul>
-<li><code>config/</code>: exact runtime artifact snapshot for reproducibility,</li>
-<li><code>logs/</code>: function-level and solver monitor traces,</li>
-<li><code>output/</code>: solver field outputs,</li>
-<li><code>viz/</code>: postprocessed VTK files for ParaView.</li>
+<li><code>&lt;run.config&gt;/</code>: exact runtime artifact snapshot for reproducibility,</li>
+<li><code>&lt;run.runtime_logs&gt;/</code>: function-level and solver monitor traces,</li>
+<li><code>&lt;run.solver_output&gt;/</code>: solver field outputs,</li>
+<li><code>&lt;run.visualization&gt;/&lt;recipe_id&gt;/</code>: postprocessed VTK files for ParaView.</li>
 </ul>
 <h1><a class="anchor" id="p02_checks_sec"></a>
 7. First Validation Checks</h1>
 <p>After run completion, verify:</p>
 <ul>
-<li>no fatal errors in <code>runs/&lt;run_id&gt;/logs/</code>,</li>
+<li>no fatal errors in <code>&lt;run.runtime_logs&gt;/</code>,</li>
 <li>non-empty VTK outputs in visualization directory,</li>
 <li>expected time sequence naming (<code>Field_*.vts</code>, optionally <code>Particle_*.vtp</code>).</li>
 </ul>
-<p>If results are missing, check <code>post.yml</code> output toggles and directory settings first.</p>
+<p>If results are missing, check the recipe-specific post state under <code>&lt;run.config&gt;/post-recipes/</code> and the <code>post.yml</code> output toggles first.</p>
 <h1><a class="anchor" id="p02_viz_sec"></a>
 8. Visualize in ParaView</h1>
 <ol type="1">
@@ -204,28 +211,8 @@ $(function() {
 <ul>
 <li>File-grid workflow: <b><a class="el" href="03_Tutorial_File-Based_Grid.html">Tutorial: Using a File-Based Grid (Bent Channel)</a></b></li>
 <li>Visualization details: <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b></li>
-<li>Operational recipes: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
+<li>Operational recipes: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md11"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Tutorial: Your First Simulation (Flat Channel)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md12"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md13"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

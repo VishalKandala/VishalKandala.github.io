@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -84,7 +90,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p50_general_sec">1. Standard Checklist For Any Selector</a></li>
+<ul><li class="level1"><a href="#p50_general_sec">1. Standard Checklist For Any Selector</a><ul><li class="level2"><a href="#p50_obligations_ssec">1.1 The Documentation Obligation Is Enforced</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p50_momentum_sec">2. Momentum Solver Selector</a></li>
 <li class="level1"><a href="#p50_bc_sec">3. Boundary Condition Type Or Handler</a></li>
 <li class="level1"><a href="#p50_particle_init_sec">4. Particle Initialization Mode</a></li>
@@ -95,12 +103,10 @@ $(function() {
 <li class="level1"><a href="#p50_grid_sec">9. Grid Selector / Generator Selector</a></li>
 <li class="level1"><a href="#p50_profiling_sec">10. Profiling Selector</a></li>
 <li class="level1"><a href="#p50_post_sec">11. Postprocessing / Statistics Tasks</a></li>
-<li class="level1"><a href="#p50_related_sec">11. Related Pages</a><ul><li class="level2"><a href="#autotoc_md172">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md173">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md174">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p50_turbulence_sec">12. Turbulence Closure Selectors</a><ul><li class="level2"><a href="#p50_turbulence_kernels_ssec">12.1 Reusable Kernels</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="level1"><a href="#p50_related_sec">13. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Modular_Selector_Extension_Guide"></a> This page is the contributor checklist for adding new selector-driven options without drifting the YAML -&gt; launcher -&gt; C runtime contract.</p>
@@ -113,10 +119,35 @@ $(function() {
 <li>emit the correct generated control/post artifact mapping,</li>
 <li>add any C enum/storage and parser wiring,</li>
 <li>add the runtime dispatch/consumer branch,</li>
-<li>update tests,</li>
-<li>update the relevant reference pages.</li>
+<li>add tests,</li>
+<li><b>declare the value in the capability registry</b>, and</li>
+<li><b>write its Tier-2 capability entry</b>.</li>
 </ol>
 <p>Use the canonical value only. Do not add placeholder enum values or compatibility aliases for unimplemented options.</p>
+<h2><a class="anchor" id="p50_obligations_ssec"></a>
+1.1 The Documentation Obligation Is Enforced</h2>
+<p>Steps 7 and 8 are not advisory. Coverage is enforced for every registered family, so <code>make audit-capability</code> fails until they are done, and the full source chain - validator, C parser, enum, runtime dispatch - must agree. If the value belongs to a family nothing yet covers, <code>make audit-family-census</code> will have already refused the new public surface.</p>
+<p>Concretely, adding a selector value means:</p>
+<div class="fragment"><div class="line"># 1. Declare it: add an entry to value_metadata in</div>
+<div class="line">#    tests/tooling/capability_families.json with its status, canonical/alias</div>
+<div class="line">#    relationship, and evidence sources.</div>
+<div class="line"> </div>
+<div class="line"># 2. Scaffold the entry with every required part already present:</div>
+<div class="line">python3 tests/tooling/scaffold_documentation.py capability \</div>
+<div class="line">    --family &lt;family.id&gt; --value &#39;&lt;Your Value&gt;&#39;</div>
+<div class="line"> </div>
+<div class="line"># 3. Paste it into the family page, fill in the TODOs, then:</div>
+<div class="line">make docs-inventory      # regenerate the inventory and its tables</div>
+<div class="line">make audit-capability    # parity, coverage, evidence, lifecycle</div>
+</div><!-- fragment --><p>The audit checks four things a reviewer would otherwise have to check by hand:</p>
+<ul>
+<li><b>Parity</b> - the value is accepted end to end, and nothing accepts a value the validator does not expose.</li>
+<li><b>Coverage</b> - an entry exists, anchored outside code blocks, with all eight contract parts (three for a deprecated alias).</li>
+<li><b>Evidence</b> - each declared source exists <em>and</em> is cited in the entry's Evidence part, so the registry and the prose cannot drift.</li>
+<li><b>Lifecycle</b> - a <code>supported</code> value has evidence, an <code>experimental</code> or <code>known-defective</code> value states limitations, a <code>deprecated</code> value gives migration.</li>
+</ul>
+<p>If the value is a synonym rather than a new capability, declare <code>spelling_of</code> instead and it inherits the canonical value's status without needing its own entry. If it is a retired name, declare <code>alias_of</code> and scaffold the three-part stub with <code><a class="el" href="scaffold__documentation_8py.html">scaffold_documentation.py</a> alias</code>.</p>
+<p>Full contract: <b><a class="el" href="64_Documentation_Extension_Framework.html">Documentation Extension Framework</a></b>.</p>
 <h1><a class="anchor" id="p50_momentum_sec"></a>
 2. Momentum Solver Selector</h1>
 <ul>
@@ -124,6 +155,11 @@ $(function() {
 <li>Canonical values:<ul>
 <li><code>Explicit RK4</code></li>
 <li><code>Dual Time Picard Jameson RK</code></li>
+<li><code>Newton Krylov</code></li>
+</ul>
+</li>
+<li>Deprecated alias:<ul>
+<li><code>Dual Time Picard RK4</code> normalizes to <code>Dual Time Picard Jameson RK</code>; the C enum keeps <code>MOMENTUM_SOLVER_DUALTIME_PICARD_RK4</code> as an alias of the Jameson value.</li>
 </ul>
 </li>
 <li>Python hook:<ul>
@@ -155,6 +191,7 @@ $(function() {
 <li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
 <li><b><a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a></b></li>
 <li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
+<li><b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b></li>
 </ul>
 </li>
 </ul>
@@ -204,6 +241,7 @@ $(function() {
 <li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
 </ul>
 </li>
+<li><b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b></li>
 </ul>
 <h1><a class="anchor" id="p50_particle_init_sec"></a>
 4. Particle Initialization Mode</h1>
@@ -395,7 +433,7 @@ $(function() {
 <li>thin delegation from <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code> for diffusivity</li>
 <li>analytical scalar truth in <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code></li>
 <li>gated particle-physics bypass in <code><a class="el" href="ParticlePhysics_8c.html">src/ParticlePhysics.c</a></code></li>
-<li>runtime metric writer in <code><a class="el" href="logging_8c.html">src/logging.c</a></code> (<code>logs/scatter_metrics.csv</code>)</li>
+<li>runtime metric writer in <code><a class="el" href="logging_8c.html">src/logging.c</a></code> (<code>&lt;run.runtime_logs&gt;/scatter_metrics.csv</code>)</li>
 </ul>
 </li>
 <li>Design boundary:<ul>
@@ -523,35 +561,77 @@ $(function() {
 </ul>
 </li>
 </ul>
+<h1><a class="anchor" id="p50_turbulence_sec"></a>
+12. Turbulence Closure Selectors</h1>
+<p>One LES closure is active per run, chosen from an enum and dispatched by a branch, the same shape the momentum solvers use. There is no registry object: a closure is a function, not an instance with a lifecycle, which is what separates this from the boundary-condition handlers in section 3.</p>
+<ul>
+<li>Schema home:<ul>
+<li><code>case.yml -&gt; models.physics.turbulence.les</code></li>
+</ul>
+</li>
+<li>Canonical values:<ul>
+<li>model: <code>constant_smagorinsky</code>, <code>dynamic_smagorinsky</code></li>
+<li><code>filter_width</code>: <code>cube_root_volume</code>, <code>geometric_mean</code>, <code>max_edge</code></li>
+<li><code>test_filter.kernel</code>: <code>volume_weighted_box</code>, <code>simpson_ik</code></li>
+<li><code>averaging.mode</code>: <code>local</code>, <code>homogeneous</code>, <code>global</code></li>
+<li><code>clipping.mode</code>: <code>clamp</code>, <code>clip_negative</code>, <code>none</code></li>
+</ul>
+</li>
+<li>Python hooks in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>:<ul>
+<li><code>normalize_les_model()</code></li>
+<li><code>normalize_les_filter_width()</code></li>
+<li><code>normalize_les_test_filter()</code></li>
+<li><code>normalize_les_averaging_mode()</code></li>
+<li><code>normalize_les_clip_mode()</code></li>
+<li><code>normalize_les_averaging_directions()</code></li>
+<li><code>validate_les_configuration()</code> for cross-key rules</li>
+<li><code>append_les_parameter_flags()</code> for emission</li>
+</ul>
+</li>
+<li>Generated mapping:<ul>
+<li>the <code>-les</code> and <code>-les_*</code> flags listed in <b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
+</ul>
+</li>
+<li>C enum/storage in <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">include/variables.h</a></code>:<ul>
+<li><code>LESModelType</code>, <code>LESFilterWidthModel</code>, <code>LESTestFilterKernel</code>, <code>LESAveragingMode</code>, <code>LESClipMode</code>, and the <code><a class="el" href="variables_8h.html#structLESConfig" title="Every user-selectable parameter of the LES closure.">LESConfig</a></code> block on <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code></li>
+</ul>
+</li>
+<li>C parser:<ul>
+<li><code><a class="el" href="setup_8c.html#a153abc21a946e4ad906209650dfd5f3c" title="Reads every LES closure parameter from the generated control file.">ParseLESConfiguration()</a></code> in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>, called from <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a>. Defaults come from <code><a class="el" href="setup_8h.html#aeb1e3c8f7c9914e870aea56bec4bfa0e" title="Installs the shipped defaults for every LES closure parameter.">LESConfigSetDefaults()</a></code>, also in <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code>, so the control-file ingress and the test fixtures cannot disagree about them. Both live with the rest of the ingress rather than in <code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) subgrid-scale closure.">src/les.c</a></code>, because the postprocessor builds a simulation context without linking the closure.</li>
+</ul>
+</li>
+<li>Runtime dispatch:<ul>
+<li><a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a> in <code><a class="el" href="solvers_8c.html">src/solvers.c</a></code></li>
+</ul>
+</li>
+<li>Implementation:<ul>
+<li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) subgrid-scale closure.">src/les.c</a></code> and <code><a class="el" href="Filter_8c.html" title="Implements numerical filtering schemes for Large Eddy Simulation (LES).">src/Filter.c</a></code></li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="p50_turbulence_kernels_ssec"></a>
+12.1 Reusable Kernels</h2>
+<p>A new closure should consume the existing kernels rather than restate them. They are declared in <code><a class="el" href="les_8h.html">include/les.h</a></code> and are the reason a second eddy-viscosity model is one function: <a class="el" href="les_8h.html#a6973a221ec840633a63a4f462ee5c3a1">StrainRateFromGradients</a>, <a class="el" href="les_8h.html#a65e9cab329abc016cff5d5a59d43fd83">ComputeCellFilterWidth</a>, <a class="el" href="les_8h.html#a381c7335cafe1a874e3c09bbf56c8731">SymTensorDeviator</a>, <a class="el" href="les_8h.html#aa4f6dfc437aaa42ae0e6ee3d2c58d40f">SymTensorContract</a>, <a class="el" href="les_8h.html#a021863760739ee79965d9f6d508c9600">SymTensorTimesVector</a>, <a class="el" href="les_8h.html#a61639a31dec10708de938f1d84fac37f">ClipModelCoefficient</a>, and <a class="el" href="les_8h.html#a4b24a9b855b6f0c642dff3a89c467fd7">EddyViscosityFromCoefficient</a>. The Germano-specific pieces, <a class="el" href="les_8h.html#a87a8a35c5326c8ae91dbf8b3f7688b69">LeonardStress</a> and <a class="el" href="les_8h.html#a4cbb5cc2008450de162cae95f35603e2">GermanoModelTensor</a>, belong to the dynamic procedure alone.</p>
+<p>Coefficient averaging is not an LES function. It is <a class="el" href="statistics__target_8h.html#aad7b407b6f3d3afe8782152c726933fd">PicurvSpatialRatioAverage</a> in <code><a class="el" href="statistics__target_8h.html" title="Spatial target resolution for the field-statistics pipeline.">include/statistics_target.h</a></code>, the module that already owns which points a spatial operation may touch. The closure resolves a <a class="el" href="statistics__target_8h.html#structSpatialTargetPlan">SpatialTargetPlan</a> for its loops through the same entry point the statistics pipeline uses, so both agree on which indices are physical and neither carries its own copy of the fluid threshold.</p>
+<ul>
+<li>Tests/docs to update:<ul>
+<li><code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code></li>
+<li><code>tests/test_config_regressions.py</code></li>
+<li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
+<li><b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b></li>
+<li><code>tests/tooling/capability_families.json</code> and <code>tests/tooling/subsystem_records.json</code></li>
+</ul>
+</li>
+</ul>
 <h1><a class="anchor" id="p50_related_sec"></a>
-11. Related Pages</h1>
+13. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="15_Config_Ingestion_Map.html">Developer Ingestion Map</a></b></li>
 <li><b><a class="el" href="16_Config_Extension_Playbook.html">Configuration Extension Playbook</a></b></li>
 <li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
-<li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b></li>
+<li><b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md172"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Modular Selector Extension Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md173"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md174"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

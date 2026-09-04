@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -95,6 +101,10 @@ $(function() {
 <li class="level1"><a href="#p55_monitors_sec">7. Monitors and Log Output</a></li>
 <li class="level1"><a href="#p55_reasons_sec">8. Convergence Reasons and Failure Modes</a></li>
 <li class="level1"><a href="#p55_precond_sec">9. Preconditioning Architecture and Status</a></li>
+<li class="level1"><a href="#p55_cap_pc_sec">9.1 Preconditioner Model Entries</a><ul><li class="level2"><a href="#p55_cap_pc_none_sub">none</a></li>
+<li class="level2"><a href="#p55_cap_pc_frozen_momentum_jacobian_sub">frozen_momentum_jacobian</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p55_validation_sec">10. Validation Coverage</a></li>
 <li class="level1"><a href="#p55_vs_jameson_sec">11. Differences from Dual-Time Picard&ndash;Jameson</a></li>
 <li class="level1"><a href="#p55_refs_sec">12. Related Pages</a></li>
@@ -107,11 +117,12 @@ $(function() {
 <p>Version one is deliberately narrow and validates its inputs up front (<a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a> rejects anything outside this set):</p>
 <ul>
 <li>exactly <b>one block</b>, no immersed boundaries, no moving/rotating bodies, FSI, or reference frames;</li>
-<li><b>no RANS, Clark, TwoD masking, or wall functions</b>;</li>
+<li><b>no RANS or TwoD masking</b>;</li>
 <li>fresh starts and Eulerian field restarts (including <code>--continue</code>); the first solved restart step uses BDF1 because only the checkpoint state is available;</li>
-<li>no masked solid cells (<code>Nvert</code> must be fluid everywhere);</li>
+<li>solid cells are permitted but the immersed-boundary method is not: a masked row carries no unknown and is constrained like any other such row, but the IBM velocity reconstruction does not run inside this solver's residual;</li>
 <li>boundary handlers limited to no-slip walls, the constant/parabolic/file inlets, the conservation outlet, and periodic faces (with paired periodic axes) using the <code>geometric</code>, <code>constant_flux</code>, or <code>initial_flux</code> handler.</li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd>The gradient (Clark) model and wall functions both reach this solver through the shared residual it already evaluates. Two properties are worth knowing before using them. The preconditioner deliberately does not model the Clark stress, so Krylov counts can rise with it enabled. That omission is a design choice rather than a gap: the Clark term is a higher-order gradient contribution, small in magnitude next to the eddy-viscosity term the diagonal already carries, and unlike that term it is not diagonally dominant - it couples a cell to its neighbours through a velocity-gradient product, which a point-block matrix cannot represent without ceasing to be a point block. Including it would cost assembly and a denser preconditioner for a term whose effect on the diagonal is second order. Whether that trade is right for a given grid is a measurement nobody has taken; the Krylov count with and without <code>gradient_model.enabled</code> is what would settle it. Wall functions obtain the friction velocity from an iterative root-find, and a matrix-free Jacobian action amplifies that solve's tolerance by <code>1/h</code>, so a loose inner tolerance shows up as a degraded Jacobian action rather than as an error.</dd></dl>
 <p>Within that scope it is a drop-in alternative to the dual-time Picard&ndash;Jameson solver and shares the same fractional-step projection, BDF time discretization, boundary system, and pressure solve.</p>
 <h2><a class="anchor" id="p55_driven_ssec"></a>
 1.1 Driven periodic faces</h2>
@@ -296,10 +307,43 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <h1><a class="anchor" id="p55_precond_sec"></a>
 9. Preconditioning Architecture and Status</h1>
 <p>The Jacobian interface owns creation, registration, update, naming, and cleanup of the finite-difference/matrix-free operator. The preconditioner model interface only describes a matrix structure and inserts interior physical coefficients. The common engine owns matrix creation/preallocation, repeated zeroing and assembly, constraint and periodic rows, PETSc backend selection, alias/ownership tracking, and cleanup.</p>
-<p>The optional frozen-momentum/point-block matrix is a separate AIJ matrix. For physical rows it reproduces the audited same-cell 3x3 block from the reachable legacy mode-2 approximation, with its sign reversed to match the modern residual convention; for constraint rows it inserts the exact modern derivative (+1 identity for fixed rows, or +1/-1 for periodic duplicates). It intentionally omits pressure, LES/RANS viscosity values and derivatives, nonorthogonal viscous cross-couplings, boundary-map and IBM derivatives, and body-force derivatives.</p>
+<p>The optional frozen-momentum/point-block matrix is a separate AIJ matrix. For physical rows it reproduces the audited same-cell 3x3 block from the reachable legacy mode-2 approximation, with its sign reversed to match the modern residual convention; for constraint rows it inserts the exact modern derivative (+1 identity for fixed rows, or +1/-1 for periodic duplicates). Its viscous diagonal carries the same effective viscosity the residual diffuses with, <code>nu + nu_t</code>, using the residual's own face average of the eddy viscosity and its wall zeroing; omitting the eddy term left the matrix modelling a viscous diagonal smaller than the operator's by the eddy-to-molecular ratio, which on a developed large-eddy simulation is order one or more. It still intentionally omits pressure, the eddy-viscosity <em>derivatives</em> with respect to velocity, nonorthogonal viscous cross-couplings, the gradient (Clark) stress, boundary-map and IBM derivatives, and body-force derivatives. The eddy viscosity and the Clark stress are omitted for different reasons, and only one of them was a judgement call: the eddy term was restored because it changes the viscous diagonal by the eddy-to-molecular ratio, while the Clark term is higher order and non-diagonal, so representing it would change what kind of matrix this is.</p>
 <p>The legacy face inverse Jacobians are arithmetic averages of neighboring cell inverse Jacobians, and its transverse metric terms average four squared metric-vector norms. The modern directional fields <code>IAj/JAj/KAj</code> directly invert separately constructed face determinants, while <code>ICsi/IEta/IZet</code>, <code>JCsi/JEta/JZet</code>, and <code>KCsi/KEta/KZet</code> come from directional face-center constructions. They are not algebraically equivalent to the legacy expressions on a general curvilinear grid: in particular, an average of squared norms is not the squared norm of an average. The explicit legacy formulas are therefore retained here. Directional fields remain potential inputs to a future, separately specified modern preconditioner model.</p>
 <p>The point-block coefficients have an independent test-only legacy transcription covering nonuniform metrics and velocities, every block entry, both BDF coefficients, constraint rows, and one- and multi-rank assembly. No performance claim is made. <code>PCPBJACOBI</code> is only the current internal backend mapping; it is not a user-facing numerical model and is not a historically proven legacy setting.</p>
 <p>Future additions are localized as follows: add a Jacobian type/mode beside <code>MomentumNewtonJacobian_Create/Update</code>; add a coefficient provider through <code><a class="el" href="structMomentumPreconditionerModelOps.html">MomentumPreconditionerModelOps</a></code>; add matrix metadata through <code><a class="el" href="momentum__newton__krylov_8c.html#structMomentumPreconditionerDescription">MomentumPreconditionerDescription</a></code>; and add a validated structure-to-PETSc backend mapping in <code>MomentumPreconditionerEngine_Create</code>. No placeholder modes are exposed before their implementations exist.</p>
+<h1><a class="anchor" id="p55_cap_pc_sec"></a>
+9.1 Preconditioner Model Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: momentum.nk_preconditioner.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p55_cap_pc_frozen_momentum_jacobian"><code>frozen_momentum_jacobian</code></a></td><td class="markdownTableBodyNone"><code>frozen_momentum_jacobian</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p55_cap_pc_none"><code>none</code></a></td><td class="markdownTableBodyNone"><code>none</code></td><td class="markdownTableBodyNone">supported</td></tr>
+</table>
+<h2><a class="anchor" id="p55_cap_pc_none_sub"></a>
+none</h2>
+<p><a class="anchor" id="p55_cap_pc_none"></a> <b>Identity.</b> <code>momentum_solver.newton_krylov.preconditioner.model: none</code> (the default) -&gt; <code>-mom_nk_preconditioner_model none</code>.</p>
+<p><b>What it does.</b> Runs the Krylov solve unpreconditioned on the matrix-free Jacobian. No preconditioning matrix is created, assembled, or stored.</p>
+<p><b>When to choose it.</b> The default, and the right starting point: it has no assembly cost, no extra memory, and no approximation of its own to be wrong. Move to <code>frozen_momentum_jacobian</code> only once Krylov iteration counts are demonstrably the bottleneck on your case.</p>
+<p><b>Parameters it owns.</b> None. Setting <code>preconditioner.structure</code> alongside this model is a validation error - <code>none</code> accepts no matrix structure, because there is no matrix.</p>
+<p><b>Interactions.</b> Mutually exclusive with <code>frozen_momentum_jacobian</code>. The Krylov method and its tolerances are configured separately under <code>linear_solver</code>.</p>
+<p><b>Diagnostics.</b> The Krylov iteration count per Newton step is the signal. It is reported by the SNES/KSP monitors described in <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_monitors_sec">7. Monitors and Log Output</a>; a rising count across timesteps is what motivates preconditioning.</p>
+<p><b>Evidence.</b> Integration verified - <code>make unit-newton-krylov</code> exercises this path.</p>
+<p><b>Limitations.</b> Iteration counts grow with conditioning, so on stiff or highly stretched grids the unpreconditioned solve can dominate the timestep cost.</p>
+<h2><a class="anchor" id="p55_cap_pc_frozen_momentum_jacobian_sub"></a>
+frozen_momentum_jacobian</h2>
+<p><a class="anchor" id="p55_cap_pc_frozen_momentum_jacobian"></a> <b>Identity.</b> <code>momentum_solver.newton_krylov.preconditioner.model: frozen_momentum_jacobian</code> with <code>preconditioner.structure.type: point_block</code> -&gt; <code>-mom_nk_preconditioner_model frozen_momentum_jacobian</code> and <code>-mom_nk_preconditioner_structure point_block</code>.</p>
+<p><b>What it does.</b> Assembles a separate AIJ matrix holding the same-cell 3x3 momentum block, and uses it as the preconditioning operator for the matrix-free Jacobian. Interior rows reproduce the audited legacy same-cell approximation with its sign reversed to match the modern residual convention; constraint rows carry the exact modern derivative.</p>
+<p><b>When to choose it.</b> When Krylov iteration counts under <code>none</code> are the measured bottleneck. It buys roughly a 6% wall-clock improvement on the case it was characterised against, while iteration counts on that case rose from 26 to 137 as the problem stiffened - so the honest expectation is a modest gain, not a transformation. Measure before and after; do not enable it on the assumption that preconditioning always helps.</p>
+<p><b>Parameters it owns.</b> <code>preconditioner.structure.type</code>, which must be <code>point_block</code>. It is not an independent choice: the model determines it, and any other value is a validation error.</p>
+<p><b>Interactions.</b> Requires <code>structure.type: point_block</code> and is rejected without it. Its viscous diagonal carries the residual's own effective viscosity <code>nu + nu_t</code>, so a turbulence model is represented at the level the diagonal can represent it. The matrix still deliberately omits pressure, the eddy-viscosity derivatives with respect to velocity, nonorthogonal viscous cross-couplings, the gradient (Clark) stress, boundary-map and IBM derivatives, and body-force derivatives - so its quality degrades as those terms matter more.</p>
+<p><b>Diagnostics.</b> Krylov iteration counts before and after are the only meaningful diagnostic. <code>PCPBJACOBI</code> appears in PETSc output as the internal backend mapping; it is not a user-facing numerical model and should not be read as one.</p>
+<p><b>Evidence.</b> Integration verified - <code>make unit-newton-krylov</code>. The point-block coefficients additionally carry an independent test-only legacy transcription covering nonuniform metrics and velocities, every block entry, both BDF coefficients, constraint rows, and one- and multi-rank assembly.</p>
+<p><b>Limitations.</b> Experimental, and <b>no performance claim is made</b>. It costs an extra assembled matrix in memory and an assembly per update, and the omitted terms mean it is a same-cell approximation rather than an approximate Jacobian in any global sense.</p>
 <h1><a class="anchor" id="p55_validation_sec"></a>
 10. Validation Coverage</h1>
 <p>The Newton&ndash;Krylov path is covered at two levels:</p>

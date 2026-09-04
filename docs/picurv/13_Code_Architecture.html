@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -97,12 +103,7 @@ $(function() {
 </li>
 <li class="level1"><a href="#p13_ingestion_sec">6. Configuration Ingestion Boundaries</a></li>
 <li class="level1"><a href="#p13_extension_sec">7. Where to Extend</a></li>
-<li class="level1"><a href="#p13_next_steps_sec">8. Next Steps</a><ul><li class="level2"><a href="#autotoc_md44">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md45">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md46">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p13_next_steps_sec">8. Next Steps</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Code_Architecture"></a> This page is the developer-oriented map of the current PICurv C codebase.</p>
@@ -199,7 +200,12 @@ $(function() {
 <li><code><a class="el" href="vtk__io_8c.html">src/vtk_io.c</a></code></li>
 </ul>
 </li>
+<li>Observability:<ul>
+<li><code><a class="el" href="logging_8c.html">src/logging.c</a></code></li>
 </ul>
+</li>
+</ul>
+<p>Observability sits apart from the list above rather than inside one of its rows, because every other module reports through it. <code><a class="el" href="logging_8c.html">logging.c</a></code> owns the console tier system, the runtime metric emitters, and the lifecycle of the per-run diagnostic files in <code>&lt;run.runtime_logs&gt;</code>. Its dependency direction is one-way and deliberate: it reads <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> for the step, physical time, log directory, rank, and continuation state, and it depends on PETSc for collectives and formatted output, but no solver module depends on logging for a numerical result. That is what lets any module report without acquiring a dependency on any other, and it is why a change here can alter what a user sees without altering what the solver computes.</p>
 <h2><a class="anchor" id="p13_module_api_matrix_ssec"></a>
 5.1 File-Level API Entry Points</h2>
 <p>For contributor orientation, the table below lists high-value public entry points per subsystem. Function names come from <code>include/*.h</code> and represent the safest integration seams.</p>
@@ -307,28 +313,8 @@ $(function() {
 <li>Field identity/layout catalog: <b><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a></b></li>
 <li>Future architecture index: <b><a class="el" href="57_Future_Architecture_Specifications.html">Future Architecture Specifications</a></b></li>
 <li>Field statistics pipeline: <b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b></li>
-<li>Low-priority fix queue: <b><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a></b></li>
+<li>Low-priority fix queue: <b><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md44"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Code Architecture</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md45"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md46"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

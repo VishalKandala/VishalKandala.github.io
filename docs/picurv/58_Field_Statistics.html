@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -90,6 +96,10 @@ $(function() {
 </ul>
 </li>
 <li class="level1"><a href="#p58_weighting_sec">3. Weighting and Quadrature</a></li>
+<li class="level1"><a href="#p58_cap_weight_sec">3.1 Weighting Mode Entries</a><ul><li class="level2"><a href="#p58_cap_weight_sample_sub">sample</a></li>
+<li class="level2"><a href="#p58_cap_weight_physical_time_sub">physical_time</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p58_state_sec">4. Accumulated State and Component Order</a><ul><li class="level2"><a href="#p58_update_sub">4.1 Per-Point State and Update</a></li>
 <li class="level2"><a href="#p58_order_sub">4.2 Products and Component Order</a></li>
 </ul>
@@ -160,6 +170,38 @@ $(function() {
 </p>
 <p>one endpoint term independent of \(N\). Divided by the window length, the difference in the mean decays as \(1/N\) regardless of timestep size, which for a converged turbulence average sits orders of magnitude below the sampling error \(\sigma/\sqrt{M}\).</p>
 <p>The decisive argument is state cost. Right-rectangle weights depend only on the past, so the only quadrature state crossing a restart is the last accepted time — a scalar. Any trapezoidal or centered rule weights sample \(i\) using \(t_{i+1}\), and because the weighted update is nonlinear in the weight, retroactively weighting a past sample requires that sample's value. That would force a full pending field snapshot per accumulated field to be held, checkpointed, and restored exactly: roughly double the state and a new restart failure mode, bought for a correction far below the noise floor.</p>
+<h1><a class="anchor" id="p58_cap_weight_sec"></a>
+3.1 Weighting Mode Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: statistics.weighting.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p58_cap_weight_physical_time"><code>physical_time</code></a></td><td class="markdownTableBodyNone"><code>physical_time</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p58_cap_weight_sample"><code>sample</code></a></td><td class="markdownTableBodyNone"><code>sample</code></td></tr>
+</table>
+<h2><a class="anchor" id="p58_cap_weight_sample_sub"></a>
+sample</h2>
+<p><a class="anchor" id="p58_cap_weight_sample"></a> <b>Identity.</b> <code>field_statistics.windows[].weighting: sample</code>.</p>
+<p><b>What it does.</b> Weights every accepted state equally: each contributes 1 to the total weight, so the window average is the arithmetic mean over states.</p>
+<p><b>When to choose it.</b> On a fixed timestep, where it is exactly equivalent to time weighting and cheaper to reason about. Also when what you want really is a per-sample average - counting states rather than integrating over time.</p>
+<p><b>Parameters it owns.</b> None. The window's bounds and cadence decide which states are accepted; this key decides only what each accepted state is worth.</p>
+<p><b>Interactions.</b> On a constant-timestep run the two modes agree exactly, by construction: the anchoring state at <code>start_time</code> is not counted as a sample under either, which is what removes an O(1/N) disagreement that would otherwise exist.</p>
+<p><b>Diagnostics.</b> The <code>csv</code> output reports sample count and total weight separately; under this mode they are equal, which is the quickest check that the intended mode is active.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics-window</code>.</p>
+<p><b>Limitations.</b> On a variable timestep it is a biased estimator of a time average: short steps count as much as long ones, so periods of small dt are over-represented.</p>
+<h2><a class="anchor" id="p58_cap_weight_physical_time_sub"></a>
+physical_time</h2>
+<p><a class="anchor" id="p58_cap_weight_physical_time"></a> <b>Identity.</b> <code>field_statistics.windows[].weighting: physical_time</code>.</p>
+<p><b>What it does.</b> Weights each accepted state by the physical time interval it represents - the half-open interval (t_{i-1}, t_i] ending at that state - so the window average is a time integral divided by the represented duration.</p>
+<p><b>When to choose it.</b> On any variable-timestep run, and whenever the result is compared against a time-averaged reference. If the timestep is adaptive, this is the only mode that gives the quantity a reference profile actually reports.</p>
+<p><b>Parameters it owns.</b> None. The interval each state carries follows from the window's accepted states, not from a configuration key.</p>
+<p><b>Interactions.</b> A state representing a zero-length interval is not a sample, which is what lets a state landing exactly on <code>start_time</code> anchor the interval origin without being counted. See <a class="el" href="58_Field_Statistics.html#p58_bounds_sub">2.2 Bounds, Clipping, and the First State</a> for why that convention settles what would otherwise be another key.</p>
+<p><b>Diagnostics.</b> The <code>csv</code> reports total weight as represented time rather than a count, so weight and sample count diverge - which is how you confirm this mode is active.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics-window</code>.</p>
+<p><b>Limitations.</b> The represented interval depends on which states were accepted, so changing the output cadence changes the weights. A window is comparable across runs only if its cadence is too.</p>
 <h1><a class="anchor" id="p58_state_sec"></a>
 4. Accumulated State and Component Order</h1>
 <h2><a class="anchor" id="p58_update_sub"></a>
@@ -261,7 +303,7 @@ k = \tfrac{1}{2}\left(R_{xx}+R_{yy}+R_{zz}\right),\qquad
 <p><code>vtk</code> writes the derived fields. <code>csv</code> appends one row per processed step with sample count, total weight, represented time, the per-point valid-fraction range, and the mean turbulent kinetic energy. The CSV is the artefact that answers whether a window has run long enough, which no single snapshot can.</p>
 <p>That mean is taken over <b>the fluid cells the window actually sampled</b>, not over the stored vector. A derived field is zero outside the target domain and wherever the mask excluded a point, and those zeros are absences rather than measurements: averaging over them scales the result down by whatever fraction of the vector the window never covered. The valid-fraction column in the same row reveals whether an immersed body made the sampled set smaller than the targeted one; at one they are the same set.</p>
 <p>A window with no sample yet at a given step is skipped with a note rather than treated as an error, because a recipe covering a whole run legitimately reaches bundles from before that window began.</p>
-<p><b>Derived statistics are not dimensionalized</b>, even when <code>global_operations.dimensionalize</code> is set. A Reynolds stress scales as velocity squared and a co-moment as the product of two different scales; the per-field scaling table expresses neither, so applying a velocity scale would be wrong rather than merely incomplete.</p>
+<p><b>Derived statistics are dimensionalized when <code>global_operations.dimensionalize</code> is set.</b> The scale is the source field's own reference value raised to the power the derived kind carries: <code>1</code> for a mean and an RMS, <code>2</code> for a Reynolds stress and a turbulent kinetic energy. A co-moment flux is the exception - it relates two possibly different fields, so its factor is the product of their two scales rather than either one squared. The exponent is what the per-field scaling table alone cannot express, and one blanket velocity factor would be wrong for three of the five kinds. The factor is applied to the staging field both the VTK output and the convergence-history CSV read, so those two cannot disagree about units. A field with no declared reference scale is left non-dimensional and warns.</p>
 <h1><a class="anchor" id="p58_monitoring_sec"></a>
 9. Runtime Monitoring and Logging</h1>
 <p><code>io.statistics_console_output_frequency</code> emits a periodic console snapshot, built on the same three-part gate as the particle snapshot it mirrors: the subsystem is active, the cadence is positive, and the effective log level is at least <code>LOG_INFO</code>. A zero cadence silences reporting without disabling accumulation.</p>
@@ -355,7 +397,7 @@ k = \tfrac{1}{2}\left(R_{xx}+R_{yy}+R_{zz}\right),\qquad
 <li><a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a> — typed field identity and layout</li>
 <li><a class="el" href="28_IEM_and_Statistical_Averaging.html">IEM Mixing and Statistical Averaging</a> — particle mixing and particle statistics</li>
 <li><a class="el" href="29_Maintenance_Backlog.html">Maintenance Backlog and Low-Priority Fixes</a> — measured restart fidelity floor and open validation items</li>
-<li><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a> — committed checkpoint bundles and restart modes </li>
+<li><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a> — committed checkpoint bundles and restart modes </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

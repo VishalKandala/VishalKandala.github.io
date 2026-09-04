@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -87,14 +93,11 @@ $(function() {
 <ul><li class="level1"><a href="#p19_refs_sec">1. Reference Scales</a></li>
 <li class="level1"><a href="#p19_primary_sec">2. Primary Converted Quantities</a></li>
 <li class="level1"><a href="#p19_fields_sec">3. Field/Coordinate Scaling Conventions</a></li>
-<li class="level1"><a href="#p19_pipeline_sec">4. Where This Happens in the Pipeline</a></li>
+<li class="level1"><a href="#p19_pipeline_sec">4. Where This Happens in the Pipeline</a><ul><li class="level2"><a href="#p19_derived_sub">4.1 Derived Products Carry Their Own Exponents</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p19_notes_sec">5. Practical Notes</a></li>
-<li class="level1"><a href="#p19_links_sec">6. References</a><ul><li class="level2"><a href="#autotoc_md59">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md60">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md61">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p19_links_sec">6. References</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Nondimensionalization"></a> PICurv uses a dimensional-input, non-dimensional-core workflow:</p>
@@ -102,7 +105,7 @@ $(function() {
 <li>Users specify physical quantities in YAML.</li>
 <li><code>picurv</code> converts/control-maps these to non-dimensional solver inputs.</li>
 <li>Solver evolves non-dimensional fields.</li>
-<li>Postprocessing can re-dimensionalize outputs for visualization/analysis.</li>
+<li>Postprocessing can re-dimensionalize outputs for &lt;run.visualization&gt;/analysis.</li>
 </ol>
 <h1><a class="anchor" id="p19_refs_sec"></a>
 1. Reference Scales</h1>
@@ -152,39 +155,47 @@ $(function() {
 </ul>
 </li>
 </ul>
+<h2><a class="anchor" id="p19_derived_sub"></a>
+4.1 Derived Products Carry Their Own Exponents</h2>
+<p><code>global_operations.dimensionalize</code> reaches three producers, because a run's derived output is not made in one place:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Producer   </th><th class="markdownTableHeadNone">What it scales    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Field pipeline (<code>DimensionalizeAllLoadedFields</code>)   </td><td class="markdownTableBodyNone">Loaded fields and grid coordinates, each by its own reference scale    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Field-statistics accumulator   </td><td class="markdownTableBodyNone">Derived statistics, by the source field's scale raised to the kind's exponent    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Spectra generator   </td><td class="markdownTableBodyNone">Every reported spectral quantity, by its own combination of <code>U_ref</code> and <code>L_ref</code>   </td></tr>
+</table>
+<p>A single blanket factor cannot serve them, because a derived quantity's dimensions are not its source field's:</p>
+<ul>
+<li>mean, RMS: source scale to the first power</li>
+<li>Reynolds stress, turbulent kinetic energy: to the second</li>
+<li>co-moment flux: the product of the two fields' scales, which need not be equal</li>
+<li>wavenumber: <code>1 / L_ref</code>; energy: <code>U_ref^2</code>; spectral second moment: <code>U_ref^2 / L_ref^2</code>; integral and Taylor scales: <code>L_ref</code></li>
+<li>Parseval residual and shell counts are ratios and counts, and are never scaled</li>
+</ul>
+<p>Checkpoints are never dimensionalized: they are restart state, and restart must reproduce the solver's own units exactly. Only derived output is scaled, so a <code>.dat</code> under <code>&lt;run.checkpoints&gt;</code> and a <code>.vts</code> under <code>&lt;run.visualization&gt;</code> are deliberately in different unit systems.</p>
+<p>The grid is the one quantity converted on the way <em>in</em> rather than out, in all three <code>grid.mode</code> values, so the round trip is uniform regardless of which one a case uses:</p>
+<ul>
+<li><code>file</code> and <code>grid_gen</code>: a <code>.picgrid</code> is supplied dimensional and is divided by <code>L_ref</code> when the conductor publishes it as an asset, so the solver reads geometry already in solver units.</li>
+<li><code>programmatic_c</code>: <code>xMins</code>/<code>xMaxs</code>/<code>yMins</code>/... are likewise supplied dimensional. <code><a class="el" href="io_8h.html#a7dd125436244f23eba5c6b06fdd35031" title="Parses command-line options for a programmatically generated grid for a SINGLE block.">ReadGridGenerationInputs()</a></code> (<code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>) divides each bound by <code>L_ref</code> after <code><a class="el" href="io_8h.html#a10269cd4ddae9d1a84b84de3e2913158" title="Parses physical scaling parameters from command-line options.">ParseScalingInformation()</a></code> has resolved it, immediately before assigning <code>user-&gt;Min_X</code>/<code>Max_X</code>/etc - the same division a <code>file</code> grid receives in Python, just performed in C because this mode has no Python staging step to perform it in.</li>
+</ul>
+<p>Coordinates written by post-processing are multiplied back by <code>L_ref</code> unconditionally (<code>DimensionalizeField("Coordinates")</code>), so a case authored with <code>length_ref: 1.0</code> is unaffected either way, and a case using another reference length gets back the same physical bounds it specified, whichever grid mode produced them.</p>
 <h1><a class="anchor" id="p19_notes_sec"></a>
 5. Practical Notes</h1>
 <ul>
 <li>Choose physically meaningful <code>L_ref</code> and <code>U_ref</code>; they directly affect <code>Re</code> and <code>dt*</code>.</li>
 <li>Keep input units consistent across all physical parameters in <code>case.yml</code>.</li>
-<li>For reproducibility, keep run-local generated artifacts under <code>runs/&lt;run_id&gt;/config/</code>.</li>
+<li>For reproducibility, keep run-local generated artifacts under <code>&lt;run.config&gt;/</code>.</li>
 </ul>
 <h1><a class="anchor" id="p19_links_sec"></a>
 6. References</h1>
 <ul>
 <li>PETSc docs (solver stack context): <a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
-<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md59"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Non-Dimensionalization Model</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md60"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md61"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

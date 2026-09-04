@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -86,16 +92,18 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p33_overview_sec">1. Where Initialization Happens</a></li>
 <li class="level1"><a href="#p33_euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
-<li class="level1"><a href="#p33_euler_modes_sec">3. C Runtime Modes and Entry Points</a></li>
-<li class="level1"><a href="#p33_restart_modes_sec">4. Authority and Restart Branches</a></li>
-<li class="level1"><a href="#p33_particle_link_sec">5. Particle Initialization Relation</a></li>
-<li class="level1"><a href="#p33_checks_sec">6. Practical Checks</a></li>
-<li class="level1"><a href="#p33_refs_sec">7. Related Pages</a><ul><li class="level2"><a href="#autotoc_md124">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md125">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md126">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p33_entries_sec">3. Field Initialization Mode Entries</a><ul><li class="level2"><a href="#p33_cap_zero_sub">Zero</a></li>
+<li class="level2"><a href="#p33_cap_constant_sub">Constant</a></li>
+<li class="level2"><a href="#p33_cap_poiseuille_sub">Poiseuille</a></li>
+<li class="level2"><a href="#p33_cap_field_ucat_sub">Ucat</a></li>
+<li class="level2"><a href="#p33_cap_field_ucont_sub">Ucont</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="level1"><a href="#p33_euler_modes_sec">4. C Runtime Modes and Entry Points</a></li>
+<li class="level1"><a href="#p33_restart_modes_sec">5. Authority and Restart Branches</a></li>
+<li class="level1"><a href="#p33_particle_link_sec">6. Particle Initialization Relation</a></li>
+<li class="level1"><a href="#p33_checks_sec">7. Practical Checks</a></li>
+<li class="level1"><a href="#p33_refs_sec">7. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Initial_Conditions"></a> This page documents how PICurv initializes Eulerian velocity fields and particles at startup. It covers both user-facing YAML inputs and the C implementation path that applies them.</p>
@@ -162,9 +170,84 @@ $(function() {
 </div><!-- fragment --><p>The launcher invokes <code>generators/ic.gen</code> by default, or the optional case-relative/absolute <code>params.script</code> override, as:</p>
 <div class="fragment"><div class="line">python &lt;ic-generator&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; --grid &lt;grid.run&gt; [cli_args...]</div>
 </div><!-- fragment --><p><code>picurv run --solve</code> materializes the result after grid preparation. <code>picurv precompute --case ...</code> materializes and stages the same artifact without running the solver.</p>
-<p>The repository <code>ic.gen</code> accepts an INI <code>[expression]</code> section. <code>Ucat</code> configs define <code>u</code>, <code>v</code>, and <code>w</code>, evaluated at actual cell centers with extrapolated dummy-cell centers. <code>Ucont</code> configs define <code>u_xi</code>, <code>u_eta</code>, and <code>u_zeta</code>, evaluated at their corresponding geometric face centers. Expressions may use <code>x/y/z</code>, normalized logical <code>xi/eta/zeta</code>, storage <code>i/j/k</code>, <code>pi</code>, and the documented numerical functions. The first implementation supports one block. The repository generator requires a staged PICGRID. <code>grid.mode: file</code> and <code>grid.mode: grid_gen</code> provide that grid directly; for single-block <code>grid.mode: programmatic_c</code>, the launcher materializes a nondimensional <code>config/grid.run</code> bridge from scalar <code>programmatic_settings</code> before invoking <code>ic.gen</code>.</p>
+<p>The repository <code>ic.gen</code> accepts an INI <code>[expression]</code> section. <code>Ucat</code> configs define <code>u</code>, <code>v</code>, and <code>w</code>, evaluated at actual cell centers with extrapolated dummy-cell centers. <code>Ucont</code> configs define <code>u_xi</code>, <code>u_eta</code>, and <code>u_zeta</code>, evaluated at their corresponding geometric face centers. Expressions may use <code>x/y/z</code>, normalized logical <code>xi/eta/zeta</code>, storage <code>i/j/k</code>, <code>pi</code>, and the documented numerical functions. The first implementation supports one block. The repository generator requires a staged PICGRID. <code>grid.mode: file</code> and <code>grid.mode: grid_gen</code> provide that grid directly; for single-block <code>grid.mode: programmatic_c</code>, the launcher materializes a nondimensional <code>&lt;run.config&gt;/grid.run</code> bridge from scalar <code>programmatic_settings</code> before invoking <code>ic.gen</code>.</p>
+<h1><a class="anchor" id="p33_entries_sec"></a>
+3. Field Initialization Mode Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: initial.field_mode.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_constant"><code>Constant</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_poiseuille"><code>Poiseuille</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_zero"><code>Zero</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<h2><a class="anchor" id="p33_cap_zero_sub"></a>
+Zero</h2>
+<p><a class="anchor" id="p33_cap_zero"></a> <b>Identity.</b> Field mode <code>Zero</code> -&gt; <code>-finit 0</code> -&gt; <code>IC_MODE_ZERO</code>.</p>
+<p><b>What it does.</b> Initializes the velocity field to zero everywhere.</p>
+<p><b>When to choose it.</b> When the flow is driven entirely by its boundaries and you want no assumption about the interior - an inlet-driven channel starting from rest. Choose <code>Poiseuille</code> instead when you want a developed profile immediately, and <code>Constant</code> when you want uniform motion.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> A zero field with periodic boundaries and no driving force stays zero; that combination needs a driven handler to do anything.</p>
+<p><b>Diagnostics.</b> The startup banner reports the resolved initial-condition mode; step 0 output shows a zero field.</p>
+<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Limitations.</b> Transition from rest can be slow, and for turbulence it will not occur at all without a finite-amplitude perturbation.</p>
+<h2><a class="anchor" id="p33_cap_constant_sub"></a>
+Constant</h2>
+<p><a class="anchor" id="p33_cap_constant"></a> <b>Identity.</b> Field mode <code>Constant</code> -&gt; <code>-finit 1</code> -&gt; <code>IC_MODE_CONSTANT_CARTESIAN</code>.</p>
+<p><b>What it does.</b> Initializes the whole field to one uniform Cartesian velocity.</p>
+<p><b>When to choose it.</b> Plug flow, or seeding a bulk motion the boundaries will then shape.</p>
+<p><b>Parameters it owns.</b> The constant velocity components in the initial-condition block.</p>
+<p><b>Interactions.</b> A uniform field will not satisfy no-slip at walls; the first steps resolve that discontinuity, which can be abrupt.</p>
+<p><b>Diagnostics.</b> As above.</p>
+<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Limitations.</b> Not divergence-free in general on a curvilinear grid, so the first pressure solve does real work.</p>
+<h2><a class="anchor" id="p33_cap_poiseuille_sub"></a>
+Poiseuille</h2>
+<p><a class="anchor" id="p33_cap_poiseuille"></a> <b>Identity.</b> Field mode <code>Poiseuille</code> -&gt; <code>-finit 2</code> -&gt; <code>IC_MODE_POISEUILLE</code>.</p>
+<p><b>What it does.</b> Initializes with an analytic parabolic profile.</p>
+<p><b>When to choose it.</b> A wall-bounded channel or duct where you want a developed-looking start rather than a transient from rest.</p>
+<p><b>Parameters it owns.</b> The profile scaling in the initial-condition block.</p>
+<p><b>Interactions.</b> Assumes a wall-bounded geometry; in a domain without the expected walls the profile will not vanish where you expect.</p>
+<p><b>Diagnostics.</b> As above; inspect the step-0 field before committing to a long run.</p>
+<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Limitations.</b> An analytic approximation, not a solution of the case being run. The C enum also carries <code>IC_MODE_CONSTANT_STREAMWISE</code> and <code>IC_MODE_FILE</code>, which this selector does not expose.</p>
+<!-- GENERATED FILE - do not edit by hand. Family: initial.target_field.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucat"><code>ucat</code></a></td><td class="markdownTableBodyNone"><code>ucat</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucont"><code>ucont</code></a></td><td class="markdownTableBodyNone"><code>ucont</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<h2><a class="anchor" id="p33_cap_field_ucat_sub"></a>
+Ucat</h2>
+<p><a class="anchor" id="p33_cap_field_ucat"></a> <b>Identity.</b> <code>initial_conditions.field: Ucat</code> -&gt; the Cartesian velocity field is the initialization target (internal code <code>0</code>).</p>
+<p><b>What it does.</b> Applies the chosen field mode to the Cartesian velocity, from which the contravariant fluxes are then derived.</p>
+<p><b>When to choose it.</b> The normal choice, and the one that matches how the field modes are expressed - a uniform or parabolic profile is naturally stated in Cartesian components.</p>
+<p><b>Parameters it owns.</b> None; it selects which field the mode writes to.</p>
+<p><b>Interactions.</b> <code>Ucat</code> is the derived representation, so initializing it requires a conversion to the evolved <code>Ucont</code> fluxes before the first step. See <b><a class="el" href="20_Grid_Cell_Architecture_Guide.html">Grid, Cell, and Variable Architecture Guide</a></b>.</p>
+<p><b>Diagnostics.</b> Step-0 output shows the initialized field.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>.</p>
+<p><b>Limitations.</b> On a strongly curvilinear grid the conversion from a Cartesian profile to fluxes is not exact in the sense of preserving the intended profile shape.</p>
+<h2><a class="anchor" id="p33_cap_field_ucont_sub"></a>
+Ucont</h2>
+<p><a class="anchor" id="p33_cap_field_ucont"></a> <b>Identity.</b> <code>initial_conditions.field: Ucont</code> -&gt; the contravariant flux field is the initialization target (internal code <code>1</code>).</p>
+<p><b>What it does.</b> Applies the chosen field mode directly to the evolved flux variable, skipping the Cartesian-to-flux conversion.</p>
+<p><b>When to choose it.</b> When you want exact control of the initial fluxes - for instance setting a precise volumetric flux - rather than of the Cartesian velocity.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> <code>Ucont</code> is what the solver actually evolves, so this path avoids one conversion. The field modes are still expressed in the same components, which is what makes this the less intuitive of the two.</p>
+<p><b>Diagnostics.</b> Step-0 output; check the derived <code>Ucat</code> looks as intended.</p>
+<p><b>Evidence.</b> Implemented only. No shipped example selects it.</p>
+<p><b>Limitations.</b> Unverified by any in-tree case, and easier to get wrong because the values are fluxes rather than velocities.</p>
 <h1><a class="anchor" id="p33_euler_modes_sec"></a>
-3. C Runtime Modes and Entry Points</h1>
+4. C Runtime Modes and Entry Points</h1>
 <p>The launcher maps the contract to one <code>InitialConditionMode</code> enum value:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -182,7 +265,7 @@ $(function() {
 </table>
 <p><a class="el" href="initialcondition_8h.html#ad6fa2492674655c0d12108914f1cce7f">PopulateInitialUcont</a> is the fresh-solve dispatcher. Built-in modes reuse <a class="el" href="initialcondition_8h.html#a4fc27923bed538788611f9a76099369d">SetInitialInteriorField</a> and <a class="el" href="setup_8h.html#a2675aaad6b90ef117bda6a52315be9a5">UniformCart2Contra</a>. File mode reuses <a class="el" href="io_8h.html#a8ded9342174d338932f9aa28d0bd432a">ReadFieldData</a>; when its field selector is <code>Ucat</code>, <a class="el" href="setup_8h.html#ad029c429cf3e717072a5dbac13fc59da">Cart2Contra</a> converts the loaded vector field to <code>Ucont</code>. After that point, the existing finalization path treats every IC source identically.</p>
 <h1><a class="anchor" id="p33_restart_modes_sec"></a>
-4. Authority and Restart Branches</h1>
+5. Authority and Restart Branches</h1>
 <p>In <a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a>:</p>
 <ul>
 <li><code>eulerian_field_source=solve</code> and <code>StartStep == 0</code> consumes <code>initial_conditions</code>.</li>
@@ -197,7 +280,7 @@ $(function() {
 <li>If a run completed through step <code>N</code>, restart with <code>start_step: N</code>; the first newly advanced step will be <code>N+1</code>.</li>
 </ul>
 <h1><a class="anchor" id="p33_particle_link_sec"></a>
-5. Particle Initialization Relation</h1>
+6. Particle Initialization Relation</h1>
 <p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> initialization is configured in <code>case.yml -&gt; models.physics.particles</code>, but executed by a separate subsystem.</p>
 <p>For full particle mode and restart details, use:</p>
 <ul>
@@ -205,7 +288,7 @@ $(function() {
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 </ul>
 <h1><a class="anchor" id="p33_checks_sec"></a>
-6. Practical Checks</h1>
+7. Practical Checks</h1>
 <p>After startup, confirm:</p>
 <ul>
 <li>banner line shows expected field initialization mode,</li>
@@ -233,28 +316,8 @@ $(function() {
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md124"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Initial Condition Modes</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md125"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md126"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

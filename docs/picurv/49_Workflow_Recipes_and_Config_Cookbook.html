@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -92,12 +98,8 @@ $(function() {
 <li class="level1"><a href="#p49_config_patterns_sec">6. Configuration Patterns Worth Reusing</a></li>
 <li class="level1"><a href="#p49_choose_sec">7. Which Example To Start From</a></li>
 <li class="level1"><a href="#p49_scatter_recipe_sec">7. Scatter Verification Recipe</a></li>
-<li class="level1"><a href="#p49_next_steps_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md169">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md170">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md171">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p49_les_recipe_sec">8. LES Closure Recipe</a></li>
+<li class="level1"><a href="#p49_next_steps_sec">9. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Workflow_Recipes_and_Config_Cookbook"></a> This page is the practical companion to the reference docs. Use it when you already understand the config roles and want proven patterns for combining them cleanly.</p>
@@ -328,7 +330,7 @@ $(function() {
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>
 <div class="line">  source_file: ../runs/&lt;run_id&gt;/config/grid.generated.picgrid</div>
-</div><!-- fragment --><p>PICurv will validate and non-dimensionalize that source file into the new run's own <code>config/grid.run</code>.</p>
+</div><!-- fragment --><p>PICurv will validate and non-dimensionalize that source file into the new run's own <code>&lt;run.config&gt;/grid.run</code>.</p>
 <p>Generated square-duct Poiseuille inlet profile:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
@@ -341,7 +343,7 @@ $(function() {
 <div class="line">        params:</div>
 <div class="line">          bulk_velocity: 1.0</div>
 <div class="line">          n_terms: 101</div>
-</div><!-- fragment --><p><code>picurv run --solve</code> writes the dimensional generated profile and <code>profile.info</code> under <code>runs/&lt;run_id&gt;/config/</code>, stages the solver-scale <code>.picslice</code>, and writes that staged path into <code>bcs.run</code>. For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. When a target <code>PICGRID</code> is available, generated profiles are sampled at inlet face centers and normalized by geometric quad face areas; <code>profile.info</code> reports the area-weighted mean before and after normalization, total area, face-area range, discrete sampled mean, and <code>Umax/Ubulk</code>.</p>
+</div><!-- fragment --><p><code>picurv run --solve</code> writes the dimensional generated profile and <code>profile.info</code> under <code>&lt;run.config&gt;/</code>, stages the solver-scale <code>.picslice</code>, and writes that staged path into <code>bcs.run</code>. For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. When a target <code>PICGRID</code> is available, generated profiles are sampled at inlet face centers and normalized by geometric quad face areas; <code>profile.info</code> reports the area-weighted mean before and after normalization, total area, face-area range, discrete sampled mean, and <code>Umax/Ubulk</code>.</p>
 <p>File-backed prescribed inlet profile:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
@@ -368,8 +370,8 @@ $(function() {
 <div class="line">          orientation: opposite</div>
 </div><!-- fragment --><p>This extracts Cartesian <code>Ucat</code> normal speeds from the old slice, validates the old and new face normals, writes <code>*.sliced.picslice</code>, then stages it through the same file-backed C path. V1 requires matching source and target slice sizes.</p>
 <p>Precompute deterministic artifacts without launching the solver:</p>
-<div class="fragment"><div class="line">./bin/picurv precompute --case case.yml --output-dir precomputed/channel</div>
-</div><!-- fragment --><p>This mirrors the run <code>config/</code> layout, so inspected generated artifacts can later be reused through <code>grid.mode: file</code> and <code>source.type: file</code>.</p>
+<div class="fragment"><div class="line">./bin/picurv precompute --case config/case.yml</div>
+</div><!-- fragment --><p>This mirrors the <code>&lt;run.config&gt;/</code> layout, so inspected generated artifacts can later be reused through <code>grid.mode: file</code> and <code>source.type: file</code>.</p>
 <p>Restart with explicit particle re-initialization:</p>
 <div class="fragment"><div class="line">run_control:</div>
 <div class="line">  start_step: 200</div>
@@ -430,7 +432,7 @@ $(function() {
 <li>use <code>analytical_type: ZERO_FLOW</code> for pure deposition checks</li>
 <li>choose a scalar profile under <code>verification.sources.scalar</code></li>
 <li>reuse the production scatter operator rather than adding a second deposition path</li>
-<li>read the runtime metric from <code>logs/scatter_metrics.csv</code></li>
+<li>read the runtime metric from <code>&lt;run.runtime_logs&gt;/scatter_metrics.csv</code></li>
 </ul>
 <p>Separation rules:</p>
 <ul>
@@ -447,36 +449,41 @@ $(function() {
 <li>future scalar-transport verification reuse</li>
 </ul>
 <p>A complete runnable example is provided in <code>examples/scatter_verification/</code>.</p>
+<h1><a class="anchor" id="p49_les_recipe_sec"></a>
+8. LES Closure Recipe</h1>
+<p>The dynamic model's defaults are the ones that are safe on any geometry, not the ones that are best for yours. Two settings usually want changing, and both follow from the flow rather than from taste.</p>
+<p><b>Pick the averaging set from the flow's homogeneous directions.</b> <code>averaging.mode</code> defaults to <code>local</code>, which assumes nothing and is correspondingly noisy: the denominator of the coefficient collapses wherever the resolved strain is briefly small. Where the flow has a homogeneous direction, say so:</p>
+<div class="fragment"><div class="line"># Triply periodic box: one coefficient for the whole domain.</div>
+<div class="line">averaging: {mode: homogeneous}</div>
+<div class="line"> </div>
+<div class="line"># Plane channel periodic in xi and zeta: a wall-normal coefficient profile.</div>
+<div class="line">averaging: {mode: homogeneous}</div>
+</div><!-- fragment --><p>Both read the same because <code>homogeneous</code> derives its directions from the case's periodicity. Name them explicitly only when the flow is homogeneous along an axis the boundary conditions do not declare periodic.</p>
+<p><b>Match the filter width to the cell aspect ratio.</b> <code>filter_width</code> defaults to <code>cube_root_volume</code>, which is exact for a cube and progressively optimistic as a cell is stretched. On a wall-normal channel mesh, <code>max_edge</code> is the defensible choice.</p>
+<p><b>Turn the diagnostics on before trusting anything.</b></p>
+<div class="fragment"><div class="line">diagnostics: {enabled: true, cadence: 1}</div>
+</div><!-- fragment --><p>Then read <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code>, or plot it directly:</p>
+<div class="fragment"><div class="line">./bin/picurv summarize --run-dir runs/&lt;run_id&gt; --list-plot-series</div>
+<div class="line">./bin/picurv summarize --run-dir runs/&lt;run_id&gt; --plot les.cs_effective</div>
+</div><!-- fragment --><p>What to look for:</p>
+<ul>
+<li><code>cs_effective</code> should settle, and for decaying isotropic turbulence it should settle near <b>0.16-0.17</b>. A curve that drifts or oscillates is the signal to stop.</li>
+<li><code>limited_fraction</code> near zero means the <code>max_cs</code> ceiling is not shaping the result. A large value means the clip is doing the modelling.</li>
+<li><code>backscatter_fraction</code> is what the clipping modes discard. Under <code>local</code> averaging it is routinely large, which is the argument for averaging rather than clipping.</li>
+<li><code>nu_t_over_nu_mean</code> far above one means the model, not the molecular viscosity, is setting the dissipation; far below one means it is doing nothing.</li>
+</ul>
+<p><b>Judging resolution.</b> Compare <code>k_sgs_mean</code> against the resolved turbulent kinetic energy from <code>monitor.yml -&gt; field_statistics</code>. Pope's criterion asks the resolved share to exceed roughly 80%. The two halves come from different pipelines deliberately: resolved turbulent energy needs the mean subtracted correctly, which the statistics windows do and the closure does not attempt.</p>
+<p>Full option reference at <b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b>; the formulation is derived in <b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b>.</p>
 <h1><a class="anchor" id="p49_next_steps_sec"></a>
-8. Related Pages</h1>
+9. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
-<li><b><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a></b></li>
+<li><b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b></li>
 <li><b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b></li>
-<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
+<li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md169"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Workflow Recipes and Config Cookbook</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md170"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md171"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

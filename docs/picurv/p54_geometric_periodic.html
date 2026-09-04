@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -217,7 +223,8 @@ U_b   = f h^2 / 3nu      -&gt;   f = 3 nu U_b / h^2
 u_tau = sqrt(f h)
 </pre> This verifies the source term and the flux controller with no turbulence model involved.</li>
 <li><code>examples/periodic_test/driven_channel/turbulent_retau180/</code> and <code>.../turbulent_retau395/</code> - DNS-resolution plane channels against Moser, Kim &amp; Mansour (1999), Phys. Fluids 11, 943.</li>
-<li><code>examples/periodic_test/driven_channel/les_retau180/</code> - the coarse LES repeat. Use <b>constant</b> Smagorinsky only; the dynamic model in this tree has a known defect (incorrect <code>M_ij</code>, no homogeneous averaging).</li>
+<li><code>examples/periodic_test/driven_channel/les_retau180/</code> - the coarse LES repeat. <dl class="section note"><dt>Note</dt><dd>Both LES models are <b>experimental</b>: implemented and unit-tested, but not yet validated against a reference flow. The channel is periodic in xi and zeta, so <code>averaging.mode: homogeneous</code> derives those two directions from the boundary pairs and produces a wall-normal coefficient profile. See <a class="el" href="07_Case_Reference.html#p07_les_sec">5. LES Subgrid Models</a> and <a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a>.</dd></dl>
+</li>
 <li><code>examples/periodic_test/driven_duct/</code> - square duct at <code>Re_b = 4410</code>, which sustains turbulence-driven secondary flow of the second kind that a plane channel does not. References: Gavrilakis (1992), JFM 244, 101; Huser &amp; Biringen (1993), JFM 257, 65.</li>
 </ul>
 <p>Grids for all of these are generated from checked-in <code>.cfg</code> files under <code>config/grids/</code>, not shipped as binary <code>.picgrid</code>. Wall spacing is a single number per walled axis, expressed as a fraction of that axis's length, so <code>y+</code> can be retargeted for a different <code>Re_tau</code> without regenerating anything by hand.</p>
@@ -225,8 +232,10 @@ u_tau = sqrt(f h)
 5.7 Known limitations</h2>
 <p><b>Initial-condition seeding.</b> There is no generator that produces a divergence-free perturbed field respecting no-slip, so a wall-bounded turbulent case has no good seed in-tree. <code>ic.gen</code>'s <code>spectral_random_velocity</code> is not usable here: it explicitly requires <code>PERIODIC</code>/<code>geometric</code> on all six faces and is rejected otherwise, which is correct - it cannot respect a no-slip wall. The shipped turbulent cases seed with <code>streamwise_constant</code>, a laminar profile; transition from it is slow and is not guaranteed without a finite-amplitude perturbation. Until a seeded generator exists, develop a field at coarse resolution (or from a precursor run) and carry it in, then use <code>initial_flux</code> to hold its flux.</p>
 <p><b>Wall-normal profiles from statistics.</b> <code>field_statistics</code> is BC-agnostic - it accumulates per-cell time moments and works unchanged under periodic boundaries. What does not exist is a spatial reduction: nothing in the postprocessor averages a statistics field over homogeneous directions to produce the <code>U+</code> vs <code>y+</code> and RMS profiles a DNS comparison needs. That reduction currently has to be done outside the postprocessor from the window payloads.</p>
-<p><b>Momentum convergence on periodic wall-bounded flow.</b> Under the Dual Time Picard Jameson RK solver these cases do not reach the pseudo-time convergence tolerance: the pseudo-CFL controller drives <code>dtau</code> to its floor and the residual ratio plateaus near 1, so every step reports "reached N total attempts without
-convergence" and continues from the last accepted state. This is independent of the driven-flow machinery - an otherwise identical case with plain <code>geometric</code> handlers behaves the same, while the shipped wall-bounded inlet/outlet example converges cleanly - and independent of <code>central_diff</code> and of the pseudo-CFL floor. The Poisson side is healthy throughout (maximum divergence around 1e-14). This must be resolved before the turbulent campaigns above can be run.</p>
+<p><b>Momentum convergence on periodic wall-bounded flow.</b></p>
+<dl class="section warning"><dt>Warning</dt><dd>Status: previously observed; requires re-characterization at current <code>HEAD</code>. The observation below was measured on 2026-08-24. Commits landed on 2026-08-25 moved momentum convergence onto a residual criterion, retired <code>absolute_tol</code>, and changed the pseudo-CFL controller's wall-relearning behavior - that is, they rewrote the exact criterion this was measured against. Do not treat it as current solver behavior, and do not cite it, until the cases below are rerun.</dd></dl>
+<p>As measured on 2026-08-24: under the Dual Time Picard Jameson RK solver these cases did not reach the pseudo-time convergence tolerance. The pseudo-CFL controller drove <code>dtau</code> to its floor and the residual ratio plateaued near 1, so every step reported "reached N total attempts without convergence" and continued from the last accepted state. The behavior was independent of the driven-flow machinery - an otherwise identical case with plain <code>geometric</code> handlers behaved the same, while the shipped wall-bounded inlet/outlet example converged cleanly - and independent of <code>central_diff</code> and of the pseudo-CFL floor. The Poisson side was healthy throughout (maximum divergence around 1e-14).</p>
+<p>If the behavior reproduces at current <code>HEAD</code>, it must be resolved before the turbulent campaigns above can be run. If it does not, replace this note with the new measured result rather than deleting it silently.</p>
 <h1><a class="anchor" id="p54_diag_sec"></a>
 6. Diagnostics and Tests</h1>
 <p>At startup, the banner reports BC-derived periodic axes and each validated translation. Use <code>make unit-periodic</code> for focused synchronization and geometry coverage and <code>make smoke-periodic</code> for the real runtime periodic workflow. Both are included in the standard <code>unit</code> and <code>check</code> gates.</p>

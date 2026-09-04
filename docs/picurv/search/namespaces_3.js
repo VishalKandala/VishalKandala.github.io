@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['picurv_5fcli_0',['picurv_cli',['../namespacepicurv__cli.html',1,'']]],
-  ['picurv_5fcli_3a_3acli_1',['cli',['../namespacepicurv__cli_1_1cli.html',1,'picurv_cli']]],
-  ['picurv_5fcli_3a_3acore_2',['core',['../namespacepicurv__cli_1_1core.html',1,'picurv_cli']]],
-  ['picurv_5fcli_3a_3amain_3',['main',['../namespacepicurv__cli_1_1main.html',1,'picurv_cli']]],
-  ['picurv_5fcli_3a_3astorage_4',['storage',['../namespacepicurv__cli_1_1storage.html',1,'picurv_cli']]],
-  ['python_5fcoverage_5fgate_5',['python_coverage_gate',['../namespacepython__coverage__gate.html',1,'']]]
+  ['generate_5fcapability_5finventory_0',['generate_capability_inventory',['../namespacegenerate__capability__inventory.html',1,'']]],
+  ['generate_5fcli_5freference_1',['generate_cli_reference',['../namespacegenerate__cli__reference.html',1,'']]],
+  ['generate_5fdoxygen_5ffallback_5findexes_2',['generate_doxygen_fallback_indexes',['../namespacegenerate__doxygen__fallback__indexes.html',1,'']]],
+  ['generate_5fxref_5findex_3',['generate_xref_index',['../namespacegenerate__xref__index.html',1,'']]]
 ];

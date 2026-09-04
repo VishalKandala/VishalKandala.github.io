@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -88,12 +94,7 @@ $(function() {
 <li class="level1"><a href="#p03_config_sec">2. File-Grid Configuration</a></li>
 <li class="level1"><a href="#p03_run_sec">3. Run the Case</a></li>
 <li class="level1"><a href="#p03_viz_sec">4. Visualize Results</a></li>
-<li class="level1"><a href="#p03_next_steps_sec">5. Next Steps</a><ul><li class="level2"><a href="#autotoc_md14">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md15">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md16">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p03_next_steps_sec">5. Next Steps</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Tutorial_File-Based_Grid"></a> This tutorial demonstrates <code>grid.mode: file</code> using the <code>bent_channel</code> template.</p>
@@ -124,42 +125,22 @@ $(function() {
 <h1><a class="anchor" id="p03_run_sec"></a>
 3. Run the Case</h1>
 <div class="fragment"><div class="line">./bin/picurv run \</div>
-<div class="line">    --case my_bent_channel_run/bent_channel.yml \</div>
-<div class="line">    --solver my_bent_channel_run/Imp-MG-Standard.yml \</div>
-<div class="line">    --monitor my_bent_channel_run/Standard_Output.yml \</div>
-<div class="line">    --post my_bent_channel_run/standard_analysis.yml \</div>
+<div class="line">    --case my_bent_channel_run/config/case.yml \</div>
+<div class="line">    --solver my_bent_channel_run/config/solver.yml \</div>
+<div class="line">    --monitor my_bent_channel_run/config/monitor.yml \</div>
+<div class="line">    --post my_bent_channel_run/config/post.yml \</div>
 <div class="line">    -n 4 --solve --post-process</div>
 </div><!-- fragment --><h1><a class="anchor" id="p03_viz_sec"></a>
 4. Visualize Results</h1>
 <ol type="1">
-<li>Open <code>runs/&lt;run_id&gt;/viz/Field_*.vts</code>.</li>
+<li>Open <code>&lt;run.visualization&gt;/&lt;recipe_id&gt;/Field_*.vts</code>.</li>
 <li>Use <code>Stream Tracer</code> seeded near inlet.</li>
 <li>Color by <code>Ucat_nodal</code> magnitude.</li>
 </ol>
 <p>This provides a fast sanity check of bend-flow behavior.</p>
 <h1><a class="anchor" id="p03_next_steps_sec"></a>
 5. Next Steps</h1>
-<p>Proceed to <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b>.</p>
-<h2><a class="anchor" id="autotoc_md14"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Tutorial: Using a File-Based Grid (Bent Channel)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md15"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md16"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
+<p>Proceed to <b><a class="el" href="04_Visualization_Tutorial.html">Tutorial: A Guide to Visualizing Your Results</a></b>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

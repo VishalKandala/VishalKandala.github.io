@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -89,27 +95,39 @@ $(function() {
 <li class="level1"><a href="#p34_physics_sec">3. Current Built-In Physics</a></li>
 <li class="level1"><a href="#p34_statistics_sec">4. Statistics and Diagnostics</a></li>
 <li class="level1"><a href="#p34_extension_sec">5. Extending To New Closures</a></li>
-<li class="level1"><a href="#p34_refs_sec">6. Related Pages</a><ul><li class="level2"><a href="#autotoc_md127">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md128">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md129">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p34_refs_sec">6. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Particle_Model_Overview"></a> This page documents the particle pipeline exactly as orchestrated in the current solver flow.</p>
+<div class="dotgraph">
+<iframe scrolling="no" frameborder="0" src="dot_particle_step.svg" width="532" height="899"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe><div class="caption">
+Order of operations in one coupled particle step</div>
+</div>
+<dl class="section note"><dt>Note</dt><dd>Diagram derived from the implementation in <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>; the advection terms are those in <a class="el" href="ParticleMotion_8h.html#a8ad3647ec07a92b3b2917e126bb56087">UpdateParticlePosition</a>. Flagged for owner validation of the scientific interpretation.</dd></dl>
 <h1><a class="anchor" id="p34_loop_sec"></a>
 1. Per-Step Particle Pipeline</h1>
-<p>Typical order inside coupled step:</p>
+<p>Order inside the coupled step, as implemented in <a class="el" href="runloop_8h.html#a5cfb2f783604af7f20171d19f969d5d3">AdvanceSimulation</a> (<code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code>):</p>
 <ol type="1">
-<li>interpolate Eulerian fields to swarm: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
-<li>advance particle positions: <a class="el" href="ParticleMotion_8h.html#a74bec635d0f085bd2e8aef6c61aac629">UpdateAllParticlePositions</a></li>
-<li>locate/migrate particles: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
+<li>refresh Eulerian transport properties when a turbulence model is active: <a class="el" href="rhs_8h.html#a40dfe264950ba54bfa99d6547ab6cc91">ComputeEulerianDiffusivity</a> and <a class="el" href="rhs_8h.html#a581a696ee216d26476ab8d71b5efe332">ComputeEulerianDiffusivityGradient</a></li>
+<li>advect particle positions using the velocity interpolated at the <b>previous</b> step: <a class="el" href="ParticleMotion_8h.html#a74bec635d0f085bd2e8aef6c61aac629">UpdateAllParticlePositions</a></li>
+<li>settle particles - locate new host cells and migrate across ranks: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
+<li>remove particles that are now lost or outside the global domain: <a class="el" href="ParticleMotion_8h.html#acb793f591b8baf11864bb85040730b28">CheckAndRemoveLostParticles</a></li>
+<li>interpolate the newly computed Eulerian velocity onto the settled positions: <a class="el" href="interpolation_8h.html#a25d384c0bcf5426864f90ab568e37511">InterpolateAllFieldsToSwarm</a></li>
 <li>update particle physics fields: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
-<li>scatter particle fields back to Eulerian storage: <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
+<li>scatter particle fields back to Eulerian storage: <a class="el" href="ParticleMotion_8h.html#a81cfdf7b32472d8f614b44e30005ec6c">CalculateParticleCountPerCell</a> and <a class="el" href="group__scatter__module.html#ga84b852e1186804ff34e9228fab1764c6">ScatterAllParticleFieldsToEulerFields</a></li>
 </ol>
+<p>The advect-then-interpolate ordering is deliberate and is the single most important property of this loop. A particle carries the state interpolated at \(t_n\) into step 2, and <a class="el" href="ParticleMotion_8h.html#a8ad3647ec07a92b3b2917e126bb56087">UpdateParticlePosition</a> displaces it by three contributions - convective velocity, drift along the diffusivity gradient, and a stochastic Brownian kick:</p>
+<p class="formulaDsp">
+\[
+\mathbf{X}^{n+1} = \mathbf{X}^{n}
+  + \left( \mathbf{u}_p^{\,n} + \nabla D^{\,n} \right) \Delta t
+  + \Delta \mathbf{X}_{\mathrm{brownian}},
+\]
+</p>
+<p>where \(\nabla D\) is the interpolated diffusivity gradient carried on the swarm and \(\Delta\mathbf{X}_{\mathrm{brownian}}\) comes from <a class="el" href="ParticleMotion_8h.html#a82a5b175af894df52fc6e0dcb63e1df7">CalculateBrownianDisplacement</a>, scaled by the particle's interpolated diffusivity. Step 5 then supplies the state at \(t_{n+1}\) from the flow field <a class="el" href="solvers_8h.html#ac6ffbc1ea90ff43f8cd847fbc3fd6144">FlowSolver</a> has just computed, ready for the next step. Interpolation therefore closes each step rather than opening it.</p>
+<p>Particles are not advected without a valid interpolated state: both <a class="el" href="runloop_8h.html#aa5b3c3a0cd447931b47a01267c36acdd">PerformInitializedParticleSetup</a> and <a class="el" href="runloop_8h.html#ad8038ca2fcc4f0534e04d144c4ffbbef">PerformLoadedParticleSetup</a> settle the swarm and run one interpolation at \(t=0\) before the step loop begins, so the first physical advection already has interpolated velocity, diffusivity, and diffusivity gradient available.</p>
 <p>Each stage relies on valid <code>DMSwarm_CellID</code>, interpolation weights, and synchronized ghost data.</p>
-<p>Step 1 dispatches through <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a>, which selects between two interpolation paths based on <code><a class="el" href="variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f">SimCtx.interpolationMethod</a></code>:</p>
+<p>Step 5 dispatches through <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a>, which selects between two interpolation paths based on <code><a class="el" href="variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f">SimCtx.interpolationMethod</a></code>:</p>
 <ul>
 <li><b>Trilinear</b> (default): direct interpolation from the 8 nearest cell centers, second-order on curvilinear grids.</li>
 <li><b>CornerAveraged</b> (legacy): two-stage center-to-corner averaging then trilinear from corners.</li>
@@ -141,7 +159,7 @@ $(function() {
 <ul>
 <li><a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a></li>
 </ul>
-<p>Additional health indicators are available from migration counters and settlement-pass counts stored in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> fields updated by location logic. For particle-enabled runs, the runtime also writes <code>logs/search_metrics.csv</code> with per-step and cumulative loss plus aggregated search-attempt, traversal, tie-break, boundary-clamp, bbox-guess, and pass-depth signals. The <code>examples/search_robustness/</code> bundle is the dedicated end-to-end reference for interpreting that artifact.</p>
+<p>Additional health indicators are available from migration counters and settlement-pass counts stored in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code> fields updated by location logic. For particle-enabled runs, the runtime also writes <code>&lt;run.runtime_logs&gt;/search_metrics.csv</code> with per-step and cumulative loss plus aggregated search-attempt, traversal, tie-break, boundary-clamp, bbox-guess, and pass-depth signals. The <code>examples/search_robustness/</code> bundle is the dedicated end-to-end reference for interpreting that artifact.</p>
 <h1><a class="anchor" id="p34_extension_sec"></a>
 5. Extending To New Closures</h1>
 <p>Recommended extension pattern:</p>
@@ -163,28 +181,8 @@ $(function() {
 <ul>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
-<li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b></li>
+<li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md127"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Model and Coupling Overview</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md128"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md129"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

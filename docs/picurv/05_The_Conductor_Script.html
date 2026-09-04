@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -87,7 +93,7 @@ $(function() {
 <ul><li class="level1"><a href="#p05_usage_sec">1. General Usage</a></li>
 <li class="level1"><a href="#p05_init_sec">2. init: Create A New Case Directory</a></li>
 <li class="level1"><a href="#p05_build_sec">3. build: Build Project Executables</a></li>
-<li class="level1"><a href="#p05_sync_sec">3b. sync-binaries / sync-config / pull-source / status-source</a></li>
+<li class="level1"><a href="#p05_sync_sec">3b. Source, Version, And Legacy Maintenance Commands</a></li>
 <li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
 <li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Configuration and Health Summary</a></li>
 <li class="level1"><a href="#p05_precompute_sec">5a. precompute: Generate Deterministic Artifacts</a></li>
@@ -101,13 +107,15 @@ $(function() {
 <li class="level1"><a href="#p05_structured_errors_sec">10. Structured Error Output Contract</a></li>
 <li class="level1"><a href="#p05_modular_sec">11. Modular Profile Strategy</a></li>
 <li class="level1"><a href="#p05_binaries_sec">12. Binary Resolution and Rebuild Safety</a></li>
+<li class="level1"><a href="#p05_cap_input_mode_sec">12.1 Workspace Input Import Mode Entries</a><ul><li class="level2"><a href="#p05_cap_input_mode_copy_sub">copy</a></li>
+<li class="level2"><a href="#p05_cap_input_mode_reflink_sub">reflink</a></li>
+<li class="level2"><a href="#p05_cap_input_mode_hardlink_sub">hardlink</a></li>
+<li class="level2"><a href="#p05_cap_input_mode_reference_sub">reference</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p05_artifacts_sec">13. Generated Runtime Artifacts</a></li>
-<li class="level1"><a href="#p05_next_steps_sec">14. Next Steps</a><ul><li class="level2"><a href="#autotoc_md20">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md21">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md22">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p05_storage_sec">14. &lt;tt&gt;storage&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#p05_next_steps_sec">15. Next Steps</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_The_Conductor_Script"></a> <code>picurv</code> is the workflow orchestrator for PICurv. It validates YAML inputs, generates C runtime artifacts, and runs or schedules solver/postprocessing stages. It is also the primary user-facing contract layer: many defaults, aliases, and translation rules are enforced here before the C solver starts.</p>
@@ -118,12 +126,12 @@ $(function() {
 <p>Primary commands:</p><ul>
 <li><code>init</code></li>
 <li><code>build</code></li>
-<li><code>sync-binaries</code></li>
+<li><code>version</code>, <code>versions</code>, and <code>source</code></li>
+<li><code>inputs</code></li>
 <li><code>sync-config</code></li>
-<li><code>pull-source</code></li>
-<li><code>status-source</code></li>
 <li><code>run</code></li>
 <li><code>precompute</code></li>
+<li><code>storage</code></li>
 <li><code>summarize</code></li>
 <li><code>submit</code></li>
 <li><code>cancel</code></li>
@@ -140,10 +148,11 @@ $(function() {
 <p>Help: </p><div class="fragment"><div class="line">./bin/picurv --help</div>
 <div class="line">./bin/picurv init --help</div>
 <div class="line">./picurv_cli/picurv build --help</div>
-<div class="line">./bin/picurv sync-binaries --help</div>
+<div class="line">./bin/picurv version --help</div>
+<div class="line">./bin/picurv versions --help</div>
+<div class="line">./bin/picurv source --help</div>
+<div class="line">./bin/picurv inputs --help</div>
 <div class="line">./bin/picurv sync-config --help</div>
-<div class="line">./bin/picurv pull-source --help</div>
-<div class="line">./bin/picurv status-source --help</div>
 <div class="line">./bin/picurv run --help</div>
 <div class="line">./bin/picurv precompute --help</div>
 <div class="line">./bin/picurv summarize --help</div>
@@ -157,6 +166,9 @@ $(function() {
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>copies <code>examples/&lt;template_name&gt;/</code> into a new working directory,</li>
+<li>creates the uniform <code>&lt;workspace&gt;/config/</code>, <code>&lt;workspace&gt;/inputs/</code>, <code>&lt;workspace&gt;/assets/</code>, <code>&lt;workspace&gt;/runs/</code>, and <code>&lt;workspace&gt;/studies/</code> tree,</li>
+<li>classifies and relocates template YAML to canonical roles under <code>&lt;workspace&gt;/config/</code>, preserving colliding variants below <code>&lt;workspace&gt;/config/variants/</code>,</li>
+<li>writes <code>.picurv-workspace.yml</code>; <code>software.picurv</code> is empty by default and therefore means the latest active installation,</li>
 <li>optionally renames the destination via <code>--dest</code>,</li>
 <li>writes <code>.picurv-origin.json</code> with the source repo path and template name,</li>
 <li>writes <code>.picurv-execution.yml</code> for optional site-specific launcher overrides,</li>
@@ -170,7 +182,6 @@ $(function() {
 <li>use this when submitting Slurm jobs and you may rebuild the repo before the job runs,</li>
 <li><code>picurv</code> itself is never copied — it is always used from PATH and is safe to update mid-run since it only launches the C binaries.</li>
 </ul>
-<p>Equivalent manual step (after init): <code>picurv sync-binaries --case-dir &lt;case&gt;</code>.</p>
 <p>Examples:</p>
 <div class="fragment"><div class="line">picurv init flat_channel --dest my_first_case</div>
 <div class="line">picurv init bent_channel --dest my_bent_case --pin-binaries</div>
@@ -184,15 +195,15 @@ $(function() {
 <li>resolves the source repo from <code>.picurv-origin.json</code> when run from an initialized case,</li>
 <li>passes any trailing arguments directly through to the Make/build layer,</li>
 <li>can rebuild or clean the source repo without leaving a copied case directory,</li>
-<li>writes the streamed build output to <code>logs/build.log</code> in the source repo,</li>
+<li>writes the streamed build output to <code>&lt;repo&gt;/logs/build.log</code> in the source repo,</li>
 <li>is the recommended command for normal users instead of invoking <code>make</code> manually.</li>
 </ul>
 <p>Direct <code>make all</code> keeps the traditional stdout-only behavior. When you want the same source-repo build plus a warnings-only artifact, use:</p>
 <div class="fragment"><div class="line">make audit-build</div>
 </div><!-- fragment --><p>This writes:</p>
 <ul>
-<li><code>logs/build.log</code></li>
-<li><code>logs/build.warnings.log</code></li>
+<li><code>&lt;repo&gt;/logs/build.log</code></li>
+<li><code>&lt;repo&gt;/logs/build.warnings.log</code></li>
 </ul>
 <p>Examples:</p>
 <div class="fragment"><div class="line">./picurv_cli/picurv build</div>
@@ -202,11 +213,21 @@ $(function() {
 <div class="line">./my_case/picurv build clean-project</div>
 <div class="line">make audit-build</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_sync_sec"></a>
-3b. sync-binaries / sync-config / pull-source / status-source</h1>
-<p>These commands are intended for case directories created by <code>init</code>.</p>
-<p><code>sync-binaries</code> copies <code>simulator</code> and <code>postprocessor</code> from the source repo <code>bin/</code> into a case directory for version-pinning (optional — normally binaries are resolved via PATH):</p>
-<div class="fragment"><div class="line">./my_case/picurv sync-binaries</div>
-</div><!-- fragment --><p><code>sync-config</code> refreshes files from <code>examples/&lt;template_name&gt;/</code> into the case directory. By default it preserves user-modified files and only copies missing files:</p>
+3b. Source, Version, And Legacy Maintenance Commands</h1>
+<p><code>picurv version</code> prints the release, Git commit, and dirty-tree build identity of the Python conductor, then reads back what <code>simulator --version</code> and <code>postprocessor --version</code> actually report. Those two identities are not the same fact: the conductor's says which source staged a run, the binaries' says which build produced its checkpoints, and an edited C tree that was never rebuilt makes them disagree. The run manifest records both, and <code>run</code> warns at staging when a binary is stale.</p>
+<p><code>picurv version status</code> reports the same thing and then <em>validates</em> it, exiting 1 when the conductor, either executable, or the workspace's <code>software.picurv</code> requirement disagree, and naming each disagreement. Bare <code>picurv version</code> always exits 0: it is an informational surface, and a job script that must refuse an incoherent build should ask for the validating form explicitly. Both accept <code>--format json</code>, which adds <code>coherent</code> and <code>problems</code> to the payload.</p>
+<p><code>make</code> delivers the identity through a generated <code>include/picurv_build_identity.h</code> rather than command-line defines, so ordinary header-dependency tracking rebuilds the two translation units that stamp it whenever the commit or dirty state changes. A binary reporting release <code>0.0.0</code> was built outside <code>make</code> and carries no identity.</p>
+<p><code>picurv source update</code> fetches branches and tags without changing the active checkout. <code>picurv versions list</code> reports tags; <code>versions install &lt;version&gt;</code> or <code>versions activate [version]</code> requires a clean source checkout, selects the exact Git version, and rebuilds. With no argument, <code>activate</code> reads the workspace's exact <code>software.picurv</code> value and refuses ranges.</p>
+<dl class="section note"><dt>Note</dt><dd><b>One installation, activated in place.</b> PICurv installs as a single source checkout that <code>versions activate</code> rewrites by <code>git checkout --detach &lt;tag&gt;</code> followed by <code>make all</code>. It does not install side-by-side versioned prefixes such as <code>/software/picurv/0.2.0/</code>, and <code>picurv</code> is not a version multiplexer.</dd></dl>
+<p>That is a deliberate trade, and it has three consequences worth knowing before you rely on a version pin:</p>
+<ul>
+<li><b>Two workspaces pinned to different releases cannot both be satisfied.</b> Activating for one makes the other's <code>software.picurv</code> requirement fail. There is one active release per installation, not one per workspace.</li>
+<li><b>Activating changes running jobs.</b> Executables resolve from the installation's <code>bin/</code>, so a rebuild replaces <code>simulator</code> and <code>postprocessor</code> underneath a job that is already using them. <code>picurv init --pin-binaries</code> copies them into the case and is the supported way to make a run immune to this; use it for anything submitted to a scheduler.</li>
+<li><b>Development and version-switching share one tree.</b> <code>activate</code> refuses a dirty checkout, so uncommitted work must be committed or stashed first.</li>
+</ul>
+<p>Both <code>versions activate</code> and a failed workspace version check name the installation they would change, so the effect is stated rather than discovered. If you need concurrent releases — several people on one filesystem, or reproducing a published result while developing against a newer tree — install PICurv more than once and select between them with your shell or your site's module system.</p>
+<p><code>pull-source</code> and <code>status-source</code> remain legacy maintenance surfaces. New workspaces normally use the active installation and the version commands instead of copying executables into every case.</p>
+<p><code>sync-config</code> refreshes files from <code>examples/&lt;template_name&gt;/</code> into the case directory. By default it preserves user-modified files and only copies missing files:</p>
 <div class="fragment"><div class="line">./my_case/picurv sync-config</div>
 <div class="line">./my_case/picurv sync-config --overwrite</div>
 <div class="line">./my_case/picurv sync-config --prune</div>
@@ -298,7 +319,7 @@ $(function() {
 <li>If the solver has only written source data through step <code>420</code>, PICurv launches only the fully available prefix in the requested stride. A later <code>--continue</code> run picks up the newer steps after the solver produces them.</li>
 <li>If the same recipe already post-processed the requested window, PICurv skips the launch and reports that the run is already caught up.</li>
 <li>If you change the recipe itself, for example by adding <code>Qcrit</code> or changing the statistics output prefix, PICurv treats that as a new recipe lineage and starts again from the configured <code>start_step</code>.</li>
-<li>PICurv allows only one post writer per run directory. If a second post job targets the same <code>runs/&lt;run_id&gt;</code>, it is refused immediately instead of racing on <code>viz/</code> or <code>statistics/</code>.</li>
+<li>PICurv allows only one post writer per run directory. If a second post job targets the same run, it is refused immediately instead of racing on <code>&lt;run.visualization&gt;/</code> or the statistics output beneath it.</li>
 </ul>
 <p>Graceful shutdown note:</p>
 <ul>
@@ -309,8 +330,8 @@ $(function() {
 </ul>
 <p>Runtime stream logs:</p>
 <ul>
-<li>C-managed logs remain under <code>runs/&lt;run_id&gt;/logs/</code>.</li>
-<li>wrapper stdout/stderr stream logs now live under <code>runs/&lt;run_id&gt;/scheduler/</code> for both local and Slurm launches.</li>
+<li>C-managed logs remain under <code>&lt;run.runtime_logs&gt;/</code>.</li>
+<li>wrapper stdout/stderr stream logs now live under <code>&lt;run.scheduler&gt;/</code> for both local and Slurm launches.</li>
 <li>this avoids collisions with solver startup, which recreates the C log directory.</li>
 </ul>
 <h1><a class="anchor" id="p05_summarize_sec"></a>
@@ -331,7 +352,7 @@ $(function() {
 <li>plotting requires <code>matplotlib</code>, which bootstrap installs in the managed PICurv environment by default,</li>
 <li>continued runs write <code># Continuation from step &lt;N&gt;</code> separators into append-only logs,</li>
 <li>plots use the latest continuation segment by default; <code>--last &lt;n&gt;</code> keeps its last N chronological records per line,</li>
-<li><code>--plot-output &lt;path&gt;</code> saves without opening a window; headless interactive requests save under <code>summary/plots/</code>,</li>
+<li><code>--plot-output &lt;path&gt;</code> saves without opening a window; headless interactive requests save under <code>&lt;run.analysis&gt;/plots/</code>,</li>
 <li>builds a best-effort step summary without changing solver output,</li>
 <li>works for active runs and completed runs,</li>
 <li>reports unavailable sections when a source log is missing or disabled.</li>
@@ -354,15 +375,16 @@ $(function() {
 </div><!-- fragment --><p>The normalized request contains plot labels, scale selection, window metadata, and ordered labeled lines of numeric <code>[timestep, value]</code> points. <code>plot.gen</code> does not parse PICurv run directories or logs.</p>
 <p>Typical sources:</p>
 <ul>
-<li><code>logs/Continuity_Metrics.log</code></li>
-<li><code>logs/Particle_Metrics.log</code> (per-step <code>Lost</code> plus run-local <code>Lost Total</code> when available)</li>
-<li><code>logs/Momentum_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/Poisson_Solver_Convergence_History_Block_*.log</code></li>
-<li><code>logs/solution_convergence.log</code> (mode-specific speed/KE drift and L2 norms)</li>
-<li><code>logs/Profiling_Timestep_Summary.csv</code> when enabled</li>
-<li><code>logs/Runtime_Memory.log</code> when <code>monitor.diagnostics.runtime_memory_log.enabled</code> is true</li>
-<li><code>logs/PETSc_*_Solver.log</code> / <code>logs/PETSc_*_PostProcessor.log</code> when file-backed PETSc diagnostics are enabled</li>
-<li><code>scheduler/*_solver.log</code> or <code>scheduler/solver_*.out</code> for sampled particle snapshot previews</li>
+<li><code>&lt;run.runtime_logs&gt;/Continuity_Metrics.log</code></li>
+<li><code>&lt;run.runtime_logs&gt;/Particle_Metrics.log</code> (per-step <code>Lost</code> plus run-local <code>Lost Total</code> when available)</li>
+<li><code>&lt;run.runtime_logs&gt;/Momentum_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_*.log</code></li>
+<li><code>&lt;run.runtime_logs&gt;/solution_convergence.log</code> (mode-specific speed/KE drift and L2 norms)</li>
+<li><code>&lt;run.runtime_logs&gt;/Profiling_Timestep_Summary.csv</code> when enabled</li>
+<li><code>&lt;run.runtime_logs&gt;/Runtime_Memory.log</code> when <code>monitor.diagnostics.runtime_memory_log.enabled</code> is true</li>
+<li><code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> when <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> is true; the <code>les.*</code> series carry the effective coefficient, its spread, eddy-viscosity levels, the modelled subgrid energy, and the pre-clipping backscattering and limited fractions</li>
+<li><code>&lt;run.runtime_logs&gt;/PETSc_*_Solver.log</code> / <code>&lt;run.runtime_logs&gt;/PETSc_*_PostProcessor.log</code> when file-backed PETSc diagnostics are enabled</li>
+<li><code>&lt;run.scheduler&gt;/*_solver.log</code> or <code>&lt;run.scheduler&gt;/solver_*.out</code> for sampled particle snapshot previews</li>
 </ul>
 <p>When particle snapshots are available, <code>summarize</code> reports sampled diagnostics such as:</p>
 <ul>
@@ -390,17 +412,10 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="p05_precompute_sec"></a>
 5a. precompute: Generate Deterministic Artifacts</h1>
-<div class="fragment"><div class="line">./bin/picurv precompute --case case.yml [--output-dir precomputed/&lt;name&gt;]</div>
-</div><!-- fragment --><p><code>precompute</code> materializes deterministic case artifacts without launching the solver. It uses the same <code>case.yml</code> generator settings as <code>run --solve</code>:</p>
-<ul>
-<li><code>grid.mode: grid_gen</code> writes the configured dimensional <code>PICGRID</code>; file and generated grids are also validated and staged as nondimensional <code>config/grid.run</code>,</li>
-<li><code>prescribed_flow.source.type: generated</code> delegates dimensional <code>.picslice</code> profile generation to <code>generators/profile.gen</code> or optional <code>source.script</code> and writes <code>profile.info</code>,</li>
-<li><code>prescribed_flow.source.type: field_slice</code> extracts a dimensional <code>.picslice</code> from an old Cartesian <code>ufield*.dat</code> plus its old <code>PICGRID</code>,</li>
-<li><code>initial_conditions.generator: ic_gen</code> runs <code>generators/ic.gen</code> or optional <code>params.script</code> and stages its PETSc vector output after the run grid is available,</li>
-<li><code>config/precompute.manifest.json</code> records generated paths, profile stats, and IC staging.</li>
-</ul>
-<p>The output layout mirrors <code>runs/&lt;run_id&gt;/config/</code> so inspected artifacts can be reused later with file-backed grid, profile, and initial-condition modes.</p>
-<p>Design intent: <code>precompute</code> is the extensible artifact-materialization route for deterministic case inputs. It should host future grid/profile/IC preprocessing that can be inspected before launch, while <code>run --solve</code> should perform the same materialization automatically for generator-style case settings.</p>
+<div class="fragment"><div class="line">picurv precompute --case config/case.yml [--only grid,initial-condition,inlet-profiles]</div>
+</div><!-- fragment --><p><code>precompute</code> creates immutable, content-addressed workspace assets without launching the solver. It uses exactly the same provider graph as <code>run --solve</code>: grids build before any Python initial condition or inlet slice that consumes them. Provider settings, referenced-file checksums, and software identity determine reuse.</p>
+<p>The build occurs under <code>assets/.precompute-*</code> and publishes to <code>assets/objects/</code> only after the whole requested dependency closure succeeds. The mutable pointer in <code>assets/sets/</code> records which objects match the current case. A normal run reuses those objects automatically and writes the exact selection to <code>inputs/assets.lock.yml</code>.</p>
+<p>Providers owned by the C runtime are reported but never approximated by Python. A selected C-only provider makes precompute fail before publication. See <b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b> for the directory and dependency contracts.</p>
 <h1><a class="anchor" id="p05_submit_sec"></a>
 5b. submit: Execute Existing Staged Artifacts</h1>
 <div class="fragment"><div class="line">./bin/picurv submit [--run-dir &lt;run_dir&gt; | --study-dir &lt;study_dir&gt;] \</div>
@@ -408,7 +423,7 @@ $(function() {
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
 <li>consumes existing <code>--no-submit</code> artifacts without regenerating configs or scripts,</li>
-<li>reads <code>scheduler/submission.json</code> to locate staged Slurm scripts or local command tokens,</li>
+<li>reads <code>&lt;run.scheduler&gt;/submission.json</code> to locate staged Slurm scripts or local command tokens,</li>
 <li>executes/submits <code>solve</code>, <code>post-process</code>, or both,</li>
 <li>wires the post stage dependency automatically for Slurm when <code>all</code> is selected,</li>
 <li>executes local staged stages in order when <code>launch_mode: local</code>,</li>
@@ -430,7 +445,7 @@ $(function() {
 <div class="fragment"><div class="line">./bin/picurv cancel --run-dir &lt;run_dir&gt; [--stage {all,solve,post-process}] [--graceful] [--dry-run]</div>
 </div><!-- fragment --><p>Behavior:</p>
 <ul>
-<li>reads <code>scheduler/submission.json</code> from an existing run directory,</li>
+<li>reads <code>&lt;run.scheduler&gt;/submission.json</code> from an existing run directory,</li>
 <li>resolves the recorded Slurm job IDs for <code>solve</code> and/or <code>post-process</code>,</li>
 <li>runs hard <code>scancel &lt;job_id&gt;</code> for the selected stage set by default,</li>
 <li>with <code>--graceful</code>, sends <code>scancel --signal=USR1 --full &lt;job_id&gt;</code> for solver jobs, reaching the batch process and MPI children so the runtime can write the latest safe off-cadence step at the next checkpoint,</li>
@@ -444,7 +459,7 @@ $(function() {
 <div class="line">./bin/picurv cancel --run-dir runs/my_case_20260310-120000 --dry-run</div>
 </div><!-- fragment --><p>Notes:</p>
 <ul>
-<li>works only for Slurm-submitted runs that have <code>scheduler/submission.json</code>,</li>
+<li>works only for Slurm-submitted runs that have <code>&lt;run.scheduler&gt;/submission.json</code>,</li>
 <li>does not apply to local runs,</li>
 <li><code>--graceful</code> requests solver shutdown and final output; if a job is wedged or not reaching runtime checkpoints, rerun without <code>--graceful</code> to hard-cancel it,</li>
 <li><code>--dry-run</code> is useful when you want to confirm the recorded stage/job mapping first.</li>
@@ -495,7 +510,432 @@ $(function() {
 </ul>
 <h1><a class="anchor" id="p05_command_matrix_sec"></a>
 8. Full Command and Option Matrix</h1>
-<p>This section is intentionally exhaustive and mirrors the current <code>argparse</code> contract in <code><a class="el" href="cli_8py.html">picurv_cli/cli.py</a></code>. Use it as the authoritative option reference when writing docs, examples, wrappers, or CI jobs.</p>
+<p>The table below is <b>generated by introspecting the assembled <code>argparse</code> parser</b> - <code>build_main_parser()</code> in <code><a class="el" href="cli_8py.html">picurv_cli/cli.py</a></code> together with the registrars delegated from other modules, such as <code>add_storage_parser()</code> in <code>picurv_cli/storage/</code>. Reading <code><a class="el" href="cli_8py.html">cli.py</a></code> alone understates the command set, which is why the generator exercises the built parser rather than pattern-matching the source.</p>
+<p>It is regenerated by <code>make docs-cli-reference</code> and checked by <code>make audit-cli-reference</code>, so a parser change makes it stale and fails CI. The narrative guidance in the sections above is hand-written and complements it; this section is the exhaustive reference.</p>
+<!-- GENERATED FILE - do not edit by hand.
+     Source of truth: the assembled argparse parser (picurv_cli.cli.build_main_parser),
+     including registrars delegated from other modules such as storage.py.
+     Regenerate with: make docs-cli-reference -->
+<p>17 top-level commands.</p>
+<h3 id="cli_build"><code>picurv build</code></h3>
+<p>Calls the project's Makefile directly through `make`.</p>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>make_args</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Arguments to pass directly to the make command (e.g., 'clean-project').</td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--source-root</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional override for the PICurv source repository root.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional case directory used to resolve .picurv-origin.json when not running from that case.</td></tr>
+</table>
+<h3 id="cli_cancel"><code>picurv cancel</code></h3>
+<p>Look up scheduler/submission.json inside an existing run directory and cancel</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the run directory whose Slurm job(s) should be canceled.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--stage</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>all</code>, <code>post-process</code>, <code>solve</code></td><td class="markdownTableBodyNone"><code>all</code></td><td class="markdownTableBodyNone">Which recorded stage job(s) to cancel (default: all).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Show which `scancel` command(s) would run without actually canceling anything.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--graceful</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">For solver jobs, request a clean runtime shutdown by sending SIGUSR1 to the process tree instead of hard-canceling immediately. The solver writes the latest safe off-cadence step at the next checkpoint. Non-solver stages still use ordinary scancel.</td></tr>
+</table>
+<h3 id="cli_init"><code>picurv init</code></h3>
+<p>Create a study directory from examples/&lt;template_name&gt;.</p>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>template_name</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Name of the case template directory to copy (e.g., 'flat_channel').</td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dest</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional name for the new directory. Defaults to the template name.
+Path is relative to your current working directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--source-root</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional override for the PICurv source repository root.
+Useful when running from a copied case without metadata.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--pin-binaries</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Copy simulator and postprocessor into the case directory.
+Use this to freeze specific binary versions for reproducibility
+or to protect running jobs from concurrent rebuilds.</td></tr>
+</table>
+<h3 id="cli_inputs"><code>picurv inputs</code></h3>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
+<h4 id="cli_inputs_import"><code>picurv inputs import</code></h4>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>kind</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone"><code>grid</code>, <code>initial-condition</code>, <code>inlet-profile</code>, <code>reference-field</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>source</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Existing source file.</td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--name</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Destination name; defaults to the source basename.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--mode</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>copy</code>, <code>hardlink</code>, <code>reference</code>, <code>reflink</code></td><td class="markdownTableBodyNone"><code>copy</code></td><td class="markdownTableBodyNone">How to retain the input. Reference mode records but does not copy an external path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root; defaults to discovery from the current directory.</td></tr>
+</table>
+<h3 id="cli_precompute"><code>picurv precompute</code></h3>
+<p>Generate configured deterministic artifacts, such as grid_gen grids,</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to case.yml containing grid/profile/IC generator settings.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--only</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>all</code></td><td class="markdownTableBodyNone">Comma-separated asset kinds (grid, initial-condition, inlet-profiles), or all.</td></tr>
+</table>
+<h3 id="cli_pull_source"><code>picurv pull-source</code></h3>
+<p>Update the source repository without leaving an initialized case directory.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional case directory used to resolve .picurv-origin.json.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--source-root</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional override for the PICurv source repository root.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--remote</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional git remote name (e.g., origin).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--branch</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional branch name. If provided without --remote, origin is assumed.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--current-branch-only</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Only pull the currently checked out branch instead of iterating across all local tracking branches.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--no-rebase</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Use plain git pull instead of git pull --rebase.</td></tr>
+</table>
+<h3 id="cli_run"><code>picurv run</code></h3>
+<p>Execute solver and/or post-processing stages.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>-n</code>, <code>--num-procs</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">Number of MPI processes for solver and post-processing stages.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml for Slurm execution mode.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--scheduler</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit scheduler selector (currently 'slurm').</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--no-submit</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Stage run artifacts without starting local execution or Slurm submission.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Resolve and print planned commands/artifacts, including diagnostic flags and log paths, without writing files.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone">Output format for --dry-run (default: text).</td></tr>
+</table>
+<p><b>stages</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>--solve</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Execute the solver stage (creates a new run directory).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--post-process</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Execute the post-processing stage on a run directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--continue</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Resume an existing run directory in-place. Requires --run-dir.
+With --solve, requires start_step &gt; 0 and appends to existing solver output/logs.
+With --post-process, resumes the same recipe from the first unfinished step
+and skips already-complete work inside the current live source frontier.</td></tr>
+</table>
+<p><b>solver inputs (required for --solve)</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>--case</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the case definition file (e.g., case.yml).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--solver</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the solver settings profile (e.g., solver.yml).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--monitor</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the monitoring, diagnostics, and I/O profile (e.g., monitor.yml).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--restart-from</code>, <code>--from</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to an existing run directory to restart from.
+Use 'latest' to select the newest compatible local workspace run.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--statistics-state</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>carry</code>, <code>reset</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">For a branched restart with field statistics enabled, this is required:
+'reset' discards the parent's accumulated windows, 'carry' resumes compatible
+saved window state. Ignored when field statistics are disabled.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--require-precomputed</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Refuse to build missing or stale deterministic assets while staging the run.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--fetch-missing</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Try the configured storage profile before rebuilding a missing workspace asset.</td></tr>
+</table>
+<p><b>post-processor inputs (required for --post-process)</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to an existing run directory.
+(Used with --post-process or --continue).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--post</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the post-processing recipe file (e.g., post.yml).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--only</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Comma-separated post stages to run: 'fields' (the field post-processor)
+and/or 'spectra'. Defaults to every stage.
+Use --only spectra to re-measure spectra without rebuilding field output.</td></tr>
+</table>
+<h3 id="cli_source"><code>picurv source</code></h3>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
+<h4 id="cli_source_update"><code>picurv source update</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--remote</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>origin</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h3 id="cli_status_source"><code>picurv status-source</code></h3>
+<p>Inspect whether the source repo, copied binaries, and template-managed files have drifted</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional case directory used to resolve .picurv-origin.json.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--source-root</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional override for the PICurv source repository root.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--template-name</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional template name override when metadata is absent.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone">Output format (default: text).</td></tr>
+</table>
+<h3 id="cli_storage"><code>picurv storage</code></h3>
+<p>Manage PICurv run and study data through a configured rclone remote.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
+<h4 id="cli_storage_list"><code>picurv storage list</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--search</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Case-insensitive search across IDs, labels, identities, and tags.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace-label</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Show only archives belonging to this workspace identity.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_offload"><code>picurv storage offload</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Standalone run directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Sweep study directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root: its configuration, catalog, and assets, not its runs and studies, which are their own artifacts.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">One numbered study member, such as case_0003; repeat to select several.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--completed</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --study-dir, select every finished member and skip the rest.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--include-inputs</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --workspace, also archive user-supplied files under inputs/.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--label</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Human-readable searchable label.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--notes</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Free-text note recorded with the archive and shown by `show`.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--tag</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Repeatable KEY=VALUE catalog tag.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--compression</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>auto</code>, <code>balanced</code>, <code>fast</code>, <code>maximum</code>, <code>none</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--policy</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>analysis-ready</code>, <code>metadata-only</code>, <code>restart-ready</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--retain</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Keep this component local regardless of --policy; repeatable and
+comma-separated. One of: checkpoints, logs, analysis, visualization, inputs, raw-output.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Prune this component locally regardless of --policy; same names as --retain.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workers</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--keep-latest-checkpoint</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop-all-checkpoints</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_plan"><code>picurv storage plan</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Standalone run directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Sweep study directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root: its configuration, catalog, and assets, not its runs and studies, which are their own artifacts.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">One numbered study member, such as case_0003; repeat to select several.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--completed</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --study-dir, select every finished member and skip the rest.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--compression</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>auto</code>, <code>balanced</code>, <code>fast</code>, <code>maximum</code>, <code>none</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--policy</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>analysis-ready</code>, <code>metadata-only</code>, <code>restart-ready</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--retain</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Keep this component local regardless of --policy; repeatable and
+comma-separated. One of: checkpoints, logs, analysis, visualization, inputs, raw-output.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Prune this component locally regardless of --policy; same names as --retain.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workers</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--keep-latest-checkpoint</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop-all-checkpoints</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_protect"><code>picurv storage protect</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Standalone run directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Sweep study directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root: its configuration, catalog, and assets, not its runs and studies, which are their own artifacts.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">One numbered study member, such as case_0003; repeat to select several.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--completed</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --study-dir, select every finished member and skip the rest.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--include-inputs</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --workspace, also archive user-supplied files under inputs/.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--label</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Human-readable searchable label.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--notes</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Free-text note recorded with the archive and shown by `show`.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--tag</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Repeatable KEY=VALUE catalog tag.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--compression</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>auto</code>, <code>balanced</code>, <code>fast</code>, <code>maximum</code>, <code>none</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--policy</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>analysis-ready</code>, <code>metadata-only</code>, <code>restart-ready</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--retain</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Keep this component local regardless of --policy; repeatable and
+comma-separated. One of: checkpoints, logs, analysis, visualization, inputs, raw-output.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Prune this component locally regardless of --policy; same names as --retain.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workers</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--keep-latest-checkpoint</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--drop-all-checkpoints</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_prune"><code>picurv storage prune</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root; defaults to discovery from the cwd.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--assets</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Select the workspace asset store. Required: prune removes nothing else.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--unused-locally</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Confirm that only objects with no active local run are removed.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Report the decision only.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+</table>
+<h4 id="cli_storage_restore"><code>picurv storage restore</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--archive-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Globally unique remote archive ID.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Restore a workspace archive by its recorded workspace identity.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Cold run containing a local storage marker.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Cold study containing a local storage marker.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--to</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional alternate restore destination.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--checkpoint</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">One committed step; repeat to select several.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--checkpoints</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">An inclusive step range as START:END or START:END:STRIDE; repeatable.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--component</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>analysis</code>, <code>assets</code>, <code>inputs</code>, <code>logs</code>, <code>raw-output</code>, <code>unclassified</code>, <code>visualization</code>, <code>workspace-config</code>, <code>workspace-inputs</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Restore one semantic component; repeat as needed.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--force</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Allow merge into a non-matching existing destination.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workers</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Parallel download/extraction workers.</td></tr>
+</table>
+<h4 id="cli_storage_setup"><code>picurv storage setup</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--remote</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Rclone remote and base path, such as labstore:picurv-data.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>archive</code></td><td class="markdownTableBodyNone">Profile name (default: archive).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Storage YAML path (default: ./.picurv-storage.yml).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--compression</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>auto</code>, <code>balanced</code>, <code>fast</code>, <code>maximum</code>, <code>none</code></td><td class="markdownTableBodyNone"><code>auto</code></td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--chunk-size-gib</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>8.0</code></td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workers</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>&lt;local CPU count, capped 1-8&gt;</code></td><td class="markdownTableBodyNone">CPU workers for compression and restoration.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--offload-policy</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>analysis-ready</code>, <code>metadata-only</code>, <code>restart-ready</code></td><td class="markdownTableBodyNone"><code>metadata-only</code></td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--keep-latest-checkpoint</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Retain the newest committed checkpoint after offload.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--staging-directory</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional local directory for one archive chunk at a time.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_show"><code>picurv storage show</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--archive-id</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+</table>
+<h4 id="cli_storage_status"><code>picurv storage status</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Standalone run directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Sweep study directory.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root: its configuration, catalog, and assets, not its runs and studies, which are their own artifacts.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">One numbered study member, such as case_0003; repeat to select several.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--completed</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">With --study-dir, select every finished member and skip the rest.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h4 id="cli_storage_verify"><code>picurv storage verify</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--archive-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-id</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>--profile</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Configured storage profile name.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--storage-config</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit storage YAML path.</td></tr>
+</table>
+<h3 id="cli_submit"><code>picurv submit</code></h3>
+<p>Consume an existing artifact set created by picurv --no-submit and</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to a staged run directory created by `picurv run ... --no-submit`.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to a staged study directory created by `picurv sweep --cluster ... --no-submit`.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--stage</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>all</code>, <code>post-process</code>, <code>solve</code></td><td class="markdownTableBodyNone"><code>all</code></td><td class="markdownTableBodyNone">Which staged job(s) to submit (default: all).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--force</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Allow re-submitting a stage already marked as submitted in scheduler/submission.json.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Show which local command(s) or `sbatch` command(s) would run without starting anything.</td></tr>
+</table>
+<h3 id="cli_summarize"><code>picurv summarize</code></h3>
+<p>Build read-only configuration overviews, run-health summaries, and scalar time-history plots.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to the run directory to inspect.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--overview</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize run metadata plus copied case, solver, and monitor configs without implicitly requesting health.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize the copied run-local case.yml.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--solver</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize the copied run-local solver.yml.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--monitor</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize the copied run-local monitor.yml.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--list-plot-series</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">List scalar histories available to --plot.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--list-series</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">==SUPPRESS==</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--plot</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Plot one qualified scalar history, such as momentum.residual_norm (requires matplotlib).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--plot-spectrum</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Plot up to six representative measured energy spectra, including the first
+and last states, overlaid on the initial-condition spectrum. Takes an optional
+task-name substring when the recipe measured more than one spectrum
+(requires matplotlib).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--last</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Plot only the last N chronological records per line.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--plot-output</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Save the plot to this path instead of opening an interactive window.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--linear-y</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Force linear y-axis scaling instead of automatic residual/norm log scaling.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--step</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Specific completed timestep to summarize.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--latest</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize the most recently appended completed step found in available artifacts (default behavior).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--max-step</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Summarize the numerically largest timestep found in available artifacts.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--snapshot-rows</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>5</code></td><td class="markdownTableBodyNone">Number of sampled particle snapshot rows to preview when solver stream output contains them.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone">Output format (default: text).</td></tr>
+</table>
+<h3 id="cli_sweep"><code>picurv sweep</code></h3>
+<p>Launch studies from study.yml + cluster.yml, whether the study uses</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to study.yml defining either a `parameters` cross-product expansion or explicit parameter_sets, plus metrics.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml defining Slurm resources.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--no-submit</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Generate all study artifacts without submitting jobs.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to an existing study directory (for --continue/--reaggregate).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--continue</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Continue a partially-completed study. Requires --study-dir.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--reaggregate</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Re-run metrics aggregation on a completed study. Requires --study-dir.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--auto-fetch</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Restore cold-storage study members automatically instead of
+refusing. Requires a configured storage profile.</td></tr>
+</table>
+<h3 id="cli_sync_config"><code>picurv sync-config</code></h3>
+<p>Copy updated example template files into an existing case directory.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional case directory to refresh. Defaults to the current case.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--source-root</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional override for the PICurv source repository root.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--template-name</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Optional template name override (e.g., flat_channel). Required when metadata is absent.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--overwrite</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Overwrite case files even when they differ from the template.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--prune</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Remove stale files that were previously tracked as template-managed but no longer exist in the source template.</td></tr>
+</table>
+<h3 id="cli_validate"><code>picurv validate</code></h3>
+<p>Validate one or more config roles. No solver/post execution and no run/study artifact writes.</p>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--case</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to case.yml</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--solver</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to solver.yml</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--monitor</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to monitor.yml (logging, diagnostics, profiling, and I/O)</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--restart-from</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to a run directory to validate restart from.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--continue</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Validate continue-in-place mode. Requires --run-dir.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--run-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to an existing run directory (for --continue validation).</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--post</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to post.yml</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--study</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to study.yml</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--strict</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Enable additional strict checks for selected roles.</td></tr>
+</table>
+<h3 id="cli_version"><code>picurv version</code></h3>
+<p>Report the build identity shared by the Python conductor and the native</p>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>version_action</code> (positional)</td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>status</code></td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">'status' validates conductor/executable/workspace coherence and exits 1 on disagreement.</td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<h3 id="cli_versions"><code>picurv versions</code></h3>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
+<h4 id="cli_versions_activate"><code>picurv versions activate</code></h4>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>version</code> (positional)</td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Version/tag; defaults to the workspace requirement.</td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--workspace</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Workspace root; defaults to discovery from the current directory.</td></tr>
+</table>
+<h4 id="cli_versions_install"><code>picurv versions install</code></h4>
+<p><b>positional arguments</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>version</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+</table>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
+<h4 id="cli_versions_list"><code>picurv versions list</code></h4>
+<p><b>options</b></p>
+<table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
+<tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
+</table>
 <p><code>run</code>:</p><ul>
 <li>stages:<ul>
 <li><code>--solve</code> (requires <code>--case</code>, <code>--solver</code>, <code>--monitor</code>)</li>
@@ -505,12 +945,19 @@ $(function() {
 <li>solver inputs:<ul>
 <li><code>--case &lt;path&gt;</code></li>
 <li><code>--solver &lt;path&gt;</code></li>
-<li><code>--monitor &lt;path&gt;</code> (logging, diagnostics, profiling, output cadence, directories)</li>
+<li><code>--monitor &lt;path&gt;</code> (logging, diagnostics, profiling, output cadence)</li>
 </ul>
 </li>
 <li>post inputs:<ul>
 <li><code>--post &lt;path&gt;</code></li>
 <li><code>--run-dir &lt;path&gt;</code></li>
+</ul>
+</li>
+<li>restart and asset selection:<ul>
+<li><code>--restart-from &lt;run-dir|latest&gt;</code> (alias <code>--from</code>; <code>latest</code> picks the newest compatible workspace run)</li>
+<li><code>--statistics-state {reset,carry}</code> (branched restart only; entries at <a class="el" href="52_Run_Artifact_Lifecycle_Contract.html#p52_cap_restart_stats_sec">8.6 Restart Statistics State Entries</a>)</li>
+<li><code>--require-precomputed</code> (refuse to build a missing or stale workspace asset)</li>
+<li><code>--fetch-missing</code> (try the configured storage profile before rebuilding one)</li>
 </ul>
 </li>
 <li>launch controls:<ul>
@@ -544,7 +991,7 @@ $(function() {
 </ul>
 </li>
 <li>optional:<ul>
-<li><code>--output-dir &lt;path&gt;</code> (defaults to <code>precomputed/&lt;case-name&gt;</code>)</li>
+<li><code>--only &lt;grid,initial-condition,inlet-profiles&gt;</code> (defaults to all configured providers)</li>
 </ul>
 </li>
 </ul>
@@ -553,7 +1000,7 @@ $(function() {
 <li><code>--run-dir &lt;path&gt;</code></li>
 </ul>
 </li>
-<li>config/run views:<ul>
+<li>&lt;run.config&gt;/run views:<ul>
 <li><code>--overview</code></li>
 <li><code>--case</code></li>
 <li><code>--solver</code></li>
@@ -570,7 +1017,7 @@ $(function() {
 <li><code>--last &lt;positive-int&gt;</code> (requires <code>--plot</code>)</li>
 <li><code>--plot-output &lt;path&gt;</code> (requires <code>--plot</code>)</li>
 <li><code>--linear-y</code> (requires <code>--plot</code>)</li>
-<li>plot/list modes cannot combine with config/run views or selected-step health</li>
+<li>plot/list modes cannot combine with &lt;run.config&gt;/run views or selected-step health</li>
 </ul>
 </li>
 <li>output:<ul>
@@ -643,10 +1090,6 @@ $(function() {
 </ul>
 </li>
 </ul>
-<p><code>sync-binaries</code>:</p><ul>
-<li><code>--case-dir &lt;case_dir&gt;</code></li>
-<li><code>--source-root &lt;repo&gt;</code></li>
-</ul>
 <p><code>sync-config</code>:</p><ul>
 <li><code>--case-dir &lt;case_dir&gt;</code></li>
 <li><code>--source-root &lt;repo&gt;</code></li>
@@ -698,7 +1141,7 @@ $(function() {
 <li><code>post_num_procs_effective</code></li>
 <li><code>num_procs_effective</code> (currently mirrors solver count)</li>
 </ul>
-<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>config/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>config/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>generators/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
+<p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>&lt;run.config&gt;/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>&lt;run.config&gt;/grid.generated.picgrid</code> by default) plus any configured <code>stats_file</code> or <code>vts_file</code>. Dry-run still does not run <code>generators/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
 <p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>
 <ul>
 <li><code>mode</code> (<code>local</code> or <code>slurm</code>)</li>
@@ -765,7 +1208,7 @@ $(function() {
 12. Binary Resolution and Rebuild Safety</h1>
 <p><code>picurv</code> resolves <code>simulator</code> and <code>postprocessor</code> at launch time using this precedence:</p>
 <ol type="1">
-<li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code> or <code>sync-binaries</code>), it is used first.</li>
+<li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code>), it is used first.</li>
 <li><b>Project <code>bin/</code> directory</b> — the default location after <code>make all</code>.</li>
 </ol>
 <p><code>bin/picurv</code> is a launcher for <code>picurv_cli/picurv</code>. This means:</p>
@@ -779,21 +1222,77 @@ $(function() {
 <ul>
 <li>Updating <code>picurv</code> (the Python script) mid-run is always safe — it is only used to launch jobs, not during solver execution.</li>
 <li>Rebuilding <code>simulator</code>/<code>postprocessor</code> (<code>make all</code>) overwrites the binaries in <code>bin/</code>. If a Slurm job references <code>bin/simulator</code> by absolute path and has not yet started, the running binary may be replaced before execution begins.</li>
-<li>To protect against this, use <code>--pin-binaries</code> at init time or <code>sync-binaries</code> before submission. Case-local copies are isolated from repo rebuilds.</li>
+<li>For a queued production job, use a tagged release checkout or an explicitly pinned legacy binary copy. The run manifest records the build identity that staged it; <code>picurv version</code> checks the currently active identity.</li>
 </ul>
 <p><b>Recommended workflow for concurrent development and production:</b></p>
 <div class="fragment"><div class="line">picurv init flat_channel --dest production_case --pin-binaries</div>
 <div class="line">picurv run --solve --cluster cluster.yml ...   # uses case-local binaries</div>
 <div class="line"># safe to rebuild in the repo now — production_case has its own copies</div>
 <div class="line">make all</div>
-</div><!-- fragment --><h1><a class="anchor" id="p05_artifacts_sec"></a>
+</div><!-- fragment --><h1><a class="anchor" id="p05_cap_input_mode_sec"></a>
+12.1 Workspace Input Import Mode Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: workspace.input_import_mode.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_copy"><code>copy</code></a></td><td class="markdownTableBodyNone"><code>copy</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_hardlink"><code>hardlink</code></a></td><td class="markdownTableBodyNone"><code>hardlink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reference"><code>reference</code></a></td><td class="markdownTableBodyNone"><code>reference</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reflink"><code>reflink</code></a></td><td class="markdownTableBodyNone"><code>reflink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<h2><a class="anchor" id="p05_cap_input_mode_copy_sub"></a>
+copy</h2>
+<p><a class="anchor" id="p05_cap_input_mode_copy"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode copy</code>.</p>
+<p><b>What it does.</b> Copies the source into its canonical workspace <code>inputs/</code> home and catalogues the source checksum, size, and new relative path.</p>
+<p><b>When to choose it.</b> Default to <code>copy</code> when portability and independent ownership matter more than local disk duplication. Unlike links, the workspace remains valid if the source is moved or deleted.</p>
+<p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
+<p><b>Interactions.</b> Storage includes the copied file when a run locks and materializes an asset derived from it.</p>
+<p><b>Diagnostics.</b> Success prints the catalog ID and relative path; an existing target or missing source fails before the catalog changes.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks the copied bytes and catalog entry.</p>
+<p><b>Limitations.</b> Uses additional disk space equal to the imported file.</p>
+<h2><a class="anchor" id="p05_cap_input_mode_reflink_sub"></a>
+reflink</h2>
+<p><a class="anchor" id="p05_cap_input_mode_reflink"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode reflink</code>.</p>
+<p><b>What it does.</b> Requests a copy-on-write clone through <code>cp --reflink=always</code>, then catalogues it like a copy.</p>
+<p><b>When to choose it.</b> Prefer it for very large local inputs on a filesystem that supports reflinks: it begins space-efficiently but remains independently writable, unlike <code>hardlink</code>.</p>
+<p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
+<p><b>Interactions.</b> Failure does not fall back silently; choose <code>copy</code> explicitly when the filesystem reports that reflinks are unsupported.</p>
+<p><b>Diagnostics.</b> The import fails with the native copy error if reflink creation is unavailable and writes no catalog record.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> verifies the mode is part of the public parser and catalog contract.</p>
+<p><b>Limitations.</b> Experimental across cluster filesystems; support depends on the local <code>cp</code> and filesystem.</p>
+<h2><a class="anchor" id="p05_cap_input_mode_hardlink_sub"></a>
+hardlink</h2>
+<p><a class="anchor" id="p05_cap_input_mode_hardlink"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode hardlink</code>.</p>
+<p><b>What it does.</b> Creates a second directory entry for the same inode and catalogues the imported path.</p>
+<p><b>When to choose it.</b> Use it only for immutable, same-filesystem inputs when avoiding a full copy matters and every owner agrees not to modify the bytes.</p>
+<p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
+<p><b>Interactions.</b> Source and destination share mutations. Asset checksums detect a changed provider input and prevent stale object reuse, but cannot undo the mutation.</p>
+<p><b>Diagnostics.</b> Cross-filesystem or permission failures are reported before the catalog changes.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> verifies the mode is part of the public parser and catalog contract.</p>
+<p><b>Limitations.</b> Experimental because shared-inode ownership is easy to misuse and it cannot cross filesystems.</p>
+<h2><a class="anchor" id="p05_cap_input_mode_reference_sub"></a>
+reference</h2>
+<p><a class="anchor" id="p05_cap_input_mode_reference"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode reference</code>.</p>
+<p><b>What it does.</b> Writes a small <code>.reference.yml</code> containing the absolute target, registration checksum, and byte count; it does not copy the target.</p>
+<p><b>When to choose it.</b> Use it for an authoritative shared dataset that should remain externally owned. Choose <code>copy</code> when the workspace or storage archive must be portable.</p>
+<p><b>Parameters it owns.</b> Optional <code>--name</code> names the reference record.</p>
+<p><b>Interactions.</b> Resolution checks the target loudly. Storage records the dependency but neither archives nor prunes the external file.</p>
+<p><b>Diagnostics.</b> Registration prints an external-reference warning; missing targets fail when registered or consumed.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks reference content and catalog identity.</p>
+<p><b>Limitations.</b> Restoring the workspace cannot restore an external target; its owner must make the same path available or the reference must be replaced.</p>
+<h1><a class="anchor" id="p05_artifacts_sec"></a>
 13. Generated Runtime Artifacts</h1>
 <p>Single run (<code>run</code>):</p><ul>
-<li><code>runs/&lt;run_id&gt;/config/*.control</code>, <code>bcs*.run</code>, <code>post.run</code>, plus optional <code>whitelist.run</code> / <code>profile.run</code> sidecars when enabled</li>
-<li><code>runs/&lt;run_id&gt;/logs/*</code> (runtime logs and metrics written by solver/postprocessor)</li>
-<li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code>, <code>post.sbatch</code> (cluster mode)</li>
-<li><code>runs/&lt;run_id&gt;/scheduler/solver_&lt;jobid&gt;.out/.err</code>, <code>post_&lt;jobid&gt;.out/.err</code> (cluster mode, after submission)</li>
-<li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code> (cluster mode)</li>
+<li><code>&lt;run.config&gt;/*.control</code>, <code>bcs*.run</code>, immutable YAML snapshots, plus optional <code>whitelist.run</code> / <code>profile.run</code> sidecars when enabled</li>
+<li><code>&lt;run.config.history&gt;/&lt;revision&gt;/</code> (new active config snapshots for continuation)</li>
+<li><code>&lt;run.post_recipes&gt;/&lt;recipe-id&gt;/{post.yml,post.run,state.json}</code></li>
+<li><code>&lt;run.inputs&gt;/{grid,initial_condition,inlet_profiles,restart}/</code> and <code>&lt;run.asset_lock&gt;</code></li>
+<li><code>&lt;run.checkpoints&gt;/</code>, <code>&lt;run.analysis&gt;/</code>, and <code>&lt;run.visualization&gt;/</code></li>
+<li><code>&lt;run.runtime_logs&gt;/</code> and <code>&lt;run.scheduler&gt;/</code> (scripts, stream logs, and submission state)</li>
 <li><code>runs/&lt;run_id&gt;/manifest.json</code></li>
 </ul>
 <p>Sweep (<code>sweep</code>):</p><ul>
@@ -803,12 +1302,16 @@ $(function() {
 <li><code>studies/&lt;study_id&gt;/scheduler/post_array.sbatch</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/solver_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code>, <code>post_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code></li>
 <li><code>studies/&lt;study_id&gt;/scheduler/submission.json</code></li>
-<li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
-<li><code>studies/&lt;study_id&gt;/results/plots/*.png</code> (if plotting enabled and matplotlib available)</li>
+<li><code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code></li>
+<li><code>studies/&lt;study_id&gt;/output/analysis/plots/*.png</code> (if plotting enabled and matplotlib available)</li>
 <li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
+<h1><a class="anchor" id="p05_storage_sec"></a>
+14. &lt;tt&gt;storage&lt;/tt&gt;</h1>
+<p><code>storage</code> is a top-level command registered from <code>picurv_cli/storage/</code>, and is the one command family this page does not detail. Subcommands: <code>setup</code>, <code>plan</code>, <code>protect</code>, <code>offload</code>, <code>restore</code>, <code>verify</code>, <code>list</code>, <code>show</code>, <code>status</code>.</p>
+<p>Full semantics, retention model, and rclone configuration are documented in <b><a class="el" href="61_Storage_Management_Guide.html">Storage Management Guide</a></b>.</p>
 <h1><a class="anchor" id="p05_next_steps_sec"></a>
-14. Next Steps</h1>
+15. Next Steps</h1>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
@@ -817,28 +1320,8 @@ $(function() {
 <li>Grid generator details: <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b></li>
 <li>Modular examples and recipes: <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li>Troubleshooting map: <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li>Smoke/CI verification details: <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
+<li>Smoke/CI verification details: <b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md20"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>The Conductor Script: picurv</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md21"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md22"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

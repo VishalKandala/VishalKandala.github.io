@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -89,12 +95,7 @@ $(function() {
 <li class="level1"><a href="#p26_implementation_sec">3. Implementation Touchpoints</a></li>
 <li class="level1"><a href="#p26_restart_sec">4. Restart Path Specifics</a></li>
 <li class="level1"><a href="#p26_testing_sec">5. Current test status</a></li>
-<li class="level1"><a href="#p26_practical_sec">6. Failure Modes and Signals</a><ul><li class="level2"><a href="#autotoc_md103">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md104">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md105">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p26_practical_sec">6. Failure Modes and Signals</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Walking_Search_Method"></a> PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell (or is explicitly marked lost).</p>
@@ -160,33 +161,13 @@ $(function() {
 <li>excessive migration pass counts,</li>
 <li>repeated <code>LOST</code> particles,</li>
 <li>non-convergence of settlement loop,</li>
-<li>elevated traversal effort or repeated tie-break/boundary-clamp events in <code>logs/search_metrics.csv</code>,</li>
+<li>elevated traversal effort or repeated tie-break/boundary-clamp events in <code>&lt;run.runtime_logs&gt;/search_metrics.csv</code>,</li>
 <li>increasing <code>search_failure_fraction</code>, <code>search_work_index</code>, or <code>re_search_fraction</code>,</li>
 <li>increasing <code>lost</code> or <code>lost_cumulative</code> even when migration otherwise appears healthy.</li>
 </ul>
 <p>For precise metric definitions and formulas, see <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b>.</p>
 <p>These usually indicate domain-decomposition mismatch, bounding-box mismatch, or invalid particle coordinates.</p>
-<p>See <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for troubleshooting commands.</p>
-<h2><a class="anchor" id="autotoc_md103"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Walking Search for <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Location</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md104"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md105"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
+<p>See <b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> for troubleshooting commands. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

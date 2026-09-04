@@ -8,7 +8,7 @@ var searchData=
   ['and_20config_20cookbook_5',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
   ['and_20coupling_20overview_6',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
   ['and_20directory_20guides_7',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],
-  ['and_20driven_20flows_8',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'']]],
+  ['and_20driven_20flows_8',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
   ['and_20fixes_9',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
   ['and_20layout_20catalog_10',['Field Identity and Layout Catalog',['../56_Field_Identity_and_Layout_Catalog.html',1,'']]],
   ['and_20low_20priority_20fixes_11',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
@@ -25,6 +25,7 @@ var searchData=
   ['architecture_22',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
   ['architecture_20guide_23',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
   ['architecture_20specifications_24',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
-  ['artifacts_20runtime_25',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['averaging_26',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['artifact_20lifecycle_20contract_25',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
+  ['artifacts_20runtime_26',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['averaging_27',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];

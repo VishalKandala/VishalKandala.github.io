@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -273,7 +279,7 @@ Why it is deferred</h2>
 <p>The boundary node layer is one node thick and the convergence-history CSV already carries the authoritative domain mean, computed with never-sampled points excluded. The defect this would close is that an unwritten boundary <em>looks like data</em>; leaving it unwritten and documented removes the trap at a fraction of the cost. The work becomes worthwhile when wall-bounded statistics are read quantitatively from the field — which is the same class of case that needs <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a>.</p>
 <h1><a class="anchor" id="p60_spectra_partial_sec"></a>
 13. Offline Line And Plane Spectra</h1>
-<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> implements one task, <code>shell_spectrum</code>, which requires all three directions to be periodic and homogeneous. See <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">7. spectra</a>.</p>
+<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> implements one task, <code>shell_spectrum</code>, which requires all three directions to be periodic and homogeneous. See <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">8. spectra</a>.</p>
 <p><b>What is missing.</b> Everything between "homogeneous in three directions" and "homogeneous in none": a channel homogeneous in two directions and bounded in the third, a straight duct homogeneous in one, a spatially developing boundary layer homogeneous in the spanwise direction alone. This is the most common wall-bounded turbulence configuration there is, and it is presently unserved — a channel has a perfectly good spatial spectrum that the pipeline cannot produce.</p>
 <p>Note this is <em>not</em> what <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a> covers. That section is for geometries with no homogeneous direction at all, where only a frequency spectrum is defined. A channel has homogeneous directions, and what is wanted there is a wavenumber spectrum resolving scales, not a frequency spectrum at a probe.</p>
 <p><b>Why it is first among the three spectral extensions.</b> It needs no new online state, no retained history, no FFT in the solver, and no MPI transpose. It reuses the offline stage exactly as it stands: read a committed checkpoint, transform, bin, write. Of the three, it is the only one that is purely additive to machinery already running.</p>
@@ -302,7 +308,7 @@ What it costs</h2>
 <p><b>Test case.</b> <code>examples/flat_channel</code>, which is homogeneous in the streamwise and spanwise directions. Not <code>examples/bent_channel</code>: a 90-degree bend develops streamwise and is bounded on all four sides, so it has no homogeneous direction and belongs to <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>.</p>
 <h1><a class="anchor" id="p60_spectra_temporal_sec"></a>
 14. Temporal Spectra From Bounded Probe Histories</h1>
-<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> measures spatial spectra offline from the instantaneous velocity in each committed checkpoint, documented in <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">7. spectra</a>. The one implemented task, <code>shell_spectrum</code>, requires a triply periodic uniform Cartesian box.</p>
+<p><b>What exists today.</b> <code>post.yml -&gt; spectra</code> measures spatial spectra offline from the instantaneous velocity in each committed checkpoint, documented in <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">8. spectra</a>. The one implemented task, <code>shell_spectrum</code>, requires a triply periodic uniform Cartesian box.</p>
 <p><b>What is missing, and why it is not a gap in the above.</b> A spatial spectrum needs a direction that is uniformly spaced, periodic, and statistically homogeneous. A curved duct, a wall-bounded channel section, or any immersed geometry supplies none of the three: the streamwise direction develops, and the cross-stream directions are bounded. For these the meaningful quantity is a <b>frequency</b> spectrum \(E(f)\) at a point, which needs no homogeneity at all and is what resolves shedding and Strouhal content.</p>
 <p>A frequency spectrum needs the signal itself, retained in time. That is the one thing <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_pdf_sec">7. Distributions, Deferred</a> rules out at full-field scale and explicitly leaves open at reduced scale: <em>whatever retains history must stay bounded, for reduced probes or regions only</em>. A handful of probes sampled every step is kilobytes; the same information as full-field snapshots is terabytes.</p>
 <p><b>Why the snapshot path cannot substitute.</b> A temporal transform of the existing checkpoint series is limited to \(f_{\max} = 1/(2\,\Delta t\,\texttt{data\_output\_frequency})\). Reaching a useful band means writing full three-dimensional fields every step or two, which is precisely the cost this extension avoids. The snapshot series can reach a low-frequency peak; it cannot reach an inertial range.</p>

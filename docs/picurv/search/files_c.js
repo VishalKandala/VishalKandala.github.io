@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['generate_5fdoxygen_5ffallback_5findexes_2epy_0',['generate_doxygen_fallback_indexes.py',['../generate__doxygen__fallback__indexes_8py.html',1,'']]],
-  ['grid_2ec_1',['grid.c',['../grid_8c.html',1,'']]],
-  ['grid_2eh_2',['grid.h',['../grid_8h.html',1,'']]],
-  ['guide_2emd_3',['guide.md',['../guide_8md.html',1,'']]]
+  ['extract_5fartifact_5ftopology_2epy_0',['extract_artifact_topology.py',['../extract__artifact__topology_8py.html',1,'']]]
 ];

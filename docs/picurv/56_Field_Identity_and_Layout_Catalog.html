@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -157,7 +163,9 @@ $(function() {
 </table>
 <p>The availability flags describe requirements; they do not replace runtime state validation. <a class="el" href="field__catalog_8h.html#a8e973bba212aed4167b3f294d220384e">FieldGetView</a> always checks the actual DM and vector handles.</p>
 <p><code><a class="el" href="particle__field__catalog_8h.html#structParticleFieldDescriptor" title="Immutable metadata for one persistent particle field.">ParticleFieldDescriptor</a></code> is separate because DMSwarm fields have a different contract: canonical PETSc name, component count, <code>PetscDataType</code>, registration owner, default initialization value, supported operations, and an optional Eulerian scatter target. In particular, particle <code>Psi</code> maps explicitly to Eulerian <code>FIELD_ID_PSI</code>; no name coincidence is used to infer that bridge.</p>
-<p>The registered aliases are retained because current diagnostic and boundary surfaces use them: <code>Eddy Viscosity</code> for <code>Nu_t</code>, <code>Cs</code> for <code>CS</code>, <code>Center-Coordinates</code> for <code>Cent</code>, and the <code>X/Y/Z-Face-Centers</code> names for <code>Centx/Centy/Centz</code>. Aliases do not create additional field identities.</p>
+<p>The registered aliases are retained because current diagnostic and boundary surfaces use them: <code>Eddy Viscosity</code> for <code>Nu_t</code>, <code>Cs</code> for <code>CS</code>, <code>Friction Velocity</code> for <code>Utau</code>, <code>Wall Eddy Viscosity</code> for <code>NuWall</code>, <code>Center-Coordinates</code> for <code>Cent</code>, and the <code>X/Y/Z-Face-Centers</code> names for <code>Centx/Centy/Centz</code>. Aliases do not create additional field identities.</p>
+<p><code>Utau</code> and <code>NuWall</code> exist only while a wall model is active, and neither is restored on restart: the first boundary pass of a restarted run recomputes both from the restored velocity field. <code>Utau</code> is written to checkpoints so postprocessing can read it; <code>NuWall</code> is not written at all, being rebuilt by every wall pass within a step.</p>
+<dl class="section warning"><dt>Warning</dt><dd><code>CS</code> stores the LES model coefficient <code>C</code>, the factor multiplying <code>Delta^2 |S|</code> in the eddy viscosity. In the classical notation that is <code>Cs^2</code>, not <code>Cs</code>, and under <code>clipping.mode: none</code> it is signed, because a negative coefficient is backscatter. Its <code>Cs</code> alias is a display name inherited from the diagnostic surfaces, not a statement about the stored quantity; readers wanting <code>Cs</code> itself should take the signed square root, which is what <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a> reports. The field carries <code>FIELD_AVAILABILITY_LES_DYNAMIC</code> and therefore exists only for <a class="el" href="07_Case_Reference.html#p07_cap_les_dynamic_smagorinsky">dynamic_smagorinsky</a>; the constant model reads its coefficient from configuration and allocates no field.</dd></dl>
 <h1><a class="anchor" id="p56_layout_sec"></a>
 4. Layout, Boundaries, and Ghost Values</h1>
 <p>The catalog's topology is based on the solver's shifted/staggered architecture, not just PETSc's owned-versus-ghosted partition.</p>
@@ -195,15 +203,16 @@ $(function() {
 <p>The periodic cell, single-face-family, and component-staggered synchronizers now accept <code>FieldId</code> arrays. Catalog capabilities reject a field routed to an incompatible synchronizer before the unchanged numerical copy loop runs. Coordinate-face translation is selected through <code>FIELD_CAPABILITY_PERIODIC_GEOMETRY_SHIFT</code>, not a field-name comparison. No string comparison remains in the periodic field dispatcher.</p>
 <h1><a class="anchor" id="p56_inventory_sec"></a>
 6. Catalog Inventory</h1>
-<p>The initial catalog groups fields as follows:</p>
+<p>The catalog groups fields by layout as follows:</p>
 <ul>
-<li>node-centered: <code>Coordinates</code>;</li>
-<li>shifted cell-centered: <code>Ucat</code>, <code>P</code>, <code>Nu_t</code>, <code>CS</code>, <code>Diffusivity</code>, <code>DiffusivityGradient</code>, <code>Nvert</code>, <code>Aj</code>, <code>Cent</code>, <code>GridSpace</code>, <code>Phi</code>, <code>Psi</code>, <code>Nvert_o</code>, <code>ParticleCount</code>, <code>K_Omega</code>, and <code>K_Omega_o</code>;</li>
+<li>node-centered: <code>Coordinates</code>, <code>CellScalarAtCorner</code>, and <code>CellVectorAtCorner</code>;</li>
+<li>shifted cell-centered: <code>Ucat</code>, <code>P</code>, <code>Nu_t</code>, <code>CS</code>, <code>Utau</code>, <code>NuWall</code>, <code>Diffusivity</code>, <code>DiffusivityGradient</code>, <code>Nvert</code>, <code>Aj</code>, <code>Cent</code>, <code>GridSpace</code>, <code>Phi</code>, <code>Psi</code>, <code>Nvert_o</code>, <code>ParticleCount</code>, <code>K_Omega</code>, <code>K_Omega_o</code>, <code>PostScalar</code>, and <code>PostVector</code>;</li>
 <li>component-staggered: <code>Ucont</code>, <code>Ucont_o</code>, and <code>Ucont_rm1</code>;</li>
 <li>I-face family: <code>Csi</code>, <code>Centx</code>, <code>ICsi</code>, <code>IEta</code>, <code>IZet</code>, and <code>IAj</code>;</li>
 <li>J-face family: <code>Eta</code>, <code>Centy</code>, <code>JCsi</code>, <code>JEta</code>, <code>JZet</code>, and <code>JAj</code>;</li>
 <li>K-face family: <code>Zet</code>, <code>Centz</code>, <code>KCsi</code>, <code>KEta</code>, <code>KZet</code>, and <code>KAj</code>.</li>
 </ul>
+<p>Four of those entries are staging workspaces rather than solver state, and none of them is checkpointed. <code>CellScalarAtCorner</code> and <code>CellVectorAtCorner</code> hold the result of writing cell-centered data onto grid corners, which is why they are node-centered by construction; they are transient scratch rebuilt on every conversion. <code>PostScalar</code> and <code>PostVector</code> stage a derived post-processing statistic, which is config-counted and therefore has no compile-time offset of its own; staging it under a catalog identity lets the existing ghost, nodal-average, and logging paths address it by name instead of each growing a second, view-based entry point.</p>
 <p><code>K_Omega</code> entries preserve the compiled RANS call surface, but the catalog does not claim that the current setup path allocates their storage. The runtime view check makes that state explicit.</p>
 <p>The particle inventory is: <code>position</code>, <code>velocity</code>, <code>DMSwarm_CellID</code>, <code>weight</code>, <code>Diffusivity</code>, <code>DiffusivityGradient</code>, <code>Psi</code>, <code>DMSwarm_location_status</code>, <code>DMSwarm_pid</code>, and <code>DMSwarm_rank</code>. It is intentionally not mixed into <code>FieldId</code>: particle fields are per-particle DMSwarm arrays, may be integer-valued, and have no persistent <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> global/local Vec pair. Dynamic postprocessor fields such as recipe-created <code>ske</code> or <code>disp</code> remain outside the persistent solver-particle catalog.</p>
 <h1><a class="anchor" id="p56_consumer_sec"></a>
@@ -215,12 +224,12 @@ $(function() {
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a></div><div class="ttdeci">@ FIELD_ID_UCAT</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00026">field_catalog.h:26</a></div></div>
 <div class="ttc" id="ainterpolation_8h_html_a7913089691fd7576c11c25c0ec381329"><div class="ttname"><a href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a></div><div class="ttdeci">PetscErrorCode InterpolateEulerFieldToSwarm(UserCtx *user, FieldId source_field_id, ParticleFieldId target_field_id)</div><div class="ttdoc">Interpolates a cell-centered field (scalar or vector) onto DMSwarm particles, using a robust,...</div><div class="ttdef"><b>Definition</b> <a href="interpolation_8c_source.html#l01353">interpolation.c:1353</a></div></div>
 <div class="ttc" id="aparticle__field__catalog_8h_html_a05a9c7684934c3016c98811f4d2c0a93afd4d5cbdf645fc7031fba0ed0063afb4"><div class="ttname"><a href="particle__field__catalog_8h.html#a05a9c7684934c3016c98811f4d2c0a93afd4d5cbdf645fc7031fba0ed0063afb4">PARTICLE_FIELD_ID_VELOCITY</a></div><div class="ttdeci">@ PARTICLE_FIELD_ID_VELOCITY</div><div class="ttdef"><b>Definition</b> <a href="particle__field__catalog_8h_source.html#l00026">particle_field_catalog.h:26</a></div></div>
-<div class="ttc" id="asetup_8h_html_ac3268b7f32258fd24c02cfd44dc5f18d"><div class="ttname"><a href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, FieldId field_id)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l01838">setup.c:1838</a></div></div>
+<div class="ttc" id="asetup_8h_html_ac3268b7f32258fd24c02cfd44dc5f18d"><div class="ttname"><a href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a></div><div class="ttdeci">PetscErrorCode UpdateLocalGhosts(UserCtx *user, FieldId field_id)</div><div class="ttdoc">Updates the local vector (including ghost points) from its corresponding global vector.</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02451">setup.c:2451</a></div></div>
 </div><!-- fragment --><p>Code that genuinely receives text should resolve it once at its ingress:</p>
 <div class="fragment"><div class="line"><a class="code hl_enumeration" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2">FieldId</a> field_id;</div>
 <div class="line">PetscCall(<a class="code hl_function" href="field__catalog_8h.html#a0ce7c6714d9d153ebfc0d9987a4e0856">FieldIdFromName</a>(requested_name, &amp;field_id));</div>
 <div class="line">PetscCall(<a class="code hl_function" href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a>(user, field_id));</div>
-<div class="ttc" id="afield__catalog_8h_html_a0ce7c6714d9d153ebfc0d9987a4e0856"><div class="ttname"><a href="field__catalog_8h.html#a0ce7c6714d9d153ebfc0d9987a4e0856">FieldIdFromName</a></div><div class="ttdeci">PetscErrorCode FieldIdFromName(const char *field_name, FieldId *field_id)</div><div class="ttdoc">Resolve a user-facing field name once into its typed identity.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00198">field_catalog.c:198</a></div></div>
+<div class="ttc" id="afield__catalog_8h_html_a0ce7c6714d9d153ebfc0d9987a4e0856"><div class="ttname"><a href="field__catalog_8h.html#a0ce7c6714d9d153ebfc0d9987a4e0856">FieldIdFromName</a></div><div class="ttdeci">PetscErrorCode FieldIdFromName(const char *field_name, FieldId *field_id)</div><div class="ttdoc">Resolve a user-facing field name once into its typed identity.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8c_source.html#l00219">field_catalog.c:219</a></div></div>
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2">FieldId</a></div><div class="ttdeci">FieldId</div><div class="ttdoc">Compile-time identity for a catalogued Eulerian field.</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00023">field_catalog.h:23</a></div></div>
 </div><!-- fragment --><p>Consumers must not cache a <a class="el" href="field__catalog_8h.html#structFieldView">FieldView</a> beyond the lifetime or re-creation of the corresponding <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> PETSc objects. A view is non-owning and must never be destroyed independently.</p>
 <p>PETSc's DMSwarm API itself remains name-based. Code at that API boundary obtains the canonical text with <a class="el" href="particle__field__catalog_8h.html#a038097897ab5a52461e0ee47bd2b7bb8">ParticleFieldName</a>; this does not require assigning particle fields an Eulerian <code>FieldId</code> or wrapping every PETSc access function. Generic gather/restart/output helpers also remain name-based for dynamic postprocessor fields, but query the registered <code>PetscDataType</code> from DMSwarm instead of inferring integer width from a field-name comparison.</p>

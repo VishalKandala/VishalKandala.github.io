@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -85,22 +91,21 @@ $(function() {
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p12_ingest_sec">1. Input and Grid Capabilities</a></li>
-<li class="level1"><a href="#p12_physics_sec">2. Physics and Model Selection</a></li>
+<li class="level1"><a href="#p12_physics_sec">2. Physics and Model Selection</a><ul><li class="level2"><a href="#p12_turbulence_ssec">2.1 Turbulence Models</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p12_solver_sec">3. Numerical Solver Stack</a></li>
 <li class="level1"><a href="#p12_bc_sec">4. Boundary and Runtime Controls</a></li>
 <li class="level1"><a href="#p12_post_sec">5. Post-Processing and Statistics</a></li>
 <li class="level1"><a href="#p12_orchestration_sec">6. Cluster and Study Orchestration</a></li>
-<li class="level1"><a href="#p12_inspection_sec">7. Run Inspection and Plotting</a></li>
-<li class="level1"><a href="#p12_extension_sec">8. Extensibility Status</a></li>
-<li class="level1"><a href="#p12_next_steps_sec">9. Suggested Reading Order</a><ul><li class="level2"><a href="#autotoc_md41">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md42">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md43">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p12_lifecycle_sec">7. Workspace, Assets, and Data Lifecycle</a></li>
+<li class="level1"><a href="#p12_inspection_sec">8. Run Inspection and Plotting</a></li>
+<li class="level1"><a href="#p12_extension_sec">9. Extensibility Status</a></li>
+<li class="level1"><a href="#p12_next_steps_sec">10. Suggested Reading Order</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Capabilities_Summary"></a> This page summarizes current capabilities from YAML + <code>picurv</code> without editing C source. It is organized by workflow stage rather than just a feature bullet list.</p>
+<div class="textblock"><p><a class="anchor" id="_Capabilities_Summary"></a>  <div class="pic-pagemeta"><span class="pic-pagemeta-item"><b>Type</b> Reference</span><span class="pic-pagemeta-item"><b>For</b>  All readers</span><span class="pic-pagemeta-item"><b>Status</b>  Capability statuses enforced by make audit-capability</span></div></p>
+<p>This page summarizes current capabilities from YAML + <code>picurv</code> without editing C source. It is organized by workflow stage rather than just a feature bullet list.</p>
 <h1><a class="anchor" id="p12_ingest_sec"></a>
 1. Input and Grid Capabilities</h1>
 <p>PICurv currently supports three grid ingestion modes:</p>
@@ -133,14 +138,21 @@ $(function() {
 <li>scalar micromixing update path (IEM-style <code>Psi</code> model).</li>
 </ul>
 <p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> positions are not currently wrapped across periodic boundaries.</p>
+<h2><a class="anchor" id="p12_turbulence_ssec"></a>
+2.1 Turbulence Models</h2>
+<p>Two LES closures are selectable. <code>constant_smagorinsky</code> applies a prescribed coefficient and allocates no coefficient field. <code>dynamic_smagorinsky</code> measures the coefficient each update through the Germano identity and Lilly's least-squares contraction, with selectable grid filter width, test-filter kernel and width ratio, coefficient averaging set, and limiting policy. Entries and full detail at <a class="el" href="07_Case_Reference.html#p07_les_sec">5. LES Subgrid Models</a>; the formulation is derived in <a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>Both models are <b>experimental</b>: they are implemented and unit-tested, but neither has been validated against a reference flow. The check that would settle the dynamic model is decaying isotropic turbulence with homogeneous averaging, where <code>Cs(t)</code> should settle near 0.16-0.17. Until such a run is recorded, treat coefficient magnitudes as uncharacterized.</dd></dl>
+<p>RANS (<code>k_omega</code>) is accepted by the configuration layer but its runtime update is incomplete. Wall functions are configured separately from both, and offer three laws - <code>log_law</code>, <code>werner</code>, and <code>cabot</code>. The correction is applied inside the momentum solve and again before the LES strain rates are formed, so a wall-modelled large-eddy simulation is coupled in both directions, and the modelled stress reaches the momentum equation through an effective eddy viscosity installed at the wall face.</p>
+<dl class="section note"><dt>Note</dt><dd>A wall model is not independent of the turbulence model in the way its configuration placement suggests. It supplies the stress of a layer the mesh does not resolve, which is only meaningful if the unresolved motions are modelled somewhere, so a wall model with LES and RANS both disabled is rejected - there is no implicit-LES scheme here to stand in. <code>cabot</code> and <code>werner</code> are rejected under RANS, being large-eddy constructs, and a wall model on a laminar case is rejected outright. Whether the first cell falls in the selected law's valid range depends on the mesh and is checked at runtime instead.</dd></dl>
 <h1><a class="anchor" id="p12_solver_sec"></a>
 3. Numerical Solver Stack</h1>
 <p>Momentum:</p>
 <ul>
 <li>named momentum strategy selection,</li>
-<li>active implementations: explicit RK and dual-time Picard Jameson RK,</li>
-<li>tunable tolerances and pseudo-CFL controls.</li>
+<li>active implementations: <code>Explicit RK4</code>, <code>Dual Time Picard Jameson RK</code>, and <code>Newton Krylov</code> (see <a class="el" href="08_Solver_Reference.html#p08_entries_sec">3. Momentum Solver Entries</a> for the comparison and status of each),</li>
+<li>tunable tolerances and pseudo-CFL controls (Picard-Jameson only).</li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd><code>Explicit RK4</code> is <code>experimental</code>: it has no positive-path verification harness. <code>Dual Time Picard Jameson RK</code> is the production default.</dd></dl>
 <p>Pressure:</p>
 <ul>
 <li>multigrid Poisson workflow,</li>
@@ -152,7 +164,7 @@ $(function() {
 4. Boundary and Runtime Controls</h1>
 <p>Boundary capabilities include validated type-handler pairings across inlet/outlet/wall/periodic classes. Runtime controls include:</p>
 <ul>
-<li>output/restart/log directory selection,</li>
+<li>fixed run-owned output, restart-input, log, and analysis homes,</li>
 <li>function-level logging allowlists,</li>
 <li>profiling critical function lists,</li>
 <li>monitor verbosity and cadence controls,</li>
@@ -184,8 +196,16 @@ $(function() {
 <li>metric aggregation and optional plots,</li>
 <li>study manifest and reproducible directory structure.</li>
 </ul>
+<h1><a class="anchor" id="p12_lifecycle_sec"></a>
+7. Workspace, Assets, and Data Lifecycle</h1>
+<p><code>picurv init</code> creates a workspace whose editable configuration, imported inputs, reusable assets, runs, and studies each have a fixed home. Run-owned directory names are part of that contract rather than a monitor setting; the topology and the guards that hold it are in <a class="el" href="71_Invariant_Contracts.html#p71_topology_sec">4. Artifact Topology</a>.</p>
+<p>External files enter a workspace explicitly. <code>picurv inputs import &lt;kind&gt; &lt;source&gt;</code> records a checksum and an ownership mode, and <code>reference</code> mode registers a path without copying it, so an unavailable external target fails loudly instead of silently. Entries at <a class="el" href="05_The_Conductor_Script.html#p05_cap_input_mode_sec">12.1 Workspace Input Import Mode Entries</a>.</p>
+<p><code>picurv precompute</code> resolves the grid, initial-condition, and inlet-profile provider graph and publishes each result as an immutable content-addressed object in the workspace asset store. Identity covers the normalized provider settings, the checksums of referenced files, and the PICurv build, so an unchanged input reuses its object and any change selects a new one. Runs materialize what they need by reflink, hardlink, or copy and record the mapping. <code>--require-precomputed</code> refuses to build a missing object instead of quietly rebuilding it; <code>--fetch-missing</code> looks in configured storage first. A provider that only exists inside the simulator is reported rather than imitated.</p>
+<p>Branching a run with <code>--restart-from</code> carries the checkpoint's physical fields but starts field-statistics accumulators empty unless <code>--statistics-state carry</code> asks for the saved window state. Entries at <a class="el" href="52_Run_Artifact_Lifecycle_Contract.html#p52_cap_restart_stats_sec">8.6 Restart Statistics State Entries</a>.</p>
+<p><code>picurv storage</code> moves finished runs, studies, and study members through an <code>rclone</code> remote. <code>protect</code> uploads and verifies while keeping every local file; <code>offload</code> does the same and then prunes the verified payload according to an offload policy that chooses what stays local, with <code>--retain</code>/<code>--drop</code> adjusting that preset one component at a time. Compression policy entries are at <a class="el" href="61_Storage_Management_Guide.html#p61_cap_comp_sec">9.1 Compression Policy Entries</a>, offload policy entries at <a class="el" href="61_Storage_Management_Guide.html#p61_cap_policy_sec">9.2 Offload Policy Entries</a>, and retention component entries at <a class="el" href="61_Storage_Management_Guide.html#p61_cap_retain_sec">9.3 Retention Component Entries</a>. Cold data is marked, so continuation, post-processing, submission, and study reaggregation refuse it with the restore command rather than mistaking pruned output for output that was never produced.</p>
+<p><code>picurv version</code>, <code>picurv versions</code>, and <code>picurv source</code> report and select the release and build identity that runs, checkpoints, and archives are stamped with. <code>picurv version status</code> additionally validates that the conductor, both executables, and any workspace version requirement agree, and exits non-zero when they do not.</p>
 <h1><a class="anchor" id="p12_inspection_sec"></a>
-7. Run Inspection and Plotting</h1>
+8. Run Inspection and Plotting</h1>
 <p><code>picurv summarize</code> supports:</p>
 <ul>
 <li>curated run, case, solver, and monitor configuration dashboards,</li>
@@ -196,7 +216,7 @@ $(function() {
 </ul>
 <p>PICurv owns run/log interpretation; standalone <code>generators/plot.gen</code> renders versioned normalized JSON requests without knowing run-directory layouts.</p>
 <h1><a class="anchor" id="p12_extension_sec"></a>
-8. Extensibility Status</h1>
+9. Extensibility Status</h1>
 <p>Current extension pathways are documented and active for:</p>
 <ul>
 <li>YAML contract extension,</li>
@@ -212,32 +232,12 @@ $(function() {
 <li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
 </ul>
 <h1><a class="anchor" id="p12_next_steps_sec"></a>
-9. Suggested Reading Order</h1>
+10. Suggested Reading Order</h1>
 <ol type="1">
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="21_Methods_Overview.html">Methods and Models Overview</a></b></li>
 <li><b><a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a></b></li>
-<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
-</ol>
-<h2><a class="anchor" id="autotoc_md41"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Capabilities Summary</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md42"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md43"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
+<li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b> </li>
 </ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -91,12 +97,12 @@ $(function() {
 <li class="level1"><a href="#p37_operations_sec">5. Operational Workflow</a></li>
 <li class="level1"><a href="#p37_continue_sec">6. Continuing a Partially-Completed Study</a></li>
 <li class="level1"><a href="#p37_reaggregate_sec">7. Manual Metrics Re-Aggregation</a></li>
-<li class="level1"><a href="#p37_refs_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md136">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md137">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md138">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p37_cap_study_sec">7.1 Study Type Entries</a><ul><li class="level2"><a href="#p37_cap_study_grid_independence_sub">grid_independence</a></li>
+<li class="level2"><a href="#p37_cap_study_timestep_independence_sub">timestep_independence</a></li>
+<li class="level2"><a href="#p37_cap_study_sensitivity_sub">sensitivity</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="level1"><a href="#p37_refs_sec">8. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Sweep_Studies_Guide"></a> <code>picurv sweep</code> orchestrates parameter studies with generated run variants, scheduler arrays, and aggregate metrics.</p>
@@ -160,7 +166,7 @@ $(function() {
 <li><code>case.models.physics.particles.count</code></li>
 <li><code>case.run_control.dt_physical</code></li>
 </ul>
-<p>Not every study should use the default <code>msd_final</code> metric shorthand. Cases that write other scalar diagnostics, such as <code>logs/interpolation_error.csv</code>, should define explicit CSV metrics instead. Search and migration characterization studies can aggregate <code>logs/search_metrics.csv</code> columns such as <code>search_failure_fraction</code>, <code>search_work_index</code>, <code>re_search_fraction</code>, or normalized run-level signals derived from <code>lost_cumulative</code>.</p>
+<p>Not every study should use the default <code>msd_final</code> metric shorthand. Cases that write other scalar diagnostics, such as <code>&lt;run.runtime_logs&gt;/interpolation_error.csv</code>, should define explicit CSV metrics instead. Search and migration characterization studies can aggregate <code>&lt;run.runtime_logs&gt;/search_metrics.csv</code> columns such as <code>search_failure_fraction</code>, <code>search_work_index</code>, <code>re_search_fraction</code>, or normalized run-level signals derived from <code>lost_cumulative</code>.</p>
 <p>CSV metric specs also support <code>reduction: p95</code>, per-row ratios via <code>numerator_column</code> plus <code>denominator_column</code>, and scalar normalization through <code>normalize_by_parameter</code> for observables such as run loss fraction.</p>
 <h1><a class="anchor" id="p37_outputs_sec"></a>
 4. Outputs and Aggregates</h1>
@@ -198,7 +204,7 @@ $(function() {
 <li>within <code>parameters</code>, mapping a parent key to a list of dicts sweeps multiple sub-fields together as a unit — they are NOT cartesian-producted with each other, but ARE cross-producted against other parameters. Example: <code>case.run_control: [{total_steps: 400, dt_physical: 0.005}, {total_steps: 800, dt_physical: 0.0025}]</code> sweeps the whole <code>run_control</code> block as two groups.</li>
 <li>generated case configs are revalidated through the same solver/post validators used by <code>picurv run</code>.</li>
 <li>submission chain: solver array → post array (<code>afterok</code>) → metrics job (<code>afterany</code>).</li>
-<li><code>scheduler/submission.json</code> is the study-directory contract consumed by <code>picurv submit --study-dir ...</code>.</li>
+<li><code>&lt;run.scheduler&gt;/submission.json</code> is the study-directory contract consumed by <code>picurv submit --study-dir ...</code>.</li>
 <li>generator/file grid external paths are rewritten to absolute paths during case materialization so they remain valid in <code>studies/&lt;study_id&gt;/cases/...</code>.</li>
 <li>generated <code>solver_array.sbatch</code> exports walltime metadata for the runtime walltime guard, while <code>post_array.sbatch</code> remains a plain post-processing launcher.</li>
 <li><code>post_array.sbatch</code> uses the same <code>nodes * ntasks_per_node</code> allocation as the solver array; conflicting launcher <code>-n</code>/<code>-np</code> flags are rewritten to that task count.</li>
@@ -225,33 +231,57 @@ $(function() {
 <p>If the automatic metrics Slurm job fails or you want to re-collect metrics after manual intervention:</p>
 <div class="fragment"><div class="line">./bin/picurv sweep --reaggregate --study-dir studies/&lt;study_id&gt;</div>
 </div><!-- fragment --><p>This reads all case outputs, writes <code>results/metrics_table.csv</code>, and generates plots (if enabled in <code>study.yml</code>).</p>
+<h1><a class="anchor" id="p37_cap_study_sec"></a>
+7.1 Study Type Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: study.type.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_grid_independence"><code>grid_independence</code></a></td><td class="markdownTableBodyNone"><code>grid_independence</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_sensitivity"><code>sensitivity</code></a></td><td class="markdownTableBodyNone"><code>sensitivity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_timestep_independence"><code>timestep_independence</code></a></td><td class="markdownTableBodyNone"><code>timestep_independence</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<h2><a class="anchor" id="p37_cap_study_grid_independence_sub"></a>
+grid_independence</h2>
+<p><a class="anchor" id="p37_cap_study_grid_independence"></a> <b>Identity.</b> <code>study.yml -&gt; study_type: grid_independence</code>.</p>
+<p><b>What it does.</b> Expands a cross-product over grid parameters and aggregates the declared metrics against resolution, so the study answers whether the result has stopped changing with the mesh.</p>
+<p><b>When to choose it.</b> Before trusting any quantitative result from a new geometry. It is the first study to run and the one most often skipped; a converged solver on an unconverged grid is still the wrong answer.</p>
+<p><b>Parameters it owns.</b> <code>parameters</code> naming the grid keys to vary - typically <code>case.grid.programmatic_settings.im/jm/km</code> - and <code>metrics</code> naming what to compare.</p>
+<p><b>Interactions.</b> The sweep recognises the grid keys and orders the aggregated table by resolution. Combines naturally with <code>grid.mode: grid_gen</code>, which regenerates the mesh per case; with <code>mode: file</code> every resolution needs its own staged mesh.</p>
+<p><b>Diagnostics.</b> <code>results/metrics_table.csv</code> carries one row per case. A metric that does not settle across the ladder is the finding, not a failure of the study.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel/grid_independence_study.yml</code>.</p>
+<p><b>Limitations.</b> It varies what you list and nothing else: refining only one direction produces a table that looks converged while the unrefined direction still controls the error.</p>
+<h2><a class="anchor" id="p37_cap_study_timestep_independence_sub"></a>
+timestep_independence</h2>
+<p><a class="anchor" id="p37_cap_study_timestep_independence"></a> <b>Identity.</b> <code>study.yml -&gt; study_type: timestep_independence</code>.</p>
+<p><b>What it does.</b> Expands a cross-product over timestep parameters and aggregates metrics against dt, separating temporal discretisation error from spatial.</p>
+<p><b>When to choose it.</b> After grid independence, and before any claim about a time-dependent quantity. Run it separately from the grid ladder: varying both at once cannot attribute the change to either.</p>
+<p><b>Parameters it owns.</b> <code>parameters</code> naming the timestep keys, and <code>metrics</code>.</p>
+<p><b>Interactions.</b> Independent of the momentum solver chosen, but the useful dt range is not: an explicit path is stability-limited where the implicit paths are not, so the ladder that is informative for one may not run at all for the other.</p>
+<p><b>Diagnostics.</b> Same <code>results/metrics_table.csv</code> shape as the grid ladder, ordered by dt.</p>
+<p><b>Evidence.</b> Implemented only. No shipped study selects it.</p>
+<p><b>Limitations.</b> Nothing here detects that the ladder crossed a stability boundary rather than a convergence one; a diverged case appears as a missing or absurd metric row.</p>
+<h2><a class="anchor" id="p37_cap_study_sensitivity_sub"></a>
+sensitivity</h2>
+<p><a class="anchor" id="p37_cap_study_sensitivity"></a> <b>Identity.</b> <code>study.yml -&gt; study_type: sensitivity</code>.</p>
+<p><b>What it does.</b> Expands either a cross-product or explicit <code>parameter_sets</code> over arbitrary configuration keys and aggregates the declared metrics, without assuming the varied parameter is a discretisation control.</p>
+<p><b>When to choose it.</b> For everything that is not a convergence ladder: Reynolds number, model coefficients, boundary treatments, solver tolerances. Use <code>parameter_sets</code> rather than <code>parameters</code> when the combinations are coupled and a full cross-product would include cases that make no sense.</p>
+<p><b>Parameters it owns.</b> <code>parameters</code> (cross-product) or <code>parameter_sets</code> (explicit coupled sets), and <code>metrics</code>.</p>
+<p><b>Interactions.</b> The only study type that does not order its table by a convergence quantity, so the aggregation is a plain comparison. <code>execution.max_concurrent_array_tasks</code> matters most here, because a sensitivity sweep is usually the widest.</p>
+<p><b>Diagnostics.</b> <code>results/metrics_table.csv</code> with one row per case and the varied keys as columns.</p>
+<p><b>Evidence.</b> Implemented only. No shipped study selects it.</p>
+<p><b>Limitations.</b> It compares what you asked for and infers nothing: there is no sensitivity index, no ranking, and no detection that two varied parameters interact.</p>
 <h1><a class="anchor" id="p37_refs_sec"></a>
 8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="36_Cluster_Run_Guide.html">Cluster Run Guide (Slurm)</a></b></li>
 <li><b><a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b></li>
+<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md136"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Sweep and Study Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md137"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md138"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['lesmodeltype_0',['LESModelType',['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2',1,'variables.h']]],
-  ['loglevel_1',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
+  ['lesaveragingmode_0',['LESAveragingMode',['../variables_8h.html#aa99812b4a0d48d2cf0a31c63bd0d08fa',1,'variables.h']]],
+  ['lesclipmode_1',['LESClipMode',['../variables_8h.html#a554404c56792a331ba007e494a6473ec',1,'variables.h']]],
+  ['lesfilterwidthmodel_2',['LESFilterWidthModel',['../variables_8h.html#af496c30781324575c1af9f01b4f278da',1,'variables.h']]],
+  ['lesmodeltype_3',['LESModelType',['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2',1,'variables.h']]],
+  ['lestestfilterkernel_4',['LESTestFilterKernel',['../variables_8h.html#a5a62ceb4e73810f622417ab6001aa29e',1,'variables.h']]],
+  ['loglevel_5',['LogLevel',['../logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'logging.h']]]
 ];

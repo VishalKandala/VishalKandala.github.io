@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -88,12 +94,7 @@ $(function() {
 <li class="level1"><a href="#p36_command_sec">2. Core Command Patterns</a></li>
 <li class="level1"><a href="#p36_artifacts_sec">3. Generated Scheduler Artifacts</a></li>
 <li class="level1"><a href="#p36_flow_sec">4. Submission Flow</a></li>
-<li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a><ul><li class="level2"><a href="#autotoc_md133">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md134">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md135">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Cluster_Run_Guide"></a> This guide documents how <code>picurv</code> converts case configs into scheduler artifacts for cluster execution.</p>
@@ -141,12 +142,12 @@ $(function() {
 3. Generated Scheduler Artifacts</h1>
 <p>In run directory, scheduler generation typically produces:</p>
 <ul>
-<li><code>runs/&lt;run_id&gt;/scheduler/solver.sbatch</code></li>
-<li><code>runs/&lt;run_id&gt;/scheduler/post.sbatch</code></li>
-<li><code>runs/&lt;run_id&gt;/scheduler/solver_&lt;jobid&gt;.out/.err</code> after solver submission</li>
-<li><code>runs/&lt;run_id&gt;/scheduler/post_&lt;jobid&gt;.out/.err</code> after post submission</li>
+<li><code>&lt;run.scheduler&gt;/solver.sbatch</code></li>
+<li><code>&lt;run.scheduler&gt;/post.sbatch</code></li>
+<li><code>&lt;run.scheduler&gt;/solver_&lt;jobid&gt;.out/.err</code> after solver submission</li>
+<li><code>&lt;run.scheduler&gt;/post_&lt;jobid&gt;.out/.err</code> after post submission</li>
 <li><code>runs/&lt;run_id&gt;/manifest.json</code></li>
-<li><code>runs/&lt;run_id&gt;/scheduler/submission.json</code> (always in cluster mode when run artifacts are written; contains launch metadata and submission IDs when present)</li>
+<li><code>&lt;run.scheduler&gt;/submission.json</code> (always in cluster mode when run artifacts are written; contains launch metadata and submission IDs when present)</li>
 </ul>
 <p>These coexist with standard runtime control artifacts used by solver/postprocessor binaries. <code>submission.json</code> is also the run-directory contract consumed by <code>picurv submit</code> and <code>picurv cancel</code>.</p>
 <h1><a class="anchor" id="p36_flow_sec"></a>
@@ -176,7 +177,7 @@ $(function() {
 <li>Keep an early signal in <code>cluster.yml -&gt; execution.extra_sbatch.signal</code> as fallback protection: <code>signal: "USR1@300"</code> for <code>srun</code>, or <code>signal: "B:USR1@300"</code> plus <code>exec mpirun ...</code> for direct <code>mpirun</code> batch launches.</li>
 <li>Solver and field postprocessor stages use <code>cluster.yml</code> resources directly.</li>
 <li>When the selected launcher is MPI-aware (<code>srun</code>, <code>mpirun</code>, <code>mpiexec</code>), PICurv strips conflicting size flags and forces the post launch to <code>nodes * ntasks_per_node</code> ranks.</li>
-<li>Slurm stdout/stderr lives under <code>scheduler/</code>; solver-generated runtime logs still live under <code>logs/</code>.</li>
+<li>Slurm stdout/stderr lives under <code>&lt;run.scheduler&gt;/</code>; solver-generated runtime logs still live under <code>&lt;run.runtime_logs&gt;/</code>.</li>
 <li><code>picurv init</code> now creates <code>.picurv-execution.yml</code> in each new case with inert defaults.</li>
 <li>If your cluster needs the same MPI launcher tokens for login-node and batch runs, edit that file and let <code>cluster.yml</code> override only when batch jobs differ.</li>
 <li>For one-off interactive multi-rank runs on cluster login nodes, <code>PICURV_MPI_LAUNCHER</code> still overrides everything.</li>
@@ -192,29 +193,9 @@ $(function() {
 <ul>
 <li><b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b></li>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
-<li><b><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
+<li><b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b></li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md133"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Cluster Run Guide (Slurm)</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md134"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md135"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

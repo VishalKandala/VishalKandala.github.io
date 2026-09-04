@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -86,18 +92,23 @@ $(function() {
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p45_contract_sec">1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;</a></li>
 <li class="level1"><a href="#p45_mode_values_sec">2. Accepted &lt;tt&gt;init_mode&lt;/tt&gt; Values</a></li>
-<li class="level1"><a href="#p45_mode_behavior_sec">3. Mode Behavior in C</a></li>
-<li class="level1"><a href="#p45_restart_matrix_sec">4. Restart Behavior Matrix</a></li>
+<li class="level1"><a href="#p45_entries_sec">3. Particle Initialization Mode Entries</a><ul><li class="level2"><a href="#p45_cap_surface_sub">Surface</a></li>
+<li class="level2"><a href="#p45_cap_volume_sub">Volume</a></li>
+<li class="level2"><a href="#p45_cap_pointsource_sub">PointSource</a></li>
+<li class="level2"><a href="#p45_cap_surfaceedges_sub">SurfaceEdges</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p45_mode_behavior_sec">4. Mode Behavior in C</a></li>
+<li class="level1"><a href="#p45_restart_matrix_sec">5. Restart Behavior Matrix</a></li>
 <li class="level1"><a href="#p45_settle_sec">5. Early-Step Settlement and Coupling</a></li>
+<li class="level1"><a href="#p45_cap_restart_sec">5.1 Particle Restart Mode Entries</a><ul><li class="level2"><a href="#p45_cap_restart_init_sub">init</a></li>
+<li class="level2"><a href="#p45_cap_restart_load_sub">load</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p45_fields_sec">6. Swarm Fields Initialized at Startup</a></li>
 <li class="level1"><a href="#p45_diagnostics_sec">7. Diagnostics and Sanity Checks</a></li>
 <li class="level1"><a href="#p45_extension_sec">8. Contributor Extension Points</a></li>
-<li class="level1"><a href="#p45_refs_sec">9. Related Pages</a><ul><li class="level2"><a href="#autotoc_md157">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md158">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md159">Practical CFD Troubleshooting Pattern</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="level1"><a href="#p45_refs_sec">9. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Particle_Initialization_and_Restart"></a> This page documents particle seeding, restart behavior, and early-step migration/settling logic. It is written for both case authors and contributors working in <code><a class="el" href="ParticleSwarm_8c.html">src/ParticleSwarm.c</a></code> and <code><a class="el" href="ParticleMotion_8c.html">src/ParticleMotion.c</a></code>.</p>
@@ -138,8 +149,63 @@ $(function() {
 <li><code>2</code>: <code>PARTICLE_INIT_POINT_SOURCE</code></li>
 <li><code>3</code>: <code>PARTICLE_INIT_SURFACE_EDGES</code></li>
 </ul>
+<h1><a class="anchor" id="p45_entries_sec"></a>
+3. Particle Initialization Mode Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: particle.init_mode.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_pointsource"><code>PointSource</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_surface"><code>Surface</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_surfaceedges"><code>SurfaceEdges</code></a></td><td class="markdownTableBodyNone"><code>3</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_volume"><code>Volume</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">supported</td></tr>
+</table>
+<h2><a class="anchor" id="p45_cap_surface_sub"></a>
+Surface</h2>
+<p><a class="anchor" id="p45_cap_surface"></a> <b>Identity.</b> <code>particles.init_mode: Surface</code> -&gt; <code>-pinit 0</code> -&gt; <code>ParticleInitializationType</code>.</p>
+<p><b>What it does.</b> Seeds particles across a bounding surface of the domain.</p>
+<p><b>When to choose it.</b> Studying what enters through a face - inlet seeding, or transport from a boundary into the interior. Choose <code>Volume</code> when you want the interior populated from the start.</p>
+<p><b>Parameters it owns.</b> The particle count; the surface is derived from the configured inlet face.</p>
+<p><b>Interactions.</b> Needs an identifiable inlet face; the startup log reports which face was chosen.</p>
+<p><b>Diagnostics.</b> "Inlet face for particle initialization identified as Face N" at startup, and the per-step particle count.</p>
+<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Limitations.</b> Concentrates particles at one boundary, so interior statistics take time to become meaningful.</p>
+<h2><a class="anchor" id="p45_cap_volume_sub"></a>
+Volume</h2>
+<p><a class="anchor" id="p45_cap_volume"></a> <b>Identity.</b> <code>particles.init_mode: Volume</code> -&gt; <code>-pinit 1</code>.</p>
+<p><b>What it does.</b> Distributes particles through the domain volume.</p>
+<p><b>When to choose it.</b> Whenever you want interior statistics immediately - dispersion, mixing, or any case where waiting for particles to arrive from a boundary wastes the run.</p>
+<p><b>Parameters it owns.</b> The particle count.</p>
+<p><b>Interactions.</b> <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> density follows the cell distribution, so a graded grid gives a non-uniform physical density.</p>
+<p><b>Diagnostics.</b> Per-step particle count and the lost-particle counter.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/scatter_verification</code> seeds this way.</p>
+<p><b>Limitations.</b> No control over the spatial distribution beyond the grid itself.</p>
+<h2><a class="anchor" id="p45_cap_pointsource_sub"></a>
+PointSource</h2>
+<p><a class="anchor" id="p45_cap_pointsource"></a> <b>Identity.</b> <code>particles.init_mode: PointSource</code> -&gt; <code>-pinit 2</code>, with coordinates from <code>-psrc_x</code>/<code>-psrc_y</code>/<code>-psrc_z</code>.</p>
+<p><b>What it does.</b> Releases all particles from a single specified point.</p>
+<p><b>When to choose it.</b> Plume and dispersion studies, and the verification cases where a known release point makes an analytic comparison possible.</p>
+<p><b>Parameters it owns.</b> The point-source coordinates.</p>
+<p><b>Interactions.</b> The point must lie inside the domain; a point outside it produces immediate particle loss.</p>
+<p><b>Diagnostics.</b> The lost-particle counter is the first signal of a misplaced source.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> and <code>examples/brownian_motion</code> are built on this mode.</p>
+<p><b>Limitations.</b> All particles share one origin, so early statistics are highly correlated.</p>
+<h2><a class="anchor" id="p45_cap_surfaceedges_sub"></a>
+SurfaceEdges</h2>
+<p><a class="anchor" id="p45_cap_surfaceedges"></a> <b>Identity.</b> <code>particles.init_mode: SurfaceEdges</code> -&gt; <code>-pinit 3</code>.</p>
+<p><b>What it does.</b> Seeds particles along the edges of a bounding surface rather than across its face.</p>
+<p><b>When to choose it.</b> Exercising the locate-and-migrate machinery, where edges and corners are the hard cases. It is a diagnostic seeding mode more than a physical one.</p>
+<p><b>Parameters it owns.</b> The particle count.</p>
+<p><b>Interactions.</b> Edge and corner cells are exactly where the walking search is most likely to struggle, which is the point.</p>
+<p><b>Diagnostics.</b> Search metrics at <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b>.</p>
+<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Limitations.</b> Not a physically motivated distribution.</p>
 <h1><a class="anchor" id="p45_mode_behavior_sec"></a>
-3. Mode Behavior in C</h1>
+4. Mode Behavior in C</h1>
 <p>Main setup flow:</p>
 <ol type="1">
 <li><a class="el" href="ParticleSwarm_8h.html#ada215a5db25227a8fd2cd2596e7d3e57">InitializeParticleSwarm</a> creates the DMSwarm and fields.</li>
@@ -168,7 +234,7 @@ $(function() {
 <li>all particles start at fixed coordinates <code>(psrc_x, psrc_y, psrc_z)</code>.</li>
 </ul>
 <h1><a class="anchor" id="p45_restart_matrix_sec"></a>
-4. Restart Behavior Matrix</h1>
+5. Restart Behavior Matrix</h1>
 <p><code>InitializeParticleSwarm</code> behavior depends on <code>StartStep</code> and restart mode:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -207,6 +273,38 @@ $(function() {
 <li><code>LocateAllParticlesInGrid</code> resolves invalid/missing cases,</li>
 <li>interpolation/scatter synchronize coupling state before stepping.</li>
 </ol>
+<h1><a class="anchor" id="p45_cap_restart_sec"></a>
+5.1 Particle Restart Mode Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: particle.restart_mode.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_restart_init"><code>init</code></a></td><td class="markdownTableBodyNone"><code>init</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p45_cap_restart_load"><code>load</code></a></td><td class="markdownTableBodyNone"><code>load</code></td></tr>
+</table>
+<h2><a class="anchor" id="p45_cap_restart_init_sub"></a>
+init</h2>
+<p><a class="anchor" id="p45_cap_restart_init"></a> <b>Identity.</b> <code>models.physics.particles.restart_mode: init</code> (the default).</p>
+<p><b>What it does.</b> Seeds the swarm from <code>init_mode</code> at the start of the run, regardless of whether Eulerian fields are being restarted. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> state in a checkpoint is ignored.</p>
+<p><b>When to choose it.</b> Whenever the particles are the thing you are varying: re-seeding onto a restarted flow field lets you launch a fresh swarm into developed turbulence without re-running the spin-up. Also the correct choice for any first run.</p>
+<p><b>Parameters it owns.</b> None of its own. It selects which branch consumes <code>models.physics.particles.init_mode</code> and its parameters - see <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_entries_sec">3. Particle Initialization Mode Entries</a>.</p>
+<p><b>Interactions.</b> Independent of <code>eulerian_field_source</code>: a run may load fields and still init particles. Combined with a field restart it is the standard 'new swarm, developed flow' configuration.</p>
+<p><b>Diagnostics.</b> The startup banner reports the resolved particle restart mode and the seeded count. A swarm that seeds at the wrong size shows here, before the first step.</p>
+<p><b>Evidence.</b> Integration verified - <code>make unit-particles</code> covers the seeding branches.</p>
+<p><b>Limitations.</b> Any statistics accumulated by a previous run's particles are lost, because the particles they described no longer exist.</p>
+<h2><a class="anchor" id="p45_cap_restart_load_sub"></a>
+load</h2>
+<p><a class="anchor" id="p45_cap_restart_load"></a> <b>Identity.</b> <code>models.physics.particles.restart_mode: load</code>.</p>
+<p><b>What it does.</b> Restores particle positions, velocities, and swarm fields from the checkpoint named by the restart, continuing the same particles rather than seeding new ones.</p>
+<p><b>When to choose it.</b> When particle history matters - dispersion, mean-squared displacement, residence time - and the trajectory must continue rather than restart. Required for any statistic accumulated across a restart boundary.</p>
+<p><b>Parameters it owns.</b> None of its own; the checkpoint supplies the state. The restart source is chosen by <code>--restart-from</code> or <code>--continue</code>, not by this key.</p>
+<p><b>Interactions.</b> Requires a checkpoint that actually contains particle state: a run whose particles were disabled writes none. The restart matrix in <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_restart_matrix_sec">5. Restart Behavior Matrix</a> gives the full combination table against <code>eulerian_field_source</code>.</p>
+<p><b>Diagnostics.</b> A missing or empty particle group in the checkpoint is a fatal startup error naming the step, not a silent reseed. The restored count is reported in the banner.</p>
+<p><b>Evidence.</b> Integration verified - <code>make unit-particles</code> covers the restore path.</p>
+<p><b>Limitations.</b> Restart is not bit-exact: boundary conditions are re-applied on load, which introduces a perturbation around 1e-7 regardless of solver tolerance. That is a floor on any claim of trajectory continuity across a restart.</p>
 <h1><a class="anchor" id="p45_fields_sec"></a>
 6. Swarm Fields Initialized at Startup</h1>
 <p>After position/PID/cell placeholders, initialization sets defaults for:</p>
@@ -248,31 +346,11 @@ $(function() {
 <ul>
 <li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
-<li><b><a class="el" href="52_Run_Lifecycle_Guide.html">Run Lifecycle Guide</a></b></li>
+<li><b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b></li>
 <li><b><a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a></b></li>
 <li><b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md157"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Initialization and Restart Guide</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md158"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md159"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

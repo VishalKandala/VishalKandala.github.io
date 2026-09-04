@@ -10,8 +10,13 @@ var searchData=
   ['y_5fmax_7',['y_max',['../variables_8h.html#a720143f2539ae0ef7f6bb1488c17c210',1,'IBMNodes']]],
   ['y_5fmidp_8',['y_midp',['../variables_8h.html#afe6ef22c15698fad2b0c6b6af001b3a1',1,'Cstart']]],
   ['y_5fmin_9',['y_min',['../variables_8h.html#a6268b577b839220f3817e3ee4b85ade4',1,'IBMNodes']]],
-  ['ym_5fcell_10',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
-  ['ymax_11',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
-  ['ymin_12',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
-  ['ys_5fcell_13',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]]
+  ['y_5fplus_5fmax_10',['y_plus_max',['../variables_8h.html#ab9df02cb7d5d0b804913ee27e5bb6a1f',1,'WallModelDiagnosticsState']]],
+  ['y_5fplus_5fsum_11',['y_plus_sum',['../variables_8h.html#a9d8cc5812d28882d1204e262f24ccb88',1,'WallModelDiagnosticsState']]],
+  ['ym_5fcell_12',['ym_cell',['../variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7',1,'RankCellInfo']]],
+  ['ymax_13',['ymax',['../variables_8h.html#aef835e2403a6d800363d11121d43b186',1,'Cstart']]],
+  ['ymin_14',['ymin',['../variables_8h.html#a7e32a8507b0794c78280fc79da5aa780',1,'Cstart']]],
+  ['yoshizawa_5fci_15',['yoshizawa_ci',['../variables_8h.html#a0ae932453fa67ae626aea2aa9f94d860',1,'LESConfig']]],
+  ['ys_5fcell_16',['ys_cell',['../variables_8h.html#a118b3648071bd642f8d066878ba920a7',1,'RankCellInfo']]],
+  ['yy_17',['yy',['../variables_8h.html#a204697bdaf394b98aeab24408e69a7d1',1,'SymTensor']]],
+  ['yz_18',['yz',['../variables_8h.html#adf87a4ed50fd393005c7d35fc11f94c5',1,'SymTensor']]]
 ];

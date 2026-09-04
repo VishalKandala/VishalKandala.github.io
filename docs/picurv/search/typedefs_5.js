@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['list_0',['List',['../variables_8h.html#aa89b8bc105d9a09d4e7c06e8b34078a7',1,'variables.h']]]
+  ['lesconfig_0',['LESConfig',['../variables_8h.html#a792996bea6849d24c17230730d72bf20',1,'variables.h']]],
+  ['lesdiagnosticsstate_1',['LESDiagnosticsState',['../variables_8h.html#a94109d0c76a320840460a86d8425b0f3',1,'variables.h']]],
+  ['list_2',['List',['../variables_8h.html#aa89b8bc105d9a09d4e7c06e8b34078a7',1,'variables.h']]]
 ];

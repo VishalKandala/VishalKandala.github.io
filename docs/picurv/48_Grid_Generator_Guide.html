@@ -12,6 +12,11 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   extensions: ["tex2jax.js"],
@@ -35,6 +40,18 @@ MathJax.Hub.Config({
    </div>
    <div id="projectbrief">A Parallel Particle-In-Cell Solver for Curvilinear LES</div>
   </td>
+    <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect"                onmouseover="return searchBox.OnSearchSelectShow()"                onmouseout="return searchBox.OnSearchSelectHide()">&#160;</span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+</td>
  </tr>
  </tbody>
 </table>
@@ -46,17 +63,6 @@ MathJax.Hub.Config({
 var searchBox = new SearchBox("searchBox", "search/",'.html');
 /* @license-end */
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -96,12 +102,12 @@ $(function() {
 </ul>
 </li>
 <li class="level1"><a href="#p48_choose_sec">7. When To Use Which Grid Path</a></li>
-<li class="level1"><a href="#p48_related_sec">8. Related Pages</a><ul><li class="level2"><a href="#autotoc_md166">CFD Reader Guidance and Practical Use</a><ul><li class="level3"><a href="#autotoc_md167">What To Extract Before Changing A Case</a></li>
-<li class="level3"><a href="#autotoc_md168">Practical CFD Troubleshooting Pattern</a></li>
+<li class="level1"><a href="#p48_cap_geom_sec">7.1 Grid Generator Geometry Entries</a><ul><li class="level2"><a href="#p48_cap_geom_warp_sub">warp</a></li>
+<li class="level2"><a href="#p48_cap_geom_cpipe_sub">cpipe</a></li>
+<li class="level2"><a href="#p48_cap_geom_pipe_sub">pipe</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="level1"><a href="#p48_related_sec">8. Related Pages</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Grid_Generator_Guide"></a> <code>generators/grid.gen</code> is the standalone structured-grid utility used by the <code>grid.mode: grid_gen</code> workflow and legacy grid conversion paths. This page documents what it can generate or convert directly, how its config files work, and how <code>picurv</code> wraps it.</p>
@@ -234,7 +240,7 @@ $(function() {
 <li>validate and non-dimensionalize the generated grid,</li>
 <li>stage the runtime <code>grid.run</code> artifact for C-side ingestion.</li>
 </ol>
-<p>This means <code>grid_gen</code> remains a Python-side preprocessing workflow even though the final solver still receives a normalized file grid. Fresh solve runs and <code>--restart-from</code> runs stage a grid in the target run directory. For <code>--continue</code> solve runs, an existing <code>config/grid.run</code> is reused when present so the generator is not called again. Post-only runs read the existing control file and do not regenerate grids.</p>
+<p>This means <code>grid_gen</code> remains a Python-side preprocessing workflow even though the final solver still receives a normalized file grid. Fresh solve runs and <code>--restart-from</code> runs stage a grid in the target run directory. For <code>--continue</code> solve runs, an existing <code>&lt;run.config&gt;/grid.run</code> is reused when present so the generator is not called again. Post-only runs read the existing control file and do not regenerate grids.</p>
 <h2><a class="anchor" id="p48_promote_generated_ssec"></a>
 6.1 Promoting a Generated Grid to File Mode</h2>
 <p>Use <code>grid_gen</code> when you want PICurv to run <code>grid.gen</code> as part of staging a case. Use <code>file</code> mode for later runs when you want to reuse a generated <code>.picgrid</code> without invoking the generator again.</p>
@@ -249,7 +255,7 @@ $(function() {
 <div class="fragment"><div class="line">runs/&lt;run_id&gt;/config/grid.generated.picgrid</div>
 </div><!-- fragment --><p>The solver does not ingest that dimensional file directly. PICurv validates and non-dimensionalizes it into:</p>
 <div class="fragment"><div class="line">runs/&lt;run_id&gt;/config/grid.run</div>
-</div><!-- fragment --><p>and the generated solver control file points the C runtime at <code>config/grid.run</code>. When reusing the generated mesh in another case, point <code>grid.source_file</code> at the <code>.picgrid</code> artifact, not at <code>grid.run</code>.</p>
+</div><!-- fragment --><p>and the generated solver control file points the C runtime at <code>&lt;run.config&gt;/grid.run</code>. When reusing the generated mesh in another case, point <code>grid.source_file</code> at the <code>.picgrid</code> artifact, not at <code>grid.run</code>.</p>
 <p>Example follow-up case:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>
@@ -270,10 +276,10 @@ $(function() {
 <div class="line">    cli_args: []                # additional raw tokens forwarded to the conversion script</div>
 </div><!-- fragment --><p>Execution sequence:</p>
 <ol type="1">
-<li>run <code>grid.gen legacy1d --input &lt;source_file&gt; --output &lt;run&gt;/config/grid.converted.picgrid</code></li>
+<li>run <code>grid.gen legacy1d --input &lt;source_file&gt; --output &lt;run.config&gt;/grid.converted.picgrid</code></li>
 <li>validate converted PICGRID payload</li>
 <li>non-dimensionalize to <code>grid.run</code></li>
-<li>pass <code>-grid_file &lt;run&gt;/config/grid.run</code> to the C runtime</li>
+<li>pass <code>-grid_file &lt;run.config&gt;/grid.run</code> to the C runtime</li>
 </ol>
 <h1><a class="anchor" id="p48_choose_sec"></a>
 7. When To Use Which Grid Path</h1>
@@ -296,6 +302,50 @@ $(function() {
 <li>you want generated <code>.info</code>/<code>.vts</code> outputs alongside the mesh.</li>
 </ul>
 <p>For a generated grid used with geometric-periodic BCs, each opposite periodic surface must be a pointwise translated copy of its partner. The translation must be nonzero and constant over the entire surface; rotating, shearing, and nonmatching surface pairs are rejected at runtime.</p>
+<h1><a class="anchor" id="p48_cap_geom_sec"></a>
+7.1 Grid Generator Geometry Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: grid.generator_type.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_cpipe"><code>cpipe</code></a></td><td class="markdownTableBodyNone"><code>cpipe</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_pipe"><code>pipe</code></a></td><td class="markdownTableBodyNone"><code>pipe</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_warp"><code>warp</code></a></td><td class="markdownTableBodyNone"><code>warp</code></td><td class="markdownTableBodyNone">supported</td></tr>
+</table>
+<h2><a class="anchor" id="p48_cap_geom_warp_sub"></a>
+warp</h2>
+<p><a class="anchor" id="p48_cap_geom_warp"></a> <b>Identity.</b> <code>grid.gen warp</code>, or <code>grid.generator.grid_type: warp</code>.</p>
+<p><b>What it does.</b> Generates a Cartesian block optionally deformed by three independent sinusoidal amplitudes. With all amplitudes at zero it is a plain stretched box, which is how the shipped periodic cases use it.</p>
+<p><b>When to choose it.</b> The default choice for channels, ducts, and any box-like domain generated rather than declared - it is the geometry every shipped <code>grid_gen</code> case selects. Turn the amplitudes up only to exercise curvilinear machinery on a deformation you know analytically.</p>
+<p><b>Parameters it owns.</b> <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--bounds-x</code>, <code>--bounds-y</code>, <code>--bounds-z</code>, and the deformation amplitudes <code>--amp-A</code>, <code>--amp-B</code>, <code>--amp-C</code>.</p>
+<p><b>Interactions.</b> Reads defaults from the <code>[warp]</code> config section - see <code>config/grids/</code> for the plane-channel and square-duct configurations. With zero amplitudes the result is equivalent to a <code>programmatic_c</code> box, and the choice between them is whether the geometry lives in a generator config or in the case file.</p>
+<p><b>Diagnostics.</b> <code>grid.gen</code> prints mesh-quality information including normalized warpage checks; <code>--vts</code> writes a viewable mesh for inspection before a solve.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/periodic_test</code> driven-channel and driven-duct cases all generate their meshes with this type.</p>
+<p><b>Limitations.</b> The deformation is a fixed three-amplitude sinusoid; arbitrary warping is not expressible, and no case establishes which amplitudes stay well-conditioned.</p>
+<h2><a class="anchor" id="p48_cap_geom_cpipe_sub"></a>
+cpipe</h2>
+<p><a class="anchor" id="p48_cap_geom_cpipe"></a> <b>Identity.</b> <code>grid.gen cpipe</code>, or <code>grid.generator.grid_type: cpipe</code>.</p>
+<p><b>What it does.</b> Generates a bent pipe with a <b>rectangular</b> cross-section as a single curvilinear block. The bend is parameterised by a radius factor and an angle rather than drawn.</p>
+<p><b>When to choose it.</b> For bent-duct geometries with a square or rectangular cross-section. Choose <code>pipe</code> instead when the cross-section must be circular, and <code>warp</code> for anything unbent.</p>
+<p><b>Parameters it owns.</b> <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--side-lengths</code>, <code>--rc-factor</code>, <code>--straight-factor</code>, <code>--bend-angle</code>, <code>--orientation</code>, plus the stretching and first-cell controls in <b><a class="el" href="48_Grid_Generator_Guide.html#p48_invocation_sec">2. Direct CLI Usage</a></b>.</p>
+<p><b>Interactions.</b> Reads defaults from the <code>[cpipe]</code> section - <code>config/grids/coarse_square_tube_curved.cfg</code> ships one. <code>--orientation</code> fixes which pair of axes the bend lies in, which must match the periodic-axis choice if the case is periodic.</p>
+<p><b>Diagnostics.</b> Mesh-quality output reports normalized warpage, which is where a too-tight bend radius shows up first.</p>
+<p><b>Evidence.</b> Implemented only. A generator config ships, but no shipped case selects this type, so nothing here is exercised end to end.</p>
+<p><b>Limitations.</b> One block only, and the bend is a single constant-radius arc; compound or variable-radius bends are not expressible. Experimental until a case exercises it.</p>
+<h2><a class="anchor" id="p48_cap_geom_pipe_sub"></a>
+pipe</h2>
+<p><a class="anchor" id="p48_cap_geom_pipe"></a> <b>Identity.</b> <code>grid.gen pipe</code>, or <code>grid.generator.grid_type: pipe</code>.</p>
+<p><b>What it does.</b> Generates a bent pipe with a <b>circular</b> cross-section, meshed O-grid style so the centre is not a singular point.</p>
+<p><b>When to choose it.</b> For round-pipe geometries, where a rectangular cross-section would change the physics rather than merely the mesh. The O-grid topology is what makes a circular section tractable on a structured block.</p>
+<p><b>Parameters it owns.</b> <code>--ncells-phi</code>, <code>--ncells-r</code>, <code>--ncells-path</code>, <code>--diameter</code>, <code>--pinhole-factor</code>, <code>--rc-factor</code>, <code>--straight-factor</code>, <code>--bend-angle</code>, <code>--orientation</code>.</p>
+<p><b>Interactions.</b> Reads defaults from the <code>[pipe]</code> config section. <code>--pinhole-factor</code> controls the O-grid core and interacts with near-axis cell quality; it is the first control to revisit when metric diagnostics complain near the centreline.</p>
+<p><b>Diagnostics.</b> Same mesh-quality reporting as the other geometries. Near-axis cells are where warpage warnings appear first.</p>
+<p><b>Evidence.</b> Implemented only. No shipped case or study selects it.</p>
+<p><b>Limitations.</b> O-grid cell quality degrades toward the axis, and nothing establishes what <code>--pinhole-factor</code> should be for a given Reynolds number. Experimental until a case exercises it.</p>
 <h1><a class="anchor" id="p48_related_sec"></a>
 8. Related Pages</h1>
 <ul>
@@ -303,28 +353,8 @@ $(function() {
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
 <li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
-<li><b><a class="el" href="p54_geometric_periodic.html">Periodic Boundaries and Driven Flows</a></b></li>
+<li><b><a class="el" href="p54_geometric_periodic.html">Periodic Boundaries and Driven Flows</a></b> </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md166"></a>
-CFD Reader Guidance and Practical Use</h2>
-<p>This page describes <b>Grid Generator Guide: generators/grid.gen</b> within the PICurv workflow. For CFD users, the most reliable reading strategy is to map the page content to a concrete run decision: what is configured, what runtime stage it influences, and which diagnostics should confirm expected behavior.</p>
-<p>Treat this page as both a conceptual reference and a runbook. If you are debugging, pair the method/procedure described here with monitor output, generated runtime artifacts under <code>runs/&lt;run_id&gt;/config</code>, and the associated solver/post logs so numerical intent and implementation behavior stay aligned.</p>
-<h3><a class="anchor" id="autotoc_md167"></a>
-What To Extract Before Changing A Case</h3>
-<ul>
-<li>Identify which YAML role or runtime stage this page governs.</li>
-<li>List the primary control knobs (tolerances, cadence, paths, selectors, or mode flags).</li>
-<li>Record expected success indicators (convergence trend, artifact presence, or stable derived metrics).</li>
-<li>Record failure signals that require rollback or parameter isolation.</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md168"></a>
-Practical CFD Troubleshooting Pattern</h3>
-<ol type="1">
-<li>Reproduce the issue on a tiny case or narrow timestep window.</li>
-<li>Change one control at a time and keep all other roles/configs fixed.</li>
-<li>Validate generated artifacts and logs after each change before scaling up.</li>
-<li>If behavior remains inconsistent, compare against a known-good baseline example and re-check grid/BC consistency. </li>
-</ol>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

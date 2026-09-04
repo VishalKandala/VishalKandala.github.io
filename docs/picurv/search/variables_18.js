@@ -14,5 +14,10 @@ var searchData=
   ['xm_5fcell_11',['xm_cell',['../variables_8h.html#a7b338865846c21925fbb6b968cdf385f',1,'RankCellInfo']]],
   ['xmax_12',['xmax',['../variables_8h.html#a2b91a4b05dbd722d9bb5656bc43d6792',1,'Cstart']]],
   ['xmin_13',['xmin',['../variables_8h.html#a40467caea1532693e5662a0812d74c1c',1,'Cstart']]],
-  ['xs_5fcell_14',['xs_cell',['../variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]]
+  ['xref_14',['XREF',['../namespacereview__packet.html#a297898d7a72005475a480ed8187d3099',1,'review_packet']]],
+  ['xref_5fcaveat_15',['XREF_CAVEAT',['../namespacereview__packet.html#a8003bdfb8c439bdf2a11e50ab1399ec9',1,'review_packet']]],
+  ['xs_5fcell_16',['xs_cell',['../variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8',1,'RankCellInfo']]],
+  ['xx_17',['xx',['../variables_8h.html#ab850c7b38c4bb014d84277ce73145bdb',1,'SymTensor']]],
+  ['xy_18',['xy',['../variables_8h.html#afb7983edfcdfa7a57adc46a4bab56f9f',1,'SymTensor']]],
+  ['xz_19',['xz',['../variables_8h.html#af56afb2351922a38a182fa38a6a8785f',1,'SymTensor']]]
 ];
