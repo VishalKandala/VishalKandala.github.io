@@ -29,7 +29,7 @@ var searchData=
   ['6_20filter_20widths_26',['6. Filter Widths',['../72_LES_Turbulence_Closure.html#p72_widths_sec',1,'']]],
   ['6_20generated_20surfaces_20are_20not_20hand_20maintained_27',['6. Generated Surfaces Are Not Hand-Maintained',['../64_Documentation_Extension_Framework.html#p64_generated_sec',1,'']]],
   ['6_20guardrails_20for_20safe_20growth_28',['6. Guardrails for Safe Growth',['../17_Workflow_Extensibility.html#p17_guardrails_sec',1,'']]],
-  ['6_20implications_20for_20post_20processing_20tt_20computenodalaverage_20tt_29',['6. Implications for Post-Processing (&lt;tt&gt;ComputeNodalAverage&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md21',1,'']]],
+  ['6_20implications_20for_20post_20processing_20tt_20computenodalaverage_20tt_29',['6. Implications for Post-Processing (&lt;tt&gt;ComputeNodalAverage&lt;/tt&gt;)',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md19',1,'']]],
   ['6_20inspect_20generated_20artifacts_30',['6. Inspect Generated Artifacts',['../02_Tutorial_Programmatic_Grid.html#p02_artifacts_sec',1,'']]],
   ['6_20interaction_20with_20existing_20commands_31',['6. Interaction With Existing Commands',['../61_Storage_Management_Guide.html#p61_cli_integration_sec',1,'']]],
   ['6_20momentum_5fsolver_20solver_20specific_20block_32',['6. momentum_solver (Solver-Specific Block)',['../08_Solver_Reference.html#p08_msolver_sec',1,'']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['1_20—_202026_2009_2004_0',['0.3.1 — 2026-09-04',['../18_Changelog.html#autotoc_md7',1,'']]],
+  ['1_200_20—_202026_2009_2004_0',['0.1.0 — 2026-09-04',['../18_Changelog.html#autotoc_md7',1,'']]],
   ['1_201_20change_20reynolds_20number_1',['1.1 Change Reynolds Number',['../11_User_How_To_Guides.html#p11_reynolds_ssec',1,'']]],
   ['1_201_20common_20data_20fields_2',['1.1. Common Data Fields',['../04_Visualization_Tutorial.html#p04_datafields_sec',1,'']]],
   ['1_201_20design_20and_20setup_3',['1.1 Design and Setup',['../Documentation_Map.html#p47_lifecycle_design_sec',1,'']]],
@@ -53,7 +53,7 @@ var searchData=
   ['1_20grid_20filter_20width_20entries_50',['5.1 Grid Filter Width Entries',['../07_Case_Reference.html#p07_les_width_sec',1,'']]],
   ['1_20grid_20generator_20geometry_20entries_51',['7.1 Grid Generator Geometry Entries',['../48_Grid_Generator_Guide.html#p48_cap_geom_sec',1,'']]],
   ['1_20grid_20particle_20interpolation_52',['1. Grid -&gt; Particle Interpolation',['../27_Trilinear_Interpolation_and_Projection.html#p27_g2p_sec',1,'']]],
-  ['1_20how_20it_20works_20at_20the_20boundaries_53',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md17',1,'']]],
+  ['1_20how_20it_20works_20at_20the_20boundaries_53',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md15',1,'']]],
   ['1_20how_20prose_20names_20these_20paths_54',['4.1 How Prose Names These Paths',['../71_Invariant_Contracts.html#p71_notation_sub',1,'']]],
   ['1_20how_20the_20gate_20is_20enforced_55',['4.1 How the Gate Is Enforced',['../64_Documentation_Extension_Framework.html#p64_lifecycle_enforcement_sub',1,'']]],
   ['1_20how_20to_20read_20it_56',['1. How to Read It',['../66_Evidence_Matrix.html#p66_reading_sec',1,'']]],
@@ -70,7 +70,7 @@ var searchData=
   ['1_20offline_20recommended_20first_67',['5.1 Offline (Recommended First)',['../17_Workflow_Extensibility.html#p17_ml_offline_ssec',1,'']]],
   ['1_20operation_5fmode_68',['1. operation_mode',['../08_Solver_Reference.html#p08_opmode_sec',1,'']]],
   ['1_20option_20families_69',['2.1 Option Families',['../48_Grid_Generator_Guide.html#p48_option_matrix_ssec',1,'']]],
-  ['1_20overview_70',['1. Overview',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md10',1,'']]],
+  ['1_20overview_70',['1. Overview',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md8',1,'']]],
   ['1_20particle_20restart_20mode_20entries_71',['5.1 Particle Restart Mode Entries',['../45_Particle_Initialization_and_Restart.html#p45_cap_restart_sec',1,'']]],
   ['1_20per_20point_20state_20and_20update_72',['4.1 Per-Point State and Update',['../58_Field_Statistics.html#p58_update_sub',1,'']]],
   ['1_20per_20step_20particle_20pipeline_73',['1. Per-Step Particle Pipeline',['../34_Particle_Model_Overview.html#p34_loop_sec',1,'']]],

@@ -8,7 +8,7 @@ var searchData=
   ['eddyviscosityfromcoefficient_5',['eddyviscosityfromcoefficient',['../les_8c.html#a4b24a9b855b6f0c642dff3a89c467fd7',1,'EddyViscosityFromCoefficient(PetscReal coefficient, PetscReal delta, PetscReal strain_magnitude, PetscReal molecular_viscosity, PetscReal min_viscosity_ratio):&#160;les.c'],['../les_8h.html#a4b24a9b855b6f0c642dff3a89c467fd7',1,'EddyViscosityFromCoefficient(PetscReal coefficient, PetscReal delta, PetscReal strain_magnitude, PetscReal molecular_viscosity, PetscReal min_viscosity_ratio):&#160;les.c']]],
   ['editable_20configurations_20and_20imported_20files_6',['2. Editable Configurations And Imported Files',['../52_Run_Artifact_Lifecycle_Contract.html#p52_newrun_sec',1,'']]],
   ['eel_7',['eel',['../variables_8h.html#a912b5bb58c3db258fa468d66ead8d6fd',1,'SimCtx']]],
-  ['effective_20computational_20domain_20and_20resolution_8',['5. Effective Computational Domain and Resolution',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md19',1,'']]],
+  ['effective_20computational_20domain_20and_20resolution_8',['5. Effective Computational Domain and Resolution',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md17',1,'']]],
   ['effective_20sample_20size_20reporting_9',['9. Effective Sample Size Reporting',['../60_Field_Statistics_Planned_Extensions.html#p60_ess_sec',1,'']]],
   ['effective_5fend_10',['effective_end',['../statistics__window_8h.html#a7c573fb68c69e0076d846ae7a95612d3',1,'PicurvWindow']]],
   ['effective_5frun_5fdirectories_11',['effective_run_directories',['../namespacepicurv__cli_1_1core.html#ae06d02e94e37108093ea56663a9ff1b6',1,'picurv_cli::core']]],

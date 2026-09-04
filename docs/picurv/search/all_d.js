@@ -2,7 +2,7 @@ var searchData=
 [
   ['b_0',['B',['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx']]],
   ['back_1',['BACK',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fac921ff2cfc571c1d19b0485d7f6926ee',1,'variables.h']]],
-  ['backlog_2',['backlog',['../40_Testing_and_Quality_Guide.html#p40_exhaustive_backlog_sec',1,'12. Exhaustive-Readiness Backlog'],['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'7. Runtime Observability Backlog'],['../md_tests_2guide.html#autotoc_md39',1,'Current targeted backlog']]],
+  ['backlog_2',['backlog',['../40_Testing_and_Quality_Guide.html#p40_exhaustive_backlog_sec',1,'12. Exhaustive-Readiness Backlog'],['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'7. Runtime Observability Backlog'],['../md_tests_2guide.html#autotoc_md37',1,'Current targeted backlog']]],
   ['backlog_20and_20low_20priority_20fixes_3',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
   ['backscatter_4',['5. Limiting and Backscatter',['../72_LES_Turbulence_Closure.html#p72_clipping_sec',1,'']]],
   ['backscatter_5fvolume_5',['backscatter_volume',['../variables_8h.html#ae7db9f8d488236f81571adee716460c6',1,'LESDiagnosticsState']]],
@@ -66,7 +66,7 @@ var searchData=
   ['bctype_63',['BCType',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08fa',1,'variables.h']]],
   ['bctypetostring_64',['bctypetostring',['../logging_8h.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c'],['../logging_8c.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c']]],
   ['be_65',['BE',['../poisson_8c.html#a78add0c4a98afa82e663ee5cfb1bdc9f',1,'poisson.c']]],
-  ['be_20a_20fixed_20linear_20operator_66',['The coarse solve must be a fixed linear operator',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md27',1,'']]],
+  ['be_20a_20fixed_20linear_20operator_66',['The coarse solve must be a fixed linear operator',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md25',1,'']]],
   ['be_20online_20and_20what_20must_20not_67',['1. What Must Be Online, And What Must Not',['../60_Field_Statistics_Planned_Extensions.html#p60_principle_sec',1,'']]],
   ['before_20adding_20state_68',['6. Call Cadence of the Shared RHS (Read Before Adding State)',['../31_Momentum_Solvers.html#p31_rhs_cadence_sec',1,'']]],
   ['before_20anything_20runs_69',['1. Validation Fails Before Anything Runs',['../67_Troubleshooting.html#p67_validate_sec',1,'']]],
@@ -107,7 +107,7 @@ var searchData=
   ['bodyforces_2eh_104',['BodyForces.h',['../BodyForces_8h.html',1,'']]],
   ['bottom_105',['BOTTOM',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa8c371f4e766fb2c49c219bbc88989461',1,'variables.h']]],
   ['bound_20details_106',['Loop Bound Details',['../grid_8h.html#loop_bounds',1,'']]],
-  ['boundaries_107',['boundaries',['../60_Field_Statistics_Planned_Extensions.html#p60_stats_boundary_sec',1,'12. Derived Statistics At Non-Periodic Boundaries'],['../59_Function_Identity_and_Observability_Specification.html#p59_boundaries_sec',1,'3. Explicit Boundaries'],['../20_Grid_Cell_Architecture_Guide.html#autotoc_md17',1,'4.1. How it Works at the Boundaries'],['../13_Code_Architecture.html#p13_ingestion_sec',1,'6. Configuration Ingestion Boundaries']]],
+  ['boundaries_107',['boundaries',['../60_Field_Statistics_Planned_Extensions.html#p60_stats_boundary_sec',1,'12. Derived Statistics At Non-Periodic Boundaries'],['../59_Function_Identity_and_Observability_Specification.html#p59_boundaries_sec',1,'3. Explicit Boundaries'],['../20_Grid_Cell_Architecture_Guide.html#autotoc_md15',1,'4.1. How it Works at the Boundaries'],['../13_Code_Architecture.html#p13_ingestion_sec',1,'6. Configuration Ingestion Boundaries']]],
   ['boundaries_20and_20driven_20flows_108',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
   ['boundaries_20and_20ghost_20values_109',['4. Layout, Boundaries, and Ghost Values',['../56_Field_Identity_and_Layout_Catalog.html#p56_layout_sec',1,'']]],
   ['boundaries_2ec_110',['Boundaries.c',['../Boundaries_8c.html',1,'']]],
@@ -138,7 +138,7 @@ var searchData=
   ['boundarysystem_5fvalidate_135',['boundarysystem_validate',['../Boundaries_8h.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c']]],
   ['boundaryvelocitycorrection_136',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
   ['bounded_137',['bounded',['../statistics__window_8h.html#abbbfbb9677ef438e4b3478f09c4a5731',1,'PicurvWindowDefinition']]],
-  ['bounded_20by_20the_20mpi_20decomposition_138',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md32',1,'']]],
+  ['bounded_20by_20the_20mpi_20decomposition_138',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md30',1,'']]],
   ['bounded_20probe_20histories_139',['14. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
   ['boundingbox_140',['boundingbox',['../variables_8h.html#a87a49c783469e6e8b255a3214f17a832',1,'BoundingBox:&#160;variables.h'],['../variables_8h.html#structBoundingBox',1,'BoundingBox']]],
   ['bounds_20clipping_20and_20the_20first_20state_141',['2.2 Bounds, Clipping, and the First State',['../58_Field_Statistics.html#p58_bounds_sub',1,'']]],
@@ -200,9 +200,9 @@ var searchData=
   ['bvel_5fw_197',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]],
   ['bw_198',['BW',['../poisson_8c.html#a84909b16209480034c40276c4f84f975',1,'poisson.c']]],
   ['by_20a_20scalar_20field_199',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]],
-  ['by_20coarse_20grid_20size_200',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md28',1,'']]],
+  ['by_20coarse_20grid_20size_200',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md26',1,'']]],
   ['by_20future_20work_201',['2. Rules Shared by Future Work',['../57_Future_Architecture_Specifications.html#p57_rules_sec',1,'']]],
   ['by_20run_20directory_202',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]],
   ['by_20symptom_203',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
-  ['by_20the_20mpi_20decomposition_204',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md32',1,'']]]
+  ['by_20the_20mpi_20decomposition_204',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md30',1,'']]]
 ];
