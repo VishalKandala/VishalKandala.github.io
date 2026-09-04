@@ -6,7 +6,7 @@ var searchData=
   ['field_20statistics_20planned_20extensions_3',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]],
   ['file_20based_20grid_20search_20robustness_4',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
   ['first_20simulation_20flat_20channel_5',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
-  ['fixes_6',['fixes',['../39_Common_Fatal_Errors.html',1,'Common Fatal Errors and Fixes'],['../29_Maintenance_Backlog.html',1,'Maintenance Backlog and Low-Priority Fixes']]],
+  ['fixes_6',['fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'57e1307-grid-generator-fixes'],['../39_Common_Fatal_Errors.html',1,'Common Fatal Errors and Fixes'],['../29_Maintenance_Backlog.html',1,'Maintenance Backlog and Low-Priority Fixes']]],
   ['flat_20channel_7',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
   ['flows_8',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
   ['for_20particle_20location_9',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],

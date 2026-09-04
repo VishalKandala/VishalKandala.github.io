@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p48_related_sec">8. Related Pages</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Grid_Generator_Guide"></a> <code>generators/grid.gen</code> is the standalone structured-grid utility used by the <code>grid.mode: grid_gen</code> workflow and legacy grid conversion paths. This page documents what it can generate or convert directly, how its config files work, and how <code>picurv</code> wraps it.</p>
+<div class="textblock"><p><a class="anchor" id="_Grid_Generator_Guide"></a> <code>generators/grid.gen</code> is the standalone structured-grid utility used by the <code>grid.mode: grid_gen</code> workflow. This page documents what it can generate, how its config files work, and how <code>picurv</code> wraps it.</p>
 <h1><a class="anchor" id="p48_role_sec"></a>
 1. What &lt;tt&gt;grid.gen&lt;/tt&gt; Is For</h1>
 <p>Use <code>grid.gen</code> when you want:</p>
@@ -145,7 +145,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>generated <code>.picgrid</code> geometry instead of C-side <code>programmatic_c</code> geometry,</li>
 <li>reusable generator configs that can be versioned and shared across cases,</li>
 <li>optional quick mesh diagnostics (<code>.info</code>) and visualization output (<code>.vts</code>).</li>
-<li>conversion of legacy headerless 1D-axis grid payloads into canonical PICGRID files.</li>
 </ul>
 <p>This is distinct from:</p>
 <ul>
@@ -161,7 +160,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">python3 generators/grid.gen box --bounds-y 0 2 --stretch-j 2.0 --first-cell-j-start 1.4e-3</div>
 <div class="line">python3 generators/grid.gen sweep --cross-section circle --side-lengths 1 1 \</div>
 <div class="line">        --path straight:len=5 arc:radius=4,deg=180 straight:len=5</div>
-<div class="line">python3 generators/grid.gen legacy1d --input legacy_flat.grid --output legacy_flat.picgrid --no-write-vtk</div>
 </div><!-- fragment --><p><code>grid.gen</code> accepts both a config file (<code>--config</code>) for reusable defaults and direct CLI flags for overrides. CLI values override config-file values. A config key matching no option is an error, not a warning: it would otherwise leave the built-in default in force, so the file would say one thing and the grid be another.</p>
 <h2><a class="anchor" id="p48_option_matrix_ssec"></a>
 2.1 Option Families</h2>
@@ -190,7 +188,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li><code>box</code>: <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--bounds-x</code>, <code>--bounds-y</code>, <code>--bounds-z</code>, <code>--wall-j-lo</code>, <code>--wall-j-hi</code>, <code>--wall-j-lo-span</code>, <code>--wall-j-hi-span</code>, <code>--amp-A</code>, <code>--amp-B</code>, <code>--amp-C</code></li>
 <li><code>sweep</code>: <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--cross-section</code>, <code>--side-lengths</code>, <code>--path</code>, <code>--cross-section-scale</code></li>
-<li><code>legacy1d</code>: <code>--input</code>, <code>--axis-columns</code>, <code>--strict-trailing</code> / <code>--allow-trailing</code></li>
 </ul>
 <p>Notes for CFD users:</p>
 <ul>
@@ -203,7 +200,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li><code>box</code>: a Cartesian block whose two bounding walls may each be shaped by a piecewise height field. See <a class="el" href="48_Grid_Generator_Guide.html#p48_cap_geom_box">p48_cap_geom_box</a>.</li>
 <li><code>sweep</code>: a cross-section carried along a piecewise centreline. See <a class="el" href="48_Grid_Generator_Guide.html#p48_cap_geom_sweep">p48_cap_geom_sweep</a>.</li>
-<li><code>legacy1d</code>: legacy 1D-axis payload converter (headerless block + dims + x/y/z axis lists -&gt; canonical PICGRID).</li>
 </ul>
 <p>Geometry comes from composition rather than from a long list of named shapes. <code>box</code> with a step wall is a backward-facing step; the same wall repeated is a rib-roughened channel; <code>sweep</code> with a 180-degree arc is a U-bend, and with a scale field a nozzle. What that reaches, and what it does not, is in <a class="el" href="48_Grid_Generator_Guide.html#p48_cap_geom_box">p48_cap_geom_box</a> and <a class="el" href="48_Grid_Generator_Guide.html#p48_cap_geom_sweep">p48_cap_geom_sweep</a>.</p>
 <h2><a class="anchor" id="p48_grammar_ssec"></a>
@@ -235,7 +231,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>isotropic_box_64.cfg</code>   </td><td class="markdownTableBodyNone"><code>box</code>, periodic cube    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>coarse_square_tube_curved.cfg</code>   </td><td class="markdownTableBodyNone"><code>sweep</code>, bent square duct   </td></tr>
+<td class="markdownTableBodyNone"><code>coarse_square_tube_curved.cfg</code>   </td><td class="markdownTableBodyNone"><code>sweep</code>, bent square duct, 90 deg    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>bent_channel_coarse.cfg</code>   </td><td class="markdownTableBodyNone"><code>sweep</code>, <code>examples/bent_channel</code>'s bent duct   </td></tr>
 </table>
 <h1><a class="anchor" id="p48_outputs_sec"></a>
 5. Outputs</h1>
@@ -332,7 +330,7 @@ sweep</h2>
 <p><b>Interactions.</b> Reads defaults from the <code>[sweep]</code> config section; <code>config/grids/coarse_square_tube_curved.cfg</code> ships a bent square duct. Logical axes follow the two cross-section directions and then the path, which makes the result right-handed. An <code>arc</code> turns in the plane perpendicular to its axis and may not turn about an axis parallel to the current tangent, because an arc has no defined plane there; chain arcs about different axes to leave a plane.</p>
 <p><b>Diagnostics.</b> The <code>.info</code> report carries <code>Right_Handed</code> alongside <code>Jacobian_Sign_Consistent</code>, which a uniformly inverted mesh would satisfy. On an out-of-plane path the parallel-transported frame reports 0.6 degrees maximum non-orthogonality, where a frame built from a fixed up-vector would shear the section badly.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> generates its square duct and quarter turn with this type. It reproduces the 2.9 MB <code>.picgrid</code> that example used to ship to 5e-8, which is the precision that file was written at, and the mesh the retired <code>cpipe</code> type produced from the same parameters to 1.8e-15 over a domain of size 13 - arithmetic reordering rather than a difference in geometry.</p>
-<p><b>Limitations.</b> One block only. <code>circle</code> uses the square-to-disc map rather than an O-grid, because an O-grid needs a circumferential seam whose coincident-node treatment lives behind a runtime branch no case file can select; the disc covers the whole section with no hole and no axis singularity, but cell size varies with angle and is worst in the four diagonal regions - a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality against 0.004 for a rectangle. That is adequate for a cylindrical domain and is not a wall-resolved pipe mesh, which needs a butterfly topology and therefore multiple blocks. Experimental until a case exercises it.</p>
+<p><b>Limitations.</b> One block only. <code>circle</code> uses the square-to-disc map rather than an O-grid: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for a circumferential seam, but it is wired only to <code>programmatic_c</code>'s <code>cgrids</code> flag, and even there <code><a class="el" href="grid_8c.html">src/grid.c</a></code> never builds anything but a Cartesian box - no path in the runtime today both produces real O-grid coordinates and can seam them. The disc covers the whole section with no hole and no axis singularity, but cell size varies with angle and is worst in the four diagonal regions - a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality against 0.004 for a rectangle. That is adequate for a cylindrical domain and is not a wall-resolved pipe mesh, which needs a butterfly topology and therefore multiple blocks. Experimental until a case exercises it.</p>
 <h1><a class="anchor" id="p48_cap_xsec_sec"></a>
 7.2 Swept Cross-Section Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.cross_section.
@@ -354,7 +352,7 @@ rectangle</h2>
 <p><b>Parameters it owns.</b> <code>--side-lengths I J</code>, the two full widths.</p>
 <p><b>Interactions.</b> Sweeps along any <code>--path</code>, and scales along it with <code>--cross-section-scale</code>. The logical section axes run on [-0.5, 0.5], so <code>first_cell_i_*</code> and <code>first_cell_j_*</code> are fractions of the full side length.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> stays near zero on a straight sweep; anything larger comes from the path, not the section.</p>
-<p><b>Evidence.</b> Implemented only. <code>config/grids/coarse_square_tube_curved.cfg</code> ships a bent square duct and unit tests cover it, but no shipped case selects <code>sweep</code>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> sweeps a <code>rectangle</code> section through its bend, and <code>config/grids/coarse_square_tube_curved.cfg</code> ships an unselected second one.</p>
 <p><b>Limitations.</b> Corners are square, so a rectangular duct has four concave corner lines where the boundary layers of two walls meet; that is the geometry, not a mesh defect, but it is where near-wall resolution has to be judged on both walls at once.</p>
 <h2><a class="anchor" id="p48_cap_xsec_circle_sub"></a>
 circle</h2>
@@ -365,7 +363,7 @@ circle</h2>
 <p><b>Interactions.</b> The logical section axes run on [-1, 1] rather than [-0.5, 0.5], so <code>first_cell_i_*</code> and <code>first_cell_j_*</code> are fractions of the full diameter. Wall clustering thickens cells toward the boundary but not uniformly around it.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> and <code>Max_Volume_Expansion_Ratio_Global</code> both report the diagonal-region cost; on a 32x32 section they read 79.7 degrees and 2.81 against 0.004 and 1.0 for a rectangle.</p>
 <p><b>Evidence.</b> Implemented only. Unit tests check that the map fills the disc, reaches its edge and leaves no hole; no shipped case selects it.</p>
-<p><b>Limitations.</b> <a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> size varies with angle and is worst in the four diagonal regions: a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality, against 0.004 for a rectangle. Composing a radial redistribution transform evens out wall-normal spacing but not azimuthal spacing. This is not a wall-resolved pipe mesh - that needs an O-grid annulus stitched to a core block, which is multi-block, and the runtime has no block-interface handler. The alternative single-block topology, an O-grid, is not offered: it needs a circumferential seam of coincident nodes whose treatment lives behind a runtime branch no case file can select.</p>
+<p><b>Limitations.</b> <a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> size varies with angle and is worst in the four diagonal regions: a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality, against 0.004 for a rectangle. Composing a radial redistribution transform evens out wall-normal spacing but not azimuthal spacing. This is not a wall-resolved pipe mesh - that needs an O-grid annulus stitched to a core block, which is multi-block, and the runtime has no block-interface handler. The alternative single-block topology, an O-grid, is not offered: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for its circumferential seam, but nothing in the runtime today can both build real O-grid coordinates and reach that branch - it is wired only to <code>programmatic_c</code>, whose grid generator never builds anything but a Cartesian box.</p>
 <h1><a class="anchor" id="p48_cap_wall_sec"></a>
 7.3 Wall Height Field Segment Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.wall_segment.
@@ -476,7 +474,7 @@ straight</h2>
 <p><b>Parameters it owns.</b> <code>len</code>.</p>
 <p><b>Interactions.</b> Carries the frame unchanged, so it neither creates nor corrects twist. <code>first_cell_k_*</code> and <code>stretch_k</code> distribute cells along it.</p>
 <p><b>Diagnostics.</b> Contributes no non-orthogonality of its own.</p>
-<p><b>Evidence.</b> Implemented only. Covered by the sweep tests; no shipped case selects <code>sweep</code>.</p>
+<p><b>Evidence.</b> Production exercised - both straight runs of <code>examples/bent_channel</code>'s path are this segment.</p>
 <p><b>Limitations.</b> None beyond needing a positive length.</p>
 <h2><a class="anchor" id="p48_cap_path_arc_sub"></a>
 arc</h2>
@@ -486,7 +484,7 @@ arc</h2>
 <p><b>Parameters it owns.</b> <code>radius</code>, <code>deg</code>, and optionally <code>axis</code>.</p>
 <p><b>Interactions.</b> Consecutive arcs about different axes take the path out of a plane, which is where parallel transport differs from a fixed up-vector. A negative <code>deg</code> reverses the turn, which is how an S-bend is written.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> is the check on bend tightness; on an out-of-plane two-arc path it reads 0.6 degrees, so a large value means the radius is too small for the section.</p>
-<p><b>Evidence.</b> Implemented only. Unit tests cover the out-of-plane path and the refusal of an arc about its own tangent.</p>
+<p><b>Evidence.</b> Production exercised for a single, default-axis arc - <code>examples/bent_channel</code>'s quarter turn. Chaining arcs about different axes to leave a plane, a negative <code>deg</code>, and the refusal of an arc about its own tangent are unit-tested only; no shipped case exercises any of them.</p>
 <p><b>Limitations.</b> Constant radius only, so a variable-radius or spiral bend needs several segments to approximate. An arc may not turn about an axis parallel to the current tangent, which has no defined plane and is refused. Curvature is not checked against the section size, so a bend radius comparable to the duct width will produce badly skewed cells on the inside of the turn; <code>Max_Non_Orthogonality_deg</code> is where that shows.</p>
 <h1><a class="anchor" id="p48_cap_xform_sec"></a>
 7.5 Placement and Similarity Transform Entries</h1>

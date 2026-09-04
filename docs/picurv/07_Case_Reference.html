@@ -284,18 +284,6 @@ grid:
   # Destinations are not configurable: PICurv writes the grid, its .vts preview,
   # and its .info quality report into the run's own asset store.
 
-  # --- Option D: Legacy Grid Conversion ---
-  # Converts an older column-text grid file to the .picgrid format before solver launch.
-  # Requires generators/grid.gen (or a custom script) to be present.
-  # legacy_conversion:
-  #   enabled: true                    # [true/false] Must be true to activate this path.
-  #   format: "column_text"            # Currently supported: "column_text"
-  #   script: null                     # Optional override path to conversion script.
-  #   output_file: "config/grid.converted.picgrid"  # Required. Destination path.
-  #   axis_columns: [0, 1, 2]          # Optional. 3-item list of zero-based column indices for x,y,z.
-  #   strict_trailing: false           # [true/false] Optional. Reject files with trailing data.
-  #   cli_args: []                     # Optional raw CLI token list passed to the converter.
-
   # --- Option C: Programmatic Grid Generation in C ---
   # Use this to have the C solver generate a structured Cartesian grid.
   # `im/jm/km` are cell counts in YAML; picurv converts them to node counts
@@ -321,9 +309,12 @@ grid:
     rys: 1.05
     rzs: 1.0
 
-    # --- Grid Type Flag ---
-    # 0 = regular Cartesian/curvilinear (default). 1 = O-type (cylindrical) grid.
-    # Used by the C metric routines to apply the correct Jacobian formula.
+    # --- Periodic Seam Formula Flag ---
+    # This block is always built as a stretched Cartesian box; nothing here can produce
+    # cylindrical/O-grid coordinates. `cgrids` only selects which formula the C metric
+    # routines use to reconstruct ghost cells at a periodic seam: 0 (default) assumes a
+    # translationally periodic box, 1 assumes a coincident-node wrap-around (annulus).
+    # Setting 1 on this Cartesian geometry corrupts the periodic metric. Leave at 0.
     # -&gt; -cgrids
     cgrids: 0
 
@@ -558,7 +549,7 @@ boundary_conditions:
     #     type: field_slice
     #     script: tools/custom_profile.py  # Optional; defaults to generators/profile.gen
     #     field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat
-    #     grid_file: ../old_run/config/grid.run
+    #     grid_file: ../old_run/inputs/grid/grid.run
     #     source_case: ../old_run/config/case.yml
     #     output_file: config/inlet_profile_block0_negEta.sliced.picslice
     #     slice:
@@ -608,7 +599,7 @@ boundary_conditions:
 #       # source:
 #       #   type: field_slice
 #       #   field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat
-#       #   grid_file: ../old_run/config/grid.run
+#       #   grid_file: ../old_run/inputs/grid/grid.run
 #       #   source_case: ../old_run/config/case.yml
 #       #   output_file: config/inlet_profile.sliced.picslice
 #       #   slice:
@@ -779,7 +770,7 @@ boundary_conditions:
 <li><code>im/jm/km</code></li>
 <li><code>xMins/xMaxs</code>, <code>yMins/yMaxs</code>, <code>zMins/zMaxs</code></li>
 <li><code>rxs/rys/rzs</code></li>
-<li><code>cgrids</code> — per-block integer grid type: <code>0</code> = Cartesian (default), <code>1</code> = O-type curvilinear → <code>-cgrids</code></li>
+<li><code>cgrids</code> — per-block integer, forwarded to <code>-cgrids</code>, default <code>0</code>. It does not change the geometry <code>programmatic_c</code> builds: <code><a class="el" href="grid_8c.html">src/grid.c</a></code> always produces a stretched Cartesian block regardless of its value. The only consumer is <code><a class="el" href="Metric_8c.html">Metric.c</a></code>'s periodic ghost reconstruction, where <code>cgrids: 1</code> swaps a translational seam correction for a coincident-node one appropriate to a true wrap-around (O-grid/annulus) topology. Setting it to <code>1</code> on the Cartesian geometry this mode actually builds corrupts the metric at a periodic seam rather than enabling curvilinear geometry; leave it at <code>0</code>.</li>
 </ul>
 <p>Dimension contract:</p><ul>
 <li><code>im/jm/km</code> in YAML are cell counts.</li>
@@ -794,20 +785,7 @@ boundary_conditions:
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: file</div>
 <div class="line">  source_file: my_grid.picgrid</div>
-</div><!-- fragment --><p><code>picurv</code> validates existence and prepares normalized grid data for C-side ingestion.</p>
-<p>Optional legacy conversion path (headerless 1D-axis payloads):</p>
-<div class="fragment"><div class="line">grid:</div>
-<div class="line">  mode: file</div>
-<div class="line">  source_file: legacy_flat.grid</div>
-<div class="line">  legacy_conversion:</div>
-<div class="line">    enabled: true</div>
-<div class="line">    format: legacy1d            # aliases: legacy_1d, les_flat_1d, les-flat-1d; or column_text</div>
-<div class="line">    output_file: null           # optional: override generated .picgrid output path</div>
-<div class="line">    script: null                # optional: override conversion script path (default generators/grid.gen)</div>
-<div class="line">    axis_columns: [0, 1, 2]    # preferred source columns for X/Y/Z axis rows</div>
-<div class="line">    strict_trailing: true</div>
-<div class="line">    cli_args: []                # additional raw tokens forwarded to the conversion script</div>
-</div><!-- fragment --><p>When enabled, <code>picurv</code> first calls <code>generators/grid.gen legacy1d</code> to create a canonical PICGRID file in the run config, then runs the normal validation/non-dimensionalization staging path.</p>
+</div><!-- fragment --><p><code>picurv</code> validates existence and prepares normalized grid data for C-side ingestion. <code>grid.legacy_conversion</code> was removed; a <code>.picgrid</code> staged this way must already be in canonical format.</p>
 <h2><a class="anchor" id="p07_grid_gen_ssec"></a>
 3.3 mode: grid_gen</h2>
 <div class="fragment"><div class="line">grid:</div>
@@ -845,12 +823,12 @@ file</h2>
 programmatic_c</h2>
 <p><a class="anchor" id="p07_cap_gridmode_programmatic_c"></a> <b>Identity.</b> <code>grid.mode: programmatic_c</code> with a <code>grid.programmatic_settings</code> block.</p>
 <p><b>What it does.</b> Builds a structured block directly in the C runtime from cell counts, extents, and stretching ratios. No mesh file exists or is read.</p>
-<p><b>When to choose it.</b> For Cartesian boxes and simple O-type blocks - channels, ducts, isotropic boxes - and for anything where the geometry is a handful of numbers you want in the case file rather than in a binary alongside it. It is also the only mode <code>TGV3D</code> accepts.</p>
-<p><b>Parameters it owns.</b> <code>grid.programmatic_settings.im/jm/km</code> (cell counts, converted to node counts before <code>-im/-jm/-km</code>), <code>xMins/xMaxs</code>, <code>yMins/yMaxs</code>, <code>zMins/zMaxs</code>, <code>rxs/rys/rzs</code>, and <code>cgrids</code> (<code>0</code> Cartesian, <code>1</code> O-type curvilinear) -&gt; <code>-cgrids</code>.</p>
+<p><b>When to choose it.</b> For Cartesian boxes - channels, ducts, isotropic boxes - and for anything where the geometry is a handful of numbers you want in the case file rather than in a binary alongside it. It is also the only mode <code>TGV3D</code> accepts.</p>
+<p><b>Parameters it owns.</b> <code>grid.programmatic_settings.im/jm/km</code> (cell counts, converted to node counts before <code>-im/-jm/-km</code>), <code>xMins/xMaxs</code>, <code>yMins/yMaxs</code>, <code>zMins/zMaxs</code>, <code>rxs/rys/rzs</code>, and <code>cgrids</code> -&gt; <code>-cgrids</code> - see <a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a> for why this is not a real geometry choice.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>file</code> and <code>grid_gen</code>. Required by the <code>TGV3D</code> analytical source. Per-block lists are supported for the geometry arrays, but <code>grid.da_processors_*</code> stay scalar: per-block processor decomposition is not implemented.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved block extents and counts. A count/extent mismatch across per-block lists is a validation error naming the offending key.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>; integration verified - <code>make unit-grid</code>.</p>
-<p><b>Limitations.</b> Restricted to what the built-in generator can express: rectangular blocks and the O-type variant. Anything bent, branched, or externally meshed needs <code>file</code> or <code>grid_gen</code>.</p>
+<p><b>Limitations.</b> Restricted to a rectangular Cartesian block - <code>cgrids</code> does not add curvilinear geometry (<a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a>). Anything bent, branched, or externally meshed needs <code>file</code> or <code>grid_gen</code>.</p>
 <h2><a class="anchor" id="p07_cap_gridmode_grid_gen_sub"></a>
 grid_gen</h2>
 <p><a class="anchor" id="p07_cap_gridmode_grid_gen"></a> <b>Identity.</b> <code>grid.mode: grid_gen</code> with a <code>grid.generator</code> block naming a config file and a <code>grid_type</code>.</p>
@@ -1270,7 +1248,7 @@ cabot</h2>
 <div class="line">    source:</div>
 <div class="line">      type: field_slice</div>
 <div class="line">      field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
-<div class="line">      grid_file: ../old_run/config/grid.run</div>
+<div class="line">      grid_file: ../old_run/inputs/grid/grid.run</div>
 <div class="line">      source_case: ../old_run/config/case.yml</div>
 <div class="line">      slice:</div>
 <div class="line">        face: &quot;+Zeta&quot;</div>

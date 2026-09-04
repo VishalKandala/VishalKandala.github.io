@@ -10,6 +10,5 @@ var searchData=
   ['checksum_2eh_7',['checksum.h',['../checksum_8h.html',1,'']]],
   ['cli_2epy_8',['cli.py',['../cli_8py.html',1,'']]],
   ['compatibility_2epy_9',['compatibility.py',['../compatibility_8py.html',1,'']]],
-  ['convert_5fgrid_5ffrom_5flegacy_5fto_5fpicgrid_2epy_10',['convert_grid_from_legacy_to_picgrid.py',['../convert__grid__from__legacy__to__picgrid_8py.html',1,'']]],
-  ['core_2epy_11',['core.py',['../core_8py.html',1,'']]]
+  ['core_2epy_10',['core.py',['../core_8py.html',1,'']]]
 ];
