@@ -1,8 +1,1 @@
-var searchData=
-[
-  ['backlog_20and_20low_20priority_20fixes_0',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
-  ['based_20grid_20search_20robustness_1',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['boundaries_20and_20driven_20flows_2',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
-  ['boundary_20conditions_20guide_3',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]],
-  ['by_20symptom_4',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
-];
+var searchData=[["backlog_20and_20low_20priority_20fixes_0",["Maintenance Backlog and Low-Priority Fixes",["../29_Maintenance_Backlog.html",1,""]]],["based_20grid_20search_20robustness_1",["Tutorial: Using a File-Based Grid (Search Robustness)",["../03_Tutorial_File-Based_Grid.html",1,""]]],["boundaries_20and_20driven_20flows_2",["Periodic Boundaries and Driven Flows",["../p54_geometric_periodic.html",1,"64_Documentation_Extension_Framework"]]],["boundary_20conditions_20guide_3",["Boundary Conditions Guide",["../44_Boundary_Conditions_Guide.html",1,""]]],["by_20symptom_4",["Troubleshooting by Symptom",["../67_Troubleshooting.html",1,""]]]];

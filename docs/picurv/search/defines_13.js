@@ -1,5 +1,1 @@
-var searchData=
-[
-  ['window_5ftime_5fepsilon_0',['WINDOW_TIME_EPSILON',['../statistics__window_8c.html#a190d9e464df6e3f3689a43a3e7343f9e',1,'statistics_window.c']]],
-  ['wp_1',['WP',['../poisson_8c.html#a2c73b81722187c48d6186148091162fb',1,'poisson.c']]]
-];
+var searchData=[["window_5ftime_5fepsilon_0",["WINDOW_TIME_EPSILON",["../statistics__window_8c.html#a190d9e464df6e3f3689a43a3e7343f9e",1,"statistics_window.c"]]],["wp_1",["WP",["../poisson_8c.html#a2c73b81722187c48d6186148091162fb",1,"poisson.c"]]]];
