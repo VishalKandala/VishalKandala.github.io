@@ -179,6 +179,12 @@ diagnostics:
     #   malloc_debug: true  -&gt; executable arg: -malloc_debug
     #   log_view: true      -&gt; executable args: -log_view :runs/&lt;run_id&gt;/logs/PETSc_LogView_Solver.log
     #   objects_dump: all   -&gt; executable args: -objects_dump all
+    # PETSc info must be present during PetscInitialize(), so it is configured
+    # here rather than in petsc_passthrough_options. Restricting classes keeps
+    # high-volume output useful; an empty list records every PETSc class.
+    info:
+      enabled: false
+      classes: [snes, ksp]
     malloc_debug: false
     malloc_test: false
     malloc_dump: false
@@ -330,7 +336,13 @@ io:
 # ==============================================================================
 solver_monitoring:
   momentum:
-    # PICurv structured nonlinear history (does not enable PETSc stdout monitors).
+    # PICurv structured solver history (does not enable PETSc stdout monitors).
+    # Writes two rank-zero logs: one row per Newton iteration, and one row per
+    # Krylov iteration carrying the requested relative tolerance beside PETSc's
+    # reported residual norm - which is what separates an Eisenstat-Walker
+    # tolerance change from the linear solve genuinely degrading. The per-Krylov
+    # file is flushed every iteration, so enable it to diagnose a solve rather
+    # than for the length of a production run.
     # The Newton summary log is unconditional, like the Jameson/Poisson logs.
     newton_krylov_history: false  # -&gt; -mom_nk_pic_monitor
     snes_monitor: false           # -&gt; -mom_nk_snes_monitor
@@ -536,6 +548,9 @@ Startup banner and solver-specific output</h1>
 <p>Structured diagnostics for PETSc memory/object/function debugging plus a compact PICurv runtime memory log:</p>
 <div class="fragment"><div class="line">diagnostics:</div>
 <div class="line">  petsc:</div>
+<div class="line">    info:</div>
+<div class="line">      enabled: false</div>
+<div class="line">      classes: [snes, ksp]</div>
 <div class="line">    malloc_debug: false</div>
 <div class="line">    malloc_test: false</div>
 <div class="line">    malloc_dump: false</div>
@@ -553,6 +568,7 @@ Startup banner and solver-specific output</h1>
 <div class="line">    file: &quot;Runtime_Memory.log&quot;</div>
 </div><!-- fragment --><p>Rules:</p><ul>
 <li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
+<li><code>info.enabled: true</code> writes PETSc initialization and runtime detail to <code>&lt;run.runtime_logs&gt;/PETSc_Info_Solver.log.&lt;rank&gt;</code> (or the matching postprocessor files); PETSc appends the emitting MPI rank. <code>info.classes</code> optionally restricts output to PETSc class names such as <code>snes</code> and <code>ksp</code>; use an empty list for all classes. This maps to PETSc <code>-info</code> during initialization. See <a href="https://petsc.org/main/manualpages/Sys/PetscInfo/">PetscInfo</a>.</li>
 <li>For example, this YAML:</li>
 </ul>
 <div class="fragment"><div class="line">diagnostics:</div>
@@ -601,6 +617,7 @@ Startup banner and solver-specific output</h1>
 </ul>
 <p>Rules:</p><ul>
 <li>The structured <code>momentum.*</code> and <code>poisson.*</code> keys are booleans. <code>true</code> emits a bare switch and <code>false</code> emits nothing; no Boolean monitor is serialized as a numeric viewer argument.</li>
+<li><code>momentum.newton_krylov_history</code> writes PICurv's own rank-zero history files rather than enabling a PETSc stdout monitor: one row per Newton iteration and one row per Krylov iteration. The per-Krylov row carries the requested relative tolerance beside PETSc's reported residual norm, which is what distinguishes an Eisenstat-Walker tolerance change from the linear solve degrading. It is flushed every iteration. <a class="el" href="55__Newton__Krylov__Momentum__Solver_8md.html">Newton-Krylov guide</a> names the files and their columns. The Newton summary log is written whether or not this is set.</li>
 <li><code>petsc_passthrough_options</code> remains available for raw PETSc flags not yet exposed as structured YAML. In passthrough, <code>true</code> emits a switch-only flag, <code>false</code> omits the flag, and non-boolean values emit <code>flag value</code>.</li>
 <li><code>solver_monitoring</code> is written into the generated <code>.control</code> file and consumed during solver setup, while <code>diagnostics.petsc</code> is placed on the executable command line for PETSc initialization-time diagnostics.</li>
 <li>Legacy direct flag entries under <code>solver_monitoring</code> are still accepted for compatibility, but new profiles should prefer the structured form above.</li>

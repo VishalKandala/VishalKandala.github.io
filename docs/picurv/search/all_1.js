@@ -145,7 +145,7 @@ var searchData=
   ['10_20architecture_20and_20extension_20points_142',['10. Architecture and Extension Points',['../58_Field_Statistics.html#p58_architecture_sec',1,'']]],
   ['10_20common_20failure_20modes_143',['10. Common Failure Modes',['../44_Boundary_Conditions_Guide.html#p44_troubleshoot_sec',1,'']]],
   ['10_20extending_20the_20test_20suite_144',['10. Extending The Test Suite',['../40_Testing_and_Quality_Guide.html#p40_extend_sec',1,'']]],
-  ['10_20next_20steps_145',['10 next steps',['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps'],['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'10. Next Steps'],['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps']]],
+  ['10_20next_20steps_145',['10 next steps',['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps'],['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps'],['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'10. Next Steps']]],
   ['10_20one_20reducer_20behind_20flow_20observables_146',['10. One Reducer Behind Flow Observables',['../60_Field_Statistics_Planned_Extensions.html#p60_reducer_sec',1,'']]],
   ['10_20profiling_20selector_147',['10. Profiling Selector',['../50_Modular_Selector_Extension_Guide.html#p50_profiling_sec',1,'']]],
   ['10_20related_20documentation_148',['10. Related Documentation',['../67_Troubleshooting.html#p67_related_sec',1,'']]],
@@ -174,7 +174,7 @@ var searchData=
   ['12_20derived_20statistics_20at_20non_20periodic_20boundaries_171',['12. Derived Statistics At Non-Periodic Boundaries',['../60_Field_Statistics_Planned_Extensions.html#p60_stats_boundary_sec',1,'']]],
   ['12_20exhaustive_20readiness_20backlog_172',['12. Exhaustive-Readiness Backlog',['../40_Testing_and_Quality_Guide.html#p40_exhaustive_backlog_sec',1,'']]],
   ['12_20petsc_5fpassthrough_5foptions_173',['12. petsc_passthrough_options',['../08_Solver_Reference.html#p08_petsc_sec',1,'']]],
-  ['12_20related_20pages_174',['12 related pages',['../72_LES_Turbulence_Closure.html#p72_related_sec',1,'12. Related Pages'],['../55_Newton_Krylov_Momentum_Solver.html#p55_refs_sec',1,'12. Related Pages'],['../58_Field_Statistics.html#p58_related_sec',1,'12. Related Pages']]],
+  ['12_20related_20pages_174',['12 related pages',['../72_LES_Turbulence_Closure.html#p72_related_sec',1,'12. Related Pages'],['../58_Field_Statistics.html#p58_related_sec',1,'12. Related Pages'],['../55_Newton_Krylov_Momentum_Solver.html#p55_refs_sec',1,'12. Related Pages']]],
   ['12_20turbulence_20closure_20selectors_175',['12. Turbulence Closure Selectors',['../50_Modular_Selector_Extension_Guide.html#p50_turbulence_sec',1,'']]],
   ['12_5fcapabilities_5fsummary_2emd_176',['12_Capabilities_Summary.md',['../12__Capabilities__Summary_8md.html',1,'']]],
   ['13_20generated_20runtime_20artifacts_177',['13. Generated Runtime Artifacts',['../05_The_Conductor_Script.html#p05_artifacts_sec',1,'']]],
@@ -193,5 +193,7 @@ var searchData=
   ['17_20related_20pages_190',['17. Related Pages',['../60_Field_Statistics_Planned_Extensions.html#p60_related_sec',1,'']]],
   ['17_5fworkflow_5fextensibility_2emd_191',['17_Workflow_Extensibility.md',['../17__Workflow__Extensibility_8md.html',1,'']]],
   ['19_5fnondimensionalization_2emd_192',['19_Nondimensionalization.md',['../19__Nondimensionalization_8md.html',1,'']]],
-  ['1a_20the_20two_20momentum_20solution_20approaches_193',['1a. The Two Momentum-Solution Approaches',['../31_Momentum_Solvers.html#p31_approaches_sec',1,'']]]
+  ['1a_20the_20two_20momentum_20solution_20approaches_193',['1a. The Two Momentum-Solution Approaches',['../31_Momentum_Solvers.html#p31_approaches_sec',1,'']]],
+  ['1d90f08_20nk_20pointblock_20transpose_194',['1d90f08-nk-pointblock-transpose',['../md_docs_2changelog_8d_21d90f08-nk-pointblock-transpose.html',1,'']]],
+  ['1d90f08_2dnk_2dpointblock_2dtranspose_2emd_195',['1d90f08-nk-pointblock-transpose.md',['../1d90f08-nk-pointblock-transpose_8md.html',1,'']]]
 ];

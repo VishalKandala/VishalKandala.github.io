@@ -270,6 +270,15 @@ momentum_solver:
   #     max_iterations: 12           # -&gt; -mom_nk_snes_max_it
   #     line_search:
   #       type: "bt"                 # -&gt; -mom_nk_snes_linesearch_type
+  #     eisenstat_walker:
+  #       enabled: true              # false keeps the KSP tolerance fixed
+  #       version: 3
+  #       initial_relative_tolerance: 0.3
+  #       maximum_relative_tolerance: 0.9
+  #       gamma: 1.0
+  #       exponent: 1.618033988749895
+  #       safeguard_exponent: 1.618033988749895
+  #       safeguard_threshold: 0.1
   #   linear_solver:
   #     method: "gmres"              # -&gt; -mom_nk_ksp_type
   #     absolute_tolerance: 1.0e-10  # -&gt; -mom_nk_ksp_atol
@@ -680,6 +689,15 @@ transient</h2>
 <div class="line">      max_iterations: 12</div>
 <div class="line">      line_search:</div>
 <div class="line">        type: bt</div>
+<div class="line">      eisenstat_walker:</div>
+<div class="line">        enabled: true</div>
+<div class="line">        version: 3</div>
+<div class="line">        initial_relative_tolerance: 0.3</div>
+<div class="line">        maximum_relative_tolerance: 0.9</div>
+<div class="line">        gamma: 1.0</div>
+<div class="line">        exponent: 1.618033988749895</div>
+<div class="line">        safeguard_exponent: 1.618033988749895</div>
+<div class="line">        safeguard_threshold: 0.1</div>
 <div class="line">    linear_solver:</div>
 <div class="line">      method: gmres</div>
 <div class="line">      absolute_tolerance: 1.0e-10</div>
@@ -688,7 +706,8 @@ transient</h2>
 <div class="line">      gmres:</div>
 <div class="line">        restart: 80</div>
 </div><!-- fragment --><p>Mappings are <code>nonlinear_solver.method/absolute_tolerance/relative_tolerance/step_tolerance/max_iterations</code> to <code>-mom_nk_snes_type/-mom_nk_snes_atol/-mom_nk_snes_rtol/-mom_nk_snes_stol/-mom_nk_snes_max_it</code>, <code>line_search.type</code> to <code>-mom_nk_snes_linesearch_type</code>, and the corresponding <code>linear_solver</code> fields to <code>-mom_nk_ksp_type/-mom_nk_ksp_atol/-mom_nk_ksp_rtol/-mom_nk_ksp_max_it</code>. <code>gmres.restart</code> maps to <code>-mom_nk_ksp_gmres_restart</code>. The Jacobian fields map to <code>-mom_nk_jacobian_type/-mom_nk_jacobian_fd_mode</code>; the preconditioner fields map to <code>-mom_nk_preconditioner_model/-mom_nk_preconditioner_structure</code>.</p>
-<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Supported combinations are finite difference/matrix free with either no preconditioner or frozen momentum Jacobian/point block. The released <code>linear_solver.preconditioner.type: none</code> remains a deprecated alias for the no-preconditioner model. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime. The Jacobian block is a strict discriminated configuration: an explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>. <code>colored_sparse</code>, <code>frozen_momentum_approximation</code>, and irrelevant sibling configuration are rejected because their implementations are not present.</p>
+<p><code>eisenstat_walker.enabled: false</code> leaves the configured KSP relative tolerance fixed. <code>enabled: true</code> enables PETSc's inexact-Newton forcing term. Its seven fields map to <code>-mom_nk_snes_ksp_ew_version</code>, <code>-mom_nk_snes_ksp_ew_rtol0</code>, <code>-mom_nk_snes_ksp_ew_rtolmax</code>, <code>-mom_nk_snes_ksp_ew_gamma</code>, <code>-mom_nk_snes_ksp_ew_alpha</code>, <code>-mom_nk_snes_ksp_ew_alpha2</code>, and <code>-mom_nk_snes_ksp_ew_threshold</code>. PETSc supports EW versions 1 through 4; version 3 is therefore selectable directly. When EW is active, <code>linear_solver.relative_tolerance</code> is the initial KSP tolerance and PETSc may replace it before each Newton linear solve.</p>
+<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Supported combinations are finite difference/matrix free with either no preconditioner or frozen momentum Jacobian/point block. The released <code>linear_solver.preconditioner.type: none</code> remains a deprecated alias for the no-preconditioner model. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime. The Jacobian block is a strict discriminated configuration: an explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>. <code>colored_sparse</code>, <code>frozen_momentum_approximation</code>, and irrelevant sibling configuration are rejected because their implementations are not present. Advanced SNES, line-search, KSP, GMRES, and PC options that do not have structured PICurv fields remain available through <code>petsc_passthrough_options</code> with the <code>-mom_nk_</code> prefix. See PETSc's <a href="https://petsc.org/main/manual/snes/">SNES manual</a>, <a href="https://petsc.org/main/manualpages/SNES/SNESSetFromOptions/">SNES option list</a>, and <a href="https://petsc.org/main/manualpages/KSP/KSPSetFromOptions/">KSP option list</a>. PETSc startup-only options such as <code>-info</code> belong under <code>monitor.diagnostics.petsc</code>.</p>
 <h1><a class="anchor" id="p08_poisson_sec"></a>
 7. poisson_solver</h1>
 <dl class="section note"><dt>Note</dt><dd>**<code>preconditioner.type</code> accepts one value.** <code>multigrid</code> is the only outer preconditioner the Poisson solve supports, because the runtime assumes PETSc <code>PCMG</code> setup. <code>mg</code> and <code>pcmg</code> are accepted spellings for it. There is no choice to make here today, which is why it is documented as a parameter rather than as a capability family; <code>tests/tooling/family_census.json</code> records that classification, and the census fails if a second value is ever added without a family being registered for it.</dd></dl>
