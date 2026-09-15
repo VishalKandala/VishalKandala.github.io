@@ -175,16 +175,15 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>seeds that file from a repo-root <code>.picurv-execution.yml</code> when the source clone already has one, otherwise from inert defaults,</li>
 <li>does <b>not</b> copy binaries by default; runtime executables are resolved from the project <code>bin/</code> directory via PATH.</li>
 </ul>
-<p>Binary pinning (<code>--pin-binaries</code>):</p>
+<p>Binary pinning (<code>--pin-binaries</code>, superseded by run-time pinning):</p>
 <ul>
 <li>when <code>--pin-binaries</code> is passed, <code>simulator</code> and <code>postprocessor</code> are copied into the case directory,</li>
-<li>case-local copies take precedence over <code>bin/</code> originals at runtime (<code>resolve_runtime_executable</code> checks the invocation directory first),</li>
-<li>use this when submitting Slurm jobs and you may rebuild the repo before the job runs,</li>
+<li><code>resolve_runtime_executable</code> uses a copy only when it is a sibling of the <code>picurv</code> script that was invoked. <code>init</code> places no launcher in the case, so the <code>picurv</code> on PATH ignores these copies and launches the installation's <code>bin/</code>,</li>
+<li>to keep a queued job on the build it was staged with, rely on run-time pinning instead (<a class="el" href="05_The_Conductor_Script.html#p05_binaries_sec">12. Binary Resolution and Rebuild Safety</a>). The flag remains until the next release,</li>
 <li><code>picurv</code> itself is never copied — it is always used from PATH and is safe to update mid-run since it only launches the C binaries.</li>
 </ul>
 <p>Examples:</p>
 <div class="fragment"><div class="line">picurv init flat_channel --dest my_first_case</div>
-<div class="line">picurv init bent_channel --dest my_bent_case --pin-binaries</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_build_sec"></a>
 3. build: Build Project Executables</h1>
 <div class="fragment"><div class="line">./picurv_cli/picurv build [--source-root &lt;repo&gt;] [--case-dir &lt;case&gt;] [MAKE_ARGS...]</div>
@@ -217,12 +216,16 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p><code>picurv version</code> prints the release, Git commit, and dirty-tree build identity of the Python conductor, then reads back what <code>simulator --version</code> and <code>postprocessor --version</code> actually report. Those two identities are not the same fact: the conductor's says which source staged a run, the binaries' says which build produced its checkpoints, and an edited C tree that was never rebuilt makes them disagree. The run manifest records both, and <code>run</code> warns at staging when a binary is stale.</p>
 <p><code>picurv version status</code> reports the same thing and then <em>validates</em> it, exiting 1 when the conductor, either executable, or the workspace's <code>software.picurv</code> requirement disagree, and naming each disagreement. Bare <code>picurv version</code> always exits 0: it is an informational surface, and a job script that must refuse an incoherent build should ask for the validating form explicitly. Both accept <code>--format json</code>, which adds <code>coherent</code> and <code>problems</code> to the payload.</p>
 <p><code>make</code> delivers the identity through a generated <code>include/picurv_build_identity.h</code> rather than command-line defines, so ordinary header-dependency tracking rebuilds the two translation units that stamp it whenever the commit or dirty state changes. A binary reporting release <code>0.0.0</code> was built outside <code>make</code> and carries no identity.</p>
-<p><code>picurv source update</code> fetches branches and tags without changing the active checkout. <code>picurv versions list</code> reports tags; <code>versions install &lt;version&gt;</code> or <code>versions activate [version]</code> requires a clean source checkout, selects the exact Git version, and rebuilds. With no argument, <code>activate</code> reads the workspace's exact <code>software.picurv</code> value and refuses ranges.</p>
-<dl class="section note"><dt>Note</dt><dd><b>One installation, activated in place.</b> PICurv installs as a single source checkout that <code>versions activate</code> rewrites by <code>git checkout --detach &lt;tag&gt;</code> followed by <code>make all</code>. It does not install side-by-side versioned prefixes such as <code>/software/picurv/0.2.0/</code>, and <code>picurv</code> is not a version multiplexer.</dd></dl>
+<p><code>picurv source update</code> fetches branches and tags without changing the active checkout. <code>picurv versions list</code> reports tags; <code>versions install &lt;version&gt;</code> or <code>versions activate [version]</code> requires a clean source checkout, selects the exact Git version, and rebuilds. A bare release such as <code>0.1.0</code> resolves to its <code>v0.1.0</code> tag when no ref carries the bare name. With no argument, <code>activate</code> reads the workspace's exact <code>software.picurv</code> value and refuses ranges.</p>
+<p>Make variables and options after the version reach <code>make</code> exactly as they do for <code>picurv build</code>, so a cluster install names its build configuration:</p>
+<div class="fragment"><div class="line">picurv versions install 0.1.0 SYSTEM=cluster</div>
+<div class="line">picurv versions activate SYSTEM=cluster        # version from the workspace pin</div>
+</div><!-- fragment --><p>A make target is refused, because the install verifies the default build. Success is reported only after <code>simulator</code> and <code>postprocessor</code> report the identity of the commit just checked out; the conductor re-reads that identity rather than using the one it computed at startup, which still names the previous commit.</p>
+<dl class="section note"><dt>Note</dt><dd><b>One installation, activated in place.</b> PICurv installs as a single source checkout that <code>versions activate</code> rewrites by <code>git checkout --detach &lt;tag&gt;</code> followed by the default <code>make</code> build. It does not install side-by-side versioned prefixes such as <code>/software/picurv/0.2.0/</code>, and <code>picurv</code> is not a version multiplexer.</dd></dl>
 <p>That is a deliberate trade, and it has three consequences worth knowing before you rely on a version pin:</p>
 <ul>
 <li><b>Two workspaces pinned to different releases cannot both be satisfied.</b> Activating for one makes the other's <code>software.picurv</code> requirement fail. There is one active release per installation, not one per workspace.</li>
-<li><b>Activating changes running jobs.</b> Executables resolve from the installation's <code>bin/</code>, so a rebuild replaces <code>simulator</code> and <code>postprocessor</code> underneath a job that is already using them. <code>picurv init --pin-binaries</code> copies them into the case and is the supported way to make a run immune to this; use it for anything submitted to a scheduler.</li>
+<li><b>Activating changes unpinned jobs.</b> A job that launches the installation's <code>bin/</code> runs whatever was built last when it starts. Every generated job script refuses to launch an executable whose identity differs from the one read at staging, and a run staged with <code>--pin-executables</code> keeps its own copies (<a class="el" href="05_The_Conductor_Script.html#p05_binaries_sec">12. Binary Resolution and Rebuild Safety</a>).</li>
 <li><b>Development and version-switching share one tree.</b> <code>activate</code> refuses a dirty checkout, so uncommitted work must be committed or stashed first.</li>
 </ul>
 <p>Both <code>versions activate</code> and a failed workspace version check name the installation they would change, so the effect is stated rather than discovered. If you need concurrent releases — several people on one filesystem, or reproducing a published result while developing against a newer tree — install PICurv more than once and select between them with your shell or your site's module system.</p>
@@ -232,7 +235,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">./my_case/picurv sync-config --overwrite</div>
 <div class="line">./my_case/picurv sync-config --prune</div>
 </div><!-- fragment --><p><code>--prune</code> is conservative: it removes only files previously recorded as template-managed that no longer exist in the source template. User-created case files are not pruned. <code>sync-config</code> does not copy <code>execution.example.yml</code> into a case; instead it creates <code>.picurv-execution.yml</code> only when the case does not already have one.</p>
-<p><code>pull-source</code> refreshes every local branch with a configured upstream, then restores the branch you started on, so you can update code without leaving the case directory:</p>
+<p><code>pull-source</code> refreshes every local branch with a configured upstream, then restores the branch you started on, so you can update code without leaving the case directory. It refuses a checkout detached by <code>versions install</code> or <code>versions activate</code>: restoring that commit after the pull would leave the code that runs unchanged while the branches moved.</p>
 <div class="fragment"><div class="line">./my_case/picurv pull-source</div>
 <div class="line">./my_case/picurv pull-source --current-branch-only</div>
 <div class="line">./my_case/picurv pull-source --no-rebase</div>
@@ -603,6 +606,12 @@ or to protect running jobs from concurrent rebuilds.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml for Slurm execution mode.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--scheduler</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit scheduler selector (currently 'slurm').</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--no-submit</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Stage run artifacts without starting local execution or Slurm submission.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--pin-executables</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Copy simulator and postprocessor into the run's config/bin/ at staging, so a later
+rebuild of the installation cannot change what the job runs. On a pinned run,
+re-pins it to the current build.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--no-pin-executables</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Launch the installation's executables even when the workspace sets
+reproducibility.pin_executables. Slurm jobs still check at start that they
+report the build identity read at staging.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--dry-run</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Resolve and print planned commands/artifacts, including diagnostic flags and log paths, without writing files.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--format</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone"><code>json</code>, <code>text</code></td><td class="markdownTableBodyNone"><code>text</code></td><td class="markdownTableBodyNone">Output format for --dry-run (default: text).</td></tr>
 </table>
@@ -863,6 +872,12 @@ task-name substring when the recipe measured more than one spectrum
 <tr><td class="markdownTableBodyNone"><code>--study</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to study.yml defining either a `parameters` cross-product expansion or explicit parameter_sets, plus metrics.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml defining Slurm resources.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--no-submit</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Generate all study artifacts without submitting jobs.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--pin-executables</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Copy simulator and postprocessor into the run's config/bin/ at staging, so a later
+rebuild of the installation cannot change what the job runs. On a pinned run,
+re-pins it to the current build.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--no-pin-executables</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Launch the installation's executables even when the workspace sets
+reproducibility.pin_executables. Slurm jobs still check at start that they
+report the build identity read at staging.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--study-dir</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to an existing study directory (for --continue/--reaggregate).</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--continue</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Continue a partially-completed study. Requires --study-dir.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--reaggregate</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Re-run metrics aggregation on a completed study. Requires --study-dir.</td></tr>
@@ -916,6 +931,7 @@ refusing. Requires a configured storage profile.</td></tr>
 <p><b>positional arguments</b></p>
 <table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
 <tr><td class="markdownTableBodyNone"><code>version</code> (positional)</td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Version/tag; defaults to the workspace requirement.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>make_args</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Make variables and options passed to the build, as with 'picurv build' (for example SYSTEM=cluster). Place them after every picurv option.</td></tr>
 </table>
 <p><b>options</b></p>
 <table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
@@ -925,7 +941,8 @@ refusing. Requires a configured storage profile.</td></tr>
 <h4 id="cli_versions_install"><code>picurv versions install</code></h4>
 <p><b>positional arguments</b></p>
 <table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
-<tr><td class="markdownTableBodyNone"><code>version</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"></td></tr>
+<tr><td class="markdownTableBodyNone"><code>version</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Tag, bare release (resolved to v&lt;release&gt;), or commit.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>make_args</code> (positional)</td><td class="markdownTableBodyNone">yes</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Make variables and options passed to the build, as with 'picurv build' (for example SYSTEM=cluster). Place them after every picurv option.</td></tr>
 </table>
 <p><b>options</b></p>
 <table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
@@ -1075,7 +1092,7 @@ refusing. Requires a configured storage profile.</td></tr>
 <li>optional:<ul>
 <li><code>--dest &lt;dir&gt;</code></li>
 <li><code>--source-root &lt;repo&gt;</code></li>
-<li><code>--pin-binaries</code> (copy <code>simulator</code>/<code>postprocessor</code> into the case for version-pinning)</li>
+<li><code>--pin-binaries</code> (legacy; copies <code>simulator</code>/<code>postprocessor</code> into the case, used only when that directory's own <code>picurv</code> is invoked)</li>
 </ul>
 </li>
 </ul>
@@ -1206,11 +1223,32 @@ refusing. Requires a configured storage profile.</td></tr>
 </ul>
 <h1><a class="anchor" id="p05_binaries_sec"></a>
 12. Binary Resolution and Rebuild Safety</h1>
-<p><code>picurv</code> resolves <code>simulator</code> and <code>postprocessor</code> at launch time using this precedence:</p>
+<p><code>picurv</code> resolves <code>simulator</code> and <code>postprocessor</code> for a run using this precedence:</p>
 <ol type="1">
-<li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code>), it is used first.</li>
+<li><b>The run's pinned copies</b> — when the run's <code>&lt;run.config&gt;/active.json</code> records <code>executables</code>, every stage of that run launches those copies.</li>
+<li><b>Invocation directory</b> — if the binary exists as a sibling of the invoked <code>picurv</code> script (e.g. case-local copies from <code>--pin-binaries</code>), it is used next.</li>
 <li><b>Project <code>bin/</code> directory</b> — the default location after <code>make all</code>.</li>
 </ol>
+<p><b>Run-time pinning (opt-in).</b> Staging a solve with <code>--pin-executables</code> copies both executables into <code>&lt;run.config.bin&gt;</code> and records each copy's path, SHA-256, and build identity in <code>active.json</code>. The run manifest and software lock then describe those copies, not the installation. Without the switch a run launches the installation's <code>bin/</code>.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Setting   </th><th class="markdownTableHeadNone">Pins    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">neither switch, no workspace setting   </td><td class="markdownTableBodyNone">no    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>--pin-executables</code> on <code>run</code> or <code>sweep</code>   </td><td class="markdownTableBodyNone">yes    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>reproducibility.pin_executables: true</code> in the workspace   </td><td class="markdownTableBodyNone">yes, for every staging in it    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>--no-pin-executables</code>   </td><td class="markdownTableBodyNone">no, even when the workspace sets it   </td></tr>
+</table>
+<ul>
+<li>A continuation keeps the run's pin. <code>--pin-executables</code> on a pinned run re-pins it to the current build under that continuation's revision in <code>&lt;run.config.history&gt;</code>; <code>--no-pin-executables</code> on a pinned run is refused, so the run's records never name a build it did not launch.</li>
+<li>Post-processing launches the postprocessor the run is pinned to. The switches apply only when a solve is staged.</li>
+<li>Each member of a sweep is pinned in its own run directory, and the array scripts launch <code>$RUN_DIR</code>'s copy. A study whose members disagree about pinning is refused.</li>
+<li>An executable that is not built is left unpinned with a warning.</li>
+</ul>
+<p><b>Job-start identity check.</b> Every generated Slurm script, pinned or not, runs the executable's <code>--version</code> after module setup and before the launcher, and exits before any rank starts when the reported identity differs from the one read at staging. When staging could not read an identity, the job logs the one it finds and launches.</p>
 <p><code>bin/picurv</code> is a launcher for <code>picurv_cli/picurv</code>. This means:</p>
 <ul>
 <li>there is one stable executable entrypoint backed by the <code>picurv_cli/</code> package,</li>
@@ -1221,14 +1259,12 @@ refusing. Requires a configured storage profile.</td></tr>
 <p><b>Rebuilding while jobs are running:</b></p>
 <ul>
 <li>Updating <code>picurv</code> (the Python script) mid-run is always safe — it is only used to launch jobs, not during solver execution.</li>
-<li>Rebuilding <code>simulator</code>/<code>postprocessor</code> (<code>make all</code>) overwrites the binaries in <code>bin/</code>. If a Slurm job references <code>bin/simulator</code> by absolute path and has not yet started, the running binary may be replaced before execution begins.</li>
-<li>For a queued production job, use a tagged release checkout or an explicitly pinned legacy binary copy. The run manifest records the build identity that staged it; <code>picurv version</code> checks the currently active identity.</li>
+<li>Rebuilding <code>simulator</code>/<code>postprocessor</code> (<code>make all</code>) overwrites the binaries in <code>bin/</code>. A pinned run is unaffected. An unpinned Slurm job that has not started fails its job-start identity check instead of running the new build, and has to be restaged.</li>
+<li>The run manifest records the build identity of the executables the run launches; <code>picurv version</code> checks the currently active identity.</li>
 </ul>
 <p><b>Recommended workflow for concurrent development and production:</b></p>
-<div class="fragment"><div class="line">picurv init flat_channel --dest production_case --pin-binaries</div>
-<div class="line">picurv run --solve --cluster cluster.yml ...   # uses case-local binaries</div>
-<div class="line"># safe to rebuild in the repo now — production_case has its own copies</div>
-<div class="line">make all</div>
+<div class="fragment"><div class="line">picurv run --solve --cluster cluster.yml --pin-executables ...   # copies bin/ into the run</div>
+<div class="line">make all                                                         # safe: the run keeps its copies</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_cap_input_mode_sec"></a>
 12.1 Workspace Input Import Mode Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: workspace.input_import_mode.
