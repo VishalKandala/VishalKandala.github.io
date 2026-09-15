@@ -1,7 +1,1 @@
-var searchData=
-[
-  ['yaml_0',['yaml',['../07_Case_Reference.html',1,'Configuration Reference: Case YAML'],['../09_Monitor_Reference.html',1,'Configuration Reference: Monitor YAML'],['../10_Post_Processing_Reference.html',1,'Configuration Reference: Postprocessor YAML'],['../08_Solver_Reference.html',1,'Configuration Reference: Solver YAML']]],
-  ['yaml_20generated_20artifacts_20runtime_1',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['your_20first_20simulation_20flat_20channel_2',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
-  ['your_20results_3',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]]
-];
+var searchData=[["yaml_0",["yaml",["../07_Case_Reference.html",1,"Configuration Reference: Case YAML"],["../09_Monitor_Reference.html",1,"Configuration Reference: Monitor YAML"],["../10_Post_Processing_Reference.html",1,"Configuration Reference: Postprocessor YAML"],["../08_Solver_Reference.html",1,"Configuration Reference: Solver YAML"]]],["yaml_20generated_20artifacts_20runtime_1",["Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)",["../14_Config_Contract.html",1,""]]],["your_20first_20simulation_20flat_20channel_2",["Tutorial: Your First Simulation (Flat Channel)",["../02_Tutorial_Programmatic_Grid.html",1,""]]],["your_20results_3",["Tutorial: A Guide to Visualizing Your Results",["../04_Visualization_Tutorial.html",1,""]]]];
