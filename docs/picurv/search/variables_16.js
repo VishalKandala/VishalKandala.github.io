@@ -16,5 +16,6 @@ var searchData=
   ['verificationdiffusivity_13',['verificationDiffusivity',['../variables_8h.html#af0d82f65e4a21ecb3fc53304b3876394',1,'SimCtx']]],
   ['verificationscalar_14',['verificationScalar',['../variables_8h.html#a8239d0a566d87f37bbaa925bf90e9d72',1,'SimCtx']]],
   ['version_5ffile_15',['VERSION_FILE',['../namespacepicurv__cli_1_1core.html#a81651329b2c7ba764f5bc3a04ff6ce61',1,'picurv_cli::core']]],
-  ['vertices_16',['vertices',['../variables_8h.html#af61db2c548db385ce7a20b00b55cdbab',1,'Cell']]]
+  ['vertices_16',['vertices',['../variables_8h.html#af61db2c548db385ce7a20b00b55cdbab',1,'Cell']]],
+  ['vreman_5fcoefficient_17',['vreman_coefficient',['../variables_8h.html#acae0ed2ea586b2e5b7eab86efdd9882d',1,'LESConfig']]]
 ];

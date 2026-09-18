@@ -106,11 +106,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p07_les_sec">5. LES Subgrid Models</a><ul><li class="level2"><a href="#p07_cap_les_none_sub">none</a></li>
 <li class="level2"><a href="#p07_cap_les_constant_smagorinsky_sub">constant_smagorinsky</a></li>
 <li class="level2"><a href="#p07_cap_les_dynamic_smagorinsky_sub">dynamic_smagorinsky</a></li>
+<li class="level2"><a href="#p07_cap_les_vreman_sub">vreman</a></li>
+<li class="level2"><a href="#p07_cap_les_wale_sub">wale</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p07_les_width_sec">5.1 Grid Filter Width Entries</a><ul><li class="level2"><a href="#p07_cap_width_cube_root_volume_sub">cube_root_volume</a></li>
 <li class="level2"><a href="#p07_cap_width_geometric_mean_sub">geometric_mean</a></li>
 <li class="level2"><a href="#p07_cap_width_max_edge_sub">max_edge</a></li>
+<li class="level2"><a href="#p07_cap_width_scotti_sub">scotti</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p07_les_avg_sec">5.2 Coefficient Averaging Entries</a><ul><li class="level2"><a href="#p07_cap_avg_local_sub">local</a></li>
@@ -353,10 +356,9 @@ models:
       #   les: true        -&gt; -les 1 (constant Smagorinsky)
       #   les: 1           -&gt; constant Smagorinsky
       #   les: 2           -&gt; dynamic Smagorinsky
-      # WARNING: both LES models are known-defective and unsafe for scientific use.
-      #   dynamic_smagorinsky - M_ij carries no dynamic content.
-      #   constant_smagorinsky - coefficient stays zero on a fresh run.
-      # Records: tests/tooling/capability_scope_records.json
+      # All four models are experimental: implemented and unit-tested, not yet
+      # validated against a reference flow. See docs/pages/07_Case_Reference.md.
+      # Each model's own parameters are refused under the others.
       les:
         # [Boolean] -&gt; -les 0 when false
         enabled: false
@@ -366,12 +368,24 @@ models:
         #                           allocated, checkpointed, or synchronized.
         #   dynamic_smagorinsky  -&gt; the Germano-Lilly procedure measures the
         #                           coefficient from the resolved field each update.
+        #   vreman               -&gt; resolved per grid direction from the cell's own
+        #                           edges; vanishes in pure shear; takes no filter_width.
+        #   wale                 -&gt; vanishes in pure shear and falls correctly toward a
+        #                           wall; one scalar width, so pair with scotti.
         # [String] -&gt; -les
         # model: "constant_smagorinsky"
 
         # The fixed Smagorinsky constant. constant_smagorinsky only.
         # [Number] -&gt; -les_constant_cs
         constant_cs: 0.03
+
+        # Model constant c. vreman only. Vreman (2004): 2.5 Cs^2 = 0.07 for Cs = 0.17.
+        # [Number] -&gt; -les_vreman_coefficient
+        # vreman_coefficient: 0.07
+
+        # Model constant C_w. wale only. Nicoud &amp; Ducros (1999) calibrate 0.55-0.60.
+        # [Number] -&gt; -les_wale_coefficient
+        # wale_coefficient: 0.5
 
         # Recompute the dynamic coefficient every N steps. dynamic_smagorinsky only;
         # the constant model has nothing to recompute.
@@ -381,8 +395,12 @@ models:
         # How each cell's grid filter width Delta is derived.
         #   cube_root_volume -&gt; (cell volume)^(1/3); exact for a cube and increasingly
         #                       optimistic as the cell is stretched.
-        #   geometric_mean   -&gt; geometric mean of the Cartesian cell extents.
-        #   max_edge         -&gt; the longest extent; conservative on stretched grids.
+        #   geometric_mean   -&gt; geometric mean of the cell's extents along its own grid
+        #                       directions; equals cube_root_volume on orthogonal cells.
+        #   max_edge         -&gt; the longest extent; for wall-modelled or hybrid runs, not
+        #                       a wall-resolved mesh, where it swamps the wall layer.
+        #   scotti           -&gt; cube root corrected for the cell's aspect ratios; the
+        #                       choice for moderately stretched wall-resolved cells.
         # [String] -&gt; -les_filter_width
         filter_width: "cube_root_volume"
 
@@ -861,8 +879,10 @@ grid_gen</h2>
 <li><code>domain.blocks</code> -&gt; <code>-nblk</code></li>
 <li>periodic axes are derived from paired <code>PERIODIC</code> boundary conditions before DMDA creation; <code>models.domain</code> does not accept periodic flags</li>
 <li><code>physics.dimensionality: "2D"</code> -&gt; <code>-TwoD 1</code></li>
-<li><code>physics.turbulence.les.enabled/model</code> -&gt; <code>-les</code> (<code>0</code> none, <code>1</code> constant Smagorinsky, <code>2</code> dynamic Smagorinsky)</li>
+<li><code>physics.turbulence.les.enabled/model</code> -&gt; <code>-les</code> (<code>0</code> none, <code>1</code> constant Smagorinsky, <code>2</code> dynamic Smagorinsky, <code>3</code> Vreman, <code>4</code> WALE)</li>
 <li><code>physics.turbulence.les.constant_cs</code> -&gt; <code>-les_constant_cs</code></li>
+<li><code>physics.turbulence.les.vreman_coefficient</code> -&gt; <code>-les_vreman_coefficient</code></li>
+<li><code>physics.turbulence.les.wale_coefficient</code> -&gt; <code>-les_wale_coefficient</code></li>
 <li><code>physics.turbulence.les.dynamic_frequency</code> -&gt; <code>-les_dynamic_frequency</code></li>
 <li><code>physics.turbulence.les.filter_width</code> -&gt; <code>-les_filter_width</code></li>
 <li><code>physics.turbulence.les.test_filter.kernel/width_ratio</code> -&gt; <code>-les_test_filter_kernel</code>, <code>-les_test_filter_width_ratio</code></li>
@@ -910,6 +930,8 @@ grid_gen</h2>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_les_none"><code>none</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_les_none"><code>off</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">accepted spelling of <code>none</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_les_constant_smagorinsky"><code>smagorinsky</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">accepted spelling of <code>constant_smagorinsky</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_les_vreman"><code>vreman</code></a></td><td class="markdownTableBodyNone"><code>3</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_les_wale"><code>wale</code></a></td><td class="markdownTableBodyNone"><code>4</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <h2><a class="anchor" id="p07_cap_les_none_sub"></a>
 none</h2>
@@ -928,7 +950,7 @@ constant_smagorinsky</h2>
 <p><b>When to choose it.</b> When you want subgrid dissipation, know a coefficient appropriate to your flow, and would rather not pay for the dynamic procedure. It is also the right choice on a geometry with no homogeneous direction, where a local dynamic coefficient is at its noisiest.</p>
 <p><b>Parameters it owns.</b> <code>constant_cs</code> -&gt; <code>-les_constant_cs</code>, the fixed coefficient, and <code>filter_width</code> -&gt; <code>-les_filter_width</code>, which sets how <code>Delta</code> is derived per cell.</p>
 <dl class="section warning"><dt>Warning</dt><dd><code>constant_cs</code> defaults to <b>0.03</b>, which is a wall-bounded value. Isotropic turbulence conventionally uses Lilly's 0.16-0.17, but only where the grid cutoff sits in an inertial range; at low <code>Re_lambda</code> a smaller value near 0.1 is more appropriate. The default is not a universal choice - set it deliberately for your flow.</dd></dl>
-<p><b>Interactions.</b> Mutually exclusive with RANS. The test-filter, averaging, and clipping controls belong to the dynamic procedure and are rejected here rather than silently ignored.</p>
+<p><b>Interactions.</b> Mutually exclusive with RANS. <code>dynamic_frequency</code> and the test-filter, averaging, and clipping controls belong to the dynamic procedure, and the other models' coefficients to those models; all are rejected here rather than silently ignored.</p>
 <p><b>Storage.</b> This model allocates no coefficient field. The coefficient is a number from the configuration, so <code>nu_t</code> is built from it directly; nothing is synchronized, checkpointed, or written to disk on its behalf.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved turbulence model. With <code>diagnostics.enabled</code> set, <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> records the eddy-viscosity levels and the modelled subgrid energy each step. The eddy-viscosity field is available for output.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>constant-model-needs-no-coefficient-field</code> runs the model with no coefficient field allocated and checks the resulting <code>nu_t</code> against the closed form.</p>
@@ -939,12 +961,34 @@ dynamic_smagorinsky</h2>
 <p><b>What it does.</b> Measures the model coefficient from the resolved field each update rather than prescribing it, using the Germano identity and Lilly's least-squares contraction. The resolved velocity is filtered a second time at a wider test scale; the stress carried between the two scales is computable, and matching the model against it determines the coefficient. The full derivation is in <b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b>.</p>
 <p><b>When to choose it.</b> When the coefficient should respond to the flow: transitional regions, near walls, or decaying turbulence, where a single constant is wrong somewhere in the domain.</p>
 <p><b>Parameters it owns.</b> <code>dynamic_frequency</code> -&gt; <code>-les_dynamic_frequency</code>, plus the <code>filter_width</code>, <code>test_filter</code>, <code>averaging</code>, and <code>clipping</code> blocks documented below.</p>
-<p><b>Interactions.</b> Mutually exclusive with RANS. <code>constant_cs</code> belongs to the constant model and is rejected here.</p>
+<p><b>Interactions.</b> Mutually exclusive with RANS. <code>constant_cs</code>, <code>vreman_coefficient</code>, and <code>wale_coefficient</code> belong to the other models and are rejected here.</p>
 <p><b>Storage.</b> The coefficient field is stored in <code>CS</code> and checkpointed. It holds <code>C</code>, the factor multiplying <code>Delta^2 |S|</code>, which is <code>Cs^2</code> in the classical notation - not <code>Cs</code>. Under <code>clipping.mode: none</code> it is signed, because a negative coefficient is backscatter.</p>
 <p><b>Diagnostics.</b> With <code>diagnostics.enabled</code>, <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> records the effective coefficient converted to <code>Cs</code>, its spatial spread, eddy-viscosity levels, and the fractions of the domain that were backscattering or limited before clipping. Those last two describe a pre-clipping state that no stored field preserves. <code>diagnostics.cadence</code> sets the interval, and <code>diagnostics.yoshizawa_ci</code> sets the constant in the reported subgrid kinetic energy; neither affects the solution. <code>picurv summarize --plot les.cs_effective</code> renders the coefficient history directly.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage in <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code>: the model tensor is checked against its closed form on constant strain, the filtered product is pinned apart from the product of filtered factors, the procedure returns exactly zero on uniform flow, and global averaging is checked to give one coefficient per block. The averaging reduction is checked to be decomposition-independent in <code><a class="el" href="test__mpi__kernels_8c.html" title="C unit tests for MPI collective helper routines.">tests/c/test_mpi_kernels.c</a></code>. <code>examples/decaying_isotropic_turbulence</code> exercises the model end to end; on a shortened 32^3 run of it the coefficient field comes out uniform to roundoff under <code>averaging.mode: homogeneous</code>, as averaging over a homogeneous set must, and <code>Cs</code> climbs monotonically from a random initial field. That is a trend check, not a validation - the run was not carried far enough for <code>Cs</code> to settle.</p>
 <dl class="section note"><dt>Note</dt><dd><b>Status: experimental.</b> The formulation is correct and unit-tested, but the coefficient has not yet been validated against a reference flow. The check that would settle it is decaying isotropic turbulence with homogeneous averaging, where <code>Cs(t)</code> should settle near 0.16-0.17; until that run is recorded, treat the magnitude as uncharacterized.</dd></dl>
 <p><b>Limitations.</b> The procedure needs a developed field to sample, so the coefficient is held at zero for the first two steps of a run started from rest. With <code>averaging.mode: local</code> the coefficient is noisy and the least-squares closure is formally inconsistent, since it assumes the coefficient is constant over the averaging set; prefer <code>homogeneous</code> wherever the flow has a homogeneous direction.</p>
+<h2><a class="anchor" id="p07_cap_les_vreman_sub"></a>
+vreman</h2>
+<p><a class="anchor" id="p07_cap_les_vreman"></a> <b>Identity.</b> <code>model: vreman</code> -&gt; <code>-les 3</code> -&gt; <code>VREMAN</code> -&gt; <a class="el" href="les_8h.html#afdf56b95d87a75ef5734f6c49cbfefaf">VremanEddyViscosity</a>.</p>
+<p><b>What it does.</b> Vreman (2004): <code>nu_t = c sqrt(B_beta / (alpha_ij alpha_ij))</code>, with <code>alpha_ij = du_j/dx_i</code> and <code>beta_ij</code> the sum over the cell's three grid directions of the outer product of the velocity change across the cell in that direction, <code>edge_m . grad(u)</code>. On an aligned Cartesian grid this is Vreman's <code>beta_ij = sum_m Delta_m^2 alpha_mi alpha_mj</code>; on a curvilinear grid the same change is measured along the cell's own edges, so the model is resolved per direction and does not depend on the grid's orientation. It vanishes in pure shear and in any locally two-component flow, so a laminar shear layer gets no eddy viscosity.</p>
+<p><b>When to choose it.</b> Wall-bounded or complex geometry with stretched cells and no homogeneous direction: it needs no test filter, no averaging and no coefficient field, and it does not collapse a cell that is fine in two directions and coarse in the third onto one scalar width the way every <code>filter_width</code> choice must. Prefer it over <code>dynamic_smagorinsky</code> with <code>averaging.mode: local</code>, whose coefficient is noisy and clipped on such geometry, and over <code>constant_smagorinsky</code>, which does not vanish in laminar shear.</p>
+<p><b>Parameters it owns.</b> <code>vreman_coefficient</code> -&gt; <code>-les_vreman_coefficient</code>, the constant <code>c</code>, default 0.07: Vreman's <code>c = 2.5 Cs^2</code> for <code>Cs = 0.17</code>, calibrated on decaying isotropic turbulence.</p>
+<p><b>Interactions.</b> Mutually exclusive with RANS. <code>filter_width</code> is refused, since the model takes each direction's spacing from the cell's edges rather than from one width; the parameters of the other models are refused as well. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
+<p><b>Storage.</b> No coefficient field; <code>nu_t</code> is recomputed from the resolved gradient every step and nothing is checkpointed on the model's behalf.</p>
+<p><b>Diagnostics.</b> The startup banner reports <code>Vreman</code>, its coefficient, and <code>per direction (cell edges; filter_width unused)</code>. With <code>diagnostics.enabled</code>, <code>les_coefficient.csv</code> records the eddy-viscosity levels and subgrid energy; its coefficient columns are written as <code>nan</code>, because the model carries no Smagorinsky coefficient.</p>
+<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-les</code>: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>wale-and-vreman-kernels</code> checks the kernel against an independent evaluation of the published formula, requires zero in pure shear and the same value when the flow and the cell rotate together, and recovers a turned cell's edges from its metrics. A three-step flat-channel run completes with the model selected. Not validated against a reference flow.</p>
+<p><b>Limitations.</b> The constant is an isotropic-turbulence calibration. The model is purely dissipative: it provides no backscatter. It responds to resolved velocity gradients, so in a laminar or transitional stretch it is small by design and does not by itself damp grid-scale oscillation that a non-dissipative convection scheme leaves behind.</p>
+<h2><a class="anchor" id="p07_cap_les_wale_sub"></a>
+wale</h2>
+<p><a class="anchor" id="p07_cap_les_wale"></a> <b>Identity.</b> <code>model: wale</code> -&gt; <code>-les 4</code> -&gt; <code>WALE</code> -&gt; <a class="el" href="les_8h.html#af5ff629769015a1f63d9adb18d1f4ea7">WALEEddyViscosity</a>.</p>
+<p><b>What it does.</b> Nicoud &amp; Ducros (1999): <code>nu_t = (C_w Delta)^2 (S^d_ij S^d_ij)^(3/2) / [(S_ij S_ij)^(5/2) + (S^d_ij S^d_ij)^(5/4)]</code>, where <code>S^d</code> is the traceless symmetric part of the squared velocity gradient. It vanishes in pure shear and falls as the cube of wall distance approaching a wall, the physically correct near-wall behaviour, without a damping function.</p>
+<p><b>When to choose it.</b> Wall-resolved LES where the near-wall eddy viscosity should vanish correctly without a damping function or a dynamic procedure. Against <code>vreman</code> it uses one scalar width, so pair it with <code>filter_width: scotti</code> on stretched cells; against <code>dynamic_smagorinsky</code> it needs no test filter or averaging and is well behaved on geometry with no homogeneous direction.</p>
+<p><b>Parameters it owns.</b> <code>wale_coefficient</code> -&gt; <code>-les_wale_coefficient</code>, the constant <code>C_w</code>, default 0.5, within Nicoud &amp; Ducros's isotropic calibration of 0.55-0.60.</p>
+<p><b>Interactions.</b> Mutually exclusive with RANS. Takes <code>filter_width</code> like the Smagorinsky models; the parameters of the other models are refused. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
+<p><b>Storage.</b> No coefficient field; <code>nu_t</code> is recomputed every step.</p>
+<p><b>Diagnostics.</b> The startup banner reports <code>WALE</code>, its coefficient and the filter width. With <code>diagnostics.enabled</code>, <code>les_coefficient.csv</code> records the eddy-viscosity levels, with its Smagorinsky coefficient columns written as <code>nan</code>.</p>
+<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-les</code>: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>wale-and-vreman-kernels</code> checks the kernel against an independent evaluation of the published formula, requires zero in pure shear, and requires the same value when the flow rotates. A three-step flat-channel run completes with the model selected. Not validated against a reference flow.</p>
+<p><b>Limitations.</b> Unlike <code>vreman</code>, it does not vanish in solid-body rotation. The constant is an isotropic calibration, it is purely dissipative, and it is small in laminar flow by design, so it does not by itself damp grid-scale oscillation there.</p>
 <h1><a class="anchor" id="p07_les_width_sec"></a>
 5.1 Grid Filter Width Entries</h1>
 <p><code>filter_width</code> sets how each cell's filter width <code>Delta</code> is derived from its metrics. It applies to both LES models, since both scale the eddy viscosity by <code>Delta^2</code>.</p>
@@ -959,6 +1003,7 @@ dynamic_smagorinsky</h2>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_cube_root_volume"><code>cube_root_volume</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_geometric_mean"><code>geometric_mean</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_max_edge"><code>max_edge</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_scotti"><code>scotti</code></a></td><td class="markdownTableBodyNone"><code>3</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <h2><a class="anchor" id="p07_cap_width_cube_root_volume_sub"></a>
 cube_root_volume</h2>
@@ -973,23 +1018,33 @@ cube_root_volume</h2>
 <h2><a class="anchor" id="p07_cap_width_geometric_mean_sub"></a>
 geometric_mean</h2>
 <p><a class="anchor" id="p07_cap_width_geometric_mean"></a> <b>Identity.</b> <code>les.filter_width: geometric_mean</code> -&gt; <code>-les_filter_width 1</code>.</p>
-<p><b>What it does.</b> Sets <code>Delta</code> to the geometric mean of the Cartesian cell extents resolved from the cell metrics rather than from the volume alone.</p>
-<p><b>When to choose it.</b> Curvilinear grids where the cell volume and the metric-derived extents disagree, so the width should follow the actual cell shape.</p>
+<p><b>What it does.</b> Sets <code>Delta</code> to the geometric mean of the cell's extents along its own grid directions, each the cell volume over the area of the face pair it crosses.</p>
+<p><b>When to choose it.</b> Skewed cells, where those extents and the volume disagree. On an orthogonal cell the product of the extents is the volume, so this equals <code>cube_root_volume</code> exactly and adds nothing.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> None beyond scaling <code>nu_t</code>.</p>
 <p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented, covered by the same unit case.</p>
+<p><b>Evidence.</b> Implemented, covered by the same unit case and by <code>filter-width-is-independent-of-cell-orientation</code>, which requires the same width for a stretched cell before and after rotating it.</p>
 <p><b>Limitations.</b> Still a geometric mean, so it shares the cube-root model's optimism on strongly stretched cells.</p>
 <h2><a class="anchor" id="p07_cap_width_max_edge_sub"></a>
 max_edge</h2>
 <p><a class="anchor" id="p07_cap_width_max_edge"></a> <b>Identity.</b> <code>les.filter_width: max_edge</code> -&gt; <code>-les_filter_width 2</code>.</p>
-<p><b>What it does.</b> Sets <code>Delta</code> to the longest Cartesian cell extent.</p>
-<p><b>When to choose it.</b> Strongly stretched grids, such as a wall-normal channel mesh, where the largest unresolved scale is set by the long direction.</p>
+<p><b>What it does.</b> Sets <code>Delta</code> to the cell's longest extent along its own grid directions.</p>
+<p><b>When to choose it.</b> When the model should act on the largest unresolved scale the cell can hold: a wall-modelled LES whose near-wall cells are deliberately coarse, a hybrid RANS-LES treatment, or a deliberately over-dissipative start-up.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> None beyond scaling <code>nu_t</code>.</p>
 <p><b>Diagnostics.</b> As above.</p>
 <p><b>Evidence.</b> Implemented, covered by the same unit case.</p>
-<p><b>Limitations.</b> The most dissipative of the three; on a near-isotropic grid it overestimates the width and adds subgrid dissipation the flow does not need.</p>
+<p><b>Limitations.</b> The most dissipative of the three; on a near-isotropic grid it overestimates the width and adds subgrid dissipation the flow does not need. Unsuited to a wall-resolved LES: a wall-adjacent cell inherits the streamwise spacing as its width, so its eddy viscosity rises by the square of the cell aspect ratio, which can be several hundred, exactly where the resolved wall layer has to survive.</p>
+<h2><a class="anchor" id="p07_cap_width_scotti_sub"></a>
+scotti</h2>
+<p><a class="anchor" id="p07_cap_width_scotti"></a> <b>Identity.</b> <code>les.filter_width: scotti</code> -&gt; <code>-les_filter_width 3</code> -&gt; <code>LES_FILTER_WIDTH_SCOTTI</code> -&gt; <a class="el" href="les_8h.html#a65e9cab329abc016cff5d5a59d43fd83">ComputeCellFilterWidth</a>.</p>
+<p><b>What it does.</b> Scotti, Meneveau &amp; Lilly (1993): the cube root of the cell's extents along its own grid directions, multiplied by <code>f(a1, a2) = cosh(sqrt((4/27)(ln^2 a1 - ln a1 ln a2 + ln^2 a2)))</code>, where <code>a1</code> and <code>a2</code> are the two shorter extents divided by the longest. <code>f</code> is exactly 1 for a cube and grows with the cell's distortion.</p>
+<p><b>When to choose it.</b> A wall-resolved mesh with moderately stretched cells, where <code>cube_root_volume</code> under-reports the unresolved scale and <code>max_edge</code> would inflate the width of every wall-adjacent cell to the streamwise spacing. It sits between the two: on the Humphrey bend mesh it raises the width by <code>f = 1.06</code> at the duct centre, <code>1.34</code> at the cells 5-20 wall layers out where grid-scale oscillation appeared, and <code>2.1-2.2</code> in the wall-adjacent cells - an eddy viscosity 1.1, 1.8 and 4.4-4.8 times the cube-root value. <code>geometric_mean</code> and <code>cube_root_volume</code> apply no correction at all.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Applies to both Smagorinsky models. It changes the eddy viscosity only; the Clark gradient term takes its widths from the cell differences themselves and is unaffected by <code>filter_width</code>.</p>
+<p><b>Diagnostics.</b> No dedicated output. Its effect appears in the eddy-viscosity field and, with LES diagnostics enabled, in the <code>nu_t</code> levels of the coefficient log; the startup banner names the resolved width model as <code>scotti</code>.</p>
+<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-les</code>: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>scotti-filter-width-matches-closed-form</code> requires <code>f = 1</code> for a cube, the closed-form width for a 1 x 2 x 8 cell, and the same width after rotating it; the <code>filter-width-is-independent-of-cell-orientation</code> case covers the shared extents. Not validated against a reference flow.</p>
+<p><b>Limitations.</b> The derivation assumes the cut-off lies in the inertial range in every direction. Along the long side of a strongly stretched cell it reaches the energy-containing scales instead, so the correction loses its basis as aspect ratios grow. It is still a single width for a cell that is fine in some directions and coarse in another; a model that weights each direction by its own spacing, such as Vreman's, addresses that directly. A modest correction may also be too small to control grid-scale oscillation where the resolved flow supplies little strain.</p>
 <h1><a class="anchor" id="p07_les_avg_sec"></a>
 5.2 Coefficient Averaging Entries</h1>
 <p><code>averaging.mode</code> selects the set the two Germano contractions are averaged over before they are divided. Lilly's closure assumes the coefficient is constant across that set, so the set should span directions in which the flow really is statistically homogeneous. Dynamic model only.</p>
