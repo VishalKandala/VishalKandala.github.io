@@ -104,6 +104,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p33_particle_link_sec">6. Particle Initialization Relation</a></li>
 <li class="level1"><a href="#p33_checks_sec">7. Practical Checks</a></li>
 <li class="level1"><a href="#p33_refs_sec">7. Related Pages</a></li>
+<li class="level1"><a href="#p33_wall_spectral_sec">Wall-bounded spectral seeds</a><ul><li class="level2"><a href="#p33_cap_gen_ic_gen_sub">ic_gen</a></li>
+<li class="level2"><a href="#p33_cap_gen_spectral_random_velocity_sub">spectral_random_velocity</a></li>
+<li class="level2"><a href="#p33_cap_gen_channel_spectral_velocity_sub">channel_spectral_velocity</a></li>
+<li class="level2"><a href="#p33_cap_gen_duct_spectral_velocity_sub">duct_spectral_velocity</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Initial_Conditions"></a> This page documents how PICurv initializes Eulerian velocity fields and particles at startup. It covers both user-facing YAML inputs and the C implementation path that applies them.</p>
@@ -316,8 +322,80 @@ Ucont</h2>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="34_Particle_Model_Overview.html">Particle Model and Coupling Overview</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
-<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b> </li>
+<li><b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b></li>
 </ul>
+<h1><a class="anchor" id="p33_wall_spectral_sec"></a>
+Wall-bounded spectral seeds</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: initial.file_generator.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_channel_spectral_velocity"><code>channel_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>channel_spectral_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_duct_spectral_velocity"><code>duct_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>duct_spectral_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_ic_gen"><code>ic_gen</code></a></td><td class="markdownTableBodyNone"><code>ic_gen</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_spectral_random_velocity"><code>spectral_random_velocity</code></a></td><td class="markdownTableBodyNone"><code>spectral_random_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<p><code>channel_spectral_velocity</code> uses one wall axis; <code>duct_spectral_velocity</code> uses two. The remaining axes are periodic, with driving allowed only on <code>streamwise_axis</code>. Both use <code>Ucat</code> on one Cartesian block. Uniform spacing is required along periodic axes; wall-normal axes may stretch. <code>grid_gen</code> provides an inspectable staged grid.</p>
+<div class="fragment"><div class="line">mode: generated</div>
+<div class="line">generator: channel_spectral_velocity</div>
+<div class="line">params:</div>
+<div class="line">  field: Ucat</div>
+<div class="line">  seed: 12345</div>
+<div class="line">  wall_axes: [j]</div>
+<div class="line">  streamwise_axis: k</div>
+<div class="line">  bulk_velocity: 1.0</div>
+<div class="line">  perturbation_rms: 0.1</div>
+<div class="line">  wall_modes: 3</div>
+<div class="line">  spectrum: {type: k4_exponential, k0: 4.0, k_cut: 8.0}</div>
+<div class="line">  initial_spectra:</div>
+<div class="line">    - {task: plane_spectrum, axes: [i, k], fixed_indices: {j: 32}, subtract_mean: sample}</div>
+</div><!-- fragment --><p>Parameters use solver nondimensional units. <code>perturbation_rms</code> is &lsquo;sqrt(volume_mean(u&rsquo;^2+v'^2+w'^2)/3)<code>, not the RMS of each component independently. The spectral envelope shapes a seeded vector potential along periodic directions; wall basis functions are</code>sin(n*pi*t)*sin(pi*t)^4`, evaluated at physical cell centers. A curl using the separable face-average divergence operators produces a perturbation in the discrete divergence nullspace, including zero wall-face flux. Periodic modes at or above one third of the cell count are removed. Wall mode count plus four (the highest sine index added by the envelope) must fit below the wall-axis count limit; stretched meshes still need a physical resolution check. The envelope is not a prescribed final isotropic velocity spectrum: the curl, wall functions, and stretching change it.</p>
+<p>The mean is a parabola on each wall axis, multiplied for a duct and normalized with cell-volume weights to the requested bulk velocity. The duct product is a startup profile, not the exact laminar rectangular-duct solution. Perturbation net flux is zero. Match the driven boundary's target flux to bulk velocity times cross-section. Wall dummy values are odd reflections, periodic dummies wrap. Runtime retains ownership of boundary enforcement and Cartesian/contravariant reconstruction.</p>
+<p><code>initial_spectra</code> is a required nonempty list using the plane/line task syntax from <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">8. spectra</a>. Initial measurements cannot use a statistics-window mean. Staging measures the generated Ucat, before runtime reconstruction. Compare against step-zero checkpoint spectra to distinguish initialization reconstruction from subsequent physical evolution. The summary and spectra use the canonical metrics and spectra directories, including through precomputed asset publication and reuse. There is no per-timestep injection, and transition/sustained turbulence is not guaranteed.</p>
+<h2><a class="anchor" id="p33_cap_gen_ic_gen_sub"></a>
+ic_gen</h2>
+<p><a class="anchor" id="p33_cap_gen_ic_gen"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: ic_gen</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
+<p><b>What it does.</b> Expression-based Ucat or Ucont generation on the staged grid.</p>
+<p><b>When to choose it.</b> Choose explicit analytic expressions; use a spectral provider for randomized velocity seeds.</p>
+<p><b>Parameters it owns.</b> Requires config_file; field selects Ucat/Ucont.</p>
+<p><b>Interactions.</b> The existing PICGRID coordinates, expression evaluator and PETSc writer own this route.</p>
+<p><b>Diagnostics.</b> Malformed expressions and missing inputs fail before solver launch.</p>
+<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
+<p><b>Limitations.</b> Experimental. No divergence or turbulence property is implied by arbitrary expressions.</p>
+<h2><a class="anchor" id="p33_cap_gen_spectral_random_velocity_sub"></a>
+spectral_random_velocity</h2>
+<p><a class="anchor" id="p33_cap_gen_spectral_random_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: spectral_random_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
+<p><b>What it does.</b> The existing seeded triply periodic random spectral velocity.</p>
+<p><b>When to choose it.</b> Choose this for DIT; channel and duct providers supply wall-compatible seeds.</p>
+<p><b>Parameters it owns.</b> seed, random, spectrum, projection, normalization and remove_mean retain their existing contracts.</p>
+<p><b>Interactions.</b> Requires six geometric-periodic faces and a uniform Cartesian grid; restart remains authoritative.</p>
+<p><b>Diagnostics.</b> The IC summary reports selected-operator divergence and realized energy; shell spectra measure the generated field.</p>
+<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
+<p><b>Limitations.</b> Experimental. A continuum solenoidal field need not be discretely solenoidal; runtime reconstruction changes energy.</p>
+<h2><a class="anchor" id="p33_cap_gen_channel_spectral_velocity_sub"></a>
+channel_spectral_velocity</h2>
+<p><a class="anchor" id="p33_cap_gen_channel_spectral_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: channel_spectral_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
+<p><b>What it does.</b> A flux-normalized channel mean plus a discrete-curl spectral perturbation.</p>
+<p><b>When to choose it.</b> Choose for two no-slip walls; use duct_spectral_velocity for four walls.</p>
+<p><b>Parameters it owns.</b> The wall-bounded parameter block above applies with one wall_axes entry; initial_spectra is required.</p>
+<p><b>Interactions.</b> Single-block 3D Cartesian grid, two periodic axes, one no-slip pair, Ucat file staging.</p>
+<p><b>Diagnostics.</b> Summary reports bulk velocity, perturbation RMS and discrete divergence; selected plane/line spectra measure the seed.</p>
+<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
+<p><b>Limitations.</b> Experimental. Experimental startup construction; amplitude and resolution do not establish sustained turbulence.</p>
+<h2><a class="anchor" id="p33_cap_gen_duct_spectral_velocity_sub"></a>
+duct_spectral_velocity</h2>
+<p><a class="anchor" id="p33_cap_gen_duct_spectral_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: duct_spectral_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
+<p><b>What it does.</b> A flux-normalized product-parabola mean plus a discrete-curl spectral perturbation.</p>
+<p><b>When to choose it.</b> Choose for rectangular/square ducts with four walls; channel_spectral_velocity has only one wall axis.</p>
+<p><b>Parameters it owns.</b> The wall-bounded parameter block above applies with two wall_axes entries; initial_spectra selects streamwise lines.</p>
+<p><b>Interactions.</b> Single-block 3D Cartesian grid, one periodic axis, two no-slip pairs, Ucat file staging.</p>
+<p><b>Diagnostics.</b> Summary reports bulk velocity and discrete divergence; actual selected line spectra report sample energy and Parseval residual.</p>
+<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
+<p><b>Limitations.</b> Experimental. Experimental; product-parabola startup mean is not the exact laminar duct solution. Circular pipes and immersed boundaries are outside this provider. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

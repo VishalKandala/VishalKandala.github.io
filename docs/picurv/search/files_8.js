@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_5f_5finit_5f_5f_2epy_0',['__init__.py',['../____init_____8py.html',1,'']]]
+  ['88cc4e0_2dwall_2dbounded_2dspectral_2dinitial_2dconditions_2emd_0',['88cc4e0-wall-bounded-spectral-initial-conditions.md',['../88cc4e0-wall-bounded-spectral-initial-conditions_8md.html',1,'']]]
 ];

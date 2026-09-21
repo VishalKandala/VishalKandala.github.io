@@ -123,6 +123,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ul>
 </li>
 <li class="level1"><a href="#p10_cap_spec_sec">8.1 Spectra Task Entries</a><ul><li class="level2"><a href="#p10_cap_spec_shell_spectrum_sub">shell_spectrum</a></li>
+<li class="level2"><a href="#p10_cap_spec_plane_spectrum_sub">plane_spectrum</a></li>
+<li class="level2"><a href="#p10_cap_spec_line_spectrum_sub">line_spectrum</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p10_io_sec">9. io</a></li>
@@ -733,30 +735,30 @@ Preconditions</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>shell_spectrum</code>   </td><td class="markdownTableBodyNone">implemented   </td><td class="markdownTableBodyNone">every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">two periodic axes; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a>    </td></tr>
+<td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">experimental   </td><td class="markdownTableBodyNone">two selected periodic uniform axes; remaining axis may stretch    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>line_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">one periodic axis; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a>    </td></tr>
+<td class="markdownTableBodyNone"><code>line_spectrum</code>   </td><td class="markdownTableBodyNone">experimental   </td><td class="markdownTableBodyNone">one selected periodic uniform axis; remaining axes may stretch    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>temporal_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">no homogeneous direction needed; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>   </td></tr>
 </table>
-<p>Only <code>shell_spectrum</code> exists today, so a case homogeneous in one or two directions — a channel, a straight duct, a boundary layer — has a spatial spectrum the pipeline cannot yet produce. The task table is built to hold the others; the reservation is recorded rather than implied.</p>
+<p>Plane and line tasks sample actual cell-center planes and lines in a single-block, axis-aligned Cartesian grid. They do not average parallel samples. Use <code>axes: [i, k]</code> and <code>fixed_indices: {j: 32}</code> for a plane, or <code>axes: [k]</code> and <code>fixed_indices: {i: 32, j: 32}</code> for a line. Indices are zero-based physical cells, excluding dummy layers. Out-of-range selections fail when the staged grid is read.</p>
 <p>Boundary conditions and block count are checked from <code>case.yml</code>; grid uniformity is checked by the generator against the staged PICGRID, which is the only place the node coordinates are known. A wall-bounded or curvilinear case is refused by name rather than yielding a curve with no meaning:</p>
 <div class="fragment"><div class="line">spectra task &#39;shell_spectrum&#39; requires every face of block 0 to be PERIODIC,</div>
 <div class="line">because a shell-averaged spectrum is only defined for a triply periodic</div>
 <div class="line">homogeneous box. Non-periodic faces: [&#39;+Eta&#39;, &#39;+Xi&#39;, ...].</div>
-</div><!-- fragment --><p>This is why a 90-degree bend cannot produce a spatial spectrum at all: it develops streamwise and is bounded on all four sides, so it has no homogeneous direction and needs <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>. A <em>straight</em> duct or channel is a different case — it does have homogeneous directions, and awaits <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a> rather than the temporal path.</p>
+</div><!-- fragment --><p>This is why a 90-degree bend cannot produce a spatial spectrum at all: it develops streamwise and is bounded on all four sides, so it has no homogeneous direction and needs <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>. A <em>straight</em> duct or channel is a different case — it does have periodic directions that the plane and line tasks can transform.</p>
 <h2><a class="anchor" id="p10_spectra_keys_sub"></a>
 Keys</h2>
 <ul>
-<li><code>symbol</code> selects the binning abscissa. <code>continuum</code> bins by \(|k|\); <code>discrete</code> bins by the centered-difference symbol \(\sin(k\,\Delta x)/\Delta x\), which is what the solver's own operator resolves. Comparing a measured rolloff against the continuum abscissa alone will attribute the scheme's damping to physics.</li>
-<li><code>subtract_mean</code> chooses the fluctuation. <code>none</code> transforms the field as stored; <code>domain</code> removes the volume mean of that snapshot; <code>window:&lt;name&gt;</code> subtracts the accumulated mean of a field-statistics window, which is the better estimate wherever the flow is not homogeneous. A window mean is only defined where the window actually sampled, so a window that has not accumulated over the domain is refused rather than subtracted as zero.</li>
+<li><code>symbol</code> selects the shell binning abscissa. Plane/line tasks require <code>continuum</code>. <code>continuum</code> bins by \(|k|\); <code>discrete</code> bins by the centered-difference symbol \(\sin(k\,\Delta x)/\Delta x\), which is what the solver's own operator resolves. Comparing a measured rolloff against the continuum abscissa alone will attribute the scheme's damping to physics.</li>
+<li><code>subtract_mean</code> chooses the fluctuation. <code>none</code> transforms the field as stored; <code>sample</code> removes the selected plane/line mean (plane/line tasks only); <code>domain</code> removes the arithmetic mean of all physical cells of that snapshot; <code>window:&lt;name&gt;</code> subtracts the accumulated mean of a field-statistics window, which is the better estimate wherever the flow is not homogeneous. A window mean is only defined where the window actually sampled, so a window that has not accumulated over the domain is refused rather than subtracted as zero.</li>
 <li><code>mean_source_step</code> pins the bundle the window mean is read from, independently of the step being transformed. It applies only to <code>window:&lt;name&gt;</code>. Left unset, each step reads its own bundle, whose mean is the <em>running</em> mean at that step — undefined at the moment the window activates, and built from few samples shortly after. Pin it to a step at or after the window closes to subtract the converged mean, which is almost always what is wanted. This mirrors <code>field_statistics.source_step</code>.</li>
 <li><code>block</code> selects the block; <code>field</code> is <code>Ucat</code>. <code>Ucont</code> is component-staggered and has no single cell-centered spectrum, per <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_products_sec">8. Further Products</a>.</li>
 </ul>
-<p>Two tasks differing in task, field, block, or symbol write different files and may coexist; two identical tasks are refused, since the second would overwrite the first.</p>
+<p>Two tasks differing in task, field, block, symbol, or plane/line selection write different files and may coexist; two identical tasks are refused, since the second would overwrite the first.</p>
 <h2><a class="anchor" id="p10_spectra_outputs_sub"></a>
 Outputs</h2>
-<p>Each task writes two CSVs under <code>&lt;monitor output&gt;/spectra/</code>:</p>
+<p>Each task writes a spectrum CSV and a history CSV under the canonical run spectra directory. For shell spectra:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File   </th><th class="markdownTableHeadNone">Columns   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
@@ -766,8 +768,9 @@ Outputs</h2>
 <td class="markdownTableBodyNone"><code>..._history.csv</code>   </td><td class="markdownTableBodyNone"><code>step,time,</code> then the scalars below   </td><td class="markdownTableBodyNone">one row per processed step   </td></tr>
 </table>
 <p>The spectrum file is long format so a family of curves stays one file, which is also what makes comparison across a sweep a glob rather than a special case.</p>
-<p>Recorded per step: <code>resolved_kinetic_energy</code>, <code>spectrum_total_energy</code>, <code>parseval_residual</code>, <code>spectrum_peak_k</code>, <code>zero_mode_energy</code>, <code>integral_length_scale</code>, <code>taylor_microscale</code>, and <code>dissipation_over_viscosity</code>.</p>
-<p><code>parseval_residual</code> is a self-check rather than an input: summed shell energy must equal the resolved kinetic energy of the transformed field, and a residual above round-off means the measurement is wrong.</p>
+<p>Shell history records per step: <code>resolved_kinetic_energy</code>, <code>spectrum_total_energy</code>, <code>parseval_residual</code>, <code>spectrum_peak_k</code>, <code>zero_mode_energy</code>, <code>integral_length_scale</code>, <code>taylor_microscale</code>, and <code>dissipation_over_viscosity</code>.</p>
+<p>Plane/line filenames also identify the transformed axes and fixed cell indices. Their mode columns and sample diagnostics are described in <a class="el" href="10_Post_Processing_Reference.html#p10_cap_spec_plane_spectrum">p10_cap_spec_plane_spectrum</a> and <a class="el" href="10_Post_Processing_Reference.html#p10_cap_spec_line_spectrum">p10_cap_spec_line_spectrum</a> below; the shell isotropic length-scale diagnostics do not apply to these samples.</p>
+<p><code>parseval_residual</code> is a self-check rather than an input: summed spectral energy must equal the resolved kinetic energy of the transformed field or sample, and a residual above round-off means the measurement is wrong.</p>
 <p>Dissipation is reported <b>divided by the kinematic viscosity</b> — \(\varepsilon = \nu \times\) <code>dissipation_over_viscosity</code> — because the measurement needs no fluid properties. Both length scales need none either; \(\nu\) cancels out of their isotropic definitions.</p>
 <h2><a class="anchor" id="p10_spectra_crosscheck_sub"></a>
 Cross-checking against field statistics</h2>
@@ -801,6 +804,8 @@ Viewing them</h2>
 <th class="markdownTableHeadNone">Maps to</th>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_line_spectrum"><code>line_spectrum</code></a></td><td class="markdownTableBodyNone"><code>line_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_plane_spectrum"><code>plane_spectrum</code></a></td><td class="markdownTableBodyNone"><code>plane_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_shell_spectrum"><code>shell_spectrum</code></a></td><td class="markdownTableBodyNone"><code>shell_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <h2><a class="anchor" id="p10_cap_spec_shell_spectrum_sub"></a>
@@ -813,6 +818,26 @@ shell_spectrum</h2>
 <p><b>Diagnostics.</b> Writes one file per task per checkpoint under the configured <code>output_prefix</code>. A precondition failure is a validation error naming the violated requirement, not a silent empty spectrum.</p>
 <p><b>Evidence.</b> Implemented only. No shipped case gates a numerical acceptance on a measured spectrum, so nothing establishes the binning against a reference result.</p>
 <p><b>Limitations.</b> Experimental. Shell averaging assumes isotropy that a wall-bounded or bent geometry does not have, and <code>subtract_mean: window:&lt;name&gt;</code> depends on an accumulated window existing at the named step. No convergence or windowing guidance is established.</p>
+<h2><a class="anchor" id="p10_cap_spec_plane_spectrum_sub"></a>
+plane_spectrum</h2>
+<p><a class="anchor" id="p10_cap_spec_plane_spectrum"></a> <b>Identity.</b> <code>spectra.tasks[].task: plane_spectrum</code> dispatches <code>spectra.gen plane-spectrum</code>; no C task is added.</p>
+<p><b>What it does.</b> A two-dimensional FFT of one actual cell-center plane, retaining both signed wavenumbers and separate Cartesian component energies.</p>
+<p><b>When to choose it.</b> Use it for scale content at a channel wall-normal station. Choose <code>line_spectrum</code> for one physical line, or <code>shell_spectrum</code> for a triply periodic box reduced to radial shells.</p>
+<p><b>Parameters it owns.</b> Required <code>axes</code> contains two distinct i/j/k axes; required <code>fixed_indices</code> selects the other axis. <code>subtract_mean: sample</code> removes this plane's mean. <code>symbol</code> must be <code>continuum</code>.</p>
+<p><b>Interactions.</b> Transform axes must be periodic and uniformly spaced; the transverse coordinate may stretch. Reads raw Ucat checkpoints, with existing window-mean subtraction available. Initial-condition staging can invoke the same computation without a checkpoint.</p>
+<p><b>Diagnostics.</b> CSV rows contain two signed <code>k_&lt;axis&gt;</code> columns in storage order, <code>energy_u/v/w</code>, total <code>energy</code>, and <code>position_&lt;fixed-axis&gt;</code>. Energies are per-mode contributions, not spectral densities: summing all rows equals half the sample mean squared speed. The history CSV reports sample kinetic energy and relative Parseval residual. Coordinates/wavenumbers/energies scale with length/velocity references when dimensionalization is requested. Task filenames include axes and fixed indices.</p>
+<p><b>Evidence.</b> Implemented only; tests in <code>tests/test_spectra_shell_spectrum.py</code> check known modes and Parseval closure. No developed turbulent-channel acceptance is established.</p>
+<p><b>Limitations.</b> Experimental, serial whole-field input, one block, Cartesian geometry, no masked/immersed lines. No 2D heatmap is added to <code>--plot-spectrum</code>; use the CSV for 2D plotting. A seed spectrum is not a developed-turbulence benchmark.</p>
+<h2><a class="anchor" id="p10_cap_spec_line_spectrum_sub"></a>
+line_spectrum</h2>
+<p><a class="anchor" id="p10_cap_spec_line_spectrum"></a> <b>Identity.</b> <code>spectra.tasks[].task: line_spectrum</code> dispatches <code>spectra.gen line-spectrum</code>; no C task is added.</p>
+<p><b>What it does.</b> A one-dimensional FFT of one selected physical line, retaining signed <code>k</code> and Cartesian component energies.</p>
+<p><b>When to choose it.</b> Use it for a streamwise line through a duct, or a single line in a channel. It is not a directional spectrum averaged over a plane; select <code>plane_spectrum</code> when the second wavenumber matters.</p>
+<p><b>Parameters it owns.</b> Required <code>axes</code> contains one i/j/k axis; required <code>fixed_indices</code> selects both transverse axes. <code>subtract_mean: sample</code> removes the line mean; <code>symbol</code> must be <code>continuum</code>.</p>
+<p><b>Interactions.</b> Only the transformed direction must be uniform and periodic. Other directions may stretch. Checkpoint discovery, window means, and dimensionalization use the same path as plane/shell tasks.</p>
+<p><b>Diagnostics.</b> Rows contain signed <code>k</code>, <code>energy_u/v/w</code>, total <code>energy</code>, and both fixed-position columns. Sum all signed modes for sample kinetic energy; do not double the already retained negative partners. The history reports kinetic energy and Parseval residual. Filenames distinguish both transverse indices.</p>
+<p><b>Evidence.</b> Implemented only; known-mode tests sample a physical line with a different amplitude at each transverse station. No developed duct-flow validation is claimed.</p>
+<p><b>Limitations.</b> Experimental, single-block Cartesian grids without immersed masks. This does not produce line ensembles or temporal spectra. Existing curve plotting displays positive modes only; the CSV retains both signs.</p>
 <h1><a class="anchor" id="p10_io_sec"></a>
 9. io</h1>
 <p>Mappings:</p><ul>
