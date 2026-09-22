@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['88cc4e0_20wall_20bounded_20spectral_20initial_20conditions_0',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]]
+  ['46a0680_20rans_20removed_20and_20spectral_20ics_20supported_0',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]]
 ];

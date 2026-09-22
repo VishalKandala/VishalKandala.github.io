@@ -132,7 +132,7 @@ logging:
   # Options: ERROR, WARNING, INFO, DEBUG, TRACE, VERBOSE
   # WARNING is the production default: quiet runtime, still shows warnings.
   # The startup banner remains visible and reports walltime-guard status.
-  # Runtime metrics such as logs/search_metrics.csv may still be written even
+  # Runtime metrics such as output/analysis/metrics/search_metrics.csv may still be written even
   # when console verbosity stays low.
   verbosity: WARNING
 
@@ -141,7 +141,7 @@ logging:
   # file so the C runtime falls back to its built-in default allow-list.
   # Example: allow-list LOG_SEARCH_METRICS with DEBUG verbosity when you want
   # compact console summaries in addition to the always-written
-  # logs/search_metrics.csv artifact for particle-enabled runs.
+  # output/analysis/metrics/search_metrics.csv artifact for particle-enabled runs.
   enabled_functions: []
 
 # ==============================================================================
@@ -157,9 +157,9 @@ profiling:
   #   all      -&gt; write every instrumented function that ran that step
   timestep_output:
     mode: "off"
-    # functions:
-    #   - AdvanceSimulation
-    #   - Flow_Solver
+    # functions:            # instrumented names, as listed by mode "all" or the final summary
+    #   - FlowSolver
+    #   - PoissonSolver_MG
     file: "Profiling_Timestep_Summary.csv"
 
   # --- Final Profiling Summary ---
@@ -383,7 +383,7 @@ solver_monitoring:
 <li>a nested block for a different mode is rejected.</li>
 </ul>
 <p>There is no <code>observations.run</code> sidecar and no observation-plan schema/version at this boundary. <code>control</code> remains the single generated C-ingress artifact for these settings.</p>
-<p>Scientific field statistics are configured separately, under <code>field_statistics</code>; see <a class="el" href="09_Monitor_Reference.html#p09_field_statistics_sec">3. field_statistics</a>. Solution monitoring answers whether the run has converged, field statistics answer what the converged flow is, and they share no state.</p>
+<p>Scientific field statistics are configured separately, under <code>field_statistics</code>; see <a class="el" href="09_Monitor_Reference.html#p09_field_statistics_sec">3. field_statistics</a>. Solution monitoring logs the measures from which convergence is judged - it never judges or stops a run itself - and field statistics answer what the converged flow is; they share no state. What each mode logs is at <a class="el" href="08_Solver_Reference.html#p08_cap_conv_steady_deterministic">p08_cap_conv_steady_deterministic</a> and the entries after it.</p>
 <p>The removed <code>case.yml -&gt; models.statistics.time_averaging</code> and <code>-averaging</code> surface is not compatible input and is not translated into a replacement workflow.</p>
 <h1><a class="anchor" id="p09_io_sec"></a>
 2. io</h1>
@@ -479,7 +479,7 @@ solver_monitoring:
 <h2><a class="anchor" id="p09_fs_reading_sub"></a>
 3.4 What a run produces</h2>
 <p>Accumulated state is written into each committed checkpoint under <code>statistics/window_&lt;n&gt;/block_&lt;n&gt;/</code>, and is restored on <code>--continue</code>. Nothing is derived at solve time; <a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a> turns saved state into Reynolds stresses, RMS, TKE, and fluxes.</p>
-<p>While the run is live, <code>io.statistics_console_output_frequency</code> prints one line per window with its state, sample count, accumulated weight, represented time, progress, and mask coverage. <a class="el" href="58_Field_Statistics.html">Field Statistics</a> explains the semantics behind each of those numbers, and <a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a> records what is not built yet.</p>
+<p>While the run is live, <code>io.statistics_console_output_frequency</code> prints one line per window with its state, sample count, accumulated weight, represented time, progress, and mask coverage. <a class="el" href="58_Field_Statistics.html">Field Statistics</a> explains the semantics behind each of those numbers.</p>
 <h1><a class="anchor" id="p09_logging_sec"></a>
 4. logging</h1>
 <div class="fragment"><div class="line">logging:</div>
@@ -493,9 +493,9 @@ solver_monitoring:
 <li>Raising <code>verbosity</code> therefore does not surface a function's diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
 <li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
-<li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>&lt;run.runtime_logs&gt;/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
-<li>LES runs with <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> write <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
-<li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.runtime_logs&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
+<li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>&lt;run.analysis.metrics&gt;/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
+<li>LES runs with <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> write <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
+<li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
 <li>Use <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b> for the exact metric definitions and formulas.</li>
 <li>Every one of these runtime files is opened for append, not truncated, and carries its column header only once. A run continued in place therefore extends the file it already has rather than replacing it, and the seam is marked with a <code># Continuation from step N</code> comment on the first row the continuation produces. That marker is what lets a reader - and <code>picurv summarize --plot</code> - treat the segments either as one history or as separate series, instead of inferring a restart from a discontinuity in the data. A restart into a <em>new</em> run directory starts fresh files, because the log directory is new.</li>
 </ul>
@@ -527,8 +527,8 @@ Startup banner and solver-specific output</h1>
 <div class="line">  timestep_output:</div>
 <div class="line">    mode: &quot;selected&quot;</div>
 <div class="line">    functions:</div>
-<div class="line">      - Flow_Solver</div>
-<div class="line">      - AdvanceSimulation</div>
+<div class="line">      - FlowSolver</div>
+<div class="line">      - PoissonSolver_MG</div>
 <div class="line">    file: &quot;Profiling_Timestep_Summary.csv&quot;</div>
 <div class="line">  final_summary:</div>
 <div class="line">    enabled: true</div>
@@ -539,7 +539,7 @@ Startup banner and solver-specific output</h1>
 <li><code>all</code>: write all instrumented functions seen in a timestep</li>
 </ul>
 </li>
-<li><code>timestep_output.functions</code> is required only when <code>mode: selected</code></li>
+<li><code>timestep_output.functions</code> is required only when <code>mode: selected</code>. Names must be instrumented functions - the ones the <code>mode: all</code> file and the final summary list, such as <code>FlowSolver</code>, <code>MomentumSolver_DualTime_Picard_JamesonRK</code>, <code>PoissonSolver_MG</code> and <code>ComputeRHS</code>. A name that is not instrumented records nothing; the run warns about it after the first step, and a list with no instrumented names writes no file.</li>
 <li><code>timestep_output.file</code> sets the filename written under <code>&lt;run.runtime_logs&gt;/</code></li>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file</li>
 </ul>
@@ -568,7 +568,7 @@ Startup banner and solver-specific output</h1>
 <div class="line">    file: &quot;Runtime_Memory.log&quot;</div>
 </div><!-- fragment --><p>Rules:</p><ul>
 <li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
-<li><code>info.enabled: true</code> writes PETSc initialization and runtime detail to <code>&lt;run.runtime_logs&gt;/PETSc_Info_Solver.log.&lt;rank&gt;</code> (or the matching postprocessor files); PETSc appends the emitting MPI rank. <code>info.classes</code> optionally restricts output to PETSc class names such as <code>snes</code> and <code>ksp</code>; use an empty list for all classes. This maps to PETSc <code>-info</code> during initialization. See <a href="https://petsc.org/main/manualpages/Sys/PetscInfo/">PetscInfo</a>.</li>
+<li><code>info.enabled: true</code> writes PETSc initialization and runtime detail to <code>&lt;run.runtime_logs&gt;/PETSc_Info_Solver.log.&lt;rank&gt;</code> (or the matching postprocessor files); PETSc appends the emitting MPI rank. <code>info.classes</code> optionally restricts output to PETSc class names such as <code>snes</code> and <code>ksp</code>; use an empty list for all classes. This maps to PETSc <code>-info</code> during initialization. See <a href="https://petsc.org/main/manualpages/Sys/PetscInfo/">PetscInfo</a>. PETSc opens the file before a fresh run clears its log directory, so the solver reopens it once the directory exists again; on a fresh run the records written during PETSc initialization itself are therefore not in the file. <code>make smoke</code> asserts that the solve's <code>ksp</code> records are.</li>
 <li>For example, this YAML:</li>
 </ul>
 <div class="fragment"><div class="line">diagnostics:</div>

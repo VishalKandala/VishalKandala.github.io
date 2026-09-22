@@ -9,6 +9,5 @@ var searchData=
   ['historical_6',['HISTORICAL',['../namespaceaudit__path__literals.html#a27a4a849919d10bb0c93bdff940caaf3',1,'audit_path_literals']]],
   ['history_5ffile_7',['history_file',['../momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3',1,'MomentumNewtonKrylovContext']]],
   ['html_5fdir_8',['HTML_DIR',['../namespaceaudit__page__types.html#ae117cd2b8a83c571e8dec0eb1f7fe0d6',1,'audit_page_types']]],
-  ['html_5fpath_9',['HTML_PATH',['../namespacegenerate__cli__reference.html#aa27a017bef1ffe8289aa14203023c36c',1,'generate_cli_reference']]],
-  ['hydro_10',['hydro',['../variables_8h.html#acdd1a65b6f7557e023f70e782c24c202',1,'SimCtx']]]
+  ['html_5fpath_9',['HTML_PATH',['../namespacegenerate__cli__reference.html#aa27a017bef1ffe8289aa14203023c36c',1,'generate_cli_reference']]]
 ];

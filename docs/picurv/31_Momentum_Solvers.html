@@ -148,13 +148,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p><code>pseudo_cfl.*</code> values are <b>dimensionless Courant numbers</b> (Phase 3+), not fractions of the physical timestep <code>dt</code>. The solver computes <code>dtau = pseudo_cfl / lambda_max</code> where <code>lambda_max</code> is the global maximum convective spectral radius of the current velocity field. This makes <code>pseudo_cfl</code> independent of <code>dt</code>, grid size, and flow speed. The stable range for the 4-stage Jameson RK smoother is <code>pseudo_cfl ≈ 0–2.83</code>; the shipped defaults are <code>initial: 0.5</code>, <code>maximum: 2.0</code>.</p>
 <h1><a class="anchor" id="p31_testing_sec"></a>
 4. Current test status</h1>
-<p>Current testing is uneven by solver path:</p>
+<p>Current testing by solver path:</p>
 <ul>
 <li>dispatch and guardrails are directly covered through <code>FlowSolver</code>-side unit tests</li>
-<li><code>MomentumSolver_DualTime_Picard_JamesonRK</code> is exercised mainly through smoke and runtime orchestration</li>
-<li><code>MomentumSolver_Explicit_RungeKutta4</code> still needs a direct positive-path harness</li>
+<li><code>MomentumSolver_DualTime_Picard_JamesonRK</code> is exercised through smoke and runtime orchestration, and its accuracy is measured: second order in time and space on the two-dimensional Taylor-Green vortex, and second order in space on duct, channel and curvilinear pipe Poiseuille flow (<a class="el" href="08_Solver_Reference.html#p08_cap_dual_time_picard_jameson_rk">p08_cap_dual_time_picard_jameson_rk</a>)</li>
+<li><code>MomentumSolver_Explicit_RungeKutta4</code> is exercised by <code>make smoke</code> on a stable step and on a step past its stability limit, which must stop with the stability message; its accuracy is measured at second order in velocity (<a class="el" href="08_Solver_Reference.html#p08_cap_explicit_rk4">p08_cap_explicit_rk4</a>)</li>
+<li><code>MomentumSolver_NewtonKrylov</code> carries its own unit and fixed-point suites (<a class="el" href="08_Solver_Reference.html#p08_cap_newton_krylov">p08_cap_newton_krylov</a>)</li>
 </ul>
-<p>That means the momentum stack is currently a stronger regression gate than bespoke debugging surface.</p>
+<p>Neither Picard nor Explicit RK4 has a unit-level harness that drives one step on a fixture and compares the result, so a regression shows in the smoke runs and in a re-measurement rather than in a targeted test.</p>
 <h1><a class="anchor" id="p31_rhs_cadence_sec"></a>
 6. Call Cadence of the Shared RHS (Read Before Adding State)</h1>
 <p>Both momentum solvers are built on one residual implementation:</p>

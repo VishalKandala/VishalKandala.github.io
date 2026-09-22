@@ -154,16 +154,18 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">grid:</div>
 <div class="line">  mode: programmatic_c</div>
 <div class="line">  programmatic_settings:</div>
-<div class="line">    km: [3]</div>
+<div class="line">    im: 3</div>
 </div><!-- fragment --><p>Why:</p>
 <ul>
-<li>2D mode still uses a thin third dimension for structured-grid machinery,</li>
-<li>small <code>km</code> is typically enough for planar scenarios.</li>
+<li><code>2D</code> holds the <b>i</b> velocity component fixed (<code>-TwoD 1</code>), so the flow plane is j-k and the thin direction must be i; thinning j or k instead freezes an in-plane component,</li>
+<li>the grid stays three-dimensional, so a small <code>im</code> keeps the structured-grid machinery working without resolving a direction the flow does not use.</li>
 </ul>
 <p>Quick check:</p>
 <ul>
-<li>confirm generated run uses expected Z resolution.</li>
+<li>confirm the generated control file contains <code>-TwoD 1</code> and the expected i resolution,</li>
+<li>start from an initial condition whose i component is zero, since <code>2D</code> never changes it.</li>
 </ul>
+<p>Status: <code>2D</code> is experimental; see <a class="el" href="07_Case_Reference.html#p07_cap_dim_2d_sub">2D</a>.</p>
 <h2><a class="anchor" id="p11_gridres_ssec"></a>
 1.3 Increase Grid Resolution</h2>
 <ul>
@@ -377,14 +379,18 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">    input_field: Ucat</div>
 <div class="line">    output_field: Ucat_nodal</div>
 <div class="line">  - task: q_criterion</div>
+<div class="line">  - task: nodal_average</div>
+<div class="line">    input_field: Qcrit</div>
+<div class="line">    output_field: Qcrit_nodal</div>
 <div class="line"> </div>
 <div class="line">io:</div>
 <div class="line">  eulerian_fields:</div>
 <div class="line">    - Ucat_nodal</div>
-<div class="line">    - Qcrit</div>
-</div><!-- fragment --><p>Verification:</p>
+<div class="line">    - Qcrit_nodal</div>
+</div><!-- fragment --><p><code>Qcrit</code> itself is cell-centred and cannot be written directly; the nodal average places it on the grid nodes the <code>.vts</code> file uses.</p>
+<p>Verification:</p>
 <ul>
-<li>open VTK output and confirm <code>Qcrit</code> field is present.</li>
+<li>open VTK output and confirm the <code>Qcrit_nodal</code> field is present.</li>
 </ul>
 <h2><a class="anchor" id="p11_stats_ssec"></a>
 4.3 Enable Statistics Output (MSD)</h2>

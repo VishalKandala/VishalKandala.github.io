@@ -117,12 +117,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 \Psi^{n+1}=\langle\Psi\rangle + (\Psi^n-\langle\Psi\rangle)e^{-\Omega\Delta t}.
 \]
 </p>
+<p><code>C_IEM</code> is <code>solver.yml -&gt; scalar_transport.iem_constant</code> (<code>-iem_constant</code>), default 2.0, the conventional value; it is exposed for sensitivity studies, not because another value has been validated.</p>
 <p>Code touchpoints:</p>
 <ul>
 <li>particle kernel: <a class="el" href="ParticlePhysics_8h.html#a78ac6f5c27a2539a823133e8e30c7200">UpdateParticleField</a></li>
 <li>per-field particle loop: <a class="el" href="ParticlePhysics_8h.html#a1d260d533f2da72fbed3d262d56a87c0">UpdateFieldForAllParticles</a></li>
 <li>stage wrapper: <a class="el" href="ParticlePhysics_8h.html#acabd01a68dc45f037d40c1183286df08">UpdateAllParticleFields</a></li>
 </ul>
+<dl class="section warning"><dt>Warning</dt><dd><b>The update runs, but nothing gives it a scalar to mix.</b> Every particle's <code>Psi</code> is initialized to the particle field catalog's default, 0.0, and no configuration seeds, injects or sources a scalar, so \(\Psi^n = \langle\Psi\rangle = 0\) and the closed-form update returns zero every step. The one path that sets <code>Psi</code> - the verification scalar source (<a class="el" href="08_Solver_Reference.html#p08_verification_sec">11. verification</a>) - prescribes it exactly and bypasses this update. The scatter of <code>Psi</code> to the grid is verified through that source; <code>TestConfiguredIEMUpdatesSwarm</code> in <code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">tests/c/test_setup_lifecycle.c</a></code> checks non-zero scalar relaxation toward a prescribed mean for the default and an overridden constant. That controlled fixture does not establish coupled scalar-variance decay in a production flow; scalar initialization and that verification remain deferred.</dd></dl>
 <h1><a class="anchor" id="p28_dataflow_sec"></a>
 2. Required Dataflow For IEM</h1>
 <p>IEM update requires:</p>

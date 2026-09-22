@@ -98,6 +98,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p64_family_sec">3. The Family Contract</a></li>
 <li class="level1"><a href="#p64_subsystem_sec">4. The Subsystem Contract</a><ul><li class="level2"><a href="#p64_lifecycle_enforcement_sub">4.1 How the Gate Is Enforced</a></li>
 <li class="level2"><a href="#p64_status_promotion_sub">4.2 A Promotion Is a Human Decision</a></li>
+<li class="level2"><a href="#p64_ceiling_sub">4.3 Every Value Has an Owner, and Cannot Outrank It</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p64_concerns_sec">5. Concern Modules</a><ul><li class="level2"><a href="#p64_units_sub">5.1 Why Units Is Its Own Concern</a></li>
@@ -124,7 +125,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">New <b>family</b> in an existing subsystem   </td><td class="markdownTableBodyNone">a family of preconditioners, particle-wall models   </td><td class="markdownTableBodyNone">a family page, then one entry per value    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">New <b>subsystem</b>   </td><td class="markdownTableBodyNone">immersed boundaries, a grid-generation framework, ML integration   </td><td class="markdownTableBodyNone">a subsystem charter, then families beneath it   </td></tr>
+<td class="markdownTableBodyNone">New <b>subsystem</b>   </td><td class="markdownTableBodyNone">a new physics model, a grid-generation framework   </td><td class="markdownTableBodyNone">a subsystem charter, then families beneath it   </td></tr>
 </table>
 <p>Pick the smallest scale that fits. Most changes are the first.</p>
 <h1><a class="anchor" id="p64_entry_sec"></a>
@@ -196,6 +197,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <h2><a class="anchor" id="p64_lifecycle_enforcement_sub"></a>
 4.1 How the Gate Is Enforced</h2>
 <p>Each subsystem has a record in <code>tests/tooling/subsystem_records.json</code> naming its status, its previous status, the capability families it owns, and where each obligation is satisfied. <code>make audit-subsystems</code> fails when an obligation is undeclared, when a cited page or anchor does not resolve, when a publicly visible subsystem cites an unpublished page, when a concern falls outside the vocabulary in section 5, when a <code>planned</code> subsystem already owns a <code>supported</code> capability value, or when the declared transition is not one the lifecycle allows - a removed subsystem cannot be revived in place, and nothing that was ever built reaches <code>removed</code> without first being deprecated or declared defective.</p>
+<p><code>supported -&gt; experimental</code> is allowed only with a <code>demotion_reason</code> naming what the earlier claim did not establish. A demotion is not a defect report: the code may be correct and the evidence simply thinner than a supported claim implies. A record that still carries its supported documentation keeps it by declaring <code>proposed_status: supported</code> with a <code>promotion_rationale</code> naming the checks that would restore the claim.</p>
+<p><code>known-defective -&gt; planned</code> is allowed on the same terms, with a <code>demotion_reason</code>, and means something narrower: a subsystem declared defective that turns out never to have been implemented at all, once its dead hooks are removed. The reason says what was found and what came out, so the record does not read as a working feature that broke. The RANS closure took that route on 2026-09-22.</p>
 <p><code>planned -&gt; removed</code> is the single deliberate exception: a cancelled design was never built, so it owes a history record and the rejection behaviour, not a migration path for users who never had it.</p>
 <p>An obligation is satisfied by a resolving documentation reference, by a literal value where the obligation is a fact rather than prose, or by a <b>reasoned</b> not-applicable declaration. A bare <code>N/A</code> is rejected. <code>tests/test_subsystem_lifecycle.py</code> holds the negative tests: each one writes a record a careless author could plausibly produce and asserts the audit refuses it.</p>
 <h2><a class="anchor" id="p64_status_promotion_sub"></a>
@@ -203,6 +206,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>The gate proves that the documentation a status owes exists. It cannot prove that a subsystem is suitable for production or that its results are scientifically correct, and those are what <code>supported</code> actually claims.</p>
 <p>A record may therefore declare a <code>proposed_status</code> above the one it claims, with a <code>promotion_rationale</code> saying what the reviewer is being asked to confirm. Obligations are then checked against the <b>proposal</b>, so the writing is held to the higher bar while the published status stays conservative until a human agrees. <code>make audit-subsystems</code> lists every pending promotion after its summary.</p>
 <dl class="section warning"><dt>Warning</dt><dd>A promotion recorded by tooling is not a promotion. If a subsystem's status changed because a gate passed, the gate was measuring the wrong thing.</dd></dl>
+<h2><a class="anchor" id="p64_ceiling_sub"></a>
+4.3 Every Value Has an Owner, and Cannot Outrank It</h2>
+<p>A capability value's status and its subsystem's status were once independent, which let a value read <code>supported</code> under a subsystem that was still <code>experimental</code>. The subsystem's status is now a ceiling, and <code>make audit-subsystems</code> enforces four rules over the whole registry:</p>
+<ul>
+<li><b>Every family is owned.</b> Each family in <code>capability_families.json</code> appears in the <code>capability_families</code> list of at least one subsystem record.</li>
+<li><b>A shared family names each value's owner.</b> When several subsystems list one family, each canonical value declares <code>"subsystem": "&lt;id&gt;"</code> in its metadata, naming one of them. The Newton-Krylov solver value belongs to <code>momentum.newton_krylov</code>, the periodic handlers to <code>boundary.periodic</code>. Spellings and deprecated aliases inherit their target's owner.</li>
+<li><b>A value never outranks its owner.</b> On the ladder <code>planned</code> &lt; <code>internal</code> &lt; <code>experimental</code> &lt; <code>supported</code>, a value may not claim a rung above its owner's. Under an owner that is <code>known-defective</code> or <code>deprecated</code>, a value shares that status or is <code>removed</code>.</li>
+<li><b>The switch that turns a subsystem off is exempt.</b> A value marked <code>"off_switch": true</code><ul>
+<li><code>none</code> for the LES model - claims nothing about the subsystem it disables, so it may be <code>supported</code> under an <code>experimental</code> owner. A family has at most one.</li>
+</ul>
+</li>
+</ul>
+<p>Promoting a subsystem therefore promotes nothing on its own: each value is promoted separately, and only as far as its owner allows.</p>
 <h1><a class="anchor" id="p64_concerns_sec"></a>
 5. Concern Modules</h1>
 <p>A feature declares which concerns apply to it. Each activated concern adds a checklist. This is what lets the framework cover changes nobody has anticipated: there is no "ML template", but an ML integration activates external service, credentials, determinism, and artifact-topology concerns and inherits their questions.</p>

@@ -111,7 +111,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </li>
 <li class="level1"><a href="#p08_tol_sec">5. tolerances</a></li>
 <li class="level1"><a href="#p08_msolver_sec">6. momentum_solver (Solver-Specific Block)</a></li>
-<li class="level1"><a href="#p08_poisson_sec">7. poisson_solver</a></li>
+<li class="level1"><a href="#p08_poisson_sec">7. poisson_solver</a><ul><li class="level2"><a href="#p08_cap_poisson_sec">7.1 Poisson Method Entries</a><ul><li class="level3"><a href="#p08_cap_poisson_fgmres_sub">fgmres</a></li>
+<li class="level3"><a href="#p08_cap_poisson_cg_sub">cg</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="level1"><a href="#p08_solution_conv_sec">8. Physical-solution convergence monitoring</a></li>
 <li class="level1"><a href="#p08_interp_sec">9. interpolation</a></li>
 <li class="level1"><a href="#p08_scalar_transport_sec">10. scalar_transport</a></li>
@@ -176,7 +181,7 @@ operation_mode:
 #       # kz: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_kz
 #
 # Scalar verification is intended for runtime diagnostics such as
-# logs/scatter_metrics.csv. It bypasses only the particle Psi evolution path and
+# output/analysis/metrics/scatter_metrics.csv. It bypasses only the particle Psi evolution path and
 # reuses the production scatter operator.
 
 # --- Scalar Transport Properties ---
@@ -184,6 +189,7 @@ operation_mode:
 scalar_transport:
   schmidt_number: 1.0              # -&gt; -schmidt_number
   turbulent_schmidt_number: 0.7    # -&gt; -turb_schmidt_number
+  iem_constant: 2.0                # -&gt; -iem_constant; C_IEM in the IEM mixing rate (default 2.0)
 
 # ==============================================================================
 # 2. PRIMARY SOLVER STRATEGY &amp; TOLERANCES
@@ -295,11 +301,12 @@ poisson_solver:
   # The outer linear solver uses PETSc KSP under the hood, but this block uses
   # PICurv-facing names for the common controls.
   # Note: 'pressure_solver' is an accepted deprecated alias for this block name.
-  method: "fgmres"             # -&gt; -ps_ksp_type
-  absolute_tolerance: 1.0e-5   # -&gt; -ps_ksp_atol and legacy -poisson_tol
+  method: "fgmres"             # -&gt; -ps_ksp_type. Options: fgmres (default), cg. gmres, lgmres
+                               #    and bcgs are refused: the multigrid preconditioner is not a
+                               #    fixed linear operator, which only a flexible method tolerates
+  absolute_tolerance: 1.0e-5   # -&gt; -ps_ksp_atol
   relative_tolerance: 1.0e-11  # -&gt; -ps_ksp_rtol
   max_iterations: 50           # -&gt; -ps_ksp_max_it
-  # tolerance: 1.0e-5          # Legacy alias for absolute_tolerance -&gt; -poisson_tol
   gmres:
     # Only valid for GMRES-family methods: gmres, fgmres, lgmres.
     restart: 20                # -&gt; -ps_ksp_gmres_restart
@@ -468,8 +475,8 @@ petsc_passthrough_options:
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p08_cap_dual_time_picard_jameson_rk"><code>Dual Time Picard Jameson RK</code></a></td><td class="markdownTableBodyNone"><code>DUALTIME_PICARD_JAMESON_RK</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p08_cap_dual_time_picard_rk4"><code>Dual Time Picard RK4</code></a></td><td class="markdownTableBodyNone"><code>DUALTIME_PICARD_JAMESON_RK</code></td><td class="markdownTableBodyNone"><b>deprecated</b> - alias of <code>Dual Time Picard Jameson RK</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_explicit_rk4"><code>Explicit RK4</code></a></td><td class="markdownTableBodyNone"><code>EXPLICIT_RK</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_newton_krylov"><code>Newton Krylov</code></a></td><td class="markdownTableBodyNone"><code>newton_krylov</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_explicit_rk4"><code>Explicit RK4</code></a></td><td class="markdownTableBodyNone"><code>EXPLICIT_RK</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_newton_krylov"><code>Newton Krylov</code></a></td><td class="markdownTableBodyNone"><code>newton_krylov</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <p>Each entry follows the capability-entry contract described in <b><a class="el" href="64_Documentation_Extension_Framework.html">Documentation Extension Framework</a></b>.</p>
 <h2><a class="anchor" id="p08_cap_explicit_rk4_sub"></a>
@@ -478,10 +485,10 @@ Explicit RK4</h2>
 <p><b>What it does.</b> Advances momentum with an explicit four-stage Runge-Kutta step. No pseudo-time iteration and no linear solve: each physical step is a fixed sequence of residual evaluations.</p>
 <p><b>When to choose it.</b> When the timestep is already small for physical reasons and you want the cheapest, most predictable step. It is also the clearest baseline when diagnosing whether a problem lies in the momentum solve or elsewhere, because it has almost no machinery of its own.</p>
 <p><b>Parameters it owns.</b> None. Explicit RK4 takes no solver-specific block; pseudo-CFL and Newton-Krylov controls are rejected for it rather than ignored.</p>
-<p><b>Interactions.</b> Stability is governed by the physical timestep alone, so it is the solver most sensitive to grid refinement. The Poisson solve and boundary treatment are unchanged.</p>
-<p><b>Diagnostics.</b> The startup banner names the solver and reports that no pseudo-time controller is active. Divergence shows as growing velocity magnitudes within a few steps rather than as a failed iteration count.</p>
-<p><b>Evidence.</b> Implemented only. <code>make unit-solver</code> covers input validation on this path but not a positive-path solve, and no shipped example selects it. <code>src/guide.md</code> records "direct positive-path momentum solver harnesses, especially explicit RK" as an open coverage gap; treat this as an evidence gap rather than a verified solver.</p>
-<p><b>Limitations.</b> Explicit stability limit: there is no mechanism to recover from a timestep that is too large, so it is unsuitable for stiff or strongly convective cases.</p>
+<p><b>Interactions.</b> Stability is governed by the physical timestep alone, so it is the solver most sensitive to grid refinement. The Poisson solve and boundary treatment are unchanged, and the driven periodic flux controller settles to the same law as under Picard (<a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>).</p>
+<p><b>Diagnostics.</b> The startup banner names the solver as <code>Explicit 4 stage Runge-Kutta</code>. A step beyond the stability limit stops the run at the step it occurs, naming the explicit stability limit and the approximate viscous bound <code>dt &lt; 2.8 / (4 nu (1/dx^2 + 1/dy^2 + 1/dz^2))</code>; it no longer surfaces later as a Poisson failure blamed on the multigrid depth.</p>
+<p><b>Evidence.</b> Integration verified - <code>make smoke</code> runs a stable flat-channel step and a step past the limit, and asserts the second stops with the stability message. Analytically verified - <code>explicit-rk4-order-2026-09-21</code>: on the two-dimensional Taylor-Green vortex, velocity converges at second order in time and space and pressure at second order in space; on the driven laminar channel the profile error falls at order 1.97 and the bulk velocity matches the controller law to 1e-4.</p>
+<p><b>Limitations.</b> No step control: the user must keep <code>dt</code> under the viscous and convective limits, and a run past them stops rather than recovers. The projection splitting limits the temporal order to two for velocity and one for pressure, below the four stages' own order. Unsuitable for stiff or strongly convective cases, where the stable <code>dt</code> is far below what the physics needs.</p>
 <h2><a class="anchor" id="p08_cap_dual_time_picard_jameson_rk_sub"></a>
 Dual Time Picard Jameson RK</h2>
 <p><a class="anchor" id="p08_cap_dual_time_picard_jameson_rk"></a> <b>Identity.</b> <code>strategy.momentum_solver: "Dual Time Picard Jameson RK"</code> -&gt; <code>-mom_solver_type DUALTIME_PICARD_JAMESON_RK</code> -&gt; <code>MOMENTUM_SOLVER_DUALTIME_PICARD_JAMESON_RK</code> -&gt; <a class="el" href="momentumsolvers_8h.html#a173269bc83cefbbc44ef4869bd3fa753">MomentumSolver_DualTime_Picard_JamesonRK</a>.</p>
@@ -491,18 +498,18 @@ Dual Time Picard Jameson RK</h2>
 <dl class="section note"><dt>Note</dt><dd><code>max_iterations</code> caps <b>accepted</b> pseudo-iterations, not attempts. A rejected trial rolls back without consuming the budget; a separate hard cap of <code>3 x max_iterations</code> bounds total attempts.</dd></dl>
 <p><b>Interactions.</b> Pseudo-CFL is exclusive to this solver: it is neither accepted from the Newton-Krylov block nor shown in a Newton-Krylov banner. Acceptance and rollback are global across blocks and MPI ranks. The controller-selected pseudo-CFL carries into the next physical timestep <b>within one process only</b> - it is not written to the checkpoint, so a restarted run begins again from the configured <code>pseudo_cfl.initial</code>.</p>
 <p><b>Diagnostics.</b> The per-trial file log records one row <b>per accepted trial</b>, with the residual ratio and the pseudo-CFL used; rejected trials are not given their own row there, so a quiet log does not mean no rejections occurred. A step that exhausts its budget logs "reached N total attempts without convergence" and continues from the last accepted state - that message counts <b>total attempts</b>, accepted plus rejected.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-solver</code>. Integration verified - <code>make smoke</code>. Production exercised in <code>examples/flat_channel</code> and <code>examples/bent_channel</code>.</p>
-<p><b>Limitations and full treatment.</b> Control law, cadence, and tuning guidance are at <b><a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a></b>. Note the periodic wall-bounded convergence caveat recorded at <a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>, which currently requires re-characterization.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-solver</code>. Integration verified - <code>make smoke</code>. Production exercised in <code>examples/flat_channel</code> and <code>examples/bent_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: steady laminar square-duct Poiseuille flow at second order in space; <code>tgv2d-picard-order-2026-09-18</code>: the two-dimensional Taylor-Green vortex at second order in time and space for velocity and pressure; <code>pipe-poiseuille-curvilinear-2026-09-18</code>: Hagen-Poiseuille flow on a strongly non-orthogonal swept circle at second order; <code>periodic-channel-laminar-picard-2026-09-18</code>: the driven periodic channel at second order, every step converged.</p>
+<p><b>Limitations and full treatment.</b> Control law, cadence, and tuning guidance are at <b><a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a></b>. The results hold when every step meets its pseudo-time tolerance: the square duct at Re = 100 with <code>dt = 1</code> hit the iteration cap on every step and finished 18% off in pressure gradient, so read the per-step history before trusting a run. Only central differencing has been measured. The periodic wall-bounded stall once recorded at <a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a> was re-characterized on 2026-09-18 and does not reproduce; turbulent periodic channels at production resolution remain uncharacterized.</p>
 <h2><a class="anchor" id="p08_cap_newton_krylov_sub"></a>
 Newton Krylov</h2>
 <p><a class="anchor" id="p08_cap_newton_krylov"></a> <b>Identity.</b> <code>strategy.momentum_solver: "Newton Krylov"</code> -&gt; <code>-mom_solver_type newton_krylov</code> -&gt; <code>MOMENTUM_SOLVER_NEWTON_KRYLOV</code> -&gt; <a class="el" href="test__momentum__newton__boundary__fixedpoint_8c.html#a32dc9ee6a4a717c130ce26161695a3ac">MomentumSolver_NewtonKrylov</a>.</p>
 <p><b>What it does.</b> Solves the momentum system with a PETSc SNES Newton-Krylov method using a matrix-free finite-difference Jacobian, rather than iterating in pseudo-time.</p>
 <p><b>When to choose it.</b> When the pseudo-time approach converges slowly or not at all, and you want true Newton convergence on the momentum system. It exposes PETSc's solver machinery directly, which is an advantage when you know what you want from it and a liability when you do not.</p>
 <p><b>Parameters it owns.</b> The <code>newton_krylov</code> block: <code>jacobian</code> (a strict discriminated configuration - explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>), <code>preconditioner</code> (<code>model</code> and <code>structure</code>), <code>nonlinear_solver</code> (including <code>line_search</code>), and <code>linear_solver</code>.</p>
-<p><b>Interactions.</b> Supported combinations are finite-difference/matrix-free with either no preconditioner or a frozen momentum Jacobian / point-block preconditioner. <code>colored_sparse</code> and <code>frozen_momentum_approximation</code> are rejected because their implementations are not present. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime.</p>
+<p><b>Interactions.</b> Supported combinations are finite-difference/matrix-free with either no preconditioner or a frozen momentum Jacobian / point-block preconditioner. Any other Jacobian type or finite-difference mode is rejected. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime.</p>
 <p><b>Diagnostics.</b> SNES and KSP convergence reasons are reported per step. A <code>DIVERGED_LINEAR_SOLVE</code> or <code>DIVERGED_BREAKDOWN</code> with <code>preconditioner.model: none</code> generally indicates the unpreconditioned matrix-free limitation rather than a configuration error.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-newton-krylov</code>. Integration verified - <code>make unit-momentum-newton-boundary-fixedpoint</code> on a production-sized straight duct.</p>
-<p><b>Limitations and full treatment.</b> <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b> carries the scope limits, preconditioner findings, and tuning guidance.</p>
+<p><b>Limitations and full treatment.</b> <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b> carries the scope limits, preconditioner findings, and tuning guidance. Experimental until the solver has been run at the problem sizes a production claim implies.</p>
 <h2><a class="anchor" id="p08_cap_dual_time_picard_rk4_sub"></a>
 Dual Time Picard RK4 (deprecated)</h2>
 <p><a class="anchor" id="p08_cap_dual_time_picard_rk4"></a> <b>Identity.</b> <code>strategy.momentum_solver: "Dual Time Picard RK4"</code> - a <b>deprecated alias</b> that normalizes to <code>Dual Time Picard Jameson RK</code>. The C enum keeps <code>MOMENTUM_SOLVER_DUALTIME_PICARD_RK4</code> as an alias of the Jameson constant.</p>
@@ -517,11 +524,10 @@ Dual Time Picard RK4 (deprecated)</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_analytical"><code>analytical</code></a></td><td class="markdownTableBodyNone"><code>analytical</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_load"><code>load</code></a></td><td class="markdownTableBodyNone"><code>load</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_solve"><code>solve</code></a></td><td class="markdownTableBodyNone"><code>solve</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_analytical"><code>analytical</code></a></td><td class="markdownTableBodyNone"><code>analytical</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_load"><code>load</code></a></td><td class="markdownTableBodyNone"><code>load</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_src_solve"><code>solve</code></a></td><td class="markdownTableBodyNone"><code>solve</code></td></tr>
 </table>
  <!-- GENERATED FILE - do not edit by hand. Family: particle.interpolation.
      Regenerate with: make docs-inventory -->
@@ -529,10 +535,9 @@ Dual Time Picard RK4 (deprecated)</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_corneraveraged"><code>CornerAveraged</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_trilinear"><code>Trilinear</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_corneraveraged"><code>CornerAveraged</code></a></td><td class="markdownTableBodyNone"><code>1</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_trilinear"><code>Trilinear</code></a></td><td class="markdownTableBodyNone"><code>0</code></td></tr>
 </table>
  <!-- GENERATED FILE - do not edit by hand. Family: solver.convergence_mode.
      Regenerate with: make docs-inventory -->
@@ -540,12 +545,11 @@ Dual Time Picard RK4 (deprecated)</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_periodic_deterministic"><code>periodic_deterministic</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC_DETERMINISTIC</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_statistical_steady"><code>statistical_steady</code></a></td><td class="markdownTableBodyNone"><code>STATISTICAL_STEADY</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_steady_deterministic"><code>steady_deterministic</code></a></td><td class="markdownTableBodyNone"><code>STEADY_DETERMINISTIC</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_transient"><code>transient</code></a></td><td class="markdownTableBodyNone"><code>TRANSIENT</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_periodic_deterministic"><code>periodic_deterministic</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC_DETERMINISTIC</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_statistical_steady"><code>statistical_steady</code></a></td><td class="markdownTableBodyNone"><code>STATISTICAL_STEADY</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_steady_deterministic"><code>steady_deterministic</code></a></td><td class="markdownTableBodyNone"><code>STEADY_DETERMINISTIC</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_conv_transient"><code>transient</code></a></td><td class="markdownTableBodyNone"><code>TRANSIENT</code></td></tr>
 </table>
 <h2><a class="anchor" id="p08_cap_src_solve_sub"></a>
 solve</h2>
@@ -555,18 +559,18 @@ solve</h2>
 <p><b>Parameters it owns.</b> None directly; it makes the whole <code>solver.yml</code> numerics block meaningful, which the other two sources largely ignore.</p>
 <p><b>Interactions.</b> Requires a valid initial condition. Restart and continuation apply to this source only.</p>
 <p><b>Diagnostics.</b> Per-step momentum and Poisson convergence logs under <code>&lt;run.runtime_logs&gt;/</code>.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code> runs this source; the solver paths it drives carry their own evidence at <a class="el" href="08_Solver_Reference.html#p08_entries_sec">3. Momentum Solver Entries</a>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code> runs this source. Analytically verified - <code>tgv2d-picard-order-2026-09-18</code> and <code>duct-poiseuille-picard-2026-09-18</code> measure the solves it drives; the solver paths carry their full evidence at <a class="el" href="08_Solver_Reference.html#p08_entries_sec">3. Momentum Solver Entries</a>.</p>
 <p><b>Limitations.</b> Cost scales with the flow solve; the other two sources are far cheaper when the flow field is not the object of study.</p>
 <h2><a class="anchor" id="p08_cap_src_load_sub"></a>
 load</h2>
 <p><a class="anchor" id="p08_cap_src_load"></a> <b>Identity.</b> <code>operation_mode.eulerian_source: load</code> -&gt; fields are read from previously written output rather than evolved.</p>
-<p><b>What it does.</b> Loads Eulerian state from an existing run's checkpoints and holds it, so downstream stages see a fixed field.</p>
+<p><b>What it does.</b> Replays Eulerian state from an existing run's checkpoints: at each step it reads the committed checkpoint of that same step, so downstream stages - particle transport above all - see the stored sequence rather than a recomputed one.</p>
 <p><b>When to choose it.</b> Post-processing an existing solution, or transporting particles through a stored field without recomputing it.</p>
 <p><b>Parameters it owns.</b> The restart/source directory controls that locate the stored field.</p>
-<p><b>Interactions.</b> The stored field must match the configured grid. Solver tolerances and momentum selection have no effect.</p>
+<p><b>Interactions.</b> The stored field must match the configured grid. Solver tolerances and momentum selection have no effect. Because every step reads its own checkpoint, the source run needs a committed checkpoint at every step the replay serves: write it with <code>io.data_output_frequency: 1</code> over that span.</p>
 <p><b>Diagnostics.</b> Startup reports the resolved source directory and the step loaded.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> No time evolution of the Eulerian state; the field is what was stored.</p>
+<p><b>Evidence.</b> Regression verified - <code>make smoke</code> restarts the flat-channel particle case with <code>eulerian_field_source: load</code> in its restart-variant sequence. Analytically verified - <code>eulerian-source-domain-modes-2026-09-21</code>: a five-step replay reproduced every stored step bitwise, step 0 to 2e-15.</p>
+<p><b>Limitations.</b> No time evolution of the Eulerian state; the field is what was stored, at the cadence it was stored. A source written at a coarser cadence cannot be replayed step by step.</p>
 <h2><a class="anchor" id="p08_cap_src_analytical_sub"></a>
 analytical</h2>
 <p><a class="anchor" id="p08_cap_src_analytical"></a> <b>Identity.</b> <code>operation_mode.eulerian_source: analytical</code> -&gt; <code>-analytical_type</code> selects a closed-form field.</p>
@@ -575,17 +579,17 @@ analytical</h2>
 <p><b>Parameters it owns.</b> The analytical mode selector and its parameters. See <b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b>.</p>
 <p><b>Interactions.</b> File-grid support is limited to the non-custom analytical modes.</p>
 <p><b>Diagnostics.</b> Startup reports the selected analytical mode.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> runs this source; the verification examples that rely on it are catalogued in <b><a class="el" href="65_Example_Catalog.html">Example Catalog</a></b>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> runs this source; the verification examples that rely on it are catalogued in <b><a class="el" href="65_Example_Catalog.html">Example Catalog</a></b>. Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: the TGV3D velocity and pressure match the closed form to 9e-16 at every step; <code>uniform-drift-2026-09-18</code>: a cloud in <code>UNIFORM_FLOW</code> drifts at exactly the carrier velocity.</p>
 <p><b>Limitations.</b> Only the shipped analytical forms are available; there is no user-supplied expression path.</p>
 <h2><a class="anchor" id="p08_cap_interp_trilinear_sub"></a>
 Trilinear</h2>
 <p><a class="anchor" id="p08_cap_interp_trilinear"></a> <b>Identity.</b> <code>interpolation.method: Trilinear</code> -&gt; <code>-interpolation_method 0</code> -&gt; <code>InterpolationMethod</code> -&gt; <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a>.</p>
 <p><b>What it does.</b> Interpolates directly from the eight surrounding cell centres to the particle position.</p>
-<p><b>When to choose it.</b> The default, and the right choice unless you are reproducing legacy behaviour. It is second-order on curvilinear grids.</p>
+<p><b>When to choose it.</b> The default, and the right choice unless you are reproducing legacy behaviour. It interpolates in the cell's own logical coordinates, so the same scheme applies on curvilinear grids; its measured order, 1.97, is from a uniform grid.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Requires valid <code>DMSwarm_CellID</code> and interpolation weights, which the settle step establishes.</p>
 <p><b>Diagnostics.</b> Interpolation accuracy is measurable with the shipped <code>interpolation_test</code> example.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/interpolation_test</code> runs this path; see <a class="el" href="65_Example_Catalog.html#p65_verify_sec">3. Particle Verification Family</a> for what that case establishes.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/interpolation_test</code> runs this path; see <a class="el" href="65_Example_Catalog.html#p65_verify_sec">3. Particle Verification Family</a> for what that case establishes. Analytically verified - <code>tgv-interpolation-2026-09-18</code>: 0.67% relative error against the TGV3D field on the shipped 32^3 grid; <code>interpolation-methods-tgv-2026-09-21</code>: 2.63% and 0.669% on 16^3 and 32^3, order 1.97.</p>
 <p><b>Limitations.</b> Accuracy degrades on strongly distorted cells, as any trilinear scheme does.</p>
 <h2><a class="anchor" id="p08_cap_interp_corneraveraged_sub"></a>
 CornerAveraged</h2>
@@ -595,48 +599,48 @@ CornerAveraged</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Same swarm prerequisites as the direct path; the extra averaging stage smooths the field the particle sees.</p>
 <p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> The additional averaging is diffusive, and it is retained for compatibility rather than accuracy.</p>
+<p><b>Evidence.</b> Regression verified - <code>make smoke</code> runs a flat-channel particle case with <code>CornerAveraged</code> and asserts the runtime banner reports it. Analytically verified - <code>interpolation-methods-tgv-2026-09-21</code>: relative L2 error 7.99% and 2.49% on 16^3 and 32^3 against the TGV3D field, order 1.68, and maximum error order 0.96 - three to four times the Trilinear error at the same resolution.</p>
+<p><b>Limitations.</b> The additional averaging is diffusive, and it is retained for compatibility rather than accuracy. It is below second order even on a uniform Cartesian grid: the corner average smooths the field before the trilinear step sees it, and the maximum error converges at first order.</p>
 <h2><a class="anchor" id="p08_cap_conv_steady_deterministic_sub"></a>
 steady_deterministic</h2>
-<p><a class="anchor" id="p08_cap_conv_steady_deterministic"></a> <b>Identity.</b> <code>solution_convergence.mode: steady_deterministic</code> -&gt; <code>-solution_convergence_mode STEADY_DETERMINISTIC</code> -&gt; <code>SOLUTION_CONVERGENCE_STEADY_DETERMINISTIC</code>.</p>
-<p><b>What it does.</b> Judges the run converged when the solution stops changing between physical steps.</p>
-<p><b>When to choose it.</b> Flows that genuinely reach a steady state - laminar channels and ducts below their critical Reynolds number.</p>
-<p><b>Parameters it owns.</b> The convergence tolerances in the <code>solution_convergence</code> block.</p>
-<p><b>Interactions.</b> Meaningless for a flow that never settles; a turbulent case will simply never satisfy it.</p>
-<p><b>Diagnostics.</b> <code>&lt;run.runtime_logs&gt;/solution_convergence.log</code> records the per-step measure.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> Steady-state detection only.</p>
+<p><a class="anchor" id="p08_cap_conv_steady_deterministic"></a> <b>Identity.</b> <code>monitor.yml -&gt; solution_monitoring.convergence.mode: steady_deterministic</code> -&gt; <code>-solution_convergence_mode STEADY_DETERMINISTIC</code> -&gt; <code>SOLUTION_CONVERGENCE_STEADY_DETERMINISTIC</code>.</p>
+<p><b>What it does.</b> Logs, after every completed step, how much the solution changed since the previous step: absolute and relative L2 changes of velocity and of pressure (with its mean removed), and the domain-mean speed and kinetic energy with their drift. It judges nothing: no tolerance is read and the run is never stopped. Whether the flow has settled is read from <code>&lt;run.runtime_logs&gt;/solution_convergence.log</code>.</p>
+<p><b>When to choose it.</b> Flows that genuinely reach a steady state - laminar channels and ducts below their critical Reynolds number - where a change per step falling toward zero is the convergence signal. It is the default.</p>
+<p><b>Parameters it owns.</b> None; <code>enabled: false</code> turns the writer off.</p>
+<p><b>Interactions.</b> A turbulent case logs changes that never fall; that is the answer, not a malfunction. Physical cells only: ghost layers are excluded from every norm and mean.</p>
+<p><b>Diagnostics.</b> The log's <code>ref</code> column is 0 on the first logged step, which has no previous state to compare with.</p>
+<p><b>Evidence.</b> Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: on the closed-form TGV3D field every logged drift and mean matched its exact value to 4e-11 in all four modes; the same measurement found and fixed means that counted ghost cells.</p>
+<p><b>Limitations.</b> Reports change per step, not error: a slowly evolving flow shows a small change per step long before it is steady, so read the trend over many steps.</p>
 <h2><a class="anchor" id="p08_cap_conv_periodic_deterministic_sub"></a>
 periodic_deterministic</h2>
 <p><a class="anchor" id="p08_cap_conv_periodic_deterministic"></a> <b>Identity.</b> <code>solution_convergence.mode: periodic_deterministic</code> -&gt; <code>-solution_convergence_mode PERIODIC_DETERMINISTIC</code> -&gt; <code>SOLUTION_CONVERGENCE_PERIODIC_DETERMINISTIC</code>.</p>
-<p><b>What it does.</b> Judges convergence against a repeating cycle rather than a fixed state.</p>
-<p><b>When to choose it.</b> Flows with a deterministic period - vortex shedding at low Reynolds number, or a pulsatile driving condition.</p>
-<p><b>Parameters it owns.</b> The same tolerance block, interpreted per cycle.</p>
-<p><b>Interactions.</b> Requires the period to be genuinely deterministic; noise defeats it.</p>
-<p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> Does not detect quasi-periodic or drifting cycles.</p>
+<p><b>What it does.</b> Compares each step with the state one period earlier at the same phase, and logs the same velocity, pressure, speed and energy changes as <code>steady_deterministic</code> together with the phase index. A cycle that repeats drives the logged change to zero.</p>
+<p><b>When to choose it.</b> Flows with a known deterministic period in steps - vortex shedding at low Reynolds number, or a pulsatile driving condition.</p>
+<p><b>Parameters it owns.</b> <code>periodic_deterministic.period_steps</code>, required and positive: the period as a whole number of steps.</p>
+<p><b>Interactions.</b> Stores one velocity and pressure snapshot per phase, so memory grows with <code>period_steps</code>. The first period has no reference and logs <code>ref</code> 0.</p>
+<p><b>Diagnostics.</b> The <code>ph</code> and <code>per</code> columns give the phase and period of each row.</p>
+<p><b>Evidence.</b> Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: on the closed-form TGV3D field every logged drift and mean matched its exact value to 4e-11 in all four modes; the same measurement found and fixed means that counted ghost cells.</p>
+<p><b>Limitations.</b> The period must be an integer number of steps and known in advance; a period that is not, or that drifts, never compares like with like.</p>
 <h2><a class="anchor" id="p08_cap_conv_statistical_steady_sub"></a>
 statistical_steady</h2>
 <p><a class="anchor" id="p08_cap_conv_statistical_steady"></a> <b>Identity.</b> <code>solution_convergence.mode: statistical_steady</code> -&gt; <code>-solution_convergence_mode STATISTICAL_STEADY</code> -&gt; <code>SOLUTION_CONVERGENCE_STATISTICAL_STEADY</code>.</p>
-<p><b>What it does.</b> Judges convergence on running statistics rather than on the instantaneous field, which never settles in a turbulent flow.</p>
-<p><b>When to choose it.</b> Turbulence. This is the mode that makes sense for the driven periodic campaigns, where the instantaneous field is chaotic but its statistics settle.</p>
-<p><b>Parameters it owns.</b> The tolerance block, applied to accumulated statistics.</p>
-<p><b>Interactions.</b> Pairs naturally with <b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b>; the averaging window must be long enough for the statistics to be meaningful.</p>
-<p><b>Diagnostics.</b> As above, plus the statistics window reporting.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> Convergence of a statistic is not convergence of the flow; a window that is too short will appear converged.</p>
+<p><b>What it does.</b> Records the domain-mean speed and kinetic energy each step, and logs the mean and RMS of each over the latest <code>window_steps</code> samples against the same over the <code>window_steps</code> before them. A statistically steady flow drives those window-to-window drifts toward zero while the instantaneous field keeps changing.</p>
+<p><b>When to choose it.</b> Turbulence, where the instantaneous field never settles but its bulk statistics do - the driven periodic campaigns, for instance.</p>
+<p><b>Parameters it owns.</b> <code>statistical_steady.window_steps</code>, required and positive.</p>
+<p><b>Interactions.</b> Independent of <b><a class="el" href="58_Field_Statistics.html">Field Statistics</a></b>: this mode watches two domain-mean scalars, while field statistics accumulate full fields over their own windows.</p>
+<p><b>Diagnostics.</b> Rows before <code>2 x window_steps</code> samples exist log <code>ref</code> 0.</p>
+<p><b>Evidence.</b> Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: on the closed-form TGV3D field every logged drift and mean matched its exact value to 4e-11 in all four modes; the same measurement found and fixed means that counted ghost cells.</p>
+<p><b>Limitations.</b> Watches two domain means only, so a flow whose mean speed and energy have settled can still have an unconverged profile. A window short against the flow's slowest time scale reads as converged when it is not.</p>
 <h2><a class="anchor" id="p08_cap_conv_transient_sub"></a>
 transient</h2>
 <p><a class="anchor" id="p08_cap_conv_transient"></a> <b>Identity.</b> <code>solution_convergence.mode: transient</code> -&gt; <code>-solution_convergence_mode TRANSIENT</code>.</p>
-<p><b>What it does.</b> Declares that the run is not expected to converge at all, so no convergence criterion is applied.</p>
+<p><b>What it does.</b> Logs exactly what <code>steady_deterministic</code> logs; only the mode label differs, so the log states that no steady state is expected.</p>
 <p><b>When to choose it.</b> Decaying turbulence, a startup transient, or any run whose point is the evolution rather than an end state.</p>
-<p><b>Parameters it owns.</b> None; tolerances are not consulted.</p>
-<p><b>Interactions.</b> The run ends on its step count rather than on a criterion.</p>
-<p><b>Diagnostics.</b> Convergence logging still records the measure, but nothing acts on it.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> Provides no automatic stopping signal.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Like every mode, it never stops the run; the run ends on its step count.</p>
+<p><b>Diagnostics.</b> As <code>steady_deterministic</code>.</p>
+<p><b>Evidence.</b> Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: on the closed-form TGV3D field every logged drift and mean matched its exact value to 4e-11 in all four modes; the same measurement found and fixed means that counted ghost cells.</p>
+<p><b>Limitations.</b> Adds no measure of its own; choose it to label the run, not to change what is computed.</p>
 <h1><a class="anchor" id="p08_tol_sec"></a>
 5. tolerances</h1>
 <div class="fragment"><div class="line">tolerances:</div>
@@ -709,11 +713,11 @@ transient</h2>
 <div class="line">        restart: 80</div>
 </div><!-- fragment --><p>Mappings are <code>nonlinear_solver.method/absolute_tolerance/relative_tolerance/step_tolerance/max_iterations</code> to <code>-mom_nk_snes_type/-mom_nk_snes_atol/-mom_nk_snes_rtol/-mom_nk_snes_stol/-mom_nk_snes_max_it</code>, <code>line_search.type</code> to <code>-mom_nk_snes_linesearch_type</code>, and the corresponding <code>linear_solver</code> fields to <code>-mom_nk_ksp_type/-mom_nk_ksp_atol/-mom_nk_ksp_rtol/-mom_nk_ksp_max_it</code>. <code>gmres.restart</code> maps to <code>-mom_nk_ksp_gmres_restart</code>. The Jacobian fields map to <code>-mom_nk_jacobian_type/-mom_nk_jacobian_fd_mode</code>; the preconditioner fields map to <code>-mom_nk_preconditioner_model/-mom_nk_preconditioner_structure</code>.</p>
 <p><code>eisenstat_walker.enabled: false</code> leaves the configured KSP relative tolerance fixed. <code>enabled: true</code> enables PETSc's inexact-Newton forcing term. Its seven fields map to <code>-mom_nk_snes_ksp_ew_version</code>, <code>-mom_nk_snes_ksp_ew_rtol0</code>, <code>-mom_nk_snes_ksp_ew_rtolmax</code>, <code>-mom_nk_snes_ksp_ew_gamma</code>, <code>-mom_nk_snes_ksp_ew_alpha</code>, <code>-mom_nk_snes_ksp_ew_alpha2</code>, and <code>-mom_nk_snes_ksp_ew_threshold</code>. PETSc supports EW versions 1 through 4; version 3 is therefore selectable directly. When EW is active, <code>linear_solver.relative_tolerance</code> is the initial KSP tolerance and PETSc may replace it before each Newton linear solve.</p>
-<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Supported combinations are finite difference/matrix free with either no preconditioner or frozen momentum Jacobian/point block. The released <code>linear_solver.preconditioner.type: none</code> remains a deprecated alias for the no-preconditioner model. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime. The Jacobian block is a strict discriminated configuration: an explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>. <code>colored_sparse</code>, <code>frozen_momentum_approximation</code>, and irrelevant sibling configuration are rejected because their implementations are not present. Advanced SNES, line-search, KSP, GMRES, and PC options that do not have structured PICurv fields remain available through <code>petsc_passthrough_options</code> with the <code>-mom_nk_</code> prefix. See PETSc's <a href="https://petsc.org/main/manual/snes/">SNES manual</a>, <a href="https://petsc.org/main/manualpages/SNES/SNESSetFromOptions/">SNES option list</a>, and <a href="https://petsc.org/main/manualpages/KSP/KSPSetFromOptions/">KSP option list</a>. PETSc startup-only options such as <code>-info</code> belong under <code>monitor.diagnostics.petsc</code>.</p>
+<p>Newton tolerances are nonnegative, iteration/restart counts are positive integers, and GMRES restart is valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code>. Supported combinations are finite difference/matrix free with either no preconditioner or frozen momentum Jacobian/point block. The released <code>linear_solver.preconditioner.type: none</code> remains a deprecated alias for the no-preconditioner model. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime. The Jacobian block is a strict discriminated configuration: an explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>. Any other mode or Jacobian type, and irrelevant sibling configuration, is rejected. Advanced SNES, line-search, KSP, GMRES, and PC options that do not have structured PICurv fields remain available through <code>petsc_passthrough_options</code> with the <code>-mom_nk_</code> prefix. See PETSc's <a href="https://petsc.org/main/manual/snes/">SNES manual</a>, <a href="https://petsc.org/main/manualpages/SNES/SNESSetFromOptions/">SNES option list</a>, and <a href="https://petsc.org/main/manualpages/KSP/KSPSetFromOptions/">KSP option list</a>. PETSc startup-only options such as <code>-info</code> belong under <code>monitor.diagnostics.petsc</code>.</p>
 <h1><a class="anchor" id="p08_poisson_sec"></a>
 7. poisson_solver</h1>
 <dl class="section note"><dt>Note</dt><dd>**<code>preconditioner.type</code> accepts one value.** <code>multigrid</code> is the only outer preconditioner the Poisson solve supports, because the runtime assumes PETSc <code>PCMG</code> setup. <code>mg</code> and <code>pcmg</code> are accepted spellings for it. There is no choice to make here today, which is why it is documented as a parameter rather than as a capability family; <code>tests/tooling/family_census.json</code> records that classification, and the census fails if a second value is ever added without a family being registered for it.</dd></dl>
-<p>The Krylov method under <code>method</code>, and the per-level methods under <code>multigrid.level_solvers</code>, are PETSc <code>KSP</code> tokens passed through rather than a closed PICurv set - any token PETSc accepts is accepted here. PICurv recognises the Krylov subset only to warn when one is configured at <code>level_0</code>, which is the coarse solve rather than a smoother; see <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec">6. Related Pages</a>.</p>
+<p>The outer Krylov method under <code>method</code> is a closed set, <code>fgmres</code> or <code>cg</code>, entered at <a class="el" href="08_Solver_Reference.html#p08_cap_poisson_sec">7.1 Poisson Method Entries</a>. The per-level methods under <code>multigrid.level_solvers</code> are PETSc <code>KSP</code> tokens passed through rather than a closed PICurv set - any token PETSc accepts is accepted there. PICurv recognises the Krylov subset only to warn when one is configured at <code>level_0</code>, which is the coarse solve rather than a smoother; see <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec">6. Related Pages</a>.</p>
 <div class="fragment"><div class="line">poisson_solver:</div>
 <div class="line">  method: &quot;fgmres&quot;</div>
 <div class="line">  absolute_tolerance: 1.0e-5</div>
@@ -744,11 +748,11 @@ transient</h2>
 <div class="line">        method: &quot;richardson&quot;</div>
 <div class="line">        preconditioner: &quot;bjacobi&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>method</code> -&gt; <code>-ps_ksp_type</code></li>
-<li><code>absolute_tolerance</code> -&gt; <code>-ps_ksp_atol</code> and legacy <code>-poisson_tol</code></li>
+<li><code>method</code> -&gt; <code>-ps_ksp_type</code>; <code>fgmres</code> (default) or <code>cg</code>, which also emits <code>-ps_ksp_norm_type unpreconditioned</code> so it stops on the true residual. <code>gmres</code>, <code>lgmres</code> and <code>bcgs</code> are refused: they are not flexible, and the multigrid preconditioner is not a fixed linear operator (see <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html#p25_config_sec">3. YAML Mapping and PETSc Options</a>)</li>
+<li><code>absolute_tolerance</code> -&gt; <code>-ps_ksp_atol</code></li>
 <li><code>relative_tolerance</code> -&gt; <code>-ps_ksp_rtol</code></li>
 <li><code>max_iterations</code> -&gt; <code>-ps_ksp_max_it</code></li>
-<li><code>gmres.restart</code> -&gt; <code>-ps_ksp_gmres_restart</code>; valid only for <code>gmres</code>, <code>fgmres</code>, or <code>lgmres</code></li>
+<li><code>gmres.restart</code> -&gt; <code>-ps_ksp_gmres_restart</code>; valid only with <code>method: fgmres</code></li>
 <li><code>preconditioner.type</code> -&gt; <code>-ps_pc_type</code>; currently only <code>multigrid</code> is supported</li>
 <li><code>multigrid.levels</code> -&gt; <code>-mg_level</code></li>
 <li><code>multigrid.pre_sweeps</code> -&gt; <code>-mg_pre_it</code></li>
@@ -756,6 +760,7 @@ transient</h2>
 <li><code>multigrid.semi_coarsening.i/j/k</code> -&gt; <code>-mg_i_semi/-mg_j_semi/-mg_k_semi</code></li>
 <li><code>multigrid.level_solvers.level_N.method</code> -&gt; <code>-ps_mg_levels_N_ksp_type</code> for <code>N &gt; 0</code></li>
 <li><code>multigrid.level_solvers.level_N.preconditioner</code> -&gt; <code>-ps_mg_levels_N_pc_type</code> for <code>N &gt; 0</code></li>
+<li><code>multigrid.level_solvers.level_N.max_it/rtol/atol</code> -&gt; <code>-ps_mg_levels_N_ksp_max_it/_ksp_rtol/_ksp_atol</code> for <code>N &gt; 0</code></li>
 <li><code>multigrid.level_solvers.level_0.*</code> -&gt; <code>-ps_mg_coarse_*</code>; PETSc names the coarsest solver separately from the positive levels</li>
 <li><code>multigrid.cycle</code> and <code>multigrid.mode</code> are validated structured keys; current supported values are <code>v</code> and <code>multiplicative</code>.</li>
 </ul>
@@ -768,6 +773,38 @@ transient</h2>
 <li>The current PETSc binding applies one MG smoother count; when <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</li>
 <li>Advanced PETSc tuning remains available through <code>petsc_passthrough_options</code>; common examples include <code>-ps_mg_levels_N_pc_sor_omega</code> for SOR and <code>-ps_mg_levels_N_pc_factor_shift_amount</code> / <code>-ps_mg_levels_N_pc_factor_levels</code> for factor PCs.</li>
 </ul>
+<h2><a class="anchor" id="p08_cap_poisson_sec"></a>
+7.1 Poisson Method Entries</h2>
+<!-- GENERATED FILE - do not edit by hand. Family: poisson.method.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_poisson_cg"><code>cg</code></a></td><td class="markdownTableBodyNone"><code>cg</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_poisson_fgmres"><code>fgmres</code></a></td><td class="markdownTableBodyNone"><code>fgmres</code></td></tr>
+</table>
+<h3><a class="anchor" id="p08_cap_poisson_fgmres_sub"></a>
+fgmres</h3>
+<p><a class="anchor" id="p08_cap_poisson_fgmres"></a> <b>Identity.</b> <code>poisson_solver.method: fgmres</code> (the default) -&gt; <code>-ps_ksp_type fgmres</code> -&gt; the outer <code>KSP</code> of <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a>.</p>
+<p><b>What it does.</b> Flexible GMRES around the multigrid preconditioner. Flexibility lets the preconditioner change from one iteration to the next, which is what a multigrid cycle with iterative smoothers is, so the residual it tracks is the true residual.</p>
+<p><b>When to choose it.</b> Always, unless measured cost says otherwise. It is the verified default and the only method that also accepts <code>gmres.restart</code>.</p>
+<p><b>Parameters it owns.</b> <code>gmres.restart</code>, the Krylov restart length.</p>
+<p><b>Interactions.</b> Uses the absolute, relative and iteration limits of the block like any method. Stopping at <code>max_iterations</code> is its normal mode and stays silent; a non-finite residual or a failed preconditioner stops the run.</p>
+<p><b>Diagnostics.</b> <code>solver_monitoring.poisson.pic_true_residual</code> logs tracked and true residuals side by side in <code>Poisson_Solver_Convergence_History_Block_*.log</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-poisson-rhs</code> solves and projects on a three-level hierarchy. Integration verified - <code>make smoke-driven-periodic</code> asserts the tracked and true residuals agree within 1e-4. Production exercised - every shipped flow case, <code>examples/flat_channel</code> among them. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: the analytic duct pressure gradient at second order; <code>poisson-options-2026-09-21</code>: every multigrid option reproduced this baseline.</p>
+<p><b>Limitations.</b> Stores one vector per iteration up to the restart length, so memory grows with <code>gmres.restart</code>.</p>
+<h3><a class="anchor" id="p08_cap_poisson_cg_sub"></a>
+cg</h3>
+<p><a class="anchor" id="p08_cap_poisson_cg"></a> <b>Identity.</b> <code>poisson_solver.method: cg</code> -&gt; <code>-ps_ksp_type cg</code> and <code>-ps_ksp_norm_type unpreconditioned</code>.</p>
+<p><b>What it does.</b> Conjugate gradients around the multigrid preconditioner, monitoring the unpreconditioned residual so that it stops on the true residual rather than on the preconditioned one.</p>
+<p><b>When to choose it.</b> When the memory of a Krylov basis matters: CG keeps a fixed handful of vectors whatever the iteration count. CG assumes a symmetric operator; the discrete pressure operator's symmetry on a non-orthogonal grid was not checked, only CG's measured convergence there.</p>
+<p><b>Parameters it owns.</b> None; <code>gmres.restart</code> is refused with it.</p>
+<p><b>Interactions.</b> As <code>fgmres</code>. CG is not flexible in theory; with this preconditioner it held the true residual at 1e-12 or below every step in the measurement below, where <code>gmres</code>, <code>lgmres</code> and <code>bcgs</code> did not.</p>
+<p><b>Diagnostics.</b> As <code>fgmres</code>; watch the true-residual column, which is the norm it stops on.</p>
+<p><b>Evidence.</b> Unit verified - <code>tests/test_config_regressions.py</code> checks that it emits the unpreconditioned norm type. Analytically verified - <code>poisson-options-2026-09-21</code>: on the duct it reproduced the <code>fgmres</code> velocity to 7e-15, and on the curved bent-channel grid it matched <code>fgmres</code> to 4.9e-15 in velocity and 4.9e-14 in pressure with the true residual at 1e-12 or below every step.</p>
+<p><b>Limitations.</b> Measured on one duct and one curved grid, both small; its cost relative to <code>fgmres</code> was not characterized. On a grid or multigrid configuration the measurement did not cover, confirm with <code>pic_true_residual</code> that the true residual still falls.</p>
 <h1><a class="anchor" id="p08_solution_conv_sec"></a>
 8. Physical-solution convergence monitoring</h1>
 <p>Convergence monitoring is observation policy rather than a numerical solver selection, so it is configured in <code>monitor.yml -&gt; solution_monitoring.convergence</code> rather than here. See <b><a class="el" href="09_Monitor_Reference.html">Configuration Reference: Monitor YAML</a></b> for modes, mappings, and defaults. The monitor records every completed timestep; cadence is not a user setting.</p>
@@ -780,20 +817,23 @@ transient</h2>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>method</code> -&gt; <code>-interpolation_method</code> (<code>Trilinear</code> = <code>0</code>, <code>CornerAveraged</code> = <code>1</code>)</li>
 </ul>
-<p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers, providing second-order accuracy on both uniform and curvilinear grids. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners), which is second-order only on uniform Cartesian grids.</p>
+<p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers; on the TGV3D field it converges at order 1.97. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners); on the same field and a uniform Cartesian grid its L2 error converges at order 1.68 and its maximum error at first order, so it is not second order anywhere measured. See <a class="el" href="08_Solver_Reference.html#p08_cap_interp_corneraveraged">p08_cap_interp_corneraveraged</a>.</p>
 <p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
 <h1><a class="anchor" id="p08_scalar_transport_sec"></a>
 10. scalar_transport</h1>
 <div class="fragment"><div class="line">scalar_transport:</div>
 <div class="line">  schmidt_number: 1.0</div>
 <div class="line">  turbulent_schmidt_number: 0.7</div>
+<div class="line">  iem_constant: 2.0</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>schmidt_number</code> -&gt; <code>-schmidt_number</code></li>
 <li><code>turbulent_schmidt_number</code> -&gt; <code>-turb_schmidt_number</code></li>
+<li><code>iem_constant</code> -&gt; <code>-iem_constant</code>, the constant <code>C_IEM</code> in the IEM mixing rate <code>Omega = C_IEM Gamma_eff / Delta^2</code> (<a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a>)</li>
 </ul>
 <p>Rules:</p><ul>
-<li>values must be positive numbers</li>
-<li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code> and <code>turbulent_schmidt_number = 0.7</code></li>
+<li>values must be positive numbers; both configuration validation and the runtime require <code>iem_constant</code> to be finite</li>
+<li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code>, <code>turbulent_schmidt_number = 0.7</code>, and <code>iem_constant = 2.0</code></li>
+<li><code>iem_constant</code> changes nothing while every particle's <code>Psi</code> is zero, which it is unless the verification scalar source prescribes it - and that source bypasses IEM; see <a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
 <li>use this structured block for ordinary scalar/Brownian transport tuning; reserve <code>petsc_passthrough_options</code> for flags without a YAML schema</li>
 </ul>
 <h1><a class="anchor" id="p08_verification_sec"></a>
@@ -832,9 +872,14 @@ transient</h2>
 <p>Rules:</p><ul>
 <li>this path is verification-only and should be used only when no ordinary end-to-end workflow can expose the behavior under test</li>
 <li>it is only valid with <code>operation_mode.eulerian_field_source: "analytical"</code></li>
-<li><code>verification.sources.scalar</code> prescribes particle <code>Psi</code> from analytical truth and enables the runtime diagnostic <code>&lt;run.runtime_logs&gt;/scatter_metrics.csv</code></li>
+<li><code>verification.sources.scalar</code> prescribes particle <code>Psi</code> from analytical truth and enables the runtime diagnostic <code>&lt;run.analysis.metrics&gt;/scatter_metrics.csv</code></li>
 <li>scalar profiles currently supported are <code>CONSTANT</code>, <code>LINEAR_X</code>, and <code>SIN_PRODUCT</code></li>
 <li>new verification source overrides must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
+</ul>
+<p>Evidence:</p><ul>
+<li>the diffusivity source, <code>LINEAR_X</code>, drives the gradient drift that <code>diffusivity-gradient-drift-paired-2026-09-18</code> resolved to 1.1% of <code>a t</code> with paired seeds;</li>
+<li>the scalar source's <code>CONSTANT</code> profile makes every scatter error term exactly zero, and <code>SIN_PRODUCT</code> gives relative L2 errors of 5.2%, 2.6% and 1.3% on 8, 16 and 32 cells per side, the first order a random cell average must show at fixed particles per cell (<code>scalar-scatter-verification-2026-09-21</code>, <code>examples/scatter_verification</code>);</li>
+<li>the scalar <code>LINEAR_X</code> profile has not been measured, and neither scatter threshold is gated in CI.</li>
 </ul>
 <h1><a class="anchor" id="p08_petsc_sec"></a>
 12. petsc_passthrough_options</h1>

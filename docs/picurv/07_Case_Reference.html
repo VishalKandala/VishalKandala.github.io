@@ -102,7 +102,11 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#p07_cap_gridmode_grid_gen_sub">grid_gen</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#p07_models_sec">4. models</a></li>
+<li class="level1"><a href="#p07_models_sec">4. models</a><ul><li class="level2"><a href="#p07_dim_sec">4.1 Dimensionality Entries</a></li>
+<li class="level2"><a href="#p07_cap_dim_3d_sub">3D</a></li>
+<li class="level2"><a href="#p07_cap_dim_2d_sub">2D</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p07_les_sec">5. LES Subgrid Models</a><ul><li class="level2"><a href="#p07_cap_les_none_sub">none</a></li>
 <li class="level2"><a href="#p07_cap_les_constant_smagorinsky_sub">constant_smagorinsky</a></li>
 <li class="level2"><a href="#p07_cap_les_dynamic_smagorinsky_sub">dynamic_smagorinsky</a></li>
@@ -126,9 +130,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#p07_cap_clip_none_sub">none</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#p07_rans_filter_sec">6. RANS and Test-Filter Entries</a><ul><li class="level2"><a href="#p07_cap_rans_none_sub">none</a></li>
-<li class="level2"><a href="#p07_cap_rans_k_omega_sub">k_omega</a></li>
-<li class="level2"><a href="#p07_cap_filter_volume_weighted_box_sub">volume_weighted_box</a></li>
+<li class="level1"><a href="#p07_wall_laws_sec">6. Test-Filter and Wall-Function Entries</a><ul><li class="level2"><a href="#p07_cap_filter_volume_weighted_box_sub">volume_weighted_box</a></li>
 <li class="level2"><a href="#p07_cap_filter_simpson_ik_sub">simpson_ik</a></li>
 <li class="level2"><a href="#p07_cap_wall_log_law_sub">log_law</a></li>
 <li class="level2"><a href="#p07_cap_wall_werner_sub">werner</a></li>
@@ -155,7 +157,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 #   1. simulation_control:  How long the simulation runs and at what time resolution.
 #   2. properties:          The core physical numbers (density, viscosity, scales).
 #   3. grid:                The geometric domain, either from a file or generated.
-#   4. models:              Switches to turn on/off different physics modules (LES, FSI, etc.).
+#   4. models:              Switches to turn on/off different physics modules (LES, particles, etc.).
 #   5. boundary_conditions: What happens at the edges of the domain.
 #
 # YAML SYNTAX NOTE:
@@ -239,7 +241,7 @@ properties:
     # source_file: initial_conditions/velocity.dat
 
     # --- External deterministic generator (ic_gen), materialized during run/precompute. ---
-    # Repository ic.gen supports file, grid_gen, and single-block programmatic_c grids.
+    # Repository ic.gen supports file, grid_gen, and programmatic_c grids.
     # For programmatic_c, scalar programmatic_settings are materialized as config/grid.run first.
     # mode: generated
     # generator: ic_gen
@@ -262,7 +264,6 @@ grid:
   # --- Optional Global DMDA Layout (applies to all grid modes) ---
   # Edit or remove these for parallel runs. The product must equal the total
   # MPI process count (-n) when all three are set.
-  # NOTE: Per-block processor decomposition is not implemented on the C side.
   da_processors_x: 2
   da_processors_y: 2
   da_processors_z: 4
@@ -291,16 +292,15 @@ grid:
   # Use this to have the C solver generate a structured Cartesian grid.
   # `im/jm/km` are cell counts in YAML; picurv converts them to node counts
   # before emitting `-im/-jm/-km` for the C runtime.
-  # For MULTI-BLOCK cases, all values must be LISTS of the same length.
   programmatic_settings:
     # --- Cell Counts ---
-    im: 64              # [Cells in i-direction] -&gt; For 2 blocks: [64, 128]
-    jm: 32              # [Cells in j-direction] -&gt; For 2 blocks: [32, 32]
-    km: 128             # [Cells in k-direction] -&gt; For 2 blocks: [128, 256]
+    im: 64              # [Cells in i-direction]
+    jm: 32              # [Cells in j-direction]
+    km: 128             # [Cells in k-direction]
 
     # --- Domain Bounds (in physical units [m]) ---
-    xMins: 0.0          # [Min x-coordinate] -&gt; For 2 blocks: [0.0, 1.0]
-    xMaxs: 1.0          # [Max x-coordinate] -&gt; For 2 blocks: [1.0, 2.0]
+    xMins: 0.0          # [Min x-coordinate]
+    xMaxs: 1.0          # [Max x-coordinate]
     yMins: 0.0
     yMaxs: 0.5
     zMins: 0.0
@@ -327,24 +327,17 @@ grid:
 #    If a section or key is omitted, the C-code's default will be used.
 # ==============================================================================
 models:
-  # --- Domain and Block Configuration ---
-  domain:
-    blocks: 1          # [Integer] -&gt; -nblk. CRITICAL for multi-block setups.
-    # Periodic axes are derived exclusively from paired PERIODIC boundary
-    # conditions. Do not add separate periodic flags here.
-
   # --- Core Physics Modules ---
   physics:
-    dimensionality: "3D" # Options: "3D" (default), "2D" (sets -TwoD 1)
-    
-    fsi:
-      immersed: false    # [true/false] -&gt; -imm (Immersed Boundary Method)
-      moving_fsi: false  # [true/false] -&gt; -fsi (Fluid-Structure Interaction)
+    dimensionality: "3D" # Options: "3D" (default), "2D" (sets -TwoD 1: the i velocity
+                         # component is held fixed; the grid is unchanged)
 
     particles:
       count: 0             # [Integer] -&gt; -numParticles
       init_mode: "Surface" # [string] -&gt; -pinit. Options: "Surface", "Volume", "PointSource", "SurfaceEdges"
       restart_mode: "init" # [string] -&gt; -particle_restart_mode. Options: "init", "load"
+      random_seed: 12345   # [Integer, optional] -&gt; -particle_random_seed. 0..2147483647; seeds
+                           # initial placement and Brownian draws (default 12345)
       point_source:        # Required only when init_mode = "PointSource" (maps to -psrc_x/-psrc_y/-psrc_z)
         x: 0.5
         y: 0.5
@@ -425,7 +418,7 @@ models:
           #   homogeneous -&gt; average over the directions named below, or over the
           #                  periodic axes when none are named. A triply periodic box
           #                  gives one coefficient; a channel gives a wall-normal profile.
-          #   global      -&gt; average over the whole block regardless of boundaries.
+          #   global      -&gt; average over the whole domain regardless of boundaries.
           # [String] -&gt; -les_averaging_mode
           mode: "local"
 
@@ -461,7 +454,7 @@ models:
           # [Boolean] -&gt; -les_gradient_model
           enabled: false
 
-        # Per-step coefficient statistics appended to logs/les_coefficient.csv:
+        # Per-step coefficient statistics appended to output/analysis/metrics/les_coefficient.csv:
         # the effective Cs, its spread, eddy-viscosity levels, the modelled subgrid
         # energy, and the fractions of the domain backscattering or limited before
         # clipping. Those last two describe a state no stored field preserves.
@@ -481,13 +474,10 @@ models:
           # [Number] -&gt; -les_yoshizawa_ci
           yoshizawa_ci: 0.09
 
-      # RANS selector. The k-omega runtime path is accepted but currently incomplete.
-      rans:
-        enabled: false
-        # model is only needed when enabled: true. Currently supported: k_omega
-        # model: "k_omega"
+      # There is no RANS selector: the closure is planned, not implemented, and a
+      # `rans:` block is refused at validation. Use `les` above, or run laminar.
 
-      # Wall functions are independent of LES/RANS and apply on WALL faces. The
+      # Wall functions are independent of the LES closure and apply on WALL faces. The
       # correction is applied inside the momentum solve's boundary pass and again
       # before the LES strain rates are formed, so the closure and the momentum
       # equation agree about the near-wall velocity.
@@ -512,19 +502,15 @@ models:
   
 # ==============================================================================
 # 5. BOUNDARY CONDITIONS
-#    Defines the behavior at each of the 6 faces of the computational domain(s).
+#    Defines the behavior at each of the 6 faces of the computational domain.
 # ==============================================================================
-# --- For SINGLE-BLOCK cases: Provide a simple list of 6 face definitions. ---
-# --- For MULTI-BLOCK cases: Provide a LIST OF LISTS. The outer list corresponds
-#     to the block index [0, 1, ...], and each inner list defines the 6 faces
-#     for that block. See the multi-block example commented out below. ---
+# --- Provide a list of 6 face definitions, one per face. ---
 # --- Geometric periodicity: set both opposite faces to PERIODIC/geometric.
 #     Periodic axes are derived from these BC pairs. The paired grid surfaces
 #     must match pointwise under one nonzero constant Cartesian translation,
 #     and the axis must contain at least four physical nodes. Periodic particle
 #     wrapping is not implemented. See examples/periodic_test/. ---
 boundary_conditions:
-  # --- Example for a Single Block Case ---
   - face: "-Xi"
     type: WALL
     handler: noslip
@@ -644,50 +630,6 @@ boundary_conditions:
 #                                     reintroduce divergence and injects single-plane noise.
 #                                     `apply_trim` is accepted as a deprecated alias.
 
-# --- Example for a 2-Block Case (syntax example; all handlers shown are currently supported) ---
-# boundary_conditions:
-#   # --- Block 0 Definitions ---
-#   - - face: "-Xi"
-#       type: INLET
-#       handler: constant_velocity
-#       params: { vx: 1.5, vy: 0.0, vz: 0.0 }
-#     - face: "+Xi"
-#       type: OUTLET
-#       handler: conservation
-#     - face: "-Eta"
-#       type: WALL
-#       handler: noslip
-#     - face: "+Eta"
-#       type: WALL
-#       handler: noslip
-#     - face: "-Zeta"
-#       type: WALL
-#       handler: noslip
-#     - face: "+Zeta"
-#       type: WALL
-#       handler: noslip
-#
-#   # --- Block 1 Definitions ---
-#   - - face: "-Xi"
-#       type: INLET
-#       handler: parabolic
-#       params: { v_max: 1.5 }
-#     - face: "+Xi"
-#       type: OUTLET
-#       handler: conservation
-#     - face: "-Eta"
-#       type: WALL
-#       handler: noslip
-#     - face: "+Eta"
-#       type: WALL
-#       handler: noslip
-#     - face: "-Zeta"
-#       type: WALL
-#       handler: noslip
-#     - face: "+Zeta"
-#       type: WALL
-#       handler: noslip
-
 # ==============================================================================
 # 6. ADVANCED PASSTHROUGH (OPTIONAL)
 # ------------------------------------------------------------------------------
@@ -695,7 +637,6 @@ boundary_conditions:
 # Keys must be full C/PETSc-style flags (including leading '-').
 # ==============================================================================
 # solver_parameters:
-#   -read_fields: true
 #   -some_new_flag: 123
 </pre><p><code>case.yml</code> defines physical setup, grid source, domain topology, and boundary conditions. It is intentionally modular: the same <code>case.yml</code> can be paired with different <code>solver.yml</code>, <code>monitor.yml</code>, and <code>post.yml</code> profiles when the combination remains contract-compatible.</p>
 <h1><a class="anchor" id="p07_properties_sec"></a>
@@ -836,8 +777,8 @@ file</h2>
 <p><b>Parameters it owns.</b> <code>grid.source_file</code> -&gt; the staged <code>.picgrid</code> path. Global DMDA hints <code>grid.da_processors_x/y/z</code> apply here as to every mode.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>programmatic_c</code> and <code>grid_gen</code>. Compatible with the <code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> analytical sources; <code>TGV3D</code> is not, because it needs the programmatic Cartesian box.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved grid source. A missing or unreadable file is a fatal <code>picurv validate</code> error naming the path, not a runtime failure.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/search_robustness</code> runs from a staged <code>.picgrid</code>. It carries the only grid file the examples still ship: <code>bent_channel</code> moved to <code>grid_gen</code> once the generator could express its geometry, which removed a duplicate of the same 2.9 MB file.</p>
-<p><b>Limitations.</b> <code>picurv</code> does not inspect the mesh beyond existence and header validity, so a geometrically wrong but well-formed file is accepted here and only shows up in metric or Jacobian diagnostics.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/search_robustness</code> runs from a staged <code>.picgrid</code>. It carries the only grid file the examples still ship: <code>bent_channel</code> moved to <code>grid_gen</code> once the generator could express its geometry, which removed a duplicate of the same 2.9 MB file. Analytically verified - <code>curvilinear-gcl-2026-09-18</code>: the face-area metrics of a curvilinear file grid close to round-off in every cell; <code>eulerian-source-domain-modes-2026-09-21</code>: a curvilinear pipe loaded as a file reproduced the grid, velocity and pressure of the same run from <code>grid_gen</code> exactly after ten steps; <code>grid-generator-closure-2026-09-21</code>: every generator feature, loaded as a file grid, closes a uniform flow to round-off.</p>
+<p><b>Limitations.</b> <code>picurv</code> does not inspect the mesh beyond existence and header validity, so a geometrically wrong but well-formed file is accepted here and only shows up in metric or Jacobian diagnostics. The solver itself refuses a uniformly left-handed file, whose logical axes would need renumbering (<a class="el" href="48_Grid_Generator_Guide.html#p48_cap_xform_reverse">p48_cap_xform_reverse</a>).</p>
 <h2><a class="anchor" id="p07_cap_gridmode_programmatic_c_sub"></a>
 programmatic_c</h2>
 <p><a class="anchor" id="p07_cap_gridmode_programmatic_c"></a> <b>Identity.</b> <code>grid.mode: programmatic_c</code> with a <code>grid.programmatic_settings</code> block.</p>
@@ -846,7 +787,7 @@ programmatic_c</h2>
 <p><b>Parameters it owns.</b> <code>grid.programmatic_settings.im/jm/km</code> (cell counts, converted to node counts before <code>-im/-jm/-km</code>), <code>xMins/xMaxs</code>, <code>yMins/yMaxs</code>, <code>zMins/zMaxs</code>, <code>rxs/rys/rzs</code>, and <code>cgrids</code> -&gt; <code>-cgrids</code> - see <a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a> for why this is not a real geometry choice.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>file</code> and <code>grid_gen</code>. Required by the <code>TGV3D</code> analytical source. Per-block lists are supported for the geometry arrays, but <code>grid.da_processors_*</code> stay scalar: per-block processor decomposition is not implemented.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved block extents and counts. A count/extent mismatch across per-block lists is a validation error naming the offending key.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>; integration verified - <code>make unit-grid</code>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>; integration verified - <code>make unit-grid</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: a programmatic square duct develops to the Poiseuille series at second order; <code>poisson-options-2026-09-21</code> and <code>initial-conditions-2026-09-21</code> run on it.</p>
 <p><b>Limitations.</b> Restricted to a rectangular Cartesian block - <code>cgrids</code> does not add curvilinear geometry (<a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a>). Anything bent, branched, or externally meshed needs <code>file</code> or <code>grid_gen</code>.</p>
 <h2><a class="anchor" id="p07_cap_gridmode_grid_gen_sub"></a>
 grid_gen</h2>
@@ -856,19 +797,15 @@ grid_gen</h2>
 <p><b>Parameters it owns.</b> <code>grid.generator.config_file</code> (required; <code>picurv</code> does not synthesize one), <code>grid.generator.grid_type</code> -&gt; <b><a class="el" href="48_Grid_Generator_Guide.html#p48_cap_geom_sec">7.1 Grid Generator Geometry Entries</a></b>, and <code>grid.generator.cli_args</code> for per-run overrides such as <code>--ncells-i</code>.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>file</code> and <code>programmatic_c</code>. The generator accepts cell counts (<code>ncells_*</code>) and writes node counts into the <code>.picgrid</code> header, so the count convention matches <code>programmatic_c</code> at the YAML boundary.</p>
 <p><b>Diagnostics.</b> Generator stdout is captured into the run's scheduler log, and the staged <code>.picgrid</code> appears under <code>&lt;run.config&gt;/</code>. A generator failure aborts before the solver launches.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/periodic_test</code> cases stage grids this way.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/periodic_test</code> cases stage grids this way. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code> on a generated box and <code>pipe-poiseuille-curvilinear-2026-09-18</code> on a generated swept circle, each at second order.</p>
 <p><b>Limitations.</b> Adds a build step to every launch, and the run's geometry depends on the generator's current behaviour rather than on a fixed artefact. <code>config_file</code> is mandatory today.</p>
 <h1><a class="anchor" id="p07_models_sec"></a>
 4. models</h1>
 <div class="fragment"><div class="line">models:</div>
-<div class="line">  domain:</div>
-<div class="line">    blocks: 1</div>
 <div class="line">  physics:</div>
 <div class="line">    dimensionality: &quot;3D&quot;</div>
 <div class="line">    turbulence:</div>
 <div class="line">      les:</div>
-<div class="line">        enabled: false</div>
-<div class="line">      rans:</div>
 <div class="line">        enabled: false</div>
 <div class="line">      wall_function:</div>
 <div class="line">        enabled: false</div>
@@ -877,7 +814,6 @@ grid_gen</h2>
 <div class="line">      init_mode: &quot;Surface&quot;</div>
 <div class="line">      restart_mode: &quot;init&quot;</div>
 </div><!-- fragment --><p>Common mappings:</p><ul>
-<li><code>domain.blocks</code> -&gt; <code>-nblk</code></li>
 <li>periodic axes are derived from paired <code>PERIODIC</code> boundary conditions before DMDA creation; <code>models.domain</code> does not accept periodic flags</li>
 <li><code>physics.dimensionality: "2D"</code> -&gt; <code>-TwoD 1</code></li>
 <li><code>physics.turbulence.les.enabled/model</code> -&gt; <code>-les</code> (<code>0</code> none, <code>1</code> constant Smagorinsky, <code>2</code> dynamic Smagorinsky, <code>3</code> Vreman, <code>4</code> WALE)</li>
@@ -891,12 +827,12 @@ grid_gen</h2>
 <li><code>physics.turbulence.les.clipping.mode/max_cs/min_viscosity_ratio</code> -&gt; <code>-les_clip_mode</code>, <code>-les_clip_max_cs</code>, <code>-les_min_viscosity_ratio</code></li>
 <li><code>physics.turbulence.les.gradient_model.enabled</code> -&gt; <code>-les_gradient_model</code></li>
 <li><code>physics.turbulence.les.diagnostics.enabled/cadence/yoshizawa_ci</code> -&gt; <code>-les_diagnostics</code>, <code>-les_diagnostics_cadence</code>, <code>-les_yoshizawa_ci</code></li>
-<li><code>physics.turbulence.rans.enabled/model</code> -&gt; <code>-rans</code> (<code>k_omega</code> accepted; runtime update currently incomplete)</li>
 <li><code>physics.turbulence.wall_function.enabled/model</code> -&gt; <code>-wallfunction</code> (<code>1</code> log law, <code>2</code> Werner-Wengle, <code>3</code> Cabot)</li>
 <li><code>physics.turbulence.wall_function.roughness_height</code> -&gt; <code>-wall_roughness</code> (<code>log_law</code> only)</li>
 <li><code>physics.particles.count</code> -&gt; <code>-numParticles</code></li>
 <li><code>physics.particles.init_mode</code> -&gt; <code>-pinit</code> (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>, <code>SurfaceEdges</code>)</li>
 <li><code>physics.particles.restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
+<li><code>physics.particles.random_seed</code> -&gt; <code>-particle_random_seed</code> (integer <code>0</code>..<code>2147483647</code>, default <code>12345</code>)</li>
 <li>point source coordinates -&gt; <code>-psrc_x/-psrc_y/-psrc_z</code></li>
 </ul>
 <p>Legacy turbulence shorthand remains valid:</p>
@@ -905,12 +841,45 @@ grid_gen</h2>
 <li><code>les: true</code> or <code>les: 1</code> -&gt; constant Smagorinsky (<code>-les 1</code>)</li>
 <li><code>les: 2</code> -&gt; dynamic Smagorinsky (<code>-les 2</code>)</li>
 </ul>
-<p>LES and RANS are mutually exclusive in one case. <code>wall_function</code> is a sibling option because wall functions can be used with wall-modeled LES or RANS boundary treatments.</p>
+<p><code>wall_function</code> is a sibling of <code>les</code> because a wall model is configured independently of the closure it pairs with; the pairing rules are listed with the wall laws in <a class="el" href="07_Case_Reference.html#p07_wall_laws_sec">6. Test-Filter and Wall-Function Entries</a>. There is no RANS closure: <code>models.physics.turbulence.rans</code> is refused at validation, and the charter for a future one is at <a class="el" href="57_Future_Architecture_Specifications.html#p57_rans_sec">6a. RANS Closures</a>.</p>
 <p>Restart note:</p>
 <ul>
 <li>if <code>run_control.start_step &gt; 0</code>, particles are enabled, and <code>restart_mode</code> is omitted, <code>picurv</code> warns that C will default to <code>load</code>.</li>
 </ul>
 <p>For mode-specific particle behavior and restart flow, see <b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b>.</p>
+<h2><a class="anchor" id="p07_dim_sec"></a>
+4.1 Dimensionality Entries</h2>
+<!-- GENERATED FILE - do not edit by hand. Family: domain.dimensionality.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_dim_2d"><code>2D</code></a></td><td class="markdownTableBodyNone"><code>2D</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_dim_3d"><code>3D</code></a></td><td class="markdownTableBodyNone"><code>3D</code></td></tr>
+</table>
+<p><code>models.physics.dimensionality</code> must be exactly <code>3D</code> or <code>2D</code>; any other spelling is refused at validation.</p>
+<h2><a class="anchor" id="p07_cap_dim_3d_sub"></a>
+3D</h2>
+<p><a class="anchor" id="p07_cap_dim_3d"></a> <b>Identity.</b> <code>models.physics.dimensionality: "3D"</code>, the default. No <code>-TwoD</code> flag is emitted, so the runtime value stays 0.</p>
+<p><b>What it does.</b> Evolves all three contravariant velocity components.</p>
+<p><b>When to choose it.</b> Every case that is not deliberately planar.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Required by generated initial conditions that build a fresh three-dimensional field, such as <code>spectral_random_velocity</code>.</p>
+<p><b>Diagnostics.</b> None of its own: the generated control file carries no <code>-TwoD</code> line.</p>
+<p><b>Evidence.</b> Production exercised - every shipped example, including <code>examples/flat_channel</code>, runs in 3D. Analytically verified - every solve measurement, for instance <code>tgv2d-picard-order-2026-09-18</code>, runs in 3D.</p>
+<p><b>Limitations.</b> None of its own.</p>
+<h2><a class="anchor" id="p07_cap_dim_2d_sub"></a>
+2D</h2>
+<p><a class="anchor" id="p07_cap_dim_2d"></a> <b>Identity.</b> <code>models.physics.dimensionality: "2D"</code> -&gt; <code>-TwoD 1</code>.</p>
+<p><b>What it does.</b> Zeroes the i-direction row of the momentum right-hand side in every cell, so the i contravariant velocity component never moves from its initial value. Nothing else changes: the grid, the pressure solve, and the particles stay three-dimensional. It is a 3D solve with one momentum component held fixed, not a two-dimensional discretization.</p>
+<p><b>When to choose it.</b> A flow that is planar in the j-k plane, on a grid thin in i, with the i velocity component initialized to zero.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Refused by the Newton-Krylov solver and by generated initial conditions that need a fresh 3D field. Only the i direction can be held fixed from YAML; the runtime also accepts <code>-TwoD 2</code> (j) and <code>-TwoD 3</code> (k), reachable only through a PETSc passthrough.</p>
+<p><b>Diagnostics.</b> The generated control file carries <code>-TwoD 1</code>; there is no startup banner line for it.</p>
+<p><b>Evidence.</b> Unit verified - the active-row mask cases in <code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code>, run by <code>make unit-solver</code>. Analytically verified - <code>eulerian-source-domain-modes-2026-09-21</code>: a Taylor-Green vortex in the j-k plane with a frozen i velocity ran 20 steps in 2D and in 3D; the i component moved by at most 3.1e-16 and the j and k components matched the 3D run to 2.8e-15.</p>
+<p><b>Limitations.</b> Nothing checks that the i component starts at zero. The pressure projection still acts on every face, so the i component stays frozen only while the pressure field does not vary along i; a flow that develops an i pressure gradient breaks the planar assumption without warning.</p>
 <h1><a class="anchor" id="p07_les_sec"></a>
 5. LES Subgrid Models</h1>
 <p>The subgrid model is chosen by <code>models.physics.turbulence.les.model</code>.</p>
@@ -940,7 +909,7 @@ none</h2>
 <p><b>What it does.</b> Disables subgrid modelling entirely. The momentum equations are solved with molecular viscosity alone.</p>
 <p><b>When to choose it.</b> Laminar cases, and any DNS where the grid resolves the dissipative scales. Also the correct choice while verifying something else: a subgrid model is one more thing to be wrong when you are chasing a discrepancy.</p>
 <p><b>Parameters it owns.</b> None. Setting <code>constant_cs</code> or dynamic-model controls alongside <code>none</code> has no effect.</p>
-<p><b>Interactions.</b> LES and RANS are mutually exclusive within one case. Wall functions are configured separately and are not implied by disabling LES.</p>
+<p><b>Interactions.</b> Wall functions are configured separately and are not implied by disabling LES.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved turbulence model. With no model active, no eddy-viscosity field is computed or logged.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code> and <code>examples/bent_channel</code> both run with no subgrid model.</p>
 <p><b>Limitations.</b> None; this is the absence of a model rather than a model.</p>
@@ -951,9 +920,9 @@ constant_smagorinsky</h2>
 <p><b>When to choose it.</b> When you want subgrid dissipation, know a coefficient appropriate to your flow, and would rather not pay for the dynamic procedure. It is also the right choice on a geometry with no homogeneous direction, where a local dynamic coefficient is at its noisiest.</p>
 <p><b>Parameters it owns.</b> <code>constant_cs</code> -&gt; <code>-les_constant_cs</code>, the fixed coefficient, and <code>filter_width</code> -&gt; <code>-les_filter_width</code>, which sets how <code>Delta</code> is derived per cell.</p>
 <dl class="section warning"><dt>Warning</dt><dd><code>constant_cs</code> defaults to <b>0.03</b>, which is a wall-bounded value. Isotropic turbulence conventionally uses Lilly's 0.16-0.17, but only where the grid cutoff sits in an inertial range; at low <code>Re_lambda</code> a smaller value near 0.1 is more appropriate. The default is not a universal choice - set it deliberately for your flow.</dd></dl>
-<p><b>Interactions.</b> Mutually exclusive with RANS. <code>dynamic_frequency</code> and the test-filter, averaging, and clipping controls belong to the dynamic procedure, and the other models' coefficients to those models; all are rejected here rather than silently ignored.</p>
+<p><b>Interactions.</b> <code>dynamic_frequency</code> and the test-filter, averaging, and clipping controls belong to the dynamic procedure, and the other models' coefficients to those models; all are rejected here rather than silently ignored.</p>
 <p><b>Storage.</b> This model allocates no coefficient field. The coefficient is a number from the configuration, so <code>nu_t</code> is built from it directly; nothing is synchronized, checkpointed, or written to disk on its behalf.</p>
-<p><b>Diagnostics.</b> The startup banner reports the resolved turbulence model. With <code>diagnostics.enabled</code> set, <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> records the eddy-viscosity levels and the modelled subgrid energy each step. The eddy-viscosity field is available for output.</p>
+<p><b>Diagnostics.</b> The startup banner reports the resolved turbulence model. With <code>diagnostics.enabled</code> set, <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> records the eddy-viscosity levels and the modelled subgrid energy each step. The eddy-viscosity field is available for output.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>constant-model-needs-no-coefficient-field</code> runs the model with no coefficient field allocated and checks the resulting <code>nu_t</code> against the closed form.</p>
 <p><b>Limitations.</b> The coefficient is constant in space and time, so it cannot adapt near walls and does not vanish in laminar regions the way a dynamic procedure does.</p>
 <h2><a class="anchor" id="p07_cap_les_dynamic_smagorinsky_sub"></a>
@@ -962,9 +931,9 @@ dynamic_smagorinsky</h2>
 <p><b>What it does.</b> Measures the model coefficient from the resolved field each update rather than prescribing it, using the Germano identity and Lilly's least-squares contraction. The resolved velocity is filtered a second time at a wider test scale; the stress carried between the two scales is computable, and matching the model against it determines the coefficient. The full derivation is in <b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b>.</p>
 <p><b>When to choose it.</b> When the coefficient should respond to the flow: transitional regions, near walls, or decaying turbulence, where a single constant is wrong somewhere in the domain.</p>
 <p><b>Parameters it owns.</b> <code>dynamic_frequency</code> -&gt; <code>-les_dynamic_frequency</code>, plus the <code>filter_width</code>, <code>test_filter</code>, <code>averaging</code>, and <code>clipping</code> blocks documented below.</p>
-<p><b>Interactions.</b> Mutually exclusive with RANS. <code>constant_cs</code>, <code>vreman_coefficient</code>, and <code>wale_coefficient</code> belong to the other models and are rejected here.</p>
+<p><b>Interactions.</b> <code>constant_cs</code>, <code>vreman_coefficient</code>, and <code>wale_coefficient</code> belong to the other models and are rejected here.</p>
 <p><b>Storage.</b> The coefficient field is stored in <code>CS</code> and checkpointed. It holds <code>C</code>, the factor multiplying <code>Delta^2 |S|</code>, which is <code>Cs^2</code> in the classical notation - not <code>Cs</code>. Under <code>clipping.mode: none</code> it is signed, because a negative coefficient is backscatter.</p>
-<p><b>Diagnostics.</b> With <code>diagnostics.enabled</code>, <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> records the effective coefficient converted to <code>Cs</code>, its spatial spread, eddy-viscosity levels, and the fractions of the domain that were backscattering or limited before clipping. Those last two describe a pre-clipping state that no stored field preserves. <code>diagnostics.cadence</code> sets the interval, and <code>diagnostics.yoshizawa_ci</code> sets the constant in the reported subgrid kinetic energy; neither affects the solution. <code>picurv summarize --plot les.cs_effective</code> renders the coefficient history directly.</p>
+<p><b>Diagnostics.</b> With <code>diagnostics.enabled</code>, <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> records the effective coefficient converted to <code>Cs</code>, its spatial spread, eddy-viscosity levels, and the fractions of the domain that were backscattering or limited before clipping. Those last two describe a pre-clipping state that no stored field preserves. <code>diagnostics.cadence</code> sets the interval, and <code>diagnostics.yoshizawa_ci</code> sets the constant in the reported subgrid kinetic energy; neither affects the solution. <code>picurv summarize --plot les.cs_effective</code> renders the coefficient history directly.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage in <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code>: the model tensor is checked against its closed form on constant strain, the filtered product is pinned apart from the product of filtered factors, the procedure returns exactly zero on uniform flow, and global averaging is checked to give one coefficient per block. The averaging reduction is checked to be decomposition-independent in <code><a class="el" href="test__mpi__kernels_8c.html" title="C unit tests for MPI collective helper routines.">tests/c/test_mpi_kernels.c</a></code>. <code>examples/decaying_isotropic_turbulence</code> exercises the model end to end; on a shortened 32^3 run of it the coefficient field comes out uniform to roundoff under <code>averaging.mode: homogeneous</code>, as averaging over a homogeneous set must, and <code>Cs</code> climbs monotonically from a random initial field. That is a trend check, not a validation - the run was not carried far enough for <code>Cs</code> to settle.</p>
 <dl class="section note"><dt>Note</dt><dd><b>Status: experimental.</b> The formulation is correct and unit-tested, but the coefficient has not yet been validated against a reference flow. The check that would settle it is decaying isotropic turbulence with homogeneous averaging, where <code>Cs(t)</code> should settle near 0.16-0.17; until that run is recorded, treat the magnitude as uncharacterized.</dd></dl>
 <p><b>Limitations.</b> The procedure needs a developed field to sample, so the coefficient is held at zero for the first two steps of a run started from rest. With <code>averaging.mode: local</code> the coefficient is noisy and the least-squares closure is formally inconsistent, since it assumes the coefficient is constant over the averaging set; prefer <code>homogeneous</code> wherever the flow has a homogeneous direction.</p>
@@ -974,7 +943,7 @@ vreman</h2>
 <p><b>What it does.</b> Vreman (2004): <code>nu_t = c sqrt(B_beta / (alpha_ij alpha_ij))</code>, with <code>alpha_ij = du_j/dx_i</code> and <code>beta_ij</code> the sum over the cell's three grid directions of the outer product of the velocity change across the cell in that direction, <code>edge_m . grad(u)</code>. On an aligned Cartesian grid this is Vreman's <code>beta_ij = sum_m Delta_m^2 alpha_mi alpha_mj</code>; on a curvilinear grid the same change is measured along the cell's own edges, so the model is resolved per direction and does not depend on the grid's orientation. It vanishes in pure shear and in any locally two-component flow, so a laminar shear layer gets no eddy viscosity.</p>
 <p><b>When to choose it.</b> Wall-bounded or complex geometry with stretched cells and no homogeneous direction: it needs no test filter, no averaging and no coefficient field, and it does not collapse a cell that is fine in two directions and coarse in the third onto one scalar width the way every <code>filter_width</code> choice must. Prefer it over <code>dynamic_smagorinsky</code> with <code>averaging.mode: local</code>, whose coefficient is noisy and clipped on such geometry, and over <code>constant_smagorinsky</code>, which does not vanish in laminar shear.</p>
 <p><b>Parameters it owns.</b> <code>vreman_coefficient</code> -&gt; <code>-les_vreman_coefficient</code>, the constant <code>c</code>, default 0.07: Vreman's <code>c = 2.5 Cs^2</code> for <code>Cs = 0.17</code>, calibrated on decaying isotropic turbulence.</p>
-<p><b>Interactions.</b> Mutually exclusive with RANS. <code>filter_width</code> is refused, since the model takes each direction's spacing from the cell's edges rather than from one width; the parameters of the other models are refused as well. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
+<p><b>Interactions.</b> <code>filter_width</code> is refused, since the model takes each direction's spacing from the cell's edges rather than from one width; the parameters of the other models are refused as well. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
 <p><b>Storage.</b> No coefficient field; <code>nu_t</code> is recomputed from the resolved gradient every step and nothing is checkpointed on the model's behalf.</p>
 <p><b>Diagnostics.</b> The startup banner reports <code>Vreman</code>, its coefficient, and <code>per direction (cell edges; filter_width unused)</code>. With <code>diagnostics.enabled</code>, <code>les_coefficient.csv</code> records the eddy-viscosity levels and subgrid energy; its coefficient columns are written as <code>nan</code>, because the model carries no Smagorinsky coefficient.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-les</code>: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>wale-and-vreman-kernels</code> checks the kernel against an independent evaluation of the published formula, requires zero in pure shear and the same value when the flow and the cell rotate together, and recovers a turned cell's edges from its metrics. A three-step flat-channel run completes with the model selected. Not validated against a reference flow.</p>
@@ -985,7 +954,7 @@ wale</h2>
 <p><b>What it does.</b> Nicoud &amp; Ducros (1999): <code>nu_t = (C_w Delta)^2 (S^d_ij S^d_ij)^(3/2) / [(S_ij S_ij)^(5/2) + (S^d_ij S^d_ij)^(5/4)]</code>, where <code>S^d</code> is the traceless symmetric part of the squared velocity gradient. It vanishes in pure shear and falls as the cube of wall distance approaching a wall, the physically correct near-wall behaviour, without a damping function.</p>
 <p><b>When to choose it.</b> Wall-resolved LES where the near-wall eddy viscosity should vanish correctly without a damping function or a dynamic procedure. Against <code>vreman</code> it uses one scalar width, so pair it with <code>filter_width: scotti</code> on stretched cells; against <code>dynamic_smagorinsky</code> it needs no test filter or averaging and is well behaved on geometry with no homogeneous direction.</p>
 <p><b>Parameters it owns.</b> <code>wale_coefficient</code> -&gt; <code>-les_wale_coefficient</code>, the constant <code>C_w</code>, default 0.5, within Nicoud &amp; Ducros's isotropic calibration of 0.55-0.60.</p>
-<p><b>Interactions.</b> Mutually exclusive with RANS. Takes <code>filter_width</code> like the Smagorinsky models; the parameters of the other models are refused. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
+<p><b>Interactions.</b> Takes <code>filter_width</code> like the Smagorinsky models; the parameters of the other models are refused. Central convection is used, as for every LES model. The Clark gradient term is independent and may be combined.</p>
 <p><b>Storage.</b> No coefficient field; <code>nu_t</code> is recomputed every step.</p>
 <p><b>Diagnostics.</b> The startup banner reports <code>WALE</code>, its coefficient and the filter width. With <code>diagnostics.enabled</code>, <code>les_coefficient.csv</code> records the eddy-viscosity levels, with its Smagorinsky coefficient columns written as <code>nan</code>.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-les</code>: <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>wale-and-vreman-kernels</code> checks the kernel against an independent evaluation of the published formula, requires zero in pure shear, and requires the same value when the flow rotates. A three-step flat-channel run completes with the model selected. Not validated against a reference flow.</p>
@@ -1030,7 +999,7 @@ geometric_mean</h2>
 max_edge</h2>
 <p><a class="anchor" id="p07_cap_width_max_edge"></a> <b>Identity.</b> <code>les.filter_width: max_edge</code> -&gt; <code>-les_filter_width 2</code>.</p>
 <p><b>What it does.</b> Sets <code>Delta</code> to the cell's longest extent along its own grid directions.</p>
-<p><b>When to choose it.</b> When the model should act on the largest unresolved scale the cell can hold: a wall-modelled LES whose near-wall cells are deliberately coarse, a hybrid RANS-LES treatment, or a deliberately over-dissipative start-up.</p>
+<p><b>When to choose it.</b> When the model should act on the largest unresolved scale the cell can hold: a wall-modelled LES whose near-wall cells are deliberately coarse, a hybrid hybrid treatment, or a deliberately over-dissipative start-up.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> None beyond scaling <code>nu_t</code>.</p>
 <p><b>Diagnostics.</b> As above.</p>
@@ -1068,7 +1037,7 @@ local</h2>
 <p><b>When to choose it.</b> Geometry with no homogeneous direction, where no larger averaging set can be justified.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> <code>averaging.directions</code> does not apply and is rejected.</p>
-<p><b>Diagnostics.</b> The coefficient spread columns in <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> show how noisy the field is.</p>
+<p><b>Diagnostics.</b> The coefficient spread columns in <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> show how noisy the field is.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>average-ratio-local-is-pointwise</code>.</p>
 <p><b>Limitations.</b> The denominator collapses wherever the resolved strain is briefly small, so the coefficient is noisy, and the least-squares derivation is formally inconsistent because the coefficient it assumes constant is not.</p>
 <h2><a class="anchor" id="p07_cap_avg_homogeneous_sub"></a>
@@ -1078,7 +1047,7 @@ homogeneous</h2>
 <p><b>When to choose it.</b> Whenever the flow has a homogeneous direction. This is the mode the dynamic procedure was derived for.</p>
 <p><b>Parameters it owns.</b> <code>averaging.directions</code> -&gt; <code>-les_averaging_directions</code>, a subset of <code>[i, j, k]</code> overriding the periodic default.</p>
 <p><b>Interactions.</b> Naming a direction the case does not declare <code>PERIODIC</code> is accepted with a warning, since homogeneity is the user's claim to make. Requesting this mode with neither periodic pairs nor an explicit list is rejected.</p>
-<p><b>Diagnostics.</b> <code>cs_effective</code> in <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> is the whole-domain value regardless of mode, so it stays comparable across modes.</p>
+<p><b>Diagnostics.</b> <code>cs_effective</code> in <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> is the whole-domain value regardless of mode, so it stays comparable across modes.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> cases <code>homogeneous-averaging-derives-periodic-axes</code> and <code>average-ratio-retains-unaveraged-direction</code>.</p>
 <p><b>Limitations.</b> Averaging over a direction the flow is not homogeneous in smears real spatial variation into a single number.</p>
 <h2><a class="anchor" id="p07_cap_avg_global_sub"></a>
@@ -1087,7 +1056,7 @@ global</h2>
 <p><b>What it does.</b> Averages both contractions over the entire block, giving one coefficient per block per update.</p>
 <p><b>When to choose it.</b> A domain you know is homogeneous but have not declared periodic. Where the domain is periodic in all three directions, <code>homogeneous</code> reaches the same answer without asserting anything the boundary conditions do not already say.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> <code>averaging.directions</code> does not apply and is rejected. In a multi-block case the average is per block.</p>
+<p><b>Interactions.</b> <code>averaging.directions</code> does not apply and is rejected.</p>
 <p><b>Diagnostics.</b> As above.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> cases <code>average-ratio-divides-summed-fields</code> and <code>dynamic-procedure-global-average-is-uniform</code>, and by the decomposition-independence case in <code><a class="el" href="test__mpi__kernels_8c.html" title="C unit tests for MPI collective helper routines.">tests/c/test_mpi_kernels.c</a></code>.</p>
 <p><b>Limitations.</b> Discards all spatial variation in the coefficient, which is wrong wherever the flow is inhomogeneous.</p>
@@ -1113,7 +1082,7 @@ clamp</h2>
 <p><b>When to choose it.</b> The conservative default, and the safe choice when a run is at risk of a diverging coefficient.</p>
 <p><b>Parameters it owns.</b> <code>clipping.max_cs</code> -&gt; <code>-les_clip_max_cs</code>, a ceiling on <code>Cs</code> and not on the stored coefficient. Defaults to 0.3, roughly twice the physical value, so it catches divergence without shaping the ordinary distribution.</p>
 <p><b>Interactions.</b> Removes backscatter, so the total-viscosity floor never engages from below.</p>
-<p><b>Diagnostics.</b> <code>limited_fraction</code> in <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> reports the volume fraction the clip modified. A ceiling that is doing nothing reads near zero.</p>
+<p><b>Diagnostics.</b> <code>limited_fraction</code> in <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> reports the volume fraction the clip modified. A ceiling that is doing nothing reads near zero.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> case <code>clip-model-coefficient-modes</code>.</p>
 <p><b>Limitations.</b> Discarding the negative tail is not neutral: the positives that would have cancelled it survive, so the mean subgrid dissipation is biased upward.</p>
 <h2><a class="anchor" id="p07_cap_clip_clip_negative_sub"></a>
@@ -1133,26 +1102,12 @@ none</h2>
 <p><b>When to choose it.</b> When the physics of backscatter matters, or when the upward bias the clipping modes introduce in mean dissipation is itself the thing under study.</p>
 <p><b>Parameters it owns.</b> None directly, but it is the mode that makes <code>clipping.min_viscosity_ratio</code> -&gt; <code>-les_min_viscosity_ratio</code> load-bearing: the total viscosity is floored at <code>ratio * nu</code>, which bounds the quantity that actually has to stay positive for the momentum operator to remain well posed.</p>
 <p><b>Interactions.</b> The stored coefficient field becomes signed. Anything reading <code>CS</code> must expect negative values.</p>
-<p><b>Diagnostics.</b> <code>backscatter_fraction</code> in <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> reports the volume fraction with a negative coefficient, which is exactly what the other two modes discard.</p>
+<p><b>Diagnostics.</b> <code>backscatter_fraction</code> in <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> reports the volume fraction with a negative coefficient, which is exactly what the other two modes discard.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> cases <code>clip-model-coefficient-modes</code> and <code>eddy-viscosity-floor-bounds-total-viscosity</code>.</p>
 <p><b>Limitations.</b> A locally averaged coefficient is negative at a large fraction of points in developed turbulence, so this mode leans hard on the viscosity floor. Pair it with <code>averaging.mode: homogeneous</code>, where the averaged coefficient is negative only when the whole homogeneous set is backscattering on balance.</p>
-<h1><a class="anchor" id="p07_rans_filter_sec"></a>
-6. RANS and Test-Filter Entries</h1>
-<!-- GENERATED FILE - do not edit by hand. Family: turbulence.rans_model.
-     Regenerate with: make docs-inventory -->
-<table class="markdownTable">
-<tr>
-<th class="markdownTableHeadNone">Value</th>
-<th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
-</tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_rans_none"><code>disabled</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">accepted spelling of <code>none</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_rans_k_omega"><code>k_omega</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_rans_k_omega"><code>komega</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">accepted spelling of <code>k_omega</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_rans_none"><code>none</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_rans_none"><code>off</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">accepted spelling of <code>none</code></td></tr>
-</table>
- <!-- GENERATED FILE - do not edit by hand. Family: turbulence.les_test_filter.
+<h1><a class="anchor" id="p07_wall_laws_sec"></a>
+6. Test-Filter and Wall-Function Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: turbulence.les_test_filter.
      Regenerate with: make docs-inventory -->
 <table class="markdownTable">
 <tr>
@@ -1164,27 +1119,6 @@ none</h2>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_simpson_ik"><code>simpson_ik</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_volume_weighted_box"><code>volume_weighted_box</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
-<h2><a class="anchor" id="p07_cap_rans_none_sub"></a>
-none</h2>
-<p><a class="anchor" id="p07_cap_rans_none"></a> <b>Identity.</b> <code>turbulence.rans.enabled: false</code>, or <code>model: none</code> -&gt; <code>-rans 0</code>. Accepted spellings: <code>off</code>, <code>disabled</code>.</p>
-<p><b>What it does.</b> Disables RANS modelling. Momentum is closed by molecular viscosity, or by LES if that is enabled instead.</p>
-<p><b>When to choose it.</b> Whenever you are not running RANS - which, given the status of the alternative below, is currently always.</p>
-<p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> RANS and LES are mutually exclusive within one case.</p>
-<p><b>Diagnostics.</b> The startup banner reports the resolved turbulence model.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code> and <code>examples/bent_channel</code> both run with RANS off.</p>
-<p><b>Limitations.</b> None; this is the absence of a model.</p>
-<h2><a class="anchor" id="p07_cap_rans_k_omega_sub"></a>
-k_omega</h2>
-<p><a class="anchor" id="p07_cap_rans_k_omega"></a> <b>Identity.</b> <code>turbulence.rans.model: k_omega</code> -&gt; <code>-rans 1</code>. Accepted spelling: <code>komega</code>.</p>
-<p><b>What it does.</b> Intended to close the momentum equations with a two-equation k-omega model.</p>
-<p><b>When to choose it.</b> Not currently - see the status below.</p>
-<p><b>Parameters it owns.</b> The RANS block in <code>case.yml</code>.</p>
-<p><b>Interactions.</b> Mutually exclusive with LES. Wall functions are configured separately and are not implied by enabling RANS.</p>
-<p><b>Diagnostics.</b> The startup banner reports the model as resolved even though the update is incomplete, so the banner alone is not evidence that it is working.</p>
-<p><b>Evidence.</b> Implemented only. No facet is claimed.</p>
-<dl class="section warning"><dt>Warning</dt><dd><b>Status: experimental - the runtime update is incomplete.</b> The configuration layer accepts <code>k_omega</code> and the flag reaches the runtime, but the transport equations are not fully updated each step. Do not treat RANS results from this tree as meaningful.</dd></dl>
-<p><b>Limitations.</b> Beyond the incomplete update, only <code>k_omega</code> is exposed; no other closure is selectable.</p>
 <h2><a class="anchor" id="p07_cap_filter_volume_weighted_box_sub"></a>
 volume_weighted_box</h2>
 <p><a class="anchor" id="p07_cap_filter_volume_weighted_box"></a> <b>Identity.</b> <code>les.test_filter.kernel: volume_weighted_box</code> -&gt; <code>-les_test_filter_kernel 0</code>. Accepted spelling: <code>box</code>. The default.</p>
@@ -1192,7 +1126,7 @@ volume_weighted_box</h2>
 <p><b>When to choose it.</b> The general-purpose choice, and the only defensible one on a geometry with no homogeneous direction.</p>
 <p><b>Parameters it owns.</b> None. <code>test_filter.width_ratio</code> belongs to the block, not to the kernel, and applies to either kernel.</p>
 <p><b>Interactions.</b> Consulted only by <a class="el" href="07_Case_Reference.html#p07_cap_les_dynamic_smagorinsky">dynamic_smagorinsky</a>.</p>
-<p><b>Diagnostics.</b> No dedicated output; its effect reaches <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> through the coefficient.</p>
+<p><b>Diagnostics.</b> No dedicated output; its effect reaches <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> through the coefficient.</p>
 <p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code>, which checks that it preserves a constant field and returns zero when the stencil is entirely solid.</p>
 <p><b>Limitations.</b> Less accurate than a Simpson stencil where one is admissible.</p>
 <h2><a class="anchor" id="p07_cap_filter_simpson_ik_sub"></a>
@@ -1219,21 +1153,19 @@ simpson_ik</h2>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_werner"><code>werner</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_werner"><code>werner_wengle</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone">accepted spelling of <code>werner</code></td></tr>
 </table>
-<p>A wall model supplies the stress of a boundary layer the mesh does not resolve, so it is only meaningful when the unresolved motions are modelled somewhere. Three pairings are therefore rejected before a run starts.</p>
+<p>A wall model supplies the stress of a boundary layer the mesh does not resolve, so it is only meaningful when the unresolved motions are modelled somewhere. One pairing is therefore refused before a run starts.</p>
 <ul>
-<li><b>No turbulence model.</b> A wall model with LES and RANS both off is refused. This solver has no implicit-LES scheme to stand in for the missing closure: its convection is QUICK, whose numerical dissipation is linear and upwind-biased rather than a limiter-based truncation error standing in for a subgrid stress. Enable LES, or resolve the wall and switch the wall function off.</li>
-<li>**<code>cabot</code> with RANS.** Cabot closes the wall layer with its own mixing-length eddy viscosity. Under a RANS model that layer would carry two closures with no matching between them.</li>
-<li>**<code>werner</code> with RANS.** Werner-Wengle applies its power law to an instantaneous filtered velocity, which is a large-eddy quantity. A RANS field is already averaged and wants a law derived for the mean profile.</li>
+<li><b>No turbulence model.</b> A wall model with LES off is refused. This solver has no implicit-LES scheme to stand in for the missing closure: its convection is QUICK, whose numerical dissipation is linear and upwind-biased rather than a limiter-based truncation error standing in for a subgrid stress. Enable LES, or resolve the wall and switch the wall function off.</li>
 </ul>
 <p>A wall model on a laminar case is refused for the same reason from the other direction: these laws describe a turbulent boundary layer, and below transition there is no inertial region for them to represent.</p>
-<p>Where the model's stress actually enters is worth stating, because it is not obvious. The correction sets the near-wall velocity, and the momentum equation reaches the wall through a viscosity times a velocity gradient - so the modelled stress arrives only if that viscosity is the one which reproduces it, <code>nu_eff = tau_w y / u</code>. Molecular viscosity alone delivers a fraction <code>u+/y+</code> of the stress, which at <code>y+ = 267</code> is about a fourteenth of it. The wall model therefore installs its own effective eddy viscosity at its wall face, in place of the subgrid value, which is zero there in a wall-resolved run. <code>nu_wall_over_nu_mean</code> in <code>&lt;run.runtime_logs&gt;/wall_model.csv</code> reports it.</p>
+<p>Where the model's stress actually enters is worth stating, because it is not obvious. The correction sets the near-wall velocity, and the momentum equation reaches the wall through a viscosity times a velocity gradient - so the modelled stress arrives only if that viscosity is the one which reproduces it, <code>nu_eff = tau_w y / u</code>. Molecular viscosity alone delivers a fraction <code>u+/y+</code> of the stress, which at <code>y+ = 267</code> is about a fourteenth of it. The wall model therefore installs its own effective eddy viscosity at its wall face, in place of the subgrid value, which is zero there in a wall-resolved run. <code>nu_wall_over_nu_mean</code> in <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code> reports it.</p>
 <h2><a class="anchor" id="p07_cap_wall_log_law_sub"></a>
 log_law</h2>
 <p><a class="anchor" id="p07_cap_wall_log_law"></a> <b>Identity.</b> <code>turbulence.wall_function.model: log_law</code> -&gt; <code>-wallfunction</code>. Accepted spelling: <code>loglaw</code>. It is also the default when <code>wall_function.enabled</code> is true and no model is named.</p>
 <p><b>What it does.</b> Applies a logarithmic law-of-the-wall boundary treatment instead of resolving the viscous sublayer.</p>
 <p><b>When to choose it.</b> When the near-wall grid is too coarse to resolve the sublayer and you accept a modelled wall stress rather than a computed one.</p>
 <p><b>Parameters it owns.</b> <code>wall_function.roughness_height</code> -&gt; <code>-wall_roughness</code>.</p>
-<p><b>Interactions.</b> Configured independently of LES and RANS - enabling a turbulence model does not imply a wall function, and vice versa. The wall handler itself remains <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_noslip">noslip</a>; the wall function changes how the stress is imposed, not the BC selection.</p>
+<p><b>Interactions.</b> Configured independently of the LES closure - enabling a turbulence model does not imply a wall function, and vice versa. The wall handler itself remains <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_noslip">noslip</a>; the wall function changes how the stress is imposed, not the BC selection.</p>
 <p>The correction also reaches the LES closure. <code>Contra2Cart</code> rebuilds the Cartesian field from the contravariant one at the top of each timestep and so discards the previous solve's near-wall correction; the wall model is re-applied before the subgrid strain rates are formed, so the closure and the momentum equation agree about the near-wall velocity rather than disagreeing within one timestep.</p>
 <p><b>Diagnostics.</b> The startup banner reports whether wall functions are enabled and the configured roughness height.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage of the velocity laws and their friction-velocity root-finds in <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code> - each is checked to invert its own law - and of the integration in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>, which checks that the corrected first interior velocity is the modelled profile at that cell's wall distance, for the friction velocity the integration itself stored. No shipped example enables it and no reference-flow comparison has been run.</p>
@@ -1263,7 +1195,7 @@ cabot</h2>
 <p><b>Limitations.</b> No roughness formulation, so <code>roughness_height</code> is rejected rather than accepted and ignored. The mixing-length constant is fixed.</p>
 <h1><a class="anchor" id="p07_bc_sec"></a>
 7. boundary_conditions</h1>
-<p>Single-block syntax: list of 6 face entries. Multi-block syntax: list-of-lists, one 6-face list per block.</p>
+<p>Syntax: a list of 6 face entries, one per face.</p>
 <p>Supported face names:</p><ul>
 <li><code>-Xi</code>, <code>+Xi</code>, <code>-Eta</code>, <code>+Eta</code>, <code>-Zeta</code>, <code>+Zeta</code></li>
 </ul>
@@ -1314,8 +1246,7 @@ cabot</h2>
 8. solver_parameters (Advanced)</h1>
 <p>Optional escape hatch for flags not yet exposed in structured schema:</p>
 <div class="fragment"><div class="line">solver_parameters:</div>
-<div class="line">  -read_fields: true</div>
-<div class="line">  -some_new_flag: 123</div>
+<div class="line">  -mom_stability_shadow: true   # diagnostic-only momentum stability estimate</div>
 </div><!-- fragment --><p>Use sparingly and prefer structured keys when available.</p>
 <h1><a class="anchor" id="p07_modular_sec"></a>
 9. Mixing With Other Profiles</h1>

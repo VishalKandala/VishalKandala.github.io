@@ -1,6 +1,15 @@
 var searchData=
 [
-  ['handoff_0',['Scientific Writing Handoff',['../69_Scientific_Writing_Handoff.html',1,'']]],
-  ['history_20two_20logs_1',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['how_20to_20guides_2',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]]
+  ['e6a0696_20les_20grid_20diagnosis_20fixes_0',['e6a0696-les-grid-diagnosis-fixes',['../md_docs_2changelog_8d_2e6a0696-les-grid-diagnosis-fixes.html',1,'']]],
+  ['e740c1a_20conductor_20executable_20pinning_1',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
+  ['errors_20and_20fixes_2',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
+  ['evidence_20matrix_3',['Capability Evidence Matrix',['../66_Evidence_Matrix.html',1,'']]],
+  ['example_20catalog_4',['Example Catalog',['../65_Example_Catalog.html',1,'']]],
+  ['executable_20pinning_5',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
+  ['execution_20map_6',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
+  ['extensibility_20guide_7',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
+  ['extension_20framework_8',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
+  ['extension_20guide_9',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
+  ['extension_20playbook_10',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
+  ['extensions_11',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]]
 ];

@@ -131,6 +131,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#p48_cap_xform_rotate_sub">rotate</a></li>
 <li class="level2"><a href="#p48_cap_xform_mirror_sub">mirror</a></li>
 <li class="level2"><a href="#p48_cap_xform_permute_sub">permute</a></li>
+<li class="level2"><a href="#p48_cap_xform_reverse_sub">reverse</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p48_related_sec">8. Related Pages</a></li>
@@ -248,7 +249,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Two entries decide whether a shaped mesh is usable:</p>
 <ul>
 <li><code>Max_Non_Orthogonality_deg</code> is the cost of every corner in the geometry. A step corner spanning one cell reports about 84 degrees, four cells 74, ten 56, twenty 37.</li>
-<li><code>Right_Handed</code> is reported separately from <code>Jacobian_Sign_Consistent</code>, because consistency only says every cell agrees on a sign, not which sign; a uniformly inverted mesh satisfies it. Mirroring or an odd axis permutation is how one gets made.</li>
+<li><code>Right_Handed</code> is reported separately from <code>Jacobian_Sign_Consistent</code>, because consistency only says every cell agrees on a sign, not which sign; a uniformly inverted mesh satisfies it. A <code>mirror</code> or an odd <code>permute</code> makes one. The generator refuses a transform list that ends left-handed and names <code>reverse</code> as the fix, and the solver refuses a left-handed grid from any source, so <code>Right_Handed</code> reads false only for a grid built outside the generator.</li>
 </ul>
 <p>The generator refuses a wall segment spanning less than one cell, because a shorter segment then produces the identical single-cell jump: the refinement asked for would not exist. Between one and four cells it reports and proceeds.</p>
 <h1><a class="anchor" id="p48_units_sec"></a>
@@ -310,10 +311,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_box"><code>box</code></a></td><td class="markdownTableBodyNone"><code>box</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_sweep"><code>sweep</code></a></td><td class="markdownTableBodyNone"><code>sweep</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_box"><code>box</code></a></td><td class="markdownTableBodyNone"><code>box</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_geom_sweep"><code>sweep</code></a></td><td class="markdownTableBodyNone"><code>sweep</code></td></tr>
 </table>
 <h2><a class="anchor" id="p48_cap_geom_box_sub"></a>
 box</h2>
@@ -323,8 +323,8 @@ box</h2>
 <p><b>Parameters it owns.</b> <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--bounds-x</code>, <code>--bounds-y</code>, <code>--bounds-z</code>, the wall fields <code>--wall-j-lo</code> and <code>--wall-j-hi</code>, their spanwise envelopes <code>--wall-j-lo-span</code> and <code>--wall-j-hi-span</code>, and the sinusoidal warp amplitudes <code>--amp-A</code>, <code>--amp-B</code>, <code>--amp-C</code>.</p>
 <p><b>Interactions.</b> Reads defaults from the <code>[box]</code> config section; <code>config/grids/</code> ships plane-channel, square-duct and isotropic-box profiles. Segment lengths must sum to the axis extent, because a wall that stops short leaves its remainder undefined. <code>origin</code> places the <em>realized</em> bounding box, so shaping a wall shrinks the block and moves it relative to what <code>bounds_y</code> alone suggests.</p>
 <p><b>Diagnostics.</b> A segment that turns the wall in less than one cell is refused: below that, a shorter segment produces the identical single-cell jump, so the refinement asked for would not exist. Segments under four cells are reported. <code>Max_Non_Orthogonality_deg</code> in the <code>.info</code> report carries the cost - measured on a 200-cell axis, a step spanning one cell reports 84.2 degrees, four cells 73.7, ten cells 55.7, twenty cells 36.6.</p>
-<p><b>Evidence.</b> Production exercised - the <code>examples/periodic_test</code> driven-channel and driven-duct cases generate their meshes with this type, and all of them reproduce byte-identically the meshes the retired <code>warp</code> type produced.</p>
-<p><b>Limitations.</b> The wall is a single-valued function of position by construction, so it cannot express an overhang, a detached body, or anything the flow passes underneath; those need an immersed boundary or multiple blocks, and neither is available in the runtime today. Walls may be shaped on one axis pair only: profiling two intersecting pairs at once needs three-dimensional transfinite interpolation, which is not implemented. No solve has yet been run on a stepped mesh, so metric quality at a resolved corner is reported but not validated. Experimental until a case exercises the shaped-wall path end to end.</p>
+<p><b>Evidence.</b> Production exercised - the <code>examples/periodic_test</code> driven-channel and driven-duct cases generate their meshes with this type, and all of them reproduce byte-identically the meshes the retired <code>warp</code> type produced. Unit verified - <code>make test-python</code> runs the generator tests. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with each wall kind, and a span-shaped hill, closes a uniform flow to 2.4e-15 of the flux scale in the solver's own metrics, and a mirrored hill channel reproduced the mirror image of the original solution to 3.4e-9. <code>duct-poiseuille-picard-2026-09-18</code> solves laminar duct flow on a flat-walled box at second order.</p>
+<p><b>Limitations.</b> The wall is a single-valued function of position by construction, so it cannot express an overhang, a detached body, or anything the flow passes underneath; those need an immersed boundary or coupled blocks, and the runtime has neither. Walls may be shaped on one axis pair only: profiling two intersecting pairs at once needs three-dimensional transfinite interpolation, which is not implemented. Metric closure establishes that the solver's metrics are consistent on every wall kind, not that a solve resolves the flow over a corner: beyond the flat duct, only the hill channel has been solved.</p>
 <h2><a class="anchor" id="p48_cap_geom_sweep_sub"></a>
 sweep</h2>
 <p><a class="anchor" id="p48_cap_geom_sweep"></a> <b>Identity.</b> <code>grid.gen sweep</code>, or <code>grid.generator.grid_type: sweep</code>.</p>
@@ -333,8 +333,8 @@ sweep</h2>
 <p><b>Parameters it owns.</b> <code>--ncells-i</code>, <code>--ncells-j</code>, <code>--ncells-k</code>, <code>--cross-section</code>, <code>--side-lengths</code>, <code>--path</code>, <code>--cross-section-scale</code>.</p>
 <p><b>Interactions.</b> Reads defaults from the <code>[sweep]</code> config section; <code>config/grids/coarse_square_tube_curved.cfg</code> ships a bent square duct. Logical axes follow the two cross-section directions and then the path, which makes the result right-handed. An <code>arc</code> turns in the plane perpendicular to its axis and may not turn about an axis parallel to the current tangent, because an arc has no defined plane there; chain arcs about different axes to leave a plane.</p>
 <p><b>Diagnostics.</b> The <code>.info</code> report carries <code>Right_Handed</code> alongside <code>Jacobian_Sign_Consistent</code>, which a uniformly inverted mesh would satisfy. On an out-of-plane path the parallel-transported frame reports 0.6 degrees maximum non-orthogonality, where a frame built from a fixed up-vector would shear the section badly.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> generates its square duct and quarter turn with this type. It reproduces the 2.9 MB <code>.picgrid</code> that example used to ship to 5e-8, which is the precision that file was written at, and the mesh the retired <code>cpipe</code> type produced from the same parameters to 1.8e-15 over a domain of size 13 - arithmetic reordering rather than a difference in geometry.</p>
-<p><b>Limitations.</b> One block only. <code>circle</code> uses the square-to-disc map rather than an O-grid: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for a circumferential seam, but it is wired only to <code>programmatic_c</code>'s <code>cgrids</code> flag, and even there <code><a class="el" href="grid_8c.html">src/grid.c</a></code> never builds anything but a Cartesian box - no path in the runtime today both produces real O-grid coordinates and can seam them. The disc covers the whole section with no hole and no axis singularity, but cell size varies with angle and is worst in the four diagonal regions - a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality against 0.004 for a rectangle. That is adequate for a cylindrical domain and is not a wall-resolved pipe mesh, which needs a butterfly topology and therefore multiple blocks. Experimental until a case exercises it.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> generates its square duct and quarter turn with this type. It reproduces the 2.9 MB <code>.picgrid</code> that example used to ship to 5e-8, which is the precision that file was written at, and the mesh the retired <code>cpipe</code> type produced from the same parameters to 1.8e-15 over a domain of size 13 - arithmetic reordering rather than a difference in geometry. Analytically verified - <code>pipe-poiseuille-curvilinear-2026-09-18</code>: Hagen-Poiseuille flow on a swept circle at second order; <code>grid-generator-closure-2026-09-21</code>: the circle sweep, a rectangle bend and a scaled sweep each close a uniform flow to round-off.</p>
+<p><b>Limitations.</b> One block only. <code>circle</code> uses the square-to-disc map rather than an O-grid: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for a circumferential seam, but it is wired only to <code>programmatic_c</code>'s <code>cgrids</code> flag, and even there <code><a class="el" href="grid_8c.html">src/grid.c</a></code> never builds anything but a Cartesian box - no path in the runtime today both produces real O-grid coordinates and can seam them. The disc covers the whole section with no hole and no axis singularity, but cell size varies with angle and is worst in the four diagonal regions - a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality against 0.004 for a rectangle. That is adequate for a cylindrical domain and is not a wall-resolved pipe mesh, which needs a butterfly topology and therefore multiple blocks.</p>
 <h1><a class="anchor" id="p48_cap_xsec_sec"></a>
 7.2 Swept Cross-Section Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.cross_section.
@@ -343,10 +343,9 @@ sweep</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xsec_circle"><code>circle</code></a></td><td class="markdownTableBodyNone"><code>circle</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xsec_rectangle"><code>rectangle</code></a></td><td class="markdownTableBodyNone"><code>rectangle</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xsec_circle"><code>circle</code></a></td><td class="markdownTableBodyNone"><code>circle</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xsec_rectangle"><code>rectangle</code></a></td><td class="markdownTableBodyNone"><code>rectangle</code></td></tr>
 </table>
 <h2><a class="anchor" id="p48_cap_xsec_rectangle_sub"></a>
 rectangle</h2>
@@ -356,7 +355,7 @@ rectangle</h2>
 <p><b>Parameters it owns.</b> <code>--side-lengths I J</code>, the two full widths.</p>
 <p><b>Interactions.</b> Sweeps along any <code>--path</code>, and scales along it with <code>--cross-section-scale</code>. The logical section axes run on [-0.5, 0.5], so <code>first_cell_i_*</code> and <code>first_cell_j_*</code> are fractions of the full side length.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> stays near zero on a straight sweep; anything larger comes from the path, not the section.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> sweeps a <code>rectangle</code> section through its bend, and <code>config/grids/coarse_square_tube_curved.cfg</code> ships an unselected second one.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/bent_channel</code> sweeps a <code>rectangle</code> section through its bend, and <code>config/grids/coarse_square_tube_curved.cfg</code> ships an unselected second one. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a rectangle bend closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> Corners are square, so a rectangular duct has four concave corner lines where the boundary layers of two walls meet; that is the geometry, not a mesh defect, but it is where near-wall resolution has to be judged on both walls at once.</p>
 <h2><a class="anchor" id="p48_cap_xsec_circle_sub"></a>
 circle</h2>
@@ -366,8 +365,8 @@ circle</h2>
 <p><b>Parameters it owns.</b> <code>--side-lengths I J</code>, read as the two diameters.</p>
 <p><b>Interactions.</b> The logical section axes run on [-1, 1] rather than [-0.5, 0.5], so <code>first_cell_i_*</code> and <code>first_cell_j_*</code> are fractions of the full diameter. Wall clustering thickens cells toward the boundary but not uniformly around it.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> and <code>Max_Volume_Expansion_Ratio_Global</code> both report the diagonal-region cost; on a 32x32 section they read 79.7 degrees and 2.81 against 0.004 and 1.0 for a rectangle.</p>
-<p><b>Evidence.</b> Implemented only. Unit tests check that the map fills the disc, reaches its edge and leaves no hole; no shipped case selects it.</p>
-<p><b>Limitations.</b> <a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> size varies with angle and is worst in the four diagonal regions: a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality, against 0.004 for a rectangle. Composing a radial redistribution transform evens out wall-normal spacing but not azimuthal spacing. This is not a wall-resolved pipe mesh - that needs an O-grid annulus stitched to a core block, which is multi-block, and the runtime has no block-interface handler. The alternative single-block topology, an O-grid, is not offered: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for its circumferential seam, but nothing in the runtime today can both build real O-grid coordinates and reach that branch - it is wired only to <code>programmatic_c</code>, whose grid generator never builds anything but a Cartesian box.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> checks that the map fills the disc, reaches its edge and leaves no hole. Analytically verified - <code>pipe-poiseuille-curvilinear-2026-09-18</code>: Hagen-Poiseuille flow on 9 and 17 cells across, maximum error 4.2% and 1.2% of the bulk velocity, order 2.0, with the cross-section velocity below 1e-15 despite the diagonal-region non-orthogonality. No shipped case selects it.</p>
+<p><b>Limitations.</b> <a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> size varies with angle and is worst in the four diagonal regions: a 32x32 section reports 79.7 degrees maximum and 12.1 average non-orthogonality, against 0.004 for a rectangle. Composing a radial redistribution transform evens out wall-normal spacing but not azimuthal spacing. This is not a wall-resolved pipe mesh - that needs an O-grid annulus stitched to a core block, which is multi-block, and the runtime has no block-interface handler. The alternative single-block topology, an O-grid, is not offered: <code><a class="el" href="Metric_8c.html">Metric.c</a></code> has a <code>cgrid</code> branch for its circumferential seam, but nothing in the runtime can both build real O-grid coordinates and reach that branch - it is wired only to <code>programmatic_c</code>, whose grid generator never builds anything but a Cartesian box.</p>
 <h1><a class="anchor" id="p48_cap_wall_sec"></a>
 7.3 Wall Height Field Segment Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.wall_segment.
@@ -376,15 +375,14 @@ circle</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_arc"><code>arc</code></a></td><td class="markdownTableBodyNone"><code>arc</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_flat"><code>flat</code></a></td><td class="markdownTableBodyNone"><code>flat</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_gaussian"><code>gaussian</code></a></td><td class="markdownTableBodyNone"><code>gaussian</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_hill"><code>hill</code></a></td><td class="markdownTableBodyNone"><code>hill</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_ramp"><code>ramp</code></a></td><td class="markdownTableBodyNone"><code>ramp</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_sine"><code>sine</code></a></td><td class="markdownTableBodyNone"><code>sine</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_step"><code>step</code></a></td><td class="markdownTableBodyNone"><code>step</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_arc"><code>arc</code></a></td><td class="markdownTableBodyNone"><code>arc</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_flat"><code>flat</code></a></td><td class="markdownTableBodyNone"><code>flat</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_gaussian"><code>gaussian</code></a></td><td class="markdownTableBodyNone"><code>gaussian</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_hill"><code>hill</code></a></td><td class="markdownTableBodyNone"><code>hill</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_ramp"><code>ramp</code></a></td><td class="markdownTableBodyNone"><code>ramp</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_sine"><code>sine</code></a></td><td class="markdownTableBodyNone"><code>sine</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_wall_step"><code>step</code></a></td><td class="markdownTableBodyNone"><code>step</code></td></tr>
 </table>
 <p>A wall is these laid end to end along the streamwise axis. Every segment takes <code>len</code>, and every segment starts at the height the previous one reached, so a wall is continuous by construction. Lengths must sum to the axis extent. The first segment may carry <code>y</code> to set the datum.</p>
 <h2><a class="anchor" id="p48_cap_wall_flat_sub"></a>
@@ -395,7 +393,7 @@ flat</h2>
 <p><b>Parameters it owns.</b> <code>len</code>, and <code>y</code> on the first segment only.</p>
 <p><b>Interactions.</b> Omitting a wall entirely is equivalent to a single <code>flat</code> at the <code>--bounds-y</code> datum, which is how every shipped channel and duct configuration uses <code>box</code>.</p>
 <p><b>Diagnostics.</b> None of its own: a flat stretch contributes no non-orthogonality.</p>
-<p><b>Evidence.</b> Production exercised - the <code>examples/periodic_test</code> cases are flat-walled boxes.</p>
+<p><b>Evidence.</b> Production exercised - the <code>examples/periodic_test</code> cases are flat-walled boxes. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a flat-walled box closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> None beyond needing a length; a <code>flat</code> cannot itself set a height except as the first segment, where <code>y</code> establishes the datum.</p>
 <h2><a class="anchor" id="p48_cap_wall_step_sub"></a>
 step</h2>
@@ -405,7 +403,7 @@ step</h2>
 <p><b>Parameters it owns.</b> <code>len</code>, <code>dy</code>, and optionally <code>shape</code>.</p>
 <p><b>Interactions.</b> Length is the only sharpness control, so it interacts directly with <code>--ncells-i</code>: refining the axis is what lets a shorter step be represented. Two steps of opposite sign make a rib; a step and a <code>ramp</code> make an expansion into a diffuser.</p>
 <p><b>Diagnostics.</b> A sub-cell segment is refused by name. Under four cells it is reported to stderr. <code>Max_Non_Orthogonality_deg</code> carries the cost.</p>
-<p><b>Evidence.</b> Implemented only. Unit tests cover the refusal, the report, and that a shorter corner costs orthogonality; no shipped case selects a shaped wall.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the refusal, the report, and that a shorter corner costs orthogonality. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with a <code>step</code> wall closes a uniform flow to 2.4e-15 of the flux scale. No shipped case selects a shaped wall.</p>
 <p><b>Limitations.</b> A segment spanning less than one cell is refused, because below that a shorter length produces the identical single-cell jump and the refinement asked for would not exist. Under four cells the corner is reported as coarse. <code>Max_Non_Orthogonality_deg</code> is the number to judge it by: on a 200-cell axis a one-cell corner reports 84.2 degrees, four cells 73.7, ten 55.7, twenty 36.6. A true zero-length corner is not expressible in one block at all.</p>
 <h2><a class="anchor" id="p48_cap_wall_ramp_sub"></a>
 ramp</h2>
@@ -415,7 +413,7 @@ ramp</h2>
 <p><b>Parameters it owns.</b> <code>len</code> and <code>dy</code>.</p>
 <p><b>Interactions.</b> Follows and precedes <code>flat</code> naturally; between two <code>arc</code> segments it forms a straight run with rounded ends.</p>
 <p><b>Diagnostics.</b> The end kinks appear as a local <code>Max_Non_Orthogonality_deg</code> spike independent of the ramp's own slope.</p>
-<p><b>Evidence.</b> Implemented only. Unit tests cover its continuity with neighbouring segments.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers its continuity with neighbouring segments. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with a <code>ramp</code> wall closes a uniform flow to round-off, the end kinks included.</p>
 <p><b>Limitations.</b> Slope is discontinuous at both ends, unlike <code>step</code> and <code>arc</code>. That kink is a local non-orthogonality spike; use <code>arc</code> where the transition itself matters.</p>
 <h2><a class="anchor" id="p48_cap_wall_arc_sub"></a>
 arc</h2>
@@ -425,7 +423,7 @@ arc</h2>
 <p><b>Parameters it owns.</b> <code>len</code>, <code>dy</code>, and optionally <code>shape</code>.</p>
 <p><b>Interactions.</b> Shares the resolution floor with <code>step</code>, since both turn the wall across their own length. Choosing <code>shape=cosine</code> on a <code>step</code> and <code>shape=smoothstep</code> on an <code>arc</code> makes the two interchangeable.</p>
 <p><b>Diagnostics.</b> Same floor and reporting as <code>step</code>.</p>
-<p><b>Evidence.</b> Implemented only. Covered by the shared segment tests.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> runs the shared segment tests. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with an <code>arc</code> wall closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> Shares <code>step</code>'s resolution floor and reporting, and is symmetric about its midpoint: an asymmetric fillet needs two segments.</p>
 <h2><a class="anchor" id="p48_cap_wall_sine_sub"></a>
 sine</h2>
@@ -435,7 +433,7 @@ sine</h2>
 <p><b>Parameters it owns.</b> <code>len</code>, <code>amp</code>, and optionally <code>cycles</code>.</p>
 <p><b>Interactions.</b> For a streamwise-periodic wavy channel, <code>cycles</code> must be a whole number and the domain length must match the wavelength, or the seam will not close.</p>
 <p><b>Diagnostics.</b> <code>Max_Non_Orthogonality_deg</code> grows with amplitude over wavelength; there is no separate check on the corrugation slope.</p>
-<p><b>Evidence.</b> Implemented only. No shipped case selects it.</p>
+<p><b>Evidence.</b> Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with a <code>sine</code> wall closes a uniform flow to round-off. No shipped case selects it.</p>
 <p><b>Limitations.</b> Returns to the entry height only when <code>cycles</code> is a whole number; a fractional count leaves a step at the join with the next segment, which the continuity of the surrounding wall will then carry forward. Amplitude is not checked against the channel height, so a large one can close the domain.</p>
 <h2><a class="anchor" id="p48_cap_wall_gaussian_sub"></a>
 gaussian</h2>
@@ -445,7 +443,7 @@ gaussian</h2>
 <p><b>Parameters it owns.</b> <code>len</code>, <code>amp</code>, and optionally <code>width</code> and <code>center</code>.</p>
 <p><b>Interactions.</b> Give the segment several <code>width</code> of run either side of <code>center</code> so the bump has decayed before the join.</p>
 <p><b>Diagnostics.</b> The residual height at the segment ends is not reported; check the wall profile in the <code>--vts</code> output if the bump is narrow.</p>
-<p><b>Evidence.</b> Implemented only. No shipped case selects it.</p>
+<p><b>Evidence.</b> Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a box with a <code>gaussian</code> wall closes a uniform flow to round-off. No shipped case selects it.</p>
 <p><b>Limitations.</b> A Gaussian never reaches zero, so the wall does not return exactly to its entry height at the segment ends unless the segment is several <code>width</code> long; a narrow bump in a short segment leaves a small discontinuity at the join.</p>
 <h2><a class="anchor" id="p48_cap_wall_hill_sub"></a>
 hill</h2>
@@ -455,8 +453,8 @@ hill</h2>
 <p><b>Parameters it owns.</b> <code>len</code> and <code>height</code>.</p>
 <p><b>Interactions.</b> Tiles without a kink, so a periodic-hill domain is one <code>hill</code> per wavelength and the streamwise axis can be declared periodic.</p>
 <p><b>Diagnostics.</b> Value and slope vanish at both ends by construction, so the joins contribute nothing to <code>Max_Non_Orthogonality_deg</code>.</p>
-<p><b>Evidence.</b> Implemented only. A unit test checks that the profile closes on itself; no shipped case selects it.</p>
-<p><b>Limitations.</b> This is a cos-squared profile, not the ERCOFTAC periodic-hill polynomial: comparisons against that benchmark's separation and reattachment data are not like-for-like. No shipped case exercises it.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> checks that the profile closes on itself. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a <code>hill</code> box, and a span-shaped hill, close a uniform flow to round-off, and a hill channel mirrored across <code>zx</code> and renumbered in <code>j</code> reproduced the mirror image of the original solution to 3.4e-9. No shipped case selects it.</p>
+<p><b>Limitations.</b> This is a cos-squared profile, not the ERCOFTAC periodic-hill polynomial: comparisons against that benchmark's separation and reattachment data are not like-for-like.</p>
 <h1><a class="anchor" id="p48_cap_path_sec"></a>
 7.4 Centreline Path Segment Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.path_segment.
@@ -465,10 +463,9 @@ hill</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_path_arc"><code>arc</code></a></td><td class="markdownTableBodyNone"><code>arc</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_path_straight"><code>straight</code></a></td><td class="markdownTableBodyNone"><code>straight</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_path_arc"><code>arc</code></a></td><td class="markdownTableBodyNone"><code>arc</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_path_straight"><code>straight</code></a></td><td class="markdownTableBodyNone"><code>straight</code></td></tr>
 </table>
 <h2><a class="anchor" id="p48_cap_path_straight_sub"></a>
 straight</h2>
@@ -498,14 +495,14 @@ arc</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_anchor"><code>anchor</code></a></td><td class="markdownTableBodyNone"><code>anchor</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_mirror"><code>mirror</code></a></td><td class="markdownTableBodyNone"><code>mirror</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_permute"><code>permute</code></a></td><td class="markdownTableBodyNone"><code>permute</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_rotate"><code>rotate</code></a></td><td class="markdownTableBodyNone"><code>rotate</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_scale"><code>scale</code></a></td><td class="markdownTableBodyNone"><code>scale</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_translate"><code>translate</code></a></td><td class="markdownTableBodyNone"><code>translate</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_anchor"><code>anchor</code></a></td><td class="markdownTableBodyNone"><code>anchor</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_mirror"><code>mirror</code></a></td><td class="markdownTableBodyNone"><code>mirror</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_permute"><code>permute</code></a></td><td class="markdownTableBodyNone"><code>permute</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_reverse"><code>reverse</code></a></td><td class="markdownTableBodyNone"><code>reverse</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_rotate"><code>rotate</code></a></td><td class="markdownTableBodyNone"><code>rotate</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_scale"><code>scale</code></a></td><td class="markdownTableBodyNone"><code>scale</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p48_cap_xform_translate"><code>translate</code></a></td><td class="markdownTableBodyNone"><code>translate</code></td></tr>
 </table>
 <p>Transforms apply after the geometry map, in the order given, and compose on top of the <code>origin</code> placement rather than replacing it. Every kind takes <code>kind:key=value,key=value</code>.</p>
 <h2><a class="anchor" id="p48_cap_xform_anchor_sub"></a>
@@ -516,7 +513,7 @@ anchor</h2>
 <p><b>Parameters it owns.</b> <code>mode</code>, and <code>x</code>, <code>y</code>, <code>z</code>.</p>
 <p><b>Interactions.</b> <code>origin</code> already applies <code>anchor:mode=bbox_min</code> before any transform list runs, so naming <code>anchor</code> again replaces that placement rather than adding to it.</p>
 <p><b>Diagnostics.</b> The realized bounding box is in the <code>.info</code> report as <code>X_Range</code>, <code>Y_Range</code> and <code>Z_Range</code>; compare against them to confirm the placement.</p>
-<p><b>Evidence.</b> Production exercised in its default form - every generated grid is placed by the implicit <code>bbox_min</code> anchor.</p>
+<p><b>Evidence.</b> Production exercised in its default form - every generated grid is placed by the implicit <code>bbox_min</code> anchor. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a hill box under an explicit <code>anchor</code> closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> The reference is computed from the realized geometry, so shaping a wall changes where <code>bbox_min</code> is; <code>origin</code> already anchors <code>bbox_min</code> by default, and a second <code>anchor</code> overrides that rather than composing with it.</p>
 <h2><a class="anchor" id="p48_cap_xform_translate_sub"></a>
 translate</h2>
@@ -526,7 +523,7 @@ translate</h2>
 <p><b>Parameters it owns.</b> <code>dx</code>, <code>dy</code>, <code>dz</code>.</p>
 <p><b>Interactions.</b> Composes with anything, and is the transform to reach for when the geometry's extent should not influence where it ends up.</p>
 <p><b>Diagnostics.</b> Visible directly in the reported ranges.</p>
-<p><b>Evidence.</b> Implemented only. Covered by unit tests for order-dependent composition.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers order-dependent composition. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a translated hill box closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> None; it is the one transform whose effect does not depend on the geometry.</p>
 <h2><a class="anchor" id="p48_cap_xform_scale_sub"></a>
 scale</h2>
@@ -536,7 +533,7 @@ scale</h2>
 <p><b>Parameters it owns.</b> <code>sx</code>, <code>sy</code>, <code>sz</code>, and optionally <code>about</code>.</p>
 <p><b>Interactions.</b> Applied after wall shaping and stretching, so it rescales targeted first-cell sizes along with everything else. Supply <code>--length-ref</code> if the report should show what the solver receives.</p>
 <p><b>Diagnostics.</b> <code>Max_Aspect_Ratio</code> and the first-cell entries in the report both move under a non-uniform scale.</p>
-<p><b>Evidence.</b> Implemented only. Unit tests cover the reference-point behaviour and the zero-factor refusal.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the reference-point behaviour and the zero-factor refusal. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a scaled hill box and a scaled sweep close a uniform flow to round-off; the same run found <code>scale:s=2</code> accepted and ignored, which unknown-key refusal now prevents.</p>
 <p><b>Limitations.</b> A zero factor is refused since it collapses the grid. Non-uniform factors change cell aspect ratios and can undo carefully targeted wall spacing; this is not the way to non-dimensionalize, which the launcher does once by <code>length_ref</code>.</p>
 <h2><a class="anchor" id="p48_cap_xform_rotate_sub"></a>
 rotate</h2>
@@ -546,7 +543,7 @@ rotate</h2>
 <p><b>Parameters it owns.</b> <code>axis</code>, <code>deg</code>, and optionally <code>about</code>.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>--periodic</code>. Compose with <code>translate</code> to rotate about a point that is not one of the named references.</p>
 <p><b>Diagnostics.</b> <code>Jacobian_Sign_Consistent</code> and <code>Right_Handed</code> both stay true: a rotation is orientation-preserving.</p>
-<p><b>Evidence.</b> Implemented only. A unit test covers the periodic refusal.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the periodic refusal. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a rotated hill box closes a uniform flow to round-off.</p>
 <p><b>Limitations.</b> Refused on any grid with a declared periodic axis. The runtime's periodic reconstruction offsets only the matching Cartesian component across the seam and copies the other two, so it assumes an axis-aligned seam; whether an arbitrarily oriented periodic grid is handled correctly is unverified, and this refuses rather than producing one quietly.</p>
 <h2><a class="anchor" id="p48_cap_xform_mirror_sub"></a>
 mirror</h2>
@@ -554,10 +551,10 @@ mirror</h2>
 <p><b>What it does.</b> Reflects the grid across the named plane through the reference point.</p>
 <p><b>When to choose it.</b> Producing the opposite-handed version of an asymmetric geometry - a bend that turns the other way - without re-specifying it.</p>
 <p><b>Parameters it owns.</b> <code>plane</code>, and optionally <code>about</code>.</p>
-<p><b>Interactions.</b> Two mirrors restore the original handedness, as does composing one with an odd <code>permute</code>.</p>
-<p><b>Diagnostics.</b> <code>Right_Handed</code> flips to false. <code>Jacobian_Sign_Consistent</code> does not move, which is exactly why the two are reported separately.</p>
-<p><b>Evidence.</b> Implemented only. Covered by the handedness tests.</p>
-<p><b>Limitations.</b> Inverts handedness. <code>Jacobian_Sign_Consistent</code> cannot detect this, because a uniformly inverted grid agrees with itself; read <code>Right_Handed</code> instead. The solver repairs a uniformly left-handed grid by flipping its metric vectors, so this is a reporting concern rather than a failure.</p>
+<p><b>Interactions.</b> Inverts handedness, so on its own it leaves the grid left-handed and the generator refuses the list. Follow it with <code>reverse</code> on a logical axis, or with an odd <code>permute</code>; two mirrors also restore the original handedness.</p>
+<p><b>Diagnostics.</b> A list that ends left-handed is refused before anything is written, with a message naming <code>reverse:axis=i|j|k</code>. Once a <code>reverse</code> follows, <code>Right_Handed</code> reads true again.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the handedness tests and the refusal. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a hill box mirrored and then renumbered closes a uniform flow to round-off, and a hill channel mirrored across <code>zx</code> and renumbered in <code>j</code> reproduced the mirror image of the original solution to 3.4e-9. The same measurement found that a mirrored grid used to reach the solver, whose metric-flip "repair" gave a mirrored duct forty times its bulk velocity; that path is now refused at both ends.</p>
+<p><b>Limitations.</b> Mirroring moves the grid, and the <code>reverse</code> that restores handedness renames the renumbered axis's two faces: after <code>mirror:plane=zx</code> and <code>reverse:axis=j</code>, what was <code>-Eta</code> is <code>+Eta</code>. Boundary conditions follow the face names, so write them for the transformed grid.</p>
 <h2><a class="anchor" id="p48_cap_xform_permute_sub"></a>
 permute</h2>
 <p><a class="anchor" id="p48_cap_xform_permute"></a> <b>Identity.</b> <code>permute:order=xyz|xzy|yxz|yzx|zxy|zyx</code>.</p>
@@ -565,15 +562,24 @@ permute</h2>
 <p><b>When to choose it.</b> Putting the streamwise direction on the axis a case expects, without regenerating the geometry. It subsumes the orientation flag the retired bent-pipe geometries carried.</p>
 <p><b>Parameters it owns.</b> <code>order</code>.</p>
 <p><b>Interactions.</b> Replaces the orientation flag the retired bent-pipe geometries carried: reorienting a swept duct is a transform rather than a geometry parameter.</p>
-<p><b>Diagnostics.</b> An odd order flips <code>Right_Handed</code>; an even one leaves it true, and unit tests pin both.</p>
-<p><b>Evidence.</b> Implemented only. Covered by the handedness tests.</p>
-<p><b>Limitations.</b> An odd permutation inverts handedness, with the same reporting consequence as <code>mirror</code>; an even one does not. It permutes physical coordinates, not logical axes, so the mapping between logical index and wall direction is unchanged.</p>
+<p><b>Diagnostics.</b> An even order leaves the grid right-handed. An odd order inverts it, and the generator refuses the list unless a <code>reverse</code> or a <code>mirror</code> follows.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> pins both parities. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: an even permute, and an odd permute followed by <code>reverse</code>, each close a uniform flow to round-off.</p>
+<p><b>Limitations.</b> It permutes physical coordinates, not logical axes, so the mapping between logical index and wall direction is unchanged. An odd order owes a <code>reverse</code>, with the face renaming described under <a class="el" href="48_Grid_Generator_Guide.html#p48_cap_xform_mirror">p48_cap_xform_mirror</a>.</p>
+<h2><a class="anchor" id="p48_cap_xform_reverse_sub"></a>
+reverse</h2>
+<p><a class="anchor" id="p48_cap_xform_reverse"></a> <b>Identity.</b> <code>reverse:axis=i|j|k</code>.</p>
+<p><b>What it does.</b> Numbers the nodes of one logical axis from its other end. The geometry does not move: the same nodes are re-indexed, so that axis's two faces trade names, and the handedness of the logical axes flips.</p>
+<p><b>When to choose it.</b> After a <code>mirror</code> or an odd <code>permute</code>, which leave the grid left-handed. The generator refuses such a list and names this transform as the fix.</p>
+<p><b>Parameters it owns.</b> <code>axis</code>, the logical axis to renumber. Any other key is refused.</p>
+<p><b>Interactions.</b> Any axis restores handedness; only the reversed axis's two faces are renamed, so pick the axis whose renaming suits the case's boundary conditions. It composes with the other transforms in order like any of them, but it is the only one that re-indexes rather than moves.</p>
+<p><b>Diagnostics.</b> <code>Right_Handed</code> in the <code>.info</code> report reads true when the list ends right-handed. A missing or invalid <code>axis</code> is refused by name.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the renumbering and the refusal it resolves. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: mirrored and oddly permuted grids made right-handed by <code>reverse</code> close a uniform flow to round-off, and a mirrored, renumbered hill channel reproduced the mirror image of the original solution to 3.4e-9.</p>
+<p><b>Limitations.</b> Face names follow the renumbering, so boundary conditions written for the untransformed grid land on the wrong faces of the renumbered axis. Nothing checks that; name the faces for the grid as generated.</p>
 <h1><a class="anchor" id="p48_related_sec"></a>
 8. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
 <li><b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
-<li><b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
 <li><b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>
 <li><b><a class="el" href="p54_geometric_periodic.html">Periodic Boundaries and Driven Flows</a></b> </li>
 </ul>

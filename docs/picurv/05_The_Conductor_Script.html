@@ -209,7 +209,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">./picurv_cli/picurv build clean-project</div>
 <div class="line">./picurv_cli/picurv build SYSTEM=cluster</div>
 <div class="line">./picurv_cli/picurv build postprocessor</div>
-<div class="line">./my_case/picurv build clean-project</div>
 <div class="line">make audit-build</div>
 </div><!-- fragment --><h1><a class="anchor" id="p05_sync_sec"></a>
 3b. Source, Version, And Legacy Maintenance Commands</h1>
@@ -220,7 +219,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Make variables and options after the version reach <code>make</code> exactly as they do for <code>picurv build</code>, so a cluster install names its build configuration:</p>
 <div class="fragment"><div class="line">picurv versions install 0.1.0 SYSTEM=cluster</div>
 <div class="line">picurv versions activate SYSTEM=cluster        # version from the workspace pin</div>
-</div><!-- fragment --><p>A make target is refused, because the install verifies the default build. Success is reported only after <code>simulator</code> and <code>postprocessor</code> report the identity of the commit just checked out; the conductor re-reads that identity rather than using the one it computed at startup, which still names the previous commit.</p>
+<div class="line">picurv versions activate -- -j8                # version from the pin, options to make</div>
+</div><!-- fragment --><p>With no version, the first word after <code>activate</code> may be a make assignment or, after <code>--</code>, a make option; neither is a tag or commit, so it goes to <code>make</code> rather than to Git.</p>
+<p>A make target is refused, because the install verifies the default build. Success is reported only after <code>simulator</code> and <code>postprocessor</code> report the identity of the commit just checked out; the conductor re-reads that identity rather than using the one it computed at startup, which still names the previous commit.</p>
 <dl class="section note"><dt>Note</dt><dd><b>One installation, activated in place.</b> PICurv installs as a single source checkout that <code>versions activate</code> rewrites by <code>git checkout --detach &lt;tag&gt;</code> followed by the default <code>make</code> build. It does not install side-by-side versioned prefixes such as <code>/software/picurv/0.2.0/</code>, and <code>picurv</code> is not a version multiplexer.</dd></dl>
 <p>That is a deliberate trade, and it has three consequences worth knowing before you rely on a version pin:</p>
 <ul>
@@ -228,22 +229,25 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><b>Activating changes unpinned jobs.</b> A job that launches the installation's <code>bin/</code> runs whatever was built last when it starts. Every generated job script refuses to launch an executable whose identity differs from the one read at staging, and a run staged with <code>--pin-executables</code> keeps its own copies (<a class="el" href="05_The_Conductor_Script.html#p05_binaries_sec">12. Binary Resolution and Rebuild Safety</a>).</li>
 <li><b>Development and version-switching share one tree.</b> <code>activate</code> refuses a dirty checkout, so uncommitted work must be committed or stashed first.</li>
 </ul>
+<p>These commands are tested in <code>tests/test_workspace_lifecycle.py</code> against real Git repositories and stubbed builds: <code>source update</code> against a live origin and an unreachable remote, <code>versions list</code> ordering, <code>install</code> and <code>activate</code> argument routing, and the refusal of a build that does not carry the new identity. Rebuilding a real release is not part of the suite.</p>
 <p>Both <code>versions activate</code> and a failed workspace version check name the installation they would change, so the effect is stated rather than discovered. If you need concurrent releases — several people on one filesystem, or reproducing a published result while developing against a newer tree — install PICurv more than once and select between them with your shell or your site's module system.</p>
 <p><code>pull-source</code> and <code>status-source</code> remain legacy maintenance surfaces. New workspaces normally use the active installation and the version commands instead of copying executables into every case.</p>
-<p><code>sync-config</code> refreshes files from <code>examples/&lt;template_name&gt;/</code> into the case directory. By default it preserves user-modified files and only copies missing files:</p>
-<div class="fragment"><div class="line">./my_case/picurv sync-config</div>
-<div class="line">./my_case/picurv sync-config --overwrite</div>
-<div class="line">./my_case/picurv sync-config --prune</div>
-</div><!-- fragment --><p><code>--prune</code> is conservative: it removes only files previously recorded as template-managed that no longer exist in the source template. User-created case files are not pruned. <code>sync-config</code> does not copy <code>execution.example.yml</code> into a case; instead it creates <code>.picurv-execution.yml</code> only when the case does not already have one.</p>
+<p><code>sync-config</code> refreshes files from <code>examples/&lt;template_name&gt;/</code> into the case directory. It compares against the template as <code>init</code> lays it out - canonical <code>&lt;workspace&gt;/config/</code> names, variants under <code>&lt;workspace&gt;/config/variants/</code>, rewritten paths - so each case file is matched with the template file it was made from. By default it preserves user-modified files and only copies missing files:</p>
+<div class="fragment"><div class="line">picurv sync-config --case-dir my_case</div>
+<div class="line">picurv sync-config --case-dir my_case --overwrite</div>
+<div class="line">picurv sync-config --case-dir my_case --prune</div>
+</div><!-- fragment --><p>Run from inside the workspace, <code>--case-dir</code> can be omitted.</p>
+<p><code>--prune</code> is conservative: it removes only files previously recorded as template-managed that no longer exist in the source template. User-created case files are not pruned. <code>sync-config</code> does not copy <code>execution.example.yml</code> into a case; instead it creates <code>.picurv-execution.yml</code> only when the case does not already have one.</p>
 <p><code>pull-source</code> refreshes every local branch with a configured upstream, then restores the branch you started on, so you can update code without leaving the case directory. It refuses a checkout detached by <code>versions install</code> or <code>versions activate</code>: restoring that commit after the pull would leave the code that runs unchanged while the branches moved.</p>
-<div class="fragment"><div class="line">./my_case/picurv pull-source</div>
-<div class="line">./my_case/picurv pull-source --current-branch-only</div>
-<div class="line">./my_case/picurv pull-source --no-rebase</div>
-<div class="line">./my_case/picurv pull-source --remote origin --branch main</div>
-</div><!-- fragment --><p><code>status-source</code> inspects source commit drift, copied binary drift, and template-file drift before you decide what to sync:</p>
-<div class="fragment"><div class="line">./my_case/picurv status-source</div>
-<div class="line">./my_case/picurv status-source --format json</div>
+<div class="fragment"><div class="line">picurv pull-source --case-dir my_case</div>
+<div class="line">picurv pull-source --case-dir my_case --current-branch-only</div>
+<div class="line">picurv pull-source --case-dir my_case --no-rebase</div>
+<div class="line">picurv pull-source --case-dir my_case --remote origin --branch main</div>
+</div><!-- fragment --><p><code>status-source</code> inspects source commit drift, copied binary drift, and template-file drift before you decide what to sync. Template files are compared the same way <code>sync-config</code> compares them, so a file reported modified is one <code>sync-config</code> would skip:</p>
+<div class="fragment"><div class="line">picurv status-source --case-dir my_case</div>
+<div class="line">picurv status-source --case-dir my_case --format json</div>
 </div><!-- fragment --><p>For older cases that do not yet have <code>.picurv-origin.json</code>, pass <code>--source-root /path/to/PICurv</code>. For <code>sync-config</code>, also pass <code>--template-name &lt;example_name&gt;</code> if the template cannot be inferred.</p>
+<p><code>init</code>, <code>sync-config</code> and <code>status-source</code> are tested in <code>tests/test_case_maintenance.py</code>, and <code>make smoke</code> initializes, validates and dry-runs every shipped template. On a fresh <code>flat_channel</code> workspace with one edited <code>&lt;workspace&gt;/config/solver.yml</code>, <code>status-source</code> reported exactly that file modified and none missing, <code>sync-config</code> skipped it and left the case root unchanged, and <code>sync-config --overwrite</code> restored it in place.</p>
 <p><code>status-source --format json</code> payload highlights:</p>
 <ul>
 <li><code>source_repo_root</code>, <code>case_dir</code></li>
@@ -321,7 +325,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!-- fragment --><ul>
 <li>If the solver has only written source data through step <code>420</code>, PICurv launches only the fully available prefix in the requested stride. A later <code>--continue</code> run picks up the newer steps after the solver produces them.</li>
 <li>If the same recipe already post-processed the requested window, PICurv skips the launch and reports that the run is already caught up.</li>
-<li>If you change the recipe itself, for example by adding <code>Qcrit</code> or changing the statistics output prefix, PICurv treats that as a new recipe lineage and starts again from the configured <code>start_step</code>.</li>
+<li>If you change the recipe itself, for example by adding <code>Qcrit_nodal</code> or changing the statistics output prefix, PICurv treats that as a new recipe lineage and starts again from the configured <code>start_step</code>.</li>
 <li>PICurv allows only one post writer per run directory. If a second post job targets the same run, it is refused immediately instead of racing on <code>&lt;run.visualization&gt;/</code> or the statistics output beneath it.</li>
 </ul>
 <p>Graceful shutdown note:</p>
@@ -385,7 +389,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>&lt;run.runtime_logs&gt;/solution_convergence.log</code> (mode-specific speed/KE drift and L2 norms)</li>
 <li><code>&lt;run.runtime_logs&gt;/Profiling_Timestep_Summary.csv</code> when enabled</li>
 <li><code>&lt;run.runtime_logs&gt;/Runtime_Memory.log</code> when <code>monitor.diagnostics.runtime_memory_log.enabled</code> is true</li>
-<li><code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> when <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> is true; the <code>les.*</code> series carry the effective coefficient, its spread, eddy-viscosity levels, the modelled subgrid energy, and the pre-clipping backscattering and limited fractions</li>
+<li><code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> when <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> is true; the <code>les.*</code> series carry the effective coefficient, its spread, eddy-viscosity levels, the modelled subgrid energy, and the pre-clipping backscattering and limited fractions</li>
 <li><code>&lt;run.runtime_logs&gt;/PETSc_*_Solver.log</code> / <code>&lt;run.runtime_logs&gt;/PETSc_*_PostProcessor.log</code> when file-backed PETSc diagnostics are enabled</li>
 <li><code>&lt;run.scheduler&gt;/*_solver.log</code> or <code>&lt;run.scheduler&gt;/solver_*.out</code> for sampled particle snapshot previews</li>
 </ul>
@@ -1275,11 +1279,12 @@ refusing. Requires a configured storage profile.</td></tr>
 <th class="markdownTableHeadNone">Maps to</th>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_copy"><code>copy</code></a></td><td class="markdownTableBodyNone"><code>copy</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_copy"><code>copy</code></a></td><td class="markdownTableBodyNone"><code>copy</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_hardlink"><code>hardlink</code></a></td><td class="markdownTableBodyNone"><code>hardlink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reference"><code>reference</code></a></td><td class="markdownTableBodyNone"><code>reference</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reference"><code>reference</code></a></td><td class="markdownTableBodyNone"><code>reference</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reflink"><code>reflink</code></a></td><td class="markdownTableBodyNone"><code>reflink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
+<p>Every mode below is experimental: the workspace asset store has been exercised locally (<code>asset-store-local-2026-09-21</code>) but not on the cluster filesystems where reflink and hardlink availability are decided, nor at the scale where object accumulation and remote-backed pruning start to matter.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_copy_sub"></a>
 copy</h2>
 <p><a class="anchor" id="p05_cap_input_mode_copy"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode copy</code>.</p>
@@ -1288,7 +1293,7 @@ copy</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Storage includes the copied file when a run locks and materializes an asset derived from it.</p>
 <p><b>Diagnostics.</b> Success prints the catalog ID and relative path; an existing target or missing source fails before the catalog changes.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks the copied bytes and catalog entry.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks the copied bytes and catalog entry. Integration verified - <code>asset-store-local-2026-09-21</code>: a copied field became an initial-condition object that a second precompute reused unchanged.</p>
 <p><b>Limitations.</b> Uses additional disk space equal to the imported file.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_reflink_sub"></a>
 reflink</h2>
@@ -1298,7 +1303,7 @@ reflink</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Failure does not fall back silently; choose <code>copy</code> explicitly when the filesystem reports that reflinks are unsupported.</p>
 <p><b>Diagnostics.</b> The import fails with the native copy error if reflink creation is unavailable and writes no catalog record.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> verifies the mode is part of the public parser and catalog contract.</p>
+<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: on a filesystem without reflink support the import failed with <code>cp</code>'s "Operation not supported", left no temporary file, and wrote no catalog record. A successful reflink import has not been exercised; that needs a filesystem that supports it.</p>
 <p><b>Limitations.</b> Experimental across cluster filesystems; support depends on the local <code>cp</code> and filesystem.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_hardlink_sub"></a>
 hardlink</h2>
@@ -1308,7 +1313,7 @@ hardlink</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Source and destination share mutations. Asset checksums detect a changed provider input and prevent stale object reuse, but cannot undo the mutation.</p>
 <p><b>Diagnostics.</b> Cross-filesystem or permission failures are reported before the catalog changes.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> verifies the mode is part of the public parser and catalog contract.</p>
+<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: the imported path shares the source's inode, the catalog records the source checksum, and after one byte of the shared file changed the next precompute built a new object rather than reusing the old one.</p>
 <p><b>Limitations.</b> Experimental because shared-inode ownership is easy to misuse and it cannot cross filesystems.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_reference_sub"></a>
 reference</h2>
@@ -1316,9 +1321,9 @@ reference</h2>
 <p><b>What it does.</b> Writes a small <code>.reference.yml</code> containing the absolute target, registration checksum, and byte count; it does not copy the target.</p>
 <p><b>When to choose it.</b> Use it for an authoritative shared dataset that should remain externally owned. Choose <code>copy</code> when the workspace or storage archive must be portable.</p>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> names the reference record.</p>
-<p><b>Interactions.</b> Resolution checks the target loudly. Storage records the dependency but neither archives nor prunes the external file.</p>
+<p><b>Interactions.</b> Resolution fails loudly when the target is missing. A target whose bytes changed since registration is used as it now is: its current checksum selects a new asset object, so nothing stale is reused, but no warning is printed and the registration checksum is not compared. Storage records the dependency but neither archives nor prunes the external file.</p>
 <p><b>Diagnostics.</b> Registration prints an external-reference warning; missing targets fail when registered or consumed.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks reference content and catalog identity.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks reference content and catalog identity. Integration verified - <code>asset-store-local-2026-09-21</code>: a reference import fed a solver run, and changing one byte of its target built a new object.</p>
 <p><b>Limitations.</b> Restoring the workspace cannot restore an external target; its owner must make the same path available or the reference must be replaced.</p>
 <h1><a class="anchor" id="p05_artifacts_sec"></a>
 13. Generated Runtime Artifacts</h1>
@@ -1351,7 +1356,6 @@ reference</h2>
 <ul>
 <li>Config contract: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
 <li>User workflows: <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b></li>
-<li>Extensibility: <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b></li>
 <li>First-run path: <b><a class="el" href="02_Tutorial_Programmatic_Grid.html">Tutorial: Your First Simulation (Flat Channel)</a></b></li>
 <li>Grid generator details: <b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b></li>
 <li>Modular examples and recipes: <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b></li>

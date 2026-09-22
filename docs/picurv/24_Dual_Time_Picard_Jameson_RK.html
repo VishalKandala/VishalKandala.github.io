@@ -98,6 +98,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p24_touchpoints_sec">6. Core Code Touchpoints</a></li>
 <li class="level1"><a href="#p24_rhs_state_sec">6a. RHS State and Pseudo-Iteration Cadence</a></li>
 <li class="level1"><a href="#p24_practical_sec">7. Practical Tuning Guidance</a></li>
+<li class="level1"><a href="#p24_limits_sec">8. Limitations</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Dual_Time_Picard_Jameson_RK"></a> This page documents one of PICurv's two implicit-in-physical-time momentum strategies: the <b>dual-time Picard fixed-point / pseudo-time</b> solver, using Jameson RK pseudo-time smoothing. It is the established, broadly exercised default. For the alternative matrix-free Newton solver and for selection guidance between the two, see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a> and <a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a>.</p>
@@ -251,7 +252,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>If instability persists after CFL tuning: revisit physical timestep, grid quality near bends or walls, and boundary condition consistency.</li>
 </ol>
 <p>For many cases, robust Poisson settings and sane initialization matter as much as dual-time tolerances.</p>
-<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>
+<p>For contributor extension steps, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>.</p>
+<h1><a class="anchor" id="p24_limits_sec"></a>
+8. Limitations</h1>
+<p><b>A physical step is only as accurate as its pseudo-time convergence.</b> When a step exhausts <code>max_pseudo_steps</code> without meeting its tolerance, the solver logs <code>reached N total attempts without convergence; continuing from last accepted finite state</code> and moves on. Nothing downstream corrects that step, so a run that logs this warning repeatedly is advancing on partially converged steps and its transient is not the physical one. On a laminar square duct at Re = 100 with <code>dt = 1.0</code>, every step hit the default cap of 50; the profile approached its steady state about ten times more slowly than the viscous time scale predicts, and the axial pressure gradient finished 18% away from the analytic value. The same duct at Re = 10 with <code>dt = 0.05</code> converged every step and reproduced the analytic solution at second order in space. Reduce <code>dt</code> until the warning disappears rather than raising the cap and accepting the drift.</p>
+<p><b>Temporal and curvilinear accuracy are measured, for converged steps.</b> On the two-dimensional Taylor-Green vortex in a triply periodic box, velocity and pressure converge at second order in time (successive-refinement orders 1.87 then 1.96) and in space (1.98 then 1.96), with every step converged (<code>tgv2d-picard-order-2026-09-18</code>). Hagen-Poiseuille flow on the swept circle - maximum non-orthogonality near 80 degrees - converges at second order in space (<code>pipe-poiseuille-curvilinear-2026-09-18</code>). Only central differencing was measured for order, and only on laminar flows.</p>
+<p><b>The streamwise-periodic wall-bounded stall did not reproduce.</b> Re-characterized on 2026-09-18 at current code, every step of the shipped laminar driven channel converged in 9 to 29 pseudo-iterations, and the Re = 10 channel reproduced the laminar profile at second order (<code>periodic-channel-laminar-picard-2026-09-18</code>); see <a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>. Turbulent periodic channels at production resolution have not been re-run. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

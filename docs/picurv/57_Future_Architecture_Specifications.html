@@ -94,7 +94,11 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p57_rules_sec">2. Rules Shared by Future Work</a></li>
 <li class="level1"><a href="#p57_stats_summary_sec">3. Statistics Direction</a></li>
 <li class="level1"><a href="#p57_functions_summary_sec">4. Function Identity Direction</a></li>
-<li class="level1"><a href="#p57_branch_sec">5. Branch Policy</a></li>
+<li class="level1"><a href="#p57_ibm_sec">5. Immersed Boundaries, Moving Bodies, and Moving Frames</a></li>
+<li class="level1"><a href="#p57_multiblock_sec">6. Multi-Block Coupling</a></li>
+<li class="level1"><a href="#p57_rans_sec">6a. RANS Closures</a></li>
+<li class="level1"><a href="#p57_nk_jacobian_sec">7. Newton-Krylov Jacobian Types and Modes</a></li>
+<li class="level1"><a href="#p57_branch_sec">8. Branch Policy</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Future_Architecture_Specifications"></a> This page indexes architectural work that is proposed rather than built, and records the dependency order between the pieces. It prevents design decisions from being lost between independently reviewed branches.</p>
@@ -111,10 +115,21 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a>   </td><td class="markdownTableBodyNone">proposed   </td><td class="markdownTableBodyNone">field statistics    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a>   </td><td class="markdownTableBodyNone">deferred, benchmark-gated   </td><td class="markdownTableBodyNone">none   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a>   </td><td class="markdownTableBodyNone">deferred, benchmark-gated   </td><td class="markdownTableBodyNone">none    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Immersed boundaries, moving bodies, moving frames (<a class="el" href="57_Future_Architecture_Specifications.html#p57_ibm_sec">5. Immersed Boundaries, Moving Bodies, and Moving Frames</a>)   </td><td class="markdownTableBodyNone">planned; switches refused   </td><td class="markdownTableBodyNone">none    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Multi-block coupling (<a class="el" href="57_Future_Architecture_Specifications.html#p57_multiblock_sec">6. Multi-Block Coupling</a>)   </td><td class="markdownTableBodyNone">planned; <code>blocks</code> other than 1 refused   </td><td class="markdownTableBodyNone">none    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">RANS closures (<a class="el" href="57_Future_Architecture_Specifications.html#p57_rans_sec">6a. RANS Closures</a>)   </td><td class="markdownTableBodyNone">planned; <code>rans</code> block and <code>-rans</code> refused   </td><td class="markdownTableBodyNone">none    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Newton-Krylov Jacobian types and modes (<a class="el" href="57_Future_Architecture_Specifications.html#p57_nk_jacobian_sec">7. Newton-Krylov Jacobian Types and Modes</a>)   </td><td class="markdownTableBodyNone">planned; refused at validation   </td><td class="markdownTableBodyNone">Newton-Krylov solver    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a>   </td><td class="markdownTableBodyNone">proposed extension directions   </td><td class="markdownTableBodyNone">none   </td></tr>
 </table>
 <p>The typed field catalog established Eulerian and particle identities, layout metadata, and non-owning views over existing vectors without changing vector ownership. That is the correctness foundation statistics rely on for shifted, face-centered, and component-staggered fields, which is why it had to land first.</p>
 <p>Field statistics build directly on it and are implemented; what remains proposed for that subsystem is indexed at <b><a class="el" href="60_Field_Statistics_Planned_Extensions.html">Field Statistics Planned Extensions</a></b>, which carries its own dependency order.</p>
+<p>Proposed extensions to the conductor workflow - further grid geometries, grid-quality gates, sweep retry, convergence-based run completion, and data-driven particle closures - are collected at <b><a class="el" href="17_Workflow_Extensibility.html">Workflow Extensibility Guide</a></b>.</p>
 <h1><a class="anchor" id="p57_rules_sec"></a>
 2. Rules Shared by Future Work</h1>
 <p>Future architectural work must:</p>
@@ -136,8 +151,46 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <h1><a class="anchor" id="p57_functions_summary_sec"></a>
 4. Function Identity Direction</h1>
 <p>Function logging/profiling identity is deliberately separate. It may replace repeated function-name scans with compile-time IDs or cached handles only after benchmarks show that the lookup overhead is material. It does not block the statistics pipeline. See <b><a class="el" href="59_Function_Identity_and_Observability_Specification.html">Function Identity and Observability Specification</a></b>.</p>
+<h1><a class="anchor" id="p57_ibm_sec"></a>
+5. Immersed Boundaries, Moving Bodies, and Moving Frames</h1>
+<p><b>Status: planned, not implemented.</b> The legacy CURVIB code this solver descends from imposed immersed bodies on the curvilinear grid, moved them, and coupled their motion to the flow. None of that was ported. What reached this tree is the switches and some dormant plumbing:</p>
+<ul>
+<li><code>models.physics.fsi.immersed</code> and <code>moving_fsi</code> (<code>-imm</code>, <code>-fsi</code>), plus the passthrough-only <code>-rfsi</code>, <code>-mframe</code>, <code>-rframe</code>, <code>-mhv</code> and <code>-lv</code>;</li>
+<li>a Poisson pre-solve branch for immersed cases (solid-aware restriction of <code>Nvert</code> through the multigrid hierarchy and a check for fully blocked regions), and <code>Nvert</code> solid markers that the momentum and Poisson kernels honour;</li>
+<li>commented-out calls to <code>ibm_interpolation_advanced</code>, a function defined nowhere, in both momentum solvers and the flow-solver orchestration; and a commented-out moving-frame convection branch in <code>ComputeRHS</code>.</li>
+</ul>
+<p>Each switch used to be accepted, and each ran a different problem without saying so: <code>immersed</code> reconfigured the Poisson solve around a body that was never loaded, <code>moving_fsi</code> did nothing, and <code>-mframe</code>/<code>-rframe</code> skipped the convective term altogether. They are now refused - the YAML switches by <code>picurv validate</code>, and the flags by <code>CreateSimulationContext</code> with <code>PETSC_ERR_SUP</code> - and <code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">tests/c/test_setup_lifecycle.c</a></code> holds that refusal in place.</p>
+<p><b>What must exist before any switch is accepted again.</b> Loading a body surface and classifying cells against it into <code>Nvert</code>; the interpolation that sets velocity at the immersed-boundary nodes each stage, in every momentum solver that claims support; an end-to-end check that the dormant Poisson branch conserves mass around a real body; and, for moving bodies or frames, the motion model and the frame-relative convection term. The Newton-Krylov solver refuses all of these independently and would need its own treatment.</p>
+<p><b>Design owner:</b> the repository owner. Nothing here is scheduled.</p>
+<h1><a class="anchor" id="p57_multiblock_sec"></a>
+6. Multi-Block Coupling</h1>
+<p><b>Status: planned, not implemented.</b> The configuration and setup layers are multi-block aware: <code>models.domain.blocks</code> reaches <code>-nblk</code>, PICGRID files carry several blocks, <code>boundary_conditions</code> accepts one face list per block and stages a <code>bcs</code> file for each, and the solvers loop over blocks. What is missing is the coupling. Every inter-block exchange (<code>Block_Interface_U</code>) is commented out - in the explicit and dual-time momentum solvers and in the initial condition - and nothing couples the pressure solve across blocks, so a multi-block case was a set of isolated single-block solves that reported themselves as one domain. No test or shipped example ever ran one.</p>
+<p>Validation now refuses <code>blocks</code> other than 1, and setup refuses <code>-nblk</code> other than 1.</p>
+<p><b>What must exist before more than one block is accepted.</b> Interface exchange of the velocity fields at shared faces in every momentum solver and in the initial condition; pressure coupling across blocks; particle hand-off between blocks; and a runtime harness showing that a domain split into blocks reproduces the single-block solution. The Newton-Krylov solver refuses multiple blocks independently. Field statistics payloads are already block scoped and follow the same natural ordering the Eulerian payloads do; the harness that proves multi-block equivalence should cover them at the same time.</p>
+<p><b>Design owner:</b> the repository owner. Nothing here is scheduled.</p>
+<h1><a class="anchor" id="p57_rans_sec"></a>
+6a. RANS Closures</h1>
+<p><b>Status: planned, not implemented.</b> PICurv models turbulence with the LES closures at <b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b>; there is no Reynolds-averaged path. A <code>k_omega</code> selector existed until 2026-09-22 and was removed: nothing behind it was ever built. Setup allocated an eddy viscosity but never the <code>K_Omega</code> fields, the transport update in <code>FlowSolver</code> was commented out, and the function it called was defined nowhere, so a case that enabled it copied a null vector and aborted at the end of the first timestep. It was recorded known-defective on 2026-09-18 and, since no implementation had ever existed, returned to planned when the dead hooks came out. <code>src/guide.md</code> lists exactly what was removed.</p>
+<p><code>models.physics.turbulence.rans</code> is refused at validation, and <code>-rans</code> is refused at setup, so nothing is silently ignored.</p>
+<p><b>What must exist before a RANS selector returns.</b> Storage and ghost exchange for the turbulence variables; a transport equation for each, discretized on the same curvilinear metrics as momentum, with their production, dissipation and cross-diffusion terms; wall treatment matched to the closure, including which wall function is admissible with it; checkpoint and restart of the turbulence state; and a validation case with a reference profile - a channel at a published <code>Re_tau</code> - showing the mean profile and the eddy viscosity the closure is supposed to produce. A wall-modelled LES path is the nearer alternative for the same engineering questions, and the wall functions already exist.</p>
+<p><b>Design owner:</b> the repository owner. Nothing here is scheduled.</p>
+<h1><a class="anchor" id="p57_nk_jacobian_sec"></a>
+7. Newton-Krylov Jacobian Types and Modes</h1>
+<p><b>Status: planned, not implemented.</b> The Newton-Krylov solver's <code>jacobian</code> block is a discriminated configuration so that further constructions can be added beside the one that exists, <code>type: finite_difference</code> with <code>mode: matrix_free</code>. Two are designed; both are refused at validation until they exist.</p>
+<p>A second finite-difference mode, <code>colored_sparse</code>, would assemble a sparse numerical Jacobian using coloring:</p>
+<div class="fragment"><div class="line">jacobian:</div>
+<div class="line">  type: finite_difference</div>
+<div class="line">  finite_difference:</div>
+<div class="line">    mode: colored_sparse</div>
+</div><!-- fragment --><p>Frozen-momentum approximations are a different Jacobian type, not storage modes of finite difference:</p>
+<div class="fragment"><div class="line">jacobian:</div>
+<div class="line">  type: frozen_momentum_approximation</div>
+<div class="line">  frozen_momentum_approximation:</div>
+<div class="line">    structure: diagonal      # or: full_sparse</div>
+</div><!-- fragment --><p>Where each would be added is recorded with the solver's extension points at <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_precond_sec">9. Preconditioning Architecture and Status</a>.</p>
+<p><b>Design owner:</b> the repository owner. Nothing here is scheduled.</p>
 <h1><a class="anchor" id="p57_branch_sec"></a>
-5. Branch Policy</h1>
+8. Branch Policy</h1>
 <p>Specification-only work uses a documentation branch. Implementation begins only after explicit plan approval, from current <code>main</code>, and each completed phase is merged before the next phase branch is created. A later phase must not rely on unreviewed changes in another long-lived branch. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

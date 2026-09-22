@@ -125,13 +125,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><b>Reduce the physical timestep</b> before touching solver internals. Many apparent solver failures are a timestep the physics will not support.</li>
 <li><b>Try a different solver.</b> <a class="el" href="08_Solver_Reference.html#p08_cap_newton_krylov">p08_cap_newton_krylov</a> gives true Newton convergence where pseudo-time stalls.</li>
 </ol>
-<dl class="section warning"><dt>Warning</dt><dd>If this is a periodic wall-bounded case, read <a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a> first. A stall was recorded there on 2026-08-24 and <b>requires re-characterization at current <code>HEAD</code></b>; you may be reproducing a known open issue rather than a configuration mistake.</dd></dl>
+<p>A periodic wall-bounded case is not a known cause: the stall recorded for it on 2026-08-24 was re-characterized on 2026-09-18 and does not reproduce (<a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>).</p>
 <h1><a class="anchor" id="p67_diverge_sec"></a>
 3. The Solution Blows Up</h1>
 <ol type="1">
 <li>Check the initial condition is physically sensible — visualize step 0 before blaming the solver.</li>
 <li>Check inlet and outlet are consistent: an inlet with no outlet to conserve against will not behave.</li>
-<li>For <code>Explicit RK4</code>, divergence within a few steps is the explicit stability limit; there is no recovery mechanism on that path. Reduce the timestep or change solver.</li>
+<li>For <code>Explicit RK4</code>, a run that stops with "the step exceeds the explicit stability
+   limit" has exceeded it; there is no recovery mechanism on that path. The message gives the viscous bound to size <code>dt</code> against. Reduce the timestep or change solver.</li>
 <li>Check the boundary conditions actually applied — the startup banner lists the resolved handler per face. A face you thought was a wall may not be.</li>
 </ol>
 <h1><a class="anchor" id="p67_particles_sec"></a>
@@ -176,7 +177,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ol>
 <h1><a class="anchor" id="p67_les_sec"></a>
 9. LES Results Look Wrong</h1>
-<p>The closure is quiet when it misbehaves: a wrong coefficient still produces a run that completes and plots that look plausible. Turn the diagnostics on (<code>les.diagnostics.enabled: true</code>) and read <code>&lt;run.runtime_logs&gt;/les_coefficient.csv</code> before anything else.</p>
+<p>The closure is quiet when it misbehaves: a wrong coefficient still produces a run that completes and plots that look plausible. Turn the diagnostics on (<code>les.diagnostics.enabled: true</code>) and read <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> before anything else.</p>
 <p>**<code>cs_effective</code> is zero for the whole run.** Expected for the first two steps of a run started from rest, because the procedure has no developed field to sample. Beyond that, check that the model is <code>dynamic_smagorinsky</code>; the constant model reports the coefficient you configured, not a measured one.</p>
 <p>**<code>cs_effective</code> is far from 0.16-0.17 in isotropic turbulence.** Check the grid first, not the model. That value assumes the grid cutoff sits in an inertial range; at low <code>Re_lambda</code> a smaller coefficient is correct. Then check <code>limited_fraction</code> — if the clip is binding, the ceiling is setting the answer.</p>
 <p>**<code>cs_effective</code> is noisy or oscillating.** Almost always <code>averaging.mode: local</code>, where the coefficient's denominator collapses wherever the resolved strain is briefly small. If the flow has a homogeneous direction, use <code>averaging.mode: homogeneous</code>.</p>

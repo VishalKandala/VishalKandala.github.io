@@ -187,7 +187,7 @@ States a run moves through, and the commands that move it</div>
 </div><!-- fragment --><p>Precompute exists so a grid, field, or profile can be looked at and corrected before a solve is committed, so every published object carries inspection material beside its payload. A preview is skipped, and <code>validation.json</code> says so, when the first block exceeds two million nodes: past that the ASCII geometry costs more than the look is worth. Inspection material describes the payload and is deliberately excluded from the object's identity, so changing a preview format does not re-identify every asset.</p>
 <p>Generated destinations are PICurv's. <code>grid.generator.output_file</code>, <code>stats_file</code>, and <code>vts_file</code> are rejected rather than honoured: a configuration file that names its own output path creates a competing directory outside the store, which is what the fixed topology exists to prevent.</p>
 <p>The payload keeps its run-relative shape rather than a flat set of canonical filenames, because an inlet-profile asset holds one file per block and face and a flat root cannot express that. Materialization exposes each payload path into the run at the same relative location.</p>
-<p>The object identity includes normalized provider settings, the case values each build reads, the identities of the assets it depends on, checksums of referenced files, and the PICurv build. Changing an equation, grid config, imported field, inlet parameters, or generator code therefore selects a new object. Unchanged inputs reuse the existing object. <code>--only grid,initial-condition</code> selects a dependency closure; publication remains all-or-nothing for that invocation.</p>
+<p>The object identity includes normalized provider settings, the case values each build reads, the identities of the assets it depends on, checksums of referenced files, and the PICurv build. Changing an equation, grid config, imported field, inlet parameters, or generator code therefore selects a new object. Unchanged inputs reuse the existing object. The provider settings include each input's workspace path, so the same bytes imported under two names build two objects. An external reference enters through its target's current checksum: a target changed since registration builds a new object rather than reusing a stale one, and the checksum recorded at registration is kept for provenance, not compared. <code>--only grid,initial-condition</code> selects a dependency closure; publication remains all-or-nothing for that invocation.</p>
 <p>A provider executed only in C is reported as <code>runtime-c</code>. Precompute does not imitate it in Python. If a Python initial-condition generator needs a grid configured as <code>programmatic_c</code>, precompute and run planning fail and tell the user to choose <code>file</code> or <code>grid_gen</code>. Otherwise the simulator announces the runtime provider and generates it during startup.</p>
 <p>Fresh runs reuse valid assets automatically. <code>--require-precomputed</code> refuses a missing or stale object instead of building it, while <code>--fetch-missing</code> searches configured storage archives before rebuilding. Each run receives physical run-local files by reflink, hardlink, or copy and records the exact object/checksum mapping in <code>inputs/assets.lock.yml</code>.</p>
 <p>Every run has this fixed shape:</p>
@@ -334,7 +334,7 @@ existed". An in-place <code>--continue</code> keeps whatever lineage the run was
 <li>Live solver example: if <code>post.yml</code> requests <code>0..1000</code> every <code>10</code>, but solver source files currently exist only through step <code>420</code>, PICurv launches only <code>0..420</code> on the first pass. A later <code>--continue</code> run resumes at <code>430</code> after those source files appear.</li>
 <li>Interrupted batch example: if <code>Field_00070.vts</code> exists but the required MSD CSV still stops at <code>60</code>, step <code>70</code> is treated as incomplete and the next <code>--continue</code> run restarts from <code>70</code>.</li>
 <li>Explicit rerun example: if you omit <code>--continue</code>, PICurv honors the requested window exactly, rewrites any overlapping VTK files for those steps, and rewrites repeated statistics rows so each step still appears once in the final CSV.</li>
-<li>Changed recipe example: if you point the same <code>run_dir</code> at a different <code>post.yml</code> recipe, such as adding <code>Qcrit</code> or changing the statistics prefix, PICurv starts from that recipe's configured <code>start_step</code> instead of inheriting completion from the previous recipe.</li>
+<li>Changed recipe example: if you point the same <code>run_dir</code> at a different <code>post.yml</code> recipe, such as adding <code>Qcrit_nodal</code> or changing the statistics prefix, PICurv starts from that recipe's configured <code>start_step</code> instead of inheriting completion from the previous recipe.</li>
 <li>Concurrency rule: PICurv holds a post lock while the stage is active. A second writer targeting the same output lineage is refused so generated controls and result files cannot race.</li>
 </ul>
 <h1><a class="anchor" id="p52_cluster_sec"></a>
@@ -450,11 +450,11 @@ existed". An in-place <code>--continue</code> keeps whatever lineage the run was
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p52_cap_restart_stats_carry"><code>carry</code></a></td><td class="markdownTableBodyNone"><code>carry</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p52_cap_restart_stats_reset"><code>reset</code></a></td><td class="markdownTableBodyNone"><code>reset</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p52_cap_restart_stats_carry"><code>carry</code></a></td><td class="markdownTableBodyNone"><code>carry</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p52_cap_restart_stats_reset"><code>reset</code></a></td><td class="markdownTableBodyNone"><code>reset</code></td></tr>
 </table>
+<p>Both modes behave as documented on a known field (<code>field-statistics-tgv3d-2026-09-21</code>): <code>carry</code> continues a window exactly and <code>reset</code> starts it afresh. The derived statistics they continue have not yet been compared against a turbulent reference profile.</p>
 <h2><a class="anchor" id="p52_cap_restart_stats_reset_sub"></a>
 reset</h2>
 <p><a class="anchor" id="p52_cap_restart_stats_reset"></a> <b>Identity.</b> <code>picurv run --solve --restart-from ... --statistics-state reset</code>.</p>
@@ -464,8 +464,8 @@ reset</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Applies to a new run created with <code>--restart-from</code>; in-place <code>--continue</code> already continues the same run state. It does not change checkpoint selection or Eulerian restart authority.</p>
 <p><b>Diagnostics.</b> The generated control omits <code>-field_statistics_continue true</code>, and the new run's active configuration records <code>statistics_state: reset</code>.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> exercises the CLI choice and generated run control surface.</p>
-<p><b>Limitations.</b> It cannot merge old and new statistics later; preserve or postprocess the old window separately if both are needed.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> exercises the CLI choice and generated run control surface. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: a TGV3D run restarted at step 10 with <code>reset</code> anchored each window at the first state the restarted run completed and accumulated the remaining samples exactly.</p>
+<p><b>Limitations.</b> It cannot merge old and new statistics later; preserve or postprocess the old window separately if both are needed. The interval between the restart point and the first state the new run completes is not represented in the reset window.</p>
 <h2><a class="anchor" id="p52_cap_restart_stats_carry_sub"></a>
 carry</h2>
 <p><a class="anchor" id="p52_cap_restart_stats_carry"></a> <b>Identity.</b> <code>picurv run --solve --restart-from ... --statistics-state carry</code>.</p>
@@ -473,9 +473,9 @@ carry</h2>
 <p><b>When to choose it.</b> Use <code>carry</code> only when the grid, field-statistics windows, weighting, fields, and covariance definitions are unchanged and the new run is a scientific continuation of the same measurement.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Emits <code>-field_statistics_continue true</code>. Checkpoint compatibility validation still owns grid layout and required state; changing the statistics recipe can make the requested state unusable.</p>
-<p><b>Diagnostics.</b> The generated control contains the continue flag. A missing or incompatible checkpoint statistics payload fails during restart setup rather than silently resetting.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> exercises the CLI choice and generated run control surface.</p>
-<p><b>Limitations.</b> Experimental: numerical equivalence across every change of MPI layout and optional field combination has not been characterized.</p>
+<p><b>Diagnostics.</b> The generated control contains the continue flag. A missing or incompatible checkpoint statistics payload fails during restart setup rather than silently resetting. The restart bundle is staged whenever <code>carry</code> is requested, whatever the Eulerian source: an analytical-source run used to stage none, because it needs no fields, and then failed at start-up looking for the accumulators.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> exercises the CLI choice and generated run control surface. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: a TGV3D run restarted at step 10 with <code>carry</code> reproduced the continuous run's windows to 1.1e-16 at step 20.</p>
+<p><b>Limitations.</b> Measured on one rank. <code>make smoke-mpi</code> checks that a window's payloads are identical between one rank and several within a single run, but carrying a window across a restart that changes the rank count, or the optional field set, has not been measured.</p>
 <h1><a class="anchor" id="p52_rules_sec"></a>
 9. Safe Rules Of Thumb</h1>
 <ul>

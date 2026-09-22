@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['yaml_0',['yaml',['../07_Case_Reference.html',1,'Configuration Reference: Case YAML'],['../09_Monitor_Reference.html',1,'Configuration Reference: Monitor YAML'],['../10_Post_Processing_Reference.html',1,'Configuration Reference: Postprocessor YAML'],['../08_Solver_Reference.html',1,'Configuration Reference: Solver YAML']]],
-  ['yaml_20generated_20artifacts_20runtime_1',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['your_20first_20simulation_20flat_20channel_2',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
-  ['your_20results_3',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]]
+  ['user_20guide_0',['User Guide',['../42_User_Guide_Index.html',1,'']]],
+  ['user_20how_20to_20guides_1',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]],
+  ['using_20a_20file_20based_20grid_20search_20robustness_2',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]]
 ];

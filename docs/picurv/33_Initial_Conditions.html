@@ -177,6 +177,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="fragment"><div class="line">python &lt;ic-generator&gt; -c &lt;config_file&gt; --field Ucat|Ucont --output &lt;output_file&gt; --grid &lt;grid.run&gt; [cli_args...]</div>
 </div><!-- fragment --><p><code>picurv run --solve</code> materializes the result after grid preparation. <code>picurv precompute --case ...</code> materializes and stages the same artifact without running the solver.</p>
 <p>The repository <code>ic.gen</code> accepts an INI <code>[expression]</code> section. <code>Ucat</code> configs define <code>u</code>, <code>v</code>, and <code>w</code>, evaluated at actual cell centers with extrapolated dummy-cell centers. <code>Ucont</code> configs define <code>u_xi</code>, <code>u_eta</code>, and <code>u_zeta</code>, evaluated at their corresponding geometric face centers. Expressions may use <code>x/y/z</code>, normalized logical <code>xi/eta/zeta</code>, storage <code>i/j/k</code>, <code>pi</code>, and the documented numerical functions. The first implementation supports one block. The repository generator requires a staged PICGRID. <code>grid.mode: file</code> and <code>grid.mode: grid_gen</code> provide that grid directly; for single-block <code>grid.mode: programmatic_c</code>, the launcher materializes a nondimensional <code>&lt;run.config&gt;/grid.run</code> bridge from scalar <code>programmatic_settings</code> before invoking <code>ic.gen</code>.</p>
+<p>Repository spectral provider, for a triply periodic box:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    mode: generated</div>
+<div class="line">    generator: spectral_random_velocity</div>
+<div class="line">    params:</div>
+<div class="line">      field: Ucat</div>
+<div class="line">      seed: 12345</div>
+<div class="line">      spectrum: {type: k4_exponential, k0: 4.0, k_cut: 20.0}</div>
+<div class="line">      projection: {type: solenoidal, operator: picurv_discrete}</div>
+<div class="line">      normalization: {type: component_rms, target: 1.0}</div>
+<div class="line">      remove_mean: true</div>
+</div><!-- fragment --><p>It draws a seeded random field, shapes it to the spectrum envelope (<code>k4_exponential</code> is <code>E(k) ~ k^4 exp(-2 (k/k0)^2)</code>, nothing above <code>k_cut</code>), projects it to be divergence-free under the chosen operator, and scales it to the requested component RMS. It requires every face geometric-periodic and a fresh 3D run, and writes <code>&lt;run.analysis&gt;/metrics/initial_condition_summary.json</code> and the staged spectrum beside the field. <code>examples/decaying_isotropic_turbulence</code> configures it; its README covers the keys. With <code>operator: picurv_discrete</code> the solver's own step-0 divergence is at round-off; <code>initial-conditions-2026-09-21</code> measured 3.1e-14 against a flux scale of 4.3, component RMS 1.000000, the shell spectrum within 4.7% (energy-weighted) of the envelope, and the same seed reproducing the same field.</p>
 <h1><a class="anchor" id="p33_entries_sec"></a>
 3. Field Initialization Mode Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: initial.field_mode.
@@ -185,12 +198,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_constant"><code>Constant</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_poiseuille"><code>Poiseuille</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_zero"><code>Zero</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_constant"><code>Constant</code></a></td><td class="markdownTableBodyNone"><code>1</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_poiseuille"><code>Poiseuille</code></a></td><td class="markdownTableBodyNone"><code>2</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_zero"><code>Zero</code></a></td><td class="markdownTableBodyNone"><code>0</code></td></tr>
 </table>
+<p>Every entry below, and the <code>streamwise_constant</code>, <code>ic_gen</code> and <code>file</code> sources above, was checked against the field it claims to produce by <code>initial-conditions-2026-09-21</code>: on a programmatic duct the staged interior face fluxes equal their definitions to 3.5e-18 or exactly, and a <code>file</code> source reproduces the generated run it was taken from bitwise. Step-0 <code>Ucat</code> next to walls and inlets reflects the boundary faces, because it is reconstructed from the fluxes after boundary conditions apply.</p>
 <h2><a class="anchor" id="p33_cap_zero_sub"></a>
 Zero</h2>
 <p><a class="anchor" id="p33_cap_zero"></a> <b>Identity.</b> Field mode <code>Zero</code> -&gt; <code>-finit 0</code> -&gt; <code>IC_MODE_ZERO</code>.</p>
@@ -199,7 +212,7 @@ Zero</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> A zero field with periodic boundaries and no driving force stays zero; that combination needs a driven handler to do anything.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved initial-condition mode; step 0 output shows a zero field.</p>
-<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Evidence.</b> Analytically verified - <code>initial-conditions-2026-09-21</code>: every staged face flux is exactly zero.</p>
 <p><b>Limitations.</b> Transition from rest can be slow, and for turbulence it will not occur at all without a finite-amplitude perturbation.</p>
 <h2><a class="anchor" id="p33_cap_constant_sub"></a>
 Constant</h2>
@@ -209,28 +222,27 @@ Constant</h2>
 <p><b>Parameters it owns.</b> The constant velocity components in the initial-condition block.</p>
 <p><b>Interactions.</b> A uniform field will not satisfy no-slip at walls; the first steps resolve that discontinuity, which can be abrupt.</p>
 <p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Evidence.</b> Regression verified - <code>make smoke-periodic</code> asserts the streamwise-constant initial-condition banner. Production exercised - <code>examples/flat_channel</code> starts from a constant field. Analytically verified - <code>initial-conditions-2026-09-21</code>: <code>(0.3, -0.2, 0.7)</code> and a streamwise constant of 1.3 along <code>+Zeta</code> stage the face fluxes they define to round-off.</p>
 <p><b>Limitations.</b> Not divergence-free in general on a curvilinear grid, so the first pressure solve does real work.</p>
 <h2><a class="anchor" id="p33_cap_poiseuille_sub"></a>
 Poiseuille</h2>
 <p><a class="anchor" id="p33_cap_poiseuille"></a> <b>Identity.</b> Field mode <code>Poiseuille</code> -&gt; <code>-finit 2</code> -&gt; <code>IC_MODE_POISEUILLE</code>.</p>
-<p><b>What it does.</b> Initializes with an analytic parabolic profile.</p>
+<p><b>What it does.</b> Sets the streamwise face flux to <code>peak * f1 * f2</code> times the face area, where each cross-stream factor is <code>1 - s^2</code> and <code>s</code> runs from -1 to 1 across the axis in logical (index) space: cell <code>c</code> of an axis with <code>n</code> nodes sits at <code>s = (c - 1/2 - (n-1)/2) / ((n-1)/2)</code>, so the profile vanishes on the walls. A periodic cross-stream axis has no walls, and its factor is 1.</p>
 <p><b>When to choose it.</b> A wall-bounded channel or duct where you want a developed-looking start rather than a transient from rest.</p>
 <p><b>Parameters it owns.</b> The profile scaling in the initial-condition block.</p>
-<p><b>Interactions.</b> Assumes a wall-bounded geometry; in a domain without the expected walls the profile will not vanish where you expect.</p>
+<p><b>Interactions.</b> The coordinate is logical, so the profile is a parabola in physical space only on a grid uniform across the section. On a channel periodic in the spanwise axis it is the exact laminar profile; on a rectangular duct the product of two parabolas is a start, not the duct solution.</p>
 <p><b>Diagnostics.</b> As above; inspect the step-0 field before committing to a long run.</p>
-<p><b>Evidence.</b> Implemented only.</p>
-<p><b>Limitations.</b> An analytic approximation, not a solution of the case being run. The C enum also carries <code>IC_MODE_CONSTANT_STREAMWISE</code> and <code>IC_MODE_FILE</code>, which this selector does not expose.</p>
+<p><b>Evidence.</b> Unit verified - <code>set-initial-interior-field-poiseuille-profile</code> and <code>set-initial-interior-field-poiseuille-uniform-along-periodic-axis</code> in <code>make unit-runtime</code> check the wall-vanishing product profile and the periodic-axis rule; <code>initial-conditions-2026-09-21</code> found the staged interior face fluxes equal to this formula to 3.5e-18 in a solver run.</p>
+<p><b>Limitations.</b> Logical-space only: on a stretched or curved cross-section the profile is not a physical parabola. Before 2026-09-18 the parabola vanished at the first cell centres rather than on the walls, and it was applied across periodic axes too.</p>
 <!-- GENERATED FILE - do not edit by hand. Family: initial.target_field.
      Regenerate with: make docs-inventory -->
 <table class="markdownTable">
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucat"><code>ucat</code></a></td><td class="markdownTableBodyNone"><code>ucat</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucont"><code>ucont</code></a></td><td class="markdownTableBodyNone"><code>ucont</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucat"><code>ucat</code></a></td><td class="markdownTableBodyNone"><code>ucat</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_field_ucont"><code>ucont</code></a></td><td class="markdownTableBodyNone"><code>ucont</code></td></tr>
 </table>
 <h2><a class="anchor" id="p33_cap_field_ucat_sub"></a>
 Ucat</h2>
@@ -240,7 +252,7 @@ Ucat</h2>
 <p><b>Parameters it owns.</b> None; it selects which field the mode writes to.</p>
 <p><b>Interactions.</b> <code>Ucat</code> is the derived representation, so initializing it requires a conversion to the evolved <code>Ucont</code> fluxes before the first step. See <b><a class="el" href="20_Grid_Cell_Architecture_Guide.html">Grid, Cell, and Variable Architecture Guide</a></b>.</p>
 <p><b>Diagnostics.</b> Step-0 output shows the initialized field.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>. Analytically verified - <code>initial-conditions-2026-09-21</code>: <code>ic_gen</code> <code>Ucat</code> expressions and every built-in mode stage the fluxes their Cartesian values define.</p>
 <p><b>Limitations.</b> On a strongly curvilinear grid the conversion from a Cartesian profile to fluxes is not exact in the sense of preserving the intended profile shape.</p>
 <h2><a class="anchor" id="p33_cap_field_ucont_sub"></a>
 Ucont</h2>
@@ -250,8 +262,8 @@ Ucont</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> <code>Ucont</code> is what the solver actually evolves, so this path avoids one conversion. The field modes are still expressed in the same components, which is what makes this the less intuitive of the two.</p>
 <p><b>Diagnostics.</b> Step-0 output; check the derived <code>Ucat</code> looks as intended.</p>
-<p><b>Evidence.</b> Implemented only. No shipped example selects it.</p>
-<p><b>Limitations.</b> Unverified by any in-tree case, and easier to get wrong because the values are fluxes rather than velocities.</p>
+<p><b>Evidence.</b> Analytically verified - <code>initial-conditions-2026-09-21</code>: <code>ic_gen</code> <code>Ucont</code> expressions stage exactly, and a <code>file</code> source of <code>Ucont</code> reproduces the generated run bitwise. No shipped example selects it.</p>
+<p><b>Limitations.</b> Easier to get wrong than <code>Ucat</code>, because the values are fluxes rather than velocities: a face flux carries the face area, so a velocity typed where a flux is expected is off by that area. Only uniform Cartesian grids were checked.</p>
 <h1><a class="anchor" id="p33_euler_modes_sec"></a>
 4. C Runtime Modes and Entry Points</h1>
 <p>The launcher maps the contract to one <code>InitialConditionMode</code> enum value:</p>
@@ -307,7 +319,6 @@ Ucont</h2>
 <li>supplying a bulk/mean velocity to Poiseuille mode when the current implementation expects <code>Vmax</code>,</li>
 <li>forgetting that initialization sets the interior only; boundary handlers then overwrite face values,</li>
 <li>providing a PETSc vector whose size does not match the target DM,</li>
-<li>attempting a file-backed IC for a multi-block case in the first implementation,</li>
 <li>omitting <code>flow_direction</code> when the domain is fully periodic (no INLET face),</li>
 <li>comparing <code>u_physical</code> directly to <code>Ucont</code> without accounting for metric-face scaling.</li>
 </ul>
@@ -332,12 +343,11 @@ Wall-bounded spectral seeds</h1>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_channel_spectral_velocity"><code>channel_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>channel_spectral_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_duct_spectral_velocity"><code>duct_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>duct_spectral_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_ic_gen"><code>ic_gen</code></a></td><td class="markdownTableBodyNone"><code>ic_gen</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_spectral_random_velocity"><code>spectral_random_velocity</code></a></td><td class="markdownTableBodyNone"><code>spectral_random_velocity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_channel_spectral_velocity"><code>channel_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>channel_spectral_velocity</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_duct_spectral_velocity"><code>duct_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>duct_spectral_velocity</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_ic_gen"><code>ic_gen</code></a></td><td class="markdownTableBodyNone"><code>ic_gen</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_spectral_random_velocity"><code>spectral_random_velocity</code></a></td><td class="markdownTableBodyNone"><code>spectral_random_velocity</code></td></tr>
 </table>
 <p><code>channel_spectral_velocity</code> uses one wall axis; <code>duct_spectral_velocity</code> uses two. The remaining axes are periodic, with driving allowed only on <code>streamwise_axis</code>. Both use <code>Ucat</code> on one Cartesian block. Uniform spacing is required along periodic axes; wall-normal axes may stretch. <code>grid_gen</code> provides an inspectable staged grid.</p>
 <div class="fragment"><div class="line">mode: generated</div>
@@ -364,8 +374,8 @@ ic_gen</h2>
 <p><b>Parameters it owns.</b> Requires config_file; field selects Ucat/Ucont.</p>
 <p><b>Interactions.</b> The existing PICGRID coordinates, expression evaluator and PETSc writer own this route.</p>
 <p><b>Diagnostics.</b> Malformed expressions and missing inputs fail before solver launch.</p>
-<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
-<p><b>Limitations.</b> Experimental. No divergence or turbulence property is implied by arbitrary expressions.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the generator and the CLI file route. Analytically verified - <code>initial-conditions-2026-09-21</code>: staged <code>Ucat</code> and <code>Ucont</code> expressions equal their definitions exactly, and a <code>file</code> source re-reading the staged vectors reproduces the run bitwise.</p>
+<p><b>Limitations.</b> No divergence or turbulence property is implied by arbitrary expressions: whatever the expression says is what is staged. Measured on uniform Cartesian grids; expressions on curved grids are not covered.</p>
 <h2><a class="anchor" id="p33_cap_gen_spectral_random_velocity_sub"></a>
 spectral_random_velocity</h2>
 <p><a class="anchor" id="p33_cap_gen_spectral_random_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: spectral_random_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
@@ -374,8 +384,8 @@ spectral_random_velocity</h2>
 <p><b>Parameters it owns.</b> seed, random, spectrum, projection, normalization and remove_mean retain their existing contracts.</p>
 <p><b>Interactions.</b> Requires six geometric-periodic faces and a uniform Cartesian grid; restart remains authoritative.</p>
 <p><b>Diagnostics.</b> The IC summary reports selected-operator divergence and realized energy; shell spectra measure the generated field.</p>
-<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
-<p><b>Limitations.</b> Experimental. A continuum solenoidal field need not be discretely solenoidal; runtime reconstruction changes energy.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code>. Production exercised in <code>examples/decaying_isotropic_turbulence</code>. Analytically verified - <code>initial-conditions-2026-09-21</code>: fluctuation RMS 1.000000 and kinetic energy 1.500000 as requested, the solver's own step-0 divergence 3.1e-14 against a flux scale of 4.3 under <code>operator: picurv_discrete</code>, the shell spectrum within 4.7% (energy-weighted) of the <code>k4_exponential</code> envelope with nothing above <code>k_cut</code>, and identical seeds reproducing identical fields.</p>
+<p><b>Limitations.</b> A continuum solenoidal field need not be discretely solenoidal - choose <code>operator: picurv_discrete</code> when the solver's own divergence must vanish - and runtime reconstruction changes the energy from the staged value, which the summary predicts separately. A startup field, not developed turbulence.</p>
 <h2><a class="anchor" id="p33_cap_gen_channel_spectral_velocity_sub"></a>
 channel_spectral_velocity</h2>
 <p><a class="anchor" id="p33_cap_gen_channel_spectral_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: channel_spectral_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
@@ -384,8 +394,8 @@ channel_spectral_velocity</h2>
 <p><b>Parameters it owns.</b> The wall-bounded parameter block above applies with one wall_axes entry; initial_spectra is required.</p>
 <p><b>Interactions.</b> Single-block 3D Cartesian grid, two periodic axes, one no-slip pair, Ucat file staging.</p>
 <p><b>Diagnostics.</b> Summary reports bulk velocity, perturbation RMS and discrete divergence; selected plane/line spectra measure the seed.</p>
-<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
-<p><b>Limitations.</b> Experimental. Experimental startup construction; amplitude and resolution do not establish sustained turbulence.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code>. Production exercised in <code>examples/turbulent_channel</code>. Analytically verified - <code>wall-spectral-ic-2026-09-22</code>: on a stretched 32 x 32 x 64 channel the volume-averaged streamwise velocity equals the requested bulk to 2e-16, the mean profile equals the flux-normalized <code>4t(1-t)</code> parabola to 1.3e-15, the perturbation RMS is exactly the requested 0.1 with zero component means, the dummy layers are exact odd reflections so the wall faces carry zero velocity, and the runtime's step-0 flux field has a cell divergence of 1.4e-17 against a flux scale of 4.5e-2.</p>
+<p><b>Limitations.</b> A startup construction: amplitude and resolution do not establish sustained turbulence, and the spectrum shapes the vector potential rather than the velocity. Measured on a reduced grid on one rank, not at the shipped production size.</p>
 <h2><a class="anchor" id="p33_cap_gen_duct_spectral_velocity_sub"></a>
 duct_spectral_velocity</h2>
 <p><a class="anchor" id="p33_cap_gen_duct_spectral_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: duct_spectral_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>
@@ -394,8 +404,8 @@ duct_spectral_velocity</h2>
 <p><b>Parameters it owns.</b> The wall-bounded parameter block above applies with two wall_axes entries; initial_spectra selects streamwise lines.</p>
 <p><b>Interactions.</b> Single-block 3D Cartesian grid, one periodic axis, two no-slip pairs, Ucat file staging.</p>
 <p><b>Diagnostics.</b> Summary reports bulk velocity and discrete divergence; actual selected line spectra report sample energy and Parseval residual.</p>
-<p><b>Evidence.</b> Implemented only; generator and CLI regression tests exercise the file route. No developed turbulence validation is claimed.</p>
-<p><b>Limitations.</b> Experimental. Experimental; product-parabola startup mean is not the exact laminar duct solution. Circular pipes and immersed boundaries are outside this provider. </p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code>. Production exercised in <code>examples/periodic_test/driven_duct</code>. Analytically verified - <code>wall-spectral-ic-2026-09-22</code>: on a doubly stretched 32 x 32 x 64 duct the volume-averaged streamwise velocity equals the requested bulk exactly, the mean equals the flux-normalized product of <code>4t(1-t)</code> parabolas to 2.7e-15, the perturbation RMS is exactly the requested 0.1, all four walls carry zero velocity through exact odd reflection, and the runtime's step-0 flux field has a cell divergence of 1.1e-17 against a flux scale of 3.0e-2.</p>
+<p><b>Limitations.</b> The product-parabola startup mean is not the exact laminar duct solution, and a startup construction establishes no sustained turbulence. Circular pipes and immersed boundaries are outside this provider. Measured on a reduced grid on one rank. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

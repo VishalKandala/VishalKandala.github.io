@@ -122,11 +122,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="textblock"><p><a class="anchor" id="_Boundary_Conditions_Guide"></a> This page is the detailed reference for boundary-condition authoring in <code>case.yml</code>. It documents what is currently supported by the Python conductor and what is currently wired in C.</p>
 <h1><a class="anchor" id="p44_grammar_sec"></a>
 1. Boundary-Condition Grammar</h1>
-<p><code>case.yml -&gt; boundary_conditions</code> supports:</p>
-<ul>
-<li>single-block form: one list with 6 faces,</li>
-<li>multi-block form: list-of-lists, one 6-face list per block.</li>
-</ul>
+<p><code>case.yml -&gt; boundary_conditions</code> is one list with 6 faces.</p>
 <p>Face names:</p>
 <ul>
 <li><code>-Xi</code>, <code>+Xi</code>, <code>-Eta</code>, <code>+Eta</code>, <code>-Zeta</code>, <code>+Zeta</code></li>
@@ -158,7 +154,7 @@ wall</h2>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Wall loses to <code>inlet</code> and <code>farfield</code> at shared edges and wins over <code>outlet</code>. Wall functions are configured separately under <code>physics.turbulence.wall_function</code>.</p>
 <p><b>Diagnostics.</b> The startup banner lists the resolved type and handler per face.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
 <p><b>Limitations.</b> <code>MOVING_WALL</code> is present in the C enum and accepted by the C compatibility check, but no public handler exposes it.</p>
 <h2><a class="anchor" id="p44_type_inlet_sub"></a>
 inlet</h2>
@@ -168,7 +164,7 @@ inlet</h2>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Highest precedence, so an inlet wins at every shared edge. A domain with an inlet needs an outlet to conserve against.</p>
 <p><b>Diagnostics.</b> Startup banner reports the resolved handler and its configured values per face.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
 <p><b>Limitations.</b> Time-varying inlet types exist in the C enum but are not exposed.</p>
 <h2><a class="anchor" id="p44_type_outlet_sub"></a>
 outlet</h2>
@@ -178,7 +174,7 @@ outlet</h2>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Lowest precedence, so inlet and wall win at shared edges. Its flux is derived from global conservation rather than prescribed.</p>
 <p><b>Diagnostics.</b> The inlet/outlet flux balance is reported at startup.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
 <p><b>Limitations.</b> A pressure-specified outlet exists in the C enum but is not exposed.</p>
 <h2><a class="anchor" id="p44_type_periodic_sub"></a>
 periodic</h2>
@@ -188,8 +184,8 @@ periodic</h2>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Periodic axes are derived from paired <code>PERIODIC</code> conditions before DMDA creation, so both faces must declare it and the grid must satisfy the translation contract. <code>models.domain</code> does not accept periodic flags. Both faces of a driven pair must carry the <b>same</b> driven handler.</p>
 <p><b>Diagnostics.</b> The startup banner reports the derived periodic axes and each validated translation.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code>. Regression verified - <code>make smoke-periodic</code>.</p>
-<p><b>Limitations.</b> Requires a matching translation between paired faces; see <a class="el" href="p54_geometric_periodic.html#p54_grid_sec">2. Grid Contract</a>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code>. Regression verified - <code>make smoke-periodic</code>. Analytically verified - <code>tgv2d-picard-order-2026-09-18</code>: a triply periodic Taylor-Green vortex at second order in time and space; <code>periodic-channel-laminar-picard-2026-09-18</code>: a channel periodic in two directions reproduces the laminar profile at second order and stays uniform along both periodic axes to 5e-12.</p>
+<p><b>Limitations.</b> Requires a matching translation between paired faces; see <a class="el" href="p54_geometric_periodic.html#p54_grid_sec">2. Grid Contract</a>. The wall-bounded pseudo-time stall once recorded here did not reproduce at current code (<a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>); turbulent periodic channels at production resolution have not been re-characterized.</p>
 <h1><a class="anchor" id="p44_supported_sec"></a>
 3. Supported Handlers</h1>
 <p>The table below is generated from <code>BC_HANDLER_SPECS</code> in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, the validation layer that decides what a case file may actually contain. It is regenerated by <code>make docs-inventory</code> and checked by <code>make audit-capability</code>, so it cannot drift from the validator.</p>
@@ -229,7 +225,7 @@ noslip</h2>
 <p><b>Parameters it owns.</b> None. <code>noslip</code> takes no parameters, and supplying any is a validation error.</p>
 <p><b>Interactions.</b> Wall faces participate in the boundary priority ordering (<code>BC_PRIORITY_WALL</code>) so that inlet and farfield conditions win at shared edges. Wall functions are configured separately under <code>physics.turbulence.wall_function</code> and are not part of this handler.</p>
 <p><b>Diagnostics.</b> The startup banner lists each face and its resolved handler. A wall that is silently not applied shows up as non-zero velocity in the first cell layer; <code>LOG_FIELD_MIN_MAX</code> on <code>Ucat</code> is the quickest check.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> exercises the handler factory and direct handler behavior in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Production exercised in every shipped wall-bounded example.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> exercises the handler factory and direct handler behavior in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Production exercised in every shipped wall-bounded example. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: the walls of a laminar square duct reproduce the Poiseuille profile at second order.</p>
 <p><b>Limitations.</b> <code>MOVING_WALL</code> exists in the C enum but is not exposed through the validator, so a moving wall cannot currently be configured from YAML.</p>
 <h2><a class="anchor" id="p44_cap_constant_velocity_sub"></a>
 constant_velocity</h2>
@@ -239,7 +235,7 @@ constant_velocity</h2>
 <p><b>Parameters it owns.</b> <code>vx</code>, <code>vy</code>, <code>vz</code> - all three required, in m/s. Scalar components only; the legacy <code>vector</code>/<code>velocity</code> spellings are rejected.</p>
 <p><b>Interactions.</b> Inlet has the highest boundary priority, so it wins over wall and outlet at shared edges. The outlet must be able to pass the mass this inlet introduces; pair it with <code>conservation</code>.</p>
 <p><b>Diagnostics.</b> The startup banner prints the <b>configured</b> vector for the face as <code>[vx,vy,vz]</code>. It does not report a derived or integrated flux; runtime flux reporting is separate from the banner.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: the inlet delivers bulk velocity 1.00000 and the duct develops to Poiseuille flow at order 1.87.</p>
 <p><b>Limitations.</b> Uniform in space and constant in time. Time-varying inlets (<code>BC_HANDLER_INLET_PULSATILE_FLUX</code>) exist in the C enum but are not exposed.</p>
 <h2><a class="anchor" id="p44_cap_parabolic_sub"></a>
 parabolic</h2>
@@ -249,8 +245,8 @@ parabolic</h2>
 <p><b>Parameters it owns.</b> <code>v_max</code> - required, in m/s, the centreline speed.</p>
 <p><b>Interactions.</b> Same inlet priority and outlet-pairing considerations as <code>constant_velocity</code>.</p>
 <p><b>Diagnostics.</b> The startup banner prints the <b>configured</b> <code>v_max</code> for the face, not an integrated flux. If the face is not bounded by walls on the axes the profile assumes, the profile will not vanish at the edges - inspect the inlet plane.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>.</p>
-<p><b>Limitations.</b> The profile shape is fixed and assumes a wall-bounded face.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: the delivered bulk velocity matches the sampled product parabola on <code>n</code> cells per side, <code>v_max ((2n^2 + 1) / (3n^2))^2</code>, which tends to <code>(4/9) v_max</code>, to five digits, and the duct develops to Poiseuille flow at order 1.86. Before the 2026-09-21 fix the profile vanished at the wall-adjacent cell centres and delivered 27% and 13% too little.</p>
+<p><b>Limitations.</b> The profile is a product of logical-space parabolas, one per wall-bounded axis, not the duct solution; it is uniform along a periodic axis. On a graded or curved face it is not a physical parabola.</p>
 <h2><a class="anchor" id="p44_cap_prescribed_flow_sub"></a>
 prescribed_flow</h2>
 <p><a class="anchor" id="p44_cap_prescribed_flow"></a> <b>Identity.</b> <code>handler: prescribed_flow</code> on an <code>INLET</code> face -&gt; <code>BC_HANDLER_INLET_PROFILE_FROM_FILE</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a2030390af67a68596b773d14c1d0a4dd">Create_InletProfileFromFile</a>.</p>
@@ -270,8 +266,8 @@ prescribed_flow</h2>
 <p>Unknown keys inside <code>source</code> are rejected with the allowed set named, rather than silently dropped.</p>
 <p><b>Interactions.</b> Profile dimensions are validated against the resolved grid block node counts before the run starts: a <code>-Xi</code>/<code>+Xi</code> face expects <code>(KM-1, JM-1)</code>, <code>-Eta</code>/<code>+Eta</code> expects <code>(KM-1, IM-1)</code>, and <code>-Zeta</code>/<code>+Zeta</code> expects <code>(JM-1, IM-1)</code>. A mismatch is a validation error, not a runtime surprise. <code>field_slice</code> needs either <code>source_case</code> (to inherit that case's scaling) or an explicit <code>velocity_scale</code>, because a raw field carries no units of its own.</p>
 <p><b>Diagnostics.</b> The startup banner prints the resolved <code>source_file</code> for the face. Validation reports expected versus actual profile dimensions on mismatch, and the resolved profile file is written into the run's config directory, so what was actually imposed is recoverable after the fact.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> covers the handler in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Integration verified - <code>tests/test_config_regressions.py</code> exercises all three source types and the face-dimension validation. It is offered by <code>examples/master_template</code>; no shipped runnable example currently selects it, so there is no production-exercised facet.</p>
-<p><b>Limitations.</b> The profile is steady: it is imposed once and held, with no time variation. <code>BC_HANDLER_INLET_INTERP_FROM_FILE</code>, which would interpolate between supplied profiles, exists in the C enum but is not exposed.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> covers the handler in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Integration verified - <code>tests/test_config_regressions.py</code> exercises all three source types and the face-dimension validation. It is offered by <code>examples/master_template</code>; no shipped runnable example currently selects it, so there is no production-exercised facet. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: a generated square-duct profile on a grid_gen grid delivered the requested flux to 1e-9 and was held downstream; <code>programmatic-inlet-flux-2026-09-18</code> measured the flux excess on <code>programmatic_c</code> grids that the 2026-09-21 fix below removed, and <code>programmatic-inlet-flux-fixed-2026-09-21</code> measured the fixed inlet delivering the requested flux to 1e-9 on uniform and stretched <code>programmatic_c</code> grids of 8 and 16 cells across. Unit verified - <code>tests/test_workspace_lifecycle.py</code> checks that a generated profile on a stretched <code>programmatic_c</code> grid is normalized on its face areas and re-identifies when the grid settings change.</p>
+<p><b>Limitations.</b> The profile is steady: it is imposed once and held, with no time variation. A generated profile is sampled at the target grid's face centres and normalized by face area on every grid mode. On <code>programmatic_c</code>, which the simulator builds itself, the target is the single-block bridge grid written with the solver's own node formula, so a multi-block <code>programmatic_c</code> case with a generated profile is refused at validation. Before 2026-09-21 a <code>programmatic_c</code> profile was sampled at uniform logical points and normalized to its continuous mean, and the inlet delivered roughly <code>2/n</code> too much flux for <code>n</code> cells across - 12% at 16 cells.</p>
 <h2><a class="anchor" id="p44_cap_conservation_sub"></a>
 conservation</h2>
 <p><a class="anchor" id="p44_cap_conservation"></a> <b>Identity.</b> <code>handler: conservation</code> on an <code>OUTLET</code> face -&gt; <code>BC_HANDLER_OUTLET_CONSERVATION</code> -&gt; <a class="el" href="BC__Handlers_8h.html#ae2dfaf7f6a717cda068b4990fb3ccd8b">Create_OutletConservation</a>.</p>
@@ -280,7 +276,7 @@ conservation</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Outlet has the lowest boundary priority, so inlet and wall win at shared edges. There must be an inlet, or a driven periodic pair, for the outlet to conserve against.</p>
 <p><b>Diagnostics.</b> The inlet/outlet flux balance is reported at startup and is the first thing to check when mass appears not to be conserved.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: outflow matched inflow to 1e-9 in a laminar square duct.</p>
 <p><b>Limitations.</b> <code>BC_HANDLER_OUTLET_PRESSURE</code>, a pressure-specified outlet, exists in the C enum but is not exposed.</p>
 <h2><a class="anchor" id="p44_cap_geometric_sub"></a>
 geometric</h2>
@@ -290,8 +286,8 @@ geometric</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Periodic axes are derived from paired <code>PERIODIC</code> boundary conditions before DMDA creation, so both faces of the pair must declare it and the grid must satisfy the translation contract. See <a class="el" href="p54_geometric_periodic.html#p54_grid_sec">2. Grid Contract</a>.</p>
 <p><b>Diagnostics.</b> The startup banner reports the BC-derived periodic axes and each validated translation.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code>. Regression verified - <code>make smoke-periodic</code>. Production exercised in the decaying-isotropic-turbulence example.</p>
-<p><b>Limitations.</b> Requires a matching translation between the paired faces; a grid that is not truly periodic is rejected rather than approximated.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code>. Regression verified - <code>make smoke-periodic</code>. Production exercised in the decaying-isotropic-turbulence example. Analytically verified - <code>tgv2d-picard-order-2026-09-18</code> on a triply periodic box, <code>periodic-channel-laminar-picard-2026-09-18</code> on a doubly periodic channel, and <code>pipe-poiseuille-curvilinear-2026-09-18</code> across the ends of a curvilinear pipe, each at second order.</p>
+<p><b>Limitations.</b> Requires a matching translation between the paired faces; a grid that is not truly periodic is rejected rather than approximated. The wall-bounded pseudo-time stall once recorded here did not reproduce at current code (<a class="el" href="p54_geometric_periodic.html#p54_driven_limits_sub">5.7 Known limitations</a>).</p>
 <h2><a class="anchor" id="p44_cap_constant_flux_sub"></a>
 constant_flux</h2>
 <p><a class="anchor" id="p44_cap_constant_flux"></a> <b>Identity.</b> <code>handler: constant_flux</code> on a <code>PERIODIC</code> face pair -&gt; <code>BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a91385da2fa73795886c2bf881d464e2e">Create_PeriodicDrivenConstant</a>.</p>
@@ -301,8 +297,8 @@ constant_flux</h2>
 <dl class="section warning"><dt>Warning</dt><dd><code>target_flux</code> is a <b>volumetric</b> flux - the bulk velocity <code>U_b</code> times the cross-sectional area - not a velocity. Supplying a velocity here silently produces a flow at the wrong Reynolds number.</dd></dl>
 <p><b>Interactions.</b> Both faces of the pair must carry the same driven handler. The target is re-read from the bcs file on every run, so editing it between restart segments takes effect - deliberately unlike <code>initial_flux</code>. <code>enforce_seam_flux</code> enables a second, local actuator at the seam plane; it is off by default because it can reintroduce divergence the pressure solve just removed.</p>
 <p><b>Diagnostics.</b> The applied body force and the measured flux are logged each step. <code>Bcs.Uch</code> records the seam correction whether or not it is applied, so you can see whether you need it before enabling it.</p>
-<p><b>Evidence.</b> Regression verified - <code>tests/smoke/run_driven_periodic_regression.sh</code> and <code>make smoke-driven-periodic</code>. Benchmark characterized against a laminar channel with an exact answer.</p>
-<p><b>Limitations and full treatment.</b> The control law, update cadence and its consequences for both momentum solvers, the restart contract, and the worked validation cases are documented at <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>. That page also carries the current convergence caveat for periodic wall-bounded flow, which you should read before planning a campaign.</p>
+<p><b>Evidence.</b> Regression verified - <code>tests/smoke/run_driven_periodic_regression.sh</code> and <code>make smoke-driven-periodic</code>. Analytically verified - <code>periodic-channel-laminar-picard-2026-09-18</code>: on a laminar channel the applied force matches <code>3 nu U_b / h^2</code> to 0.18% at the finest grid, the profile converges at second order, and the bulk velocity converges to the controller law below; <code>explicit-rk4-order-2026-09-21</code> finds the same law under Explicit RK4.</p>
+<p><b>Limitations and full treatment.</b> The proportional controller settles below its target, at <code>U_target / (1 + 3 nu dt / (2.7 h^2))</code> on a laminar channel - 10% low at <code>dt = 1</code>, <code>nu = 0.1</code>, <code>h = 1</code> - so choose <code>dt</code> small against <code>h^2 / nu</code> or set the target above the flux wanted. The control law, update cadence and its consequences for both momentum solvers, the restart contract, and the worked validation cases are documented at <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>.</p>
 <h2><a class="anchor" id="p44_cap_initial_flux_sub"></a>
 initial_flux</h2>
 <p><a class="anchor" id="p44_cap_initial_flux"></a> <b>Identity.</b> <code>handler: initial_flux</code> on a <code>PERIODIC</code> face pair -&gt; <code>BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a8dcdc50153bc8e9aeb4581563757bde9">Create_PeriodicDrivenInitial</a>.</p>
@@ -311,8 +307,8 @@ initial_flux</h2>
 <p><b>Parameters it owns.</b> <code>enforce_seam_flux</code> only (optional, default false; <code>apply_trim</code> is accepted as a deprecated alias, exactly as for <code>constant_flux</code>). <code>target_flux</code> is <b>rejected</b>, not ignored: accepting it would make the two driven handlers indistinguishable in a case file.</p>
 <p><b>Interactions.</b> Both faces of the pair must carry the same driven handler. The measured target is written to the checkpoint and restored on restart, so a resumed run holds the original target rather than re-measuring a drifted one. Checkpoints written before that metadata existed have no entry; the controller then re-measures and says so in the log.</p>
 <p><b>Diagnostics.</b> The latched target is reported once when measured and again when restored from a checkpoint. A restart that re-measures instead of restoring is logged explicitly.</p>
-<p><b>Evidence.</b> Regression verified - <code>make smoke-driven-periodic</code>. Production exercised in the driven-channel examples.</p>
-<p><b>Limitations and full treatment.</b> See <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>, including the convergence caveat for periodic wall-bounded flow.</p>
+<p><b>Evidence.</b> Regression verified - <code>make smoke-driven-periodic</code>. Production exercised in the driven-channel examples. Analytically verified - <code>periodic-channel-laminar-picard-2026-09-18</code>: gives the same field as <code>constant_flux</code> with the same target, to round-off, and reproduces the laminar profile at second order; <code>pipe-poiseuille-curvilinear-2026-09-18</code> drives Hagen-Poiseuille flow with it on a curvilinear pipe.</p>
+<p><b>Limitations and full treatment.</b> Shares <code>constant_flux</code>'s controller and its shortfall below target (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_constant_flux">p44_cap_constant_flux</a>). See <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>.</p>
 <h1><a class="anchor" id="p44_nondim_sec"></a>
 5. Non-Dimensionalization Before C Input</h1>
 <p><code>picurv</code> converts physical BC values to solver-scale values before writing <code>bcs.run</code>:</p>
@@ -354,7 +350,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="line">      source:</div>
 <div class="line">        type: file</div>
 <div class="line">        path: profiles/inlet.picslice</div>
-</div><!-- fragment --><p>For multi-block cases, keep using the existing list-of-lists <code>boundary_conditions</code> shape. Each block face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per block face and writes <code>source_file=...</code> into that block's <code>bcs_block*.run</code>.</p>
+</div><!-- fragment --><p>Each face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per face and writes <code>source_file=...</code> into the run's <code>bcs.run</code>.</p>
 <p>Generated profiles currently support analytical square-duct Poiseuille flow:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
@@ -375,7 +371,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><code>-Zeta/+Zeta</code>: <code>(JM - 1, IM - 1)</code>, ordered <code>(j, i)</code></li>
 </ul>
 <p>For <code>grid.mode: grid_gen</code>, <code>picurv run --solve</code> generates the grid first, then reads the generated <code>PICGRID</code> header to size the profile. For <code>grid.mode: file</code>, it reads the source <code>PICGRID</code> header. Generated dimensional profiles and <code>profile.info</code> are written under <code>&lt;run.config&gt;/</code>, then the staged solver-scale <code>.picslice</code> is referenced from <code>bcs.run</code>.</p>
-<p>For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. When a canonical target <code>PICGRID</code> is available, <code>picurv</code> evaluates the analytical profile at target inlet face centers and rescales it using geometric quad face areas so <code>sum(u * area) / sum(area)</code> matches <code>bulk_velocity</code>. <code>profile.info</code> records the normalization mode, sampling mode, area-weighted mean before and after normalization, total inlet area, face-area range, and discrete sample mean. If no target grid is available yet, generation falls back to continuous-area normalization on uniform logical sample points. Exact C metric-vector area matching is a future refinement; the current Python path uses geometric quad areas from the target grid coordinates.</p>
+<p>For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. <code>picurv</code> evaluates the analytical profile at the target inlet face centers and rescales it using geometric quad face areas so <code>sum(u * area) / sum(area)</code> matches <code>bulk_velocity</code>. The target is the grid file for <code>file</code>, the generated grid for <code>grid_gen</code>, and for <code>programmatic_c</code> the bridge <code>PICGRID</code> built from <code>programmatic_settings</code> with the formula the solver uses, so its stretching is honoured. <code>profile.info</code> records the normalization mode, sampling mode, area-weighted mean before and after normalization, total inlet area, face-area range, and discrete sample mean. Only <code>profile.gen</code> run by hand without <code>--target-grid</code> falls back to continuous-area normalization on uniform logical sample points, and <code>profile.info</code> then says so. The areas are geometric quad areas computed from the target grid coordinates, not the C metric face-area vectors.</p>
 <p>Field-sliced profiles reuse an existing Cartesian velocity field as a new inlet:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>

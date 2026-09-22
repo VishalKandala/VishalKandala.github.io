@@ -92,13 +92,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p22_formulation_sec">1. Curvilinear Formulation Context</a></li>
 <li class="level1"><a href="#p22_setup_sec">2. Grid and Metric Build Pipeline</a></li>
-<li class="level1"><a href="#p22_ibm_sec">3. Immersed-Boundary Role In Current Code</a></li>
-<li class="level1"><a href="#p22_literature_sec">4. Literature Anchors</a></li>
-<li class="level1"><a href="#p22_practical_sec">5. What This Means For Users</a></li>
-<li class="level1"><a href="#p22_refs_sec">6. Related Pages</a></li>
+<li class="level1"><a href="#p22_literature_sec">3. Literature Anchors</a></li>
+<li class="level1"><a href="#p22_practical_sec">4. What This Means For Users</a></li>
+<li class="level1"><a href="#p22_refs_sec">5. Related Pages</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_CURVIB_Method"></a> PICurv solves flow on structured curvilinear grids and applies immersed-boundary-aware logic in metric, pressure, and projection stages.</p>
+<div class="textblock"><p><a class="anchor" id="_CURVIB_Method"></a> PICurv solves flow on structured curvilinear grids using the curvilinear formulation of CURVIB. It has no immersed-boundary capability.</p>
 <h1><a class="anchor" id="p22_formulation_sec"></a>
 1. Curvilinear Formulation Context</h1>
 <p>The code evolves contravariant flux-like velocity components (<code>Ucont</code>) and derives Cartesian velocity (<code>Ucat</code>) as needed. Curvilinear metrics map physical derivatives to computational coordinates:</p>
@@ -119,7 +118,7 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <li>coordinate assignment: <a class="el" href="grid_8h.html#ab2aef4bb6fc2d2223a52ff6a45c7c600">AssignAllGridCoordinates</a></li>
 <li>face metrics: <a class="el" href="Metric_8h.html#a6f0dfb324211e230a387501f93cfd316">ComputeFaceMetrics</a></li>
 <li>cell-centered Jacobian inverse: <a class="el" href="Metric_8h.html#a92d28e2f14645b0eb563144f4ccf2b49">ComputeCellCenteredJacobianInverse</a></li>
-<li>orientation checks/fixups: <a class="el" href="Metric_8h.html#a436bb94905ee06971f632571f5bc8cbb">CheckAndFixGridOrientation</a></li>
+<li>orientation check, which refuses a uniformly left-handed grid rather than repairing it: <a class="el" href="Metric_8h.html#a436bb94905ee06971f632571f5bc8cbb">CheckAndFixGridOrientation</a></li>
 </ul>
 <p>Useful geometric helper for BC and flux logic:</p>
 <ul>
@@ -131,16 +130,8 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <li><a class="el" href="Metric_8h.html#a017960b0e845bf403e78b81d4c6cccdc">ComputeCellEdgeVectors</a> returns the covariant edge vector along each grid direction, direction and length together, which the Vreman model projects the velocity gradient onto.</li>
 </ul>
 <p><a class="el" href="Metric_8h.html#a75854e9f2d8b34a30be940ec7e722ef0">ComputeCellCharacteristicLengthScale</a> returns the Cartesian components of the cell diagonal instead. Those change when the same cell is rotated, which is why no subgrid path uses it; it has no production caller.</p>
-<h1><a class="anchor" id="p22_ibm_sec"></a>
-3. Immersed-Boundary Role In Current Code</h1>
-<p>The current branch keeps immersed-boundary hooks in solver paths, while several IBM-specific calls are conditional or currently inactive in default runs. In practice:</p>
-<ul>
-<li>geometry masking uses <code>Nvert</code>/solid markers in key kernels,</li>
-<li>Poisson and projection stencils include boundary-aware logic,</li>
-<li>IBM-specific interpolation hooks remain extension points for fully active IBM runs.</li>
-</ul>
 <h1><a class="anchor" id="p22_literature_sec"></a>
-4. Literature Anchors</h1>
+3. Literature Anchors</h1>
 <p>Relevant CURVIB references for this code path:</p>
 <ul>
 <li>Borazjani I, Ge L, Sotiropoulos F. "Curvilinear immersed boundary method for simulating fluid structure interaction with complex 3D rigid bodies." <em>Journal of Computational Physics</em> 227(16), 7587-7620 (2008). DOI: <code>10.1016/j.jcp.2008.04.024</code>.</li>
@@ -149,10 +140,10 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 <p>PICurv implementation notes:</p>
 <ul>
 <li>PICurv follows the same curvilinear metric-centered philosophy (precomputed geometric tensors and metric-aware operators).</li>
-<li>the current branch emphasizes stable production paths for structured curvilinear flow + particle workflows, while preserving immersed-boundary extension hooks for deeper IBM/FSI development.</li>
+<li>PICurv implements the curvilinear formulation these references build on, together with the particle workflows; it does not implement their immersed-boundary or fluid-structure components.</li>
 </ul>
 <h1><a class="anchor" id="p22_practical_sec"></a>
-5. What This Means For Users</h1>
+4. What This Means For Users</h1>
 <p>You mainly control CurvIB behavior through:</p>
 <ul>
 <li>grid generation/ingestion choice,</li>
@@ -162,7 +153,7 @@ J^{-1} = \frac{\partial(\xi,\eta,\zeta)}{\partial(x,y,z)}.
 </ul>
 <p>Even when users never interact with metric tensors directly, they govern stability, pressure correction quality, and particle coupling accuracy.</p>
 <h1><a class="anchor" id="p22_refs_sec"></a>
-6. Related Pages</h1>
+5. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="20_Grid_Cell_Architecture_Guide.html">Grid, Cell, and Variable Architecture Guide</a></b></li>
 <li><b><a class="el" href="23_Fractional_Step_Method.html">Fractional-Step (Projection) Method</a></b></li>

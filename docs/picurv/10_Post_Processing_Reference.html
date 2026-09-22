@@ -174,8 +174,9 @@ run_control:
 
   # (Optional) The interval for processing steps (e.g., 100 means process
   # steps 0, 100, 200...). Defaults to 1.
-  # Must be a multiple of monitor.yml -&gt; io.data_output_frequency: the solver only
-  # commits a checkpoint at that cadence, so a finer stride names steps that were
+  # Must be positive. For a single checkpoint, set start_step = end_step and use 1.
+  # For multiple checkpoints, use a multiple of monitor.yml -&gt; io.data_output_frequency:
+  # the solver only commits at that cadence, so a finer stride names steps that were
   # never written. Validation rejects a mismatch rather than letting the run stop
   # at the first missing step.
   # Maps to 'timeStep' in the generated C-side post.run recipe.
@@ -203,9 +204,12 @@ global_operations:
 eulerian_pipeline:
 
   # Computes the Q-Criterion for vortex identification.
-  # Creates a new field named "Qcrit".
+  # Creates a new cell-centred field named "Qcrit"; average it to nodes (below) before writing it.
   # Invokes the C function: `ComputeQCriterion()`.
   - task: q_criterion
+  - task: nodal_average
+    input_field: 'Qcrit'
+    output_field: 'Qcrit_nodal'
 
   # (Optional) Performs cell-to-node averaging on specified fields.
   # For each field in the list (e.g., 'P'), this computes a new field
@@ -397,11 +401,12 @@ io:
 
   # (Required) List of Eulerian fields to save to the output .vts files.
   # You can include original fields ('P', 'Ucat') and newly computed fields
-  # from the pipeline ('Qcrit', 'P_nodal', 'Ucat_nodal').
+  # from the pipeline ('Qcrit_nodal', 'P_nodal', 'Ucat_nodal'). Cell-centred fields such as
+  # 'Qcrit' cannot be written directly: nodal-average them first.
   # Maps to 'output_fields_instantaneous' in post.run.
   eulerian_fields:
     - 'Ucat_nodal'
-    - 'Qcrit'
+    - 'Qcrit_nodal'
     - 'P_nodal'
 
   # (Optional) A master switch for all particle-related output. Defaults to false.
@@ -448,6 +453,9 @@ io:
 <div class="line">    input_field: Ucat</div>
 <div class="line">    output_field: Ucat_nodal</div>
 <div class="line">  - task: q_criterion</div>
+<div class="line">  - task: nodal_average</div>
+<div class="line">    input_field: Qcrit</div>
+<div class="line">    output_field: Qcrit_nodal</div>
 <div class="line"> </div>
 <div class="line">lagrangian_pipeline:</div>
 <div class="line">  - task: specific_ke</div>
@@ -475,7 +483,7 @@ io:
 <div class="line">  output_filename_prefix: &quot;Field&quot;</div>
 <div class="line">  particle_filename_prefix: &quot;Particle&quot;</div>
 <div class="line">  output_particles: true</div>
-<div class="line">  eulerian_fields: [Ucat_nodal, Qcrit]</div>
+<div class="line">  eulerian_fields: [Ucat_nodal, Qcrit_nodal]</div>
 <div class="line">  particle_fields: [velocity, SpecificKE]</div>
 </div><!-- fragment --><h1><a class="anchor" id="p10_run_control_sec"></a>
 2. run_control</h1>
@@ -484,7 +492,8 @@ io:
 <li><code>end_step</code> -&gt; <code>endTime</code></li>
 <li><code>step_interval</code> -&gt; <code>timeStep</code></li>
 </ul>
-<p><b>Requested steps must be steps the solver committed.</b> The solver writes a checkpoint every <code>monitor.yml -&gt; io.data_output_frequency</code> completed steps, plus the initial and final states. <code>step_interval</code> must therefore be a multiple of that cadence; a finer stride names steps that were never written, and post-processing stops at the first one it cannot find rather than skipping it. <code>picurv validate</code> rejects a mismatch, and warns when <code>start_step</code> is off cadence — that one is only valid if it is the run's own starting step, which is committed off cadence.</p>
+<p><code>step_interval</code> must be positive; zero and negative values are rejected by both YAML validation and the C postprocessor. To process one checkpoint, set <code>start_step</code> and <code>end_step</code> to that checkpoint and use <code>step_interval: 1</code>.</p>
+<p><b>Requested steps must be steps the solver committed.</b> The solver writes a checkpoint every <code>monitor.yml -&gt; io.data_output_frequency</code> completed steps, plus the initial and final states. A selection requesting multiple checkpoints must use an interval that is a multiple of that cadence. A bounded selection containing only one checkpoint is exempt from this alignment check. An off-cadence <code>start_step</code> draws a warning because it may be an initial or final checkpoint; the selected checkpoint must still exist. Post-processing stops at the first missing checkpoint rather than skipping it.</p>
 <p>Operational semantics when launched through <code>picurv</code>:</p><ul>
 <li>keep <code>start_step</code> and <code>end_step</code> as the full logical analysis window you want the recipe to represent.</li>
 <li><code>picurv run --post-process --continue --run-dir ... --post post.yml</code> computes an internal effective start step for the same recipe lineage, so you do not need to keep editing <code>start_step</code> during batch catch-up.</li>
@@ -506,7 +515,7 @@ io:
 <li><code>normalize_field</code> -&gt; <code>NormalizeRelativeField:&lt;field&gt;</code></li>
 </ul>
 <p>Global operation:</p><ul>
-<li><code>global_operations.dimensionalize: true</code> prepends <code>DimensionalizeAllLoadedFields</code> and reports every derived product in physical units. It reaches three producers: the field pipeline scales loaded fields, the accumulator scales derived statistics, and the spectra generator scales its own outputs.</li>
+<li><code>global_operations.dimensionalize: true</code> prepends <code>DimensionalizeAllLoadedFields</code> and reports every derived product in physical units. It reaches three producers: the field pipeline scales loaded fields, the accumulator scales derived statistics, and the spectra generator scales its own outputs. Each quantity is scaled once: grid coordinates by <code>L_ref</code>, <code>Ucat</code> and <code>Ucont</code> by <code>U_ref</code>, <code>P</code> by <code>rho U_ref^2</code>, particle positions by <code>L_ref</code> and velocities by <code>U_ref</code> before the Lagrangian tasks run, and <code>Qcrit</code> by <code>(U_ref / L_ref)^2</code>. The <code>msd</code> statistic is the exception: it runs before particle positions are scaled and stays non-dimensional, because it is compared against the non-dimensional diffusivity <code>1 / (Re Sc)</code>.</li>
 </ul>
 <p>Lagrangian tasks (<code>lagrangian_pipeline</code>):</p><ul>
 <li><code>specific_ke</code> -&gt; <code>ComputeSpecificKE:&lt;in&gt;&gt;&lt;out&gt;</code></li>
@@ -532,8 +541,8 @@ q_criterion</h2>
 <p><b>Parameters it owns.</b> None. It reads the loaded velocity field and writes one derived field.</p>
 <p><b>Interactions.</b> Requires <code>Ucat</code> to be loaded, which the standard source data provides. Order within <code>eulerian_pipeline</code> matters only against tasks that rewrite velocity; it does not consume the output of <code>nodal_average</code>.</p>
 <p><b>Diagnostics.</b> The derived field appears in the written <code>.vts</code> and in the post-processor's field listing. Its absence there means the task never ran.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>.</p>
-<p><b>Limitations.</b> Q is a diagnostic, not a threshold: the isovalue that reveals structure is flow-dependent and this task chooses none for you.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>. Analytically verified - <code>q-criterion-nodal-tgv-2026-09-18</code>: <code>Qcrit_nodal</code> matched the analytic Q of the TGV3D field to 3.2% RMS at the node positions a <code>.vts</code> assigns it.</p>
+<p><b>Limitations.</b> Q is a diagnostic, not a threshold: the isovalue that reveals structure is flow-dependent and this task chooses none for you. <code>Qcrit</code> is computed at cell centres, and a <code>.vts</code> carries point data only, so it cannot be written directly - validation refuses it. Follow the task with <code>nodal_average</code> from <code>Qcrit</code> to <code>Qcrit_nodal</code> and write that; averaging to nodes smooths it slightly, as it does every nodal field.</p>
 <h2><a class="anchor" id="p10_cap_eul_normalize_field_sub"></a>
 normalize_field</h2>
 <p><a class="anchor" id="p10_cap_eul_normalize_field"></a> <b>Identity.</b> <code>eulerian_pipeline: [{task: normalize_field, field: P, reference_point: [i,j,k]}]</code> -&gt; <code>NormalizeRelativeField:&lt;field&gt;</code>.</p>
@@ -542,17 +551,17 @@ normalize_field</h2>
 <p><b>Parameters it owns.</b> <code>field</code> (currently <code>P</code> only) and <code>reference_point</code>, a three-item cell index that becomes <code>reference_ip/jp/kp</code>.</p>
 <p><b>Interactions.</b> Applies to the loaded field before any writer sees it. Choosing a reference point inside a recirculation or a boundary layer makes the normalized field harder to compare, not easier - prefer a quiescent interior cell.</p>
 <p><b>Diagnostics.</b> The written field carries the same name; the difference is visible as a shifted range. A reference point outside the block is a validation error naming the index.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>. Analytically verified - <code>post-pipeline-dimensionalize-2026-09-21</code>: <code>P</code> normalized at a cell and averaged to nodes equals the nodal mean of <code>P - P[4,4,4]</code> to 2.2e-16, and scales by <code>rho U_ref^2</code> exactly once when dimensionalized.</p>
 <p><b>Limitations.</b> Only <code>P</code> is accepted today, and the reference point is a fixed index rather than a coordinate, so it does not follow a moving feature or survive a grid change.</p>
 <h2><a class="anchor" id="p10_cap_eul_nodal_average_sub"></a>
 nodal_average</h2>
 <p><a class="anchor" id="p10_cap_eul_nodal_average"></a> <b>Identity.</b> <code>eulerian_pipeline: [{task: nodal_average, input_field: X, output_field: Y}]</code> -&gt; <code>CellToNodeAverage:X&gt;Y</code>.</p>
-<p><b>What it does.</b> Averages a cell-centred field onto grid nodes, writing the result as a separate named field.</p>
+<p><b>What it does.</b> Averages a cell-centred field onto grid nodes, writing the result as a separate named field. Accepted inputs are <code>P</code>, <code>Ucat</code>, <code>Psi</code>, and <code>Qcrit</code>, written to <code>P_nodal</code>, <code>Ucat_nodal</code>, <code>Psi_nodal</code>, and <code>Qcrit_nodal</code>; a <code>.vts</code> carries point data only, so a cell-centred field reaches the file through this task.</p>
 <p><b>When to choose it.</b> When a downstream consumer expects nodal data - some visualisation filters and line-extraction tools interpolate badly from cell data - or when comparing against a reference that is defined at nodes. Leave cell fields alone otherwise: averaging is a smoothing operation and loses information.</p>
 <p><b>Parameters it owns.</b> <code>input_field</code> and <code>output_field</code>, which must differ. The audit rejects an in-place average because it would destroy the source the rest of the pipeline reads.</p>
 <p><b>Interactions.</b> Runs after any task that produces the input field, so a <code>q_criterion</code> output can be averaged by listing <code>nodal_average</code> later in the pipeline.</p>
 <p><b>Diagnostics.</b> Both fields appear in the written <code>.vts</code>. A missing output field means the input name did not match anything loaded.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>. Analytically verified - <code>post-pipeline-dimensionalize-2026-09-21</code>: <code>Ucat_nodal</code> equals the eight-cell mean, ghost cells included, to 2.2e-16; <code>q-criterion-nodal-tgv-2026-09-18</code> measures the smoothing it adds to <code>Qcrit_nodal</code>.</p>
 <p><b>Limitations.</b> Averaging is a low-pass filter: peak values move toward their neighbourhood mean, so nodal fields understate extrema and should not be used for max-value claims.</p>
 <h1><a class="anchor" id="p10_cap_lag_sec"></a>
 4.2 Lagrangian Post-Processing Kernel Entries</h1>
@@ -573,7 +582,7 @@ specific_ke</h2>
 <p><b>Parameters it owns.</b> <code>input_field</code> (a particle vector field, typically the particle velocity) and <code>output_field</code> (the scalar to write).</p>
 <p><b>Interactions.</b> Reads a swarm field, so it requires particle data in the source bundle. It does not interact with the Eulerian pipeline, which runs over a different data structure.</p>
 <p><b>Diagnostics.</b> The derived scalar appears in the written particle output. An input name that matches no swarm field leaves the output absent rather than zero.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post</code>. Analytically verified - <code>post-pipeline-dimensionalize-2026-09-21</code>: half the squared particle velocity exactly, and <code>U_ref^2</code> times that when dimensionalized.</p>
 <p><b>Limitations.</b> Specific energy per particle, not per unit mass of a distribution: it carries no particle mass or number weighting, so summing it across a swarm is not a physical total unless every particle represents the same mass.</p>
 <h1><a class="anchor" id="p10_stats_sec"></a>
 5. Particle Statistics Pipeline</h1>
@@ -637,6 +646,7 @@ specific_ke</h2>
 <tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_rms"><code>rms</code></a></td><td class="markdownTableBodyNone"><code>rms</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_tke"><code>tke</code></a></td><td class="markdownTableBodyNone"><code>tke</code></td></tr>
 </table>
+<p>Every output below was checked against a known answer by <code>field-statistics-tgv3d-2026-09-21</code>: on the analytic TGV3D field, each written value equals the eight-cell average of the exact cell statistic to round-off. Written fields are node averages of cell statistics, so a nodal <code>rms</code> is the mean of the neighbouring cell RMS values, not the root of an averaged variance. None has yet been compared against a turbulent reference profile.</p>
 <dl class="section note"><dt>Note</dt><dd>**<code>formats</code> is a parameter, not a choice between behaviours.** <code>vtk</code> writes the derived fields listed below into the window's bundle; <code>csv</code> appends one row per processed step carrying sample count, total weight, represented time, the per-point valid-fraction range, and the mean turbulent kinetic energy. Both are written from the same accumulated state, so requesting both costs output volume rather than computation. The <code>csv</code> is the artefact that answers whether a window converged; the <code>vtk</code> is the one that shows what it converged to. <code>tests/tooling/family_census.json</code> records why this is classified as a parameter of these entries rather than as a family of its own.</dd></dl>
 <h2><a class="anchor" id="p10_cap_fso_mean_sub"></a>
 mean</h2>
@@ -646,7 +656,7 @@ mean</h2>
 <p><b>Parameters it owns.</b> None. The fields averaged, the window bounds, and the weighting are properties of the window, not of this output.</p>
 <p><b>Interactions.</b> Requires an accumulated window. Reads the same state <code>reynolds_stress</code>, <code>rms</code>, and <code>tke</code> are derived from, so requesting several outputs costs one accumulation.</p>
 <p><b>Diagnostics.</b> Written into the window's <code>vtk</code> bundle; the <code>csv</code> row reports the sample count and total weight behind it.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: the window mean of <code>Ucat</code> and <code>P</code> equals the exact weighted mean of the sampled states to 7e-16.</p>
 <p><b>Limitations.</b> A mean over a window that has not converged is still a mean: the output carries no statement about whether the averaging interval was long enough. The <code>csv</code> convergence history is what answers that.</p>
 <h2><a class="anchor" id="p10_cap_fso_reynolds_stress_sub"></a>
 reynolds_stress</h2>
@@ -656,7 +666,7 @@ reynolds_stress</h2>
 <p><b>Parameters it owns.</b> None; it is derived from the accumulated second moment.</p>
 <p><b>Interactions.</b> Requires the window to accumulate second moments. <code>rms</code> and <code>tke</code> are functions of the same tensor, so requesting all three adds output volume, not computation.</p>
 <p><b>Diagnostics.</b> Six fields per window in the <code>vtk</code> bundle. One window carrying every output already writes fifteen fields against a per-file limit of twenty, which is why windows cannot share a file.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: all six <code>Ucat</code> components and the <code>P</code> variance equal their exact weighted values to 3e-18.</p>
 <p><b>Limitations.</b> Off-diagonal components converge more slowly than the diagonal, so a window long enough for <code>rms</code> is not necessarily long enough for the shear stress.</p>
 <h2><a class="anchor" id="p10_cap_fso_rms_sub"></a>
 rms</h2>
@@ -666,7 +676,7 @@ rms</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Derived from the same second moment as <code>reynolds_stress</code> and <code>tke</code>. Small negative variances from floating-point cancellation are clamped only when taking the square root, and only within a documented tolerance - stored state is never mutated.</p>
 <p><b>Diagnostics.</b> Three fields per window. The <code>csv</code> row's valid-fraction range is the check on whether every point had enough samples.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: <code>Ucat</code> and <code>P</code> RMS values equal their exact values to 5e-17.</p>
 <p><b>Limitations.</b> The clamp means an RMS of exactly zero can mean 'no fluctuation' or 'variance below the cancellation floor'; the sample count distinguishes them.</p>
 <h2><a class="anchor" id="p10_cap_fso_tke_sub"></a>
 tke</h2>
@@ -676,17 +686,17 @@ tke</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> A scalar contraction of the same tensor <code>reynolds_stress</code> and <code>rms</code> come from. The <code>csv</code> output reports the mean value of this field per processed step, which is the convergence signal for the window as a whole.</p>
 <p><b>Diagnostics.</b> One field per window, plus the per-step mean in the <code>csv</code>.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: the written TKE equals its exact value to 2e-18, and the CSV <code>mean_tke</code> to 3.7e-12.</p>
 <p><b>Limitations.</b> Being a trace, it is blind to anisotropy: two flows with very different stress structure can report the same k.</p>
 <h2><a class="anchor" id="p10_cap_fso_flux_sub"></a>
 flux</h2>
 <p><a class="anchor" id="p10_cap_fso_flux"></a> <b>Identity.</b> <code>field_statistics.outputs: [flux]</code>.</p>
-<p><b>What it does.</b> Writes the centred cross-moment between velocity and a scalar, u_i'psi' = C_ipsi / W - the turbulent flux of that scalar.</p>
-<p><b>When to choose it.</b> When a scalar is being transported and the question is how turbulence moves it: heat flux, species flux, any gradient-transport closure being assessed. It requires a scalar to exist, so it is inert in a pure momentum run.</p>
-<p><b>Parameters it owns.</b> None of its own; which scalar is tracked is a property of the window.</p>
-<p><b>Interactions.</b> Requires scalar transport to be active and the scalar included in the window's tracked fields. Otherwise the cross-moment has nothing to accumulate.</p>
+<p><b>What it does.</b> Writes the centred cross-moment of each vector-scalar pair the window lists under <code>covariances</code>, u_i's' = C_is / W, one field per pair named <code>&lt;window&gt;_&lt;vector&gt;_&lt;scalar&gt;_flux</code>. With <code>Ucat</code> and <code>P</code> it is the velocity-pressure correlation u_i'p' that appears in the turbulent transport of kinetic energy; with <code>Ucat</code> and a transported scalar it is that scalar's turbulent flux.</p>
+<p><b>When to choose it.</b> When the question is how turbulence carries a quantity: the pressure-transport term of a kinetic-energy budget, or a heat, species or other scalar flux against which a gradient-transport closure is assessed.</p>
+<p><b>Parameters it owns.</b> None of its own; which pairs exist is a property of the window's <code>covariances</code> list.</p>
+<p><b>Interactions.</b> Requires at least one <code>covariances</code> entry on the window, both members cell-centred; a recipe asking for <code>flux</code> from a window without one is rejected before the run. A pair with a transported scalar produces a flux only when the particle scalar is non-zero, which today only the verification scalar source makes it (<a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a>).</p>
 <p><b>Diagnostics.</b> Three fields per window, one per velocity component.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: the <code>Ucat</code>-<code>P</code> co-moment equals its exact value to 1.4e-18.</p>
 <p><b>Limitations.</b> A cross-moment converges more slowly than either factor's own variance, so flux is the output most likely to be under-converged in a given window.</p>
 <h1><a class="anchor" id="p10_stat_entries_sec"></a>
 7. Particle Statistics Task Entries</h1>
@@ -701,14 +711,14 @@ flux</h2>
 </table>
 <h2><a class="anchor" id="p10_cap_stat_msd_sub"></a>
 msd</h2>
-<p><a class="anchor" id="p10_cap_stat_msd"></a> <b>Identity.</b> Statistics pipeline task <code>msd</code> -&gt; <code>ComputeMSD</code>.</p>
-<p><b>What it does.</b> Computes the mean squared displacement of the particle swarm over time and writes it as a CSV time series.</p>
+<p><a class="anchor" id="p10_cap_stat_msd"></a> <b>Identity.</b> Statistics pipeline task <code>msd</code> -&gt; pipeline keyword <code>ComputeMSD</code> -&gt; <a class="el" href="particle__statistics_8h.html#acfb130aeba6e6d430c0ca599b34e38d4">ComputeParticleMSD</a>.</p>
+<p><b>What it does.</b> Computes the mean squared displacement of the particle swarm over time and writes it as a CSV time series, together with the cloud's centre of mass. Displacement is measured from the configured point source (<code>point_source.x/y/z</code>), not from each particle's own start and not from the cloud's centre, so a drifting cloud's <code>MSD_total</code> includes its squared drift: the spread about the centre is <code>MSD_total - |com|^2</code>.</p>
 <p><b>When to choose it.</b> Characterizing dispersion. MSD against time is the standard way to read a diffusion coefficient out of a particle simulation, which is what the Brownian and drift verification cases do.</p>
 <p><b>Parameters it owns.</b> The statistics pipeline block that selects it; the output file name follows the configured statistics prefix.</p>
 <p><b>Interactions.</b> Requires particles. It reads particle positions only, so it is unaffected by the Eulerian field source.</p>
 <p><b>Diagnostics.</b> The emitted CSV is the diagnostic: a linear MSD in time indicates diffusive behaviour, a quadratic one indicates ballistic transport.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code> covers the MSD kernel including its empty-swarm behaviour.</p>
-<p><b>Limitations.</b> The only statistics task currently exposed. It is a whole-swarm measure with no spatial conditioning.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code> covers the MSD kernel including its empty-swarm behaviour. Analytically verified - <code>brownian-msd-2026-09-18</code>: the MSD slope of a Brownian cloud matched the Einstein relation to 0.17%.</p>
+<p><b>Limitations.</b> The only statistics task currently exposed. It is a whole-swarm measure with no spatial conditioning. It is meaningful only for <code>init_mode: PointSource</code>: with any other seeding the reference point would be the unset point source, the coordinate origin, so validation refuses <code>msd</code> for a seeded case that does not use <code>PointSource</code>.</p>
 <h1><a class="anchor" id="p10_spectra_sec"></a>
 8. spectra</h1>
 <p>Measures turbulent energy spectra from the instantaneous velocity in each committed checkpoint. Omit the block to measure nothing.</p>
@@ -733,7 +743,7 @@ Preconditions</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Task   </th><th class="markdownTableHeadNone">Status   </th><th class="markdownTableHeadNone">Requires    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>shell_spectrum</code>   </td><td class="markdownTableBodyNone">implemented   </td><td class="markdownTableBodyNone">every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid    </td></tr>
+<td class="markdownTableBodyNone"><code>shell_spectrum</code>   </td><td class="markdownTableBodyNone">supported   </td><td class="markdownTableBodyNone">every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">experimental   </td><td class="markdownTableBodyNone">two selected periodic uniform axes; remaining axis may stretch    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -753,7 +763,7 @@ Keys</h2>
 <li><code>symbol</code> selects the shell binning abscissa. Plane/line tasks require <code>continuum</code>. <code>continuum</code> bins by \(|k|\); <code>discrete</code> bins by the centered-difference symbol \(\sin(k\,\Delta x)/\Delta x\), which is what the solver's own operator resolves. Comparing a measured rolloff against the continuum abscissa alone will attribute the scheme's damping to physics.</li>
 <li><code>subtract_mean</code> chooses the fluctuation. <code>none</code> transforms the field as stored; <code>sample</code> removes the selected plane/line mean (plane/line tasks only); <code>domain</code> removes the arithmetic mean of all physical cells of that snapshot; <code>window:&lt;name&gt;</code> subtracts the accumulated mean of a field-statistics window, which is the better estimate wherever the flow is not homogeneous. A window mean is only defined where the window actually sampled, so a window that has not accumulated over the domain is refused rather than subtracted as zero.</li>
 <li><code>mean_source_step</code> pins the bundle the window mean is read from, independently of the step being transformed. It applies only to <code>window:&lt;name&gt;</code>. Left unset, each step reads its own bundle, whose mean is the <em>running</em> mean at that step — undefined at the moment the window activates, and built from few samples shortly after. Pin it to a step at or after the window closes to subtract the converged mean, which is almost always what is wanted. This mirrors <code>field_statistics.source_step</code>.</li>
-<li><code>block</code> selects the block; <code>field</code> is <code>Ucat</code>. <code>Ucont</code> is component-staggered and has no single cell-centered spectrum, per <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_products_sec">8. Further Products</a>.</li>
+<li><code>block</code> selects the block, which is always block 0; <code>field</code> is <code>Ucat</code>. <code>Ucont</code> is component-staggered and has no single cell-centered spectrum, so it is refused.</li>
 </ul>
 <p>Two tasks differing in task, field, block, symbol, or plane/line selection write different files and may coexist; two identical tasks are refused, since the second would overwrite the first.</p>
 <h2><a class="anchor" id="p10_spectra_outputs_sub"></a>
@@ -806,7 +816,7 @@ Viewing them</h2>
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_line_spectrum"><code>line_spectrum</code></a></td><td class="markdownTableBodyNone"><code>line_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_plane_spectrum"><code>plane_spectrum</code></a></td><td class="markdownTableBodyNone"><code>plane_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_shell_spectrum"><code>shell_spectrum</code></a></td><td class="markdownTableBodyNone"><code>shell_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_shell_spectrum"><code>shell_spectrum</code></a></td><td class="markdownTableBodyNone"><code>shell_spectrum</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
 <h2><a class="anchor" id="p10_cap_spec_shell_spectrum_sub"></a>
 shell_spectrum</h2>
@@ -816,8 +826,8 @@ shell_spectrum</h2>
 <p><b>Parameters it owns.</b> <code>field</code> (the vector field to transform), <code>block</code>, <code>symbol</code> (<code>continuum</code> or <code>discrete</code>, the binning abscissa), <code>subtract_mean</code> (<code>none</code>, <code>domain</code>, or <code>window:&lt;name&gt;</code>), and <code>mean_source_step</code> when a window mean is used.</p>
 <p><b>Interactions.</b> Requires a uniformly spaced, geometrically periodic, single-block domain, and <code>picurv validate</code> checks all three against the case <b>before any field is read</b>. Independent of <code>eulerian_pipeline</code>: it reads raw checkpoint payloads, so no field output stage is needed. <code>--only spectra</code> runs it alone.</p>
 <p><b>Diagnostics.</b> Writes one file per task per checkpoint under the configured <code>output_prefix</code>. A precondition failure is a validation error naming the violated requirement, not a silent empty spectrum.</p>
-<p><b>Evidence.</b> Implemented only. No shipped case gates a numerical acceptance on a measured spectrum, so nothing establishes the binning against a reference result.</p>
-<p><b>Limitations.</b> Experimental. Shell averaging assumes isotropy that a wall-bounded or bent geometry does not have, and <code>subtract_mean: window:&lt;name&gt;</code> depends on an accumulated window existing at the named step. No convergence or windowing guidance is established.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> runs the spectra generator's tests. Analytically verified - <code>post-spectra-analytic-2026-09-21</code>: three single modes on a 32-cubed periodic box landed in shells 2, 3 and 4 at exactly their energies, every other shell below 1e-32, with zero Parseval residual, and the dissipation, integral length and Taylor microscale each equal their closed forms; <code>initial-conditions-2026-09-21</code> recovered a spectral initial condition's envelope to 4.7%, energy-weighted. The same measurement found <code>picurv summarize --plot-spectrum</code> unable to find what a post recipe wrote, because recipes write into a subdirectory; it now searches there.</p>
+<p><b>Limitations.</b> Shell averaging assumes isotropy that a wall-bounded or bent geometry does not have, and <code>subtract_mean: window:&lt;name&gt;</code> depends on an accumulated window existing at the named step. Measured on single modes and one broadband seed; no convergence or windowing guidance for a turbulent spectrum is established here.</p>
 <h2><a class="anchor" id="p10_cap_spec_plane_spectrum_sub"></a>
 plane_spectrum</h2>
 <p><a class="anchor" id="p10_cap_spec_plane_spectrum"></a> <b>Identity.</b> <code>spectra.tasks[].task: plane_spectrum</code> dispatches <code>spectra.gen plane-spectrum</code>; no C task is added.</p>
