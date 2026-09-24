@@ -92,7 +92,10 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p66_reading_sec">1. How to Read It</a></li>
 <li class="level1"><a href="#p66_matrix_sec">2. The Matrix</a></li>
-<li class="level1"><a href="#p66_gaps_sec">3. Reading the Gaps</a></li>
+<li class="level1"><a href="#p66_gaps_sec">3. Reading the Gaps</a><ul><li class="level2"><a href="#p66_pvd_evidence">Physical-Time ParaView Collections (post.pipeline)</a></li>
+<li class="level2"><a href="#p66_scientific_gaps">Scientific Evidence Limits</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p66_updating_sec">4. Keeping It Current</a><ul><li class="level2"><a href="#p66_measurements_sub">4.1 Citing a Measurement That Already Happened</a></li>
 </ul>
 </li>
@@ -101,7 +104,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div>
 <div class="textblock"><p><a class="anchor" id="_Evidence_Matrix"></a>  <div class="pic-pagemeta"><span class="pic-pagemeta-item"><b>Type</b> Reference</span><span class="pic-pagemeta-item"><b>For</b>  Scientists assessing credibility</span><span class="pic-pagemeta-item"><b>Status</b>  Declared sources for every public capability</span></div></p>
 <p>What confidence this project claims for each capability in the families covered so far.</p>
-<p>The table is generated from the capability registry and now covers every public capability family the census recognises - 40 families, 131 canonical values.</p>
+<p>The table is generated from the capability registry and now covers every public capability family the census recognises - 39 families, 129 canonical values.</p>
 <dl class="section warning"><dt>Warning</dt><dd><b>Coverage is not credibility.</b> A complete table means every capability has been <em>asked</em> what evidence stands behind it, not that the answers are strong. Many rows carry a single facet, and some carry none. Read the gaps in section 3 before citing anything here.</dd></dl>
 <p>A method being <em>documented</em> says nothing about whether it has been <em>verified</em>, which is what this table is for.</p>
 <h1><a class="anchor" id="p66_reading_sec"></a>
@@ -258,6 +261,26 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Accepted spellings and latent values are omitted: they carry no evidence of their own beyond the canonical value they resolve to.</p>
 <h1><a class="anchor" id="p66_gaps_sec"></a>
 3. Reading the Gaps</h1>
+<h2><a class="anchor" id="p66_pvd_evidence"></a>
+Physical-Time ParaView Collections (post.pipeline)</h2>
+<p>PVD indexing is a presentation option within <code>post.pipeline</code>, so it has no separate selector-value row in the generated table. Its direct regression evidence is <code><a href="file:tests/test_cli_smoke.py">file:tests/test_cli_smoke.py</a></code>; run &lsquo;python3 -m pytest -q tests/test_cli_smoke.py -k 'paraview or lineage_enabled_post_plan&rsquo;`.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Checked behavior   </th><th class="markdownTableHeadNone">Direct test    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Toggling indexing preserves computational recipe identity   </td><td class="markdownTableBodyNone"><code>test_paraview_series_is_presentation_only_for_recipe_identity</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Checkpoint times, including a nonzero initial time, survive repeated collection growth   </td><td class="markdownTableBodyNone"><code>test_paraview_series_uses_checkpoint_physical_time_and_refreshes_live_output</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Nested A/B/C ancestry clips parents and selects the child at a fork   </td><td class="markdownTableBodyNone"><code>test_paraview_lineage_flattens_nested_branches_and_child_wins_fork</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Reinitialized particles start a new collection   </td><td class="markdownTableBodyNone"><code>test_paraview_particle_series_starts_at_branch_when_particles_reinitialize</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">A child's post plan starts at its first owned cadence step   </td><td class="markdownTableBodyNone"><code>test_lineage_enabled_post_plan_starts_at_child_owned_cadence</code>   </td></tr>
+</table>
+<p>These tests construct checkpoint metadata and visualization fixtures; they do not run a live concurrent solver or open ParaView. The nested test supplies nonuniform times and frame spacing under one recipe ID. It does not establish stitching across different post strides. <code>make smoke</code> exercises executable solver/post workflows and the supplied templates, but has no dedicated PVD-content assertions. PVD-specific Slurm execution, statistics carry/reset, interrupted-write recovery, pruned-checkpoint fallback, and a real ParaView reader session remain <b>not verified by this evidence</b>. The historical kernel measurements in the generated table do not establish these indexing properties. See <a class="el" href="10_Post_Processing_Reference.html#p10_io_sec">9. io</a> for the implementation's current contract.</p>
+<h2><a class="anchor" id="p66_scientific_gaps"></a>
+Scientific Evidence Limits</h2>
 <p>Four gaps in the current table are worth naming, because they are the ones most likely to matter:</p>
 <ul>
 <li><b>Analytical facets rest on single recorded measurements, and none is <code>reference</code>.</b> 85 values cite <code>measurement:</code> records - 24 distinct ones, taken between 2026-09-18 and 2026-09-22 - covering the Picard and Explicit RK4 solvers' orders, duct, channel and pipe Poiseuille flow, the Poisson options, every initial-condition mode, every particle seeding and restart mode, both interpolation methods, the post-processing kernels, field statistics, spectra, metric closure on every grid-generator feature, the workspace input import modes, and the four generated initial-condition providers. Each record states what it does not establish, and none is gated in CI. Five records are cited by no value: the two <code>not-met</code> ones (the Q-criterion output placement and the generated inlet flux on <code>programmatic_c</code> grids, both since fixed and re-measured), the superseded <code>inconclusive</code> drift measurement, and the paired drift and scalar-scatter measurements, which verify subsystems with no selector value to cite them. No capability has been compared against external reference data.</li>

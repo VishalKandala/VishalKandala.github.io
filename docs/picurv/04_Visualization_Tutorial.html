@@ -113,6 +113,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>After a successful run, the postprocessor writes visualization files under <code>&lt;run.visualization&gt;/&lt;recipe_id&gt;/</code>. The recipe id combines a readable output prefix with a stable digest of the recipe, so repeated use resumes the same result while different recipes coexist. <code>post.yml -&gt; io.output_directory</code> is runtime-managed and cannot redirect output outside this home.</p>
 <p>You will typically find:</p>
 <ul>
+<li>**Physical-time collections (<code>.pvd</code> files):** When <code>post.yml -&gt; io.paraview_series.enabled: true</code>, open the collection named after the output prefix, such as <code>eulerian_data.pvd</code> or <code>Particle.pvd</code>. Its time axis comes from committed checkpoints. With <code>scope: lineage</code>, it also references compatible visualization files in ancestor runs recorded by <code>--restart-from</code>.</li>
 <li>**Eulerian Grid Data (<code>.vts</code> files):** These are VTK Structured Grid files (e.g., <code>Field_000100.vts</code>). They contain the computational mesh and any data fields that live on that grid, such as velocity and pressure. When you open them in ParaView, they will be grouped as a time series.</li>
 <li>**Lagrangian <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Data (<code>.vtp</code> files):** These are VTK PolyData files (e.g., <code>Particle_000100.vtp</code>). They contain particle coordinates and particle fields. These files exist only when <code>post.yml -&gt; io.output_particles: true</code>.</li>
 </ul>
@@ -135,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ol>
 <h1><a class="anchor" id="p04_eulerian_recipes_sec"></a>
 3. Recipes for Visualizing Grid Data (.vts files)</h1>
-<p>Let's walk through the most common visualization techniques for the Eulerian grid data. First, open your <code>Field..vts</code> time series in ParaView and click <b>Apply</b>.</p>
+<p>Let's walk through the most common visualization techniques for the Eulerian grid data. Open the Eulerian <code>.pvd</code> collection and click <b>Apply</b>. If collection generation is disabled, open the numbered <code>.vts</code> group instead; filename grouping alone does not provide the checkpoint physical-time axis.</p>
 <h2><a class="anchor" id="p04_recipe_color_sec"></a>
 3.1. Recipe: Coloring by a Scalar Field</h2>
 <p>By default, the object is shown as a solid color. To color it by pressure:</p><ol type="1">
@@ -176,7 +177,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ol>
 <h1><a class="anchor" id="p04_lagrangian_recipes_sec"></a>
 4. Recipes for Visualizing Particle Data (.vtp files)</h1>
-<p>Load your <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a>..vtp</code> time series (if present) to visualize the Lagrangian particles.</p>
+<p>Load <code>Particle.pvd</code> (if present) to visualize the Lagrangian particles with physical time. Without a collection, load the numbered <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a>..vtp</code> group.</p>
 <ol type="1">
 <li><b>Change Representation:</b> In the Properties panel, find the <b>Representation</b> dropdown. Change it from "Surface" to <b>Point Gaussian</b>. This will render the particles as spheres. You can adjust the <b>Gaussian Radius</b> to change their size.</li>
 <li><b>Color by Velocity:</b> Use the Coloring dropdown in the toolbar to color the particles by <code>velocity</code> and <code>Magnitude</code>.</li>
@@ -194,6 +195,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>If particles were disabled in solver or post (<code>output_particles: false</code>), absence of <code>.vtp</code> files is expected.</li>
 <li>Statistics pipeline outputs (e.g., MSD CSV) are analysis files, not ParaView geometry files.</li>
 </ul>
+<p>To enable collections in an existing post recipe, add:</p>
+<div class="fragment"><div class="line">io:</div>
+<div class="line">  paraview_series:</div>
+<div class="line">    enabled: true</div>
+<div class="line">    scope: lineage</div>
+</div><!-- fragment --><p>Merge this block into the recipe's existing <code>io</code> mapping. Use <code>scope: run</code> for a collection confined to one run. Omitting the option disables collections; the standard analysis profiles explicitly enable them.</p>
+<p>Run the usual post-processing command, keeping the full desired analysis window. Postprocess ancestors with the same recipe before processing the child. Open the child's collection to see the retained ancestor frames followed by the child frames; the child owns the restart step. Repeating post <code>--continue</code> updates the collection through the currently available source frontier. Reopen the collection in ParaView to load its refreshed contents. Keep the referenced run directories accessible: the PVD contains relative links, not copies of the VTK data.</p>
+<p>See <a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a> for recipe compatibility, cadence, and restart reset rules. In particular, changing the post stride creates a different recipe; the index does not search other recipe directories automatically.</p>
 <p> 
 <div style="text-align:center; margin:1rem 0;">
   <img
