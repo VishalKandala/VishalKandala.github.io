@@ -148,13 +148,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 # Defines where to find the input data and which timesteps to process.
 # This section directly configures the main processing loop in the C executable.
 # ==============================================================================
-source_data:
-  # (Required) The directory containing the input solver data files (.dat).
-  #
-  # SPECIAL TOKEN: "&lt;solver_output_dir&gt;"
-  #   The picurv script replaces this with the solver's output directory.
-  #   This is the standard and recommended setting.
-  directory: "&lt;solver_output_dir&gt;"
+# The input directory is not configurable: picurv always reads the run's own
+# &lt;run.output&gt;, so a source_data.directory key is overwritten and plays no part in
+# the recipe identity. Omit it.
 
 run_control:
   # (Required) The first timestep in the logical analysis window.
@@ -237,11 +233,11 @@ eulerian_pipeline:
 lagrangian_pipeline:
   # A list of operations performed on particle data.
   # Computes the specific kinetic energy (0.5 * |v|^2) for each particle.
-  # Creates a new particle field named "specific_ke".
-  # Invokes the C function: `ComputeSpecificKE()`.
+  # Creates a new particle field named by output_field; list that same name in
+  # io.particle_fields to write it. Invokes the C function: `ComputeSpecificKE()`.
   - task: specific_ke
     input_field: 'velocity'
-    output_field: 'ske'
+    output_field: 'specific_ke'
 
 # --- Global Particle Statistics Pipeline ---
 # Optional reduction kernels that append CSV diagnostics per timestep.
@@ -250,7 +246,8 @@ statistics_pipeline:
   # Optional base name for CSV outputs (default: "Stats")
   output_prefix: "Stats"
   tasks:
-    # Mean-square displacement based on simCtx-&gt;psrc_x/y/z reference point.
+    # Mean-square displacement from case.yml models.physics.particles.point_source.
+    # Validation refuses it for a seeded case whose init_mode is not PointSource.
     - task: msd
 
 # Deprecated: statistics_output_prefix at the top level was an older way to
@@ -320,12 +317,20 @@ statistics_pipeline:
 #   picurv summarize --run-dir &lt;run&gt; --plot spectra.resolved_kinetic_energy
 #
 # PRECONDITIONS. A spectrum is only defined where the transform direction is
-# uniformly spaced, periodic, and statistically homogeneous. shell_spectrum
-# therefore requires every face PERIODIC, a single block, and a uniform
-# axis-aligned Cartesian grid. picurv validate checks this against case.yml
-# before any field is read, so a wall-bounded or curvilinear case is refused by
-# name rather than producing a curve with no meaning. A channel or a bend cannot
-# use this block.
+# uniformly spaced, periodic, and statistically homogeneous. picurv validate
+# checks each task against case.yml before any field is read, so a case that
+# does not meet them is refused by name rather than producing a meaningless curve.
+#   shell_spectrum  every face PERIODIC, one block, uniform axis-aligned Cartesian
+#                   grid; bins 3-D modes into |k| shells.
+#   plane_spectrum  one block, Cartesian; the two transformed axes
+#                   periodic and uniform, the third may stretch. A channel's
+#                   wall-parallel planes qualify.
+#   line_spectrum   as plane_spectrum, one transformed axis.
+# Plane and line tasks take symbol: continuum only, require `axes` and zero-based
+# `fixed_indices` on every other axis, and accept subtract_mean: sample (the mean
+# of the sampled plane or line). A curvilinear case such as a bend cannot use
+# any of them, and every task needs a staged grid: grid.mode grid_gen or file,
+# not programmatic_c.
 # spectra:
 #   # Prefix for the CSV basenames written under &lt;monitor output&gt;/spectra/.
 #   output_prefix: "Spectrum"
@@ -375,6 +380,20 @@ statistics_pipeline:
 #       # Optional baseline to overlay when plotting. The placeholder resolves to
 #       # the spectrum recorded for a generated initial condition.
 #       # reference: "&lt;ic_spectrum&gt;"
+#
+#     # A wall-parallel plane of a channel whose walls are on j:
+#     - task: plane_spectrum
+#       field: Ucat
+#       axes: [i, k]
+#       fixed_indices: { j: 8 }
+#       subtract_mean: sample
+#
+#     # A streamwise line:
+#     - task: line_spectrum
+#       field: Ucat
+#       axes: [k]
+#       fixed_indices: { i: 16, j: 8 }
+#       subtract_mean: sample
 
 # ==============================================================================
 # SECTION 4: OUTPUT CONFIGURATION
@@ -449,9 +468,6 @@ io:
 <div class="line">  end_step: 1000</div>
 <div class="line">  step_interval: 100</div>
 <div class="line"> </div>
-<div class="line">source_data:</div>
-<div class="line">  directory: &quot;&lt;solver_output_dir&gt;&quot;</div>
-<div class="line"> </div>
 <div class="line">global_operations:</div>
 <div class="line">  dimensionalize: true</div>
 <div class="line"> </div>
@@ -513,8 +529,7 @@ io:
 <h1><a class="anchor" id="p10_source_sec"></a>
 3. source_data</h1>
 <ul>
-<li><code>source_data.directory</code> -&gt; <code>source_directory</code></li>
-<li><code>&lt;solver_output_dir&gt;</code> is a supported placeholder resolved by <code>picurv</code>.</li>
+<li><code>source_data</code> is optional; omit it. <code>picurv</code> always sets <code>source_directory</code> to the run's own <code>&lt;run.output&gt;</code>, so a configured <code>source_data.directory</code> (including the legacy <code>&lt;solver_output_dir&gt;</code> placeholder) is overwritten, and <code>picurv validate</code> warns about any other value. Omitting the block, leaving it empty, or carrying the old directory all give the same recipe ID.</li>
 <li>for live post-processing while the solver is still running, PICurv treats a timestep as source-available only when its checkpoint bundle has a valid <code>checkpoint.meta</code>/<code>COMMITTED</code> pair and complete payload inventory. A recipe that needs particles also requires committed particle state.</li>
 </ul>
 <h1><a class="anchor" id="p10_pipelines_sec"></a>
@@ -755,13 +770,13 @@ Preconditions</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>shell_spectrum</code>   </td><td class="markdownTableBodyNone">supported   </td><td class="markdownTableBodyNone">every face <code>PERIODIC</code>, a single block, and a uniform axis-aligned Cartesian grid    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">experimental   </td><td class="markdownTableBodyNone">two selected periodic uniform axes; remaining axis may stretch    </td></tr>
+<td class="markdownTableBodyNone"><code>plane_spectrum</code>   </td><td class="markdownTableBodyNone">supported   </td><td class="markdownTableBodyNone">two selected periodic uniform axes; remaining axis may stretch    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>line_spectrum</code>   </td><td class="markdownTableBodyNone">experimental   </td><td class="markdownTableBodyNone">one selected periodic uniform axis; remaining axes may stretch    </td></tr>
+<td class="markdownTableBodyNone"><code>line_spectrum</code>   </td><td class="markdownTableBodyNone">supported   </td><td class="markdownTableBodyNone">one selected periodic uniform axis; remaining axes may stretch    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>temporal_spectrum</code>   </td><td class="markdownTableBodyNone">planned   </td><td class="markdownTableBodyNone">no homogeneous direction needed; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>   </td></tr>
 </table>
-<p>Plane and line tasks sample actual cell-center planes and lines in a single-block, axis-aligned Cartesian grid. They do not average parallel samples. Use <code>axes: [i, k]</code> and <code>fixed_indices: {j: 32}</code> for a plane, or <code>axes: [k]</code> and <code>fixed_indices: {i: 32, j: 32}</code> for a line. Indices are zero-based physical cells, excluding dummy layers. Out-of-range selections fail when the staged grid is read.</p>
+<p>Plane and line tasks sample actual cell-center planes and lines in a single-block, axis-aligned Cartesian grid. They do not average parallel samples. Use <code>axes: [i, k]</code> and <code>fixed_indices: {j: 32}</code> for a plane, or <code>axes: [k]</code> and <code>fixed_indices: {i: 32, j: 32}</code> for a line. Indices are zero-based physical cells, excluding dummy layers. Out-of-range selections fail when the staged grid is read. Every spectra task reads the staged PICGRID, so the case must use <code>grid.mode: grid_gen</code> or <code>file</code>; a <code>programmatic_c</code> case is refused at validation.</p>
 <p>Boundary conditions and block count are checked from <code>case.yml</code>; grid uniformity is checked by the generator against the staged PICGRID, which is the only place the node coordinates are known. A wall-bounded or curvilinear case is refused by name rather than yielding a curve with no meaning:</p>
 <div class="fragment"><div class="line">spectra task &#39;shell_spectrum&#39; requires every face of block 0 to be PERIODIC,</div>
 <div class="line">because a shell-averaged spectrum is only defined for a triply periodic</div>
@@ -822,11 +837,10 @@ Viewing them</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_line_spectrum"><code>line_spectrum</code></a></td><td class="markdownTableBodyNone"><code>line_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_plane_spectrum"><code>plane_spectrum</code></a></td><td class="markdownTableBodyNone"><code>plane_spectrum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_shell_spectrum"><code>shell_spectrum</code></a></td><td class="markdownTableBodyNone"><code>shell_spectrum</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_line_spectrum"><code>line_spectrum</code></a></td><td class="markdownTableBodyNone"><code>line_spectrum</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_plane_spectrum"><code>plane_spectrum</code></a></td><td class="markdownTableBodyNone"><code>plane_spectrum</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_spec_shell_spectrum"><code>shell_spectrum</code></a></td><td class="markdownTableBodyNone"><code>shell_spectrum</code></td></tr>
 </table>
 <h2><a class="anchor" id="p10_cap_spec_shell_spectrum_sub"></a>
 shell_spectrum</h2>
@@ -846,8 +860,8 @@ plane_spectrum</h2>
 <p><b>Parameters it owns.</b> Required <code>axes</code> contains two distinct i/j/k axes; required <code>fixed_indices</code> selects the other axis. <code>subtract_mean: sample</code> removes this plane's mean. <code>symbol</code> must be <code>continuum</code>.</p>
 <p><b>Interactions.</b> Transform axes must be periodic and uniformly spaced; the transverse coordinate may stretch. Reads raw Ucat checkpoints, with existing window-mean subtraction available. Initial-condition staging can invoke the same computation without a checkpoint.</p>
 <p><b>Diagnostics.</b> CSV rows contain two signed <code>k_&lt;axis&gt;</code> columns in storage order, <code>energy_u/v/w</code>, total <code>energy</code>, and <code>position_&lt;fixed-axis&gt;</code>. Energies are per-mode contributions, not spectral densities: summing all rows equals half the sample mean squared speed. The history CSV reports sample kinetic energy and relative Parseval residual. Coordinates/wavenumbers/energies scale with length/velocity references when dimensionalization is requested. Task filenames include axes and fixed indices.</p>
-<p><b>Evidence.</b> Implemented only; tests in <code>tests/test_spectra_shell_spectrum.py</code> check known modes and Parseval closure. No developed turbulent-channel acceptance is established.</p>
-<p><b>Limitations.</b> Experimental, serial whole-field input, one block, Cartesian geometry, no masked/immersed lines. No 2D heatmap is added to <code>--plot-spectrum</code>; use the CSV for 2D plotting. A seed spectrum is not a developed-turbulence benchmark.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> (<code>tests/test_spectra_shell_spectrum.py</code>: known modes, Parseval closure, transform-axis uniformity). Production exercised in <code>examples/turbulent_channel</code>. Analytically verified - <code>post-plane-line-spectra-2026-09-24</code>: on a checkpoint of known Fourier content over a stretched wall-normal axis, every signed mode's per-component energy matched a direct DFT of the same samples to 1.9e-15 of the plane energy, rows summed to the sample kinetic energy, no energy appeared outside the designed modes, and positions matched the cell centres; designed-mode energies differed from the staged expression only by the runtime's reconstruction factor <code>cos^4(k h/2)</code>.</p>
+<p><b>Limitations.</b> Serial whole-field input, one block, Cartesian geometry, no masked/immersed lines. A checkpoint spectrum measures the field the runtime holds, smoothed by its reconstruction relative to a staged expression. No developed turbulent-channel acceptance is established; that is a flow result, not a property of the measurement. No 2D heatmap is added to <code>--plot-spectrum</code>; use the CSV for 2D plotting. A seed spectrum is not a developed-turbulence benchmark.</p>
 <h2><a class="anchor" id="p10_cap_spec_line_spectrum_sub"></a>
 line_spectrum</h2>
 <p><a class="anchor" id="p10_cap_spec_line_spectrum"></a> <b>Identity.</b> <code>spectra.tasks[].task: line_spectrum</code> dispatches <code>spectra.gen line-spectrum</code>; no C task is added.</p>
@@ -856,8 +870,8 @@ line_spectrum</h2>
 <p><b>Parameters it owns.</b> Required <code>axes</code> contains one i/j/k axis; required <code>fixed_indices</code> selects both transverse axes. <code>subtract_mean: sample</code> removes the line mean; <code>symbol</code> must be <code>continuum</code>.</p>
 <p><b>Interactions.</b> Only the transformed direction must be uniform and periodic. Other directions may stretch. Checkpoint discovery, window means, and dimensionalization use the same path as plane/shell tasks.</p>
 <p><b>Diagnostics.</b> Rows contain signed <code>k</code>, <code>energy_u/v/w</code>, total <code>energy</code>, and both fixed-position columns. Sum all signed modes for sample kinetic energy; do not double the already retained negative partners. The history reports kinetic energy and Parseval residual. Filenames distinguish both transverse indices.</p>
-<p><b>Evidence.</b> Implemented only; known-mode tests sample a physical line with a different amplitude at each transverse station. No developed duct-flow validation is claimed.</p>
-<p><b>Limitations.</b> Experimental, single-block Cartesian grids without immersed masks. This does not produce line ensembles or temporal spectra. Existing curve plotting displays positive modes only; the CSV retains both signs.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code>: known-mode tests sample a physical line with a different amplitude at each transverse station. Production exercised in <code>examples/periodic_test/driven_duct</code> (<code>post_spectral.yml</code>). Analytically verified - <code>post-plane-line-spectra-2026-09-24</code>: lines along a uniform periodic axis of a grid stretched in another direction matched a direct DFT of the same samples to round-off, with exact positions; a line along a stretched axis is refused. No developed duct-flow validation is claimed.</p>
+<p><b>Limitations.</b> Single-block Cartesian grids without immersed masks. This does not produce line ensembles or temporal spectra. Existing curve plotting displays positive modes only; the CSV retains both signs.</p>
 <h1><a class="anchor" id="p10_io_sec"></a>
 9. io</h1>
 <p>Mappings:</p><ul>
@@ -872,7 +886,7 @@ line_spectrum</h2>
 </ul>
 <p>The postprocessor reads the catalogued <code>.dat</code> PETSc vectors inventoried by each committed checkpoint; input extensions are not runtime-selectable. The conductor routes <code>statistics_pipeline.output_prefix</code> to <code>&lt;run.analysis.statistics&gt;/&lt;recipe_id&gt;/&lt;basename&gt;</code>; only the configured basename is retained. Relative or absolute directory components do not redirect the result. When the same timestep is post-processed again, PICurv now rewrites same-step VTK/VTP outputs and rewrites same-step statistics rows so the final CSV still contains one row per step. <code>picurv run --post-process --continue</code> may be repeated while a solver is active: each invocation stops at the current committed source frontier, appends newly available VTK frames, and atomically refreshes the PVD. Ancestor frames must already exist for the same recipe. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> ancestry begins again when particles use <code>restart_mode: init</code>, and field statistics ancestry begins again after <code>--statistics-state reset</code>.</p>
 <p>Omitting <code>io.paraview_series</code> disables collection generation. The boolean shorthand <code>true</code> enables lineage scope; a mapping defaults to <code>enabled: true, scope: lineage</code>. The standard analysis profiles and master template explicitly enable lineage scope. The setting is consumed by the conductor and does not add a PETSc option or change VTK payload fields. A solve-only invocation does not generate collections, and <code>--only spectra</code> does not refresh them.</p>
-<p>Lineage indexing requires the same recipe ID in each contributing run. Changing the logical start/end window or toggling collection generation preserves that ID; changing the post <code>step_interval</code>, fields, or pipelines does not. Different solver <code>dt</code> values and checkpoint cadences can share a collection when the post recipe remains compatible and its requested steps exist. The index uses available VTK frames, but does not discover or combine outputs from other recipe IDs.</p>
+<p>Lineage indexing requires the same recipe ID in each contributing run. Changing the logical start/end window, toggling collection generation, or omitting <code>source_data</code> preserves that ID; changing the post <code>step_interval</code>, fields, or pipelines does not. Different solver <code>dt</code> values and checkpoint cadences can share a collection when the post recipe remains compatible and its requested steps exist. The index uses available VTK frames, but does not discover or combine outputs from other recipe IDs.</p>
 <p>Missing parents or ancestor segments with no matching frames produce an error. Every indexed frame needs committed checkpoint time metadata, or a retained PVD from which its time can be recovered after checkpoint pruning. Collections reference VTK files by relative path, so moving or deleting individual runs can break those references; retain the directory relationships or regenerate after restoring them. Refreshing a collection is atomic under the run's post writer lock. Reopen the PVD in ParaView after a refresh; PICurv does not push updates into an open GUI session.</p>
 <h1><a class="anchor" id="p10_next_steps_sec"></a>
 10. Next Steps</h1>

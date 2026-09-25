@@ -286,10 +286,8 @@ Re = \frac{\rho U L}{\mu}
 <li>In this example, the restarted run advances from step 501 through step 1500.</li>
 <li>When <code>--restart-from</code> is given, <code>picurv</code> automatically resolves the previous run's restart directory from that run's <code>&lt;run.config&gt;/monitor.yml</code> and injects the correct <code>-restart_dir</code> into the new control file.</li>
 </ul>
-<p>Typical full field restart (<code>solver.yml</code>):</p>
-<div class="fragment"><div class="line">operation_mode:</div>
-<div class="line">  eulerian_field_source: &quot;load&quot;</div>
-</div><!-- fragment --><p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> restart choices (<code>case.yml</code>):</p>
+<p>Keep <code>solver.yml -&gt; operation_mode.eulerian_field_source: "solve"</code> (the default). With <code>start_step &gt; 0</code> the solver reads the restart state at <code>start_step</code> and then advances it. <code>load</code> is a different mode: it replays a stored field at every step and never solves, so a continuation under <code>load</code> needs a checkpoint at every step it would advance through.</p>
+<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> restart choices (<code>case.yml</code>):</p>
 <p>Full restart of the existing particle swarm:</p>
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  physics:</div>
@@ -302,8 +300,9 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">      restart_mode: &quot;init&quot;</div>
 </div><!-- fragment --><p>Common combinations:</p>
 <ul>
-<li>Full restart: <code>start_step &gt; 0</code>, <code>eulerian_field_source: load</code>, <code>restart_mode: load</code></li>
-<li>Flow restart + fresh particles: <code>start_step &gt; 0</code>, <code>eulerian_field_source: load</code>, <code>restart_mode: init</code></li>
+<li>Full restart: <code>start_step &gt; 0</code>, <code>eulerian_field_source: solve</code>, <code>restart_mode: load</code></li>
+<li>Flow restart + fresh particles: <code>start_step &gt; 0</code>, <code>eulerian_field_source: solve</code>, <code>restart_mode: init</code></li>
+<li>Frozen-field particle replay: <code>eulerian_field_source: load</code>, with a checkpoint at every replayed step</li>
 <li>Analytical mode is different: <code>eulerian_field_source: analytical</code> regenerates the analytical field at the requested <code>(t, step)</code> instead of loading restart files.</li>
 </ul>
 <p>How to think about this workflow:</p>
@@ -326,7 +325,7 @@ Re = \frac{\rho U L}{\mu}
 <p>Common restart mistakes:</p>
 <ul>
 <li>Setting <code>start_step: 501</code> after a run that ended at 500. Use <code>start_step: 500</code>.</li>
-<li>Forgetting <code>solver.yml -&gt; operation_mode.eulerian_field_source: load</code> for a true field restart.</li>
+<li>Setting <code>solver.yml -&gt; operation_mode.eulerian_field_source: load</code> for a continuation. That replays stored fields instead of solving, and fails at the first step with no checkpoint.</li>
 <li>Forgetting to choose <code>particles.restart_mode: load</code> or <code>init</code> explicitly.</li>
 <li>Trying to restart from a step that was never written to disk.</li>
 </ul>
@@ -426,7 +425,7 @@ Re = \frac{\rho U L}{\mu}
 <p><code>shell_spectrum</code> requires a triply periodic, single-block, uniform Cartesian box, and <code>picurv validate --case ... --post ...</code> refuses a case that is not one <b>before any field is read</b>.</p>
 <p>For anything else, which spectrum applies depends on how many directions are statistically homogeneous:</p>
 <ul>
-<li><b>one or two</b> — a periodic channel or straight duct. Experimental <code>line_spectrum</code> and <code>plane_spectrum</code> tasks transform one selected physical line or plane on a single-block Cartesian grid. Set <code>axes</code> to the uniform periodic directions and <code>fixed_indices</code> to the remaining physical cell indices; see <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">8. spectra</a>. Parallel-sample averaging remains planned in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a>.</li>
+<li><b>one or two</b> — a periodic channel or straight duct. <code>line_spectrum</code> and <code>plane_spectrum</code> tasks transform one selected physical line or plane on a single-block Cartesian grid. Set <code>axes</code> to the uniform periodic directions and <code>fixed_indices</code> to the remaining physical cell indices; see <a class="el" href="10_Post_Processing_Reference.html#p10_spectra_sec">8. spectra</a>. Parallel-sample averaging remains planned in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_partial_sec">13. Offline Line And Plane Spectra</a>.</li>
 <li><b>none</b> — a bend, a wake, an immersed geometry. No spatial spectrum exists; what is wanted is a frequency spectrum at a probe, also planned; see <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a>.</li>
 </ul>
 <h1><a class="anchor" id="p11_init_sec"></a>
