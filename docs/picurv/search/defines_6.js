@@ -1,9 +1,1 @@
-var searchData=
-[
-  ['field_5fcoordinate_5fentry_0',['FIELD_COORDINATE_ENTRY',['../field__catalog_8c.html#af61c10b693b6863b1b1950cf3e6ed8b4',1,'field_catalog.c']]],
-  ['field_5fentry_1',['FIELD_ENTRY',['../field__catalog_8c.html#a445398badf842e8acaac5b2074deec91',1,'field_catalog.c']]],
-  ['field_5fno_5fvec_5foffset_2',['FIELD_NO_VEC_OFFSET',['../field__catalog_8c.html#a74f44faeb300c8c1871bd4005c634869',1,'field_catalog.c']]],
-  ['fp_5ffield_5fcount_3',['FP_FIELD_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a57c559c90564202dde80f3c975f642b0',1,'test_momentum_newton_boundary_fixedpoint.c']]],
-  ['fp_5fscalar_5fcount_4',['FP_SCALAR_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a9c3dd7a1963ce1aeab226a54251688ab',1,'test_momentum_newton_boundary_fixedpoint.c']]],
-  ['fully_5frough_5fyplus_5',['FULLY_ROUGH_YPLUS',['../wallfunction_8c.html#ab7a22afc56b6e61d6286b0932f3f33fd',1,'wallfunction.c']]]
-];
+var searchData=[["field_5fcoordinate_5fentry_0",["FIELD_COORDINATE_ENTRY",["../field__catalog_8c.html#af61c10b693b6863b1b1950cf3e6ed8b4",1,"field_catalog.c"]]],["field_5fentry_1",["FIELD_ENTRY",["../field__catalog_8c.html#a445398badf842e8acaac5b2074deec91",1,"field_catalog.c"]]],["field_5fno_5fvec_5foffset_2",["FIELD_NO_VEC_OFFSET",["../field__catalog_8c.html#a74f44faeb300c8c1871bd4005c634869",1,"field_catalog.c"]]],["fp_5ffield_5fcount_3",["FP_FIELD_COUNT",["../test__momentum__newton__boundary__fixedpoint_8c.html#a57c559c90564202dde80f3c975f642b0",1,"test_momentum_newton_boundary_fixedpoint.c"]]],["fp_5fscalar_5fcount_4",["FP_SCALAR_COUNT",["../test__momentum__newton__boundary__fixedpoint_8c.html#a9c3dd7a1963ce1aeab226a54251688ab",1,"test_momentum_newton_boundary_fixedpoint.c"]]],["fully_5frough_5fyplus_5",["FULLY_ROUGH_YPLUS",["../wallfunction_8c.html#ab7a22afc56b6e61d6286b0932f3f33fd",1,"wallfunction.c"]]]];

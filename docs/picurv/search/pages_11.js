@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['krylov_20momentum_20solver_0',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
-];
+var searchData=[["krylov_20momentum_20solver_0",["Newton&amp;ndash;Krylov Momentum Solver",["../55_Newton_Krylov_Momentum_Solver.html",1,""]]]];

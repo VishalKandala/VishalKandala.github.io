@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['inject_5ftheme_5fsync_0',['inject_theme_sync',['../namespaceinject__theme__sync.html',1,'']]]
-];
+var searchData=[["inject_5ftheme_5fsync_0",["inject_theme_sync",["../namespaceinject__theme__sync.html",1,""]]]];

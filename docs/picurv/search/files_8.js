@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['88cc4e0_2dwall_2dbounded_2dspectral_2dinitial_2dconditions_2emd_0',['88cc4e0-wall-bounded-spectral-initial-conditions.md',['../88cc4e0-wall-bounded-spectral-initial-conditions_8md.html',1,'']]]
-];
+var searchData=[["88cc4e0_2dwall_2dbounded_2dspectral_2dinitial_2dconditions_2emd_0",["88cc4e0-wall-bounded-spectral-initial-conditions.md",["../88cc4e0-wall-bounded-spectral-initial-conditions_8md.html",1,""]]]];
