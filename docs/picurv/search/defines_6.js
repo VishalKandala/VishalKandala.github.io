@@ -1,9 +1,21 @@
 var searchData=
 [
-  ['field_5fcoordinate_5fentry_0',['FIELD_COORDINATE_ENTRY',['../field__catalog_8c.html#af61c10b693b6863b1b1950cf3e6ed8b4',1,'field_catalog.c']]],
-  ['field_5fentry_1',['FIELD_ENTRY',['../field__catalog_8c.html#a445398badf842e8acaac5b2074deec91',1,'field_catalog.c']]],
-  ['field_5fno_5fvec_5foffset_2',['FIELD_NO_VEC_OFFSET',['../field__catalog_8c.html#a74f44faeb300c8c1871bd4005c634869',1,'field_catalog.c']]],
-  ['fp_5ffield_5fcount_3',['FP_FIELD_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a57c559c90564202dde80f3c975f642b0',1,'test_momentum_newton_boundary_fixedpoint.c']]],
-  ['fp_5fscalar_5fcount_4',['FP_SCALAR_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a9c3dd7a1963ce1aeab226a54251688ab',1,'test_momentum_newton_boundary_fixedpoint.c']]],
-  ['fully_5frough_5fyplus_5',['FULLY_ROUGH_YPLUS',['../wallfunction_8c.html#ab7a22afc56b6e61d6286b0932f3f33fd',1,'wallfunction.c']]]
+  ['field_5fcoordinate_5fentry_0',['FIELD_COORDINATE_ENTRY',['../field__catalog_8c.html#ae11da9e2b64dfc015afc6ba0bd84c53c',1,'field_catalog.c']]],
+  ['field_5fdim_5farea_1',['FIELD_DIM_AREA',['../field__catalog_8h.html#a8c9548974d214cca5bc73986e2265750',1,'field_catalog.h']]],
+  ['field_5fdim_5fdiffusivity_2',['FIELD_DIM_DIFFUSIVITY',['../field__catalog_8h.html#a2f46450b477c4096eb0fe10eda1b25bc',1,'field_catalog.h']]],
+  ['field_5fdim_5fdimensionless_3',['FIELD_DIM_DIMENSIONLESS',['../field__catalog_8h.html#a7b5db4118956d9227a665199664f7552',1,'field_catalog.h']]],
+  ['field_5fdim_5ffrom_5fsource_4',['FIELD_DIM_FROM_SOURCE',['../field__catalog_8h.html#ab225b496a9705f76d06984d3fad8a93a',1,'field_catalog.h']]],
+  ['field_5fdim_5finverse_5ftime_5fsquared_5',['FIELD_DIM_INVERSE_TIME_SQUARED',['../field__catalog_8h.html#a6bb656ca107940b7ced77e8406378ead',1,'field_catalog.h']]],
+  ['field_5fdim_5finverse_5fvolume_6',['FIELD_DIM_INVERSE_VOLUME',['../field__catalog_8h.html#a120df982692effb09db7cc25680ee323',1,'field_catalog.h']]],
+  ['field_5fdim_5flength_7',['FIELD_DIM_LENGTH',['../field__catalog_8h.html#a9495826cbf015d81d6aefbbcae3570ed',1,'field_catalog.h']]],
+  ['field_5fdim_5fnot_5fa_5fquantity_8',['FIELD_DIM_NOT_A_QUANTITY',['../field__catalog_8h.html#a8e9b0b4757e5d37b74eb6e3d8658bfa2',1,'field_catalog.h']]],
+  ['field_5fdim_5fpressure_9',['FIELD_DIM_PRESSURE',['../field__catalog_8h.html#ae4fc3dd432fb6674a2cd9c81437a370c',1,'field_catalog.h']]],
+  ['field_5fdim_5ftime_10',['FIELD_DIM_TIME',['../field__catalog_8h.html#ac5e43e66673c5837889b5a4a58db2320',1,'field_catalog.h']]],
+  ['field_5fdim_5fvelocity_11',['FIELD_DIM_VELOCITY',['../field__catalog_8h.html#af2f6f169b5ac279b7ff1f4d678b17934',1,'field_catalog.h']]],
+  ['field_5fdim_5fvolume_5fflux_12',['FIELD_DIM_VOLUME_FLUX',['../field__catalog_8h.html#ae96d036b0290f4aaf206a925f825f75d',1,'field_catalog.h']]],
+  ['field_5fentry_13',['FIELD_ENTRY',['../field__catalog_8c.html#a41e5bff98e1a9e8c809c938aa41931e9',1,'field_catalog.c']]],
+  ['field_5fno_5fvec_5foffset_14',['FIELD_NO_VEC_OFFSET',['../field__catalog_8c.html#a74f44faeb300c8c1871bd4005c634869',1,'field_catalog.c']]],
+  ['fp_5ffield_5fcount_15',['FP_FIELD_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a57c559c90564202dde80f3c975f642b0',1,'test_momentum_newton_boundary_fixedpoint.c']]],
+  ['fp_5fscalar_5fcount_16',['FP_SCALAR_COUNT',['../test__momentum__newton__boundary__fixedpoint_8c.html#a9c3dd7a1963ce1aeab226a54251688ab',1,'test_momentum_newton_boundary_fixedpoint.c']]],
+  ['fully_5frough_5fyplus_17',['FULLY_ROUGH_YPLUS',['../wallfunction_8c.html#ab7a22afc56b6e61d6286b0932f3f33fd',1,'wallfunction.c']]]
 ];

@@ -91,6 +91,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p45_contract_sec">1. User Contract in &lt;tt&gt;case.yml&lt;/tt&gt;</a></li>
+<li class="level1"><a href="#p45_particle_values_sec">1.1 Configured Particle Values (&lt;tt&gt;fields&lt;/tt&gt;)</a></li>
 <li class="level1"><a href="#p45_mode_values_sec">2. Accepted &lt;tt&gt;init_mode&lt;/tt&gt; Values</a></li>
 <li class="level1"><a href="#p45_entries_sec">3. Particle Initialization Mode Entries</a><ul><li class="level2"><a href="#p45_cap_surface_sub">Surface</a></li>
 <li class="level2"><a href="#p45_cap_volume_sub">Volume</a></li>
@@ -126,15 +127,71 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">        x: 0.5</div>
 <div class="line">        y: 0.5</div>
 <div class="line">        z: 0.5</div>
+<div class="line">      fields:                         # optional; see 1.1</div>
+<div class="line">        Psi: 0.5</div>
 </div><!-- fragment --><p>Mapping to control flags:</p>
 <ul>
 <li><code>count</code> -&gt; <code>-numParticles</code></li>
 <li><code>init_mode</code> -&gt; <code>-pinit</code></li>
 <li><code>restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
 <li><code>random_seed</code> -&gt; <code>-particle_random_seed</code> (optional; integer <code>0</code>..<code>2147483647</code>, default <code>12345</code>)</li>
-<li><code>point_source</code> -&gt; <code>-psrc_x/-psrc_y/-psrc_z</code> (required when <code>init_mode</code> is <code>PointSource</code>)</li>
+<li><code>point_source</code> -&gt; <code>-psrc_x/-psrc_y/-psrc_z</code> (required when <code>init_mode</code> is <code>PointSource</code>); a physical position, divided by <code>length_ref</code> like the grid bounds it sits within</li>
+<li><code>fields</code> -&gt; <code>-particle_fields_*</code> (optional; see <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_particle_values_sec">1.1 Configured Particle Values (<code>fields</code>)</a>)</li>
 </ul>
 <p>Note: The interpolation method (<code>Trilinear</code> / <code>CornerAveraged</code>) is configured in <code>solver.yml</code>, not <code>case.yml</code>. See <b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b> and <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b>.</p>
+<h1><a class="anchor" id="p45_particle_values_sec"></a>
+1.1 Configured Particle Values (&lt;tt&gt;fields&lt;/tt&gt;)</h1>
+<p><code>fields</code> gives particle-carried fields a value when the population is created. Only fields the particle carries from step to step can be set; every other particle field is re-derived from the Eulerian fields or from particle location, so a value given to it would not survive. Today that is <code>Psi</code>, the scalar that IEM micromixing relaxes (see <b><a class="el" href="28_IEM_and_Statistical_Averaging.html">IEM Mixing and Statistical Averaging</a></b>).</p>
+<div class="fragment"><div class="line">models:</div>
+<div class="line">  physics:</div>
+<div class="line">    particles:</div>
+<div class="line">      count: 50000</div>
+<div class="line">      init_mode: &quot;Volume&quot;</div>
+<div class="line">      fields:</div>
+<div class="line">        Psi: 0.5                                  # a number</div>
+<div class="line">        # Psi: &quot;0.5 + 0.5*sin(2*pi*xn)&quot;           # or an expression</div>
+<div class="line">        # Psi:                                    # or regions over a background</div>
+<div class="line">        #   params: {r: 0.1}</div>
+<div class="line">        #   background: 0</div>
+<div class="line">        #   regions:</div>
+<div class="line">        #     - {shape: half_space, axis: x, at: 0.5, side: above, value: 1,</div>
+<div class="line">        #        edge: {profile: smoothstep, width: 0.02}}</div>
+<div class="line">        #     - {shape: ball, center: [0.5, 0.5, 0.5], radius: r, value: &quot;uniform()&quot;}</div>
+</div><!-- fragment --><p>Each value is one of:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Form   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">number   </td><td class="markdownTableBodyNone">every particle gets it    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">expression string   </td><td class="markdownTableBodyNone">evaluated per particle    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>{params, value}</code>   </td><td class="markdownTableBodyNone">an expression that may use the named numbers in <code>params</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>{params, background, regions}</code>   </td><td class="markdownTableBodyNone">start from <code>background</code>; each region, in order, paints its <code>value</code> over what came before   </td></tr>
+</table>
+<p><b>Expressions</b> use the language of <code>ic_gen</code> Eulerian initial conditions (<b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b>): <code>+ - * / % **</code>, comparisons (chains such as <code>0.2 &lt; x &lt; 0.5</code> included), <code>and or not</code>, <code>abs sin cos tan exp sqrt minimum maximum where(c, a, b)</code>, and <code>pi</code>. A comparison or logical expression is 1 when true and 0 when false. Numbers are decimal literals. A particle expression may use:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Name   </th><th class="markdownTableHeadNone">Value    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>x</code>, <code>y</code>, <code>z</code>   </td><td class="markdownTableBodyNone">particle position, physical    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>xn</code>, <code>yn</code>, <code>zn</code>   </td><td class="markdownTableBodyNone">position normalized to the domain bounding box, 0 to 1    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>pid</code>   </td><td class="markdownTableBodyNone">particle ID    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>t</code>   </td><td class="markdownTableBodyNone">physical time of the event that creates the particle    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>uniform()</code>, <code>normal()</code>   </td><td class="markdownTableBodyNone">a per-particle draw in [0, 1), or from N(0, 1)   </td></tr>
+</table>
+<p>A draw is a pure function of <code>random_seed</code>, the particle ID, and the field; it does not depend on the rank a particle lives on or the order particles are visited. <code>uniform(k)</code> and <code>normal(k)</code> with a non-negative integer literal <code>k</code> name a stream shared across fields, so two fields can draw the same number for one particle.</p>
+<p><b>Regions</b> are <code>half_space</code> (<code>axis</code>, <code>at</code>, <code>side: above | below</code>), <code>slab</code> (<code>axis</code>, <code>from</code>, <code>to</code>), <code>box</code> (<code>min</code>, <code>max</code>), <code>ball</code> (<code>center</code>, <code>radius</code>), and <code>cylinder</code> (<code>axis</code>, <code>center</code> in the other two coordinates, <code>radius</code>), all in physical coordinates. Without <code>edge</code>, a region's boundary is sharp; <code>edge: {profile, width}</code> blends across a band of that width centred on the boundary with <code>linear</code>, <code>smoothstep</code>, or <code>cosine</code>, reaching one half on the boundary itself. Region numbers may name a <code>params</code> entry.</p>
+<p><b>When it applies.</b> A value is applied once each particle's position is final: after placement and location, and before interpolation and the first scatter, so the t=0 cell mean already reflects it. A particle restored from a checkpoint (<code>restart_mode: load</code>) keeps its saved value, and <code>fields</code> is ignored with a warning.</p>
+<p><b>Units.</b> Values are physical, in the field's units, and are divided by the field's reference scale as they are stored (<b><a class="el" href="19_Nondimensionalization.html">Units and Non-Dimensionalization</a></b>). <code>Psi</code> is dimensionless.</p>
+<p><b>Validation.</b> <code>picurv validate</code> refuses an unknown or re-derived field, an expression outside the language, a region with a missing or unknown key, <code>fields</code> without particles, and <code>fields</code> together with <code>solver.yml</code> <code>verification.sources.scalar</code>, which prescribes <code>Psi</code> at every step. It warns when a <code>PointSource</code> value has no draw, because every particle then starts at one point with one value.</p>
+<p><b>Diagnostics.</b> The launcher prints each lowered expression. After applying them, the solver logs each field's particle count, mean, variance, minimum, and maximum (info level), and <code>particle_initial_fields.csv</code> in the run's analysis directory records the same per field and component, with a ten-bin histogram between the minimum and maximum.</p>
+<p>Mapping to control flags: <code>-particle_fields_count</code>, then per field <code>-particle_fields_&lt;i&gt;_name</code> and one <code>-particle_fields_&lt;i&gt;_expr_&lt;c&gt;</code> per component, holding the lowered expression.</p>
 <h1><a class="anchor" id="p45_mode_values_sec"></a>
 2. Accepted &lt;tt&gt;init_mode&lt;/tt&gt; Values</h1>
 <p><code>picurv</code> accepts these exact canonical strings:</p>
@@ -266,8 +323,9 @@ SurfaceEdges</h2>
 <li><code>LocateAllParticlesInGrid</code> performs location/migration.</li>
 <li>surface modes call <a class="el" href="ParticleMotion_8h.html#abb62172d12ae65122070a3674196c8e2">ReinitializeParticlesOnInletSurface</a>.</li>
 <li>statuses are reset and location pass is repeated.</li>
+<li><a class="el" href="ParticleInitialConditions_8h.html#aed793e2577401bb20c60e9c5b5abe6ac">ParticleFieldPlanApply</a> sets configured <code>fields</code> values, and <a class="el" href="ParticleInitialConditions_8h.html#a2bde527a273fc6943ee0b3a9ca88ce60">ParticleFieldPlanSummarize</a> logs and records them.</li>
 <li><code>InterpolateAllFieldsToSwarm</code> assigns flow fields at particle positions.</li>
-<li>optional scatter updates Eulerian particle-derived fields.</li>
+<li>the scatter updates Eulerian particle-derived fields.</li>
 </ol>
 <p>For loaded particles:</p>
 <ol type="1">
@@ -317,6 +375,7 @@ load</h2>
 <li><code>DiffusivityGradient</code> (vector),</li>
 <li><code>Psi</code> (scalar).</li>
 </ul>
+<p>These are the catalog defaults. Once positions are final, configured <code>fields</code> values (<a class="el" href="45_Particle_Initialization_and_Restart.html#p45_particle_values_sec">1.1 Configured Particle Values (<code>fields</code>)</a>) replace the defaults of the fields they name.</p>
 <p><a class="el" href="variables_8h.html#structCell" title="Defines the vertices of a single hexahedral grid cell.">Cell</a> IDs start at <code>-1</code> until location confirms host cells.</p>
 <h1><a class="anchor" id="p45_diagnostics_sec"></a>
 7. Diagnostics and Sanity Checks</h1>
@@ -330,8 +389,10 @@ load</h2>
 <ul>
 <li>no INLET face with surface modes,</li>
 <li>missing <code>point_source.{x,y,z}</code> for point source mode,</li>
-<li>restart mode not in <code>{init, load}</code>.</li>
+<li>restart mode not in <code>{init, load}</code>,</li>
+<li>a <code>fields</code> entry naming a field the runtime re-derives, or an expression outside the language (the error names the configuration path of the value).</li>
 </ul>
+<p>The <code>[<a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> IC]</code> log line and <code>particle_initial_fields.csv</code> show what the configured values produced: a minimum and maximum that are equal where a spread was expected usually means the expression does not depend on anything that varies across the particles.</p>
 <h1><a class="anchor" id="p45_extension_sec"></a>
 8. Contributor Extension Points</h1>
 <p>If adding a new particle initialization mode:</p>

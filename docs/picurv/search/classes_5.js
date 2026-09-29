@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['fielddescriptor_0',['FieldDescriptor',['../field__catalog_8h.html#structFieldDescriptor',1,'']]],
-  ['fieldview_1',['FieldView',['../field__catalog_8h.html#structFieldView',1,'']]],
-  ['flowwave_2',['FlowWave',['../variables_8h.html#structFlowWave',1,'']]],
-  ['fpsnapshot_3',['FpSnapshot',['../test__momentum__newton__boundary__fixedpoint_8c.html#structFpSnapshot',1,'']]],
-  ['fsinfo_4',['FSInfo',['../variables_8h.html#structFSInfo',1,'']]]
+  ['expressioninstruction_0',['ExpressionInstruction',['../ParticleInitialConditions_8c.html#structExpressionInstruction',1,'']]],
+  ['expressionnode_1',['ExpressionNode',['../ParticleInitialConditions_8c.html#structExpressionNode',1,'']]],
+  ['expressionparser_2',['ExpressionParser',['../ParticleInitialConditions_8c.html#structExpressionParser',1,'']]]
 ];

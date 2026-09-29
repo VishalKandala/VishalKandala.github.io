@@ -1,11 +1,7 @@
 var searchData=
 [
-  ['mgctx_0',['MGCtx',['../variables_8h.html#structMGCtx',1,'']]],
-  ['migrationinfo_1',['MigrationInfo',['../variables_8h.html#structMigrationInfo',1,'']]],
-  ['momentumnewtonjacobian_2',['MomentumNewtonJacobian',['../momentum__newton__krylov_8c.html#structMomentumNewtonJacobian',1,'']]],
-  ['momentumnewtonkrylovcontext_3',['MomentumNewtonKrylovContext',['../momentum__newton__krylov_8c.html#structMomentumNewtonKrylovContext',1,'']]],
-  ['momentumpreconditionerdescription_4',['MomentumPreconditionerDescription',['../momentum__newton__krylov_8c.html#structMomentumPreconditionerDescription',1,'']]],
-  ['momentumpreconditionerengine_5',['MomentumPreconditionerEngine',['../momentum__newton__krylov_8c.html#structMomentumPreconditionerEngine',1,'']]],
-  ['momentumpreconditionermodelops_6',['MomentumPreconditionerModelOps',['../structMomentumPreconditionerModelOps.html',1,'']]],
-  ['momstabilityreport_7',['MomStabilityReport',['../momentumsolvers_8h.html#structMomStabilityReport',1,'']]]
+  ['lesconfig_0',['LESConfig',['../variables_8h.html#structLESConfig',1,'']]],
+  ['lesdiagnosticsstate_1',['LESDiagnosticsState',['../variables_8h.html#structLESDiagnosticsState',1,'']]],
+  ['list_2',['list',['../variables_8h.html#structlist',1,'']]],
+  ['list_5fnode_3',['list_node',['../variables_8h.html#structlist__node',1,'']]]
 ];

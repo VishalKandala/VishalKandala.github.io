@@ -279,6 +279,22 @@ Python Test Files (&lt;tt&gt;tests/test_*.py&lt;/tt&gt;)</h1>
 <li>documentation scaffolding output, and repository-wide fragment-link resolution</li>
 </ul>
 </li>
+<li><code>test_units_and_scaling.py</code><ul>
+<li>every solver-facing input records a dimension and conversion site, and the units audit (<code><a class="el" href="audit__units_8py.html" title="Enforce the physical-units rule and the published units indexes.">tests/tooling/audit_units.py</a></code>) passes against page 19's indexes</li>
+<li>each conversion at non-unit scales: <code>dt</code>, grid lengths, BC velocities and fluxes, the point source, window times, spectral provider parameters, <code>ic_gen</code> expressions, and a file initial condition staged from physical units or from another run's scales</li>
+<li>the validate notice names inputs whose reading changed, only at non-unit scales</li>
+</ul>
+</li>
+<li><code>test_expression_language.py</code><ul>
+<li><code>generators/ic.gen</code> reproduces every case of <code>tests/fixtures/expression_conformance.txt</code>, which <code>make unit-particles</code> also evaluates through the C runtime evaluator</li>
+<li>constructs outside the language are refused; draws are particle-only</li>
+<li>region and edge lowering: paint order, half-way edge value, inlined <code>params</code></li>
+</ul>
+</li>
+<li><code>test_particle_fields.py</code><ul>
+<li><code>models.physics.particles.fields</code>: the settable set matches the C catalog's <code>USER_INITIALIZE</code> capability, values become quoted <code>-particle_fields_*</code> options, and validation refuses unknown fields, bad expressions, particle-free runs, and a conflicting verification scalar source</li>
+</ul>
+</li>
 <li><code>test_field_catalog.py</code><ul>
 <li>the published field inventory matches the compiled Eulerian and particle catalogs</li>
 <li>missing fields, wrong layout groups, undocumented layout values, and renamed inventory groups are each rejected</li>
@@ -323,9 +339,9 @@ C Unit Files (&lt;tt&gt;tests/c/test_*.c&lt;/tt&gt;)</h1>
 <ul>
 <li><code><a class="el" href="test__install__check_8c.html" title="C unit tests for PETSc installation and environment readiness checks.">test_install_check.c</a></code>: PETSc environment and basic object viability (<code>doctor</code>: <code>environment-visible</code>, <code>basic-petsc-objects</code>)</li>
 <li><code><a class="el" href="test__geometry_8c.html" title="C unit tests for interpolation and signed-distance geometry helpers.">test_geometry.c</a></code>: interpolation and geometric signed-distance helpers</li>
-<li><code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">test_setup_lifecycle.c</a></code>: setup/cleanup lifecycle, RNG, and initialized particle-settlement contracts</li>
+<li><code><a class="el" href="test__setup__lifecycle_8c.html" title="C unit tests for setup, initialization, and cleanup lifecycle entry points.">test_setup_lifecycle.c</a></code>: setup/cleanup lifecycle, RNG, and initialized particle-settlement contracts; configured particle initial values reaching every particle, the t=0 cell mean, and the scatter's filled <code>Psi</code> dummy cells; IEM relaxing each particle toward its own cell mean; post-processing loading saved particle averages</li>
 <li><code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">test_solver_kernels.c</a></code>: analytical geometry/particle dispatch, LES filter/eddy-viscosity, FlowSolver guardrails, and analytical source helpers</li>
-<li><code><a class="el" href="test__particle__kernels_8c.html" title="C unit tests for particle walking-search helper routines.">test_particle_kernels.c</a></code>: walking-search helper kernels</li>
+<li><code><a class="el" href="test__particle__kernels_8c.html" title="C unit tests for particle walking-search helpers and the initial-value expression engine.">test_particle_kernels.c</a></code>: walking-search helper kernels, and the initial-value expression engine (shared conformance cases, refusals, keyed draws)</li>
 <li><code><a class="el" href="test__io_8c.html" title="C unit tests for I/O helpers, parsers, and startup-banner output.">test_io.c</a></code>: I/O path checks, parser helpers, scaling-ingestion contracts, and startup-banner summary contracts</li>
 <li><code><a class="el" href="test__logging_8c.html" title="C unit tests for runtime log-level, allow-list, conversion, and profiling helpers.">test_logging.c</a></code>: log-level, allow-list, string-conversion, continuity/min-max/interpolation diagnostics, profiling, and snapshot-cadence contracts</li>
 <li><code><a class="el" href="test__postprocessing_8c.html" title="C unit tests for post-processing kernel functions.">test_postprocessing.c</a></code>: post-processing kernel contracts (specific-KE, displacement, nodal average, normalization, dimensionalization, Q-criterion)</li>
@@ -342,7 +358,7 @@ C Unit Files (&lt;tt&gt;tests/c/test_*.c&lt;/tt&gt;)</h1>
 <li><code><a class="el" href="test__statistics__config_8c.html" title="C unit tests for field-statistics control ingress.">test_statistics_config.c</a></code>: field-statistics control resolution from the generated control file</li>
 <li><code><a class="el" href="test__grid_8c.html" title="C unit tests for grid bounding-box helper routines.">test_grid.c</a></code>: local/global bounding-box helpers</li>
 <li><code><a class="el" href="test__metric_8c.html" title="C unit tests for metric tensors, face geometry, and length-scale helpers.">test_metric.c</a></code>: metric inversion, contravariant velocity, face geometry helpers, and the degeneracy check on a wall-resolved-sized cell</li>
-<li><code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">test_boundaries.c</a></code>: boundary factory, direct handler-behavior checks, and wall-model dispatch across the log law, Werner-Wengle, and Cabot</li>
+<li><code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">test_boundaries.c</a></code>: boundary factory, direct handler-behavior checks, wall-model dispatch across the log law, Werner-Wengle, and Cabot, and each cell field's dummy-cell rule (<code>UpdateDummyCells</code>, <code>UpdateCornerNodes</code>)</li>
 <li><code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">test_les.c</a></code>: LES closure kernels - symmetric-tensor algebra, strain rate, filter widths (including the Scotti closed form and independence from cell orientation), the Germano model tensor and Leonard stress, coefficient clipping and the viscosity floor, homogeneous-direction resolution, the WALE and Vreman kernels against independent evaluations, and cell edge vectors recovered from metrics</li>
 <li><code><a class="el" href="test__periodic__dev_8c.html" title="Focused geometric-periodic boundary tests.">test_periodic_dev.c</a></code>: gating geometric-periodic boundary and synchronization harness</li>
 <li><code><a class="el" href="test__poisson__rhs_8c.html" title="C unit tests for Poisson, RHS, body-force, and diffusivity helpers.">test_poisson_rhs.c</a></code>: pressure update, RHS, projection, body-force and diffusivity helpers, and the Clark gradient term's scaling and coefficient on non-unit cells</li>

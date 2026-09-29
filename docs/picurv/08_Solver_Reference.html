@@ -156,9 +156,9 @@ operation_mode:
   # Parameters for analytical_type: "UNIFORM_FLOW".
   # Uncomment this block only when analytical_type = "UNIFORM_FLOW".
   # uniform_flow:
-  #   u: 0.0                      # -&gt; -analytical_uniform_u
-  #   v: 0.0                      # -&gt; -analytical_uniform_v
-  #   w: 0.0                      # -&gt; -analytical_uniform_w
+  #   u: 0.0                      # [m/s] -&gt; -analytical_uniform_u (divided by velocity_ref)
+  #   v: 0.0                      # [m/s] -&gt; -analytical_uniform_v
+  #   w: 0.0                      # [m/s] -&gt; -analytical_uniform_w
 
 # Verification-only source overrides.
 # Use these only when ordinary end-to-end setup cannot expose the behavior you need to test.
@@ -169,17 +169,17 @@ operation_mode:
 #     diffusivity:
 #       mode: "analytical"        # Verification-only selector; currently fixed to analytical
 #       profile: "LINEAR_X"       # Supported today: LINEAR_X
-#       gamma0: 1.0e-3             # -&gt; -verification_diffusivity_gamma0
-#       slope_x: 2.0e-4            # -&gt; -verification_diffusivity_slope_x
+#       gamma0: 1.0e-3             # [m^2/s] -&gt; -verification_diffusivity_gamma0
+#       slope_x: 2.0e-4            # [m/s], diffusivity per metre -&gt; -verification_diffusivity_slope_x
 #
 #     scalar:
 #       mode: "analytical"        # Verification-only selector; currently fixed to analytical
 #       profile: "CONSTANT"       # Supported: CONSTANT, LINEAR_X, SIN_PRODUCT
 #       value: 1.0                 # CONSTANT -&gt; -verification_scalar_value
 #       # phi0: 0.0                # LINEAR_X -&gt; -verification_scalar_phi0
-#       # slope_x: 1.0             # LINEAR_X -&gt; -verification_scalar_slope_x
+#       # slope_x: 1.0             # [1/m] LINEAR_X -&gt; -verification_scalar_slope_x
 #       # amplitude: 1.0           # SIN_PRODUCT -&gt; -verification_scalar_amplitude
-#       # kx: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_kx
+#       # kx: 3.141592653589793    # [1/m] SIN_PRODUCT -&gt; -verification_scalar_kx
 #       # ky: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_ky
 #       # kz: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_kz
 #
@@ -450,7 +450,7 @@ petsc_passthrough_options:
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>eulerian_field_source</code> -&gt; <code>-euler_field_source</code> (<code>solve</code>, <code>load</code>, <code>analytical</code>)</li>
 <li><code>analytical_type</code> -&gt; <code>-analytical_type</code></li>
-<li><code>uniform_flow.u/v/w</code> -&gt; <code>-analytical_uniform_u/-analytical_uniform_v/-analytical_uniform_w</code> when <code>analytical_type: "UNIFORM_FLOW"</code></li>
+<li><code>uniform_flow.u/v/w</code> -&gt; <code>-analytical_uniform_u/-analytical_uniform_v/-analytical_uniform_w</code> when <code>analytical_type: "UNIFORM_FLOW"</code>; physical velocities, divided by <code>velocity_ref</code></li>
 </ul>
 <p><code>uniform_flow</code> is only valid when <code>analytical_type: "UNIFORM_FLOW"</code>.</p>
 <h1><a class="anchor" id="p08_strategy_sec"></a>
@@ -479,7 +479,7 @@ petsc_passthrough_options:
 <tr><td class="markdownTableBodyNone"><a href="#p08_cap_dual_time_picard_jameson_rk"><code>Dual Time Picard Jameson RK</code></a></td><td class="markdownTableBodyNone"><code>DUALTIME_PICARD_JAMESON_RK</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p08_cap_dual_time_picard_rk4"><code>Dual Time Picard RK4</code></a></td><td class="markdownTableBodyNone"><code>DUALTIME_PICARD_JAMESON_RK</code></td><td class="markdownTableBodyNone"><b>deprecated</b> - alias of <code>Dual Time Picard Jameson RK</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p08_cap_explicit_rk4"><code>Explicit RK4</code></a></td><td class="markdownTableBodyNone"><code>EXPLICIT_RK</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_newton_krylov"><code>Newton Krylov</code></a></td><td class="markdownTableBodyNone"><code>newton_krylov</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_newton_krylov"><code>Newton Krylov</code></a></td><td class="markdownTableBodyNone"><code>newton_krylov</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
 <p>Each entry follows the capability-entry contract described in <b><a class="el" href="64_Documentation_Extension_Framework.html">Documentation Extension Framework</a></b>.</p>
 <h2><a class="anchor" id="p08_cap_explicit_rk4_sub"></a>
@@ -509,10 +509,10 @@ Newton Krylov</h2>
 <p><b>What it does.</b> Solves the momentum system with a PETSc SNES Newton-Krylov method using a matrix-free finite-difference Jacobian, rather than iterating in pseudo-time.</p>
 <p><b>When to choose it.</b> When the pseudo-time approach converges slowly or not at all, and you want true Newton convergence on the momentum system. It exposes PETSc's solver machinery directly, which is an advantage when you know what you want from it and a liability when you do not.</p>
 <p><b>Parameters it owns.</b> The <code>newton_krylov</code> block: <code>jacobian</code> (a strict discriminated configuration - explicit <code>type: finite_difference</code> requires <code>finite_difference.mode: matrix_free</code>), <code>preconditioner</code> (<code>model</code> and <code>structure</code>), <code>nonlinear_solver</code> (including <code>line_search</code>), and <code>linear_solver</code>.</p>
-<p><b>Interactions.</b> Supported combinations are finite-difference/matrix-free with either no preconditioner or a frozen momentum Jacobian / point-block preconditioner. Any other Jacobian type or finite-difference mode is rejected. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime.</p>
+<p><b>Interactions.</b> Accepted combinations are finite-difference/matrix-free with either no preconditioner or a frozen momentum Jacobian / point-block preconditioner. Any other Jacobian type or finite-difference mode is rejected. Raw <code>petsc_passthrough_options</code> are applied last, but an incompatible raw <code>-mom_nk_pc_type</code> override is rejected by the runtime.</p>
 <p><b>Diagnostics.</b> SNES and KSP convergence reasons are reported per step. A <code>DIVERGED_LINEAR_SOLVE</code> or <code>DIVERGED_BREAKDOWN</code> with <code>preconditioner.model: none</code> generally indicates the unpreconditioned matrix-free limitation rather than a configuration error.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-newton-krylov</code>. Integration verified - <code>make unit-momentum-newton-boundary-fixedpoint</code> on a production-sized straight duct.</p>
-<p><b>Limitations and full treatment.</b> <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b> carries the scope limits, preconditioner findings, and tuning guidance. Experimental until the solver has been run at the problem sizes a production claim implies.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-newton-krylov</code>. Integration verified - <code>make unit-momentum-newton-boundary-fixedpoint</code> on a production-sized straight duct. Production exercised - <code>turbulent-channel-nk-2026-09-29</code>: 96 x 96 x 256 cells on 144 ranks, all 10,000 inspected steps converged and committed; see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_channel_evidence_sub">10.1 Retained turbulent-channel campaign (2026-09-29)</a> for the retained measurements and DNS discrepancy.</p>
+<p><b>Limitations and full treatment.</b> <b><a class="el" href="55_Newton_Krylov_Momentum_Solver.html">Newton&ndash;Krylov Momentum Solver</a></b> carries the scope limits, preconditioner findings, and tuning guidance. Supported within that scope; the production campaign used <code>preconditioner.model: none</code>. <code>frozen_momentum_jacobian</code> remains experimental. Quantitative turbulent-channel DNS agreement, refinement convergence, and parallel scaling remain unverified.</p>
 <h2><a class="anchor" id="p08_cap_dual_time_picard_rk4_sub"></a>
 Dual Time Picard RK4 (deprecated)</h2>
 <p><a class="anchor" id="p08_cap_dual_time_picard_rk4"></a> <b>Identity.</b> <code>strategy.momentum_solver: "Dual Time Picard RK4"</code> - a <b>deprecated alias</b> that normalizes to <code>Dual Time Picard Jameson RK</code>. The C enum keeps <code>MOMENTUM_SOLVER_DUALTIME_PICARD_RK4</code> as an alias of the Jameson constant.</p>
@@ -834,7 +834,8 @@ cg</h3>
 <li><code>iem_constant</code> -&gt; <code>-iem_constant</code>, the constant <code>C_IEM</code> in the IEM mixing rate <code>Omega = C_IEM Gamma_eff / Delta^2</code> (<a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a>)</li>
 </ul>
 <p>Rules:</p><ul>
-<li>values must be positive numbers; both configuration validation and the runtime require <code>iem_constant</code> to be finite</li>
+<li>the Schmidt numbers must be positive; <code>iem_constant</code> must be non-negative, and both configuration validation and the runtime require it to be finite</li>
+<li><code>iem_constant: 0</code> switches micromixing off: the particle update is skipped, so each particle's <code>Psi</code> is carried unchanged and bit-identical - a passive label</li>
 <li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code>, <code>turbulent_schmidt_number = 0.7</code>, and <code>iem_constant = 2.0</code></li>
 <li><code>iem_constant</code> changes nothing while every particle's <code>Psi</code> is zero, which it is unless the verification scalar source prescribes it - and that source bypasses IEM; see <a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
 <li>use this structured block for ordinary scalar/Brownian transport tuning; reserve <code>petsc_passthrough_options</code> for flags without a YAML schema</li>
@@ -872,6 +873,7 @@ cg</h3>
 <li><code>verification.sources.scalar.amplitude</code> -&gt; <code>-verification_scalar_amplitude</code></li>
 <li><code>verification.sources.scalar.kx/ky/kz</code> -&gt; <code>-verification_scalar_kx/-verification_scalar_ky/-verification_scalar_kz</code></li>
 </ul>
+<p>Units: every value is physical and is converted with the case's scales. <code>gamma0</code> is a diffusivity (divided by <code>velocity_ref length_ref</code>) and the diffusivity <code>slope_x</code> a diffusivity per length (divided by <code>velocity_ref</code>); the scalar <code>slope_x</code> and <code>kx/ky/kz</code> are per length (multiplied by <code>length_ref</code>); <code>value</code>, <code>phi0</code>, and <code>amplitude</code> are dimensionless. See <a class="el" href="19_Nondimensionalization.html#p19_inputs_sec">3. Input Index</a>.</p>
 <p>Rules:</p><ul>
 <li>this path is verification-only and should be used only when no ordinary end-to-end workflow can expose the behavior under test</li>
 <li>it is only valid with <code>operation_mode.eulerian_field_source: "analytical"</code></li>

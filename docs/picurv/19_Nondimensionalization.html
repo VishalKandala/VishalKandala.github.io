@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Non-Dimensionalization Model</title>
+<title>PICurv: Units and Non-Dimensionalization</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,115 +86,385 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">Non-Dimensionalization Model</div></div>
+  <div class="headertitle"><div class="title">Units and Non-Dimensionalization</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p19_refs_sec">1. Reference Scales</a></li>
-<li class="level1"><a href="#p19_primary_sec">2. Primary Converted Quantities</a></li>
-<li class="level1"><a href="#p19_fields_sec">3. Field/Coordinate Scaling Conventions</a></li>
-<li class="level1"><a href="#p19_pipeline_sec">4. Where This Happens in the Pipeline</a><ul><li class="level2"><a href="#p19_derived_sub">4.1 Derived Products Carry Their Own Exponents</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#p19_notes_sec">5. Practical Notes</a></li>
-<li class="level1"><a href="#p19_links_sec">6. References</a></li>
+<ul><li class="level1"><a href="#p19_refs_sec">1. Reference Scales and Dimensions</a></li>
+<li class="level1"><a href="#p19_pipeline_sec">2. Where Conversion Happens</a></li>
+<li class="level1"><a href="#p19_inputs_sec">3. Input Index</a></li>
+<li class="level1"><a href="#p19_fields_sec">4. Field Index</a></li>
+<li class="level1"><a href="#p19_output_sec">5. Output</a></li>
+<li class="level1"><a href="#p19_payloads_sec">6. File Payloads and Providers</a></li>
+<li class="level1"><a href="#p19_transition_sec">7. Inputs Once Read in Solver Units</a></li>
+<li class="level1"><a href="#p19_extend_sec">8. Adding an Input or a Field</a></li>
+<li class="level1"><a href="#p19_links_sec">9. References</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Nondimensionalization"></a> PICurv uses a dimensional-input, non-dimensional-core workflow:</p>
+<div class="textblock"><p><a class="anchor" id="_Nondimensionalization"></a> PICurv follows one units rule, everywhere:</p>
 <ol type="1">
-<li>Users specify physical quantities in YAML.</li>
-<li><code>picurv</code> converts/control-maps these to non-dimensional solver inputs.</li>
-<li>Solver evolves non-dimensional fields.</li>
-<li>Postprocessing can re-dimensionalize outputs for &lt;run.visualization&gt;/analysis.</li>
+<li>Every value a user writes in <code>case.yml</code>, <code>solver.yml</code>, or <code>monitor.yml</code> is physical, in any consistent unit system, the one the reference scales are written in.</li>
+<li>Each value is converted to solver units exactly once, at the point where the reference scales are known.</li>
+<li>The solver works in non-dimensional form, and checkpoints stay in that form.</li>
+<li>Output is physical when a post-processing recipe sets <code>global_operations.dimensionalize: true</code>, and in solver units otherwise.</li>
 </ol>
+<p>Choosing <code>length_ref: 1.0</code> and <code>velocity_ref: 1.0</code> makes physical and solver values coincide, which is what most test and smoke cases do; the rule still holds, and a case may change its scales without rewriting any other input.</p>
 <h1><a class="anchor" id="p19_refs_sec"></a>
-1. Reference Scales</h1>
-<p>From <code>case.yml</code>:</p><ul>
-<li><code>L_ref = properties.scaling.length_ref</code></li>
-<li><code>U_ref = properties.scaling.velocity_ref</code></li>
-<li><code>rho_ref = properties.fluid.density</code></li>
-</ul>
-<p>Derived scales:</p><ul>
-<li><code>T_ref = L_ref / U_ref</code></li>
-<li><code>P_ref = rho_ref * U_ref^2</code></li>
-</ul>
-<h1><a class="anchor" id="p19_primary_sec"></a>
-2. Primary Converted Quantities</h1>
-<p>Common quantities prepared before solver launch:</p>
+1. Reference Scales and Dimensions</h1>
+<p>From <code>case.yml</code>:</p>
 <ul>
-<li>Reynolds number:<ul>
-<li><code>Re = rho_ref * U_ref * L_ref / mu</code></li>
-<li>emitted as <code>-ren</code></li>
+<li><code>L = properties.scaling.length_ref</code></li>
+<li><code>U = properties.scaling.velocity_ref</code></li>
+<li><code>rho = properties.fluid.density</code></li>
 </ul>
-</li>
-<li>Physical timestep to non-dimensional timestep:<ul>
-<li><code>dt* = dt_physical / T_ref</code></li>
-<li>emitted as <code>-dt</code></li>
-</ul>
-</li>
-</ul>
-<p>For file/grid-generated meshes, coordinates are normalized by <code>L_ref</code> before C-side ingestion.</p>
-<h1><a class="anchor" id="p19_fields_sec"></a>
-3. Field/Coordinate Scaling Conventions</h1>
-<p>Representative scaling conventions used across solver/post:</p>
-<ul>
-<li>Position: <code>x* = x / L_ref</code></li>
-<li>Velocity: <code>u* = u / U_ref</code></li>
-<li>Pressure: <code>p* = p / P_ref</code></li>
-</ul>
-<p><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> and Eulerian data follow the same scale family so interpolation/projection remain consistent.</p>
-<h1><a class="anchor" id="p19_pipeline_sec"></a>
-4. Where This Happens in the Pipeline</h1>
-<ul>
-<li>YAML validation and conversion: <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code></li>
-<li>Runtime option ingestion: <code><a class="el" href="setup_8c.html" title="// Setup code for running any simulation">src/setup.c</a></code></li>
-<li>Grid/data read-write scaling hooks: <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code></li>
-<li>Post re-dimensionalization trigger via <code>post.yml</code>:<ul>
-<li><code>global_operations.dimensionalize: true</code></li>
-<li>pipeline keyword <code>DimensionalizeAllLoadedFields</code></li>
-</ul>
-</li>
-</ul>
-<h2><a class="anchor" id="p19_derived_sub"></a>
-4.1 Derived Products Carry Their Own Exponents</h2>
-<p><code>global_operations.dimensionalize</code> reaches three producers, because a run's derived output is not made in one place:</p>
+<p>A quantity's dimension is recorded as three exponents <code>(a, b, c)</code> of those scales; a physical value is divided by <code>L^a U^b rho^c</code> to reach solver units, and a solver value is multiplied by it to leave them. The launcher (<code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>) records input dimensions with these triples, and the C field catalogs record field dimensions with the same triples, so input and output conversion share one vocabulary:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Producer   </th><th class="markdownTableHeadNone">What it scales    </th></tr>
+<th class="markdownTableHeadNone">Dimension   </th><th class="markdownTableHeadNone">Exponents <code>(L, U, rho)</code>   </th><th class="markdownTableHeadNone">Scale   </th><th class="markdownTableHeadNone">Examples    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Field pipeline (<code>DimensionalizeAllLoadedFields</code>)   </td><td class="markdownTableBodyNone">Loaded fields and grid coordinates, each by its own reference scale    </td></tr>
+<td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">(1, 0, 0)   </td><td class="markdownTableBodyNone"><code>L</code>   </td><td class="markdownTableBodyNone">grid coordinates, particle position, roughness height    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Field-statistics accumulator   </td><td class="markdownTableBodyNone">Derived statistics, by the source field's scale raised to the kind's exponent    </td></tr>
+<td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">(2, 0, 0)   </td><td class="markdownTableBodyNone"><code>L^2</code>   </td><td class="markdownTableBodyNone">face-area metrics <code>Csi</code>, <code>Eta</code>, <code>Zet</code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Spectra generator   </td><td class="markdownTableBodyNone">Every reported spectral quantity, by its own combination of <code>U_ref</code> and <code>L_ref</code>   </td></tr>
+<td class="markdownTableBodyNone"><code>INVERSE_VOLUME</code>   </td><td class="markdownTableBodyNone">(-3, 0, 0)   </td><td class="markdownTableBodyNone"><code>1/L^3</code>   </td><td class="markdownTableBodyNone">Jacobian <code>Aj</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>WAVENUMBER</code>   </td><td class="markdownTableBodyNone">(-1, 0, 0)   </td><td class="markdownTableBodyNone"><code>1/L</code>   </td><td class="markdownTableBodyNone">spectral <code>k0</code>, verification <code>kx</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">(0, 1, 0)   </td><td class="markdownTableBodyNone"><code>U</code>   </td><td class="markdownTableBodyNone"><code>Ucat</code>, BC velocities, particle velocity    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>TIME</code>   </td><td class="markdownTableBodyNone">(1, -1, 0)   </td><td class="markdownTableBodyNone"><code>L/U</code>   </td><td class="markdownTableBodyNone"><code>dt_physical</code>, statistics window times    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>VOLUME_FLUX</code>   </td><td class="markdownTableBodyNone">(2, 1, 0)   </td><td class="markdownTableBodyNone"><code>U L^2</code>   </td><td class="markdownTableBodyNone"><code>Ucont</code>, <code>target_flux</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>DIFFUSIVITY</code>   </td><td class="markdownTableBodyNone">(1, 1, 0)   </td><td class="markdownTableBodyNone"><code>U L</code>   </td><td class="markdownTableBodyNone"><code>Nu_t</code>, <code>Diffusivity</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>PRESSURE</code>   </td><td class="markdownTableBodyNone">(0, 2, 1)   </td><td class="markdownTableBodyNone"><code>rho U^2</code>   </td><td class="markdownTableBodyNone"><code>P</code>, <code>Phi</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>INVERSE_TIME_SQUARED</code>   </td><td class="markdownTableBodyNone">(-2, 2, 0)   </td><td class="markdownTableBodyNone"><code>U^2/L^2</code>   </td><td class="markdownTableBodyNone">Q-criterion    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">(0, 0, 0)   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone"><code>Psi</code>, <code>CS</code>, <code>Nvert</code>, model constants   </td></tr>
 </table>
-<p>A single blanket factor cannot serve them, because a derived quantity's dimensions are not its source field's:</p>
+<p>The Reynolds number is <code>Re = rho U L / mu</code> and is passed as <code>-ren</code>; <code>T = L/U</code> and <code>P = rho U^2</code> are the derived time and pressure scales.</p>
+<h1><a class="anchor" id="p19_pipeline_sec"></a>
+2. Where Conversion Happens</h1>
+<p>Each physical input is converted at one site, recorded beside its dimension:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Site   </th><th class="markdownTableHeadNone">Meaning   </th><th class="markdownTableHeadNone">Inputs    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>cli</code>   </td><td class="markdownTableBodyNone">the launcher divides the value while writing the control file   </td><td class="markdownTableBodyNone"><code>dt_physical</code>, BC velocities and fluxes, <code>_physical</code> IC values, point source, roughness height, <code>uniform_flow</code>, verification profiles, window times, spectral provider parameters    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>c</code>   </td><td class="markdownTableBodyNone">the runtime divides it, because the input reaches C with no staging step   </td><td class="markdownTableBodyNone"><code>programmatic_settings</code> domain bounds (<code><a class="el" href="io_8h.html#a7dd125436244f23eba5c6b06fdd35031" title="Parses command-line options for a programmatically generated grid for a SINGLE block.">ReadGridGenerationInputs()</a></code> in <code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>staging</code>   </td><td class="markdownTableBodyNone">a file payload is divided as it is staged under <code>&lt;run.inputs&gt;</code>   </td><td class="markdownTableBodyNone"><code>.picgrid</code> grids, <code>grid.gen</code> output, inlet-profile PICSLICEs, a <code>mode: file</code> initial condition    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>provider</code>   </td><td class="markdownTableBodyNone">a generator is handed the reference scales and writes solver units   </td><td class="markdownTableBodyNone"><code>ic_gen</code> expressions (<code>--length-ref</code>, <code>--velocity-ref</code>)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>evaluator</code>   </td><td class="markdownTableBodyNone">the runtime evaluates an expression at physical coordinates and divides the value by its field's scale   </td><td class="markdownTableBodyNone">particle <code>fields</code> initial values    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>reference</code>   </td><td class="markdownTableBodyNone">the input defines a scale   </td><td class="markdownTableBodyNone"><code>length_ref</code>, <code>velocity_ref</code>, <code>density</code>, <code>viscosity</code>, the provenance scales of a file payload    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>passthrough</code>   </td><td class="markdownTableBodyNone">raw solver flags, in solver units by definition   </td><td class="markdownTableBodyNone"><code>solver_parameters</code>, <code>petsc_passthrough_options</code>   </td></tr>
+</table>
+<p>The dimension and site of every input are recorded in <code>INPUT_QUANTITIES</code> (with <code>BC_PARAM_QUANTITIES</code> and <code>IC_PARAM_QUANTITIES</code> for free-form parameter mappings) in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, and every conversion takes its factor from that record.</p>
+<h1><a class="anchor" id="p19_inputs_sec"></a>
+3. Input Index</h1>
+<p>Every input that carries a physical dimension. Selectors, counts, steps, grid indices, tolerances, and dimensionless model constants are recorded as such and are not listed. <code>PAYLOAD</code> marks a file whose dimension follows its content: velocity for <code>Ucat</code>, volume flux for <code>Ucont</code>, and physical coordinates and values for <code>ic_gen</code> expressions and particle <code>fields</code>.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Input   </th><th class="markdownTableHeadNone">Dimension   </th><th class="markdownTableHeadNone">Converted by   </th><th class="markdownTableHeadNone">Scale    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.source</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.target_flux</code>   </td><td class="markdownTableBodyNone">VOLUME_FLUX   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.v_max</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vx</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vy</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vz</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: grid.generator</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.xMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.xMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.yMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.yMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.zMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.zMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: grid.source_file</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.bulk_velocity (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.bulk_velocity (duct_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.config_file (ic_gen)</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">provider   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.normalization.target (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.peak_velocity_physical (poiseuille)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.perturbation_rms (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.perturbation_rms (duct_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.random.mean (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k0 (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k0 (duct_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k0 (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k_cut (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k_cut (duct_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k_cut (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.u_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.v_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.velocity_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.velocity_physical (streamwise_constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.w_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.fields</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.x</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.y</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.z</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: models.physics.turbulence.wall_function.roughness_height</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.fluid.density</code>   </td><td class="markdownTableBodyNone">DENSITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">rho    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.fluid.viscosity</code>   </td><td class="markdownTableBodyNone">DYNAMIC_VISCOSITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">rho U L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.length_scale</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.peak_velocity_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.source_file</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.u_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.v_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.velocity_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.velocity_scale</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.w_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.scaling.length_ref</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>case.yml: properties.scaling.velocity_ref</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: run_control.dt_physical</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>monitor.yml: field_statistics.windows.[].end_time</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>monitor.yml: field_statistics.windows.[].start_time</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>monitor.yml: field_statistics.windows.[].time_cadence</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.u</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.v</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.w</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.gamma0</code>   </td><td class="markdownTableBodyNone">DIFFUSIVITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.slope_x</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.kx</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.ky</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.kz</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.slope_x</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L   </td></tr>
+</table>
+<h1><a class="anchor" id="p19_fields_sec"></a>
+4. Field Index</h1>
+<p>Every catalogued field records the dimension post-processing scales it by, as a <code>FIELD_DIM_*</code> argument of its entry in <code><a class="el" href="field__catalog_8c.html" title="Authoritative persistent-Eulerian-field catalog and runtime view resolver.">src/field_catalog.c</a></code> or <code><a class="el" href="particle__field__catalog_8c.html" title="Persistent solver-particle-field catalog implementation.">src/particle_field_catalog.c</a></code>. <code>NOT_A_QUANTITY</code> marks integer bookkeeping, and <code>FROM_SOURCE</code> marks staging storage that holds whatever field was written into it; neither has a scale of its own, and asking to dimensionalize one is an error. Each field's scale is resolved from this record by <code><a class="el" href="io_8h.html#a4b6d53ebde89bdb78a93fdc4dea248d6" title="Physical scale one field is multiplied by to leave non-dimensional form.">PicurvFieldReferenceScale()</a></code> (<code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>).</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Field   </th><th class="markdownTableHeadNone">Catalog   </th><th class="markdownTableHeadNone">Dimension   </th><th class="markdownTableHeadNone">Scale    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Aj</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>INVERSE_VOLUME</code>   </td><td class="markdownTableBodyNone">1/L^3    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>CellScalarAtCorner</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>FROM_SOURCE</code>   </td><td class="markdownTableBodyNone">its source field's    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>CellVectorAtCorner</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>FROM_SOURCE</code>   </td><td class="markdownTableBodyNone">its source field's    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Cent</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Centx</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Centy</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Centz</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Coordinates</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>CS</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Csi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Diffusivity</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIFFUSIVITY</code>   </td><td class="markdownTableBodyNone">U L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>DiffusivityGradient</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Eta</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>GridSpace</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>IAj</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>INVERSE_VOLUME</code>   </td><td class="markdownTableBodyNone">1/L^3    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>ICsi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>IEta</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>IZet</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>JAj</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>INVERSE_VOLUME</code>   </td><td class="markdownTableBodyNone">1/L^3    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>JCsi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>JEta</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>JZet</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>KAj</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>INVERSE_VOLUME</code>   </td><td class="markdownTableBodyNone">1/L^3    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>KCsi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>KEta</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>KZet</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Nu_t</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIFFUSIVITY</code>   </td><td class="markdownTableBodyNone">U L    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>NuWall</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIFFUSIVITY</code>   </td><td class="markdownTableBodyNone">U L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Nvert</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Nvert_o</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>P</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>PRESSURE</code>   </td><td class="markdownTableBodyNone">rho U^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>ParticleCount</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Phi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>PRESSURE</code>   </td><td class="markdownTableBodyNone">rho U^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>PostScalar</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>FROM_SOURCE</code>   </td><td class="markdownTableBodyNone">its source field's    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>PostVector</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>FROM_SOURCE</code>   </td><td class="markdownTableBodyNone">its source field's    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Psi</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Qcrit</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>INVERSE_TIME_SQUARED</code>   </td><td class="markdownTableBodyNone">U^2/L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Ucat</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Ucont</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VOLUME_FLUX</code>   </td><td class="markdownTableBodyNone">U L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Ucont_o</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VOLUME_FLUX</code>   </td><td class="markdownTableBodyNone">U L^2    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Ucont_rm1</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VOLUME_FLUX</code>   </td><td class="markdownTableBodyNone">U L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Utau</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Zet</code>   </td><td class="markdownTableBodyNone">Eulerian   </td><td class="markdownTableBodyNone"><code>AREA</code>   </td><td class="markdownTableBodyNone">L^2    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Diffusivity</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>DIFFUSIVITY</code>   </td><td class="markdownTableBodyNone">U L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>DiffusivityGradient</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>DMSwarm_CellID</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>NOT_A_QUANTITY</code>   </td><td class="markdownTableBodyNone">not scaled    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>DMSwarm_location_status</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>NOT_A_QUANTITY</code>   </td><td class="markdownTableBodyNone">not scaled    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>DMSwarm_pid</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>NOT_A_QUANTITY</code>   </td><td class="markdownTableBodyNone">not scaled    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>DMSwarm_rank</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>NOT_A_QUANTITY</code>   </td><td class="markdownTableBodyNone">not scaled    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>position</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>LENGTH</code>   </td><td class="markdownTableBodyNone">L    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Psi</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>velocity</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>VELOCITY</code>   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>weight</code>   </td><td class="markdownTableBodyNone">particle   </td><td class="markdownTableBodyNone"><code>DIMENSIONLESS</code>   </td><td class="markdownTableBodyNone">1   </td></tr>
+</table>
+<h1><a class="anchor" id="p19_output_sec"></a>
+5. Output</h1>
+<p><code>global_operations.dimensionalize</code> is a setting that reaches every producer, and each scales its own values once, where they are made:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Producer   </th><th class="markdownTableHeadNone">With <code>dimensionalize: true</code>    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Eulerian fields   </td><td class="markdownTableBodyNone">each field is scaled by its catalog dimension as it is read from a checkpoint (<code><a class="el" href="io_8h.html#a3a009dabc71ccfa59f196e1bc045de45" title="Reads binary field data for velocity, pressure, and other required vectors.">ReadSimulationFields()</a></code>), so a field a step does not reload is never scaled twice    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Grid coordinates   </td><td class="markdownTableBodyNone">scaled by <code>L</code> once, after the first read    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> fields   </td><td class="markdownTableBodyNone">every loaded particle field with a fixed dimension, after the statistics pipeline has run    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD (<code>*_msd.csv</code>)   </td><td class="markdownTableBodyNone">computed in solver units against <code>D = 1/(Re Sc)</code>; <code>t</code> is written times <code>L/U</code>, the <code>MSD_*</code> columns times <code>L^2</code>, radii and centre of mass times <code>L</code>; the relative error and shell fractions are ratios and are the same in either system    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Field-statistics fields   </td><td class="markdownTableBodyNone">a derived statistic carries its source field's scale raised to the kind's exponent (mean and RMS to the first, Reynolds stress and TKE to the second), and a co-moment the product of its two fields' scales    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Field-statistics history (<code>*_statistics_&lt;window&gt;.csv</code>)   </td><td class="markdownTableBodyNone"><code>represented_time</code> in seconds, and <code>total_weight</code> too under <code>physical_time</code> weighting    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Spectra   </td><td class="markdownTableBodyNone">every spectral quantity by its own combination of <code>U</code> and <code>L</code>; the <code>time</code> column times <code>L/U</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Q-criterion   </td><td class="markdownTableBodyNone"><code>U^2/L^2</code>: the velocity is already physical and the metrics are not, so the kernel divides by <code>L^2</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">ParaView collections (<code>.pvd</code>)   </td><td class="markdownTableBodyNone">each frame's time is its checkpoint time times the reference time of the run that wrote it   </td></tr>
+</table>
+<p>Without the setting, every one of these is in solver units, including the collection times, which then match the frames they index.</p>
+<p>Runtime diagnostics written during a solve (<code>les_coefficient.csv</code>, <code>wall_model.csv</code>, <code>interpolation_error.csv</code>, <code>scatter_metrics.csv</code>, <code>search_metrics.csv</code>) are in solver units, with a <code>physical_time</code> column beside <code>time</code> for plotting in seconds. Checkpoints are never dimensionalized: they are restart state, and a restart must reproduce the solver's own units exactly.</p>
+<h1><a class="anchor" id="p19_payloads_sec"></a>
+6. File Payloads and Providers</h1>
 <ul>
-<li>mean, RMS: source scale to the first power</li>
-<li>Reynolds stress, turbulent kinetic energy: to the second</li>
-<li>co-moment flux: the product of the two fields' scales, which need not be equal</li>
-<li>wavenumber: <code>1 / L_ref</code>; energy: <code>U_ref^2</code>; spectral second moment: <code>U_ref^2 / L_ref^2</code>; integral and Taylor scales: <code>L_ref</code></li>
-<li>Parseval residual and shell counts are ratios and counts, and are never scaled</li>
+<li><b>Grids.</b> A <code>.picgrid</code>, whether supplied or written by <code>grid.gen</code>, is physical and is divided by <code>L</code> when staged; <code>programmatic_settings</code> bounds are divided by <code>L</code> in C.</li>
+<li><b>Inlet profiles.</b> A <code>file</code> or <code>generated</code> PICSLICE is a physical velocity. A <code>field_slice</code> re-samples an earlier run's solver-unit field, and names that run's case (<code>source_case</code>) or its <code>velocity_scale</code>.</li>
+<li><b>File initial conditions.</b> A <code>mode: file</code> payload is physical: <code>Ucat</code> in velocity, <code>Ucont</code> in volume flux per face. A field saved by an earlier PICurv run is in that run's solver units, so it names the case that wrote it (<code>source_case</code>), or gives <code>velocity_scale</code>, with <code>length_scale</code> too for <code>Ucont</code>; the staged payload is rescaled from those scales to this case's.</li>
+<li>**<code>ic_gen</code> expressions** are evaluated at physical coordinates and give physical values. The generator receives <code>--length-ref</code> and <code>--velocity-ref</code> and writes solver units; a custom <code>params.script</code> receives the same two options.</li>
+<li><b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> <code>fields</code> expressions</b> are evaluated by the runtime at physical coordinates (<code>x y z</code> are the particle position times <code>L</code>, <code>t</code> the physical time) and give values in the field's physical units; each value is divided by the field's catalog scale before it is stored. <code>Psi</code> is dimensionless, so its values are stored as given.</li>
+<li><b>Spectral providers</b> receive their velocities and wavenumbers already converted, and work on the staged non-dimensional grid; their summaries report solver units.</li>
 </ul>
-<p>Checkpoints are never dimensionalized: they are restart state, and restart must reproduce the solver's own units exactly. Only derived output is scaled, so a <code>.dat</code> under <code>&lt;run.checkpoints&gt;</code> and a <code>.vts</code> under <code>&lt;run.visualization&gt;</code> are deliberately in different unit systems.</p>
-<p>The grid is the one quantity converted on the way <em>in</em> rather than out, in all three <code>grid.mode</code> values, so the round trip is uniform regardless of which one a case uses:</p>
+<h1><a class="anchor" id="p19_transition_sec"></a>
+7. Inputs Once Read in Solver Units</h1>
+<p>The point source, the wall-function roughness height, <code>uniform_flow</code>, the verification source profiles, the statistics window times, the <code>ic_gen</code> expressions, the spectral provider parameters, and a <code>mode: file</code> initial-condition payload were read in solver units before this rule covered them. At unit reference scales the two readings are the same. At any other scale, <code>picurv validate</code> names each of these inputs a configuration sets, since a value written in solver units has to be converted to physical.</p>
+<h1><a class="anchor" id="p19_extend_sec"></a>
+8. Adding an Input or a Field</h1>
 <ul>
-<li><code>file</code> and <code>grid_gen</code>: a <code>.picgrid</code> is supplied dimensional and is divided by <code>L_ref</code> when the conductor publishes it as an asset, so the solver reads geometry already in solver units.</li>
-<li><code>programmatic_c</code>: <code>xMins</code>/<code>xMaxs</code>/<code>yMins</code>/... are likewise supplied dimensional. <code><a class="el" href="io_8h.html#a7dd125436244f23eba5c6b06fdd35031" title="Parses command-line options for a programmatically generated grid for a SINGLE block.">ReadGridGenerationInputs()</a></code> (<code><a class="el" href="io_8c.html" title="Implementation of data input/output routines, focusing on grid configuration.">src/io.c</a></code>) divides each bound by <code>L_ref</code> after <code><a class="el" href="io_8h.html#a10269cd4ddae9d1a84b84de3e2913158" title="Parses physical scaling parameters from command-line options.">ParseScalingInformation()</a></code> has resolved it, immediately before assigning <code>user-&gt;Min_X</code>/<code>Max_X</code>/etc - the same division a <code>file</code> grid receives in Python, just performed in C because this mode has no Python staging step to perform it in.</li>
-</ul>
-<p>Coordinates written by post-processing are multiplied back by <code>L_ref</code> unconditionally (<code>DimensionalizeField("Coordinates")</code>), so a case authored with <code>length_ref: 1.0</code> is unaffected either way, and a case using another reference length gets back the same physical bounds it specified, whichever grid mode produced them.</p>
-<h1><a class="anchor" id="p19_notes_sec"></a>
-5. Practical Notes</h1>
-<ul>
-<li>Choose physically meaningful <code>L_ref</code> and <code>U_ref</code>; they directly affect <code>Re</code> and <code>dt*</code>.</li>
-<li>Keep input units consistent across all physical parameters in <code>case.yml</code>.</li>
-<li>For reproducibility, keep run-local generated artifacts under <code>&lt;run.config&gt;/</code>.</li>
+<li>A new configuration key needs an entry in <code>INPUT_QUANTITIES</code> (or <code>BC_PARAM_QUANTITIES</code>, <code>IC_PARAM_QUANTITIES</code>) giving its dimension and conversion site; <code>tests/test_units_and_scaling.py</code> fails until it has one, and a <code>cli</code> conversion takes its factor from that entry through <code>to_solver_units()</code>.</li>
+<li>A new catalogued field needs a <code>FIELD_DIM_*</code> argument; an entry without one does not compile.</li>
+<li>Both indexes on this page are checked against the code by <code><a class="el" href="audit__units_8py.html" title="Enforce the physical-units rule and the published units indexes.">tests/tooling/audit_units.py</a></code>, the checker of the <code>units.nondimensionalization</code> contract.</li>
 </ul>
 <h1><a class="anchor" id="p19_links_sec"></a>
-6. References</h1>
+9. References</h1>
 <ul>
-<li>PETSc docs (solver stack context): <a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
-<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b> </li>
+<li>Config contract details: <b><a class="el" href="14_Config_Contract.html">Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)</a></b></li>
+<li>Field identities and layouts: <a class="el" href="56_Field_Identity_and_Layout_Catalog.html">Field Identity and Layout Catalog</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

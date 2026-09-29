@@ -248,12 +248,12 @@ field_statistics:
 
       # Physical time at which the window starts accumulating. The first accepted
       # state anchors the window; it contributes no interval of its own.
-      # [Number] -&gt; -field_statistics_window_&lt;i&gt;_start_time
+      # [Number, s] -&gt; -field_statistics_window_&lt;i&gt;_start_time (divided by length_ref/velocity_ref)
       start_time: 1.0
 
       # Physical time at which the window stops. Omit for an open-ended window
       # that keeps accumulating until the run ends.
-      # [Number] -&gt; -field_statistics_window_&lt;i&gt;_end_time
+      # [Number, s] -&gt; -field_statistics_window_&lt;i&gt;_end_time
       # end_time: 10.0
 
       # How an accepted state is weighted.
@@ -268,7 +268,7 @@ field_statistics:
       # or past each multiple of the interval.
       # [Positive Integer] -&gt; -field_statistics_window_&lt;i&gt;_step_cadence
       step_cadence: 10
-      # [Positive Number] -&gt; -field_statistics_window_&lt;i&gt;_time_cadence
+      # [Positive Number, s] -&gt; -field_statistics_window_&lt;i&gt;_time_cadence
       # time_cadence: 0.05
 
       # Fields to accumulate. The first moment is always kept, because every
@@ -493,6 +493,7 @@ solver_monitoring:
 <li>Raising <code>verbosity</code> therefore does not surface a function's diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
 <li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
+<li>Runtime diagnostics CSVs (<code>search_metrics.csv</code>, <code>scatter_metrics.csv</code>, <code>interpolation_error.csv</code>, <code>les_coefficient.csv</code>, <code>wall_model.csv</code>) are in solver units. Each row carries <code>time</code> in solver time and, as its last column, <code>physical_time</code> in seconds (<code>time * length_ref / velocity_ref</code>), so a history can be plotted in physical time without the case's scales at hand. See <a class="el" href="19_Nondimensionalization.html#p19_output_sec">5. Output</a>.</li>
 <li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>&lt;run.analysis.metrics&gt;/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
 <li>LES runs with <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> write <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
 <li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
