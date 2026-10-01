@@ -366,30 +366,48 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="foldopen" id="foldopen00257" data-start="" data-end="">
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno"><a class="line" href="namespacepicurv__cli_1_1storage_1_1compatibility.html#a11147bbde9dfde13973fba69bc8894fe">  257</a></span><span class="keyword">def </span>_rebase_restored_text_paths(root: str, replacements: list) -&gt; list:</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="stringliteral">    @brief Rebase known generated text artifacts after an explicit relocated restore.</span></div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="stringliteral">    @param[in] root Value supplied through the `root` argument.</span></div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="stringliteral">    @param[in] replacements Value supplied through the `replacements` argument.</span></div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="stringliteral">    @return Result produced by this operation.</span></div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    changed = []</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    allowed_suffixes = {<span class="stringliteral">&quot;.control&quot;</span>, <span class="stringliteral">&quot;.run&quot;</span>, <span class="stringliteral">&quot;.sbatch&quot;</span>, <span class="stringliteral">&quot;.json&quot;</span>, <span class="stringliteral">&quot;.tsv&quot;</span>, <span class="stringliteral">&quot;.yml&quot;</span>, <span class="stringliteral">&quot;.yaml&quot;</span>}</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="keywordflow">for</span> path <span class="keywordflow">in</span> Path(root).rglob(<span class="stringliteral">&quot;*&quot;</span>):</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> path.is_file() <span class="keywordflow">or</span> path.is_symlink() <span class="keywordflow">or</span> path.stat().st_size &gt; 32 * 1024 * 1024:</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>        <span class="keywordflow">if</span> path.suffix.lower() <span class="keywordflow">not</span> <span class="keywordflow">in</span> allowed_suffixes:</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>        <span class="keywordflow">try</span>:</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            content = path.read_text(encoding=<span class="stringliteral">&quot;utf-8&quot;</span>)</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        <span class="keywordflow">except</span> (OSError, UnicodeDecodeError):</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        updated = content</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>        <span class="keywordflow">for</span> old, new <span class="keywordflow">in</span> replacements:</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>            <span class="keywordflow">if</span> old <span class="keywordflow">and</span> new <span class="keywordflow">and</span> old != new:</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>                updated = updated.replace(old, new)</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        <span class="keywordflow">if</span> updated != content:</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>            path.write_text(updated, encoding=<span class="stringliteral">&quot;utf-8&quot;</span>)</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>            changed.append(str(path))</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    <span class="keywordflow">return</span> changed</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="stringliteral">    @brief Rebase known generated text artifacts after a run or study changed location.</span></div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="stringliteral">    @details Used after a relocated restore and when a moved run or study is next opened.</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="stringliteral">             An old path is replaced only where it ends at a path boundary, so moving</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="stringliteral">             `/a/run1` does not rewrite `/a/run10`. Immutable stores are never rewritten:</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="stringliteral">             an asset object&#39;s payload is checked against the digests in its `asset.json`,</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="stringliteral">             and a committed checkpoint against its commit marker, so editing either would</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="stringliteral">             invalidate it; the paths they carry are provenance, not inputs. A rewritten</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="stringliteral">             file replaces the old one instead of being edited in place, so a hard link</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="stringliteral">             to it (a run input materialized from an asset object) keeps the original.</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="stringliteral">    @param[in] root Directory whose generated text artifacts are rewritten.</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span><span class="stringliteral">    @param[in] replacements (old absolute path, new absolute path) pairs.</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="stringliteral">    @return Paths of the files that changed.</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    immutable = re.compile(<span class="stringliteral">r&quot;(^|/)(assets/objects|checkpoints/step_\d+)/&quot;</span>)</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    patterns = [</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        (re.compile(re.escape(old) + <span class="stringliteral">r&quot;(?=$|[/\s&#39;\&quot;=,;:)\]}])&quot;</span>, re.MULTILINE), new)</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        <span class="keywordflow">for</span> old, new <span class="keywordflow">in</span> replacements</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>        <span class="keywordflow">if</span> old <span class="keywordflow">and</span> new <span class="keywordflow">and</span> old != new</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    ]</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    changed = []</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    allowed_suffixes = {<span class="stringliteral">&quot;.control&quot;</span>, <span class="stringliteral">&quot;.run&quot;</span>, <span class="stringliteral">&quot;.sbatch&quot;</span>, <span class="stringliteral">&quot;.json&quot;</span>, <span class="stringliteral">&quot;.tsv&quot;</span>, <span class="stringliteral">&quot;.yml&quot;</span>, <span class="stringliteral">&quot;.yaml&quot;</span>}</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    <span class="keywordflow">for</span> path <span class="keywordflow">in</span> Path(root).rglob(<span class="stringliteral">&quot;*&quot;</span>):</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> path.is_file() <span class="keywordflow">or</span> path.is_symlink() <span class="keywordflow">or</span> path.stat().st_size &gt; 32 * 1024 * 1024:</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        <span class="keywordflow">if</span> path.suffix.lower() <span class="keywordflow">not</span> <span class="keywordflow">in</span> allowed_suffixes:</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        <span class="keywordflow">if</span> immutable.search(path.relative_to(root).as_posix()):</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        <span class="keywordflow">try</span>:</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>            content = path.read_text(encoding=<span class="stringliteral">&quot;utf-8&quot;</span>)</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>        <span class="keywordflow">except</span> (OSError, UnicodeDecodeError):</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>        updated = content</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>        <span class="keywordflow">for</span> pattern, new <span class="keywordflow">in</span> patterns:</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>            updated = pattern.sub(<span class="keyword">lambda</span> _match, value=new: value, updated)</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        <span class="keywordflow">if</span> updated != content:</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>            staging = path.with_name(f<span class="stringliteral">&quot;.{path.name}.rebase&quot;</span>)</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>            staging.write_text(updated, encoding=<span class="stringliteral">&quot;utf-8&quot;</span>)</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>            shutil.copymode(path, staging)</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>            os.replace(staging, path)</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>            changed.append(str(path))</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    <span class="keywordflow">return</span> changed</div>
 </div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

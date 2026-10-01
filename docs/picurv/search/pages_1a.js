@@ -30,10 +30,11 @@ var searchData=
   ['status_20vocabulary_27',['Capability Status Vocabulary',['../62_Capability_Status_Vocabulary.html',1,'']]],
   ['step_20projection_20method_28',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
   ['storage_20management_20guide_29',['Storage Management Guide',['../61_Storage_Management_Guide.html',1,'']]],
-  ['study_20guide_30',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['suite_20developer_20guide_31',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
-  ['summary_32',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['supported_33',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]],
-  ['sweep_20and_20study_20guide_34',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['symptom_35',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['storage_20promotion_30',['f0097d7-storage-promotion',['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'']]],
+  ['study_20guide_31',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['suite_20developer_20guide_32',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
+  ['summary_33',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
+  ['supported_34',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]],
+  ['sweep_20and_20study_20guide_35',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['symptom_36',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];

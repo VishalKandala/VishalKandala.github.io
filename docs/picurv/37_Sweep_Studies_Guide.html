@@ -209,6 +209,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>generator/file grid external paths are rewritten to absolute paths during case materialization so they remain valid in <code>studies/&lt;study_id&gt;/cases/...</code>.</li>
 <li>generated <code>solver_array.sbatch</code> exports walltime metadata for the runtime walltime guard. After successful field processing, <code>post_array.sbatch</code> also finalizes each member's PVD collections when its post recipe enables <code>io.paraview_series</code>. Collections describe one member's run or restart ancestry; they do not concatenate independent sweep members into one time series.</li>
 <li><code>post_array.sbatch</code> uses the same <code>nodes * ntasks_per_node</code> allocation as the solver array; conflicting launcher <code>-n</code>/<code>-np</code> flags are rewritten to that task count.</li>
+<li>each member's post runs under that member's post lock and processes only the steps whose output is missing or stale when its array task starts, as <code>picurv run --post-process</code> does (see <a class="el" href="05_The_Conductor_Script.html#p05_run_sec">4. run: Single-Case Workflow</a>).</li>
 </ul>
 <h1><a class="anchor" id="p37_continue_sec"></a>
 6. Continuing a Partially-Completed Study</h1>
@@ -224,7 +225,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>If all cases are complete, auto-aggregates metrics and exits (no jobs submitted).</li>
 <li>For partial cases: updates <code>case.yml</code> (<code>start_step</code>, <code>total_steps</code>), sets particle <code>restart_mode</code> to <code>load</code> when a checkpoint exists, and delegates to <code>resolve_restart_source</code> for the full restart scenario matrix.</li>
 <li>For empty cases (no checkpoint): re-runs from scratch with unmodified control files.</li>
-<li>Submits a sparse solver array (incomplete cases only) → full post array → metrics aggregation.</li>
+<li>Submits a sparse solver array (incomplete cases only) → full post array → metrics aggregation. The post array covers every member, but a member whose output is up to date launches no postprocessor, so only the continued members' new steps are processed. With <code>--no-submit</code> the three scripts are staged instead; <code>picurv submit --study-dir &lt;study&gt;</code> submits them in that order.</li>
 </ol>
 <p>Repeated continuation is safe: the target step count is always computed from the original <code>study.yml</code>, not from the (potentially modified) per-case <code>case.yml</code>.</p>
 <h1><a class="anchor" id="p37_reaggregate_sec"></a>

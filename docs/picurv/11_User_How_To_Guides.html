@@ -318,7 +318,7 @@ Re = \frac{\rho U L}{\mu}
 <ul>
 <li>the previous run actually wrote solver outputs for the target <code>start_step</code>,</li>
 <li>the <code>--restart-from</code> path points to the intended previous run directory,</li>
-<li>the selected previous run has its checkpoint component locally available (restore it with <code>picurv storage restore --component checkpoints</code> when cold),</li>
+<li>the selected previous run has its checkpoint component locally available (restore it with <code>picurv storage restore --run-dir &lt;previous_run&gt; --checkpoint &lt;start_step&gt;</code> when cold),</li>
 <li>restart source files for the requested step exist,</li>
 <li><code>start_step</code> matches an actual saved timestep, not just a desired number.</li>
 </ul>
@@ -360,15 +360,12 @@ Re = \frac{\rho U L}{\mu}
 <div class="line">  --run-dir runs/flat_channel_20240401-153000 \</div>
 <div class="line">  --post my_study/standard_analysis.yml</div>
 </div><!-- fragment --><p>Use when solver outputs already exist and you are iterating only on analysis pipeline.</p>
-<p>To catch up the same recipe in batches while the solver is still running, add <code>--continue</code> and keep the full desired window in <code>post.yml</code>:</p>
-<div class="fragment"><div class="line">./bin/picurv run --post-process --continue \</div>
-<div class="line">  --run-dir runs/flat_channel_20240401-153000 \</div>
-<div class="line">  --post my_study/standard_analysis.yml</div>
-</div><!-- fragment --><p>Behavior notes:</p><ul>
-<li>if the same recipe already produced steps <code>0..60</code> and <code>post.yml</code> still asks for <code>0..100</code>, PICurv launches only <code>70..100</code>.</li>
-<li>if source files currently exist only through <code>420</code>, PICurv launches only the fully available contiguous prefix and exits successfully; a later <code>--continue</code> run picks up the newer steps.</li>
-<li>if you change the recipe itself, PICurv starts from that recipe's configured <code>start_step</code> instead of inheriting completion from the earlier recipe.</li>
-<li>if you omit <code>--continue</code>, PICurv honors the requested window exactly and treats the run as an explicit rerun.</li>
+<p>To catch up the same recipe in batches while the solver is still running, repeat the same command and keep the full desired window in <code>post.yml</code>. Each run processes only the steps whose output is missing or stale.</p>
+<p>Behavior notes:</p><ul>
+<li>if the same recipe already produced steps <code>0..60</code> and <code>post.yml</code> still asks for <code>0..100</code>, PICurv processes only <code>70..100</code>.</li>
+<li>if source files currently exist only through <code>420</code>, PICurv processes the committed steps and exits successfully; a later run picks up the newer steps.</li>
+<li>if you change the recipe itself, it is a new recipe with its own output directory, and its whole window is processed.</li>
+<li>to regenerate output that is still up to date, for example after rebuilding the postprocessor, add <code>--recompute</code>.</li>
 </ul>
 <p>For the broader run-directory lifecycle around restart, post-only reuse, and generated scheduler artifacts, see <b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b>.</p>
 <p>For a physical-time movie across a restart campaign, add <code>io.paraview_series: {enabled: true, scope: lineage}</code> to the existing post recipe. Postprocess the parent before the child, using the same recipe and a window that includes the desired parent history. The child processes only its owned steps and writes <code>&lt;run.visualization&gt;/&lt;recipe_id&gt;/&lt;output_filename_prefix&gt;.pvd</code>, which references both runs. Open that PVD in ParaView. A later catch-up invocation refreshes it; reopen it to load new frames. Use <code>scope: run</code> to restrict the view to one run. Different solver timesteps use checkpoint physical time; changing the post stride or fields creates a different recipe ID, which is not automatically combined with the earlier one. See <a class="el" href="10_Post_Processing_Reference.html">Configuration Reference: Postprocessor YAML</a> for reset and retention rules.</p>

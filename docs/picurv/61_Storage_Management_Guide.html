@@ -227,6 +227,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  --run-dir runs/channel_20260824-143000 \</div>
 <div class="line">  --label &quot;pilot 64, still processing&quot;</div>
 </div><!-- fragment --><p>This gives the run a verified remote copy while <code>--continue</code>, post-processing, and ordinary file access continue to use the full local tree.</p>
+<p>When the run later becomes cold, <code>picurv storage offload</code> reuses that archive instead of uploading the run again, as long as nothing in the run changed since it was protected ("Reusing verified archive ..."). An explicit <code>--compression</code> is honoured: an archive made at another level is not reused for it, and a new one is created. Pass the same <code>--compression</code> to <code>offload</code> as to <code>protect</code>, or none, to reuse.</p>
 <h2><a class="anchor" id="p61_mixed_study"></a>
 3.3 Only Some Cases in a Study Are Finished</h2>
 <p>Inspect all numbered members:</p>
@@ -252,7 +253,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!-- fragment --><h2><a class="anchor" id="p61_small_large"></a>
 3.4 Small and Very Large Artifacts</h2>
 <p>Choose compression per operation when the profile default is not appropriate:</p>
-<div class="fragment"><div class="line"># Small/already-compressed data: package without compression.</div>
+<div class="fragment"><div class="line"># Small or already-compressed data: package without compression.</div>
+<div class="line"># PICurv checkpoints compress by about 30%, so this rarely pays for them.</div>
 <div class="line">picurv storage protect --run-dir runs/small_run --compression none</div>
 <div class="line"> </div>
 <div class="line"># Large data where transfer size matters more than compression time.</div>
@@ -281,6 +283,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  --study-dir studies/grid_study_20260824-150000 \</div>
 <div class="line">  --case-id case_0007</div>
 </div><!-- fragment --><p>A whole-study archive is restored with <code>--study-dir</code> and no case selector.</p>
+<p>Restoring into the artifact's own directory downloads only what it does not already hold: components kept by the offload policy or restored earlier are skipped and listed as "Already local, not downloaded again". <code>--force</code> downloads everything.</p>
 <h2><a class="anchor" id="p61_restore_deleted"></a>
 4.2 Every Local Directory Was Deleted</h2>
 <p>The catalog lives on the remote and does not depend on local marker files:</p>
@@ -295,7 +298,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  --archive-id 0123456789abcdef0123456789abcdef \</div>
 <div class="line">  --to /cluster/new-workspace/runs/pilot-64-restored</div>
 </div><!-- fragment --><p>When an individually archived study member is restored after the entire study was deleted, its archive also recreates the small parent study context, including <code>study.yml</code>, <code>study_manifest.json</code>, and <code>&lt;run.scheduler&gt;/case_index.tsv</code> when those files were present at archive time.</p>
-<p>An alternate-location restore conservatively replaces the old run/study prefix in known generated text files (<code>.control</code>, <code>.run</code>, <code>.sbatch</code>, JSON, TSV, and YAML). Inspect regenerated scheduler scripts and any user-authored absolute paths before submitting on a different cluster. Remote archive bytes remain unchanged.</p>
+<p>An alternate-location restore conservatively replaces the old run/study prefix in known generated text files (<code>.control</code>, <code>.run</code>, <code>.sbatch</code>, JSON, TSV, and YAML), matching only whole path components. Asset objects (<code>assets/objects/</code>) and committed checkpoint bundles are never rewritten: their contents are checked against recorded digests, and the paths they carry are provenance. A run or study moved by hand gets the same rewrite the next time PICurv opens it (see <a class="el" href="52_Run_Artifact_Lifecycle_Contract.html#p52_scope_move_sub">1.3 Moving Or Copying A Run Or Study</a>). Inspect regenerated scheduler scripts and any user-authored absolute paths before submitting on a different cluster. Remote archive bytes remain unchanged.</p>
 <h2><a class="anchor" id="p61_restore_checkpoint"></a>
 4.3 Only Particular Checkpoints Are Needed</h2>
 <p>Use repeatable checkpoint selectors to avoid downloading unrelated bulk output:</p>
@@ -303,7 +306,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  --archive-id 0123456789abcdef0123456789abcdef \</div>
 <div class="line">  --checkpoint 500 \</div>
 <div class="line">  --checkpoint 600</div>
-</div><!-- fragment --><p>The result is <code>PARTIAL</code>. Restart and continuation proceed when their required checkpoint is present. Post-processing proceeds when all checkpoint steps in its requested start/end/interval window are present; otherwise PICurv prints the exact selective or full restore command to run.</p>
+</div><!-- fragment --><p>The result is <code>PARTIAL</code>. Restart and continuation proceed when their required checkpoint is present. Post-processing proceeds when the checkpoint of every requested step whose output is missing or stale is present; a step whose output is up to date is not read. Otherwise PICurv prints the exact selective or full restore command to run.</p>
 <p><code>--force</code> permits a restore to merge into an existing directory that is not already the matching cold artifact. Because matching archived files can be replaced, use it only after inspecting the destination. Prefer a new <code>--to</code> path for recovery experiments.</p>
 <h2><a class="anchor" id="p61_restore_component"></a>
 4.4 Only One Semantic Component Is Needed</h2>
@@ -316,7 +319,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 4.5 Reclaiming a Shared Asset</h2>
 <p>Offloading a run does not remove the workspace assets it used, because another run may still need them. Once nothing local does, and a workspace archive has been verified, the local copies can go:</p>
 <div class="fragment"><div class="line">picurv storage prune --workspace . --assets --unused-locally --dry-run</div>
-</div><!-- fragment --><p>Both selectors are required: <code>prune</code> removes nothing else, and it says what it decided before it decides it.</p>
+</div><!-- fragment --><p>Both selectors are required: <code>prune</code> removes nothing else, and it says what it decided before it decides it. A removal the filesystem refuses is reported with its error and the command exits non-zero, rather than being counted as removed.</p>
+<p><code>prune</code> acts on local copies only; nothing in <code>picurv storage</code> deletes from the remote. <code>storage restore --run-dir</code> restores a run's own copies of its inputs, not the workspace's shared objects. A pruned object comes back when a run is staged with <code>--fetch-missing</code>, or from the workspace archive (<code>storage restore --archive-id &lt;workspace archive&gt; --component assets</code>). Verify a workspace's own archive with <code>picurv storage verify --workspace .</code>.</p>
 <div class="fragment"><div class="line">8df21abc0e4f1a92  grids</div>
 <div class="line">  referenced by remote runs       2</div>
 <div class="line">  referenced by active local runs 0</div>
@@ -364,7 +368,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li><code>restart --from</code> behavior is represented by <code>picurv run --solve --restart-from ...</code>. A cold source is refused unless its requested start checkpoint has been restored.</li>
 <li><code>run --solve --continue --run-dir ...</code> follows the same checkpoint rule.</li>
-<li><code>run --post-process</code> accepts a partial restore only when the complete requested checkpoint window is local.</li>
+<li><code>run --post-process</code> accepts a partial restore only when every checkpoint it must process is local. Steps whose output is up to date are excluded, so a window that is already complete is reported as complete without a restore. Spectra follow the same rule.</li>
 <li><code>submit</code> refuses a cold run and refuses a study with cold members. Existing staged scripts and scheduler metadata are retained during offload.</li>
 <li><code>sweep --continue</code> refuses cold members instead of interpreting pruned checkpoints as incomplete cases; <code>--auto-fetch</code> restores them first instead of failing (see <a class="el" href="61_Storage_Management_Guide.html#p61_mixed_study">3.3 Only Some Cases in a Study Are Finished</a>).</li>
 <li><code>sweep --reaggregate</code> carries a cold member's previously aggregated values forward instead of refusing; <code>--auto-fetch</code> restores cold members first so they are re-measured like any other (see <a class="el" href="61_Storage_Management_Guide.html#p61_mixed_study">3.3 Only Some Cases in a Study Are Finished</a>).</li>
@@ -432,15 +436,27 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_auto"><code>auto</code></a></td><td class="markdownTableBodyNone"><code>auto</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_balanced"><code>balanced</code></a></td><td class="markdownTableBodyNone"><code>balanced</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_fast"><code>fast</code></a></td><td class="markdownTableBodyNone"><code>fast</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_maximum"><code>maximum</code></a></td><td class="markdownTableBodyNone"><code>maximum</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_none"><code>none</code></a></td><td class="markdownTableBodyNone"><code>none</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_auto"><code>auto</code></a></td><td class="markdownTableBodyNone"><code>auto</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_balanced"><code>balanced</code></a></td><td class="markdownTableBodyNone"><code>balanced</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_fast"><code>fast</code></a></td><td class="markdownTableBodyNone"><code>fast</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_maximum"><code>maximum</code></a></td><td class="markdownTableBodyNone"><code>maximum</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_comp_none"><code>none</code></a></td><td class="markdownTableBodyNone"><code>none</code></td></tr>
 </table>
-<p>Every policy below is experimental: the offload and restore cycle has not been exercised against a real remote at campaign scale.</p>
+<p>Every policy below is supported. Each was exercised against a Google Drive remote on a 3.5 GiB run of the turbulent-channel campaign, protected, sized, timed, restored to a new directory, and compared file by file (<code>storage-campaign-grace-2026-09-30</code>). On that run (3.794 GB raw):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Policy   </th><th class="markdownTableHeadNone">Stored   </th><th class="markdownTableHeadNone">Ratio   </th><th class="markdownTableHeadNone">Protect wall / CPU   </th><th class="markdownTableHeadNone">Peak memory   </th><th class="markdownTableHeadNone">Restore    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>none</code>   </td><td class="markdownTableBodyNone">3.795 GB   </td><td class="markdownTableBodyNone">1.000   </td><td class="markdownTableBodyNone">not timed   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">59.5 s    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>fast</code>   </td><td class="markdownTableBodyNone">2.671 GB   </td><td class="markdownTableBodyNone">0.704   </td><td class="markdownTableBodyNone">12:57 / 114 s   </td><td class="markdownTableBodyNone">95 MB   </td><td class="markdownTableBodyNone">51.6 s    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>balanced</code>   </td><td class="markdownTableBodyNone">2.652 GB   </td><td class="markdownTableBodyNone">0.699   </td><td class="markdownTableBodyNone">13:33 / 137 s   </td><td class="markdownTableBodyNone">78 MB   </td><td class="markdownTableBodyNone">62.7 s    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>maximum</code>   </td><td class="markdownTableBodyNone">2.462 GB   </td><td class="markdownTableBodyNone">0.649   </td><td class="markdownTableBodyNone">30:24 / 1526 s   </td><td class="markdownTableBodyNone">3.8 GB   </td><td class="markdownTableBodyNone">2:42   </td></tr>
+</table>
+<p>The upload ran at about 3.4 MB/s and the download at 50-65 MB/s, so the upload dominated <code>fast</code> and <code>balanced</code> and compression saved time as well as space; <code>maximum</code> was bound by xz instead. These figures describe one data set and one network link.</p>
 <h2><a class="anchor" id="p61_cap_comp_auto_sub"></a>
 auto</h2>
 <p><a class="anchor" id="p61_cap_comp_auto"></a> <b>Identity.</b> <code>picurv storage offload --compression auto</code>, or <code>compression: auto</code> in the storage profile. The default.</p>
@@ -449,16 +465,18 @@ auto</h2>
 <p><b>Parameters it owns.</b> None. The thresholds are constants (<code>AUTO_NO_COMPRESSION_BYTES</code>, <code>AUTO_MAXIMUM_COMPRESSION_BYTES</code>), not configuration.</p>
 <p><b>Interactions.</b> Resolves before the archive extension is chosen, so <code>auto</code> never appears in a filename. <code>picurv storage plan</code> reports the resolved policy without transferring anything.</p>
 <p><b>Diagnostics.</b> <code>picurv storage plan</code> prints the policy it resolved to and the payload size that decided it.</p>
-<p><b>Evidence.</b> Unit verified - <code>tests/test_storage.py</code> exercises the resolver and the archive path for this policy.**Limitations.** The thresholds are judgement, not measurement, and they take no account of the data's compressibility: an incompressible payload just above 256 MiB pays for <code>balanced</code> and gains nothing.</p>
+<p><b>Evidence.</b> Unit verified - <code>tests/test_storage.py</code> exercises the resolver and the archive path for this policy. Production exercised - on the cluster campaign <code>storage-campaign-grace-2026-09-30</code> it resolved a 3.5 GiB run to <code>balanced</code>.</p>
+<p><b>Limitations.</b> The thresholds are judgement, not measurement, and they take no account of the data's compressibility: an incompressible payload just above 256 MiB pays for <code>balanced</code> and gains nothing. The 20 GiB switch to <code>maximum</code> was not exercised; on the measured link <code>maximum</code> took 2.3 times as long as <code>balanced</code> and 3.8 GB of memory for an archive 7% smaller, so pin <code>--compression balanced</code> for large runs when time or login-node memory matters.</p>
 <h2><a class="anchor" id="p61_cap_comp_none_sub"></a>
 none</h2>
 <p><a class="anchor" id="p61_cap_comp_none"></a> <b>Identity.</b> <code>--compression none</code> -&gt; a <code>.tar</code> archive.</p>
 <p><b>What it does.</b> Archives without compressing. Bytes on disk equal bytes transferred.</p>
-<p><b>When to choose it.</b> For payloads that are already compressed - most binary checkpoint formats - and for anything where restore latency matters more than footprint. Also the right choice when the archive is a staging step before something that compresses anyway.</p>
+<p><b>When to choose it.</b> For payloads that are already compressed, or when the archive is a staging step before something that compresses anyway. PICurv checkpoints are not in that class: they compressed by about 30% at <code>fast</code>.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> Produces the largest artefact and the fastest offload and restore of the four.</p>
+<p><b>Interactions.</b> Produces the largest artefact. It costs no CPU, but on a slow upload link it is not the fastest offload: transferring the extra bytes takes longer than compressing them.</p>
 <p><b>Diagnostics.</b> The <code>.tar</code> suffix in the catalog listing identifies it after the fact.</p>
-<p><b>Evidence.</b> Unit verified - <code>tests/test_storage.py</code> exercises the resolver and the archive path for this policy.**Limitations.** Storage cost is the full payload size, which for a long campaign is the dominant term.</p>
+<p><b>Evidence.</b> Unit verified - <code>tests/test_storage.py</code> exercises the resolver and the archive path for this policy. Production exercised and benchmark characterized - <code>storage-campaign-grace-2026-09-30</code>.</p>
+<p><b>Limitations.</b> Storage cost is the full payload size, which for a long campaign is the dominant term.</p>
 <h2><a class="anchor" id="p61_cap_comp_fast_sub"></a>
 fast</h2>
 <p><a class="anchor" id="p61_cap_comp_fast"></a> <b>Identity.</b> <code>--compression fast</code> -&gt; a <code>.tar.gz</code> archive.</p>
@@ -467,7 +485,7 @@ fast</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Produces the same <code>.tar.gz</code> extension as <code>balanced</code>, so the suffix does not distinguish them; the catalog records the policy, worker count, and compressor.</p>
 <p><b>Diagnostics.</b> Catalog metadata records the policy used, which is the only way to tell <code>fast</code> and <code>balanced</code> archives apart afterwards.</p>
-<p><b>Evidence.</b> Implemented only.</p>
+<p><b>Evidence.</b> Unit verified - <code>tests/test_storage.py</code> archives at this level. Production exercised and benchmark characterized - <code>storage-campaign-grace-2026-09-30</code>: 2.671 GB from 3.794 GB raw in 12:57, of which 114 s was CPU.</p>
 <p><b>Limitations.</b> Shares an extension with <code>balanced</code>, so an archive inspected outside PICurv cannot be identified by filename alone.</p>
 <h2><a class="anchor" id="p61_cap_comp_balanced_sub"></a>
 balanced</h2>
@@ -477,8 +495,8 @@ balanced</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Same extension as <code>fast</code>; the catalog record distinguishes them.</p>
 <p><b>Diagnostics.</b> Reported by <code>picurv storage plan</code> and recorded in the catalog entry.</p>
-<p><b>Evidence.</b> Implemented only. <code>auto</code> resolves to <code>balanced</code> only for artifacts in a middle size band, and the storage tests package artifacts too small to reach it.</p>
-<p><b>Limitations.</b> Nothing establishes that gzip's default is the right point on the curve for this project's data; it is a conventional choice, not a measured one.</p>
+<p><b>Evidence.</b> Production exercised and benchmark characterized - <code>storage-campaign-grace-2026-09-30</code>: 2.652 GB from 3.794 GB raw in 13:33, of which 137 s was CPU. The storage tests package artifacts too small for <code>auto</code> to select it.</p>
+<p><b>Limitations.</b> On the measured data it stored 0.7% less than <code>fast</code> for 20% more CPU; whether gzip's default level is worth it for other data is not measured.</p>
 <h2><a class="anchor" id="p61_cap_comp_maximum_sub"></a>
 maximum</h2>
 <p><a class="anchor" id="p61_cap_comp_maximum"></a> <b>Identity.</b> <code>--compression maximum</code> -&gt; a <code>.tar.xz</code> archive. What <code>auto</code> selects at or above 20 GiB.</p>
@@ -487,8 +505,8 @@ maximum</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Restore also parallelizes independent chunks. A single very large xz chunk may still dominate latency, so chunk size and worker count should be planned together.</p>
 <p><b>Diagnostics.</b> The <code>.tar.xz</code> suffix identifies it, and <code>picurv storage plan</code> reports it in advance.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> creates and extracts a native xz chunk while asserting the requested worker count.</p>
-<p><b>Limitations.</b> xz memory use scales with its window and worker count. Request the compression on a compute node when cluster login-node policy or memory is restrictive.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> creates and extracts a native xz chunk while asserting the requested worker count. Production exercised and benchmark characterized - <code>storage-campaign-grace-2026-09-30</code>: 2.462 GB from 3.794 GB raw in 30:24 at 85% CPU with a 3.8 GB peak, restored in 2:42.</p>
+<p><b>Limitations.</b> xz memory use scales with its window and worker count: with 8 workers it peaked at 3.8 GB. Request the compression on a compute node when cluster login-node policy or memory is restrictive. Restore is also slower than for the gzip policies.</p>
 <h1><a class="anchor" id="p61_cap_policy_sec"></a>
 9.2 Offload Policy Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: storage.offload_policy.
@@ -497,13 +515,12 @@ maximum</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_analysis_ready"><code>analysis-ready</code></a></td><td class="markdownTableBodyNone"><code>analysis-ready</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_metadata_only"><code>metadata-only</code></a></td><td class="markdownTableBodyNone"><code>metadata-only</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_restart_ready"><code>restart-ready</code></a></td><td class="markdownTableBodyNone"><code>restart-ready</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_analysis_ready"><code>analysis-ready</code></a></td><td class="markdownTableBodyNone"><code>analysis-ready</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_metadata_only"><code>metadata-only</code></a></td><td class="markdownTableBodyNone"><code>metadata-only</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_policy_restart_ready"><code>restart-ready</code></a></td><td class="markdownTableBodyNone"><code>restart-ready</code></td></tr>
 </table>
-<p>Every policy below is experimental, for the same reason as the compression policies.</p>
+<p>Every policy below is supported. Each was applied to its own 3.5 GiB run against a Google Drive remote, and the files left behind were compared with the documented components (<code>storage-campaign-grace-2026-09-30</code>): <code>metadata-only</code> left 720K, <code>restart-ready</code> 1.2G, and <code>analysis-ready</code> 674M. A restart from a checkpoint offloaded and restored by <code>restart-ready</code> ran normally.</p>
 <h2><a class="anchor" id="p61_cap_policy_metadata_only_sub"></a>
 metadata-only</h2>
 <p><a class="anchor" id="p61_cap_policy_metadata_only"></a> <b>Identity.</b> <code>picurv storage offload --policy metadata-only</code>, or <code>offload_policy: metadata-only</code> in a profile. The default.</p>
@@ -512,7 +529,7 @@ metadata-only</h2>
 <p><b>Parameters it owns.</b> <code>--keep-latest-checkpoint</code> optionally retains the newest committed checkpoint in addition to the policy baseline.</p>
 <p><b>Interactions.</b> Post, restart, and continuation guards read the storage marker and request the precise missing checkpoint or component instead of treating pruned data as an incomplete run.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> reports retained and pruned byte estimates and names the policy; <code>storage status</code> reports <code>COLD</code> after offload.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises the policy mapping, pruning, state marker, and remote round trip.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises the policy mapping, pruning, state marker, and remote round trip. Production exercised - <code>storage-campaign-grace-2026-09-30</code>.</p>
 <p><b>Limitations.</b> Logs and metadata can still be large in pathological runs; the policy does not truncate them.</p>
 <h2><a class="anchor" id="p61_cap_policy_restart_ready_sub"></a>
 restart-ready</h2>
@@ -522,7 +539,7 @@ restart-ready</h2>
 <p><b>Parameters it owns.</b> Latest-checkpoint retention is intrinsic and cannot be disabled without selecting another policy.</p>
 <p><b>Interactions.</b> <code>--continue</code> and <code>--restart-from</code> can proceed if they request the retained step. Other steps remain cold and trigger a selective restore instruction.</p>
 <p><b>Diagnostics.</b> The plan names the exact retained checkpoint; the storage marker lists <code>inputs</code> and <code>checkpoint:&lt;step&gt;</code> in <code>retained_components</code>.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises the policy mapping and latest-checkpoint retention behavior.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises the policy mapping and latest-checkpoint retention behavior. Production exercised - <code>storage-campaign-grace-2026-09-30</code>.</p>
 <p><b>Limitations.</b> It retains only one checkpoint; branching from older states requires a selective remote restore.</p>
 <h2><a class="anchor" id="p61_cap_policy_analysis_ready_sub"></a>
 analysis-ready</h2>
@@ -533,7 +550,7 @@ analysis-ready</h2>
 <p><b>Interactions.</b> Existing derived results remain readable; rerunning post may still require restoring source checkpoints or raw output.</p>
 <p>A lineage <code>.pvd</code> can reference visualization files in other runs. Retaining the child's visualization alone does not retain those ancestor files: keep each referenced run's visualization accessible and preserve their relative locations. Existing PVDs carry physical times even after checkpoints are pruned; generating a new index without those recorded times requires restoring checkpoint metadata.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> separates retained analysis/visualization bytes from pruned bytes, and the marker records both retained components.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises all named policy mappings and semantic component classification.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> exercises all named policy mappings and semantic component classification. Production exercised - <code>storage-campaign-grace-2026-09-30</code>.</p>
 <p><b>Limitations.</b> It cannot infer whether a particular future analysis needs raw fields; restore those inputs explicitly when required.</p>
 <h1><a class="anchor" id="p61_cap_retain_sec"></a>
 9.3 Retention Component Entries</h1>
@@ -545,14 +562,14 @@ analysis-ready</h2>
 <th class="markdownTableHeadNone">Maps to</th>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_analysis"><code>analysis</code></a></td><td class="markdownTableBodyNone"><code>analysis</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_checkpoints"><code>checkpoints</code></a></td><td class="markdownTableBodyNone"><code>checkpoints</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_inputs"><code>inputs</code></a></td><td class="markdownTableBodyNone"><code>inputs</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_logs"><code>logs</code></a></td><td class="markdownTableBodyNone"><code>logs</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_analysis"><code>analysis</code></a></td><td class="markdownTableBodyNone"><code>analysis</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_checkpoints"><code>checkpoints</code></a></td><td class="markdownTableBodyNone"><code>checkpoints</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_inputs"><code>inputs</code></a></td><td class="markdownTableBodyNone"><code>inputs</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_logs"><code>logs</code></a></td><td class="markdownTableBodyNone"><code>logs</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_raw_output"><code>raw-output</code></a></td><td class="markdownTableBodyNone"><code>raw-output</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_visualization"><code>visualization</code></a></td><td class="markdownTableBodyNone"><code>visualization</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_visualization"><code>visualization</code></a></td><td class="markdownTableBodyNone"><code>visualization</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
-<p>Every component below is experimental, for the same reason as the compression policies.</p>
+<p>Every component below except <code>raw-output</code> is supported. On a Google Drive remote (<code>storage-campaign-grace-2026-09-30</code>), <code>--policy metadata-only --retain visualization --drop logs</code> kept every visualization file, pruned every log the preset would otherwise keep, and pruned the rest as the preset does; a whole restore returned every file bit for bit. The other components were exercised through the presets. <code>raw-output</code> held no data in those runs and stays experimental.</p>
 <p>A named <code>--policy</code> is a preset, not a ceiling. <code>--retain</code> and <code>--drop</code> adjust one component at a time on top of whichever preset is in force, so a campaign whose retention needs do not match any single preset does not have to pick the closest one and accept the rest. Both flags are repeatable and accept comma-separated names. The preset still decides every component neither flag mentions.</p>
 <p>Four components are never selectable, because no correct offload prunes them: <code>metadata</code> (a cold artifact that cannot say what it is cannot be restored), <code>assets</code> (reclaimed only by the reference-aware <code>storage prune --assets --unused-locally</code>), <code>workspace-config</code> and <code>workspace-inputs</code> (a workspace protect is a backup, not a handover of the user's own files), and anything storage could not classify.</p>
 <div class="fragment"><div class="line"># Keep the figures this preset keeps, and the checkpoints it would not.</div>
@@ -569,7 +586,7 @@ checkpoints</h2>
 <p><b>Parameters it owns.</b> None of its own. It is mutually exclusive with <code>--drop-all-checkpoints</code>, which asks for the opposite, and it supersedes <code>--keep-latest-checkpoint</code> by keeping every step rather than one.</p>
 <p><b>Interactions.</b> With it retained, <code>--restart-from</code> can branch from any step without a selective restore. A committed bundle is identified by the <code>-checkpoint_step</code> its own <code>checkpoint.meta</code> records, so a bundle copied under a new directory name is still classified by the step it actually holds.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> reports <code>Kept checkpoint: every committed step (N)</code> instead of naming one step, and lists <code>checkpoints</code> under both <code>Kept components</code> and <code>Retained by flag</code>. After offload the storage marker records each surviving <code>checkpoint:&lt;step&gt;</code> in <code>retained_components</code>.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts that every step is retained under it, that <code>--keep-latest-checkpoint</code> retains only the newest, and that the conflict with <code>--drop-all-checkpoints</code> is refused.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts that every step is retained under it, that <code>--keep-latest-checkpoint</code> retains only the newest, and that the conflict with <code>--drop-all-checkpoints</code> is refused. Production exercised - <code>storage-campaign-grace-2026-09-30</code>: every checkpoint pruned by <code>metadata-only</code> and <code>analysis-ready</code>, the latest kept by <code>restart-ready</code>, each restored bit for bit.</p>
 <p><b>Limitations.</b> It is the most expensive selection available; on a long run the checkpoint set is usually the bulk of local size, so retaining it recovers almost no scratch.</p>
 <h2><a class="anchor" id="p61_cap_retain_logs_sub"></a>
 logs</h2>
@@ -579,7 +596,7 @@ logs</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> <code>picurv summarize</code> reads this directory. Dropping it makes <code>summarize --plot</code> unavailable locally until the component is restored, and the command says so rather than reporting an empty history.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> lists <code>logs</code> in <code>Kept components</code>, and names it under <code>Dropped by flag</code> when it was removed from a preset that would have kept it.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions against a preset that retains it by default.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions against a preset that retains it by default. Production exercised - <code>storage-campaign-grace-2026-09-30</code>: <code>--drop logs</code> pruned all 7 logs from a <code>metadata-only</code> offload.</p>
 <p><b>Limitations.</b> Dropping logs removes the cheapest evidence a run leaves behind; the space recovered is rarely worth it outside pathological verbosity settings.</p>
 <h2><a class="anchor" id="p61_cap_retain_analysis_sub"></a>
 analysis</h2>
@@ -589,7 +606,7 @@ analysis</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Re-deriving a dropped analysis requires the sources it was computed from, so dropping <code>analysis</code> while also dropping <code>checkpoints</code> and <code>raw-output</code> means a restore is the only way back to those numbers.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> separates retained from pruned bytes, and lists <code>analysis</code> under <code>Retained by flag</code> or <code>Dropped by flag</code> according to which flag moved it. <code>storage status</code> reports <code>PARTIAL</code> for a run whose analysis was pruned.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is added to a preset that omits it and removed from one that includes it.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is added to a preset that omits it and removed from one that includes it. Production exercised - <code>storage-campaign-grace-2026-09-30</code>: kept by <code>analysis-ready</code>, pruned by <code>metadata-only</code> and <code>restart-ready</code>, restored bit for bit.</p>
 <p><b>Limitations.</b> It is a single switch over the whole analysis tree; individual metrics, spectra, or plot sets are not separately selectable.</p>
 <h2><a class="anchor" id="p61_cap_retain_visualization_sub"></a>
 visualization</h2>
@@ -599,7 +616,7 @@ visualization</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Re-deriving it means re-running <code>picurv run --post-process</code>, which needs the source checkpoints locally. Dropping visualization and checkpoints together makes that a restore rather than a recompute.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> lists <code>visualization</code> in the resolved <code>Kept components</code> line, and the per-component chunk table reports its packaged size, so its share of the archive is visible before the upload starts.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions. Production exercised - <code>storage-campaign-grace-2026-09-30</code>: <code>--retain visualization</code> kept all 5 files of a <code>metadata-only</code> offload.</p>
 <p><b>Limitations.</b> One switch covers every post recipe's output; a single recipe's directory cannot be selected on its own.</p>
 <h2><a class="anchor" id="p61_cap_retain_inputs_sub"></a>
 inputs</h2>
@@ -609,7 +626,7 @@ inputs</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Run inputs are normally reflinks or hardlinks into <code>assets/</code>, so dropping them recovers space only once the shared object is also gone. The <code>assets.lock.yml</code> that names those objects is <code>metadata</code> and is never pruned, so a cold run can still state what it consumed.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> lists <code>inputs</code> in <code>Kept components</code>; <code>storage status</code> reports the run <code>COLD</code> or <code>PARTIAL</code> once it was pruned, and <code>--restart-from</code> or <code>--continue</code> names the exact missing component instead of reporting a broken run.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions, and that the always-retained workspace components are unaffected by it.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions, and that the always-retained workspace components are unaffected by it. Production exercised - <code>storage-campaign-grace-2026-09-30</code>: pruned by <code>metadata-only</code> and <code>analysis-ready</code> except the two metadata files, kept by <code>restart-ready</code>.</p>
 <p><b>Limitations.</b> Dropping it does not free the underlying asset object, which <code>storage prune --assets --unused-locally</code> owns and removes only when no active local run still references it.</p>
 <h2><a class="anchor" id="p61_cap_retain_raw_output_sub"></a>
 raw-output</h2>

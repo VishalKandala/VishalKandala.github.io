@@ -104,9 +104,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a99fc021c3236eda89116ed6def742dd7" id="r_a99fc021c3236eda89116ed6def742dd7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="variables_8h.html#structlist">list</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepicurv__cli_1_1storage_1_1catalog.html#a99fc021c3236eda89116ed6def742dd7">prune_unused_workspace_assets</a> (str workspace_root, dict profile, bool dry_run=False)</td></tr>
 <tr class="memdesc:a99fc021c3236eda89116ed6def742dd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove local asset objects that nothing local needs and storage has verified.  <br /></td></tr>
 <tr class="separator:a99fc021c3236eda89116ed6def742dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74797fb8f317d7a2f3cc5d7a0a83bde2" id="r_a74797fb8f317d7a2f3cc5d7a0a83bde2"><td class="memItemLeft" align="right" valign="top">dict&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepicurv__cli_1_1storage_1_1catalog.html#a74797fb8f317d7a2f3cc5d7a0a83bde2">_find_reusable_archive</a> (dict profile, dict target, str fingerprint)</td></tr>
-<tr class="memdesc:a74797fb8f317d7a2f3cc5d7a0a83bde2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a completed archive of this artifact whose content is already current.  <br /></td></tr>
-<tr class="separator:a74797fb8f317d7a2f3cc5d7a0a83bde2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94a835612f304582f6f257a9073a94c6" id="r_a94a835612f304582f6f257a9073a94c6"><td class="memItemLeft" align="right" valign="top">dict&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepicurv__cli_1_1storage_1_1catalog.html#a94a835612f304582f6f257a9073a94c6">_find_reusable_archive</a> (dict profile, dict target, str fingerprint, str compression=None)</td></tr>
+<tr class="memdesc:a94a835612f304582f6f257a9073a94c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a completed archive of this artifact whose content is already current.  <br /></td></tr>
+<tr class="separator:a94a835612f304582f6f257a9073a94c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab822d24feeb0372aad91fea73cced300" id="r_ab822d24feeb0372aad91fea73cced300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="variables_8h.html#structlist">list</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepicurv__cli_1_1storage_1_1catalog.html#ab822d24feeb0372aad91fea73cced300">list_remote_manifests</a> (dict profile)</td></tr>
 <tr class="memdesc:ab822d24feeb0372aad91fea73cced300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerate completed archive manifests from the remote catalog.  <br /></td></tr>
 <tr class="separator:ab822d24feeb0372aad91fea73cced300"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,12 +262,17 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  105</span>        decision = {**entry, <span class="stringliteral">&quot;remote_protection&quot;</span>: <span class="stringliteral">&quot;verified&quot;</span> <span class="keywordflow">if</span> verified <span class="keywordflow">else</span> <span class="stringliteral">&quot;none&quot;</span>,</div>
 <div class="line"><span class="lineno">  106</span>                    <span class="stringliteral">&quot;local_removal&quot;</span>: <span class="stringliteral">&quot;safe&quot;</span> <span class="keywordflow">if</span> removable <span class="keywordflow">else</span> <span class="stringliteral">&quot;blocked&quot;</span>}</div>
 <div class="line"><span class="lineno">  107</span>        <span class="keywordflow">if</span> removable <span class="keywordflow">and</span> <span class="keywordflow">not</span> dry_run:</div>
-<div class="line"><span class="lineno">  108</span>            shutil.rmtree(entry[<span class="stringliteral">&quot;object&quot;</span>], ignore_errors=<span class="keyword">True</span>)</div>
-<div class="line"><span class="lineno">  109</span>            decision[<span class="stringliteral">&quot;removed&quot;</span>] = <span class="keyword">True</span></div>
-<div class="line"><span class="lineno">  110</span>        decisions.append(decision)</div>
-<div class="line"><span class="lineno">  111</span>    <span class="keywordflow">return</span> decisions</div>
-<div class="line"><span class="lineno">  112</span> </div>
-<div class="line"><span class="lineno">  113</span> </div>
+<div class="line"><span class="lineno">  108</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">  109</span>                shutil.rmtree(entry[<span class="stringliteral">&quot;object&quot;</span>])</div>
+<div class="line"><span class="lineno">  110</span>                decision[<span class="stringliteral">&quot;removed&quot;</span>] = <span class="keyword">True</span></div>
+<div class="line"><span class="lineno">  111</span>            <span class="keywordflow">except</span> OSError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">  112</span>                <span class="comment"># Partly deleted is still present: report it rather than count it as gone.</span></div>
+<div class="line"><span class="lineno">  113</span>                decision[<span class="stringliteral">&quot;removed&quot;</span>] = <span class="keyword">False</span></div>
+<div class="line"><span class="lineno">  114</span>                decision[<span class="stringliteral">&quot;error&quot;</span>] = str(exc)</div>
+<div class="line"><span class="lineno">  115</span>        decisions.append(decision)</div>
+<div class="line"><span class="lineno">  116</span>    <span class="keywordflow">return</span> decisions</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -276,8 +281,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a74797fb8f317d7a2f3cc5d7a0a83bde2" name="a74797fb8f317d7a2f3cc5d7a0a83bde2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74797fb8f317d7a2f3cc5d7a0a83bde2">&#9670;&#160;</a></span>_find_reusable_archive()</h2>
+<a id="a94a835612f304582f6f257a9073a94c6" name="a94a835612f304582f6f257a9073a94c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94a835612f304582f6f257a9073a94c6">&#9670;&#160;</a></span>_find_reusable_archive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -301,7 +306,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">str&#160;</td>
-          <td class="paramname"><em>fingerprint</em>&#160;</td>
+          <td class="paramname"><em>fingerprint</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">str &#160;</td>
+          <td class="paramname"><em>compression</em> = <code>None</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -322,43 +333,48 @@ Here is the call graph for this function:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">profile</td><td>Resolved storage profile. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">target</td><td>Local artifact target. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fingerprint</td><td>Inventory fingerprint of the artifact as it stands now. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compression</td><td>Resolved compression the archive must have been made with; an archive at another level is not what was asked for. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Matching remote manifest, or None. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00114">114</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  114</span><span class="keyword">def </span>_find_reusable_archive(profile: dict, target: dict, fingerprint: str) -&gt; dict:</div>
-<div class="line"><span class="lineno">  115</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">  116</span><span class="stringliteral">    @brief Find a completed archive of this artifact whose content is already current.</span></div>
-<div class="line"><span class="lineno">  117</span><span class="stringliteral">    @param[in] profile Resolved storage profile.</span></div>
-<div class="line"><span class="lineno">  118</span><span class="stringliteral">    @param[in] target Local artifact target.</span></div>
-<div class="line"><span class="lineno">  119</span><span class="stringliteral">    @param[in] fingerprint Inventory fingerprint of the artifact as it stands now.</span></div>
-<div class="line"><span class="lineno">  120</span><span class="stringliteral">    @return Matching remote manifest, or None.</span></div>
-<div class="line"><span class="lineno">  121</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> fingerprint:</div>
-<div class="line"><span class="lineno">  123</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">  124</span>    identity = (target[<span class="stringliteral">&quot;artifact_type&quot;</span>], target.get(<span class="stringliteral">&quot;run_id&quot;</span>),</div>
-<div class="line"><span class="lineno">  125</span>                target.get(<span class="stringliteral">&quot;study_id&quot;</span>), target.get(<span class="stringliteral">&quot;case_id&quot;</span>))</div>
-<div class="line"><span class="lineno">  126</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">  127</span>        candidates = list_remote_manifests(profile)</div>
-<div class="line"><span class="lineno">  128</span>    <span class="keywordflow">except</span> StorageError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno">  129</span>        <span class="comment"># Reuse is an optimization. A remote that cannot be listed - not yet created,</span></div>
-<div class="line"><span class="lineno">  130</span>        <span class="comment"># briefly unreachable - must fall through to a normal upload, never fail here.</span></div>
-<div class="line"><span class="lineno">  131</span>        print(f<span class="stringliteral">&quot;[INFO] Could not check for a reusable archive ({exc}); uploading.&quot;</span>)</div>
-<div class="line"><span class="lineno">  132</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">  133</span>    newest = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno">  134</span>    <span class="keywordflow">for</span> manifest <span class="keywordflow">in</span> candidates:</div>
-<div class="line"><span class="lineno">  135</span>        <span class="keywordflow">if</span> manifest.get(<span class="stringliteral">&quot;inventory_sha256&quot;</span>) != fingerprint:</div>
-<div class="line"><span class="lineno">  136</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno">  137</span>        <span class="keywordflow">if</span> (manifest.get(<span class="stringliteral">&quot;artifact_type&quot;</span>), manifest.get(<span class="stringliteral">&quot;run_id&quot;</span>),</div>
-<div class="line"><span class="lineno">  138</span>                manifest.get(<span class="stringliteral">&quot;study_id&quot;</span>), manifest.get(<span class="stringliteral">&quot;case_id&quot;</span>)) != identity:</div>
-<div class="line"><span class="lineno">  139</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno">  140</span>        <span class="keywordflow">if</span> newest <span class="keywordflow">is</span> <span class="keywordtype">None</span> <span class="keywordflow">or</span> str(manifest.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)) &gt; str(newest.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)):</div>
-<div class="line"><span class="lineno">  141</span>            newest = manifest</div>
-<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">return</span> newest</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span> </div>
+<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00119">119</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  120</span>                           compression: str = <span class="keywordtype">None</span>) -&gt; dict:</div>
+<div class="line"><span class="lineno">  121</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">  122</span><span class="stringliteral">    @brief Find a completed archive of this artifact whose content is already current.</span></div>
+<div class="line"><span class="lineno">  123</span><span class="stringliteral">    @param[in] profile Resolved storage profile.</span></div>
+<div class="line"><span class="lineno">  124</span><span class="stringliteral">    @param[in] target Local artifact target.</span></div>
+<div class="line"><span class="lineno">  125</span><span class="stringliteral">    @param[in] fingerprint Inventory fingerprint of the artifact as it stands now.</span></div>
+<div class="line"><span class="lineno">  126</span><span class="stringliteral">    @param[in] compression Resolved compression the archive must have been made with;</span></div>
+<div class="line"><span class="lineno">  127</span><span class="stringliteral">                           an archive at another level is not what was asked for.</span></div>
+<div class="line"><span class="lineno">  128</span><span class="stringliteral">    @return Matching remote manifest, or None.</span></div>
+<div class="line"><span class="lineno">  129</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">  130</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> fingerprint:</div>
+<div class="line"><span class="lineno">  131</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">  132</span>    identity = (target[<span class="stringliteral">&quot;artifact_type&quot;</span>], target.get(<span class="stringliteral">&quot;run_id&quot;</span>),</div>
+<div class="line"><span class="lineno">  133</span>                target.get(<span class="stringliteral">&quot;study_id&quot;</span>), target.get(<span class="stringliteral">&quot;case_id&quot;</span>))</div>
+<div class="line"><span class="lineno">  134</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">  135</span>        candidates = list_remote_manifests(profile)</div>
+<div class="line"><span class="lineno">  136</span>    <span class="keywordflow">except</span> StorageError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno">  137</span>        <span class="comment"># Reuse is an optimization. A remote that cannot be listed - not yet created,</span></div>
+<div class="line"><span class="lineno">  138</span>        <span class="comment"># briefly unreachable - must fall through to a normal upload, never fail here.</span></div>
+<div class="line"><span class="lineno">  139</span>        print(f<span class="stringliteral">&quot;[INFO] Could not check for a reusable archive ({exc}); uploading.&quot;</span>)</div>
+<div class="line"><span class="lineno">  140</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">  141</span>    newest = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">for</span> manifest <span class="keywordflow">in</span> candidates:</div>
+<div class="line"><span class="lineno">  143</span>        <span class="keywordflow">if</span> manifest.get(<span class="stringliteral">&quot;inventory_sha256&quot;</span>) != fingerprint:</div>
+<div class="line"><span class="lineno">  144</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">  145</span>        <span class="keywordflow">if</span> compression <span class="keywordflow">and</span> manifest.get(<span class="stringliteral">&quot;compression&quot;</span>) != compression:</div>
+<div class="line"><span class="lineno">  146</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">  147</span>        <span class="keywordflow">if</span> (manifest.get(<span class="stringliteral">&quot;artifact_type&quot;</span>), manifest.get(<span class="stringliteral">&quot;run_id&quot;</span>),</div>
+<div class="line"><span class="lineno">  148</span>                manifest.get(<span class="stringliteral">&quot;study_id&quot;</span>), manifest.get(<span class="stringliteral">&quot;case_id&quot;</span>)) != identity:</div>
+<div class="line"><span class="lineno">  149</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">  150</span>        <span class="keywordflow">if</span> newest <span class="keywordflow">is</span> <span class="keywordtype">None</span> <span class="keywordflow">or</span> str(manifest.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)) &gt; str(newest.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)):</div>
+<div class="line"><span class="lineno">  151</span>            newest = manifest</div>
+<div class="line"><span class="lineno">  152</span>    <span class="keywordflow">return</span> newest</div>
+<div class="line"><span class="lineno">  153</span> </div>
+<div class="line"><span class="lineno">  154</span> </div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -387,29 +403,29 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Result produced by this operation. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00145">145</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  145</span><span class="keyword">def </span>list_remote_manifests(profile: dict) -&gt; list:</div>
-<div class="line"><span class="lineno">  146</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">  147</span><span class="stringliteral">    @brief Enumerate completed archive manifests from the remote catalog.</span></div>
-<div class="line"><span class="lineno">  148</span><span class="stringliteral">    @param[in] profile Value supplied through the `profile` argument.</span></div>
-<div class="line"><span class="lineno">  149</span><span class="stringliteral">    @return Result produced by this operation.</span></div>
-<div class="line"><span class="lineno">  150</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  151</span>    root = _remote_join(profile[<span class="stringliteral">&quot;remote&quot;</span>], REMOTE_OBJECTS_DIRECTORY)</div>
-<div class="line"><span class="lineno">  152</span>    result = _transport._run_rclone([</div>
-<div class="line"><span class="lineno">  153</span>        <span class="stringliteral">&quot;lsf&quot;</span>, root, <span class="stringliteral">&quot;--recursive&quot;</span>, <span class="stringliteral">&quot;--files-only&quot;</span>, <span class="stringliteral">&quot;--include&quot;</span>, f<span class="stringliteral">&quot;*/{REMOTE_MANIFEST_FILENAME}&quot;</span></div>
-<div class="line"><span class="lineno">  154</span>    ])</div>
-<div class="line"><span class="lineno">  155</span>    manifests = []</div>
-<div class="line"><span class="lineno">  156</span>    <span class="keywordflow">for</span> relative <span class="keywordflow">in</span> sorted(line.strip() <span class="keywordflow">for</span> line <span class="keywordflow">in</span> result.stdout.splitlines() <span class="keywordflow">if</span> line.strip()):</div>
-<div class="line"><span class="lineno">  157</span>        archive_id = relative.split(<span class="stringliteral">&quot;/&quot;</span>, 1)[0]</div>
-<div class="line"><span class="lineno">  158</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> ARCHIVE_ID_PATTERN.fullmatch(archive_id):</div>
-<div class="line"><span class="lineno">  159</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno">  160</span>        <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno">  161</span>            manifests.append(_load_remote_manifest(profile, archive_id))</div>
-<div class="line"><span class="lineno">  162</span>        <span class="keywordflow">except</span> StorageError:</div>
-<div class="line"><span class="lineno">  163</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno">  164</span>    <span class="keywordflow">return</span> manifests</div>
-<div class="line"><span class="lineno">  165</span> </div>
-<div class="line"><span class="lineno">  166</span> </div>
+<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00155">155</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  155</span><span class="keyword">def </span>list_remote_manifests(profile: dict) -&gt; list:</div>
+<div class="line"><span class="lineno">  156</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">  157</span><span class="stringliteral">    @brief Enumerate completed archive manifests from the remote catalog.</span></div>
+<div class="line"><span class="lineno">  158</span><span class="stringliteral">    @param[in] profile Value supplied through the `profile` argument.</span></div>
+<div class="line"><span class="lineno">  159</span><span class="stringliteral">    @return Result produced by this operation.</span></div>
+<div class="line"><span class="lineno">  160</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">  161</span>    root = _remote_join(profile[<span class="stringliteral">&quot;remote&quot;</span>], REMOTE_OBJECTS_DIRECTORY)</div>
+<div class="line"><span class="lineno">  162</span>    result = _transport._run_rclone([</div>
+<div class="line"><span class="lineno">  163</span>        <span class="stringliteral">&quot;lsf&quot;</span>, root, <span class="stringliteral">&quot;--recursive&quot;</span>, <span class="stringliteral">&quot;--files-only&quot;</span>, <span class="stringliteral">&quot;--include&quot;</span>, f<span class="stringliteral">&quot;*/{REMOTE_MANIFEST_FILENAME}&quot;</span></div>
+<div class="line"><span class="lineno">  164</span>    ])</div>
+<div class="line"><span class="lineno">  165</span>    manifests = []</div>
+<div class="line"><span class="lineno">  166</span>    <span class="keywordflow">for</span> relative <span class="keywordflow">in</span> sorted(line.strip() <span class="keywordflow">for</span> line <span class="keywordflow">in</span> result.stdout.splitlines() <span class="keywordflow">if</span> line.strip()):</div>
+<div class="line"><span class="lineno">  167</span>        archive_id = relative.split(<span class="stringliteral">&quot;/&quot;</span>, 1)[0]</div>
+<div class="line"><span class="lineno">  168</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> ARCHIVE_ID_PATTERN.fullmatch(archive_id):</div>
+<div class="line"><span class="lineno">  169</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">  170</span>        <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno">  171</span>            manifests.append(_load_remote_manifest(profile, archive_id))</div>
+<div class="line"><span class="lineno">  172</span>        <span class="keywordflow">except</span> StorageError:</div>
+<div class="line"><span class="lineno">  173</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">return</span> manifests</div>
+<div class="line"><span class="lineno">  175</span> </div>
+<div class="line"><span class="lineno">  176</span> </div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -449,25 +465,25 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Result produced by this operation. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00167">167</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  167</span><span class="keyword">def </span>verify_remote_archive(profile: dict, archive_id: str) -&gt; dict:</div>
-<div class="line"><span class="lineno">  168</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">  169</span><span class="stringliteral">    @brief Verify the completion marker and every stored chunk checksum.</span></div>
-<div class="line"><span class="lineno">  170</span><span class="stringliteral">    @param[in] profile Value supplied through the `profile` argument.</span></div>
-<div class="line"><span class="lineno">  171</span><span class="stringliteral">    @param[in] archive_id Value supplied through the `archive_id` argument.</span></div>
-<div class="line"><span class="lineno">  172</span><span class="stringliteral">    @return Result produced by this operation.</span></div>
-<div class="line"><span class="lineno">  173</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  174</span>    manifest = _load_remote_manifest(profile, archive_id)</div>
-<div class="line"><span class="lineno">  175</span>    <span class="keywordflow">for</span> chunk <span class="keywordflow">in</span> manifest.get(<span class="stringliteral">&quot;chunks&quot;</span>, []):</div>
-<div class="line"><span class="lineno">  176</span>        actual = _remote_sha256(_chunk_remote_path(profile, archive_id, chunk))</div>
-<div class="line"><span class="lineno">  177</span>        <span class="keywordflow">if</span> actual != chunk.get(<span class="stringliteral">&quot;sha256&quot;</span>):</div>
-<div class="line"><span class="lineno">  178</span>            <span class="keywordflow">raise</span> StorageError(</div>
-<div class="line"><span class="lineno">  179</span>                f<span class="stringliteral">&quot;Archive {archive_id} chunk checksum mismatch: {chunk[&#39;name&#39;]} &quot;</span></div>
-<div class="line"><span class="lineno">  180</span>                f<span class="stringliteral">&quot;(expected {chunk.get(&#39;sha256&#39;)}, got {actual}).&quot;</span></div>
-<div class="line"><span class="lineno">  181</span>            )</div>
-<div class="line"><span class="lineno">  182</span>    <span class="keywordflow">return</span> manifest</div>
-<div class="line"><span class="lineno">  183</span> </div>
-<div class="line"><span class="lineno">  184</span> </div>
+<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00177">177</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  177</span><span class="keyword">def </span>verify_remote_archive(profile: dict, archive_id: str) -&gt; dict:</div>
+<div class="line"><span class="lineno">  178</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">  179</span><span class="stringliteral">    @brief Verify the completion marker and every stored chunk checksum.</span></div>
+<div class="line"><span class="lineno">  180</span><span class="stringliteral">    @param[in] profile Value supplied through the `profile` argument.</span></div>
+<div class="line"><span class="lineno">  181</span><span class="stringliteral">    @param[in] archive_id Value supplied through the `archive_id` argument.</span></div>
+<div class="line"><span class="lineno">  182</span><span class="stringliteral">    @return Result produced by this operation.</span></div>
+<div class="line"><span class="lineno">  183</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">  184</span>    manifest = _load_remote_manifest(profile, archive_id)</div>
+<div class="line"><span class="lineno">  185</span>    <span class="keywordflow">for</span> chunk <span class="keywordflow">in</span> manifest.get(<span class="stringliteral">&quot;chunks&quot;</span>, []):</div>
+<div class="line"><span class="lineno">  186</span>        actual = _remote_sha256(_chunk_remote_path(profile, archive_id, chunk))</div>
+<div class="line"><span class="lineno">  187</span>        <span class="keywordflow">if</span> actual != chunk.get(<span class="stringliteral">&quot;sha256&quot;</span>):</div>
+<div class="line"><span class="lineno">  188</span>            <span class="keywordflow">raise</span> StorageError(</div>
+<div class="line"><span class="lineno">  189</span>                f<span class="stringliteral">&quot;Archive {archive_id} chunk checksum mismatch: {chunk[&#39;name&#39;]} &quot;</span></div>
+<div class="line"><span class="lineno">  190</span>                f<span class="stringliteral">&quot;(expected {chunk.get(&#39;sha256&#39;)}, got {actual}).&quot;</span></div>
+<div class="line"><span class="lineno">  191</span>            )</div>
+<div class="line"><span class="lineno">  192</span>    <span class="keywordflow">return</span> manifest</div>
+<div class="line"><span class="lineno">  193</span> </div>
+<div class="line"><span class="lineno">  194</span> </div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -513,23 +529,23 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00185">185</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  185</span><span class="keyword">def </span>resolve_workspace_archive_id(profile: dict, workspace_id: str) -&gt; str:</div>
-<div class="line"><span class="lineno">  186</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno">  187</span><span class="stringliteral">    @brief Find the newest complete workspace archive carrying one workspace identity.</span></div>
-<div class="line"><span class="lineno">  188</span><span class="stringliteral">    @param[in] profile Resolved storage profile.</span></div>
-<div class="line"><span class="lineno">  189</span><span class="stringliteral">    @param[in] workspace_id Workspace identity recorded at archive time.</span></div>
-<div class="line"><span class="lineno">  190</span><span class="stringliteral">    @return Archive id.</span></div>
-<div class="line"><span class="lineno">  191</span><span class="stringliteral">    @throws StorageError when no such archive exists.</span></div>
-<div class="line"><span class="lineno">  192</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno">  193</span>    matches = [</div>
-<div class="line"><span class="lineno">  194</span>        manifest <span class="keywordflow">for</span> manifest <span class="keywordflow">in</span> list_remote_manifests(profile)</div>
-<div class="line"><span class="lineno">  195</span>        <span class="keywordflow">if</span> manifest.get(<span class="stringliteral">&quot;artifact_type&quot;</span>) == <span class="stringliteral">&quot;workspace&quot;</span></div>
-<div class="line"><span class="lineno">  196</span>        <span class="keywordflow">and</span> manifest.get(<span class="stringliteral">&quot;workspace_id&quot;</span>) == workspace_id</div>
-<div class="line"><span class="lineno">  197</span>    ]</div>
-<div class="line"><span class="lineno">  198</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> matches:</div>
-<div class="line"><span class="lineno">  199</span>        <span class="keywordflow">raise</span> StorageError(f<span class="stringliteral">&quot;No workspace archive found for identity {workspace_id!r}.&quot;</span>)</div>
-<div class="line"><span class="lineno">  200</span>    <span class="keywordflow">return</span> max(matches, key=<span class="keyword">lambda</span> item: str(item.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)))[<span class="stringliteral">&quot;archive_id&quot;</span>]</div>
+<p class="definition">Definition at line <a class="el" href="catalog_8py_source.html#l00195">195</a> of file <a class="el" href="catalog_8py_source.html">catalog.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  195</span><span class="keyword">def </span>resolve_workspace_archive_id(profile: dict, workspace_id: str) -&gt; str:</div>
+<div class="line"><span class="lineno">  196</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno">  197</span><span class="stringliteral">    @brief Find the newest complete workspace archive carrying one workspace identity.</span></div>
+<div class="line"><span class="lineno">  198</span><span class="stringliteral">    @param[in] profile Resolved storage profile.</span></div>
+<div class="line"><span class="lineno">  199</span><span class="stringliteral">    @param[in] workspace_id Workspace identity recorded at archive time.</span></div>
+<div class="line"><span class="lineno">  200</span><span class="stringliteral">    @return Archive id.</span></div>
+<div class="line"><span class="lineno">  201</span><span class="stringliteral">    @throws StorageError when no such archive exists.</span></div>
+<div class="line"><span class="lineno">  202</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno">  203</span>    matches = [</div>
+<div class="line"><span class="lineno">  204</span>        manifest <span class="keywordflow">for</span> manifest <span class="keywordflow">in</span> list_remote_manifests(profile)</div>
+<div class="line"><span class="lineno">  205</span>        <span class="keywordflow">if</span> manifest.get(<span class="stringliteral">&quot;artifact_type&quot;</span>) == <span class="stringliteral">&quot;workspace&quot;</span></div>
+<div class="line"><span class="lineno">  206</span>        <span class="keywordflow">and</span> manifest.get(<span class="stringliteral">&quot;workspace_id&quot;</span>) == workspace_id</div>
+<div class="line"><span class="lineno">  207</span>    ]</div>
+<div class="line"><span class="lineno">  208</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> matches:</div>
+<div class="line"><span class="lineno">  209</span>        <span class="keywordflow">raise</span> StorageError(f<span class="stringliteral">&quot;No workspace archive found for identity {workspace_id!r}.&quot;</span>)</div>
+<div class="line"><span class="lineno">  210</span>    <span class="keywordflow">return</span> max(matches, key=<span class="keyword">lambda</span> item: str(item.get(<span class="stringliteral">&quot;created_at&quot;</span>, <span class="stringliteral">&quot;&quot;</span>)))[<span class="stringliteral">&quot;archive_id&quot;</span>]</div>
 </div><!-- fragment -->
 </div>
 </div>
