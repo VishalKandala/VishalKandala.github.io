@@ -95,6 +95,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p36_artifacts_sec">3. Generated Scheduler Artifacts</a></li>
 <li class="level1"><a href="#p36_flow_sec">4. Submission Flow</a></li>
 <li class="level1"><a href="#p36_notes_sec">5. Operational Notes</a></li>
+<li class="level1"><a href="#p36_evidence_sec">6. What Has Been Verified On A Cluster</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Cluster_Run_Guide"></a> This guide documents how <code>picurv</code> converts case configs into scheduler artifacts for cluster execution.</p>
@@ -158,7 +159,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>run directory + control artifact generation,</li>
 <li>sbatch script rendering from scheduler settings,</li>
 <li>optional solver submission (<code>solver.sbatch</code>) immediately, or later via <code>picurv submit --run-dir ...</code>,</li>
-<li>optional post submission (<code>post.sbatch</code>), with <code>afterok:&lt;solver_jobid&gt;</code> dependency when solve+post are both requested in one command or when <code>submit --stage all</code> is used.</li>
+<li>optional post submission (<code>post.sbatch</code>), with <code>afterok:&lt;solver_jobid&gt;</code> dependency when solve+post are both requested in one command or when <code>submit --stage all</code> is used. <code>submit --stage post-process</code> on its own depends on the recorded solve job only while that job is still queued. Slurm forgets a finished job after its <code>MinJobAge</code> and then rejects any dependency on it, so a solve that has completed is not waited for: the post job plans its steps from the committed checkpoints when it starts. A solve that ended <code>FAILED</code>, <code>CANCELLED</code>, <code>TIMEOUT</code> or similar is refused unless <code>--force</code> is given. When <code>sacct</code> cannot say how the job ended, the post job is submitted without a dependency and a warning says so.</li>
 </ol>
 <p>This allows consistent local dry-run and cluster production flow from the same inputs.</p>
 <h1><a class="anchor" id="p36_notes_sec"></a>
@@ -195,8 +196,11 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><b><a class="el" href="37_Sweep_Studies_Guide.html">Sweep and Study Guide</a></b></li>
 <li><b><a class="el" href="05_The_Conductor_Script.html">The Conductor Script: picurv</a></b></li>
 <li><b><a class="el" href="52_Run_Artifact_Lifecycle_Contract.html">Run Artifact Lifecycle Contract</a></b></li>
-<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> </li>
+<li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>
 </ul>
+<h1><a class="anchor" id="p36_evidence_sec"></a>
+6. What Has Been Verified On A Cluster</h1>
+<p>On TAMU Grace (Slurm, one node, 8 MPI tasks per job), <code>cluster-session-grace-2026-10-01</code> recorded: <code>picurv cancel</code> stopping a running solver (<code>CANCELLED</code>); <code>cancel --graceful</code> making the solver write an off-cadence checkpoint and exit, and <code>run --continue</code> resuming from it; post jobs planning their steps when they start and skipping current output; and array studies honouring <code>max_concurrent_array_tasks</code>. <code>turbulent-channel-nk-2026-09-29</code> recorded a 144-rank solve with a dependent post job, and <code>cluster-cancel-pending-2026-09-29</code> the cancellation of pending jobs. The post-dependency rule of <a class="el" href="36_Cluster_Run_Guide.html#p36_flow_sec">4. Submission Flow</a> and study continuation inside a workspace were fixed after that session and are verified by the local test suite only. Multi-node arrays and a walltime-guard stop on the cluster have not been exercised. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

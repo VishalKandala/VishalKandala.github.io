@@ -213,6 +213,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!-- fragment --><h1><a class="anchor" id="p05_sync_sec"></a>
 3b. Source, Version, And Legacy Maintenance Commands</h1>
 <p><code>picurv version</code> prints the release, Git commit, and dirty-tree build identity of the Python conductor, then reads back what <code>simulator --version</code> and <code>postprocessor --version</code> actually report. Those two identities are not the same fact: the conductor's says which source staged a run, the binaries' says which build produced its checkpoints, and an edited C tree that was never rebuilt makes them disagree. The run manifest records both, and <code>run</code> warns at staging when a binary is stale.</p>
+<p>Each executable's <code>--version</code> has a second line naming the PETSc it was compiled against, <code>petsc &lt;version&gt; &lt;debug|optimized&gt; &lt;arch&gt; &lt;dir&gt;</code>, taken from PETSc's own headers. The same text is stamped into the binary, so <code>picurv version</code> still shows it when the executable cannot start - for example <code>undefined symbol: petscstack</code>, a debug-PETSc build launched with an optimized PETSc on the library path. Where <code>ldd</code> exists, it also shows the <code>libpetsc</code> the current shell would load and marks it when that library lies outside the PETSc the binary was built against. Binaries built before the stamp show <code>PETSc: not recorded</code>.</p>
 <p><code>picurv version status</code> reports the same thing and then <em>validates</em> it, exiting 1 when the conductor, either executable, or the workspace's <code>software.picurv</code> requirement disagree, and naming each disagreement. Bare <code>picurv version</code> always exits 0: it is an informational surface, and a job script that must refuse an incoherent build should ask for the validating form explicitly. Both accept <code>--format json</code>, which adds <code>coherent</code> and <code>problems</code> to the payload.</p>
 <p><code>make</code> delivers the identity through a generated <code>include/picurv_build_identity.h</code> rather than command-line defines, so ordinary header-dependency tracking rebuilds the two translation units that stamp it whenever the commit or dirty state changes. A binary reporting release <code>0.0.0</code> was built outside <code>make</code> and carries no identity.</p>
 <p><code>picurv source update</code> fetches branches and tags without changing the active checkout. <code>picurv versions list</code> reports tags; <code>versions install &lt;version&gt;</code> or <code>versions activate [version]</code> requires a clean source checkout, selects the exact Git version, and rebuilds. A bare release such as <code>0.1.0</code> resolves to its <code>v0.1.0</code> tag when no ref carries the bare name. With no argument, <code>activate</code> reads the workspace's exact <code>software.picurv</code> value and refuses ranges.</p>
@@ -1261,7 +1262,7 @@ refusing. Requires a configured storage profile.</td></tr>
 <li>Each member of a sweep is pinned in its own run directory, and the array scripts launch <code>$RUN_DIR</code>'s copy. A study whose members disagree about pinning is refused.</li>
 <li>An executable that is not built is left unpinned with a warning.</li>
 </ul>
-<p><b>Job-start identity check.</b> Every generated Slurm script, pinned or not, runs the executable's <code>--version</code> after module setup and before the launcher, and exits before any rank starts when the reported identity differs from the one read at staging. When staging could not read an identity, the job logs the one it finds and launches.</p>
+<p><b>Job-start identity check.</b> Every generated Slurm script, pinned or not, runs the executable's <code>--version</code> after module setup and before the launcher, and exits before any rank starts when the reported identity, including the PETSc line, differs from the one read at staging. When staging could not read an identity, the job logs the one it finds and launches.</p>
 <p><code>bin/picurv</code> is a launcher for <code>picurv_cli/picurv</code>. This means:</p>
 <ul>
 <li>there is one stable executable entrypoint backed by the <code>picurv_cli/</code> package,</li>
@@ -1286,14 +1287,13 @@ refusing. Requires a configured storage profile.</td></tr>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_copy"><code>copy</code></a></td><td class="markdownTableBodyNone"><code>copy</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_hardlink"><code>hardlink</code></a></td><td class="markdownTableBodyNone"><code>hardlink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reference"><code>reference</code></a></td><td class="markdownTableBodyNone"><code>reference</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reflink"><code>reflink</code></a></td><td class="markdownTableBodyNone"><code>reflink</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_copy"><code>copy</code></a></td><td class="markdownTableBodyNone"><code>copy</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_hardlink"><code>hardlink</code></a></td><td class="markdownTableBodyNone"><code>hardlink</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reference"><code>reference</code></a></td><td class="markdownTableBodyNone"><code>reference</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p05_cap_input_mode_reflink"><code>reflink</code></a></td><td class="markdownTableBodyNone"><code>reflink</code></td></tr>
 </table>
-<p>Every mode below is experimental: the workspace asset store has been exercised locally (<code>asset-store-local-2026-09-21</code>) but not on the cluster filesystems where reflink and hardlink availability are decided, nor at the scale where object accumulation and remote-backed pruning start to matter.</p>
+<p>Every mode below is supported. They were exercised locally (<code>asset-store-local-2026-09-21</code>) and on the cluster's Lustre scratch (<code>asset-lifecycle-grace-2026-10-01</code>), where <code>copy</code>, <code>hardlink</code> and <code>reference</code> imports each fed a precompute that a second precompute reused, and <code>reflink</code> was refused with the filesystem's reason. Object accumulation at campaign scale and remote-backed pruning have not been exercised.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_copy_sub"></a>
 copy</h2>
 <p><a class="anchor" id="p05_cap_input_mode_copy"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode copy</code>.</p>
@@ -1302,7 +1302,7 @@ copy</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Storage includes the copied file when a run locks and materializes an asset derived from it.</p>
 <p><b>Diagnostics.</b> Success prints the catalog ID and relative path; an existing target or missing source fails before the catalog changes.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks the copied bytes and catalog entry. Integration verified - <code>asset-store-local-2026-09-21</code>: a copied field became an initial-condition object that a second precompute reused unchanged.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks the copied bytes and catalog entry. Integration verified - <code>asset-store-local-2026-09-21</code>: a copied field became an initial-condition object that a second precompute reused unchanged. Production verified - <code>asset-lifecycle-grace-2026-10-01</code>: on Lustre a copied grid got its own inode, and a precompute from it was reused by the next precompute.</p>
 <p><b>Limitations.</b> Uses additional disk space equal to the imported file.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_reflink_sub"></a>
 reflink</h2>
@@ -1312,8 +1312,8 @@ reflink</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Failure does not fall back silently; choose <code>copy</code> explicitly when the filesystem reports that reflinks are unsupported.</p>
 <p><b>Diagnostics.</b> The import fails with the native copy error if reflink creation is unavailable and writes no catalog record.</p>
-<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: on a filesystem without reflink support the import failed with <code>cp</code>'s "Operation not supported", left no temporary file, and wrote no catalog record. A successful reflink import has not been exercised; that needs a filesystem that supports it.</p>
-<p><b>Limitations.</b> Experimental across cluster filesystems; support depends on the local <code>cp</code> and filesystem.</p>
+<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: on a filesystem without reflink support the import failed with <code>cp</code>'s "Operation not supported", left no temporary file, and wrote no catalog record. A successful reflink import has not been exercised; that needs a filesystem that supports it. Production verified - <code>asset-lifecycle-grace-2026-10-01</code>: Lustre scratch refused it the same way. Supported on the owner's decision, since the refusal path is the one most users meet.</p>
+<p><b>Limitations.</b> A successful clone needs a copy-on-write filesystem with reflink support, such as Btrfs or XFS; none has been tested.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_hardlink_sub"></a>
 hardlink</h2>
 <p><a class="anchor" id="p05_cap_input_mode_hardlink"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode hardlink</code>.</p>
@@ -1322,8 +1322,8 @@ hardlink</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> supplies the destination basename.</p>
 <p><b>Interactions.</b> Source and destination share mutations. Asset checksums detect a changed provider input and prevent stale object reuse, but cannot undo the mutation.</p>
 <p><b>Diagnostics.</b> Cross-filesystem or permission failures are reported before the catalog changes.</p>
-<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: the imported path shares the source's inode, the catalog records the source checksum, and after one byte of the shared file changed the next precompute built a new object rather than reusing the old one.</p>
-<p><b>Limitations.</b> Experimental because shared-inode ownership is easy to misuse and it cannot cross filesystems.</p>
+<p><b>Evidence.</b> Integration verified - <code>asset-store-local-2026-09-21</code>: the imported path shares the source's inode, the catalog records the source checksum, and after one byte of the shared file changed the next precompute built a new object rather than reusing the old one. Production verified - <code>asset-lifecycle-grace-2026-10-01</code>: on Lustre the imported grid shared the source's inode (2 links), and its precompute was reused.</p>
+<p><b>Limitations.</b> Shared-inode ownership is easy to misuse, and it cannot cross filesystems.</p>
 <h2><a class="anchor" id="p05_cap_input_mode_reference_sub"></a>
 reference</h2>
 <p><a class="anchor" id="p05_cap_input_mode_reference"></a> <b>Identity.</b> <code>picurv inputs import &lt;kind&gt; &lt;source&gt; --mode reference</code>.</p>
@@ -1332,7 +1332,7 @@ reference</h2>
 <p><b>Parameters it owns.</b> Optional <code>--name</code> names the reference record.</p>
 <p><b>Interactions.</b> Resolution fails loudly when the target is missing. A target whose bytes changed since registration is used as it now is: its current checksum selects a new asset object, so nothing stale is reused, but no warning is printed and the registration checksum is not compared. Storage records the dependency but neither archives nor prunes the external file.</p>
 <p><b>Diagnostics.</b> Registration prints an external-reference warning; missing targets fail when registered or consumed.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks reference content and catalog identity. Integration verified - <code>asset-store-local-2026-09-21</code>: a reference import fed a solver run, and changing one byte of its target built a new object.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_workspace_lifecycle.py</code> checks reference content and catalog identity. Integration verified - <code>asset-store-local-2026-09-21</code>: a reference import fed a solver run, and changing one byte of its target built a new object. Production verified - <code>asset-lifecycle-grace-2026-10-01</code>: on Lustre a 280-byte reference record fed a precompute that the next precompute reused.</p>
 <p><b>Limitations.</b> Restoring the workspace cannot restore an external target; its owner must make the same path available or the reference must be replaced.</p>
 <h1><a class="anchor" id="p05_artifacts_sec"></a>
 13. Generated Runtime Artifacts</h1>

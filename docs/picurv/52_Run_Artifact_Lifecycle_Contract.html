@@ -96,7 +96,10 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ul>
 </li>
 <li class="level1"><a href="#p52_newrun_sec">2. Editable Configurations And Imported Files</a></li>
-<li class="level1"><a href="#p52_layout_sec">3. Reusable Assets And The Run Snapshot</a></li>
+<li class="level1"><a href="#p52_layout_sec">3. Reusable Assets And The Run Snapshot</a><ul><li class="level2"><a href="#p52_assets_restart_sub">3.1 Assets Across Restarts, Moves, And Storage</a></li>
+<li class="level2"><a href="#p52_assets_trouble_sub">3.2 When An Asset Is Missing Or Rejected</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p52_launchers_sec">4. Local, Login-Node, and Batch Launch Resolution</a></li>
 <li class="level1"><a href="#p52_restart_sec">5. Restart And Continuation</a><ul><li class="level2"><a href="#p52_restart_cfd">5.1 CFD Restart (New Run, Continue Solving)</a></li>
 <li class="level2"><a href="#p52_restart_particle">5.2 Particle-Tracking Restart (New Run, Pre-Computed Flow)</a></li>
@@ -213,6 +216,21 @@ States a run moves through, and the commands that move it</div>
 <div class="line">  scheduler/</div>
 </div><!-- fragment --><p>No peer <code>diagnostics/</code>, <code>results/</code>, or arbitrary monitor-selected output root is created. C runtime metrics use <code>&lt;run.analysis.metrics&gt;</code>; post statistics and spectra use their analysis homes; renderable VTK output uses <code>&lt;run.visualization&gt;</code>.</p>
 <p>The initial YAML snapshot is immutable evidence. An in-place continuation stores the new YAML and generated controls under <code>&lt;run.config.history&gt;/&lt;revision&gt;/</code> and updates <code>&lt;run.config.active&gt;</code>; it does not erase the original. A continuation keeps the pinned executables recorded in <code>&lt;run.config.active&gt;</code>; an explicit re-pin writes new copies under that revision instead of replacing <code>&lt;run.config.bin&gt;</code>. <code>manifest.json</code> records the workspace identity, active build, canonical paths, stages, locked assets, per-executable build identity of the executables the run launches (<code>binaries</code>), and each stage's lifecycle state (<code>components</code>: e.g. not_requested, planned, complete, offloaded).</p>
+<h2><a class="anchor" id="p52_assets_restart_sub"></a>
+3.1 Assets Across Restarts, Moves, And Storage</h2>
+<p>A run reads its assets from run-local files. Each payload file is exposed into the run by reflink when the filesystem allows it, otherwise by hardlink, otherwise by copy, and <code>inputs/assets.lock.yml</code> records the object and checksum behind every file. On a Lustre scratch filesystem, which refuses reflinks, a run in the same filesystem as its workspace therefore holds hardlinks to the shared objects: never edit a run's input files in place.</p>
+<p>A run that starts from saved state (<code>start_step &gt; 0</code>), or whose Eulerian field comes from the <code>load</code> or an analytical source, never reads the configured initial condition. Planning marks that asset <code>unused</code> and neither builds nor materializes it; the grid and inlet profiles are still resolved.</p>
+<p>A moved run or study is adopted where it now stands (<a class="el" href="52_Run_Artifact_Lifecycle_Contract.html#p52_scope_move_sub">1.3 Moving Or Copying A Run Or Study</a>). <code>picurv storage restore --run-dir</code> restores the run's own files but not the shared objects in <code>assets/objects/</code>; those come back through <code>--fetch-missing</code> when a run is staged, or by restoring a workspace archive's <code>assets</code> component. Objects that no run references are reclaimed only by an explicit <code>picurv storage prune --assets --unused-locally</code> (<a class="el" href="61_Storage_Management_Guide.html#p61_prune_assets">4.5 Reclaiming a Shared Asset</a>).</p>
+<h2><a class="anchor" id="p52_assets_trouble_sub"></a>
+3.2 When An Asset Is Missing Or Rejected</h2>
+<ul>
+<li><code>Required precomputed asset(s) are missing or stale</code> comes from <code>--require-precomputed</code>; run the <code>picurv precompute ... --only ...</code> command the message names.</li>
+<li><code>Asset generation completed without satisfying: &lt;kind&gt;</code> means precompute ran but that kind still has no object; <code>picurv precompute --case &lt;case&gt; --only &lt;kind&gt;</code> shows the provider's own output.</li>
+<li>An import with <code>--mode reflink</code> that fails with <code>cp</code>'s "Operation not supported" is on a filesystem without reflinks, such as Lustre or ext4. Use <code>copy</code>, or <code>hardlink</code> within one filesystem; nothing falls back silently.</li>
+<li>An import with <code>--mode hardlink</code> fails across filesystems, for example from a home directory into scratch. Use <code>copy</code>.</li>
+<li>A <code>reference</code> import whose target has disappeared fails when it is consumed. Make the target available at the same path, or import a copy. A target whose bytes changed is used as it now is and builds a new object, without a warning.</li>
+<li>The same file imported under two names builds two objects, because each input's workspace path is part of the provider settings. Point the case files at one imported path; <code>storage prune --assets --unused-locally</code> reclaims the unused object.</li>
+</ul>
 <h1><a class="anchor" id="p52_launchers_sec"></a>
 4. Local, Login-Node, and Batch Launch Resolution</h1>
 <p>PICurv now separates case physics from site execution policy.</p>

@@ -10,5 +10,6 @@ var searchData=
   ['16_5fconfig_5fextension_5fplaybook_2emd_7',['16_Config_Extension_Playbook.md',['../16__Config__Extension__Playbook_8md.html',1,'']]],
   ['17_5fworkflow_5fextensibility_2emd_8',['17_Workflow_Extensibility.md',['../17__Workflow__Extensibility_8md.html',1,'']]],
   ['19_5fnondimensionalization_2emd_9',['19_Nondimensionalization.md',['../19__Nondimensionalization_8md.html',1,'']]],
-  ['1d90f08_2dnk_2dpointblock_2dtranspose_2emd_10',['1d90f08-nk-pointblock-transpose.md',['../1d90f08-nk-pointblock-transpose_8md.html',1,'']]]
+  ['1bed094_2dcluster_2dpromotions_2dpetsc_2dstamp_2emd_10',['1bed094-cluster-promotions-petsc-stamp.md',['../1bed094-cluster-promotions-petsc-stamp_8md.html',1,'']]],
+  ['1d90f08_2dnk_2dpointblock_2dtranspose_2emd_11',['1d90f08-nk-pointblock-transpose.md',['../1d90f08-nk-pointblock-transpose_8md.html',1,'']]]
 ];

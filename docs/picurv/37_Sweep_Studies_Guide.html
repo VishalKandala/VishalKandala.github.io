@@ -95,7 +95,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p37_contract_sec">3. Study Contract Essentials</a></li>
 <li class="level1"><a href="#p37_outputs_sec">4. Outputs and Aggregates</a></li>
 <li class="level1"><a href="#p37_operations_sec">5. Operational Workflow</a></li>
-<li class="level1"><a href="#p37_continue_sec">6. Continuing a Partially-Completed Study</a></li>
+<li class="level1"><a href="#p37_continue_sec">6. Continuing a Partially-Completed Study</a><ul><li class="level2"><a href="#p37_trouble_sub">6.1 When A Study Does Not Finish</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p37_reaggregate_sec">7. Manual Metrics Re-Aggregation</a></li>
 <li class="level1"><a href="#p37_cap_study_sec">7.1 Study Type Entries</a><ul><li class="level2"><a href="#p37_cap_study_grid_independence_sub">grid_independence</a></li>
 <li class="level2"><a href="#p37_cap_study_timestep_independence_sub">timestep_independence</a></li>
@@ -181,8 +183,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>studies/&lt;study_id&gt;/scheduler/solver_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code> after submission</li>
 <li><code>studies/&lt;study_id&gt;/scheduler/post_&lt;array_jobid&gt;_&lt;taskid&gt;.out/.err</code> after submission</li>
 <li><code>studies/&lt;study_id&gt;/scheduler/submission.json</code> (when jobs are submitted)</li>
-<li><code>studies/&lt;study_id&gt;/results/metrics_table.csv</code></li>
-<li><code>studies/&lt;study_id&gt;/results/plots/*</code> (when plotting is enabled and matplotlib is available)</li>
+<li><code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code></li>
+<li><code>studies/&lt;study_id&gt;/output/analysis/plots/*</code> (when plotting is enabled and matplotlib is available)</li>
 <li><code>studies/&lt;study_id&gt;/study_manifest.json</code></li>
 </ul>
 <p>This keeps raw run data and comparative study diagnostics in one reproducible structure.</p>
@@ -228,11 +230,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>Submits a sparse solver array (incomplete cases only) → full post array → metrics aggregation. The post array covers every member, but a member whose output is up to date launches no postprocessor, so only the continued members' new steps are processed. With <code>--no-submit</code> the three scripts are staged instead; <code>picurv submit --study-dir &lt;study&gt;</code> submits them in that order.</li>
 </ol>
 <p>Repeated continuation is safe: the target step count is always computed from the original <code>study.yml</code>, not from the (potentially modified) per-case <code>case.yml</code>.</p>
+<h2><a class="anchor" id="p37_trouble_sub"></a>
+6.1 When A Study Does Not Finish</h2>
+<ul>
+<li><b>One member's solve failed and the post array never ran.</b> The post array waits on the whole solver array with <code>afterok</code>, so one failed member cancels it. Fix the cause, then <code>picurv sweep --continue --study-dir &lt;study&gt;</code> resubmits only the incomplete members.</li>
+<li>**<code>--continue</code> refuses a member in cold storage.** Restore it with the <code>picurv storage restore</code> command the message prints, or pass <code>--auto-fetch</code>.</li>
+<li><b>A metric column is empty for a member that completed.</b> The metric's <code>file_glob</code> or <code>regex</code> did not match that member's output. Correct <code>study.yml</code>, then <code>picurv sweep --reaggregate --study-dir &lt;study&gt;</code> rebuilds the table without running anything.</li>
+<li><b>No job ID after <code>sweep</code> or <code>submit</code>.</b> Some sites' <code>sbatch</code> rejects a submission and still exits 0; <a class="el" href="67_Troubleshooting.html#p67_cluster_sec">7. The Job Fails on a Cluster but Works Locally</a> says how to see why.</li>
+</ul>
 <h1><a class="anchor" id="p37_reaggregate_sec"></a>
 7. Manual Metrics Re-Aggregation</h1>
 <p>If the automatic metrics Slurm job fails or you want to re-collect metrics after manual intervention:</p>
 <div class="fragment"><div class="line">./bin/picurv sweep --reaggregate --study-dir studies/&lt;study_id&gt;</div>
-</div><!-- fragment --><p>This reads all case outputs, writes <code>results/metrics_table.csv</code>, and generates plots (if enabled in <code>study.yml</code>).</p>
+</div><!-- fragment --><p>This reads all case outputs, writes <code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code>, and generates plots (if enabled in <code>study.yml</code>).</p>
 <h1><a class="anchor" id="p37_cap_study_sec"></a>
 7.1 Study Type Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: study.type.
@@ -241,11 +251,10 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_grid_independence"><code>grid_independence</code></a></td><td class="markdownTableBodyNone"><code>grid_independence</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_sensitivity"><code>sensitivity</code></a></td><td class="markdownTableBodyNone"><code>sensitivity</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_timestep_independence"><code>timestep_independence</code></a></td><td class="markdownTableBodyNone"><code>timestep_independence</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_grid_independence"><code>grid_independence</code></a></td><td class="markdownTableBodyNone"><code>grid_independence</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_sensitivity"><code>sensitivity</code></a></td><td class="markdownTableBodyNone"><code>sensitivity</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p37_cap_study_timestep_independence"><code>timestep_independence</code></a></td><td class="markdownTableBodyNone"><code>timestep_independence</code></td></tr>
 </table>
 <h2><a class="anchor" id="p37_cap_study_grid_independence_sub"></a>
 grid_independence</h2>
@@ -254,8 +263,8 @@ grid_independence</h2>
 <p><b>When to choose it.</b> Before trusting any quantitative result from a new geometry. It is the first study to run and the one most often skipped; a converged solver on an unconverged grid is still the wrong answer.</p>
 <p><b>Parameters it owns.</b> <code>parameters</code> naming the grid keys to vary - typically <code>case.grid.programmatic_settings.im/jm/km</code> - and <code>metrics</code> naming what to compare.</p>
 <p><b>Interactions.</b> The sweep recognises the grid keys and orders the aggregated table by resolution. Combines naturally with <code>grid.mode: grid_gen</code>, which regenerates the mesh per case; with <code>mode: file</code> every resolution needs its own staged mesh.</p>
-<p><b>Diagnostics.</b> <code>results/metrics_table.csv</code> carries one row per case. A metric that does not settle across the ladder is the finding, not a failure of the study.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel/grid_independence_study.yml</code>.</p>
+<p><b>Diagnostics.</b> <code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code> carries one row per case. A metric that does not settle across the ladder is the finding, not a failure of the study.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/flat_channel/grid_independence_study.yml</code>, and on the cluster in <code>cluster-session-grace-2026-10-01</code>: a three-member ladder ran as a Slurm array throttled to one task at a time and aggregated one row per member.</p>
 <p><b>Limitations.</b> It varies what you list and nothing else: refining only one direction produces a table that looks converged while the unrefined direction still controls the error.</p>
 <h2><a class="anchor" id="p37_cap_study_timestep_independence_sub"></a>
 timestep_independence</h2>
@@ -264,8 +273,8 @@ timestep_independence</h2>
 <p><b>When to choose it.</b> After grid independence, and before any claim about a time-dependent quantity. Run it separately from the grid ladder: varying both at once cannot attribute the change to either.</p>
 <p><b>Parameters it owns.</b> <code>parameters</code> naming the timestep keys, and <code>metrics</code>.</p>
 <p><b>Interactions.</b> Independent of the momentum solver chosen, but the useful dt range is not: an explicit path is stability-limited where the implicit paths are not, so the ladder that is informative for one may not run at all for the other.</p>
-<p><b>Diagnostics.</b> Same <code>results/metrics_table.csv</code> shape as the grid ladder, ordered by dt.</p>
-<p><b>Evidence.</b> Implemented only. No shipped study selects it.</p>
+<p><b>Diagnostics.</b> Same <code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code> shape as the grid ladder, ordered by dt.</p>
+<p><b>Evidence.</b> Production exercised - <code>cluster-session-grace-2026-10-01</code>: a two-member study ran as a Slurm array and aggregated one row per member. No shipped study selects it.</p>
 <p><b>Limitations.</b> Nothing here detects that the ladder crossed a stability boundary rather than a convergence one; a diverged case appears as a missing or absurd metric row.</p>
 <h2><a class="anchor" id="p37_cap_study_sensitivity_sub"></a>
 sensitivity</h2>
@@ -274,8 +283,8 @@ sensitivity</h2>
 <p><b>When to choose it.</b> For everything that is not a convergence ladder: Reynolds number, model coefficients, boundary treatments, solver tolerances. Use <code>parameter_sets</code> rather than <code>parameters</code> when the combinations are coupled and a full cross-product would include cases that make no sense.</p>
 <p><b>Parameters it owns.</b> <code>parameters</code> (cross-product) or <code>parameter_sets</code> (explicit coupled sets), and <code>metrics</code>.</p>
 <p><b>Interactions.</b> The only study type that does not order its table by a convergence quantity, so the aggregation is a plain comparison. <code>execution.max_concurrent_array_tasks</code> matters most here, because a sensitivity sweep is usually the widest.</p>
-<p><b>Diagnostics.</b> <code>results/metrics_table.csv</code> with one row per case and the varied keys as columns.</p>
-<p><b>Evidence.</b> Implemented only. No shipped study selects it.</p>
+<p><b>Diagnostics.</b> <code>studies/&lt;study_id&gt;/output/analysis/metrics_table.csv</code> with one row per case and the varied keys as columns.</p>
+<p><b>Evidence.</b> Production exercised - <code>cluster-session-grace-2026-10-01</code>: a two-member study ran as a Slurm array and aggregated one row per member. No shipped study selects it.</p>
 <p><b>Limitations.</b> It compares what you asked for and infers nothing: there is no sensitivity index, no ranking, and no detection that two varied parameters interact.</p>
 <h1><a class="anchor" id="p37_refs_sec"></a>
 8. Related Pages</h1>
