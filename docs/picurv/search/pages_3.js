@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['46a0680_20rans_20removed_20and_20spectral_20ics_20supported_0',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]]
-];
+var searchData=[["46a0680_20rans_20removed_20and_20spectral_20ics_20supported_0",["46a0680-rans-removed-and-spectral-ics-supported",["../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html",1,""]]]];

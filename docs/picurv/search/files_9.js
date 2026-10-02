@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['951870f_2dphysical_2dunits_2drule_2emd_0',['951870f-physical-units-rule.md',['../951870f-physical-units-rule_8md.html',1,'']]]
-];
+var searchData=[["951870f_2dphysical_2dunits_2drule_2emd_0",["951870f-physical-units-rule.md",["../951870f-physical-units-rule_8md.html",1,""]]]];

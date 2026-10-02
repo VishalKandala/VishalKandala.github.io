@@ -1,6 +1,1 @@
-var searchData=
-[
-  ['needs_5flocation_0',['NEEDS_LOCATION',['../variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a',1,'variables.h']]],
-  ['no_5fles_5fmodel_1',['NO_LES_MODEL',['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2a5d1fa4229781cf94cd4a809266db7a63',1,'variables.h']]],
-  ['num_5ffaces_2',['NUM_FACES',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294faea9f55d94d5c6f9337119ed01805d36f',1,'variables.h']]]
-];
+var searchData=[["needs_5flocation_0",["NEEDS_LOCATION",["../variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a",1,"variables.h"]]],["no_5fles_5fmodel_1",["NO_LES_MODEL",["../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2a5d1fa4229781cf94cd4a809266db7a63",1,"variables.h"]]],["num_5ffaces_2",["NUM_FACES",["../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294faea9f55d94d5c6f9337119ed01805d36f",1,"variables.h"]]]];

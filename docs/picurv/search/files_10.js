@@ -1,9 +1,1 @@
-var searchData=
-[
-  ['f0097d7_2dstorage_2dpromotion_2emd_0',['f0097d7-storage-promotion.md',['../f0097d7-storage-promotion_8md.html',1,'']]],
-  ['fc3ae90_2dvv_2dcampaign_2dpromotions_2emd_1',['fc3ae90-vv-campaign-promotions.md',['../fc3ae90-vv-campaign-promotions_8md.html',1,'']]],
-  ['field_5fcatalog_2ec_2',['field_catalog.c',['../field__catalog_8c.html',1,'']]],
-  ['field_5fcatalog_2eh_3',['field_catalog.h',['../field__catalog_8h.html',1,'']]],
-  ['filter_2ec_4',['Filter.c',['../Filter_8c.html',1,'']]],
-  ['filter_2eh_5',['Filter.h',['../Filter_8h.html',1,'']]]
-];
+var searchData=[["f0097d7_2dstorage_2dpromotion_2emd_0",["f0097d7-storage-promotion.md",["../f0097d7-storage-promotion_8md.html",1,""]]],["fc3ae90_2dvv_2dcampaign_2dpromotions_2emd_1",["fc3ae90-vv-campaign-promotions.md",["../fc3ae90-vv-campaign-promotions_8md.html",1,""]]],["field_5fcatalog_2ec_2",["field_catalog.c",["../field__catalog_8c.html",1,""]]],["field_5fcatalog_2eh_3",["field_catalog.h",["../field__catalog_8h.html",1,""]]],["filter_2ec_4",["Filter.c",["../Filter_8c.html",1,""]]],["filter_2eh_5",["Filter.h",["../Filter_8h.html",1,""]]]];

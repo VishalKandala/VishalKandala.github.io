@@ -1,6 +1,1 @@
-var searchData=
-[
-  ['handoff_0',['Scientific Writing Handoff',['../69_Scientific_Writing_Handoff.html',1,'']]],
-  ['history_20two_20logs_1',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['how_20to_20guides_2',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]]
-];
+var searchData=[["handoff_0",["Scientific Writing Handoff",["../69_Scientific_Writing_Handoff.html",1,""]]],["history_20two_20logs_1",["cab1626-nk-history-two-logs",["../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html",1,""]]],["how_20to_20guides_2",["User How-To Guides",["../11_User_How_To_Guides.html",1,""]]]];
