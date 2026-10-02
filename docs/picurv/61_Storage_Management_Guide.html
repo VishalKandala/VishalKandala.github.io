@@ -560,16 +560,15 @@ analysis-ready</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_analysis"><code>analysis</code></a></td><td class="markdownTableBodyNone"><code>analysis</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_checkpoints"><code>checkpoints</code></a></td><td class="markdownTableBodyNone"><code>checkpoints</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_inputs"><code>inputs</code></a></td><td class="markdownTableBodyNone"><code>inputs</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_logs"><code>logs</code></a></td><td class="markdownTableBodyNone"><code>logs</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_raw_output"><code>raw-output</code></a></td><td class="markdownTableBodyNone"><code>raw-output</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_visualization"><code>visualization</code></a></td><td class="markdownTableBodyNone"><code>visualization</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_analysis"><code>analysis</code></a></td><td class="markdownTableBodyNone"><code>analysis</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_checkpoints"><code>checkpoints</code></a></td><td class="markdownTableBodyNone"><code>checkpoints</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_inputs"><code>inputs</code></a></td><td class="markdownTableBodyNone"><code>inputs</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_logs"><code>logs</code></a></td><td class="markdownTableBodyNone"><code>logs</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_raw_output"><code>raw-output</code></a></td><td class="markdownTableBodyNone"><code>raw-output</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p61_cap_retain_visualization"><code>visualization</code></a></td><td class="markdownTableBodyNone"><code>visualization</code></td></tr>
 </table>
-<p>Every component below except <code>raw-output</code> is supported. On a Google Drive remote (<code>storage-campaign-grace-2026-09-30</code>), <code>--policy metadata-only --retain visualization --drop logs</code> kept every visualization file, pruned every log the preset would otherwise keep, and pruned the rest as the preset does; a whole restore returned every file bit for bit. The other components were exercised through the presets. <code>raw-output</code> held no data in those runs and stays experimental.</p>
+<p>Every component below is supported. On a Google Drive remote (<code>storage-campaign-grace-2026-09-30</code>), <code>--policy metadata-only --retain visualization --drop logs</code> kept every visualization file, pruned every log the preset would otherwise keep, and pruned the rest as the preset does; a whole restore returned every file bit for bit. The other components were exercised through the presets. <code>raw-output</code> held no data in those runs; it is supported on the owner's decision of 2026-10-01, because it is classified and selected by the same code as the components that were exercised.</p>
 <p>A named <code>--policy</code> is a preset, not a ceiling. <code>--retain</code> and <code>--drop</code> adjust one component at a time on top of whichever preset is in force, so a campaign whose retention needs do not match any single preset does not have to pick the closest one and accept the rest. Both flags are repeatable and accept comma-separated names. The preset still decides every component neither flag mentions.</p>
 <p>Four components are never selectable, because no correct offload prunes them: <code>metadata</code> (a cold artifact that cannot say what it is cannot be restored), <code>assets</code> (reclaimed only by the reference-aware <code>storage prune --assets --unused-locally</code>), <code>workspace-config</code> and <code>workspace-inputs</code> (a workspace protect is a backup, not a handover of the user's own files), and anything storage could not classify.</p>
 <div class="fragment"><div class="line"># Keep the figures this preset keeps, and the checkpoints it would not.</div>
@@ -636,7 +635,7 @@ raw-output</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> An incomplete checkpoint — a bundle still being written — is refused before packaging rather than classified here, so this never becomes a way to archive a run mid-write.</p>
 <p><b>Diagnostics.</b> <code>storage plan</code> shows a <code>raw-output</code> chunk with its file count and uncompressed size, which is how an unexpected writer under <code>&lt;run.output&gt;</code> is noticed: the chunk is larger than the run should produce.</p>
-<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions, and that a bundle whose step cannot be identified becomes <code>unclassified</code> rather than falling into this component.</p>
+<p><b>Evidence.</b> Unit verified — <code>tests/test_storage.py</code> asserts the component is selectable in both directions, and that a bundle whose step cannot be identified becomes <code>unclassified</code> rather than falling into this component. The cluster campaign archived and restored it, but it held no files there, so no data has passed through it on a real remote.</p>
 <p><b>Limitations.</b> It is defined by what it is not, so an unexpected writer under <code>&lt;run.output&gt;</code> lands here and becomes prunable. Output that must survive belongs under the analysis or visualization tree, which the run layout defines for that purpose. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
