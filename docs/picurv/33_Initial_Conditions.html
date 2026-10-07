@@ -91,7 +91,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p33_overview_sec">1. Where Initialization Happens</a></li>
-<li class="level1"><a href="#p33_euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a></li>
+<li class="level1"><a href="#p33_euler_sec">2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)</a><ul><li class="level2"><a href="#p33_file_or_import_ssec">File, Or Import?</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p33_entries_sec">3. Field Initialization Mode Entries</a><ul><li class="level2"><a href="#p33_cap_zero_sub">Zero</a></li>
 <li class="level2"><a href="#p33_cap_constant_sub">Constant</a></li>
 <li class="level2"><a href="#p33_cap_poiseuille_sub">Poiseuille</a></li>
@@ -106,6 +108,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p33_refs_sec">7. Related Pages</a></li>
 <li class="level1"><a href="#p33_wall_spectral_sec">Wall-bounded spectral seeds</a><ul><li class="level2"><a href="#p33_cap_gen_ic_gen_sub">ic_gen</a></li>
 <li class="level2"><a href="#p33_cap_gen_spectral_random_velocity_sub">spectral_random_velocity</a></li>
+<li class="level2"><a href="#p33_cap_gen_resampled_velocity_sub">resampled_velocity</a></li>
 <li class="level2"><a href="#p33_cap_gen_channel_spectral_velocity_sub">channel_spectral_velocity</a></li>
 <li class="level2"><a href="#p33_cap_gen_duct_spectral_velocity_sub">duct_spectral_velocity</a></li>
 </ul>
@@ -169,6 +172,20 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">source_file: inputs/initial_conditions/velocity.dat</div>
 <div class="line">source_case: runs/&lt;earlier_run&gt;/config/case.yml   # or: velocity_scale: 1.5</div>
 </div><!-- fragment --><p><code>velocity_scale</code> needs <code>length_scale</code> too for a <code>Ucont</code> payload, and <code>source_case</code> and the explicit scales are mutually exclusive.</p>
+<h2><a class="anchor" id="p33_file_or_import_ssec"></a>
+File, Or Import?</h2>
+<p>Every Python provider ends in a <code>.dat</code> vector; what differs is who guarantees it fits the case.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone"></th><th class="markdownTableHeadNone"><code>mode: file</code>   </th><th class="markdownTableHeadNone"><code>generator: resampled_velocity</code>    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">You supply   </td><td class="markdownTableBodyNone">a vector already in PICurv's layout for this grid   </td><td class="markdownTableBodyNone">a field from anywhere: another code, resolution, or layout    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">PICurv does   </td><td class="markdownTableBodyNone">reads it verbatim   </td><td class="markdownTableBodyNone">resamples and filters it onto this grid, projects it, writes the vector    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Typical source   </td><td class="markdownTableBodyNone">a field PICurv itself produced   </td><td class="markdownTableBodyNone">a published DNS, an experiment, another code's snapshot   </td></tr>
+</table>
+<p>A <code>mode: file</code> vector sized for another grid is refused when it is staged, with a pointer to <a class="el" href="33_Initial_Conditions.html#p33_cap_gen_resampled_velocity">p33_cap_gen_resampled_velocity</a>.</p>
 <p>Repository generator:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
@@ -354,6 +371,7 @@ Wall-bounded spectral seeds</h1>
 <tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_channel_spectral_velocity"><code>channel_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>channel_spectral_velocity</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_duct_spectral_velocity"><code>duct_spectral_velocity</code></a></td><td class="markdownTableBodyNone"><code>duct_spectral_velocity</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_ic_gen"><code>ic_gen</code></a></td><td class="markdownTableBodyNone"><code>ic_gen</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_resampled_velocity"><code>resampled_velocity</code></a></td><td class="markdownTableBodyNone"><code>resampled_velocity</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p33_cap_gen_spectral_random_velocity"><code>spectral_random_velocity</code></a></td><td class="markdownTableBodyNone"><code>spectral_random_velocity</code></td></tr>
 </table>
 <p><code>channel_spectral_velocity</code> uses one wall axis; <code>duct_spectral_velocity</code> uses two. The remaining axes are periodic, with driving allowed only on <code>streamwise_axis</code>. Both use <code>Ucat</code> on one Cartesian block. Uniform spacing is required along periodic axes; wall-normal axes may stretch. <code>grid_gen</code> provides an inspectable staged grid.</p>
@@ -393,6 +411,16 @@ spectral_random_velocity</h2>
 <p><b>Diagnostics.</b> The IC summary reports selected-operator divergence and realized energy; shell spectra measure the generated field.</p>
 <p><b>Evidence.</b> Unit verified - <code>make test-python</code>. Production exercised in <code>examples/decaying_isotropic_turbulence</code>. Analytically verified - <code>initial-conditions-2026-09-21</code>: fluctuation RMS 1.000000 and kinetic energy 1.500000 as requested, the solver's own step-0 divergence 3.1e-14 against a flux scale of 4.3 under <code>operator: picurv_discrete</code>, the shell spectrum within 4.7% (energy-weighted) of the <code>k4_exponential</code> envelope with nothing above <code>k_cut</code>, and identical seeds reproducing identical fields.</p>
 <p><b>Limitations.</b> A continuum solenoidal field need not be discretely solenoidal - choose <code>operator: picurv_discrete</code> when the solver's own divergence must vanish - and runtime reconstruction changes the energy from the staged value, which the summary predicts separately. A startup field, not developed turbulence.</p>
+<h2><a class="anchor" id="p33_cap_gen_resampled_velocity_sub"></a>
+resampled_velocity</h2>
+<p><a class="anchor" id="p33_cap_gen_resampled_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: resampled_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generate_resampled_velocity()</code> in <code>generators/ic.gen</code>, then the file IC runtime path; the Fourier resampling is <code>fourier_resample</code> in <code><a class="el" href="periodic__spectral_8py.html" title="Fourier machinery for the uniform periodic axes of PICurv&#39;s Cartesian grids.">generators/periodic_spectral.py</a></code>.</p>
+<p><b>What it does.</b> Brings an external triply periodic velocity field onto this case's grid. It reads the source, re-evaluates it at the target points from its Fourier series - truncating when the grid is coarser, zero-padding when it is finer - optionally filters it, projects it to be divergence-free under PICurv's discrete operator, and writes solver units. With <code>field: Ucont</code> (the default) it samples face centres and stages volume fluxes, the representation PICurv evolves; with <code>field: Ucat</code> it stages cell-centre velocities like the synthetic providers.</p>
+<p><b>When to choose it.</b> When the starting field exists already: a published DNS or experiment field, a snapshot from another code, or a field at another resolution. <code>spectral_random_velocity</code> synthesizes a field from a spectrum instead, and suits decay-law and parametric studies where the initial spectrum is the variable. <code>mode: file</code> reads a vector already laid out for this grid, verbatim; see <a class="el" href="33_Initial_Conditions.html#p33_file_or_import_ssec">File, Or Import?</a>.</p>
+<p><b>Parameters it owns.</b> Required: <code>source_file</code> (a workspace input, normally a <code>reference-field</code> import), <code>format</code> (<code>raw</code>, <code>npy</code>, <code>npz</code>, or <code>hdf5</code>), and <code>box_length</code>, the source's three periods in physical length, which must equal the grid's. <code>cells</code> (samples along x, y, z) is required for <code>raw</code> and checked otherwise. <code>layout</code>: <code>fastest_axis</code> (<code>x</code>, default, or <code>z</code>) and <code>components</code> (<code>interleaved</code>, default, or <code>separate</code>); for <code>raw</code> also <code>dtype</code> (<code>float32</code> or <code>float64</code>), <code>byte_order</code> (<code>little</code>, <code>big</code>, <code>native</code>) and <code>header_bytes</code>; for <code>npz</code> and <code>hdf5</code>, <code>datasets</code> (one array name, or three for u, v, w). Optional: <code>sample_offset</code> (fraction of the source spacing at which samples sit, 0 for nodes on the box origin and 0.5 for cell centres; default 0), <code>filter</code> (<code>none</code>; <code>sharp</code> with <code>cutoff</code>, a wavenumber; <code>gaussian</code> or <code>box</code> with <code>width</code>, a length), <code>projection</code> (<code>picurv_discrete</code>, default; <code>continuum</code>; <code>none</code>), <code>remove_mean</code> (default true), and <code>field</code>. The source values are physical velocities, divided by <code>velocity_ref</code>.</p>
+<p><b>Interactions.</b> Requires six geometric-periodic faces, one block, and a uniform Cartesian grid; wall-bounded sources are refused. Restart remains authoritative. The source file's checksum is part of the asset identity, so changing its bytes builds a new object. <code>hdf5</code> needs <code>h5py</code>, which PICurv does not install; without it the provider says how to add it.</p>
+<p><b>Diagnostics.</b> The IC summary reports the source, resampled, and projected kinetic energies, the fraction the projection removed, the divergence before and after, and the energy, dissipation and <code>re_lambda</code> of the field the runtime will hold; for <code>Ucont</code> that is the velocity reconstructed from the staged fluxes (<code>measurement_state</code>). The shell spectrum is measured on that same field. A layout that does not fit the file is refused with the byte or shape count it expected; a <code>box_length</code> that differs from the grid is refused.</p>
+<p><b>Evidence.</b> Unit verified - <code>tests/test_resampled_velocity.py</code> (<code>make test-python</code>). Analytically verified - <code>resampled-velocity-hom02-2026-10-03</code>: a band-limited field coarsened and refined to round-off (1e-14) at the target cell and face centres, every container and layout reading the same field, and the HOM02 DNS field (AGARD-AR-345) imported at 64-cubed with every shell below the cutoff equal to the source's to 7e-16 before projection; the solver's step-1 energy matched the provider's prediction within one step's decay, at divergence 3.5e-12.</p>
+<p><b>Limitations.</b> Periodic boxes only. The projection changes the field near the grid cutoff: with <code>Ucat</code> it removed 2.6% of HOM02's energy at 64-cubed (21% of the k = 32 shell), with <code>Ucont</code> 0.075%. The runtime then holds a second-order reconstruction of what was staged - 87% of the band's energy for <code>Ucont</code> and 78% for <code>Ucat</code> on that field - so compare spectra only well below the cutoff. <code>projection: continuum</code> keeps the source's modes but leaves the staged field discretely divergent.</p>
 <h2><a class="anchor" id="p33_cap_gen_channel_spectral_velocity_sub"></a>
 channel_spectral_velocity</h2>
 <p><a class="anchor" id="p33_cap_gen_channel_spectral_velocity"></a> <b>Identity.</b> <code>properties.initial_conditions.generator: channel_spectral_velocity</code> dispatches through <code>GENERATED_IC_PROVIDERS</code> into <code>generators/ic.gen</code>, then the existing file IC runtime path.</p>

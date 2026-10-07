@@ -13,11 +13,12 @@ var searchData=
   ['particlephysics_2eh_10',['ParticlePhysics.h',['../ParticlePhysics_8h.html',1,'']]],
   ['particleswarm_2ec_11',['ParticleSwarm.c',['../ParticleSwarm_8c.html',1,'']]],
   ['particleswarm_2eh_12',['ParticleSwarm.h',['../ParticleSwarm_8h.html',1,'']]],
-  ['poisson_2ec_13',['poisson.c',['../poisson_8c.html',1,'']]],
-  ['poisson_2eh_14',['poisson.h',['../poisson_8h.html',1,'']]],
-  ['postprocessing_5fkernels_2ec_15',['postprocessing_kernels.c',['../postprocessing__kernels_8c.html',1,'']]],
-  ['postprocessing_5fkernels_2eh_16',['postprocessing_kernels.h',['../postprocessing__kernels_8h.html',1,'']]],
-  ['postprocessor_2ec_17',['postprocessor.c',['../postprocessor_8c.html',1,'']]],
-  ['postprocessor_2eh_18',['postprocessor.h',['../postprocessor_8h.html',1,'']]],
-  ['python_5fcoverage_5fgate_2epy_19',['python_coverage_gate.py',['../python__coverage__gate_8py.html',1,'']]]
+  ['periodic_5fspectral_2epy_13',['periodic_spectral.py',['../periodic__spectral_8py.html',1,'']]],
+  ['poisson_2ec_14',['poisson.c',['../poisson_8c.html',1,'']]],
+  ['poisson_2eh_15',['poisson.h',['../poisson_8h.html',1,'']]],
+  ['postprocessing_5fkernels_2ec_16',['postprocessing_kernels.c',['../postprocessing__kernels_8c.html',1,'']]],
+  ['postprocessing_5fkernels_2eh_17',['postprocessing_kernels.h',['../postprocessing__kernels_8h.html',1,'']]],
+  ['postprocessor_2ec_18',['postprocessor.c',['../postprocessor_8c.html',1,'']]],
+  ['postprocessor_2eh_19',['postprocessor.h',['../postprocessor_8h.html',1,'']]],
+  ['python_5fcoverage_5fgate_2epy_20',['python_coverage_gate.py',['../python__coverage__gate_8py.html',1,'']]]
 ];
