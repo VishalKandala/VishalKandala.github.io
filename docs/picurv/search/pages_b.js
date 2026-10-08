@@ -21,5 +21,6 @@ var searchData=
   ['doxygen_20nk_20fragment_20leading_20blank_18',['c0b46a8-doxygen-nk-fragment-leading-blank',['../md_docs_2changelog_8d_2c0b46a8-doxygen-nk-fragment-leading-blank.html',1,'']]],
   ['driven_20flows_19',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
   ['dual_20time_20picard_20jameson_20rk_20momentum_20solver_20',['Dual-Time Picard Jameson RK Momentum Solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'']]],
-  ['dummy_20cell_20fill_21',['04e341b-dummy-cell-fill',['../md_docs_2changelog_8d_204e341b-dummy-cell-fill.html',1,'']]]
+  ['duct_20cross_20section_20reducer_21',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
+  ['dummy_20cell_20fill_22',['04e341b-dummy-cell-fill',['../md_docs_2changelog_8d_204e341b-dummy-cell-fill.html',1,'']]]
 ];

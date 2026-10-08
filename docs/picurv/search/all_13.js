@@ -42,7 +42,7 @@ var searchData=
   ['history_20two_20logs_39',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
   ['history_5ffile_40',['history_file',['../momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3',1,'MomentumNewtonKrylovContext']]],
   ['homogeneous_41',['homogeneous',['../07_Case_Reference.html#p07_cap_avg_homogeneous_sub',1,'']]],
-  ['homogeneous_5faverage_42',['homogeneous_average',['../namespacewall__normal__profile.html#abe1e330d3477f93c378c87636be76f69',1,'wall_normal_profile']]],
+  ['homogeneous_5fstatistics_42',['homogeneous_statistics',['../namespacewall__normal__profile.html#abbfb3bd49450cfda262733253779a040',1,'wall_normal_profile']]],
   ['hooks_43',['6. Boundary System Runtime Hooks',['../46_C_Runtime_Execution_Map.html#p46_boundaries_sec',1,'']]],
   ['how_20it_20is_20validated_44',['11. How It Is Validated',['../58_Field_Statistics.html#p58_validation_sec',1,'']]],
   ['how_20it_20works_20at_20the_20boundaries_45',['4.1. How it Works at the Boundaries',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md15',1,'']]],
