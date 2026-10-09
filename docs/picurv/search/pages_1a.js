@@ -36,7 +36,7 @@ var searchData=
   ['study_20guide_33',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
   ['suite_20developer_20guide_34',['C Test Suite Developer Guide',['../51_C_Test_Suite_Developer_Guide.html',1,'']]],
   ['summary_35',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
-  ['supported_36',['supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'46a0680-rans-removed-and-spectral-ics-supported'],['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'eb0478d-nk-pointblock-supported']]],
+  ['supported_36',['supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'46a0680-rans-removed-and-spectral-ics-supported'],['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'4831839-les-wall-function-supported'],['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'eb0478d-nk-pointblock-supported']]],
   ['sweep_20and_20study_20guide_37',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
   ['symptom_38',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];

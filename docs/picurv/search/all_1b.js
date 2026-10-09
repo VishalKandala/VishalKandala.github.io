@@ -11,7 +11,7 @@ var searchData=
   ['packer_8',['packer',['../variables_8h.html#ab0d238ded511fffbc230f137f2ac30ff',1,'MGCtx::packer'],['../variables_8h.html#a0477d0c6078aecd8d2298d0708b2a05b',1,'UserMG::packer']]],
   ['packet_20test_20targets_9',['643e8e2-review-packet-test-targets',['../md_docs_2changelog_8d_2643e8e2-review-packet-test-targets.html',1,'']]],
   ['packets_10',['6.1 Declared Routing Packets',['../64_Documentation_Extension_Framework.html#p64_review_packets_sub',1,'']]],
-  ['page_11',['page',['../namespaceaudit__field__catalog.html#ac300a0f2f4872c0ccedcce14a06bbeda',1,'audit_field_catalog.PAGE'],['../namespaceaudit__units.html#a9c4c74020d5e5809e56450b432edbf84',1,'audit_units.PAGE'],['../namespacescaffold__documentation.html#af56adadf356f32854e1b4db2926016e9',1,'scaffold_documentation.page()']]],
+  ['page_11',['page',['../namespaceaudit__units.html#a9c4c74020d5e5809e56450b432edbf84',1,'audit_units.PAGE'],['../namespacescaffold__documentation.html#af56adadf356f32854e1b4db2926016e9',1,'scaffold_documentation.page()'],['../namespaceaudit__field__catalog.html#ac300a0f2f4872c0ccedcce14a06bbeda',1,'audit_field_catalog.PAGE']]],
   ['page_20authoritative_12',['6. What Makes a Method Page Authoritative',['../21_Methods_Overview.html#p21_authority_sec',1,'']]],
   ['page_20owes_13',['2. What Each Page Owes',['../69_Scientific_Writing_Handoff.html#p69_contract_sec',1,'']]],
   ['page_20type_20contract_14',['Page Type Contract',['../63_Page_Type_Contract.html',1,'']]],

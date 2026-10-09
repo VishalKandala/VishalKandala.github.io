@@ -119,6 +119,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a808919a50bffc7db7c6e7f902c9add13" id="r_a808919a50bffc7db7c6e7f902c9add13"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BodyForces_8h.html#a808919a50bffc7db7c6e7f902c9add13">ComputeDrivenChannelFlowSource</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user, Vec Rct)</td></tr>
 <tr class="memdesc:a808919a50bffc7db7c6e7f902c9add13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies a momentum source term to drive flow in a periodic channel or pipe.  <br /></td></tr>
 <tr class="separator:a808919a50bffc7db7c6e7f902c9add13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a2cb0f2d6946ba64edcf43a247faed4" id="r_a2a2cb0f2d6946ba64edcf43a247faed4"><td class="memItemLeft" align="right" valign="top">PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BodyForces_8h.html#a2a2cb0f2d6946ba64edcf43a247faed4">LogDrivenFlowDiagnostics</a> (<a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *user)</td></tr>
+<tr class="memdesc:a2a2cb0f2d6946ba64edcf43a247faed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Appends one row of driven-flow controller state to <code>driven_flow.csv</code>.  <br /></td></tr>
+<tr class="separator:a2a2cb0f2d6946ba64edcf43a247faed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Momentum source terms added to the contravariant RHS. </p>
@@ -188,190 +191,256 @@ RULE: DO NOT ADVANCE PER-TIMESTEP STATE HERE</h1>
 <p>Applies a momentum source term to drive flow in a periodic channel or pipe.</p>
 <p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="BodyForces_8c_source.html#l00014">14</a> of file <a class="el" href="BodyForces_8c_source.html">BodyForces.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   15</span>{</div>
-<div class="line"><span class="lineno">   16</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">   17</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
-<div class="line"><span class="lineno">   18</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">   19</span> </div>
-<div class="line"><span class="lineno">   20</span>    <span class="comment">// --- Step 1: Discover if and where a driven flow is active ---</span></div>
-<div class="line"><span class="lineno">   21</span>    <span class="keywordtype">char</span> drivenDirection = <span class="charliteral">&#39; &#39;</span>; <span class="comment">// Use space as a null/not-found indicator</span></div>
-<div class="line"><span class="lineno">   22</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 6; i++) {</div>
-<div class="line"><span class="lineno">   23</span>        <a class="code hl_enumeration" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1">BCHandlerType</a> handler_type = user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[i].<a class="code hl_variable" href="variables_8h.html#a499ad2619c29a9aee2d01e859c8942f6">handler_type</a>;</div>
-<div class="line"><span class="lineno">   24</span>        <span class="keywordflow">if</span> (handler_type == <a class="code hl_enumvalue" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4">BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</a> ||</div>
-<div class="line"><span class="lineno">   25</span>            handler_type == <a class="code hl_enumvalue" href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a39c0e759cb55c40589433dbb7ea5d55a">BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</a>)</div>
-<div class="line"><span class="lineno">   26</span>        {</div>
-<div class="line"><span class="lineno">   27</span>            <span class="keywordflow">switch</span> (user-&gt;<a class="code hl_variable" href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">boundary_faces</a>[i].<a class="code hl_variable" href="variables_8h.html#a43d81caf7c9b0dfc29d388df974ebb31">face_id</a>) {</div>
-<div class="line"><span class="lineno">   28</span>                <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa19d65b9e7835046cd7e2ca88cc7cb611">BC_FACE_NEG_X</a>: <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafabbe50296e7a96e9818fa4d11bcc4443c">BC_FACE_POS_X</a>: drivenDirection = <span class="charliteral">&#39;X&#39;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">   29</span>                <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafad74ee1b3767f0c8d5251abe91549c99a">BC_FACE_NEG_Y</a>: <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa9c068efc5178fd37591bbcdf5e86b3fb">BC_FACE_POS_Y</a>: drivenDirection = <span class="charliteral">&#39;Y&#39;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">   30</span>                <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafaa686c3443b4073aa247c2446ae9d5c8d">BC_FACE_NEG_Z</a>: <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa4ce567113013a4c4cafd58543ac2b61e">BC_FACE_POS_Z</a>: drivenDirection = <span class="charliteral">&#39;Z&#39;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">   31</span>            }</div>
-<div class="line"><span class="lineno">   32</span>            <span class="keywordflow">break</span>; <span class="comment">// Found it, no need to check other faces</span></div>
-<div class="line"><span class="lineno">   33</span>        }</div>
-<div class="line"><span class="lineno">   34</span>    }</div>
-<div class="line"><span class="lineno">   35</span> </div>
-<div class="line"><span class="lineno">   36</span>    <span class="comment">// --- Step 2: Early exit if no driven flow is configured ---</span></div>
-<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">if</span> (drivenDirection == <span class="charliteral">&#39; &#39;</span>) {</div>
-<div class="line"><span class="lineno">   38</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   39</span>    }</div>
-<div class="line"><span class="lineno">   40</span> </div>
-<div class="line"><span class="lineno">   41</span>    <span class="comment">// --- Step 3: Get the control signal and exit if no correction is needed ---</span></div>
-<div class="line"><span class="lineno">   42</span>    PetscReal bulkVelocityCorrection = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d">bulkVelocityCorrection</a>;</div>
-<div class="line"><span class="lineno">   43</span>    <span class="keywordflow">if</span> (PetscAbsReal(bulkVelocityCorrection) &lt; 1.0e-12) {</div>
-<div class="line"><span class="lineno">   44</span>        PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">   45</span>    }</div>
-<div class="line"><span class="lineno">   46</span> </div>
-<div class="line"><span class="lineno">   47</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d, Block %d: Applying driven flow momentum source in &#39;%c&#39; direction.\n&quot;</span>,</div>
-<div class="line"><span class="lineno">   48</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">_this</a>, drivenDirection);</div>
-<div class="line"><span class="lineno">   49</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Received Bulk Velocity Correction: %le\n&quot;</span>, bulkVelocityCorrection);</div>
+<p class="definition">Definition at line <a class="el" href="BodyForces_8c_source.html#l00037">37</a> of file <a class="el" href="BodyForces_8c_source.html">BodyForces.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   38</span>{</div>
+<div class="line"><span class="lineno">   39</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">   40</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">   41</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">   42</span> </div>
+<div class="line"><span class="lineno">   43</span>    <span class="comment">// --- Step 1: Discover if and where a driven flow is active ---</span></div>
+<div class="line"><span class="lineno">   44</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> drivenDirection = <a class="code hl_function" href="BodyForces_8c.html#a8e9e940cd8270ae0ae162cd9316187d8">DrivenFlowDirection</a>(user); <span class="comment">// &#39; &#39; when none is configured</span></div>
+<div class="line"><span class="lineno">   45</span> </div>
+<div class="line"><span class="lineno">   46</span>    <span class="comment">// --- Step 2: Early exit if no driven flow is configured ---</span></div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">if</span> (drivenDirection == <span class="charliteral">&#39; &#39;</span>) {</div>
+<div class="line"><span class="lineno">   48</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   49</span>    }</div>
 <div class="line"><span class="lineno">   50</span> </div>
-<div class="line"><span class="lineno">   51</span>    <span class="comment">// --- Step 4: Setup for calculation ---</span></div>
-<div class="line"><span class="lineno">   52</span>    DMDALocalInfo info = user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>;</div>
-<div class="line"><span class="lineno">   53</span>    PetscInt i, j, k;</div>
-<div class="line"><span class="lineno">   54</span>    PetscInt lxs = (info.xs == 0) ? 1 : info.xs;</div>
-<div class="line"><span class="lineno">   55</span>    PetscInt lys = (info.ys == 0) ? 1 : info.ys;</div>
-<div class="line"><span class="lineno">   56</span>    PetscInt lzs = (info.zs == 0) ? 1 : info.zs;</div>
-<div class="line"><span class="lineno">   57</span>    PetscInt lxe = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
-<div class="line"><span class="lineno">   58</span>    PetscInt lye = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
-<div class="line"><span class="lineno">   59</span>    PetscInt lze = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
+<div class="line"><span class="lineno">   51</span>    <span class="comment">// --- Step 3: Get the control signal and exit if no correction is needed ---</span></div>
+<div class="line"><span class="lineno">   52</span>    PetscReal bulkVelocityCorrection = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d">bulkVelocityCorrection</a>;</div>
+<div class="line"><span class="lineno">   53</span>    <span class="keywordflow">if</span> (PetscAbsReal(bulkVelocityCorrection) &lt; 1.0e-12) {</div>
+<div class="line"><span class="lineno">   54</span>        PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">   55</span>    }</div>
+<div class="line"><span class="lineno">   56</span> </div>
+<div class="line"><span class="lineno">   57</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;Rank %d, Block %d: Applying driven flow momentum source in &#39;%c&#39; direction.\n&quot;</span>,</div>
+<div class="line"><span class="lineno">   58</span>              simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">_this</a>, drivenDirection);</div>
+<div class="line"><span class="lineno">   59</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Received Bulk Velocity Correction: %le\n&quot;</span>, bulkVelocityCorrection);</div>
 <div class="line"><span class="lineno">   60</span> </div>
-<div class="line"><span class="lineno">   61</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***rct, ***csi, ***eta, ***zet;</div>
-<div class="line"><span class="lineno">   62</span>    PetscReal ***nvert;</div>
-<div class="line"><span class="lineno">   63</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, Rct, &amp;rct); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   64</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   65</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   66</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   67</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keyword">const</span> PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">   68</span> </div>
-<div class="line"><span class="lineno">   69</span>    <span class="comment">// Calculate the driving force magnitude for the current timestep, smoothed</span></div>
-<div class="line"><span class="lineno">   70</span>    <span class="comment">// with the value from the previous step for stability.</span></div>
-<div class="line"><span class="lineno">   71</span>    <span class="comment">//</span></div>
-<div class="line"><span class="lineno">   72</span>    <span class="comment">// ONCE PER PHYSICAL STEP, NOT ONCE PER CALL. This function runs from</span></div>
-<div class="line"><span class="lineno">   73</span>    <span class="comment">// ComputeRHS, which executes once per Jameson RK stage under the Picard</span></div>
-<div class="line"><span class="lineno">   74</span>    <span class="comment">// solver and once per residual evaluation under Newton-Krylov. The smoothing</span></div>
-<div class="line"><span class="lineno">   75</span>    <span class="comment">// below carries state in simCtx across calls, so advancing it every call</span></div>
-<div class="line"><span class="lineno">   76</span>    <span class="comment">// would walk the applied force toward its target within a single timestep</span></div>
-<div class="line"><span class="lineno">   77</span>    <span class="comment">// (0.5, then 0.75, then 0.875 ... of the way there). The force would then</span></div>
-<div class="line"><span class="lineno">   78</span>    <span class="comment">// depend on how many residual evaluations preceded it - history dependence</span></div>
-<div class="line"><span class="lineno">   79</span>    <span class="comment">// that MomentumNewtonKrylov_FormResidual() explicitly forbids, and that</span></div>
-<div class="line"><span class="lineno">   80</span>    <span class="comment">// breaks the constant-forcing assumption behind the Picard shadow-Jacobian</span></div>
-<div class="line"><span class="lineno">   81</span>    <span class="comment">// estimate. Resolve it once for the step and reuse it thereafter.</span></div>
-<div class="line"><span class="lineno">   82</span>    <span class="keyword">const</span> PetscReal forceScalingFactor  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">forceScalingFactor</a>;</div>
-<div class="line"><span class="lineno">   83</span>    PetscReal drivingForceMagnitude;</div>
-<div class="line"><span class="lineno">   84</span> </div>
-<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa6117211998d508f487d1327194ebb21">drivingForceStep</a> != simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>) {</div>
-<div class="line"><span class="lineno">   86</span>        <span class="keyword">const</span> PetscReal targetForce = (bulkVelocityCorrection / simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a> / 1.0 * <a class="code hl_define" href="variables_8h.html#af0af02fbd08daea87f3523a3754981f0">COEF_TIME_ACCURACY</a>); <span class="comment">// replaced simCtx-&gt;st with 1.0.</span></div>
-<div class="line"><span class="lineno">   87</span>        drivingForceMagnitude = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a> * 0.5) + (targetForce * 0.5);</div>
-<div class="line"><span class="lineno">   88</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a> = drivingForceMagnitude;</div>
-<div class="line"><span class="lineno">   89</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa6117211998d508f487d1327194ebb21">drivingForceStep</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>;</div>
-<div class="line"><span class="lineno">   90</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   91</span>        drivingForceMagnitude = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a>;</div>
-<div class="line"><span class="lineno">   92</span>    }</div>
-<div class="line"><span class="lineno">   93</span>    </div>
-<div class="line"><span class="lineno">   94</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Previous driving force:            %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a>);</div>
-<div class="line"><span class="lineno">   95</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - New smoothed driving force:        %le\n&quot;</span>, drivingForceMagnitude);</div>
-<div class="line"><span class="lineno">   96</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Force scaling factor:              %f\n&quot;</span>,  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">forceScalingFactor</a>);</div>
-<div class="line"><span class="lineno">   97</span> </div>
-<div class="line"><span class="lineno">   98</span>    PetscBool hasLoggedApplication = PETSC_FALSE; <span class="comment">// Flag to log details only once per rank.</span></div>
-<div class="line"><span class="lineno">   99</span>    <span class="comment">// --- Step 5: Apply the momentum source to the correct RHS component ---</span></div>
-<div class="line"><span class="lineno">  100</span>    <span class="keywordflow">for</span> (k = lzs; k &lt; lze; k++) {</div>
-<div class="line"><span class="lineno">  101</span>        <span class="keywordflow">for</span> (j = lys; j &lt; lye; j++) {</div>
-<div class="line"><span class="lineno">  102</span>            <span class="keywordflow">for</span> (i = lxs; i &lt; lxe; i++) {</div>
-<div class="line"><span class="lineno">  103</span>                <span class="keywordflow">if</span> (nvert[k][j][i] &lt; 0.1) { <span class="comment">// Apply only to fluid cells</span></div>
-<div class="line"><span class="lineno">  104</span>                    PetscReal faceArea = 0.0;</div>
-<div class="line"><span class="lineno">  105</span>                    PetscReal momentumSource = 0.0;</div>
-<div class="line"><span class="lineno">  106</span> </div>
-<div class="line"><span class="lineno">  107</span>                    <span class="keywordflow">switch</span> (drivenDirection) {</div>
-<div class="line"><span class="lineno">  108</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;X&#39;</span>:</div>
-<div class="line"><span class="lineno">  109</span>                            faceArea = sqrt(csi[k][j][i].x * csi[k][j][i].x + csi[k][j][i].y * csi[k][j][i].y + csi[k][j][i].z * csi[k][j][i].z);</div>
-<div class="line"><span class="lineno">  110</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
-<div class="line"><span class="lineno">  111</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> += momentumSource;</div>
-<div class="line"><span class="lineno">  112</span> </div>
-<div class="line"><span class="lineno">  113</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
-<div class="line"><span class="lineno">  114</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
-<div class="line"><span class="lineno">  115</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
-<div class="line"><span class="lineno">  116</span>                                hasLoggedApplication = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  117</span>                            }</div>
-<div class="line"><span class="lineno">  118</span>                                <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  119</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;Y&#39;</span>:</div>
-<div class="line"><span class="lineno">  120</span>                            faceArea = sqrt(eta[k][j][i].x * eta[k][j][i].x + eta[k][j][i].y * eta[k][j][i].y + eta[k][j][i].z * eta[k][j][i].z);</div>
-<div class="line"><span class="lineno">  121</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
-<div class="line"><span class="lineno">  122</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> += momentumSource;</div>
-<div class="line"><span class="lineno">  123</span>                            </div>
-<div class="line"><span class="lineno">  124</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
-<div class="line"><span class="lineno">  125</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
-<div class="line"><span class="lineno">  126</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
-<div class="line"><span class="lineno">  127</span>                                hasLoggedApplication = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  128</span>                            }</div>
-<div class="line"><span class="lineno">  129</span>                            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  130</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;Z&#39;</span>:</div>
-<div class="line"><span class="lineno">  131</span>                            faceArea = sqrt(zet[k][j][i].x * zet[k][j][i].x + zet[k][j][i].y * zet[k][j][i].y + zet[k][j][i].z * zet[k][j][i].z);</div>
-<div class="line"><span class="lineno">  132</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
-<div class="line"><span class="lineno">  133</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> += momentumSource;</div>
-<div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
-<div class="line"><span class="lineno">  136</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
-<div class="line"><span class="lineno">  137</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
-<div class="line"><span class="lineno">  138</span>                                hasLoggedApplication = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  139</span>                            }</div>
-<div class="line"><span class="lineno">  140</span>                            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  141</span>                    }</div>
-<div class="line"><span class="lineno">  142</span>                }</div>
-<div class="line"><span class="lineno">  143</span>            }</div>
-<div class="line"><span class="lineno">  144</span>        }</div>
-<div class="line"><span class="lineno">  145</span>    }</div>
-<div class="line"><span class="lineno">  146</span> </div>
-<div class="line"><span class="lineno">  147</span>    <span class="comment">// --- Step 6: Restore arrays ---</span></div>
-<div class="line"><span class="lineno">  148</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, Rct, &amp;rct); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  149</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  150</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  151</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  152</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keyword">const</span> PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno">  153</span> </div>
-<div class="line"><span class="lineno">  154</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  155</span>}</div>
+<div class="line"><span class="lineno">   61</span>    <span class="comment">// --- Step 4: Setup for calculation ---</span></div>
+<div class="line"><span class="lineno">   62</span>    DMDALocalInfo info = user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>;</div>
+<div class="line"><span class="lineno">   63</span>    PetscInt i, j, k;</div>
+<div class="line"><span class="lineno">   64</span>    PetscInt lxs = (info.xs == 0) ? 1 : info.xs;</div>
+<div class="line"><span class="lineno">   65</span>    PetscInt lys = (info.ys == 0) ? 1 : info.ys;</div>
+<div class="line"><span class="lineno">   66</span>    PetscInt lzs = (info.zs == 0) ? 1 : info.zs;</div>
+<div class="line"><span class="lineno">   67</span>    PetscInt lxe = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
+<div class="line"><span class="lineno">   68</span>    PetscInt lye = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
+<div class="line"><span class="lineno">   69</span>    PetscInt lze = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
+<div class="line"><span class="lineno">   70</span> </div>
+<div class="line"><span class="lineno">   71</span>    <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***rct, ***csi, ***eta, ***zet;</div>
+<div class="line"><span class="lineno">   72</span>    PetscReal ***nvert;</div>
+<div class="line"><span class="lineno">   73</span>    ierr = DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, Rct, &amp;rct); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   74</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   75</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   76</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   77</span>    ierr = DMDAVecGetArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keyword">const</span> PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">   78</span> </div>
+<div class="line"><span class="lineno">   79</span>    <span class="comment">// Calculate the driving force magnitude for the current timestep, smoothed</span></div>
+<div class="line"><span class="lineno">   80</span>    <span class="comment">// with the value from the previous step for stability.</span></div>
+<div class="line"><span class="lineno">   81</span>    <span class="comment">//</span></div>
+<div class="line"><span class="lineno">   82</span>    <span class="comment">// ONCE PER PHYSICAL STEP, NOT ONCE PER CALL. This function runs from</span></div>
+<div class="line"><span class="lineno">   83</span>    <span class="comment">// ComputeRHS, which executes once per Jameson RK stage under the Picard</span></div>
+<div class="line"><span class="lineno">   84</span>    <span class="comment">// solver and once per residual evaluation under Newton-Krylov. The smoothing</span></div>
+<div class="line"><span class="lineno">   85</span>    <span class="comment">// below carries state in simCtx across calls, so advancing it every call</span></div>
+<div class="line"><span class="lineno">   86</span>    <span class="comment">// would walk the applied force toward its target within a single timestep</span></div>
+<div class="line"><span class="lineno">   87</span>    <span class="comment">// (0.5, then 0.75, then 0.875 ... of the way there). The force would then</span></div>
+<div class="line"><span class="lineno">   88</span>    <span class="comment">// depend on how many residual evaluations preceded it - history dependence</span></div>
+<div class="line"><span class="lineno">   89</span>    <span class="comment">// that MomentumNewtonKrylov_FormResidual() explicitly forbids, and that</span></div>
+<div class="line"><span class="lineno">   90</span>    <span class="comment">// breaks the constant-forcing assumption behind the Picard shadow-Jacobian</span></div>
+<div class="line"><span class="lineno">   91</span>    <span class="comment">// estimate. Resolve it once for the step and reuse it thereafter.</span></div>
+<div class="line"><span class="lineno">   92</span>    <span class="keyword">const</span> PetscReal forceScalingFactor  = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">forceScalingFactor</a>;</div>
+<div class="line"><span class="lineno">   93</span>    PetscReal drivingForceMagnitude;</div>
+<div class="line"><span class="lineno">   94</span> </div>
+<div class="line"><span class="lineno">   95</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa6117211998d508f487d1327194ebb21">drivingForceStep</a> != simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>) {</div>
+<div class="line"><span class="lineno">   96</span>        <span class="keyword">const</span> PetscReal targetForce = (bulkVelocityCorrection / simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">dt</a> / 1.0 * <a class="code hl_define" href="variables_8h.html#af0af02fbd08daea87f3523a3754981f0">COEF_TIME_ACCURACY</a>); <span class="comment">// replaced simCtx-&gt;st with 1.0.</span></div>
+<div class="line"><span class="lineno">   97</span>        drivingForceMagnitude = (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a> * 0.5) + (targetForce * 0.5);</div>
+<div class="line"><span class="lineno">   98</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a> = drivingForceMagnitude;</div>
+<div class="line"><span class="lineno">   99</span>        simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa6117211998d508f487d1327194ebb21">drivingForceStep</a> = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>;</div>
+<div class="line"><span class="lineno">  100</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  101</span>        drivingForceMagnitude = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a>;</div>
+<div class="line"><span class="lineno">  102</span>    }</div>
+<div class="line"><span class="lineno">  103</span>    </div>
+<div class="line"><span class="lineno">  104</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Previous driving force:            %le\n&quot;</span>, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a>);</div>
+<div class="line"><span class="lineno">  105</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - New smoothed driving force:        %le\n&quot;</span>, drivingForceMagnitude);</div>
+<div class="line"><span class="lineno">  106</span>    <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, <span class="stringliteral">&quot;  - Force scaling factor:              %f\n&quot;</span>,  simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">forceScalingFactor</a>);</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>    PetscBool hasLoggedApplication = PETSC_FALSE; <span class="comment">// Flag to log details only once per rank.</span></div>
+<div class="line"><span class="lineno">  109</span>    <span class="comment">// --- Step 5: Apply the momentum source to the correct RHS component ---</span></div>
+<div class="line"><span class="lineno">  110</span>    <span class="keywordflow">for</span> (k = lzs; k &lt; lze; k++) {</div>
+<div class="line"><span class="lineno">  111</span>        <span class="keywordflow">for</span> (j = lys; j &lt; lye; j++) {</div>
+<div class="line"><span class="lineno">  112</span>            <span class="keywordflow">for</span> (i = lxs; i &lt; lxe; i++) {</div>
+<div class="line"><span class="lineno">  113</span>                <span class="keywordflow">if</span> (nvert[k][j][i] &lt; 0.1) { <span class="comment">// Apply only to fluid cells</span></div>
+<div class="line"><span class="lineno">  114</span>                    PetscReal faceArea = 0.0;</div>
+<div class="line"><span class="lineno">  115</span>                    PetscReal momentumSource = 0.0;</div>
+<div class="line"><span class="lineno">  116</span> </div>
+<div class="line"><span class="lineno">  117</span>                    <span class="keywordflow">switch</span> (drivenDirection) {</div>
+<div class="line"><span class="lineno">  118</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;X&#39;</span>:</div>
+<div class="line"><span class="lineno">  119</span>                            faceArea = sqrt(csi[k][j][i].x * csi[k][j][i].x + csi[k][j][i].y * csi[k][j][i].y + csi[k][j][i].z * csi[k][j][i].z);</div>
+<div class="line"><span class="lineno">  120</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
+<div class="line"><span class="lineno">  121</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> += momentumSource;</div>
+<div class="line"><span class="lineno">  122</span> </div>
+<div class="line"><span class="lineno">  123</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
+<div class="line"><span class="lineno">  124</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
+<div class="line"><span class="lineno">  125</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
+<div class="line"><span class="lineno">  126</span>                                hasLoggedApplication = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  127</span>                            }</div>
+<div class="line"><span class="lineno">  128</span>                                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  129</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;Y&#39;</span>:</div>
+<div class="line"><span class="lineno">  130</span>                            faceArea = sqrt(eta[k][j][i].x * eta[k][j][i].x + eta[k][j][i].y * eta[k][j][i].y + eta[k][j][i].z * eta[k][j][i].z);</div>
+<div class="line"><span class="lineno">  131</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
+<div class="line"><span class="lineno">  132</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> += momentumSource;</div>
+<div class="line"><span class="lineno">  133</span>                            </div>
+<div class="line"><span class="lineno">  134</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
+<div class="line"><span class="lineno">  135</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
+<div class="line"><span class="lineno">  136</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
+<div class="line"><span class="lineno">  137</span>                                hasLoggedApplication = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  138</span>                            }</div>
+<div class="line"><span class="lineno">  139</span>                            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  140</span>                        <span class="keywordflow">case</span> <span class="charliteral">&#39;Z&#39;</span>:</div>
+<div class="line"><span class="lineno">  141</span>                            faceArea = sqrt(zet[k][j][i].x * zet[k][j][i].x + zet[k][j][i].y * zet[k][j][i].y + zet[k][j][i].z * zet[k][j][i].z);</div>
+<div class="line"><span class="lineno">  142</span>                            momentumSource = drivingForceMagnitude * forceScalingFactor * faceArea;</div>
+<div class="line"><span class="lineno">  143</span>                            rct[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> += momentumSource;</div>
+<div class="line"><span class="lineno">  144</span> </div>
+<div class="line"><span class="lineno">  145</span>                            <span class="comment">// Log details for the very first point where force is applied on this rank.</span></div>
+<div class="line"><span class="lineno">  146</span>                            <span class="keywordflow">if</span> (!hasLoggedApplication) {</div>
+<div class="line"><span class="lineno">  147</span>                                <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>,<span class="stringliteral">&quot;Body Force %le added at (%d,%d,%d)\n&quot;</span>,momentumSource, k, j, i);</div>
+<div class="line"><span class="lineno">  148</span>                                hasLoggedApplication = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  149</span>                            }</div>
+<div class="line"><span class="lineno">  150</span>                            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  151</span>                    }</div>
+<div class="line"><span class="lineno">  152</span>                }</div>
+<div class="line"><span class="lineno">  153</span>            }</div>
+<div class="line"><span class="lineno">  154</span>        }</div>
+<div class="line"><span class="lineno">  155</span>    }</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>    <span class="comment">// --- Step 6: Restore arrays ---</span></div>
+<div class="line"><span class="lineno">  158</span>    ierr = DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, Rct, &amp;rct); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  159</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">lCsi</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;csi); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  160</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">lEta</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;eta); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  161</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">lZet</a>, (<span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a>***)&amp;zet); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  162</span>    ierr = DMDAVecRestoreArrayRead(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, (<span class="keyword">const</span> PetscReal***)&amp;nvert); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  165</span>}</div>
+<div class="ttc" id="aBodyForces_8c_html_a8e9e940cd8270ae0ae162cd9316187d8"><div class="ttname"><a href="BodyForces_8c.html#a8e9e940cd8270ae0ae162cd9316187d8">DrivenFlowDirection</a></div><div class="ttdeci">static char DrivenFlowDirection(const UserCtx *user)</div><div class="ttdoc">The axis a driven periodic handler drives, or ' ' when none is configured.</div><div class="ttdef"><b>Definition</b> <a href="BodyForces_8c_source.html#l00014">BodyForces.c:14</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3758dd5d300a594312c95bc393378df0"><div class="ttname"><a href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a></div><div class="ttdeci">#define LOCAL</div><div class="ttdoc">Logging scope definitions for controlling message output.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a3de33738fd3c7e77bffbcfaefc3e7645"><div class="ttname"><a href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a></div><div class="ttdeci">#define GLOBAL</div><div class="ttdoc">Scope for global logging across all processes.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00046">logging.h:46</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00200">logging.h:200</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00032">logging.h:32</a></div></div>
 <div class="ttc" id="avariables_8h_html_a19aa807b9181b13618527d6c4eb6fa89"><div class="ttname"><a href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">SimCtx::rank</a></div><div class="ttdeci">PetscMPIInt rank</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00869">variables.h:869</a></div></div>
-<div class="ttc" id="avariables_8h_html_a1eb17f75ee17fe107be3ba668cec3443"><div class="ttname"><a href="variables_8h.html#a1eb17f75ee17fe107be3ba668cec3443">UserCtx::boundary_faces</a></div><div class="ttdeci">BoundaryFaceConfig boundary_faces[6]</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01098">variables.h:1098</a></div></div>
-<div class="ttc" id="avariables_8h_html_a2f213dcdaf9617bfb44e4f22857f2e56"><div class="ttname"><a href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">UserCtx::lNvert</a></div><div class="ttdeci">Vec lNvert</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01113">variables.h:1113</a></div></div>
+<div class="ttc" id="avariables_8h_html_a2f213dcdaf9617bfb44e4f22857f2e56"><div class="ttname"><a href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">UserCtx::lNvert</a></div><div class="ttdeci">Vec lNvert</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01117">variables.h:1117</a></div></div>
 <div class="ttc" id="avariables_8h_html_a31942a93a313c4d622ffcc02b67b0c41"><div class="ttname"><a href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">SimCtx::forceScalingFactor</a></div><div class="ttdeci">PetscReal forceScalingFactor</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00969">variables.h:969</a></div></div>
-<div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01076">variables.h:1076</a></div></div>
-<div class="ttc" id="avariables_8h_html_a414751d7a391a78834cdce87b52a066f"><div class="ttname"><a href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">UserCtx::lZet</a></div><div class="ttdeci">Vec lZet</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01148">variables.h:1148</a></div></div>
-<div class="ttc" id="avariables_8h_html_a43d81caf7c9b0dfc29d388df974ebb31"><div class="ttname"><a href="variables_8h.html#a43d81caf7c9b0dfc29d388df974ebb31">BoundaryFaceConfig::face_id</a></div><div class="ttdeci">BCFace face_id</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00398">variables.h:398</a></div></div>
-<div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1">BCHandlerType</a></div><div class="ttdeci">BCHandlerType</div><div class="ttdoc">Defines the specific computational &quot;strategy&quot; for a boundary handler.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00334">variables.h:334</a></div></div>
-<div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a39c0e759cb55c40589433dbb7ea5d55a"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a39c0e759cb55c40589433dbb7ea5d55a">BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</a></div><div class="ttdeci">@ BC_HANDLER_PERIODIC_DRIVEN_INITIAL_FLUX</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00351">variables.h:350</a></div></div>
-<div class="ttc" id="avariables_8h_html_a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4"><div class="ttname"><a href="variables_8h.html#a466f572ad4e3d8b6f5eb03bceaad2ca1a4c1e44358d48f093a09ac663ccb036d4">BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</a></div><div class="ttdeci">@ BC_HANDLER_PERIODIC_DRIVEN_CONSTANT_FLUX</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00349">variables.h:349</a></div></div>
-<div class="ttc" id="avariables_8h_html_a499ad2619c29a9aee2d01e859c8942f6"><div class="ttname"><a href="variables_8h.html#a499ad2619c29a9aee2d01e859c8942f6">BoundaryFaceConfig::handler_type</a></div><div class="ttdeci">BCHandlerType handler_type</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00400">variables.h:400</a></div></div>
-<div class="ttc" id="avariables_8h_html_a4f7c5fd8843d026101b193e9236e1192"><div class="ttname"><a href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">UserCtx::_this</a></div><div class="ttdeci">PetscInt _this</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01091">variables.h:1091</a></div></div>
+<div class="ttc" id="avariables_8h_html_a322702c716e6e140d71515d0b3e111b1"><div class="ttname"><a href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">UserCtx::simCtx</a></div><div class="ttdeci">SimCtx * simCtx</div><div class="ttdoc">Back-pointer to the master simulation context.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01080">variables.h:1080</a></div></div>
+<div class="ttc" id="avariables_8h_html_a414751d7a391a78834cdce87b52a066f"><div class="ttname"><a href="variables_8h.html#a414751d7a391a78834cdce87b52a066f">UserCtx::lZet</a></div><div class="ttdeci">Vec lZet</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01152">variables.h:1152</a></div></div>
+<div class="ttc" id="avariables_8h_html_a4f7c5fd8843d026101b193e9236e1192"><div class="ttname"><a href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">UserCtx::_this</a></div><div class="ttdeci">PetscInt _this</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01095">variables.h:1095</a></div></div>
 <div class="ttc" id="avariables_8h_html_a53b044b8b0e4a4dc8c8fa05387af564c"><div class="ttname"><a href="variables_8h.html#a53b044b8b0e4a4dc8c8fa05387af564c">SimCtx::dt</a></div><div class="ttdeci">PetscReal dt</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00881">variables.h:881</a></div></div>
 <div class="ttc" id="avariables_8h_html_a595ab2d9e5cc108efaf9c2e98da7145d"><div class="ttname"><a href="variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d">SimCtx::bulkVelocityCorrection</a></div><div class="ttdeci">PetscReal bulkVelocityCorrection</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00981">variables.h:981</a></div></div>
-<div class="ttc" id="avariables_8h_html_a69966d928601d61d4f526636f84396c5"><div class="ttname"><a href="variables_8h.html#a69966d928601d61d4f526636f84396c5">UserCtx::fda</a></div><div class="ttdeci">DM fda</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01079">variables.h:1079</a></div></div>
+<div class="ttc" id="avariables_8h_html_a69966d928601d61d4f526636f84396c5"><div class="ttname"><a href="variables_8h.html#a69966d928601d61d4f526636f84396c5">UserCtx::fda</a></div><div class="ttdeci">DM fda</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01083">variables.h:1083</a></div></div>
 <div class="ttc" id="avariables_8h_html_a718a09fbedf450248eaf7019a980e139"><div class="ttname"><a href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">Cmpnts::x</a></div><div class="ttdeci">PetscScalar x</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00122">variables.h:122</a></div></div>
-<div class="ttc" id="avariables_8h_html_a9693ebf5c9ea601d5ebaf6d24cc60721"><div class="ttname"><a href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">UserCtx::lCsi</a></div><div class="ttdeci">Vec lCsi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01148">variables.h:1148</a></div></div>
+<div class="ttc" id="avariables_8h_html_a9693ebf5c9ea601d5ebaf6d24cc60721"><div class="ttname"><a href="variables_8h.html#a9693ebf5c9ea601d5ebaf6d24cc60721">UserCtx::lCsi</a></div><div class="ttdeci">Vec lCsi</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01152">variables.h:1152</a></div></div>
 <div class="ttc" id="avariables_8h_html_a9f0c002a2c7cde3b6ac843ab9185f4d4"><div class="ttname"><a href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">Cmpnts::z</a></div><div class="ttdeci">PetscScalar z</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00122">variables.h:122</a></div></div>
 <div class="ttc" id="avariables_8h_html_aa6117211998d508f487d1327194ebb21"><div class="ttname"><a href="variables_8h.html#aa6117211998d508f487d1327194ebb21">SimCtx::drivingForceStep</a></div><div class="ttdeci">PetscInt drivingForceStep</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00974">variables.h:974</a></div></div>
 <div class="ttc" id="avariables_8h_html_ac9684d6e871566d55c997416270b5b99"><div class="ttname"><a href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">SimCtx::step</a></div><div class="ttdeci">PetscInt step</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00874">variables.h:874</a></div></div>
-<div class="ttc" id="avariables_8h_html_acd99423029a666652ee1f5bf573619bc"><div class="ttname"><a href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">UserCtx::info</a></div><div class="ttdeci">DMDALocalInfo info</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01085">variables.h:1085</a></div></div>
+<div class="ttc" id="avariables_8h_html_acd99423029a666652ee1f5bf573619bc"><div class="ttname"><a href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">UserCtx::info</a></div><div class="ttdeci">DMDALocalInfo info</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01089">variables.h:1089</a></div></div>
 <div class="ttc" id="avariables_8h_html_ad032e456f7f4b32b9ac0d94be05de204"><div class="ttname"><a href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">Cmpnts::y</a></div><div class="ttdeci">PetscScalar y</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00122">variables.h:122</a></div></div>
-<div class="ttc" id="avariables_8h_html_ad4296b10d8eb7b065165582f5cc85897"><div class="ttname"><a href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">UserCtx::lEta</a></div><div class="ttdeci">Vec lEta</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01148">variables.h:1148</a></div></div>
-<div class="ttc" id="avariables_8h_html_af031acb43b014d5ac788aa9003491e75"><div class="ttname"><a href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">UserCtx::da</a></div><div class="ttdeci">DM da</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01079">variables.h:1079</a></div></div>
+<div class="ttc" id="avariables_8h_html_ad4296b10d8eb7b065165582f5cc85897"><div class="ttname"><a href="variables_8h.html#ad4296b10d8eb7b065165582f5cc85897">UserCtx::lEta</a></div><div class="ttdeci">Vec lEta</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01152">variables.h:1152</a></div></div>
+<div class="ttc" id="avariables_8h_html_af031acb43b014d5ac788aa9003491e75"><div class="ttname"><a href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">UserCtx::da</a></div><div class="ttdeci">DM da</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01083">variables.h:1083</a></div></div>
 <div class="ttc" id="avariables_8h_html_af0af02fbd08daea87f3523a3754981f0"><div class="ttname"><a href="variables_8h.html#af0af02fbd08daea87f3523a3754981f0">COEF_TIME_ACCURACY</a></div><div class="ttdeci">#define COEF_TIME_ACCURACY</div><div class="ttdoc">Coefficient controlling the temporal accuracy scheme (e.g., 1.5 for 2nd Order Backward Difference).</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00075">variables.h:75</a></div></div>
 <div class="ttc" id="avariables_8h_html_af7e455fb30466f43ba667bc859fe88f6"><div class="ttname"><a href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">SimCtx::drivingForceMagnitude</a></div><div class="ttdeci">PetscReal drivingForceMagnitude</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00969">variables.h:969</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafa19d65b9e7835046cd7e2ca88cc7cb611"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa19d65b9e7835046cd7e2ca88cc7cb611">BC_FACE_NEG_X</a></div><div class="ttdeci">@ BC_FACE_NEG_X</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00293">variables.h:293</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafa4ce567113013a4c4cafd58543ac2b61e"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa4ce567113013a4c4cafd58543ac2b61e">BC_FACE_POS_Z</a></div><div class="ttdeci">@ BC_FACE_POS_Z</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00296">variables.h:295</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafa9c068efc5178fd37591bbcdf5e86b3fb"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafa9c068efc5178fd37591bbcdf5e86b3fb">BC_FACE_POS_Y</a></div><div class="ttdeci">@ BC_FACE_POS_Y</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00294">variables.h:294</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafaa686c3443b4073aa247c2446ae9d5c8d"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafaa686c3443b4073aa247c2446ae9d5c8d">BC_FACE_NEG_Z</a></div><div class="ttdeci">@ BC_FACE_NEG_Z</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00295">variables.h:295</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafabbe50296e7a96e9818fa4d11bcc4443c"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafabbe50296e7a96e9818fa4d11bcc4443c">BC_FACE_POS_X</a></div><div class="ttdeci">@ BC_FACE_POS_X</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00293">variables.h:293</a></div></div>
-<div class="ttc" id="avariables_8h_html_afc4c17936462d8236c21005c4cf6bbafad74ee1b3767f0c8d5251abe91549c99a"><div class="ttname"><a href="variables_8h.html#afc4c17936462d8236c21005c4cf6bbafad74ee1b3767f0c8d5251abe91549c99a">BC_FACE_NEG_Y</a></div><div class="ttdeci">@ BC_FACE_NEG_Y</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00294">variables.h:294</a></div></div>
 <div class="ttc" id="avariables_8h_html_structCmpnts"><div class="ttname"><a href="variables_8h.html#structCmpnts">Cmpnts</a></div><div class="ttdoc">A 3D point or vector with PetscScalar components.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00121">variables.h:121</a></div></div>
 <div class="ttc" id="avariables_8h_html_structSimCtx"><div class="ttname"><a href="variables_8h.html#structSimCtx">SimCtx</a></div><div class="ttdoc">The master context for the entire simulation.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00866">variables.h:866</a></div></div>
 </div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="BodyForces_8h_a808919a50bffc7db7c6e7f902c9add13_cgraph.svg" width="422" height="51"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="BodyForces_8h_a808919a50bffc7db7c6e7f902c9add13_icgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+
+</div>
+</div>
+<a id="a2a2cb0f2d6946ba64edcf43a247faed4" name="a2a2cb0f2d6946ba64edcf43a247faed4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a2cb0f2d6946ba64edcf43a247faed4">&#9670;&#160;</a></span>LogDrivenFlowDiagnostics()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PetscErrorCode LogDrivenFlowDiagnostics </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="variables_8h.html#structUserCtx">UserCtx</a> *&#160;</td>
+          <td class="paramname"><em>user</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Appends one row of driven-flow controller state to <code>driven_flow.csv</code>. </p>
+<p>Active whenever a <code>constant_flux</code> or <code>initial_flux</code> handler drives the flow, in any geometry. Call once per physical step, after the momentum solve, so the row holds the force that step actually applied. Rank 0 writes; block 0 only, since the controller state lives in <code><a class="el" href="variables_8h.html#structSimCtx" title="The master context for the entire simulation.">SimCtx</a></code>.</p>
+<p>Columns: <code>target_flux</code> and <code>measured_flux</code> (the planar-average volumetric flux the correction was computed from this step), <code>cross_section_area</code>, <code>bulk_velocity</code> (their ratio), <code>bulk_velocity_correction</code>, and <code>driving_acceleration</code>, the momentum source per unit mass along the driven axis in solver units: the smoothed magnitude times <code>-driven_flow_scaling_factor</code>, or zero on a step where the correction was negligible and no source was added. In a statistically stationary driven channel its time average is the mean wall stress over the half-height, <code>u_tau^2 / h</code>; in a duct, the mean wall stress times the wetted perimeter over the cross-section area.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">user</td><td>Block context; only block 0 reports. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>PetscErrorCode 0 on success.</dd></dl>
+<p>Appends one row of driven-flow controller state to <code>driven_flow.csv</code>.</p>
+<p>Full API contract is documented with the header declaration in <code><a class="el" href="BodyForces_8h.html" title="Momentum source terms added to the contravariant RHS.">include/BodyForces.h</a></code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="BodyForces_8c_source.html#l00174">174</a> of file <a class="el" href="BodyForces_8c_source.html">BodyForces.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  175</span>{</div>
+<div class="line"><span class="lineno">  176</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>    *simCtx = user-&gt;<a class="code hl_variable" href="variables_8h.html#a322702c716e6e140d71515d0b3e111b1">simCtx</a>;</div>
+<div class="line"><span class="lineno">  177</span>    <span class="keyword">const</span> <span class="keywordtype">char</span> direction = <a class="code hl_function" href="BodyForces_8c.html#a8e9e940cd8270ae0ae162cd9316187d8">DrivenFlowDirection</a>(user);</div>
+<div class="line"><span class="lineno">  178</span>    FILE      *<a class="code hl_variable" href="namespaceaudit__starter__content.html#a2f1bde1ef008cf3e48aea8fc90c706f0">file</a> = NULL;</div>
+<div class="line"><span class="lineno">  179</span> </div>
+<div class="line"><span class="lineno">  180</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  181</span> </div>
+<div class="line"><span class="lineno">  182</span>    <span class="comment">/* The controller state is global: every rank holds the same values, set from the</span></div>
+<div class="line"><span class="lineno">  183</span><span class="comment">       controller&#39;s collective reductions, so rank 0 reports it once per step. */</span></div>
+<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">if</span> (direction == <span class="charliteral">&#39; &#39;</span> || user-&gt;<a class="code hl_variable" href="variables_8h.html#a4f7c5fd8843d026101b193e9236e1192">_this</a> != 0 || simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> != 0) PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  185</span> </div>
+<div class="line"><span class="lineno">  186</span>    <span class="comment">/* What the momentum equation actually received this step. The source is resolved</span></div>
+<div class="line"><span class="lineno">  187</span><span class="comment">       once per step and skipped entirely when the correction is negligible, in which</span></div>
+<div class="line"><span class="lineno">  188</span><span class="comment">       case the smoothed magnitude is stale and nothing was applied. */</span></div>
+<div class="line"><span class="lineno">  189</span>    <span class="keyword">const</span> PetscBool applied = (PetscBool)(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aa6117211998d508f487d1327194ebb21">drivingForceStep</a> == simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a> &amp;&amp;</div>
+<div class="line"><span class="lineno">  190</span>                                          PetscAbsReal(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d">bulkVelocityCorrection</a>) &gt;= 1.0e-12);</div>
+<div class="line"><span class="lineno">  191</span>    <span class="keyword">const</span> PetscReal acceleration = applied ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af7e455fb30466f43ba667bc859fe88f6">drivingForceMagnitude</a> * simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a31942a93a313c4d622ffcc02b67b0c41">forceScalingFactor</a> : 0.0;</div>
+<div class="line"><span class="lineno">  192</span>    <span class="keyword">const</span> PetscReal area = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#acc22a8df77c0b8cc09f29dd319037e9d">drivenFluxArea</a>;</div>
+<div class="line"><span class="lineno">  193</span>    <span class="keyword">const</span> PetscReal bulk_velocity = (area &gt; 0.0) ? simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aaa38c0e638f610b256f1aeb7436a9434">drivenFluxMeasured</a> / area : 0.0;</div>
+<div class="line"><span class="lineno">  194</span>    PetscReal physical_time = 0.0;</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  196</span>    PetscCall(<a class="code hl_function" href="io_8h.html#afb6442b55e79be5586ff6d39465165ad">PicurvPhysicalTime</a>(simCtx, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">ti</a>, &amp;physical_time));</div>
+<div class="line"><span class="lineno">  197</span>    PetscCall(<a class="code hl_function" href="logging_8h.html#ae44fd200e57e9a05158ac4786e6ed8b1">PicurvOpenDiagnosticsCsv</a>(simCtx, <span class="stringliteral">&quot;driven_flow.csv&quot;</span>,</div>
+<div class="line"><span class="lineno">  198</span>                                       <span class="stringliteral">&quot;step,time,direction,target_flux,measured_flux,cross_section_area,&quot;</span></div>
+<div class="line"><span class="lineno">  199</span>                                       <span class="stringliteral">&quot;bulk_velocity,bulk_velocity_correction,driving_acceleration,physical_time&quot;</span>,</div>
+<div class="line"><span class="lineno">  200</span>                                       &amp;file));</div>
+<div class="line"><span class="lineno">  201</span>    fprintf(file, <span class="stringliteral">&quot;%d,%.6e,%c,%.10e,%.10e,%.10e,%.10e,%.6e,%.10e,%.6e\n&quot;</span>,</div>
+<div class="line"><span class="lineno">  202</span>            (<span class="keywordtype">int</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">ti</a>, direction,</div>
+<div class="line"><span class="lineno">  203</span>            (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a2a960fee99f2a7681b519c8388c2c57f">targetVolumetricFlux</a>, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#aaa38c0e638f610b256f1aeb7436a9434">drivenFluxMeasured</a>, (<span class="keywordtype">double</span>)area,</div>
+<div class="line"><span class="lineno">  204</span>            (<span class="keywordtype">double</span>)bulk_velocity, (<span class="keywordtype">double</span>)simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d">bulkVelocityCorrection</a>, (<span class="keywordtype">double</span>)acceleration,</div>
+<div class="line"><span class="lineno">  205</span>            (<span class="keywordtype">double</span>)physical_time);</div>
+<div class="line"><span class="lineno">  206</span>    PetscCheck(fclose(file) == 0, PETSC_COMM_SELF, PETSC_ERR_FILE_WRITE,</div>
+<div class="line"><span class="lineno">  207</span>               <span class="stringliteral">&quot;Unable to close the driven-flow diagnostics file.&quot;</span>);</div>
+<div class="line"><span class="lineno">  208</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  209</span>}</div>
+<div class="ttc" id="aio_8h_html_afb6442b55e79be5586ff6d39465165ad"><div class="ttname"><a href="io_8h.html#afb6442b55e79be5586ff6d39465165ad">PicurvPhysicalTime</a></div><div class="ttdeci">PetscErrorCode PicurvPhysicalTime(const SimCtx *simCtx, PetscReal solver_time, PetscReal *physical)</div><div class="ttdoc">Convert a solver time to physical seconds, t * L_ref / U_ref.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l03177">io.c:3177</a></div></div>
+<div class="ttc" id="alogging_8h_html_ae44fd200e57e9a05158ac4786e6ed8b1"><div class="ttname"><a href="logging_8h.html#ae44fd200e57e9a05158ac4786e6ed8b1">PicurvOpenDiagnosticsCsv</a></div><div class="ttdeci">PetscErrorCode PicurvOpenDiagnosticsCsv(const SimCtx *simCtx, const char *filename, const char *header, FILE **file)</div><div class="ttdoc">Opens a per-run diagnostics CSV in the run's analysis directory for appending.</div><div class="ttdef"><b>Definition</b> <a href="logging_8c_source.html#l03504">logging.c:3504</a></div></div>
+<div class="ttc" id="anamespaceaudit__starter__content_html_a2f1bde1ef008cf3e48aea8fc90c706f0"><div class="ttname"><a href="namespaceaudit__starter__content.html#a2f1bde1ef008cf3e48aea8fc90c706f0">audit_starter_content.file</a></div><div class="ttdeci">file</div><div class="ttdef"><b>Definition</b> <a href="audit__starter__content_8py_source.html#l00179">audit_starter_content.py:179</a></div></div>
+<div class="ttc" id="avariables_8h_html_a2a960fee99f2a7681b519c8388c2c57f"><div class="ttname"><a href="variables_8h.html#a2a960fee99f2a7681b519c8388c2c57f">SimCtx::targetVolumetricFlux</a></div><div class="ttdeci">PetscReal targetVolumetricFlux</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00975">variables.h:975</a></div></div>
+<div class="ttc" id="avariables_8h_html_aaa38c0e638f610b256f1aeb7436a9434"><div class="ttname"><a href="variables_8h.html#aaa38c0e638f610b256f1aeb7436a9434">SimCtx::drivenFluxMeasured</a></div><div class="ttdeci">PetscReal drivenFluxMeasured</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00986">variables.h:986</a></div></div>
+<div class="ttc" id="avariables_8h_html_acc22a8df77c0b8cc09f29dd319037e9d"><div class="ttname"><a href="variables_8h.html#acc22a8df77c0b8cc09f29dd319037e9d">SimCtx::drivenFluxArea</a></div><div class="ttdeci">PetscReal drivenFluxArea</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00986">variables.h:986</a></div></div>
+<div class="ttc" id="avariables_8h_html_aea06dd1e5437886745d3545e2a383172"><div class="ttname"><a href="variables_8h.html#aea06dd1e5437886745d3545e2a383172">SimCtx::ti</a></div><div class="ttdeci">PetscReal ti</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00875">variables.h:875</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="BodyForces_8h_a2a2cb0f2d6946ba64edcf43a247faed4_cgraph.svg" width="100%" height="401"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="BodyForces_8h_a2a2cb0f2d6946ba64edcf43a247faed4_icgraph.svg" width="100%" height="424"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

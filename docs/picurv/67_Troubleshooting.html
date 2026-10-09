@@ -99,7 +99,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p67_cluster_sec">7. The Job Fails on a Cluster but Works Locally</a></li>
 <li class="level1"><a href="#p67_suspicious_sec">8. Results Look Numerically Suspicious</a></li>
 <li class="level1"><a href="#p67_les_sec">9. LES Results Look Wrong</a></li>
-<li class="level1"><a href="#p67_related_sec">10. Related Documentation</a></li>
+<li class="level1"><a href="#p67_wallmodel_sec">10. A Wall-Model Run Stops or Its Wall Stress Looks Wrong</a></li>
+<li class="level1"><a href="#p67_related_sec">11. Related Documentation</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="_Troubleshooting"></a>  <div class="pic-pagemeta"><span class="pic-pagemeta-item"><b>Type</b> How-to</span><span class="pic-pagemeta-item"><b>For</b>  Anyone with a failing run</span><span class="pic-pagemeta-item"><b>Status</b>  Current behavior</span></div></p>
@@ -182,15 +183,21 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 9. LES Results Look Wrong</h1>
 <p>The closure is quiet when it misbehaves: a wrong coefficient still produces a run that completes and plots that look plausible. Turn the diagnostics on (<code>les.diagnostics.enabled: true</code>) and read <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code> before anything else.</p>
 <p>**<code>cs_effective</code> is zero for the whole run.** Expected for the first two steps of a run started from rest, because the procedure has no developed field to sample. Beyond that, check that the model is <code>dynamic_smagorinsky</code>; the constant model reports the coefficient you configured, not a measured one.</p>
-<p>**<code>cs_effective</code> is far from 0.16-0.17 in isotropic turbulence.** Check the grid first, not the model. That value assumes the grid cutoff sits in an inertial range; at low <code>Re_lambda</code> a smaller coefficient is correct. Then check <code>limited_fraction</code> — if the clip is binding, the ceiling is setting the answer.</p>
+<p>**<code>cs_effective</code> is far from 0.18-0.19 in isotropic turbulence.** That is what the dynamic procedure measured on the HOM02 benchmark at 64^3 with the box test filter (0.193-0.196 homogeneous, 0.181-0.183 local; <a class="el" href="72_LES_Turbulence_Closure.html#p72_status_sec">10. Status and Evidence</a>). Lilly's 0.16-0.17 assumes a spectral cutoff in an inertial range. Check the grid first, not the model: at low <code>Re_lambda</code> a smaller coefficient is correct. Then check <code>limited_fraction</code> — if the clip is binding, the ceiling is setting the answer.</p>
 <p>**<code>cs_effective</code> is noisy or oscillating.** Almost always <code>averaging.mode: local</code>, where the coefficient's denominator collapses wherever the resolved strain is briefly small. If the flow has a homogeneous direction, use <code>averaging.mode: homogeneous</code>.</p>
 <p>**<code>limited_fraction</code> is large.** The <code>max_cs</code> ceiling is doing the modelling. Either the coefficient is genuinely diverging, which is a resolution or stability problem, or the ceiling is set too low for the flow.</p>
 <p>**<code>backscatter_fraction</code> is large and the run is over-dissipative.** The clipping modes discard only the negative tail, which biases mean dissipation upward. Averaging over a homogeneous set lets forward and reverse transfer cancel the way the physics intends; <code>clipping.mode: none</code> keeps the sign and bounds the total viscosity instead.</p>
 <p>**<code>nu_t_over_nu_mean</code> is far below one.** The model is contributing nothing. Check that LES is actually enabled, and that the grid is coarse enough for a subgrid model to be the right tool.</p>
 <p><b>Validation rejected <code>simpson_ik</code>.</b> That stencil averages over the central eta-plane only and assumes xi and zeta are homogeneous. The check requires both declared <code>PERIODIC</code>. Use <code>volume_weighted_box</code> on any other geometry.</p>
 <p>More detail on every setting at <b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b>, and the reasoning at <b><a class="el" href="72_LES_Turbulence_Closure.html">LES Turbulence Closure</a></b>.</p>
+<h1><a class="anchor" id="p67_wallmodel_sec"></a>
+10. A Wall-Model Run Stops or Its Wall Stress Looks Wrong</h1>
+<p>Read <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code> first: one row per step with the wall-face mean, spread and extremes of the friction velocity, the mean and maximum first-cell <code>y+</code>, and <code>nu_wall_over_nu_mean</code>.</p>
+<p><b>The run stopped with "first-cell y+ has been outside ...".</b> The runtime checks the wall-face mean <code>y+</code> every step against the selected law's range (<code>log_law</code> 30-300, <code>werner</code> up to 300, <code>cabot</code> up to 1000) and stops after ten consecutive steps outside it. A <code>log_law</code> run started from a plug or laminar field often sits below 30 at first; <code>werner</code> has a linear branch and no lower bound. Otherwise resize the first cell.</p>
+<p>**<code>u_tau_mean</code> collapses toward zero within a few steps**, with <code>nu_wall_over_nu_mean</code> falling to zero beside it. The flow has stopped, and the wall model is reporting it rather than causing it. Check that the inflow actually delivers flux: <code>constant_velocity</code> takes the face-normal speed from the component named after the face's own axis (<code>vz</code> on a <code>-Zeta</code> inlet), whatever the Cartesian direction of the inlet, and a speed given in another component is ignored.</p>
+<p>**<code>u_tau</code> disagrees with the stress the flow carries.** In a stationary channel the viscous, resolved and subgrid shear together must fall linearly from the wall stress. A wall model whose <code>u_tau^2</code> sits well above that line is delivering more stress than the law it reports, and the excess appears as Reynolds shear stress in the outer layer; that was the signature of the cell-integral Werner relation corrected on 2026-10-08 (<code>wmles-channel-retau1000-werner-2026-10-09</code>). On the corrected channel the two agree to about 2%.</p>
 <h1><a class="anchor" id="p67_related_sec"></a>
-10. Related Documentation</h1>
+11. Related Documentation</h1>
 <ul>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b> — organized by error message</li>
 <li><b><a class="el" href="66_Evidence_Matrix.html">Capability Evidence Matrix</a></b> — what is verified and what is not</li>
