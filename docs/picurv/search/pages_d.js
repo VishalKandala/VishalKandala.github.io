@@ -24,6 +24,7 @@ var searchData=
   ['framework_21',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
   ['function_20evidence_22',['51bd14f-wall-function-evidence',['../md_docs_2changelog_8d_251bd14f-wall-function-evidence.html',1,'']]],
   ['function_20identity_20and_20observability_20specification_23',['Function Identity and Observability Specification',['../59_Function_Identity_and_Observability_Specification.html',1,'']]],
-  ['function_20supported_24',['4831839-les-wall-function-supported',['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'']]],
-  ['future_20architecture_20specifications_25',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]]
+  ['function_20renames_24',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
+  ['function_20supported_25',['4831839-les-wall-function-supported',['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'']]],
+  ['future_20architecture_20specifications_26',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]]
 ];
