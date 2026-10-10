@@ -3,7 +3,7 @@ var searchData=
   ['maintenance_20backlog_20and_20low_20priority_20fixes_0',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
   ['management_20guide_1',['Storage Management Guide',['../61_Storage_Management_Guide.html',1,'']]],
   ['map_2',['map',['../46_C_Runtime_Execution_Map.html',1,'C Runtime Execution Map'],['../15_Config_Ingestion_Map.html',1,'Developer Ingestion Map'],['../Documentation_Map.html',1,'Documentation Map']]],
-  ['matrix_3',['Capability Evidence Matrix',['../66_Evidence_Matrix.html',1,'']]],
+  ['matrix_3',['matrix',['../md_docs_2changelog_8d_2998a037-poisson-option-matrix.html',1,'998a037-poisson-option-matrix'],['../66_Evidence_Matrix.html',1,'Capability Evidence Matrix']]],
   ['mean_4',['6507b4b-iem-own-cell-mean',['../md_docs_2changelog_8d_26507b4b-iem-own-cell-mean.html',1,'']]],
   ['method_5',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
   ['method_20overview_6',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]],

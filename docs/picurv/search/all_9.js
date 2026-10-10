@@ -25,9 +25,11 @@ var searchData=
   ['9_20preconditioning_20architecture_20and_20status_22',['9. Preconditioning Architecture and Status',['../55_Newton_Krylov_Momentum_Solver.html#p55_precond_sec',1,'']]],
   ['9_20references_23',['9. References',['../19_Nondimensionalization.html#p19_links_sec',1,'']]],
   ['9_20regression_20coverage_24',['9. Regression Coverage',['../56_Field_Identity_and_Layout_Catalog.html#p56_validation_sec',1,'']]],
-  ['9_20related_20pages_25',['9 related pages',['../46_C_Runtime_Execution_Map.html#p46_refs_sec',1,'9. Related Pages'],['../51_C_Test_Suite_Developer_Guide.html#p51_refs_sec',1,'9. Related Pages'],['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_next_steps_sec',1,'9. Related Pages'],['../45_Particle_Initialization_and_Restart.html#p45_refs_sec',1,'9. Related Pages']]],
+  ['9_20related_20pages_25',['9 related pages',['../45_Particle_Initialization_and_Restart.html#p45_refs_sec',1,'9. Related Pages'],['../51_C_Test_Suite_Developer_Guide.html#p51_refs_sec',1,'9. Related Pages'],['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_next_steps_sec',1,'9. Related Pages'],['../46_C_Runtime_Execution_Map.html#p46_refs_sec',1,'9. Related Pages']]],
   ['9_20runtime_20monitoring_20and_20logging_26',['9. Runtime Monitoring and Logging',['../58_Field_Statistics.html#p58_monitoring_sec',1,'']]],
   ['9_20safe_20rules_20of_20thumb_27',['9. Safe Rules Of Thumb',['../52_Run_Artifact_Lifecycle_Contract.html#p52_rules_sec',1,'']]],
   ['951870f_20physical_20units_20rule_28',['951870f-physical-units-rule',['../md_docs_2changelog_8d_2951870f-physical-units-rule.html',1,'']]],
-  ['951870f_2dphysical_2dunits_2drule_2emd_29',['951870f-physical-units-rule.md',['../951870f-physical-units-rule_8md.html',1,'']]]
+  ['951870f_2dphysical_2dunits_2drule_2emd_29',['951870f-physical-units-rule.md',['../951870f-physical-units-rule_8md.html',1,'']]],
+  ['998a037_20poisson_20option_20matrix_30',['998a037-poisson-option-matrix',['../md_docs_2changelog_8d_2998a037-poisson-option-matrix.html',1,'']]],
+  ['998a037_2dpoisson_2doption_2dmatrix_2emd_31',['998a037-poisson-option-matrix.md',['../998a037-poisson-option-matrix_8md.html',1,'']]]
 ];
