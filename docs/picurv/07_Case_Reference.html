@@ -508,8 +508,10 @@ models:
           # [String] -&gt; -les_test_filter_kernel
           kernel: "volume_weighted_box"
 
-          # Test-to-grid filter width ratio. alpha is its square. Must exceed 1: a test
-          # filter no wider than the grid filter leaves nothing to measure.
+          # Test-to-grid filter width ratio in each direction the kernel filters. The box
+          # filters all three, so alpha is its square; simpson_ik filters only xi and
+          # zeta, so alpha is ratio^(4/3). Must exceed 1: a test filter no wider than the
+          # grid filter leaves nothing to measure.
           # [Number] -&gt; -les_test_filter_width_ratio
           width_ratio: 2.0
 
@@ -593,7 +595,9 @@ models:
         #              viscous sublayer, and free of the inner iteration that a
         #              matrix-free Jacobian amplifies
         #   cabot   -&gt; integrated mixing-length eddy viscosity; its non-equilibrium
-        #              form takes the wall-parallel gradient of the resolved pressure
+        #              form takes the wall-parallel gradient of the resolved pressure.
+        #              Experimental: on the Re_tau ~ 1000 channel that term put u_tau
+        #              22% low, so prefer werner or log_law for results.
         # The run stops if the mean first-cell y+ stays outside the law's range
         # (log_law 30-300, werner &lt;= 300, cabot &lt;= 1000) for 10 consecutive steps.
         # [String] -&gt; -wallfunction
@@ -1076,12 +1080,11 @@ wale</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_cube_root_volume"><code>cube_root_volume</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_geometric_mean"><code>geometric_mean</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_max_edge"><code>max_edge</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_scotti"><code>scotti</code></a></td><td class="markdownTableBodyNone"><code>3</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_cube_root_volume"><code>cube_root_volume</code></a></td><td class="markdownTableBodyNone"><code>0</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_geometric_mean"><code>geometric_mean</code></a></td><td class="markdownTableBodyNone"><code>1</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_max_edge"><code>max_edge</code></a></td><td class="markdownTableBodyNone"><code>2</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_width_scotti"><code>scotti</code></a></td><td class="markdownTableBodyNone"><code>3</code></td></tr>
 </table>
 <h2><a class="anchor" id="p07_cap_width_cube_root_volume_sub"></a>
 cube_root_volume</h2>
@@ -1101,8 +1104,8 @@ geometric_mean</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> None beyond scaling <code>nu_t</code>.</p>
 <p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented, covered by the same unit case and by <code>filter-width-is-independent-of-cell-orientation</code>, which requires the same width for a stretched cell before and after rotating it.</p>
-<p><b>Limitations.</b> Still a geometric mean, so it shares the cube-root model's optimism on strongly stretched cells.</p>
+<p><b>Evidence.</b> Unit verified - the same unit case and <code>filter-width-is-independent-of-cell-orientation</code>, which requires the same width for a stretched cell before and after rotating it. Benchmark characterized - <code>hom02-geometric-mean-equivalence-2026-10-09</code>: on the 2:1 cells of the HOM02 width comparison it reproduced <code>cube_root_volume</code> in every reduced quantity, and the velocity fields differed by at most 1.3e-10 relative. The difference comes only from the two formulas' floating-point paths, because two identical runs on different nodes were bitwise equal.</p>
+<p><b>Limitations.</b> Still a geometric mean, so it shares the cube-root model's optimism on strongly stretched cells. Measured only on orthogonal cells, where it equals <code>cube_root_volume</code> by construction. Its behaviour on skewed cells, the one place it differs, has not been run.</p>
 <h2><a class="anchor" id="p07_cap_width_max_edge_sub"></a>
 max_edge</h2>
 <p><a class="anchor" id="p07_cap_width_max_edge"></a> <b>Identity.</b> <code>les.filter_width: max_edge</code> -&gt; <code>-les_filter_width 2</code>.</p>
@@ -1222,7 +1225,7 @@ none</h2>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_volume_weighted_box"><code>box</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">accepted spelling of <code>volume_weighted_box</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_simpson_ik"><code>simpson_ik</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_simpson_ik"><code>simpson_ik</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_filter_volume_weighted_box"><code>volume_weighted_box</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
 <h2><a class="anchor" id="p07_cap_filter_volume_weighted_box_sub"></a>
@@ -1241,10 +1244,10 @@ simpson_ik</h2>
 <p><b>What it does.</b> Applies a two-dimensional Simpson stencil across the central eta-plane of the 3x3x3 neighbourhood, weighting the nine samples 1, 4, and 16. Volume weights are not used: the stencil assumes uniform spacing in the plane it averages over.</p>
 <p><b>When to choose it.</b> A plane channel or any flow homogeneous in xi and zeta, where the higher-order stencil is both admissible and more accurate.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> The homogeneity assumption is now checked rather than trusted: selecting this kernel without declaring both xi and zeta <code>PERIODIC</code> is rejected during validation.</p>
+<p><b>Interactions.</b> The homogeneity assumption is now checked rather than trusted: selecting this kernel without declaring both xi and zeta <code>PERIODIC</code> is rejected during validation. <code>test_filter.width_ratio</code> applies to the two directions the stencil filters and leaves eta at the grid width, so the dynamic procedure uses alpha = ratio^(4/3) here rather than the box filter's ratio^2. The default ratio 2 therefore gives a cube-root width ratio of 4^(1/3), about 1.59.</p>
 <p><b>Diagnostics.</b> As above.</p>
-<p><b>Evidence.</b> Implemented, covered by <code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code> alongside the box filter.</p>
-<p><b>Limitations.</b> Averages over only the central eta-plane, so it ignores variation in the wall-normal direction entirely; that is the point on a channel and wrong anywhere else.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-les</code>: <code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code> checks the stencil alongside the box filter, and <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">tests/c/test_les.c</a></code> (<code>dynamic-procedure-simpson-ratio-counts-filtered-directions</code>) runs the dynamic procedure on a linear field and requires the coefficient to scale as 1/(ratio^(4/3) - 1), which the former squared-ratio weighting fails. Benchmark characterized - <code>hom02-simpson-ik-2026-10-09</code>: on HOM02 the former weighting halved the dynamic coefficient against the box filter (0.091 against 0.194) and left a +0.39 cutoff-band pile-up; weighted as a two-direction filter it gives 0.168 and +0.12, and runs to the last DNS spectrum. Externally validated - <code>wmles-channel-retau1000-simpson-2026-10-09</code>: on the wall-modelled Re_tau ~ 1000 channel, with the corrected weighting, u_tau is 2.5% above Lee &amp; Moser, the bulk-unit mean velocity is within 0.8% RMS, and the outer-layer resolved shear stress is 0.97-1.01 of the reference; the outer u' excess falls from 16% under the former weighting to 6%.</p>
+<p><b>Limitations.</b> Averages over only the central eta-plane, so it ignores variation in the wall-normal direction entirely; that is the point on a channel and wrong anywhere else. Even corrected, it is less dissipative than the box filter: on the channel it carries about 20% less eddy viscosity and 6% more outer u', and on isotropic turbulence ten times the box filter's cutoff pile-up. The channel criteria do not discriminate test filters, because the wall model sets the friction velocity; the corrected default was represented there by a width ratio equal to it within 1.6e-6 in alpha, not run on the corrected build.</p>
 <!-- GENERATED FILE - do not edit by hand. Family: turbulence.wall_function.
      Regenerate with: make docs-inventory -->
 <table class="markdownTable">
@@ -1254,7 +1257,7 @@ simpson_ik</h2>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_cabot"><code>cabot</code></a></td><td class="markdownTableBodyNone"><code>3</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_log_law"><code>log_law</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_log_law"><code>log_law</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_log_law"><code>loglaw</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">accepted spelling of <code>log_law</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_werner"><code>werner</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p07_cap_wall_werner"><code>werner_wengle</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone">accepted spelling of <code>werner</code></td></tr>
@@ -1276,8 +1279,8 @@ log_law</h2>
 <p>The correction also reaches the LES closure. <code>Contra2Cart</code> rebuilds the Cartesian field from the contravariant one at the top of each timestep and so discards the previous solve's near-wall correction; the wall model is re-applied before the subgrid strain rates are formed, so the closure and the momentum equation agree about the near-wall velocity rather than disagreeing within one timestep.</p>
 <p><b>Diagnostics.</b> The startup banner reports whether wall functions are enabled and the configured roughness height. Every timestep appends one row to <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code> - the wall-face mean, spread, minimum and maximum of the friction velocity, the mean and maximum first-cell y+, the mean wall distance, and <code>nu_wall_over_nu_mean</code> - and logs the mean friction velocity and y+ to the console.</p>
 <p>The same row is checked against the range the selected law supports: mean first-cell y+ from 30 to 300 for <code>log_law</code>, at most 300 for <code>werner</code>, and at most 1000 for <code>cabot</code>. Each step outside it logs a warning, and ten consecutive steps outside it stop the run; a step back in range resets the count, so a startup transient survives where a mis-sized first cell does not.</p>
-<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-runtime</code> and <code>make unit-boundaries</code>. <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code> covers the velocity laws and their friction-velocity root-finds, each checked to invert its own law; <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code> covers the integration, checking that the corrected first interior velocity is the modelled profile at that cell's wall distance, for the friction velocity the integration itself stored. No shipped example enables it and no reference-flow comparison has been run.</p>
-<p><b>Limitations.</b> Validity depends on the first cell falling in the logarithmic region. Only the wall-face mean y+ is checked, so individual cells outside the region, near a corner or a separation for instance, pass unremarked while the mean stays in range.</p>
+<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-runtime</code> and <code>make unit-boundaries</code>. <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code> covers the velocity laws and their friction-velocity root-finds, each checked to invert its own law; <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code> covers the integration, checking that the corrected first interior velocity is the modelled profile at that cell's wall distance, for the friction velocity the integration itself stored. Externally validated - <code>wmles-channel-retau1000-loglaw-2026-10-09</code>: on the wall-modelled Re_tau ~ 1000 channel (<code>driven_channel/les_wallmodel_retau1000</code>, restarted from the werner run), u_tau over the statistics window is 0.3% below Lee &amp; Moser (2015), the driving-force balance agrees to 0.2%, U+ stays within 0.08 of the reference over y+ 100-500, and the outer-layer resolved Reynolds shear stress is 0.92-0.97 of it - every criterion the werner model was held to, with the widest margins of the three wall functions.</p>
+<p><b>Limitations.</b> Validity depends on the first cell falling in the logarithmic region. Only the wall-face mean y+ is checked, so individual cells outside the region, near a corner or a separation for instance, pass unremarked while the mean stays in range. The validation is one smooth-wall channel on one grid; <code>roughness_height</code> is not exercised, and the run adapted for 200 time units from a werner-developed state rather than developing under this law from rest.</p>
 <h2><a class="anchor" id="p07_cap_wall_werner_sub"></a>
 werner</h2>
 <p><a class="anchor" id="p07_cap_wall_werner"></a> <b>Identity.</b> <code>turbulence.wall_function.model: werner</code> -&gt; <code>-wallfunction 2</code>. Accepted spelling: <code>werner_wengle</code>.</p>
@@ -1289,18 +1292,18 @@ werner</h2>
 <p><b>Interactions.</b> As for <a class="el" href="07_Case_Reference.html#p07_cap_wall_log_law">log_law</a>.</p>
 <p><b>Diagnostics.</b> As for <a class="el" href="07_Case_Reference.html#p07_cap_wall_log_law">log_law</a>; the banner reports the selected model by name.</p>
 <p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-runtime</code> and <code>make unit-boundaries</code>. In <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code>, <code>find_utau_Werner</code> inverts <code>u_Werner</code> exactly at y+ from 2 to 500, across the switch, and the wall function given a reference speed taken from the profile returns that profile's friction velocity and places the boundary cell on it. The integration that dispatches to it is covered in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Externally validated - <code>wmles-channel-retau1000-werner-2026-10-09</code>: the cell-integrated relation it replaced read the point reference speed as a first-cell average and put u_tau 14.5% above Lee &amp; Moser (2015) on the wall-modelled Re_tau ~ 1000 channel (<code>driven_channel/les_wallmodel_retau1000</code>); rerun with the pointwise relation, u_tau over the statistics window is 2.9% above, and the outer-layer resolved Reynolds shear stress falls from 1.27 to 0.91-1.02 of the reference. Production exercised - <code>humphrey-turbulent-bend-wmles-2026-10-09</code>: a turbulent 90-degree duct bend at Re_D = 40,000, where the low-shear inner wall takes individual cells into the linear branch while the run continues.</p>
-<p><b>Limitations.</b> No roughness. The power-law constants are fixed, and the model carries no pressure-gradient term, so it describes an equilibrium layer only - <code>cabot</code> is the selection when the near-wall layer is not in equilibrium. The validation is one grid of one channel. There, the stress the model applies sits about 2% above what the channel's own outer-layer stress balance implies, a gap the run cannot settle because the solver does not report the driving force.</p>
+<p><b>Limitations.</b> No roughness. The power-law constants are fixed, and the model carries no pressure-gradient term, so it describes an equilibrium layer only; no implemented model handles a non-equilibrium layer correctly (see <code>cabot</code>). The validation is one grid of one channel, and its friction velocity is biased about +3%: a later window of the same flow, <code>wmles-channel-retau1000-werner-window2-2026-10-09</code>, gave +3.2% and so missed the 3% criterion by 0.2 points while passing every other one. The driving force, now logged, agrees with the wall model's stress to 0.2%, so the 2% gap an outer-layer stress fit once suggested came from that fit's single-snapshot subgrid estimate, not from the model.</p>
 <h2><a class="anchor" id="p07_cap_wall_cabot_sub"></a>
 cabot</h2>
 <p><a class="anchor" id="p07_cap_wall_cabot"></a> <b>Identity.</b> <code>turbulence.wall_function.model: cabot</code> -&gt; <code>-wallfunction 3</code>.</p>
 <p><b>What it does.</b> Applies Cabot's wall model, which integrates a mixing-length eddy viscosity across the wall layer rather than assuming a profile shape.</p>
-<p><b>When to choose it.</b> When the near-wall flow departs from equilibrium enough that a fixed profile is a poor fit, and you are prepared to pay for the integration.</p>
+<p><b>When to choose it.</b> Not for results yet. It is meant for near-wall flow that departs from equilibrium, but as implemented its pressure-gradient term makes the wall stress unreliable (see Limitations); use <code>werner</code> or <code>log_law</code>.</p>
 <p><b>Parameters it owns.</b> None currently.</p>
 <p><b>What it needs.</b> Cabot's departure from an equilibrium profile is driven by the wall-parallel pressure gradient, which is taken from the resolved pressure at the near-wall cell through <a class="el" href="setup_8h.html#aba17592e43d898dfe86c30b26d455ed6">ComputeScalarFieldDerivatives</a>. The pressure is the previous projection's, the same lag every other explicit use of it carries.</p>
 <p><b>Interactions.</b> As for <a class="el" href="07_Case_Reference.html#p07_cap_wall_log_law">log_law</a>.</p>
 <p><b>Diagnostics.</b> As for <a class="el" href="07_Case_Reference.html#p07_cap_wall_log_law">log_law</a>.</p>
-<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-runtime</code> and <code>make unit-boundaries</code>: <code>find_utau_Cabot</code> and <code>u_Cabot</code> in <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code>. The integration that dispatches to it is covered in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. No reference-flow comparison has been run.</p>
-<p><b>Limitations.</b> No roughness formulation, so <code>roughness_height</code> is rejected rather than accepted and ignored. The mixing-length constant is fixed.</p>
+<p><b>Evidence.</b> Implemented, with unit coverage run by <code>make unit-runtime</code> and <code>make unit-boundaries</code>: <code>find_utau_Cabot</code> and <code>u_Cabot</code> in <code><a class="el" href="test__runtime__kernels_8c.html" title="C unit tests for runtime, particle, wall, and walltime-guard helpers.">tests/c/test_runtime_kernels.c</a></code>. The integration that dispatches to it is covered in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. The one reference-flow comparison failed: <code>wmles-channel-retau1000-cabot-2026-10-09</code>. Restarted on the wall-modelled Re_tau ~ 1000 channel from a state werner held at u_tau 0.0514, it gave 0.039 from the first step, with 3.4 times werner's cell-to-cell scatter, and it was cancelled before its statistics window.</p>
+<p><b>Limitations.</b> Not usable as implemented. The pressure-gradient term integrates the instantaneous resolved gradient across the layer up to the reference cell, without the convective terms that balance it in the full boundary-layer equations; on the channel it was +-38% of the reference velocity, gave a negative stress in a third of wall cells, and the friction-velocity solve takes the magnitude of that stress. Evaluated offline on the same state, the relation without its pressure term gives -2.6%. No roughness formulation, so <code>roughness_height</code> is rejected rather than accepted and ignored. The mixing-length constant is fixed.</p>
 <h1><a class="anchor" id="p07_bc_sec"></a>
 7. boundary_conditions</h1>
 <p>Syntax: a list of 6 face entries, one per face.</p>

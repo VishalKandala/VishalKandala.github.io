@@ -315,7 +315,7 @@ States a run moves through, and the commands that move it</div>
 <li>use <code>start_step</code> equal to the saved checkpoint step, not the next desired step,</li>
 <li>do not edit bundle contents or generated control files by hand.</li>
 </ul>
-<p><code>--continue</code> is for the same physical case. It permits changes to run-control time settings, solver parameters/type, monitoring, postprocessing, and resource settings. Other <code>case.yml</code> changes are rejected; use <code>--restart-from</code> to create a new branch. <code>--restart-from</code> may change case physics, but C still requires the same grid geometry/layout. A newly enabled optional subsystem such as particles uses its normal initialization path unless its restart mode explicitly requests saved state; subsequent checkpoints then include that subsystem.</p>
+<p><code>--continue</code> is for the same physical case. It permits changes to run-control time settings, the MPI domain decomposition (<code>grid.da_processors_x/y/z</code> and the rank count), solver parameters/type, monitoring, postprocessing, and resource settings. Other <code>case.yml</code> changes are rejected; use <code>--restart-from</code> to create a new branch. <code>--restart-from</code> may change case physics, but C still requires the same grid geometry/layout. A newly enabled optional subsystem such as particles uses its normal initialization path unless its restart mode explicitly requests saved state; subsequent checkpoints then include that subsystem.</p>
 <h2><a class="anchor" id="p52_restart_lineage"></a>
 5.5 A Branch Records What It Branched From</h2>
 <p>A run created with <code>--restart-from</code> writes a <code>lineage</code> record into its <code>&lt;run.manifest&gt;</code>:</p>
@@ -414,7 +414,7 @@ existed". An in-place <code>--continue</code> keeps whatever lineage the run was
 <dl class="section warning"><dt>Warning</dt><dd><code>unknown</code> means nobody has checked. It is <b>not</b> a synonym for "no". Where a cell says unknown, the tool may well permit the change and produce something meaningless without complaining.</dd></dl>
 <h2><a class="anchor" id="p52_compat_inplace_sub"></a>
 8.2 Continue In Place (&lt;tt&gt;--continue&lt;/tt&gt;)</h2>
-<p>Continuation guards <b>physical case identity</b>: <code>validate_continue_case_identity</code> compares a hash of <code>case.yml</code> with <code>run_control</code> and the particle <code>restart_mode</code> excluded. Everything else in <code>case.yml</code> is part of that identity.</p>
+<p>Continuation guards <b>physical case identity</b>: <code>validate_continue_case_identity</code> compares a hash of <code>case.yml</code> with <code>run_control</code>, the particle <code>restart_mode</code>, and <code>grid.da_processors_x/y/z</code> excluded. Everything else in <code>case.yml</code> is part of that identity.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Change   </th><th class="markdownTableHeadNone">Accepted?   </th><th class="markdownTableHeadNone">Advised?   </th><th class="markdownTableHeadNone">Basis    </th></tr>
@@ -441,7 +441,7 @@ existed". An in-place <code>--continue</code> keeps whatever lineage the run was
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Grid dimensions or geometry   </td><td class="markdownTableBodyNone"><b>no</b>   </td><td class="markdownTableBodyNone">—   </td><td class="markdownTableBodyNone">enforced — part of the case identity    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">MPI rank count   </td><td class="markdownTableBodyNone">unknown   </td><td class="markdownTableBodyNone">avoid   </td><td class="markdownTableBodyNone">unknown — no test covers rank change under <code>--continue</code>   </td></tr>
+<td class="markdownTableBodyNone">MPI rank count or <code>da_processors</code> layout   </td><td class="markdownTableBodyNone">yes   </td><td class="markdownTableBodyNone">yes   </td><td class="markdownTableBodyNone">enforced — the layout is excluded from the identity hash (<code>test_continue_accepts_a_changed_domain_decomposition</code>); a 25 x 25 x 97 channel continued from 2 ranks (1 x 1 x 2) to 2 ranks (2 x 1 x 1) and then to 4 (2 x 1 x 2) on 2026-10-09, with divergence at the 1e-8 level of the first segment   </td></tr>
 </table>
 <dl class="section note"><dt>Note</dt><dd>Anything reachable through <code>solver.yml</code>, <code>monitor.yml</code>, or <code>post.yml</code> is <b>accepted</b> during continuation by design; the guard is on the physical case only. The "discouraged" rows are a scientific judgement, not a tooling restriction: the resulting trajectory concatenates two differently-converged segments, which is rarely what you want in a published result.</dd></dl>
 <h2><a class="anchor" id="p52_compat_restart_sub"></a>

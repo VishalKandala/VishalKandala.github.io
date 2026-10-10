@@ -34,7 +34,7 @@ var searchData=
   ['profile_20tool_31',['c35c008-wall-normal-profile-tool',['../md_docs_2changelog_8d_2c35c008-wall-normal-profile-tool.html',1,'']]],
   ['projection_32',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
   ['projection_20method_33',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['promotion_34',['f0097d7-storage-promotion',['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'']]],
+  ['promotion_34',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
   ['promotions_35',['fc3ae90-vv-campaign-promotions',['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'']]],
   ['promotions_20petsc_20stamp_36',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
 ];
