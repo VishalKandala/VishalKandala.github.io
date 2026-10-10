@@ -1,6 +1,5 @@
 var searchData=
 [
   ['edge_5faverage_0',['EDGE_AVERAGE',['../Boundaries_8c.html#a828b1dca406e5a70c37fcc13fd8c2207',1,'Boundaries.c']]],
-  ['ep_1',['EP',['../poisson_8c.html#adb5bf6fbe6405b09bad71e89e1da5850',1,'poisson.c']]],
-  ['error_5fmsg_5fbuffer_5fsize_2',['error_msg_buffer_size',['../interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;interpolation.c'],['../ParticleMotion_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;ParticleMotion.c'],['../ParticlePhysics_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;ParticlePhysics.c']]]
+  ['error_5fmsg_5fbuffer_5fsize_1',['error_msg_buffer_size',['../interpolation_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;interpolation.c'],['../ParticleMotion_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;ParticleMotion.c'],['../ParticlePhysics_8c.html#a8a60be44abd6bcc3c5912e23b8b940c4',1,'ERROR_MSG_BUFFER_SIZE:&#160;ParticlePhysics.c']]]
 ];

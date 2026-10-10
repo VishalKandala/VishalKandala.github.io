@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['2f1f387_20example_20config_20refresh_0',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]]
+  ['21e90ad_20distinct_20smoothing_0',['21e90ad-distinct-smoothing',['../md_docs_2changelog_8d_221e90ad-distinct-smoothing.html',1,'']]],
+  ['2f1f387_20example_20config_20refresh_1',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]]
 ];

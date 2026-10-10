@@ -32,6 +32,7 @@ var searchData=
   ['picurv_5fwindow_5fmax_5frequests_29',['PICURV_WINDOW_MAX_REQUESTS',['../statistics__window_8h.html#aeb05becae7bb23ba8ffbef68ce6f00c0',1,'statistics_window.h']]],
   ['picurv_5fwindow_5fname_5flength_30',['PICURV_WINDOW_NAME_LENGTH',['../statistics__window_8h.html#a941bf9e9e702ab5685723ded07e8b860',1,'statistics_window.h']]],
   ['piecewiselinearinterpolation_31',['PieceWiseLinearInterpolation',['../interpolation_8h.html#ab36f15645b4460e25ec6ace7aba17dd8',1,'interpolation.h']]],
-  ['profile_5ffunction_5fbegin_32',['PROFILE_FUNCTION_BEGIN',['../logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e',1,'logging.h']]],
-  ['profile_5ffunction_5fend_33',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]]
+  ['poisson_5fsolid_5fthreshold_32',['POISSON_SOLID_THRESHOLD',['../poisson_8c.html#a660aad096cd947485e4201ac58cdc38a',1,'poisson.c']]],
+  ['profile_5ffunction_5fbegin_33',['PROFILE_FUNCTION_BEGIN',['../logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e',1,'logging.h']]],
+  ['profile_5ffunction_5fend_34',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]]
 ];

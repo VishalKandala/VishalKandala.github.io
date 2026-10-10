@@ -20,6 +20,9 @@ var searchData=
   ['picurvwindowfieldrequest_17',['PicurvWindowFieldRequest',['../statistics__window_8h.html#structPicurvWindowFieldRequest',1,'']]],
   ['picurvwindowstorage_18',['PicurvWindowStorage',['../statistics__accumulator_8h.html#structPicurvWindowStorage',1,'']]],
   ['plotdependencyerror_19',['PlotDependencyError',['../classpicurv__cli_1_1core_1_1PlotDependencyError.html',1,'picurv_cli::core']]],
-  ['postprocessparams_20',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
-  ['profiledfunction_21',['ProfiledFunction',['../logging_8c.html#structProfiledFunction',1,'']]]
+  ['poissonfacegradient_20',['PoissonFaceGradient',['../poisson_8c.html#structPoissonFaceGradient',1,'']]],
+  ['poissonfacemetrics_21',['PoissonFaceMetrics',['../poisson_8c.html#structPoissonFaceMetrics',1,'']]],
+  ['poissontransversedifference_22',['PoissonTransverseDifference',['../poisson_8c.html#structPoissonTransverseDifference',1,'']]],
+  ['postprocessparams_23',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
+  ['profiledfunction_24',['ProfiledFunction',['../logging_8c.html#structProfiledFunction',1,'']]]
 ];

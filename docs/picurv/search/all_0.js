@@ -22,5 +22,7 @@ var searchData=
   ['09_2029_19',['10.2 Retained turbulent-channel campaign (2026-09-29)',['../55_Newton_Krylov_Momentum_Solver.html#p55_channel_evidence_sub',1,'']]],
   ['09_5fmonitor_5freference_2emd_20',['09_Monitor_Reference.md',['../09__Monitor__Reference_8md.html',1,'']]],
   ['0c7b543_20init_20runs_20dir_20iem_20raw_20output_21',['0c7b543-init-runs-dir-iem-raw-output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'']]],
-  ['0c7b543_2dinit_2druns_2ddir_2diem_2draw_2doutput_2emd_22',['0c7b543-init-runs-dir-iem-raw-output.md',['../0c7b543-init-runs-dir-iem-raw-output_8md.html',1,'']]]
+  ['0c7b543_2dinit_2druns_2ddir_2diem_2draw_2doutput_2emd_22',['0c7b543-init-runs-dir-iem-raw-output.md',['../0c7b543-init-runs-dir-iem-raw-output_8md.html',1,'']]],
+  ['0d34592_20poisson_20rewrite_23',['0d34592-poisson-rewrite',['../md_docs_2changelog_8d_20d34592-poisson-rewrite.html',1,'']]],
+  ['0d34592_2dpoisson_2drewrite_2emd_24',['0d34592-poisson-rewrite.md',['../0d34592-poisson-rewrite_8md.html',1,'']]]
 ];

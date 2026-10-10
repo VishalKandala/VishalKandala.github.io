@@ -339,8 +339,8 @@ poisson_solver:
     # Worked maxima: docs/pages/25_Pressure_Poisson_GMRES_Multigrid.md
     pre_sweeps: 2     # [Integer] -&gt; -mg_pre_it
     post_sweeps: 2    # [Integer] -&gt; -mg_post_it
-    # Current PETSc binding applies one smoother count; if these differ,
-    # PICurv uses the larger value and logs a warning.
+    # Sweeps before and after the coarse-grid correction on each smoothed level.
+    # When they differ, the post-smoother copies the level solver configured below.
     semi_coarsening:
       i: false        # [true/false] -&gt; -mg_i_semi
       j: false        # [true/false] -&gt; -mg_j_semi
@@ -773,7 +773,7 @@ transient</h2>
 <li><code>level_0</code> is the multigrid <b>coarse solve</b>, not a smoother, and the naming hides that. <code>level_1..N</code> are smoothers; <code>level_0</code> sits at the base of the V-cycle and removes the smooth error the smoothers cannot see. Because multigrid is used here as a preconditioner, <code>level_0</code> must be a <b>fixed linear operator</b>. A Krylov method there (<code>gmres</code>, <code>fgmres</code>, <code>cg</code>, <code>bcgs</code>, ...) makes the whole preconditioner nonlinear, which decouples the outer FGMRES tracked residual from the true residual <code>b - Ax</code>: the solver then reports convergence on a number that no longer describes the constraint. Pinning <code>ksp_max_it</code> does not fix it. PICurv logs a startup warning if you configure one. Use <code>{method: preonly, preconditioner: redundant}</code> for coarse grids up to roughly 1e4 unknowns, <code>telescope</code> above that. Full discussion, the worked tracked-vs-true residual table, and the level-count sizing rule: <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li><code>multigrid.levels</code> is bounded by the MPI decomposition, not chosen freely: every level must leave each rank at least <code>stencil_width</code> nodes per axis (3 when any axis is periodic, 2 otherwise). Exceeding it aborts during DM creation with <code>Local x-width of domain ... is smaller than stencil width</code>. <code>picurv run</code>, including <code>--dry-run</code>, refuses such a layout before launch when <code>grid.da_processors_x/y/z</code> is set; a layout left to PETSc is only known at runtime. Formula and worked maxima: <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li>The outer Poisson preconditioner is multigrid-only in the current runtime.</li>
-<li>The current PETSc binding applies one MG smoother count; when <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</li>
+<li><code>pre_sweeps</code> and <code>post_sweeps</code> are applied separately: smoothers run <code>pre_sweeps</code> iterations before the coarse-grid correction and <code>post_sweeps</code> after it. When they differ, the post-smoother copies the configured level solver and reads extra options under <code>-ps_mg_levels_N_up_</code>; see <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html">Pressure-Poisson, GMRES, and Multigrid</a>.</li>
 <li>Advanced PETSc tuning remains available through <code>petsc_passthrough_options</code>; common examples include <code>-ps_mg_levels_N_pc_sor_omega</code> for SOR and <code>-ps_mg_levels_N_pc_factor_shift_amount</code> / <code>-ps_mg_levels_N_pc_factor_levels</code> for factor PCs.</li>
 </ul>
 <h2><a class="anchor" id="p08_cap_poisson_sec"></a>
@@ -790,7 +790,7 @@ transient</h2>
 </table>
 <h3><a class="anchor" id="p08_cap_poisson_fgmres_sub"></a>
 fgmres</h3>
-<p><a class="anchor" id="p08_cap_poisson_fgmres"></a> <b>Identity.</b> <code>poisson_solver.method: fgmres</code> (the default) -&gt; <code>-ps_ksp_type fgmres</code> -&gt; the outer <code>KSP</code> of <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a>.</p>
+<p><a class="anchor" id="p08_cap_poisson_fgmres"></a> <b>Identity.</b> <code>poisson_solver.method: fgmres</code> (the default) -&gt; <code>-ps_ksp_type fgmres</code> -&gt; the outer <code>KSP</code> of <a class="el" href="poisson_8h.html#ab19f665f53af7654d4a638f0e7ac4b07">PoissonSolver_Multigrid</a>.</p>
 <p><b>What it does.</b> Flexible GMRES around the multigrid preconditioner. Flexibility lets the preconditioner change from one iteration to the next, which is what a multigrid cycle with iterative smoothers is, so the residual it tracks is the true residual.</p>
 <p><b>When to choose it.</b> Always, unless measured cost says otherwise. It is the verified default and the only method that also accepts <code>gmres.restart</code>.</p>
 <p><b>Parameters it owns.</b> <code>gmres.restart</code>, the Krylov restart length.</p>

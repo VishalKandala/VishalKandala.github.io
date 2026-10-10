@@ -36,11 +36,10 @@ var searchData=
   ['krylov_5fksp_5ftypes_33',['KRYLOV_KSP_TYPES',['../namespacepicurv__cli_1_1core.html#a62416d3efce0f25895fcbb4a77bcf866',1,'picurv_cli::core']]],
   ['ksc_34',['ksc',['../variables_8h.html#a3e8bcd710c619c329608b6f7da5f1ea1',1,'UserCtx::ksc'],['../variables_8h.html#aa2740545fceacde9a9d1c1a6d073c711',1,'UserMG::ksc']]],
   ['ksentinel_35',['kSentinel',['../test__post__compute__mpi_8c.html#a23e7a89e842a119b9a49ab98779f1b90',1,'test_post_compute_mpi.c']]],
-  ['kske_36',['KSKE',['../variables_8h.html#a24d419b8507d91d3752afe90a3ac1de5',1,'UserCtx']]],
-  ['ksp_37',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
-  ['ksp_5ftotal_38',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
-  ['kx_39',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
-  ['ky_40',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
-  ['kz_41',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
-  ['kzet_42',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
+  ['ksp_36',['ksp',['../variables_8h.html#ad4fcce0981f153a693d86659b81531a3',1,'UserCtx']]],
+  ['ksp_5ftotal_37',['ksp_total',['../test__momentum__newton__boundary__fixedpoint_8c.html#a7f17220503f22d34f0dda7059bff14c1',1,'SolveResult']]],
+  ['kx_38',['kx',['../variables_8h.html#ae23c94ab132f58176704096e04a6feed',1,'VerificationScalarConfig']]],
+  ['ky_39',['ky',['../variables_8h.html#a65ab1b129a13c15cc32beb08d49fe5ce',1,'VerificationScalarConfig']]],
+  ['kz_40',['kz',['../variables_8h.html#a820b562bfc5c35ffdae04f4688f2264a',1,'VerificationScalarConfig']]],
+  ['kzet_41',['KZet',['../variables_8h.html#ad6b708fb886f2f7b49f28d4466af5fa0',1,'UserCtx']]]
 ];

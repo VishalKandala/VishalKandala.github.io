@@ -123,26 +123,28 @@ Multigrid V-cycle over the coarsened grid hierarchy</div>
 </p>
 <p>In code terms:</p>
 <ul>
-<li>RHS assembly: divergence source in <a class="el" href="poisson_8h.html#a9340445ae2c0a3c7be290e2a1aea3d67">PoissonRHS</a></li>
-<li>LHS assembly: metric-aware operator in <a class="el" href="poisson_8h.html#a26f0e6321b7ace56b3b105e1eb10475e">PoissonLHSNew</a></li>
-<li>solve orchestration: <a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a></li>
+<li>right-hand side: the scaled divergence of the contravariant flux, in <a class="el" href="poisson_8h.html#af045f98b0e6be8bd98c7f925c6e4369c">ComputePoissonRHS</a></li>
+<li>operator: the 19-point curvilinear Laplacian on one multigrid level, in <a class="el" href="poisson_8h.html#a47b43e889eca7cce152c0f39dc8d74dd">AssemblePoissonOperator</a></li>
+<li>solve: <a class="el" href="poisson_8h.html#ab19f665f53af7654d4a638f0e7ac4b07">PoissonSolver_Multigrid</a></li>
 </ul>
-<p>Null-space handling is explicitly configured for Neumann-like pressure systems via function <a class="el" href="poisson_8h.html#a2648a0c6cafb7916a706cd757e5b92f5">PoissonNullSpaceFunction</a> in the Poisson module.</p>
+<p>The operator and the projection evaluate the gradient flux through each face with the same stencil, including its one-sided forms beside non-periodic boundaries and solid cells, so the Laplacian the solver inverts is exactly the divergence of the gradient the projection subtracts. Non-periodic faces are homogeneous Neumann. The constant null space of that problem is removed on every level by a callback attached to each level's operator.</p>
+<p>The integral of the right-hand side is reported as <code>Poisson Source Imbalance</code> in <code>Continuity_Metrics.log</code>. It is the net volume flux into the domain carried by the momentum step's velocity before the correction, and must stay near zero for the all-Neumann equation to have a solution. It covers every boundary face, unlike that log's <code>Net Flux</code> column, which sums only the inlet and outlet faces.</p>
 <h1><a class="anchor" id="p25_mg_sec"></a>
 2. Multigrid/KSP Stack In Code</h1>
-<p><a class="el" href="poisson_8h.html#acfdf6d56006b1b5f68d400deb6cf0959">PoissonSolver_MG</a> currently:</p>
+<p>On its first call for a block, <a class="el" href="poisson_8h.html#ab19f665f53af7654d4a638f0e7ac4b07">PoissonSolver_Multigrid</a> does the following:</p>
 <ol type="1">
-<li>assembles per-level operators,</li>
-<li>configures <code>KSP</code> + <code>PCMG</code>,</li>
-<li>sets restriction/interpolation operators (<a class="el" href="poisson_8h.html#a5fa351d4c691fef0d76cedf5cc5cbb72">MyRestriction</a> and <a class="el" href="poisson_8h.html#aa2fc17959230252f30b2278d81a16caf">MyInterpolation</a>),</li>
-<li>applies level smoothers/coarse solve,</li>
-<li>solves finest-level system for <code>Phi</code>.</li>
+<li>assembles the operator on every level,</li>
+<li>creates the outer <code>KSP</code> (options prefix <code>ps_</code>) with a multiplicative V-cycle <code>PCMG</code>,</li>
+<li>registers shell restriction and interpolation operators between levels, both of which skip solid cells,</li>
+<li>configures the level smoothers and the coarse solve and attaches the null space,</li>
 </ol>
-<p>After Poisson solve:</p>
+<p>and stores the result in the finest level's context. Every later step reuses it: only the right-hand side is formed and the finest-level system solved for <code>Phi</code>. The operator depends only on the grid metrics, the solid field and the boundary types, all fixed for a run. Rebuilding the coarse factorization every step had cost 60-65% of each step on a 0.52M-cell wall-resolved LES duct before the solver was kept. The solver is created at the first step of every process, so <code>--continue</code> and <code>--restart-from</code> with a different rank count build it for the new layout.</p>
+<p>After the Poisson solve:</p>
 <ul>
 <li>pressure is updated by <a class="el" href="poisson_8h.html#a7cf2cfc0383ba0076f827f7d3856f2ed">UpdatePressure</a></li>
-<li>velocity is projected by <a class="el" href="poisson_8h.html#a34a113dcc9ca606d914c3d021a4d85fc">Projection</a></li>
+<li>velocity is projected by <a class="el" href="poisson_8h.html#a7f4f4c710141b23db0f1990719a0262c">ProjectVelocity</a></li>
 </ul>
+<p>The implementation that rebuilt the solver every step, with its dormant immersed-boundary flux corrections and multi-region null space, is available at commit <code>53ba654</code> and earlier.</p>
 <h1><a class="anchor" id="p25_config_sec"></a>
 3. YAML Mapping and PETSc Options</h1>
 <p>From <code>solver.yml</code> via <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>:</p>
@@ -165,7 +167,7 @@ Multigrid V-cycle over the coarsened grid hierarchy</div>
 <li><code>petsc_passthrough_options</code> -&gt; advanced PETSc flags not exposed as structured YAML</li>
 </ul>
 <p>Final option parsing happens in function <a class="el" href="setup_8h.html#a977df65dac293c1308451334cb198693">CreateSimulationContext</a> during context creation.</p>
-<p>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest grid. Larger level numbers are progressively finer. The default MG level preconditioner is block Jacobi (<code>bjacobi</code>) when not specified. The current PETSc binding applies one MG smoother count; if <code>pre_sweeps</code> and <code>post_sweeps</code> differ, PICurv uses the larger value and logs a warning.</p>
+<p>MG level numbering follows PETSc/PICurv convention: <code>level_0</code> is the coarsest grid. Larger level numbers are progressively finer. The default MG level preconditioner is block Jacobi (<code>bjacobi</code>) when not specified. Each smoothed level runs <code>pre_sweeps</code> iterations before the coarse-grid correction and <code>post_sweeps</code> after it. When the two counts differ, the post-smoother is a separate PETSc solver: it starts as a copy of the configured pre-smoother (method, preconditioner, tolerances) and reads any further options under <code>-ps_mg_levels_N_up_</code>. A per-level <code>max_it</code> in <code>level_solvers</code> sets the pre-smoother's count only; the post-smoother keeps <code>post_sweeps</code> unless <code>-ps_mg_levels_N_up_ksp_max_it</code> is passed through. Equal counts keep one shared smoother.</p>
 <p>Common MG-level preconditioner notes:</p>
 <ul>
 <li><code>jacobi</code> and <code>sor</code> are simple smoother PCs. SOR can use <code>-ps_mg_levels_N_pc_sor_omega &lt;positive-real&gt;</code> through passthrough when needed.</li>
@@ -293,14 +295,16 @@ Multigrid depth is bounded by the MPI decomposition</h2>
 <p>Reducing <code>levels</code> is the usual fix; also delete the now-unused <code>level_solvers.level_N</code> entry for the level that no longer exists. Shallower hierarchies converge more slowly but stay usable. Measure the cost in <code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_0.log</code>: if iteration counts grow sharply, prefer lowering the rank count and restoring the deeper hierarchy.</p>
 <h1><a class="anchor" id="p25_testing_sec"></a>
 5. Current test status</h1>
-<p>Current direct tests are strongest for helper and invariant behavior:</p>
+<p><code>make unit-poisson-rhs</code> covers the module directly:</p>
 <ul>
-<li><code>PoissonLHSNew</code></li>
-<li><code>Projection</code></li>
-<li><code>PoissonNullSpaceFunction</code></li>
-<li>RHS-related helpers used by <code>ComputeRHS</code></li>
+<li><code>operator-and-projection-share-one-face-gradient</code> fills every face metric with random, non-orthogonal values, places a solid cell, projects a zero flux with a random <code>Phi</code>, and requires the right-hand side of the result to equal <code>-A Phi</code> on every fluid row to 1e-12. That identity holds for arbitrary metrics only if the operator and the projection use the same face gradient, including its one-sided forms.</li>
+<li><code>poisson-solver-multigrid-projects-to-divergence-free</code> perturbs interior face fluxes on a 17-cubed three-level hierarchy, solves and projects, and checks the result is divergence-free.</li>
+<li><code>poisson-solver-multigrid-reuses-its-solver</code> checks that a second step reuses the same solver and operator, converges, and adds one header to the convergence log.</li>
+<li><code>poisson-solver-multigrid-honours-distinct-sweeps</code> checks the separate pre- and post-smoothing counts.</li>
+<li><code>poisson-null-space-removes-the-interior-mean</code> exercises the attached null space.</li>
+<li><code>poisson-solver-multigrid-refuses-an-overcoarsened-hierarchy</code> checks that a hierarchy coarsened past what a 9-cubed grid supports stops with the fatal Poisson error rather than projecting on an unsolved <code>Phi</code>.</li>
 </ul>
-<p><code>PoissonSolver_MG</code> has direct coverage in <code>make unit-poisson-rhs</code>: <code>poisson-solver-mg-projects-to-divergence-free</code> perturbs interior face fluxes on a 17-cubed three-level hierarchy, solves and projects, and checks the result is divergence-free; <code>poisson-solver-mg-refuses-an-overcoarsened-hierarchy</code> checks that a hierarchy coarsened past what a 9-cubed grid supports stops with the fatal Poisson error rather than projecting on an unsolved <code>Phi</code>. Periodic stencil branches remain thinner than the core Cartesian helper surface.</p>
+<p>The periodic stencil branches are exercised end to end rather than by a unit test.</p>
 <p>Every user-selectable option was run end to end by <code>poisson-options-2026-09-21</code>: one and two levels, full coarsening, one and three sweeps, Chebyshev and Jacobi smoothers, a Krylov coarse solve, a per-level iteration cap, and <code>cg</code> each reproduced the baseline velocity to 7e-15 and gauge-free pressure to 8e-14. The same measurement found <code>gmres</code>, <code>lgmres</code> and <code>bcgs</code> converging their Krylov residual to 1e-12 while the true residual stalled near 1e-3, with left or right preconditioning; those methods are now refused (see <a class="el" href="25_Pressure_Poisson_GMRES_Multigrid.html#p25_config_sec">3. YAML Mapping and PETSc Options</a>), and the per-level <code>max_it</code>, <code>rtol</code> and <code>atol</code> keys, which were emitted without PETSc's <code>ksp_</code> prefix and silently ignored, now reach the level solvers.</p>
 <p>End to end, <code>make smoke-driven-periodic</code> asserts at 4 and 10 ranks that the multigrid coarse solve keeps tracked and true residuals within 1e-4 of each other until both fall below 1e-10 of the step's initial residual (below that the two drift apart in round-off even with an exact coarse solve; a row whose true residual stays high is always compared) and the maximum divergence below 1e-11. Its 32^3 Cartesian fixture does not reproduce the Krylov-<code>level_0</code> failure above: there the outer FGMRES tolerates even a coarse solve truncated at two iterations, so the check guards the working configuration rather than detecting that defect. The recorded measurement <code>duct-poiseuille-picard-2026-09-18</code> (see <a class="el" href="66_Evidence_Matrix.html">Capability Evidence Matrix</a>) reproduced the analytic axial pressure gradient of laminar square-duct flow at second order on three grids, with divergence at most 5.5e-8.</p>
 <h1><a class="anchor" id="p25_refs_sec"></a>
