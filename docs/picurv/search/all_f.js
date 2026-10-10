@@ -156,7 +156,7 @@ var searchData=
   ['differencemaxrank_153',['DifferenceMaxRank',['../test__momentum__newton__boundary__fixedpoint_8c.html#ad241f3346e44e83d8d7ecddb309c7bfb',1,'test_momentum_newton_boundary_fixedpoint.c']]],
   ['differences_20from_20dual_20time_20picard_20ndash_20jameson_154',['11. Differences from Dual-Time Picard&amp;ndash;Jameson',['../55_Newton_Krylov_Momentum_Solver.html#p55_vs_jameson_sec',1,'']]],
   ['different_20questions_155',['8.1 Three Different Questions',['../52_Run_Artifact_Lifecycle_Contract.html#p52_compat_axes_sub',1,'']]],
-  ['diffusivity_156',['diffusivity',['../namespacepicurv__cli_1_1core.html#ae9e158877609609a8d74b9c0f70c6ae3',1,'picurv_cli.core.DIFFUSIVITY'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity'],['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity']]],
+  ['diffusivity_156',['diffusivity',['../namespacepicurv__cli_1_1core.html#ae9e158877609609a8d74b9c0f70c6ae3',1,'picurv_cli.core.DIFFUSIVITY'],['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity']]],
   ['diffusivitygradient_157',['diffusivitygradient',['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient'],['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient']]],
   ['digest_5ffiles_158',['digest_files',['../namespacegenerate__xref__index.html#a04408090c016e5606855fc90e9f13232',1,'generate_xref_index']]],
   ['digest_5fof_159',['digest_of',['../namespaceaudit__freshness.html#a6b069ae48f6b3b5aba06923c9e0c8e91',1,'audit_freshness']]],

@@ -36,7 +36,7 @@ var searchData=
   ['diagnostics_5fenabled_33',['diagnostics_enabled',['../variables_8h.html#ab07f7859f7e6f23dc7f236b0bff84bfd',1,'LESConfig']]],
   ['diagnostics_5fpetsc_5fkeys_34',['DIAGNOSTICS_PETSC_KEYS',['../namespacepicurv__cli_1_1core.html#a0b179ea52a1d7283ec4b9e6ef8e4dbbc',1,'picurv_cli::core']]],
   ['diff_35',['diff',['../poisson_8c.html#a308e5e7368413b3ff71b3f9e3f813a47',1,'PoissonFaceGradient']]],
-  ['diffusivity_36',['diffusivity',['../namespacepicurv__cli_1_1core.html#ae9e158877609609a8d74b9c0f70c6ae3',1,'picurv_cli.core.DIFFUSIVITY'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity'],['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity']]],
+  ['diffusivity_36',['diffusivity',['../namespacepicurv__cli_1_1core.html#ae9e158877609609a8d74b9c0f70c6ae3',1,'picurv_cli.core.DIFFUSIVITY'],['../variables_8h.html#ac70620645fa7e26cccaf59e7b8a97b4b',1,'Particle::diffusivity'],['../variables_8h.html#ac99944ab7ac8e80b684db6dfa013f2a2',1,'UserCtx::Diffusivity']]],
   ['diffusivitygradient_37',['diffusivitygradient',['../variables_8h.html#a4ef8690e95723ae9f4cda687d2d778c8',1,'Particle::diffusivitygradient'],['../variables_8h.html#a637ef784f87facca3a5c449eb6239d7f',1,'UserCtx::DiffusivityGradient']]],
   ['dimension_38',['dimension',['../particle__field__catalog_8h.html#acfc572a951b8ba2fd9635e9c0eda43ab',1,'ParticleFieldDescriptor::dimension'],['../field__catalog_8h.html#ac8188935637c8263b46caddcc92bda46',1,'FieldDescriptor::dimension']]],
   ['dimension_5fre_39',['DIMENSION_RE',['../namespaceaudit__units.html#ad9f6a18769ec48893be12c99717ffc90',1,'audit_units']]],
