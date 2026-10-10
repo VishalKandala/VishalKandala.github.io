@@ -6,7 +6,7 @@ var searchData=
   ['eb0478d_20nk_20pointblock_20supported_3',['eb0478d-nk-pointblock-supported',['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'']]],
   ['ec403bc_20resampled_20velocity_4',['ec403bc-resampled-velocity',['../md_docs_2changelog_8d_2ec403bc-resampled-velocity.html',1,'']]],
   ['errors_20and_20fixes_5',['Common Fatal Errors and Fixes',['../39_Common_Fatal_Errors.html',1,'']]],
-  ['evidence_6',['evidence',['../md_docs_2changelog_8d_251bd14f-wall-function-evidence.html',1,'51bd14f-wall-function-evidence'],['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'a13f165-newton-krylov-channel-evidence']]],
+  ['evidence_6',['evidence',['../md_docs_2changelog_8d_251bd14f-wall-function-evidence.html',1,'51bd14f-wall-function-evidence'],['../md_docs_2changelog_8d_261b3c82-poisson-evidence.html',1,'61b3c82-poisson-evidence'],['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'a13f165-newton-krylov-channel-evidence']]],
   ['evidence_20matrix_7',['Capability Evidence Matrix',['../66_Evidence_Matrix.html',1,'']]],
   ['example_20catalog_8',['Example Catalog',['../65_Example_Catalog.html',1,'']]],
   ['example_20config_20refresh_9',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
