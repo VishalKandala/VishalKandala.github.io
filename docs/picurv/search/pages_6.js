@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['7d08e19_20hom02_20poisson_20rewrite_0',['7d08e19-hom02-poisson-rewrite',['../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html',1,'']]]
-];
+var searchData=[["7d08e19_20hom02_20poisson_20rewrite_0",["7d08e19-hom02-poisson-rewrite",["../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html",1,""]]]];

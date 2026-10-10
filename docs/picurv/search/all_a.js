@@ -1,5 +1,1 @@
-var searchData=
-[
-  ['_3a_20additional_20checks_0',['8. &lt;tt&gt;validate --strict&lt;/tt&gt;: Additional Checks',['../05_The_Conductor_Script.html#p05_strict_validate_sec',1,'']]],
-  ['_3a_20the_20l_5finf_20norm_20of_20the_20total_20residual_20rhs_1',['resid_norm        : The L_inf norm of the Total Residual (RHS).',['../momentumsolvers_8h.html#autotoc_md4',1,'']]]
-];
+var searchData=[["_3a_20additional_20checks_0",["8. &lt;tt&gt;validate --strict&lt;/tt&gt;: Additional Checks",["../05_The_Conductor_Script.html#p05_strict_validate_sec",1,""]]],["_3a_20the_20l_5finf_20norm_20of_20the_20total_20residual_20rhs_1",["resid_norm        : The L_inf norm of the Total Residual (RHS).",["../momentumsolvers_8h.html#autotoc_md4",1,""]]]];
