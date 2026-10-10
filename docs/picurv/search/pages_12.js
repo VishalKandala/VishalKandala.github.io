@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['krylov_20channel_20evidence_0',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
-  ['krylov_20momentum_20solver_1',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
+  ['jameson_20rk_20momentum_20solver_0',['Dual-Time Picard Jameson RK Momentum Solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'']]]
 ];

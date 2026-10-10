@@ -1,9 +1,13 @@
 var searchData=
 [
-  ['observability_20specification_0',['Function Identity and Observability Specification',['../59_Function_Identity_and_Observability_Specification.html',1,'']]],
-  ['of_20a_20simulation_1',['Anatomy of a Simulation',['../06_Simulation_Anatomy.html',1,'']]],
-  ['option_20matrix_2',['998a037-poisson-option-matrix',['../md_docs_2changelog_8d_2998a037-poisson-option-matrix.html',1,'']]],
-  ['output_3',['0c7b543-init-runs-dir-iem-raw-output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'']]],
-  ['overview_4',['overview',['../22_CURVIB_Method.html',1,'CurvIB Method Overview'],['../21_Methods_Overview.html',1,'Methods and Models Overview'],['../34_Particle_Model_Overview.html',1,'Particle Model and Coupling Overview']]],
-  ['own_20cell_20mean_5',['6507b4b-iem-own-cell-mean',['../md_docs_2changelog_8d_26507b4b-iem-own-cell-mean.html',1,'']]]
+  ['navigation_20and_20directory_20guides_0',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],
+  ['ndash_20krylov_20momentum_20solver_1',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]],
+  ['newton_20krylov_20channel_20evidence_2',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
+  ['newton_20ndash_20krylov_20momentum_20solver_3',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]],
+  ['nk_20fragment_20leading_20blank_4',['c0b46a8-doxygen-nk-fragment-leading-blank',['../md_docs_2changelog_8d_2c0b46a8-doxygen-nk-fragment-leading-blank.html',1,'']]],
+  ['nk_20history_20two_20logs_5',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
+  ['nk_20pointblock_20supported_6',['eb0478d-nk-pointblock-supported',['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'']]],
+  ['nk_20pointblock_20transpose_7',['1d90f08-nk-pointblock-transpose',['../md_docs_2changelog_8d_21d90f08-nk-pointblock-transpose.html',1,'']]],
+  ['non_20dimensionalization_8',['Units and Non-Dimensionalization',['../19_Nondimensionalization.html',1,'']]],
+  ['normal_20profile_20tool_9',['c35c008-wall-normal-profile-tool',['../md_docs_2changelog_8d_2c35c008-wall-normal-profile-tool.html',1,'']]]
 ];
