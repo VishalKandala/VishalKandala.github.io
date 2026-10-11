@@ -164,7 +164,7 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <li>optionally, a separately assembled AIJ preconditioning matrix contains the frozen-momentum point blocks; its validated internal PETSc backend is <code>PCPBJACOBI</code>.</li>
 </ul>
 <p>Because the Jacobian action is a finite difference of the residual, the residual <b>must be a deterministic function of the trial vector</b> <code>X</code> (see <a class="el" href="55_Newton_Krylov_Momentum_Solver.html#p55_seed_sec">5. Deterministic Cartesian Seeding (Why It Is Required)</a>). GMRES uses PETSc's default classical Gram&ndash;Schmidt orthogonalization; modified Gram&ndash;Schmidt is <b>not</b> required and is not enabled.</p>
-<p>The Newton loop is: evaluate <code>F(X)</code> → form Krylov solve of <code>J dX = -F</code> → line search along <code>dX</code> → repeat until an <code>SNES</code> convergence test fires. On convergence the solution is committed into <code>Ucont</code>; on failure the entry state is restored (rollback) and the physical step is reported as not converged (<code>simCtx-&gt;mom_last_converged</code>).</p>
+<p>The Newton loop is: evaluate <code>F(X)</code> → form Krylov solve of <code>J dX = -F</code> → line search along <code>dX</code> → repeat until an <code>SNES</code> convergence test fires. On convergence the solution is committed into <code>Ucont</code>. When <code>SNES</code> fails, the residual is recomputed at the iterate it holds. That iterate is still committed if it meets the dual-time solver's dimensionless test (step converged), or if its <code>|R|_2</code> is finite and no larger than at entry (step not converged, <code>simCtx-&gt;mom_last_converged</code> false, run continues with a warning). Otherwise the entry state is restored (rollback) and the solve returns <code>PETSC_ERR_CONV_FAILED</code>, which stops the run. This is the policy shared with the dual-time solver; see <a class="el" href="31_Momentum_Solvers.html#p31_nonconvergence_sec">3a. When a Momentum Solve Does Not Converge</a>.</p>
 <h1><a class="anchor" id="p55_residual_sec"></a>
 4. Residual Evaluation and Boundary Application</h1>
 <p>One residual evaluation (<a class="el" href="momentum__newton__krylov_8c.html#ad4d70d3fdc2914eea7a69d760dd6f975">MomentumNewtonKrylov_FormResidual</a>) performs, in order:</p>
@@ -262,7 +262,7 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <ul>
 <li><code>Momentum_Solver_Newton_Krylov_History_Block_&lt;b&gt;.log</code>: one row per Newton iteration (<code>step | block | newton | nonlinear_norm</code>);</li>
 <li><code>Momentum_Solver_Newton_Krylov_Linear_History_Block_&lt;b&gt;.log</code>: one row per KSP iteration (<code>step | block | newton | krylov | requested_rtol | reported_residual_norm</code>), including the effective tolerance after any EW update;</li>
-<li><code>Momentum_Solver_Newton_Krylov_Summary_Block_&lt;b&gt;.log</code>: one row per physical step (the mathematical Jacobian and preconditioner selections, <code>SNES reason</code>, Newton iterations, residual evaluations, Krylov iterations, initial/final norm, and whether the result was committed or rolled back).</li>
+<li><code>Momentum_Solver_Newton_Krylov_Summary_Block_&lt;b&gt;.log</code>: one row per physical step (the mathematical Jacobian and preconditioner selections, <code>SNES reason</code>, Newton iterations, residual evaluations, Krylov iterations, initial/final norm, and <code>state</code>: <code>committed</code>, <code>committed_unconverged</code>, or <code>rolled_back</code>).</li>
 </ul>
 <p>A healthy solve on the validated duct case shows the nonlinear norm dropping by several orders of magnitude in about two Newton iterations with accepted line search <code>lambda = 1</code>.</p>
 <h1><a class="anchor" id="p55_reasons_sec"></a>
@@ -272,7 +272,7 @@ F(\mathbf{U}) \;=\; -\,\mathrm{RHS}_{\text{spatial}}(\mathbf{U})
 <li>**<code>CONVERGED_FNORM_ABS</code> / <code>CONVERGED_FNORM_RELATIVE</code>**: success (absolute or relative nonlinear tolerance met).</li>
 <li>**<code>DIVERGED_MAX_IT</code>**: hit <code>snes_max_it</code> without meeting a tolerance — usually under-resolved inner solves or too tight a nonlinear tolerance for the timestep; loosen <code>nonlinear_solver.relative_tolerance</code> or reduce <code>dt</code>.</li>
 <li>**<code>DIVERGED_LINEAR_SOLVE</code>**: an inner GMRES solve failed to converge — inspect <code>ksp_converged_reason</code>; raise <code>linear_solver.max_iterations</code> or <code>gmres.restart</code>, or loosen <code>linear_solver.relative_tolerance</code>.</li>
-<li>**<code>DIVERGED_LINE_SEARCH</code>**: the backtracking line search could not find a sufficient decrease — typically a poor Newton direction. In this solver that most often means the residual was <b>not deterministic</b> (a broken Cartesian seed, Section 5); it should not occur with the shipped residual.</li>
+<li>**<code>DIVERGED_LINE_SEARCH</code>**: the backtracking line search could not find a sufficient decrease. Two causes are known. At a steady or slowly varying state the residual can already sit at the round-off floor of its own evaluation, so no step decreases it; the iterate is then committed as not converged (Section 3) and the run continues. Observed on a 33² swept-circle laminar pipe at <code>dt = 0.5</code>, steady to 1e-10 per step: <code>|R|_inf = 2.7e-9</code>, or 1.4e-7 of <code>a0 |U|_inf / dt</code>. A failure away from a steady state, or with non-repeatable nonlinear norms, instead points to a residual that is <b>not deterministic</b> (a broken Cartesian seed, Section 5).</li>
 <li><b>GMRES breakdown / slow Krylov convergence</b>: a stagnating or breaking-down inner solve. With a pure residual the default classical Gram&ndash;Schmidt is sufficient; enabling modified Gram&ndash;Schmidt is <b>not</b> the intended remedy.</li>
 <li><b>Nonlinear stagnation</b>: the nonlinear norm plateaus above tolerance — often a physically stiff step; reduce <code>dt</code>.</li>
 </ul>
@@ -379,7 +379,9 @@ frozen_momentum_jacobian</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Maturity   </td><td class="markdownTableBodyNone">newer, narrow validated scope (Section 1)   </td><td class="markdownTableBodyNone">established, broadly exercised    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Failure surface   </td><td class="markdownTableBodyNone">SNES/KSP convergence reasons   </td><td class="markdownTableBodyNone">pseudo-CFL rollback / rejection   </td></tr>
+<td class="markdownTableBodyNone">Failure surface   </td><td class="markdownTableBodyNone">SNES/KSP convergence reasons   </td><td class="markdownTableBodyNone">pseudo-CFL rollback / rejection    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Unconverged step   </td><td class="markdownTableBodyNone">commit if residual fell, else stop (<a class="el" href="31_Momentum_Solvers.html#p31_nonconvergence_sec">3a. When a Momentum Solve Does Not Converge</a>)   </td><td class="markdownTableBodyNone">commit last accepted state (<a class="el" href="31_Momentum_Solvers.html#p31_nonconvergence_sec">3a. When a Momentum Solve Does Not Converge</a>)   </td></tr>
 </table>
 <p>See <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html">Dual-Time Picard Jameson RK Momentum Solver</a> for the Picard&ndash;Jameson solver and <a class="el" href="31_Momentum_Solvers.html">Momentum Solver Implementations</a> for selection guidance.</p>
 <h1><a class="anchor" id="p55_refs_sec"></a>
