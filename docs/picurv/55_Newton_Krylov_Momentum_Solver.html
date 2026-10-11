@@ -107,6 +107,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </li>
 <li class="level1"><a href="#p55_validation_sec">10. Validation Coverage</a><ul><li class="level2"><a href="#p55_bend_evidence_sub">10.1 Retained laminar curved-duct campaign (2026-10-07)</a></li>
 <li class="level2"><a href="#p55_channel_evidence_sub">10.2 Retained turbulent-channel campaign (2026-09-29)</a></li>
+<li class="level2"><a href="#p55_pipe_evidence_sub">10.3 Hagen-Poiseuille refinement on the swept circle (2026-10-10)</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p55_vs_jameson_sec">11. Differences from Dual-Time Picard&ndash;Jameson</a></li>
@@ -318,7 +319,7 @@ frozen_momentum_jacobian</h2>
 <p><b>Limitations.</b> Supported for correct execution within the solver's declared scope; <b>no performance claim is made</b>, because no run compared it against <code>none</code> on the same case. It costs an extra assembled matrix in memory and an assembly per update, and the omitted terms make it a same-cell approximation rather than an approximate Jacobian in any global sense. Its quality falls as the discarded neighbour coupling grows relative to the mass term, so expect rising Krylov counts at large timesteps and on wall-resolved, high-Reynolds-number grids, where the near-wall diffusion number approaches one. The production evidence is a laminar, steady, low-Reynolds case and a wall-modelled LES at Re_D = 40,000 whose first cell sits at y+ ~ 36; a wall-resolved high-Reynolds grid, where the near-wall diffusion number reaches order one, remains untested with the current implementation.</p>
 <h1><a class="anchor" id="p55_validation_sec"></a>
 10. Validation Coverage</h1>
-<p>The Newton&ndash;Krylov path has two regression levels and the two retained production measurements below:</p>
+<p>The Newton&ndash;Krylov path has two regression levels, the two retained production measurements, and the analytical refinement study below:</p>
 <ul>
 <li><b>Default suite</b> (<code>unit-newton-krylov</code>, part of <code>make check</code>): constraint-row Jacobian structure, matrix-free vs direct differencing, preconditioning-engine model/backend/ownership wiring, small solve/rollback, and residual repeatability. The conservation-outlet conditioned-row derivative test doubles as a <b>seed-removal detector</b>: removing the deterministic Cartesian seed makes that row's self-derivative revert to the decoupled artifact and the test fails.</li>
 <li><b>Opt-in integration regression</b> (<code>make unit-momentum-newton-boundary-fixedpoint</code>, one and four ranks): on the production-sized straight duct it advances a real physical step 1, then verifies (i) residual purity at the step-2 state (immediate and after real MFFD products), (ii) a complete step-2 solve with the default classical Gram&ndash;Schmidt, (iii) that the converged three-pass solution also zeros the 24-pass outlet residual, and (iv) clean pressure projection.</li>
@@ -365,6 +366,10 @@ frozen_momentum_jacobian</h2>
 <td class="markdownTableBodyNone"><code>workspace.asset_lifecycle</code>   </td><td class="markdownTableBodyNone">Remains experimental: manifest records content-addressed grid/IC materialization through hardlinks; cluster import modes, campaign-scale reuse, reflinks, and remote-backed pruning were not checked   </td></tr>
 </table>
 <p>Statistics, spectra, initial-condition generation, periodic forcing, and restart already have supported records. Asset materialization through hardlinks does not establish that the selectable <code>workspace.input_import_mode: hardlink</code> operation was invoked. The frozen-Jacobian preconditioner, LES, wall functions, storage operations, and parameter sweeps were not exercised by this campaign. No refinement study, solver-strategy comparison, parallel scaling measurement, or fully converged DNS validation is claimed.</p>
+<h2><a class="anchor" id="p55_pipe_evidence_sub"></a>
+10.3 Hagen-Poiseuille refinement on the swept circle (2026-10-10)</h2>
+<p><code>tests/tooling/measurement_records.json</code>, record <code>pipe-poiseuille-nk-three-grid-2026-10-10</code>, is the durable source. Laminar flow at <code>nu = 0.1</code> through the square-to-disc circle section, 9, 17 and 33 cells across, periodic <code>initial_flux</code> along a straight path, <code>dt = 0.5</code> for 120 steps, with the frozen point-block preconditioner, ran at commit <code>46eaa7f</code>. Against the exact profile <code>2 U_b (1 - r^2)</code> the area-weighted relative RMS error was 1.81e-2, 5.08e-3 and 1.31e-3, observed order 2.00 then 2.04. The worst non-orthogonality of this section is about 80 degrees.</p>
+<p>The 33-cell run is also the case that exposed the failure policy in Section 3: at step 69, steady to 1e-10 per step, the line search failed at a residual of 1.4e-7 of <code>a0 |U|_inf / dt</code>. That step is now committed as not converged, and the other 119 converged. The dual-time solver did not converge at 33 cells and this <code>dt</code>; see <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html#p24_limits_sec">8. Limitations</a>.</p>
 <h1><a class="anchor" id="p55_vs_jameson_sec"></a>
 11. Differences from Dual-Time Picard–Jameson</h1>
 <table class="markdownTable">
