@@ -1,5 +1,1 @@
-var searchData=
-[
-  ['951870f_20physical_20units_20rule_0',['951870f-physical-units-rule',['../md_docs_2changelog_8d_2951870f-physical-units-rule.html',1,'']]],
-  ['998a037_20poisson_20option_20matrix_1',['998a037-poisson-option-matrix',['../md_docs_2changelog_8d_2998a037-poisson-option-matrix.html',1,'']]]
-];
+var searchData=[["951870f_20physical_20units_20rule_0",["951870f-physical-units-rule",["../md_docs_2changelog_8d_2951870f-physical-units-rule.html",1,""]]],["998a037_20poisson_20option_20matrix_1",["998a037-poisson-option-matrix",["../md_docs_2changelog_8d_2998a037-poisson-option-matrix.html",1,""]]]];

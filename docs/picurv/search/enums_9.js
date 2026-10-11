@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['residualstage_0',['ResidualStage',['../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93',1,'test_momentum_convective_candidates.c']]]
-];
+var searchData=[["residualstage_0",["ResidualStage",["../test__momentum__convective__candidates_8c.html#a14638f60a032d6f03016aaddcb6cba93",1,"test_momentum_convective_candidates.c"]]]];

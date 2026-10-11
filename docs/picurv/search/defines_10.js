@@ -1,8 +1,1 @@
-var searchData=
-[
-  ['solution_5fconvergence_5ffluid_5fthreshold_0',['SOLUTION_CONVERGENCE_FLUID_THRESHOLD',['../logging_8c.html#ae6eadb506319ea4c37731af0466aa88b',1,'logging.c']]],
-  ['solution_5fconvergence_5frel_5feps_1',['SOLUTION_CONVERGENCE_REL_EPS',['../logging_8c.html#a6c613589e746429c68e6766dc4fa7883',1,'logging.c']]],
-  ['statistics_5fderived_5foutput_5flength_2',['STATISTICS_DERIVED_OUTPUT_LENGTH',['../statistics__accumulator_8c.html#a14cd345b801901de6a56114a825f4692',1,'statistics_accumulator.c']]],
-  ['statistics_5foption_5fname_5flength_3',['STATISTICS_OPTION_NAME_LENGTH',['../statistics__config_8c.html#a36f3aef1ca3f0adb9264909254c23802',1,'statistics_config.c']]],
-  ['statistics_5foption_5fvalue_5flength_4',['STATISTICS_OPTION_VALUE_LENGTH',['../statistics__config_8c.html#a399083e75395b9c89ae4a77ea20d808c',1,'statistics_config.c']]]
-];
+var searchData=[["solution_5fconvergence_5ffluid_5fthreshold_0",["SOLUTION_CONVERGENCE_FLUID_THRESHOLD",["../logging_8c.html#ae6eadb506319ea4c37731af0466aa88b",1,"logging.c"]]],["solution_5fconvergence_5frel_5feps_1",["SOLUTION_CONVERGENCE_REL_EPS",["../logging_8c.html#a6c613589e746429c68e6766dc4fa7883",1,"logging.c"]]],["statistics_5fderived_5foutput_5flength_2",["STATISTICS_DERIVED_OUTPUT_LENGTH",["../statistics__accumulator_8c.html#a14cd345b801901de6a56114a825f4692",1,"statistics_accumulator.c"]]],["statistics_5foption_5fname_5flength_3",["STATISTICS_OPTION_NAME_LENGTH",["../statistics__config_8c.html#a36f3aef1ca3f0adb9264909254c23802",1,"statistics_config.c"]]],["statistics_5foption_5fvalue_5flength_4",["STATISTICS_OPTION_VALUE_LENGTH",["../statistics__config_8c.html#a399083e75395b9c89ae4a77ea20d808c",1,"statistics_config.c"]]]];
