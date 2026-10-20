@@ -45,6 +45,7 @@ var searchData=
   ['summary_42',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
   ['supported_43',['supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'46a0680-rans-removed-and-spectral-ics-supported'],['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'4831839-les-wall-function-supported'],['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'eb0478d-nk-pointblock-supported']]],
   ['swarm_20batch_20removal_44',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
-  ['sweep_20and_20study_20guide_45',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['symptom_46',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['swarm_20removal_20promoted_45',['9e5a634-swarm-removal-promoted',['../md_docs_2changelog_8d_29e5a634-swarm-removal-promoted.html',1,'']]],
+  ['sweep_20and_20study_20guide_46',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['symptom_47',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];
