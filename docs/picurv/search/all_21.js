@@ -127,7 +127,7 @@ var searchData=
   ['vreman_124',['vreman',['../72_LES_Turbulence_Closure.html#p72_coefficient_free_ssec',1,'5.2 Coefficient-Free Models: WALE and Vreman'],['../07_Case_Reference.html#p07_cap_les_vreman_sub',1,'vreman'],['../variables_8h.html#a02c34d525de10470f7953ff7c6d704e2a52921cb45f445c9b3ed0a770a8bcb5bc',1,'VREMAN:&#160;variables.h']]],
   ['vreman_5fcoefficient_125',['vreman_coefficient',['../variables_8h.html#acae0ed2ea586b2e5b7eab86efdd9882d',1,'LESConfig']]],
   ['vremaneddyviscosity_126',['vremaneddyviscosity',['../les_8h.html#afdf56b95d87a75ef5734f6c49cbfefaf',1,'VremanEddyViscosity(Cmpnts dudx, Cmpnts dvdx, Cmpnts dwdx, const Cmpnts edges[3], PetscReal coefficient):&#160;les.c'],['../les_8c.html#afdf56b95d87a75ef5734f6c49cbfefaf',1,'VremanEddyViscosity(Cmpnts dudx, Cmpnts dvdx, Cmpnts dwdx, const Cmpnts edges[3], PetscReal coefficient):&#160;les.c']]],
-  ['vs_20latent_20options_127',['8. Exposed vs Latent Options',['../44_Boundary_Conditions_Guide.html#p44_c_gap_sec',1,'']]],
+  ['vs_20latent_20options_127',['9. Exposed vs Latent Options',['../44_Boundary_Conditions_Guide.html#p44_c_gap_sec',1,'']]],
   ['vs_20true_20residual_20divergence_128',['Diagnosing tracked-vs-true residual divergence',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md29',1,'']]],
   ['vtk_5fio_2ec_129',['vtk_io.c',['../vtk__io_8c.html',1,'']]],
   ['vtk_5fio_2eh_130',['vtk_io.h',['../vtk__io_8h.html',1,'']]],

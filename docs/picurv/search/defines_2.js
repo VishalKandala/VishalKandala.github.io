@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bbox_5ftolerance_0',['BBOX_TOLERANCE',['../grid_8c.html#a0fecd69049f6a1716f0f0b8fd5a88c68',1,'grid.c']]]
+  ['bbox_5ftolerance_0',['BBOX_TOLERANCE',['../grid_8c.html#a0fecd69049f6a1716f0f0b8fd5a88c68',1,'grid.c']]],
+  ['blocked_5fwalk_5fguard_5fcells_1',['BLOCKED_WALK_GUARD_CELLS',['../walkingsearch_8c.html#a26b215c76f99755dec01ef8ab92600a3',1,'walkingsearch.c']]]
 ];

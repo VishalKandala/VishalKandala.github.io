@@ -14,9 +14,10 @@ var searchData=
   ['example_20config_20refresh_11',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
   ['executable_20pinning_12',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
   ['execution_20map_13',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
-  ['extensibility_20guide_14',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
-  ['extension_20framework_15',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
-  ['extension_20guide_16',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
-  ['extension_20playbook_17',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
-  ['extensions_18',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]]
+  ['exited_20status_20settlement_14',['72ad71b-exited-status-settlement',['../md_docs_2changelog_8d_272ad71b-exited-status-settlement.html',1,'']]],
+  ['extensibility_20guide_15',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
+  ['extension_20framework_16',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
+  ['extension_20guide_17',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
+  ['extension_20playbook_18',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
+  ['extensions_19',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]]
 ];
