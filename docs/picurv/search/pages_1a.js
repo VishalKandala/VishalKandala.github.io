@@ -13,7 +13,7 @@ var searchData=
   ['reflection_10',['015c281-particle-wall-reflection',['../md_docs_2changelog_8d_2015c281-particle-wall-reflection.html',1,'']]],
   ['refresh_11',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
   ['removal_12',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
-  ['removal_20promoted_13',['9e5a634-swarm-removal-promoted',['../md_docs_2changelog_8d_29e5a634-swarm-removal-promoted.html',1,'']]],
+  ['removal_20promoted_13',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
   ['removed_20and_20spectral_20ics_20supported_14',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]],
   ['renames_15',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
   ['repository_20navigation_20and_20directory_20guides_16',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],

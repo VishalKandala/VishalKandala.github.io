@@ -216,5 +216,7 @@ var searchData=
   ['1d90f08_20nk_20pointblock_20transpose_213',['1d90f08-nk-pointblock-transpose',['../md_docs_2changelog_8d_21d90f08-nk-pointblock-transpose.html',1,'']]],
   ['1d90f08_2dnk_2dpointblock_2dtranspose_2emd_214',['1d90f08-nk-pointblock-transpose.md',['../1d90f08-nk-pointblock-transpose_8md.html',1,'']]],
   ['1edd226_20driven_20flow_20log_215',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
-  ['1edd226_2ddriven_2dflow_2dlog_2emd_216',['1edd226-driven-flow-log.md',['../1edd226-driven-flow-log_8md.html',1,'']]]
+  ['1edd226_2ddriven_2dflow_2dlog_2emd_216',['1edd226-driven-flow-log.md',['../1edd226-driven-flow-log_8md.html',1,'']]],
+  ['1f58998_20swarm_20removal_20promoted_217',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['1f58998_2dswarm_2dremoval_2dpromoted_2emd_218',['1f58998-swarm-removal-promoted.md',['../1f58998-swarm-removal-promoted_8md.html',1,'']]]
 ];
