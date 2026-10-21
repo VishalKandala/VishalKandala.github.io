@@ -49,7 +49,7 @@ var searchData=
   ['5_20driven_20flux_20targets_20across_20segments_46',['8.5 Driven-Flux Targets Across Segments',['../52_Run_Artifact_Lifecycle_Contract.html#p52_compat_flux_sub',1,'']]],
   ['5_20driven_20periodic_20flows_47',['5. Driven Periodic Flows',['../p54_geometric_periodic.html#p54_driven_sec',1,'']]],
   ['5_20early_20step_20settlement_20and_20coupling_48',['5. Early-Step Settlement and Coupling',['../45_Particle_Initialization_and_Restart.html#p45_settle_sec',1,'']]],
-  ['5_20effective_20computational_20domain_20and_20resolution_49',['5. Effective Computational Domain and Resolution',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md17',1,'']]],
+  ['5_20effective_20computational_20domain_20and_20resolution_49',['5. Effective Computational Domain and Resolution',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md18',1,'']]],
   ['5_20fixture_20helpers_50',['5. Fixture Helpers',['../51_C_Test_Suite_Developer_Guide.html#p51_fixtures_sec',1,'']]],
   ['5_20how_20the_20contract_20is_20enforced_51',['5. How the Contract Is Enforced',['../63_Page_Type_Contract.html#p63_enforcement_sec',1,'']]],
   ['5_20how_20to_20read_20these_20pages_52',['5. How To Read These Pages',['../21_Methods_Overview.html#p21_usage_sec',1,'']]],

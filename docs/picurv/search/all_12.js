@@ -179,7 +179,7 @@ var searchData=
   ['grid_20scattering_176',['Particle-to-Grid Scattering',['../group__scatter__module.html',1,'']]],
   ['grid_20search_20robustness_177',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
   ['grid_20selector_20generator_20selector_178',['9. Grid Selector / Generator Selector',['../50_Modular_Selector_Extension_Guide.html#p50_grid_sec',1,'']]],
-  ['grid_20size_179',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md26',1,'']]],
+  ['grid_20size_179',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md27',1,'']]],
   ['grid_20workflow_20extensions_180',['2. Grid Workflow Extensions',['../17_Workflow_Extensibility.html#p17_grid_sec',1,'']]],
   ['grid_2ec_181',['grid.c',['../grid_8c.html',1,'']]],
   ['grid_2eh_182',['grid.h',['../grid_8h.html',1,'']]],

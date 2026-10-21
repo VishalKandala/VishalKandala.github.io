@@ -10,7 +10,7 @@ var searchData=
   ['b971bf5_20iem_20current_20mean_7',['b971bf5-iem-current-mean',['../md_docs_2changelog_8d_2b971bf5-iem-current-mean.html',1,'']]],
   ['b971bf5_2diem_2dcurrent_2dmean_2emd_8',['b971bf5-iem-current-mean.md',['../b971bf5-iem-current-mean_8md.html',1,'']]],
   ['back_9',['BACK',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fac921ff2cfc571c1d19b0485d7f6926ee',1,'variables.h']]],
-  ['backlog_10',['backlog',['../40_Testing_and_Quality_Guide.html#p40_exhaustive_backlog_sec',1,'12. Exhaustive-Readiness Backlog'],['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'7. Runtime Observability Backlog'],['../md_tests_2guide.html#autotoc_md37',1,'Current targeted backlog']]],
+  ['backlog_10',['backlog',['../40_Testing_and_Quality_Guide.html#p40_exhaustive_backlog_sec',1,'12. Exhaustive-Readiness Backlog'],['../29_Maintenance_Backlog.html#p29_runtime_obs_sec',1,'7. Runtime Observability Backlog'],['../md_tests_2guide.html#autotoc_md38',1,'Current targeted backlog']]],
   ['backlog_20and_20low_20priority_20fixes_11',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],
   ['backscatter_12',['5. Limiting and Backscatter',['../72_LES_Turbulence_Closure.html#p72_clipping_sec',1,'']]],
   ['backscatter_5fvolume_13',['backscatter_volume',['../variables_8h.html#ae7db9f8d488236f81571adee716460c6',1,'LESDiagnosticsState']]],
@@ -76,7 +76,7 @@ var searchData=
   ['bctypetostring_73',['bctypetostring',['../logging_8c.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c'],['../logging_8h.html#aa28884cc21bbf93fee9f1b1a26dfed6a',1,'BCTypeToString(BCType type):&#160;logging.c']]],
   ['bdf438f_20inlet_20apply_20consolidation_74',['bdf438f-inlet-apply-consolidation',['../md_docs_2changelog_8d_2bdf438f-inlet-apply-consolidation.html',1,'']]],
   ['bdf438f_2dinlet_2dapply_2dconsolidation_2emd_75',['bdf438f-inlet-apply-consolidation.md',['../bdf438f-inlet-apply-consolidation_8md.html',1,'']]],
-  ['be_20a_20fixed_20linear_20operator_76',['The coarse solve must be a fixed linear operator',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md25',1,'']]],
+  ['be_20a_20fixed_20linear_20operator_76',['The coarse solve must be a fixed linear operator',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md26',1,'']]],
   ['be_20online_20and_20what_20must_20not_77',['1. What Must Be Online, And What Must Not',['../60_Field_Statistics_Planned_Extensions.html#p60_principle_sec',1,'']]],
   ['been_20verified_20on_20a_20cluster_78',['6. What Has Been Verified On A Cluster',['../36_Cluster_Run_Guide.html#p36_evidence_sec',1,'']]],
   ['before_20adding_20state_79',['6. Call Cadence of the Shared RHS (Read Before Adding State)',['../31_Momentum_Solvers.html#p31_rhs_cadence_sec',1,'']]],
@@ -152,7 +152,7 @@ var searchData=
   ['boundarysystem_5fvalidate_149',['boundarysystem_validate',['../Boundaries_8h.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a8f7f4c878e8af3f5d069b0083d989c3c',1,'BoundarySystem_Validate(UserCtx *user):&#160;Boundaries.c']]],
   ['boundaryvelocitycorrection_150',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
   ['bounded_151',['bounded',['../statistics__window_8h.html#abbbfbb9677ef438e4b3478f09c4a5731',1,'PicurvWindowDefinition']]],
-  ['bounded_20by_20the_20mpi_20decomposition_152',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md30',1,'']]],
+  ['bounded_20by_20the_20mpi_20decomposition_152',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md31',1,'']]],
   ['bounded_20probe_20histories_153',['14. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
   ['bounded_20spectral_20initial_20conditions_154',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]],
   ['bounded_20spectral_20seeds_155',['Wall-bounded spectral seeds',['../33_Initial_Conditions.html#p33_wall_spectral_sec',1,'']]],
@@ -219,9 +219,9 @@ var searchData=
   ['bvel_5fv_216',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
   ['bvel_5fw_217',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]],
   ['by_20a_20scalar_20field_218',['3.1. Recipe: Coloring by a Scalar Field',['../04_Visualization_Tutorial.html#p04_recipe_color_sec',1,'']]],
-  ['by_20coarse_20grid_20size_219',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md26',1,'']]],
+  ['by_20coarse_20grid_20size_219',['Choosing a coarse solver by coarse-grid size',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md27',1,'']]],
   ['by_20future_20work_220',['2. Rules Shared by Future Work',['../57_Future_Architecture_Specifications.html#p57_rules_sec',1,'']]],
   ['by_20run_20directory_221',['5c. cancel: Stop A Slurm Run By Run Directory',['../05_The_Conductor_Script.html#p05_cancel_sec',1,'']]],
   ['by_20symptom_222',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
-  ['by_20the_20mpi_20decomposition_223',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md30',1,'']]]
+  ['by_20the_20mpi_20decomposition_223',['Multigrid depth is bounded by the MPI decomposition',['../25_Pressure_Poisson_GMRES_Multigrid.html#autotoc_md31',1,'']]]
 ];
