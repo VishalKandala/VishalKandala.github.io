@@ -53,5 +53,6 @@ var searchData=
   ['cookbook_50',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
   ['coupling_20overview_51',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
   ['cross_20section_20reducer_52',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
-  ['curvib_20method_20overview_53',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
+  ['current_20mean_53',['b971bf5-iem-current-mean',['../md_docs_2changelog_8d_2b971bf5-iem-current-mean.html',1,'']]],
+  ['curvib_20method_20overview_54',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
 ];
