@@ -132,9 +132,10 @@ var searchData=
   ['28_5fiem_5fand_5fstatistical_5faveraging_2emd_129',['28_IEM_and_Statistical_Averaging.md',['../28__IEM__and__Statistical__Averaging_8md.html',1,'']]],
   ['29_130',['10.2 Retained turbulent-channel campaign (2026-09-29)',['../55_Newton_Krylov_Momentum_Solver.html#p55_channel_evidence_sub',1,'']]],
   ['29_5fmaintenance_5fbacklog_2emd_131',['29_Maintenance_Backlog.md',['../29__Maintenance__Backlog_8md.html',1,'']]],
-  ['2d_132',['2d',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'1.2 Run in 2D'],['../07_Case_Reference.html#p07_cap_dim_2d_sub',1,'2D']]],
-  ['2f1f387_20example_20config_20refresh_133',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_134',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
-  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_135',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
-  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_136',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
+  ['2a_20face_20flux_20velocity_132',['1.2a Face-Flux Velocity',['../27_Trilinear_Interpolation_and_Projection.html#p27_face_flux_ssec',1,'']]],
+  ['2d_133',['2d',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'1.2 Run in 2D'],['../07_Case_Reference.html#p07_cap_dim_2d_sub',1,'2D']]],
+  ['2f1f387_20example_20config_20refresh_134',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_135',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
+  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_136',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
+  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_137',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
 ];

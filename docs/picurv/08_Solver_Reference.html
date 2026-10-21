@@ -103,6 +103,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#p08_cap_src_analytical_sub">analytical</a></li>
 <li class="level2"><a href="#p08_cap_interp_trilinear_sub">Trilinear</a></li>
 <li class="level2"><a href="#p08_cap_interp_corneraveraged_sub">CornerAveraged</a></li>
+<li class="level2"><a href="#p08_cap_interp_faceflux_sub">FaceFlux</a></li>
 <li class="level2"><a href="#p08_cap_conv_steady_deterministic_sub">steady_deterministic</a></li>
 <li class="level2"><a href="#p08_cap_conv_periodic_deterministic_sub">periodic_deterministic</a></li>
 <li class="level2"><a href="#p08_cap_conv_statistical_steady_sub">statistical_steady</a></li>
@@ -538,9 +539,11 @@ Dual Time Picard RK4 (deprecated)</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_corneraveraged"><code>CornerAveraged</code></a></td><td class="markdownTableBodyNone"><code>1</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_trilinear"><code>Trilinear</code></a></td><td class="markdownTableBodyNone"><code>0</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_corneraveraged"><code>CornerAveraged</code></a></td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_faceflux"><code>FaceFlux</code></a></td><td class="markdownTableBodyNone"><code>2</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p08_cap_interp_trilinear"><code>Trilinear</code></a></td><td class="markdownTableBodyNone"><code>0</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
  <!-- GENERATED FILE - do not edit by hand. Family: solver.convergence_mode.
      Regenerate with: make docs-inventory -->
@@ -604,6 +607,16 @@ CornerAveraged</h2>
 <p><b>Diagnostics.</b> As above.</p>
 <p><b>Evidence.</b> Regression verified - <code>make smoke</code> runs a flat-channel particle case with <code>CornerAveraged</code> and asserts the runtime banner reports it. Analytically verified - <code>interpolation-methods-tgv-2026-09-21</code>: relative L2 error 7.99% and 2.49% on 16^3 and 32^3 against the TGV3D field, order 1.68, and maximum error order 0.96 - three to four times the Trilinear error at the same resolution.</p>
 <p><b>Limitations.</b> The additional averaging is diffusive, and it is retained for compatibility rather than accuracy. It is below second order even on a uniform Cartesian grid: the corner average smooths the field before the trilinear step sees it, and the maximum error converges at first order.</p>
+<h2><a class="anchor" id="p08_cap_interp_faceflux_sub"></a>
+FaceFlux</h2>
+<p><a class="anchor" id="p08_cap_interp_faceflux"></a> <b>Identity.</b> <code>interpolation.method: FaceFlux</code> -&gt; <code>-interpolation_method 2</code> -&gt; <code>INTERP_FACE_FLUX</code> -&gt; <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a>.</p>
+<p><b>What it does.</b> Builds the particle velocity from its host cell's face fluxes <code>Ucont</code> instead of from cell-centre <code>Ucat</code>. Each contravariant flux varies linearly between the cell's two faces of its family, at the particle's in-cell weights, and is mapped to Cartesian velocity by <a class="el" href="setup_8h.html#a3238d9ac14702446906314e192703d4c">ContravariantToCartesianInCell</a>, the solve <a class="el" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a> uses at cell centres. The velocity is therefore divergence-free wherever the solver's fluxes are, its wall-normal component is zero on a wall face, and at a cell centre it equals <code>Ucat</code>. Diffusivity and its gradient are still interpolated with Trilinear.</p>
+<p><b>When to choose it.</b> When the particle number density must stay uniform in a non-uniform flow, as an FDF needs: trilinear velocity is slightly compressible and drifts tracers, measurably near walls. Prefer Trilinear where velocity accuracy along a face matters more than density, and on coarse near-wall grids.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Needs <code>Ucont</code> to hold the flow, so it is refused with an analytical type other than <code>UNIFORM_FLOW</code>, which set <code>Ucat</code> only. Same swarm prerequisites as the other methods.</p>
+<p><b>Diagnostics.</b> The startup banner names the method. The per-cell particle count stays statistically uniform in a solved incompressible flow; compare against Trilinear.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-runtime</code> builds fluxes from a stream function and checks that the interpolated velocity is divergence-free to round-off, is zero normal to a wall face, and equals <code>Contra2Cart</code> at the cell centre.</p>
+<p><b>Limitations.</b> First-order accurate: a component varies only along its own axis inside a cell, so it is constant across the cell in the other two directions (for example the streamwise velocity does not vary in the wall-normal direction within a cell). The divergence is exactly zero only on cells whose face-area vectors do not vary along their own axis, which includes every rectilinear cell; on warped curvilinear cells a small residual remains.</p>
 <h2><a class="anchor" id="p08_cap_conv_steady_deterministic_sub"></a>
 steady_deterministic</h2>
 <p><a class="anchor" id="p08_cap_conv_steady_deterministic"></a> <b>Identity.</b> <code>monitor.yml -&gt; solution_monitoring.convergence.mode: steady_deterministic</code> -&gt; <code>-solution_convergence_mode STEADY_DETERMINISTIC</code> -&gt; <code>SOLUTION_CONVERGENCE_STEADY_DETERMINISTIC</code>.</p>
@@ -816,11 +829,11 @@ cg</h3>
 <h1><a class="anchor" id="p08_interp_sec"></a>
 9. interpolation</h1>
 <div class="fragment"><div class="line">interpolation:</div>
-<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;</div>
+<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;, &quot;FaceFlux&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>method</code> -&gt; <code>-interpolation_method</code> (<code>Trilinear</code> = <code>0</code>, <code>CornerAveraged</code> = <code>1</code>)</li>
+<li><code>method</code> -&gt; <code>-interpolation_method</code> (<code>Trilinear</code> = <code>0</code>, <code>CornerAveraged</code> = <code>1</code>, <code>FaceFlux</code> = <code>2</code>)</li>
 </ul>
-<p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers; on the TGV3D field it converges at order 1.97. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners); on the same field and a uniform Cartesian grid its L2 error converges at order 1.68 and its maximum error at first order, so it is not second order anywhere measured. See <a class="el" href="08_Solver_Reference.html#p08_cap_interp_corneraveraged">p08_cap_interp_corneraveraged</a>.</p>
+<p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers; on the TGV3D field it converges at order 1.97. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners); on the same field and a uniform Cartesian grid its L2 error converges at order 1.68 and its maximum error at first order, so it is not second order anywhere measured. See <a class="el" href="08_Solver_Reference.html#p08_cap_interp_corneraveraged">p08_cap_interp_corneraveraged</a>. The <b>FaceFlux</b> method builds velocity from the face fluxes so that it is divergence-free, at first-order accuracy; see <a class="el" href="08_Solver_Reference.html#p08_cap_interp_faceflux">p08_cap_interp_faceflux</a>.</p>
 <p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
 <h1><a class="anchor" id="p08_scalar_transport_sec"></a>
 10. scalar_transport</h1>

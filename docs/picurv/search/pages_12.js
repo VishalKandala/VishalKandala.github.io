@@ -17,6 +17,7 @@ var searchData=
   ['initialization_20and_20restart_20guide_14',['Particle Initialization and Restart Guide',['../45_Particle_Initialization_and_Restart.html',1,'']]],
   ['inlet_20apply_20consolidation_15',['bdf438f-inlet-apply-consolidation',['../md_docs_2changelog_8d_2bdf438f-inlet-apply-consolidation.html',1,'']]],
   ['installation_16',['Installation',['../01_Installation.html',1,'']]],
-  ['interpolation_20and_20particle_20grid_20projection_17',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['invariant_20contracts_18',['Invariant Contracts',['../71_Invariant_Contracts.html',1,'']]]
+  ['interpolation_17',['837ea43-faceflux-interpolation',['../md_docs_2changelog_8d_2837ea43-faceflux-interpolation.html',1,'']]],
+  ['interpolation_20and_20particle_20grid_20projection_18',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['invariant_20contracts_19',['Invariant Contracts',['../71_Invariant_Contracts.html',1,'']]]
 ];

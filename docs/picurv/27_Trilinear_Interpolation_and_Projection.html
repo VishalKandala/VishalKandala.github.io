@@ -92,6 +92,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p27_g2p_sec">1. Grid -&gt; Particle Interpolation</a><ul><li class="level2"><a href="#p27_trilinear_ssec">1.1 Trilinear (Direct Cell-Center) — Default</a></li>
 <li class="level2"><a href="#p27_corner_averaged_ssec">1.2 Corner-Averaged (Legacy)</a></li>
+<li class="level2"><a href="#p27_face_flux_ssec">1.2a Face-Flux Velocity</a></li>
 <li class="level2"><a href="#p27_shared_ssec">1.3 Shared Kernels</a></li>
 <li class="level2"><a href="#p27_config_ssec">1.4 Configuration</a></li>
 </ul>
@@ -133,6 +134,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ol>
 <p>This is second-order on uniform Cartesian grids but degrades to first-order on curvilinear grids because the unweighted averaging does not account for the asymmetric placement of cell centers around nodes.</p>
 <p>Code path: <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a> dispatches to <code>InterpolateEulerFieldFromCornerToSwarm</code>.</p>
+<h2><a class="anchor" id="p27_face_flux_ssec"></a>
+1.2a Face-Flux Velocity</h2>
+<p>For velocity only, <code>FaceFlux</code> uses the face fluxes <code>Ucont</code> the pressure projection makes discretely divergence-free. Inside the host cell, with weights \(a_1, a_2, a_3\) measured from each axis's minimum face, every flux family and its face-area vector are interpolated linearly between the two faces of that family,</p>
+<p class="formulaDsp">
+\[ U^i(a) = (1-a_i)\,U^i_- + a_i\,U^i_+, \qquad S_i(a) = (1-a_i)\,S_{i,-} + a_i\,S_{i,+}, \]
+</p>
+<p>and the Cartesian velocity solves \(S_i(a)\cdot u = U^i(a)\) (<a class="el" href="setup_8h.html#a3238d9ac14702446906314e192703d4c">ContravariantToCartesianInCell</a>, the cell-centre solve of <a class="el" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a>, which is the case \(a = 1/2\)). On a cell whose face-area vectors do not vary along their own axis, \(\nabla\cdot u\) equals the cell's discrete flux divergence, so a divergence-free flow gives a divergence-free particle velocity and a uniform tracer density is preserved; a wall face carries no flux, so the wall-normal velocity is zero there. Each component is linear only along its own axis, so the method is first-order accurate (see <a class="el" href="08_Solver_Reference.html#p08_cap_interp_faceflux">p08_cap_interp_faceflux</a>).</p>
+<p>Code path: <a class="el" href="interpolation_8h.html#a7913089691fd7576c11c25c0ec381329">InterpolateEulerFieldToSwarm</a> dispatches <code>Ucat</code> to <code>InterpolateEulerVelocityFromFacesToSwarm</code>; other fields use the Trilinear path.</p>
 <h2><a class="anchor" id="p27_shared_ssec"></a>
 1.3 Shared Kernels</h2>
 <p>Both methods share the same underlying trilinear kernels:</p>
@@ -147,8 +156,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 1.4 Configuration</h2>
 <p>YAML (<code>solver.yml</code>):</p>
 <div class="fragment"><div class="line">interpolation:</div>
-<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;</div>
-</div><!-- fragment --><p>C flag: <code>-interpolation_method 0</code> (Trilinear) or <code>-interpolation_method 1</code> (CornerAveraged).</p>
+<div class="line">  method: &quot;Trilinear&quot;     # default; or &quot;CornerAveraged&quot;, &quot;FaceFlux&quot;</div>
+</div><!-- fragment --><p>C flag: <code>-interpolation_method 0</code> (Trilinear), <code>1</code> (CornerAveraged) or <code>2</code> (FaceFlux).</p>
 <p>Enum: <code>InterpolationMethod</code> in <code><a class="el" href="variables_8h.html" title="Main header file for a complex fluid dynamics solver.">include/variables.h</a></code>. Stored in <code><a class="el" href="variables_8h.html#a7cf359e25637e2e93f1aa16d4d78551f">SimCtx.interpolationMethod</a></code>.</p>
 <h1><a class="anchor" id="p27_p2g_sec"></a>
 2. Particle -&gt; Grid Scatter and Normalization</h1>
