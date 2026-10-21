@@ -325,9 +325,9 @@ initial_flux</h2>
 <th class="markdownTableHeadNone">Maps to</th>
 <th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_reflect"><code>reflect</code></a></td><td class="markdownTableBodyNone"><code>reflect</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_reflect"><code>reflect</code></a></td><td class="markdownTableBodyNone"><code>reflect</code></td><td class="markdownTableBodyNone">supported</td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_remove"><code>remove</code></a></td><td class="markdownTableBodyNone"><code>remove</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_wrap"><code>wrap</code></a></td><td class="markdownTableBodyNone"><code>wrap</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_wrap"><code>wrap</code></a></td><td class="markdownTableBodyNone"><code>wrap</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
 <p>A face lies on the domain boundary when the walk's cell index is at that axis' extreme, the same test the handlers use. The walk applies a policy only when every face the particle is outside of lies on the domain boundary; outside an interior face it keeps walking along the boundary first. A pass-1 walk from the particle's previous cell that ends more than three cell sizes beyond the face is treated as blocked by a curved boundary and searched again from scratch in the same pass, before any policy applies (see <a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a>).</p>
 <h2><a class="anchor" id="p44_cap_ppol_reflect_sub"></a>
@@ -338,7 +338,7 @@ reflect</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Only meaningful where the particle can reach the face; the policy is ignored on faces nothing crosses. Not allowed on <code>periodic</code> faces, which wrap. Analytical flows that drive particles through a reflecting face pile them up in the last cell layer.</p>
 <p><b>Diagnostics.</b> <code>search_metrics.csv</code> reports <code>reflections</code> and <code>reflection_fallbacks</code> per step; the console prints one INFO line per step with reflections and one WARNING line when any particle reached the cap. A nonzero <code>reflection_fallbacks</code> points at strongly warped boundary cells or very large steps.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-particles</code> mirrors a point about a flat face, a sheared face and a two-face corner, and checks the cap fallback; <code>make unit-runtime</code> reflects a particle through the walking search, including after a tangential walk along the wall.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-particles</code> mirrors a point about a flat face, a sheared face and a two-face corner, and checks the cap fallback; <code>make unit-runtime</code> reflects a particle through the walking search, including after a tangential walk along the wall. Analytically verified - <code>particle-wall-reflection-2026-10-20</code>: wall flux 351.2 reflections per step against the analytic 351, box and near-wall distributions against their analytic references, identical counts on 1, 2 and 4 ranks, and no fallback or loss up to CFL 4; <code>volume-seeding-fix-2026-10-20</code>: curvilinear walls stay well mixed with no near-wall deficit.</p>
 <p><b>Limitations.</b> The face is the planar approximation the search uses, so on curved walls a mirrored point can land outside a neighbouring cell's plane and need another reflection. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> velocity is not reset at the wall. Immersed boundaries are not seen by particles.</p>
 <h2><a class="anchor" id="p44_cap_ppol_remove_sub"></a>
 remove</h2>
@@ -358,7 +358,7 @@ wrap</h2>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Requires a geometric periodic pair, whose translation the grid setup validates. The dummy cell centres next to a periodic seam, which particle interpolation reads, are the translated images of the cells across the seam, including along periodic edges and at corners.</p>
 <p><b>Diagnostics.</b> <code>search_metrics.csv</code> reports <code>wraps</code> per step; the per-step INFO line counts periodic wraps. In a statistically steady flow, wraps per step should match the mean particle flux through the seam.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code> wraps a particle through each x-periodic face and through an x-y periodic corner, and checks the shifted position and landing cell.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code> wraps a particle through each x-periodic face and through an x-y periodic corner, and checks the shifted position and landing cell. Analytically verified - <code>periodic-particle-wrap-2026-10-20</code>: exact conservation and wrap flux within 5e-5 of analytic on 8 to 64 ranks split along every axis, with diffusion, in a DNS channel and in a curvilinear pipe; <code>wrap-one-handoff-owner-lookup-2026-10-21</code>: one handoff per corner crossing, bit-identical results, at most 2 settlement passes up to 216 ranks.</p>
 <p><b>Limitations.</b> Only translational periodicity; rotational periods are not supported by the grid contract either.</p>
 <h1><a class="anchor" id="p44_nondim_sec"></a>
 6. Non-Dimensionalization Before C Input</h1>

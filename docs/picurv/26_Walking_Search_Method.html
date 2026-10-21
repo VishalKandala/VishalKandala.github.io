@@ -92,13 +92,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#p26_concept_sec">1. Core Search Concept</a></li>
 <li class="level1"><a href="#p26_statuses_sec">2. Settlement Status Model</a></li>
+<li class="level1"><a href="#p26_boundary_sec">2a. Domain Boundaries</a></li>
 <li class="level1"><a href="#p26_implementation_sec">3. Implementation Touchpoints</a></li>
 <li class="level1"><a href="#p26_restart_sec">4. Restart Path Specifics</a></li>
 <li class="level1"><a href="#p26_testing_sec">5. Current test status</a></li>
 <li class="level1"><a href="#p26_practical_sec">6. Failure Modes and Signals</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Walking_Search_Method"></a> PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell (or is explicitly marked lost).</p>
+<div class="textblock"><p><a class="anchor" id="_Walking_Search_Method"></a> PICurv uses a robust locate-and-migrate pipeline so every particle ends each step with a valid owner rank and host cell, or is explicitly marked as having left the domain (<code>EXITED</code>) or as a search failure (<code>LOST</code>).</p>
 <h1><a class="anchor" id="p26_concept_sec"></a>
 1. Core Search Concept</h1>
 <p>A particle is tested against candidate cell faces using signed distances. Search starts from prior cell information when available, then walks to neighboring cells by face-crossing logic until a terminal status is reached.</p>
@@ -110,10 +111,21 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>NEEDS_LOCATION</code></li>
 <li><code>ACTIVE_AND_LOCATED</code></li>
 <li><code>MIGRATING_OUT</code></li>
-<li><code>LOST</code></li>
+<li><code>LOST</code> - the search failed for a particle believed inside the domain</li>
 <li><code>UNINITIALIZED</code></li>
+<li><code>EXITED</code> - the particle left through a face whose policy is <code>remove</code></li>
 </ul>
-<p>These statuses drive the iterative migration passes in the orchestrator.</p>
+<p>These statuses drive the iterative migration passes in the orchestrator. <code>LOST</code> and <code>EXITED</code> are final within one settlement: only pass 1 searches them, so a particle beyond the boundary is never re-walked and re-migrated pass after pass. Cleanup removes both and counts them separately (<a class="el" href="53_Search_Robustness_Metrics_Reference.html#p53_definitions_legacy">4.4 Loss and Exit Counters</a>).</p>
+<h1><a class="anchor" id="p26_boundary_sec"></a>
+2a. Domain Boundaries</h1>
+<p>When a walk ends outside a boundary cell, the action depends on the crossed faces' <code>particle_policy</code> (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_ppol_sec">5. Particle Boundary Policies</a>):</p>
+<ul>
+<li>any crossed face periodic (<code>wrap</code>): the particle is shifted by every crossed seam's translation at once and the walk moves to the cell at the other end of those axes, handing off to its owner if that cell is remote, so an edge or corner crossing of several seams needs one handoff; a wall crossed in the same corner reflects on the next evaluation;</li>
+<li>otherwise, on a pass-1 walk that started from the particle's previous cell, an end more than three cell sizes beyond the face is treated as blocked by the domain's shape (a non-convex boundary between the start and the target), and the particle is searched again from scratch in the same pass;</li>
+<li>any crossed face <code>remove</code>: the particle is <code>EXITED</code>;</li>
+<li>all crossed faces <code>reflect</code>: the particle is mirrored about the most-crossed face plane and the cell is evaluated again, up to four reflections per search, after which it is placed just inside the boundary cell (counted as a reflection fallback). Only a cell warped so far that its centroid is outside the crossed face planes cannot take the fallback, and the particle is then <code>LOST</code>.</li>
+</ul>
+<p>The rank owning a cell is found by a binary search of the decomposition's per-axis range starts (<a class="el" href="walkingsearch_8h.html#a9aedf40cb1545b554e113ebb0863859d">FindOwnerOfCell</a>), so its cost does not grow with the rank count.</p>
 <h1><a class="anchor" id="p26_implementation_sec"></a>
 3. Implementation Touchpoints</h1>
 <ul>
@@ -121,7 +133,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>robust locate-or-migrate decision: <code>LocateParticleOrFindMigrationTarget</code> (walking-search module)</li>
 <li>global orchestrator: <a class="el" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></li>
 <li>rank migration communication: <a class="el" href="ParticleMotion_8h.html#af68865be3bc987bdf1be2c5c7a1903fa">PerformMigration</a> (sent particles are removed afterwards in one pass by <a class="el" href="ParticleMotion_8h.html#a4b87b0c1887f84e318f74f2a0982811e">RemoveFlaggedParticles</a>, keeping the one-at-a-time survivor order; measurement <code>swarm-one-pass-removal-2026-10-20</code>)</li>
-<li>per-particle migration cycle helper: <a class="el" href="ParticleMotion_8h.html#ab2eeab12258446f697695ebdaef3f011">PerformSingleParticleMigrationCycle</a></li>
+<li>owner of a cell: <a class="el" href="walkingsearch_8h.html#a9aedf40cb1545b554e113ebb0863859d">FindOwnerOfCell</a></li>
+<li>wall reflection: <a class="el" href="walkingsearch_8h.html#ae31c5e43d7302a9317af9a4e239861c7">ReflectParticleAcrossCellFace</a>, with the cap fallback <a class="el" href="walkingsearch_8h.html#a613213b999fbeada2354275197ea5b6f">PlaceParticleInsideCell</a></li>
 <li>restart fast-path migration: <a class="el" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a></li>
 </ul>
 <p>The current orchestrator includes:</p>
@@ -137,20 +150,16 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>For restart-loaded particles with valid <code>CellID</code>, PICurv can skip full walking search and directly resolve owner rank via cell ownership map before migration. This is usually much cheaper than full re-location on first restart step.</p>
 <h1><a class="anchor" id="p26_testing_sec"></a>
 5. Current test status</h1>
-<p>Current direct coverage is strongest at the orchestrator level:</p>
+<p>Direct coverage:</p>
 <ul>
-<li><code>LocateAllParticlesInGrid</code> has dedicated direct tests for the prior-cell fast path and the local guess-then-verify path</li>
-<li>restart fast-path migration is covered directly through <code>MigrateRestartParticlesUsingCellID</code></li>
+<li><code>LocateAllParticlesInGrid</code>: the prior-cell fast path and the local guess-then-verify path</li>
+<li>restart fast-path migration through <code>MigrateRestartParticlesUsingCellID</code></li>
+<li><code>LocateParticleOrFindMigrationTarget</code> boundary branches: reflection about a face (<code>make unit-particles</code>), an exit classified once across settlement passes on two ranks (<code>make unit-mpi</code>), and wraps through a face, an x-y corner and an off-axis seam (<code>make unit-periodic</code>)</li>
+<li><code>FindOwnerOfCell</code> against a scan of every rank's ranges (<code>make unit-mpi</code>)</li>
 </ul>
-<p>Current direct gaps still targeted for the next remediation are:</p>
+<p>Remaining direct gaps:</p>
 <ul>
-<li>branch-complete unit coverage for <code>LocateParticleOrFindMigrationTarget</code><ul>
-<li>boundary clamp</li>
-<li>ghost-region handoff</li>
-<li>stuck/tie-breaker</li>
-<li><code>LOST</code> and <code>MIGRATING_OUT</code></li>
-</ul>
-</li>
+<li>branch coverage of <code>LocateParticleOrFindMigrationTarget</code> for the boundary clamp, ghost-region handoff, the stuck tie-breaker and the blocked-walk retry</li>
 <li>direction-complete and failure-path coverage for the <code>GuessParticleOwnerWithBBox</code> heuristic</li>
 <li>non-restart MPI migration tests for multi-pass handoff and newcomer flagging</li>
 </ul>
@@ -159,7 +168,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Watch for:</p>
 <ul>
 <li>excessive migration pass counts,</li>
-<li>repeated <code>LOST</code> particles,</li>
+<li>repeated <code>LOST</code> particles (<code>EXITED</code> through an outlet is outflow, not a failure),</li>
+<li>nonzero <code>reflection_fallbacks</code>, or many <code>blocked_walk_retry_count</code> events outside a strongly non-convex domain,</li>
 <li>non-convergence of settlement loop,</li>
 <li>elevated traversal effort or repeated tie-break/boundary-clamp events in <code>&lt;run.analysis.metrics&gt;/search_metrics.csv</code>,</li>
 <li>increasing <code>search_failure_fraction</code>, <code>search_work_index</code>, or <code>re_search_fraction</code>,</li>

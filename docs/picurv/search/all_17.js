@@ -260,7 +260,7 @@ var searchData=
   ['loop_20bound_20details_257',['Loop Bound Details',['../grid_8h.html#loop_bounds',1,'']]],
   ['loop_20tt_20advancesimulation_20tt_258',['5. Timestep Loop (&lt;tt&gt;AdvanceSimulation&lt;/tt&gt;)',['../46_C_Runtime_Execution_Map.html#p46_loop_sec',1,'']]],
   ['loss_259',['4.6 Recovering From Complete Local Loss',['../61_Storage_Management_Guide.html#p61_recover_workspace',1,'']]],
-  ['loss_20counters_260',['4.4 Loss Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_legacy',1,'']]],
+  ['loss_20and_20exit_20counters_260',['4.4 Loss and Exit Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_legacy',1,'']]],
   ['lost_261',['LOST',['../variables_8h.html#a347829443e8a679209e21f7f04f51581a339435bd0d4a842c6107333c908a5317',1,'variables.h']]],
   ['lost_20or_20behave_20oddly_262',['4. Particles Are Lost or Behave Oddly',['../67_Troubleshooting.html#p67_particles_sec',1,'']]],
   ['low_20priority_20fixes_263',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]],

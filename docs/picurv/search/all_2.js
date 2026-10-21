@@ -82,7 +82,7 @@ var searchData=
   ['2_20run_20and_20monitor_79',['1.2 Run and Monitor',['../Documentation_Map.html#p47_lifecycle_run_sec',1,'']]],
   ['2_20run_20in_202d_80',['1.2 Run in 2D',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'']]],
   ['2_20run_20on_20slurm_20generate_20and_20submit_81',['3.2 Run on Slurm (Generate and Submit)',['../11_User_How_To_Guides.html#p11_cluster_run_ssec',1,'']]],
-  ['2_20run_5fcontrol_82',['2 run_control',['../07_Case_Reference.html#p07_run_control_sec',1,'2. run_control'],['../10_Post_Processing_Reference.html#p10_run_control_sec',1,'2. run_control']]],
+  ['2_20run_5fcontrol_82',['2 run_control',['../10_Post_Processing_Reference.html#p10_run_control_sec',1,'2. run_control'],['../07_Case_Reference.html#p07_run_control_sec',1,'2. run_control']]],
   ['2_20running_20a_20mixing_20case_83',['1.2 Running a Mixing Case',['../28_IEM_and_Statistical_Averaging.html#p28_running_ssec',1,'']]],
   ['2_20runtime_20execution_20order_84',['2. Runtime Execution Order',['../21_Methods_Overview.html#p21_runtime_map_sec',1,'']]],
   ['2_20settlement_20status_20model_85',['2. Settlement Status Model',['../26_Walking_Search_Method.html#p26_statuses_sec',1,'']]],
@@ -133,10 +133,13 @@ var searchData=
   ['28_5fiem_5fand_5fstatistical_5faveraging_2emd_130',['28_IEM_and_Statistical_Averaging.md',['../28__IEM__and__Statistical__Averaging_8md.html',1,'']]],
   ['29_131',['10.2 Retained turbulent-channel campaign (2026-09-29)',['../55_Newton_Krylov_Momentum_Solver.html#p55_channel_evidence_sub',1,'']]],
   ['29_5fmaintenance_5fbacklog_2emd_132',['29_Maintenance_Backlog.md',['../29__Maintenance__Backlog_8md.html',1,'']]],
-  ['2a_20face_20flux_20velocity_133',['1.2a Face-Flux Velocity',['../27_Trilinear_Interpolation_and_Projection.html#p27_face_flux_ssec',1,'']]],
-  ['2d_134',['2d',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'1.2 Run in 2D'],['../07_Case_Reference.html#p07_cap_dim_2d_sub',1,'2D']]],
-  ['2f1f387_20example_20config_20refresh_135',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_136',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
-  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_137',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
-  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_138',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
+  ['2a_20domain_20boundaries_133',['2a. Domain Boundaries',['../26_Walking_Search_Method.html#p26_boundary_sec',1,'']]],
+  ['2a_20face_20flux_20velocity_134',['1.2a Face-Flux Velocity',['../27_Trilinear_Interpolation_and_Projection.html#p27_face_flux_ssec',1,'']]],
+  ['2d_135',['2d',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'1.2 Run in 2D'],['../07_Case_Reference.html#p07_cap_dim_2d_sub',1,'2D']]],
+  ['2e00957_20particle_20closeout_136',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
+  ['2e00957_2dparticle_2dcloseout_2emd_137',['2e00957-particle-closeout.md',['../2e00957-particle-closeout_8md.html',1,'']]],
+  ['2f1f387_20example_20config_20refresh_138',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_139',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
+  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_140',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
+  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_141',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
 ];
