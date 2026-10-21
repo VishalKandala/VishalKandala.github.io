@@ -179,7 +179,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Validation, on every geometry:</p>
 <ul>
 <li><code>--mg-levels N</code> - refuse node counts the multigrid hierarchy cannot coarsen N times</li>
-<li><code>--periodic AXIS...</code> - refuse a seam joining unequal cells, and refuse a rotation</li>
+<li><code>--periodic AXIS...</code> - refuse a seam joining unequal cells</li>
 </ul>
 <p>Reference scales, reporting only (see <a class="el" href="48_Grid_Generator_Guide.html#p48_units_sec">5.2 Units In The Report</a>):</p>
 <ul>
@@ -304,7 +304,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>you want a reusable mesh recipe with controlled overrides,</li>
 <li>you want generated <code>.info</code>/<code>.vts</code> outputs alongside the mesh.</li>
 </ul>
-<p>For a generated grid used with geometric-periodic BCs, each opposite periodic surface must be a pointwise translated copy of its partner. The translation must be nonzero and constant over the entire surface; rotating, shearing, and nonmatching surface pairs are rejected at runtime.</p>
+<p>For a generated grid used with geometric-periodic BCs, each opposite periodic surface must be a pointwise translated copy of its partner. The translation must be nonzero and constant over the entire surface, but may point in any direction, so a rigidly rotated periodic grid is valid. Surface pairs related by a rotation (a periodic axis that curves), a shear, or no rigid map are rejected at runtime.</p>
 <h1><a class="anchor" id="p48_cap_geom_sec"></a>
 7.1 Grid Generator Geometry Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: grid.generator_type.
@@ -543,10 +543,10 @@ rotate</h2>
 <p><b>What it does.</b> Rotates the grid about an axis through the named reference point.</p>
 <p><b>When to choose it.</b> Orienting a generated domain to match an external geometry or an inflow direction.</p>
 <p><b>Parameters it owns.</b> <code>axis</code>, <code>deg</code>, and optionally <code>about</code>.</p>
-<p><b>Interactions.</b> Mutually exclusive with <code>--periodic</code>. Compose with <code>translate</code> to rotate about a point that is not one of the named references.</p>
+<p><b>Interactions.</b> Allowed with <code>--periodic</code>: a rigid rotation turns each seam translation into the rotated vector, which the runtime validates and applies in full. Compose with <code>translate</code> to rotate about a point that is not one of the named references.</p>
 <p><b>Diagnostics.</b> <code>Jacobian_Sign_Consistent</code> and <code>Right_Handed</code> both stay true: a rotation is orientation-preserving.</p>
-<p><b>Evidence.</b> Unit verified - <code>make test-python</code> covers the periodic refusal. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a rotated hill box closes a uniform flow to round-off.</p>
-<p><b>Limitations.</b> Refused on any grid with a declared periodic axis. The runtime's periodic reconstruction offsets only the matching Cartesian component across the seam and copies the other two, so it assumes an axis-aligned seam; whether an arbitrarily oriented periodic grid is handled correctly is unverified, and this refuses rather than producing one quietly.</p>
+<p><b>Evidence.</b> Unit verified - <code>make test-python</code> accepts it on a periodic grid, and <code>make unit-periodic</code> validates the rotated translation of a grid turned 30 degrees and wraps a particle by it. Analytically verified - <code>grid-generator-closure-2026-09-21</code>: a rotated hill box closes a uniform flow to round-off.</p>
+<p><b>Limitations.</b> A rotation keeps translational periodicity; it does not create rotational periodicity, which the runtime does not support. Tools that Fourier-transform along the grid axes - spectra and the <code>spectral_random_velocity</code>, <code>resampled_velocity</code> and wall-spectral initial conditions - need an axis-aligned Cartesian grid and refuse a rotated one.</p>
 <h2><a class="anchor" id="p48_cap_xform_mirror_sub"></a>
 mirror</h2>
 <p><a class="anchor" id="p48_cap_xform_mirror"></a> <b>Identity.</b> <code>mirror:plane=xy|yz|zx[,about=...]</code>.</p>
