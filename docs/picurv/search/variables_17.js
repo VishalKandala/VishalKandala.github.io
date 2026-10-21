@@ -27,7 +27,7 @@ var searchData=
   ['walltimeguardwarmuptotalseconds_24',['walltimeGuardWarmupTotalSeconds',['../variables_8h.html#a30648fac102d9e7ac7077a1f36208a2f',1,'SimCtx']]],
   ['want_5fsecond_25',['want_second',['../statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41',1,'PicurvWindowFieldRequest']]],
   ['wavenumber_26',['WAVENUMBER',['../namespacepicurv__cli_1_1core.html#a4655c4672b3dffe125f4d6b3df88acab',1,'picurv_cli::core']]],
-  ['weight_27',['weight',['../statistics__accumulator_8h.html#a04a25a1b0dc80a0a3bd07a1d22fafd0e',1,'PicurvWindowStorage::weight'],['../poisson_8c.html#a2b1b9249d24c053f7ad193337163acfa',1,'PoissonTransverseDifference::weight'],['../statistics__moments_8h.html#acaa5291a6fc821cdeee2bcca861e1851',1,'PicurvCoMomentState::weight'],['../statistics__moments_8h.html#a39ddefed36bfd498511eac3b5e834186',1,'PicurvMomentState::weight']]],
+  ['weight_27',['weight',['../statistics__moments_8h.html#a39ddefed36bfd498511eac3b5e834186',1,'PicurvMomentState::weight'],['../poisson_8c.html#a2b1b9249d24c053f7ad193337163acfa',1,'PoissonTransverseDifference::weight'],['../statistics__moments_8h.html#acaa5291a6fc821cdeee2bcca861e1851',1,'PicurvCoMomentState::weight'],['../statistics__accumulator_8h.html#a04a25a1b0dc80a0a3bd07a1d22fafd0e',1,'PicurvWindowStorage::weight']]],
   ['weight_5fsq_28',['weight_sq',['../statistics__moments_8h.html#a1142c512a49eeac30d501ad05eee9c59',1,'PicurvMomentState::weight_sq'],['../statistics__accumulator_8h.html#a17c14364b590e3237fd757999ef0ad49',1,'PicurvWindowStorage::weight_sq'],['../statistics__moments_8h.html#a1e37ac45763a57616ecb7fa1d68fe6be',1,'PicurvCoMomentState::weight_sq']]],
   ['weighting_29',['weighting',['../statistics__window_8h.html#aff366ea4b51210605ba10041a7ecafa1',1,'PicurvWindowDefinition']]],
   ['weights_30',['weights',['../variables_8h.html#ad3cf9af789ad3875d496c48112ade0ec',1,'Particle']]],
@@ -38,5 +38,6 @@ var searchData=
   ['workspace_5finput_5fkinds_35',['WORKSPACE_INPUT_KINDS',['../namespacepicurv__cli_1_1cli.html#a27b9090dc79a5794a334d87a2249b5b6',1,'picurv_cli::cli']]],
   ['workspace_5finput_5fmodes_36',['WORKSPACE_INPUT_MODES',['../namespacepicurv__cli_1_1cli.html#a64d328925043fe71d29a0f927cfe2712',1,'picurv_cli::cli']]],
   ['workspace_5fowned_37',['WORKSPACE_OWNED',['../namespaceaudit__path__literals.html#a0113c35189f5b9e22d502566841e3297',1,'audit_path_literals']]],
-  ['workspace_5fschema_5fversion_38',['WORKSPACE_SCHEMA_VERSION',['../namespacepicurv__cli_1_1core.html#ad14f1ee9a18da348d0b3075556f9454d',1,'picurv_cli::core']]]
+  ['workspace_5fschema_5fversion_38',['WORKSPACE_SCHEMA_VERSION',['../namespacepicurv__cli_1_1core.html#ad14f1ee9a18da348d0b3075556f9454d',1,'picurv_cli::core']]],
+  ['wrapcount_39',['wrapCount',['../variables_8h.html#a3c6fd87f1b6f80394d4f85d47e120c26',1,'SearchMetricsState']]]
 ];

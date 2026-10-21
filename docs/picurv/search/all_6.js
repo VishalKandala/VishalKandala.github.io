@@ -43,7 +43,7 @@ var searchData=
   ['6_20postprocess_20an_20existing_20run_40',['6. Postprocess An Existing Run',['../52_Run_Artifact_Lifecycle_Contract.html#p52_post_sec',1,'']]],
   ['6_20raising_20the_20accumulated_20moment_20order_41',['6. Raising The Accumulated Moment Order',['../60_Field_Statistics_Planned_Extensions.html#p60_order_extension_sec',1,'']]],
   ['6_20recovering_20from_20complete_20local_20loss_42',['4.6 Recovering From Complete Local Loss',['../61_Storage_Management_Guide.html#p61_recover_workspace',1,'']]],
-  ['6_20related_20documentation_43',['6 related documentation',['../69_Scientific_Writing_Handoff.html#p69_related_sec',1,'6. Related Documentation'],['../63_Page_Type_Contract.html#p63_related_sec',1,'6. Related Documentation'],['../65_Example_Catalog.html#p65_related_sec',1,'6. Related Documentation'],['../71_Invariant_Contracts.html#p71_related_sec',1,'6. Related Documentation']]],
+  ['6_20related_20documentation_43',['6 related documentation',['../63_Page_Type_Contract.html#p63_related_sec',1,'6. Related Documentation'],['../71_Invariant_Contracts.html#p71_related_sec',1,'6. Related Documentation'],['../65_Example_Catalog.html#p65_related_sec',1,'6. Related Documentation'],['../69_Scientific_Writing_Handoff.html#p69_related_sec',1,'6. Related Documentation']]],
   ['6_20related_20pages_44',['6 related pages',['../28_IEM_and_Statistical_Averaging.html#p28_refs_sec',1,'6. Related Pages'],['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages']]],
   ['6_20repository_20and_20documentation_20navigation_45',['6. Repository and Documentation Navigation',['../Documentation_Map.html#p47_repo_axis_sec',1,'']]],
   ['6_20restart_20is_20rejected_20or_20behaves_20unexpectedly_46',['6. Restart Is Rejected or Behaves Unexpectedly',['../67_Troubleshooting.html#p67_restart_sec',1,'']]],
@@ -85,6 +85,8 @@ var searchData=
   ['6a_20residual_20purity_20invariant_20matrix_20free_20solvers_82',['6a. Residual-Purity Invariant (Matrix-Free Solvers)',['../46_C_Runtime_Execution_Map.html#p46_residual_purity_sec',1,'']]],
   ['6a_20rhs_20state_20and_20pseudo_20iteration_20cadence_83',['6a. RHS State and Pseudo-Iteration Cadence',['../24_Dual_Time_Picard_Jameson_RK.html#p24_rhs_state_sec',1,'']]],
   ['6b_20pressure_20boundary_20conditions_84',['6b. Pressure Boundary Conditions',['../57_Future_Architecture_Specifications.html#p57_pressure_bc_sec',1,'']]],
-  ['6e50553_20single_20checkpoint_20post_85',['6e50553-single-checkpoint-post',['../md_docs_2changelog_8d_26e50553-single-checkpoint-post.html',1,'']]],
-  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_86',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]]
+  ['6b11b15_20periodic_20dummy_20centres_85',['6b11b15-periodic-dummy-centres',['../md_docs_2changelog_8d_26b11b15-periodic-dummy-centres.html',1,'']]],
+  ['6b11b15_2dperiodic_2ddummy_2dcentres_2emd_86',['6b11b15-periodic-dummy-centres.md',['../6b11b15-periodic-dummy-centres_8md.html',1,'']]],
+  ['6e50553_20single_20checkpoint_20post_87',['6e50553-single-checkpoint-post',['../md_docs_2changelog_8d_26e50553-single-checkpoint-post.html',1,'']]],
+  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_88',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]]
 ];

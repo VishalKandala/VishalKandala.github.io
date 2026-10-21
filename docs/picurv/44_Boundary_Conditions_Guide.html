@@ -110,6 +110,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </li>
 <li class="level1"><a href="#p44_ppol_sec">5. Particle Boundary Policies</a><ul><li class="level2"><a href="#p44_cap_ppol_reflect_sub">reflect</a></li>
 <li class="level2"><a href="#p44_cap_ppol_remove_sub">remove</a></li>
+<li class="level2"><a href="#p44_cap_ppol_wrap_sub">wrap</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p44_nondim_sec">6. Non-Dimensionalization Before C Input</a><ul><li class="level2"><a href="#p44_picslice_ssec">6.1 Prescribed Inlet Profile Files</a></li>
@@ -315,7 +316,7 @@ initial_flux</h2>
 <p><b>Limitations and full treatment.</b> Shares <code>constant_flux</code>'s controller and its shortfall below target (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_constant_flux">p44_cap_constant_flux</a>). See <a class="el" href="p54_geometric_periodic.html#p54_driven_sec">5. Driven Periodic Flows</a>.</p>
 <h1><a class="anchor" id="p44_ppol_sec"></a>
 5. Particle Boundary Policies</h1>
-<p><code>boundary_conditions[].particle_policy</code> says what a particle becomes when its walk ends beyond that face. It is independent of the flow handler: every handler states a default (<code>noslip</code> reflects; the inlet and outlet handlers remove), and a BC entry may override it. It cannot be set on a <code>periodic</code> face, where particles do not wrap yet and are removed. The startup banner prints the resolved policy of all six faces on its <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Boundary Policy</code> line.</p>
+<p><code>boundary_conditions[].particle_policy</code> says what a particle becomes when its walk ends beyond that face. It is independent of the flow handler: every handler states a default (<code>noslip</code> reflects; the inlet and outlet handlers remove; the periodic handlers wrap), and a BC entry may override it. <code>wrap</code> belongs to <code>periodic</code> faces: they accept only it, and no other face accepts it. The startup banner prints the resolved policy of all six faces on its <code><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> Boundary Policy</code> line.</p>
 <!-- GENERATED FILE - do not edit by hand. Family: particle.boundary_policy.
      Regenerate with: make docs-inventory -->
 <table class="markdownTable">
@@ -326,6 +327,7 @@ initial_flux</h2>
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_reflect"><code>reflect</code></a></td><td class="markdownTableBodyNone"><code>reflect</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_remove"><code>remove</code></a></td><td class="markdownTableBodyNone"><code>remove</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_ppol_wrap"><code>wrap</code></a></td><td class="markdownTableBodyNone"><code>wrap</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <p>A face lies on the domain boundary when the walk's cell index is at that axis' extreme, the same test the handlers use. The walk applies a policy only when every face the particle is outside of lies on the domain boundary; outside an interior face it keeps walking along the boundary first. A pass-1 walk from the particle's previous cell that ends more than three cell sizes beyond the face is treated as blocked by a curved boundary and searched again from scratch in the same pass, before any policy applies (see <a class="el" href="26_Walking_Search_Method.html">Walking Search for Particle Location</a>).</p>
 <h2><a class="anchor" id="p44_cap_ppol_reflect_sub"></a>
@@ -334,7 +336,7 @@ reflect</h2>
 <p><b>What it does.</b> Mirrors the particle about the plane of the crossed face of its boundary cell, p' = p + 2 d n, and continues the search. Psi, weight and particle ID are unchanged, so the particle count and the carried scalar are conserved at the face. An edge or corner crossing reflects about the most-crossed face first and the next one on the following walk step. After four reflections in one search the particle is placed just inside the boundary cell along the segment to its centroid (<a class="el" href="walkingsearch_8h.html#a613213b999fbeada2354275197ea5b6f">PlaceParticleInsideCell</a>) instead of being lost.</p>
 <p><b>When to choose it.</b> An impermeable face with zero scalar flux, which is every solid wall: deleting particles there is a sink the physics does not have. Choose <code>remove</code> instead for a face particles genuinely leave through.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> Only meaningful where the particle can reach the face; the policy is ignored on faces nothing crosses. Not allowed on <code>periodic</code> faces. Analytical flows that drive particles through a reflecting face pile them up in the last cell layer.</p>
+<p><b>Interactions.</b> Only meaningful where the particle can reach the face; the policy is ignored on faces nothing crosses. Not allowed on <code>periodic</code> faces, which wrap. Analytical flows that drive particles through a reflecting face pile them up in the last cell layer.</p>
 <p><b>Diagnostics.</b> <code>search_metrics.csv</code> reports <code>reflections</code> and <code>reflection_fallbacks</code> per step; the console prints one INFO line per step with reflections and one WARNING line when any particle reached the cap. A nonzero <code>reflection_fallbacks</code> points at strongly warped boundary cells or very large steps.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-particles</code> mirrors a point about a flat face, a sheared face and a two-face corner, and checks the cap fallback; <code>make unit-runtime</code> reflects a particle through the walking search, including after a tangential walk along the wall.</p>
 <p><b>Limitations.</b> The face is the planar approximation the search uses, so on curved walls a mirrored point can land outside a neighbouring cell's plane and need another reflection. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> velocity is not reset at the wall. Immersed boundaries are not seen by particles.</p>
@@ -344,10 +346,20 @@ remove</h2>
 <p><b>What it does.</b> Ends the particle's search as <code>EXITED</code>; <code>CheckAndRemoveLostParticles</code> removes it after settlement and adds its Psi to the step's exited total. The particle is classified once and is not searched again in later settlement passes.</p>
 <p><b>When to choose it.</b> A face particles leave through: an outlet, an inlet when particles diffuse upstream, or a wall you deliberately treat as absorbing.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> The default for the inlet and outlet handlers and for <code>periodic</code> faces, and what a <code>bcs.run</code> without a <code>particle_policy</code> token means. A corner where one crossed face removes and another reflects removes the particle.</p>
+<p><b>Interactions.</b> The default for the inlet and outlet handlers, and what a <code>bcs.run</code> without a <code>particle_policy</code> token means. A corner where one crossed face removes and another reflects removes the particle.</p>
 <p><b>Diagnostics.</b> <code>search_metrics.csv</code> and <code>Particle_Metrics.log</code> report <code>exited</code>, <code>exited_cumulative</code> and <code>exited_psi_sum</code>; <code>lost</code> counts only search failures, so a nonzero <code>lost</code> is a defect signal rather than outflow.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-mpi</code> pins one exit across a migration pass on two ranks and checks it is counted once; <code>make unit-runtime</code> checks that removal tallies exits and failures separately and keeps the survivor order.</p>
 <p><b>Limitations.</b> A particle that leaves is gone; nothing re-injects it.</p>
+<h2><a class="anchor" id="p44_cap_ppol_wrap_sub"></a>
+wrap</h2>
+<p><a class="anchor" id="p44_cap_ppol_wrap"></a> <b>Identity.</b> <code>particle_policy: wrap</code> -&gt; <code>particle_policy=wrap</code> in <code>bcs.run</code> -&gt; <code>PARTICLE_BOUNDARY_WRAP</code> -&gt; <a class="el" href="walkingsearch_8h.html#a185fb4b04004f734e515310527e63e40">LocateParticleOrFindMigrationTarget</a>.</p>
+<p><b>What it does.</b> When the walk ends beyond a periodic face, shifts the particle by the validated seam translation (<code>periodic_translation</code>, the same vector the Eulerian periodic images use) into the domain, moves the walk to the cell at the other end of that axis and continues. If that cell belongs to another rank, the particle is handed off there. A corner with a wall reflects after wrapping. Psi, weight and particle ID are unchanged.</p>
+<p><b>When to choose it.</b> It is the default and only policy of <code>periodic</code> faces; there is no alternative to choose on them.</p>
+<p><b>Parameters it owns.</b> None.</p>
+<p><b>Interactions.</b> Requires a geometric periodic pair, whose translation the grid setup validates. The dummy cell centres next to a periodic seam, which particle interpolation reads, are the translated images of the cells across the seam, including along periodic edges and at corners.</p>
+<p><b>Diagnostics.</b> <code>search_metrics.csv</code> reports <code>wraps</code> per step; the per-step INFO line counts periodic wraps. In a statistically steady flow, wraps per step should match the mean particle flux through the seam.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-periodic</code> wraps a particle through each x-periodic face and checks the shifted position and landing cell.</p>
+<p><b>Limitations.</b> Only translational periodicity; rotational periods are not supported by the grid contract either.</p>
 <h1><a class="anchor" id="p44_nondim_sec"></a>
 6. Non-Dimensionalization Before C Input</h1>
 <p><code>picurv</code> converts physical BC values to solver-scale values before writing <code>bcs.run</code>:</p>

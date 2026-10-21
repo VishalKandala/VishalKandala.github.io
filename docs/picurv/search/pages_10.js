@@ -1,8 +1,27 @@
 var searchData=
 [
-  ['handoff_0',['Scientific Writing Handoff',['../69_Scientific_Writing_Handoff.html',1,'']]],
-  ['hint_1',['9aebaf8-seed-cell-hint',['../md_docs_2changelog_8d_29aebaf8-seed-cell-hint.html',1,'']]],
-  ['history_20two_20logs_2',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['hom02_20poisson_20rewrite_3',['7d08e19-hom02-poisson-rewrite',['../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html',1,'']]],
-  ['how_20to_20guides_4',['User How-To Guides',['../11_User_How_To_Guides.html',1,'']]]
+  ['gen_0',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['generated_20artifacts_20runtime_1',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['generator_20composed_20geometries_2',['57b539e-grid-generator-composed-geometries',['../md_docs_2changelog_8d_257b539e-grid-generator-composed-geometries.html',1,'']]],
+  ['generator_20fixes_3',['57e1307-grid-generator-fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'']]],
+  ['generator_20guide_3a_20generators_20grid_20gen_4',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['generators_20grid_20gen_5',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['geometries_6',['57b539e-grid-generator-composed-geometries',['../md_docs_2changelog_8d_257b539e-grid-generator-composed-geometries.html',1,'']]],
+  ['getter_7',['f28a813-bc-param-string-getter',['../md_docs_2changelog_8d_2f28a813-bc-param-string-getter.html',1,'']]],
+  ['glossary_8',['Glossary',['../68_Glossary.html',1,'']]],
+  ['gmres_20and_20multigrid_9',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]],
+  ['grid_10',['09de63f-tgv3d-file-grid',['../md_docs_2changelog_8d_209de63f-tgv3d-file-grid.html',1,'']]],
+  ['grid_20cell_20and_20variable_20architecture_20guide_11',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
+  ['grid_20diagnosis_20fixes_12',['e6a0696-les-grid-diagnosis-fixes',['../md_docs_2changelog_8d_2e6a0696-les-grid-diagnosis-fixes.html',1,'']]],
+  ['grid_20evidence_13',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
+  ['grid_20generator_20composed_20geometries_14',['57b539e-grid-generator-composed-geometries',['../md_docs_2changelog_8d_257b539e-grid-generator-composed-geometries.html',1,'']]],
+  ['grid_20generator_20fixes_15',['57e1307-grid-generator-fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'']]],
+  ['grid_20generator_20guide_3a_20generators_20grid_20gen_16',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['grid_20projection_17',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['grid_20search_20robustness_18',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['guide_19',['guide',['../44_Boundary_Conditions_Guide.html',1,'Boundary Conditions Guide'],['../51_C_Test_Suite_Developer_Guide.html',1,'C Test Suite Developer Guide'],['../70_Case_Design_Guide.html',1,'Case Design Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../50_Modular_Selector_Extension_Guide.html',1,'Modular Selector Extension Guide'],['../45_Particle_Initialization_and_Restart.html',1,'Particle Initialization and Restart Guide'],['../61_Storage_Management_Guide.html',1,'Storage Management Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../40_Testing_and_Quality_Guide.html',1,'Testing and Validation Guide'],['../md_tests_2guide.html',1,'Tests Guide'],['../42_User_Guide_Index.html',1,'User Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
+  ['guide_20slurm_20',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['guide_20to_20visualizing_20your_20results_21',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['guide_3a_20generators_20grid_20gen_22',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['guides_23',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
 ];
