@@ -161,7 +161,7 @@ var searchData=
   ['10_20architecture_20and_20extension_20points_158',['10. Architecture and Extension Points',['../58_Field_Statistics.html#p58_architecture_sec',1,'']]],
   ['10_20authoring_20examples_159',['10. Authoring Examples',['../44_Boundary_Conditions_Guide.html#p44_examples_sec',1,'']]],
   ['10_20extending_20the_20test_20suite_160',['10. Extending The Test Suite',['../40_Testing_and_Quality_Guide.html#p40_extend_sec',1,'']]],
-  ['10_20next_20steps_161',['10 next steps',['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps'],['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps'],['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'10. Next Steps']]],
+  ['10_20next_20steps_161',['10 next steps',['../01_Installation.html#p01_next_steps_sec',1,'10. Next Steps'],['../02_Tutorial_Programmatic_Grid.html#p02_next_steps_sec',1,'10. Next Steps'],['../10_Post_Processing_Reference.html#p10_next_steps_sec',1,'10. Next Steps']]],
   ['10_20one_20reducer_20behind_20flow_20observables_162',['10. One Reducer Behind Flow Observables',['../60_Field_Statistics_Planned_Extensions.html#p60_reducer_sec',1,'']]],
   ['10_20profiling_20selector_163',['10. Profiling Selector',['../50_Modular_Selector_Extension_Guide.html#p50_profiling_sec',1,'']]],
   ['10_20related_20pages_164',['10 related pages',['../52_Run_Artifact_Lifecycle_Contract.html#p52_refs_sec',1,'10. Related Pages'],['../56_Field_Identity_and_Layout_Catalog.html#p56_related_sec',1,'10. Related Pages']]],
@@ -215,8 +215,10 @@ var searchData=
   ['1bed094_2dcluster_2dpromotions_2dpetsc_2dstamp_2emd_212',['1bed094-cluster-promotions-petsc-stamp.md',['../1bed094-cluster-promotions-petsc-stamp_8md.html',1,'']]],
   ['1d90f08_20nk_20pointblock_20transpose_213',['1d90f08-nk-pointblock-transpose',['../md_docs_2changelog_8d_21d90f08-nk-pointblock-transpose.html',1,'']]],
   ['1d90f08_2dnk_2dpointblock_2dtranspose_2emd_214',['1d90f08-nk-pointblock-transpose.md',['../1d90f08-nk-pointblock-transpose_8md.html',1,'']]],
-  ['1edd226_20driven_20flow_20log_215',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
-  ['1edd226_2ddriven_2dflow_2dlog_2emd_216',['1edd226-driven-flow-log.md',['../1edd226-driven-flow-log_8md.html',1,'']]],
-  ['1f58998_20swarm_20removal_20promoted_217',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
-  ['1f58998_2dswarm_2dremoval_2dpromoted_2emd_218',['1f58998-swarm-removal-promoted.md',['../1f58998-swarm-removal-promoted_8md.html',1,'']]]
+  ['1d983d2_20wrap_20one_20handoff_20owner_20lookup_215',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['1d983d2_2dwrap_2done_2dhandoff_2downer_2dlookup_2emd_216',['1d983d2-wrap-one-handoff-owner-lookup.md',['../1d983d2-wrap-one-handoff-owner-lookup_8md.html',1,'']]],
+  ['1edd226_20driven_20flow_20log_217',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
+  ['1edd226_2ddriven_2dflow_2dlog_2emd_218',['1edd226-driven-flow-log.md',['../1edd226-driven-flow-log_8md.html',1,'']]],
+  ['1f58998_20swarm_20removal_20promoted_219',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['1f58998_2dswarm_2dremoval_2dpromoted_2emd_220',['1f58998-swarm-removal-promoted.md',['../1f58998-swarm-removal-promoted_8md.html',1,'']]]
 ];

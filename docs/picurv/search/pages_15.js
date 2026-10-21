@@ -13,5 +13,6 @@ var searchData=
   ['location_10',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
   ['log_11',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
   ['logs_12',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['low_20priority_20fixes_13',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
+  ['lookup_13',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['low_20priority_20fixes_14',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
 ];

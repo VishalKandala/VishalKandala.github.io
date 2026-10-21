@@ -147,6 +147,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9309564f12d2507769fa471290ad5aa2" id="r_a9309564f12d2507769fa471290ad5aa2"><td class="memItemLeft" align="right" valign="top">static PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__mpi__kernels_8c.html#a9309564f12d2507769fa471290ad5aa2">TestPeriodicStaggeredFieldSynchronizationMultiRank</a> (void)</td></tr>
 <tr class="memdesc:a9309564f12d2507769fa471290ad5aa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests persistent Ucont synchronization across an MPI-partitioned seam.  <br /></td></tr>
 <tr class="separator:a9309564f12d2507769fa471290ad5aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9e4e1b0d2cdc1f333020e8c089289d5" id="r_ac9e4e1b0d2cdc1f333020e8c089289d5"><td class="memItemLeft" align="right" valign="top">static PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__mpi__kernels_8c.html#ac9e4e1b0d2cdc1f333020e8c089289d5">TestFindOwnerOfCellMatchesRankRanges</a> (void)</td></tr>
+<tr class="memdesc:ac9e4e1b0d2cdc1f333020e8c089289d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The per-axis owner lookup agrees with a scan of every rank's cell ranges.  <br /></td></tr>
+<tr class="separator:ac9e4e1b0d2cdc1f333020e8c089289d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e2883618fbf7f0ef29db18953be8145" id="r_a6e2883618fbf7f0ef29db18953be8145"><td class="memItemLeft" align="right" valign="top">static PetscErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__mpi__kernels_8c.html#a6e2883618fbf7f0ef29db18953be8145">TestRestartCellIdMigrationMovesParticleToOwner</a> (void)</td></tr>
 <tr class="memdesc:a6e2883618fbf7f0ef29db18953be8145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests restart fast-path migration using preloaded cell ownership metadata.  <br /></td></tr>
 <tr class="separator:a6e2883618fbf7f0ef29db18953be8145"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -963,6 +966,96 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="ac9e4e1b0d2cdc1f333020e8c089289d5" name="ac9e4e1b0d2cdc1f333020e8c089289d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9e4e1b0d2cdc1f333020e8c089289d5">&#9670;&#160;</a></span>TestFindOwnerOfCellMatchesRankRanges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static PetscErrorCode TestFindOwnerOfCellMatchesRankRanges </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The per-axis owner lookup agrees with a scan of every rank's cell ranges. </p>
+<p>Checks every cell of the grid, plus cells just outside each face, which have no owner. </p>
+
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00429">429</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  430</span>{</div>
+<div class="line"><span class="lineno">  431</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  432</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
+<div class="line"><span class="lineno">  433</span>    <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> my_cell_info;</div>
+<div class="line"><span class="lineno">  434</span>    PetscMPIInt size = 1;</div>
+<div class="line"><span class="lineno">  435</span> </div>
+<div class="line"><span class="lineno">  436</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  437</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
+<div class="line"><span class="lineno">  438</span>    PetscCall(PetscMemzero(&amp;my_cell_info, <span class="keyword">sizeof</span>(my_cell_info)));</div>
+<div class="line"><span class="lineno">  439</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 6, 4));</div>
+<div class="line"><span class="lineno">  440</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 0, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a>));</div>
+<div class="line"><span class="lineno">  441</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 1, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a>));</div>
+<div class="line"><span class="lineno">  442</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 2, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>));</div>
+<div class="line"><span class="lineno">  443</span>    PetscCall(PetscMalloc1(size, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>));</div>
+<div class="line"><span class="lineno">  444</span>    PetscCallMPI(MPI_Allgather(&amp;my_cell_info, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  445</span>                               user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  446</span>                               PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  447</span> </div>
+<div class="line"><span class="lineno">  448</span>    <span class="keywordflow">for</span> (PetscInt k = -1; k &lt;= user-&gt;<a class="code hl_variable" href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">KM</a> - 1; ++k) {</div>
+<div class="line"><span class="lineno">  449</span>        <span class="keywordflow">for</span> (PetscInt j = -1; j &lt;= user-&gt;<a class="code hl_variable" href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">JM</a> - 1; ++j) {</div>
+<div class="line"><span class="lineno">  450</span>            <span class="keywordflow">for</span> (PetscInt i = -1; i &lt;= user-&gt;<a class="code hl_variable" href="variables_8h.html#ad1904cdee33ebeffba809c883f7e9641">IM</a> - 1; ++i) {</div>
+<div class="line"><span class="lineno">  451</span>                PetscMPIInt owner, expected = -1;</div>
+<div class="line"><span class="lineno">  452</span>                <span class="keywordflow">for</span> (PetscMPIInt r = 0; r &lt; size; ++r) {</div>
+<div class="line"><span class="lineno">  453</span>                    <span class="keyword">const</span> <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> *info = &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[r];</div>
+<div class="line"><span class="lineno">  454</span>                    <span class="keywordflow">if</span> (i &gt;= info-&gt;<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a> &amp;&amp; i &lt; info-&gt;xs_cell + info-&gt;<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a> &amp;&amp;</div>
+<div class="line"><span class="lineno">  455</span>                        j &gt;= info-&gt;<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a> &amp;&amp; j &lt; info-&gt;ys_cell + info-&gt;<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a> &amp;&amp;</div>
+<div class="line"><span class="lineno">  456</span>                        k &gt;= info-&gt;<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a> &amp;&amp; k &lt; info-&gt;zs_cell + info-&gt;<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>) expected = r;</div>
+<div class="line"><span class="lineno">  457</span>                }</div>
+<div class="line"><span class="lineno">  458</span>                PetscCall(<a class="code hl_function" href="walkingsearch_8h.html#a9aedf40cb1545b554e113ebb0863859d">FindOwnerOfCell</a>(user, i, j, k, &amp;owner));</div>
+<div class="line"><span class="lineno">  459</span>                PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(expected, owner, <span class="stringliteral">&quot;owner lookup should match the rank cell ranges&quot;</span>));</div>
+<div class="line"><span class="lineno">  460</span>            }</div>
+<div class="line"><span class="lineno">  461</span>        }</div>
+<div class="line"><span class="lineno">  462</span>    }</div>
+<div class="line"><span class="lineno">  463</span> </div>
+<div class="line"><span class="lineno">  464</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  465</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  466</span>}</div>
+<div class="ttc" id="asetup_8h_html_a135027905841ed83f1a3ef2279d865cc"><div class="ttname"><a href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a></div><div class="ttdeci">PetscErrorCode GetOwnedCellRange(const DMDALocalInfo *info_nodes, PetscInt dim, PetscInt *xs_cell_global_out, PetscInt *xm_cell_local_out)</div><div class="ttdoc">Determines the global starting index and number of CELLS owned by the current processor in a specifie...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02939">setup.c:2939</a></div></div>
+<div class="ttc" id="avariables_8h_html_a118b3648071bd642f8d066878ba920a7"><div class="ttname"><a href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">RankCellInfo::ys_cell</a></div><div class="ttdeci">PetscInt ys_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
+<div class="ttc" id="avariables_8h_html_a19272b97c7c160d257dbe0fc8da2f2d8"><div class="ttname"><a href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">RankCellInfo::xs_cell</a></div><div class="ttdeci">PetscInt xs_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
+<div class="ttc" id="avariables_8h_html_a3f5ec0e4536c9ccaa3d663f14d47f904"><div class="ttname"><a href="variables_8h.html#a3f5ec0e4536c9ccaa3d663f14d47f904">UserCtx::KM</a></div><div class="ttdeci">PetscInt KM</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01105">variables.h:1105</a></div></div>
+<div class="ttc" id="avariables_8h_html_a4b91bc588672c42d8917bf335d1a754e"><div class="ttname"><a href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">RankCellInfo::zm_cell</a></div><div class="ttdeci">PetscInt zm_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
+<div class="ttc" id="avariables_8h_html_a4d6a4d14075dd0718f49111d91c61e1d"><div class="ttname"><a href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">RankCellInfo::zs_cell</a></div><div class="ttdeci">PetscInt zs_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
+<div class="ttc" id="avariables_8h_html_a7b338865846c21925fbb6b968cdf385f"><div class="ttname"><a href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">RankCellInfo::xm_cell</a></div><div class="ttdeci">PetscInt xm_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
+<div class="ttc" id="avariables_8h_html_a7dead9b6c11ee4a34d5bb1ae46b140c9"><div class="ttname"><a href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">UserCtx::RankCellInfoMap</a></div><div class="ttdeci">RankCellInfo * RankCellInfoMap</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01187">variables.h:1187</a></div></div>
+<div class="ttc" id="avariables_8h_html_a823852c48e9bdaa32c354ae7b41f29d7"><div class="ttname"><a href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">RankCellInfo::ym_cell</a></div><div class="ttdeci">PetscInt ym_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
+<div class="ttc" id="avariables_8h_html_aa55a2a246e904b3569075eb4de0092a6"><div class="ttname"><a href="variables_8h.html#aa55a2a246e904b3569075eb4de0092a6">UserCtx::JM</a></div><div class="ttdeci">PetscInt JM</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01105">variables.h:1105</a></div></div>
+<div class="ttc" id="avariables_8h_html_structRankCellInfo"><div class="ttname"><a href="variables_8h.html#structRankCellInfo">RankCellInfo</a></div><div class="ttdoc">A lean struct to hold the global cell ownership range for a single MPI rank.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00230">variables.h:230</a></div></div>
+<div class="ttc" id="awalkingsearch_8h_html_a9aedf40cb1545b554e113ebb0863859d"><div class="ttname"><a href="walkingsearch_8h.html#a9aedf40cb1545b554e113ebb0863859d">FindOwnerOfCell</a></div><div class="ttdeci">PetscErrorCode FindOwnerOfCell(UserCtx *user, PetscInt i, PetscInt j, PetscInt k, PetscMPIInt *owner_rank)</div><div class="ttdoc">Finds the MPI rank that owns a given global cell index.</div><div class="ttdef"><b>Definition</b> <a href="walkingsearch_8c_source.html#l00920">walkingsearch.c:920</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="test__mpi__kernels_8c_ac9e4e1b0d2cdc1f333020e8c089289d5_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="test__mpi__kernels_8c_ac9e4e1b0d2cdc1f333020e8c089289d5_icgraph.svg" width="326" height="51"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
 <a id="a6e2883618fbf7f0ef29db18953be8145" name="a6e2883618fbf7f0ef29db18953be8145"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e2883618fbf7f0ef29db18953be8145">&#9670;&#160;</a></span>TestRestartCellIdMigrationMovesParticleToOwner()</h2>
 
@@ -989,72 +1082,63 @@ Here is the caller graph for this function:</div>
 
 <p>Tests restart fast-path migration using preloaded cell ownership metadata. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00428">428</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  429</span>{</div>
-<div class="line"><span class="lineno">  430</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
-<div class="line"><span class="lineno">  431</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
-<div class="line"><span class="lineno">  432</span>    <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> my_cell_info;</div>
-<div class="line"><span class="lineno">  433</span>    PetscMPIInt rank = 0, size = 1;</div>
-<div class="line"><span class="lineno">  434</span>    PetscInt *cell_ids = NULL;</div>
-<div class="line"><span class="lineno">  435</span>    PetscReal *positions = NULL;</div>
-<div class="line"><span class="lineno">  436</span>    PetscInt nlocal = 0;</div>
-<div class="line"><span class="lineno">  437</span> </div>
-<div class="line"><span class="lineno">  438</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  439</span>    PetscCallMPI(MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank));</div>
-<div class="line"><span class="lineno">  440</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
-<div class="line"><span class="lineno">  441</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, size, <span class="stringliteral">&quot;restart migration unit test expects exactly two MPI ranks&quot;</span>));</div>
-<div class="line"><span class="lineno">  442</span> </div>
-<div class="line"><span class="lineno">  443</span>    PetscCall(PetscMemzero(&amp;my_cell_info, <span class="keyword">sizeof</span>(my_cell_info)));</div>
-<div class="line"><span class="lineno">  444</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 4, 4));</div>
-<div class="line"><span class="lineno">  445</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a4fded7e050920885b9b5154681d88ca2">PicurvCreateSwarmPair</a>(user, 1, <span class="stringliteral">&quot;ske&quot;</span>));</div>
-<div class="line"><span class="lineno">  446</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 0, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a>));</div>
-<div class="line"><span class="lineno">  447</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 1, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a>));</div>
-<div class="line"><span class="lineno">  448</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 2, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>));</div>
-<div class="line"><span class="lineno">  449</span>    PetscCall(PetscMalloc1(size, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>));</div>
-<div class="line"><span class="lineno">  450</span>    PetscCallMPI(MPI_Allgather(&amp;my_cell_info, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
-<div class="line"><span class="lineno">  451</span>                               user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
-<div class="line"><span class="lineno">  452</span>                               PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  453</span> </div>
-<div class="line"><span class="lineno">  454</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
-<div class="line"><span class="lineno">  455</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
-<div class="line"><span class="lineno">  456</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
-<div class="line"><span class="lineno">  457</span>        cell_ids[0] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>;</div>
-<div class="line"><span class="lineno">  458</span>        cell_ids[1] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>;</div>
-<div class="line"><span class="lineno">  459</span>        cell_ids[2] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>;</div>
-<div class="line"><span class="lineno">  460</span>        positions[0] = 0.875;</div>
-<div class="line"><span class="lineno">  461</span>        positions[1] = 0.5;</div>
-<div class="line"><span class="lineno">  462</span>        positions[2] = 0.5;</div>
-<div class="line"><span class="lineno">  463</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  464</span>        cell_ids[0] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>;</div>
-<div class="line"><span class="lineno">  465</span>        cell_ids[1] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>;</div>
-<div class="line"><span class="lineno">  466</span>        cell_ids[2] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>;</div>
-<div class="line"><span class="lineno">  467</span>        positions[0] = 0.95;</div>
-<div class="line"><span class="lineno">  468</span>        positions[1] = 0.5;</div>
-<div class="line"><span class="lineno">  469</span>        positions[2] = 0.5;</div>
-<div class="line"><span class="lineno">  470</span>    }</div>
-<div class="line"><span class="lineno">  471</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
-<div class="line"><span class="lineno">  472</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
-<div class="line"><span class="lineno">  473</span> </div>
-<div class="line"><span class="lineno">  474</span>    PetscCall(<a class="code hl_function" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a>(user));</div>
-<div class="line"><span class="lineno">  475</span>    PetscCall(DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nlocal));</div>
-<div class="line"><span class="lineno">  476</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>((rank == 0) ? 0 : 2, nlocal,</div>
-<div class="line"><span class="lineno">  477</span>                                   <span class="stringliteral">&quot;restart migration should move the foreign particle onto the owning rank&quot;</span>));</div>
-<div class="line"><span class="lineno">  478</span> </div>
-<div class="line"><span class="lineno">  479</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  480</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  481</span>}</div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00471">471</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  472</span>{</div>
+<div class="line"><span class="lineno">  473</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  474</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
+<div class="line"><span class="lineno">  475</span>    <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> my_cell_info;</div>
+<div class="line"><span class="lineno">  476</span>    PetscMPIInt rank = 0, size = 1;</div>
+<div class="line"><span class="lineno">  477</span>    PetscInt *cell_ids = NULL;</div>
+<div class="line"><span class="lineno">  478</span>    PetscReal *positions = NULL;</div>
+<div class="line"><span class="lineno">  479</span>    PetscInt nlocal = 0;</div>
+<div class="line"><span class="lineno">  480</span> </div>
+<div class="line"><span class="lineno">  481</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  482</span>    PetscCallMPI(MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank));</div>
+<div class="line"><span class="lineno">  483</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
+<div class="line"><span class="lineno">  484</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, size, <span class="stringliteral">&quot;restart migration unit test expects exactly two MPI ranks&quot;</span>));</div>
+<div class="line"><span class="lineno">  485</span> </div>
+<div class="line"><span class="lineno">  486</span>    PetscCall(PetscMemzero(&amp;my_cell_info, <span class="keyword">sizeof</span>(my_cell_info)));</div>
+<div class="line"><span class="lineno">  487</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 4, 4));</div>
+<div class="line"><span class="lineno">  488</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a4fded7e050920885b9b5154681d88ca2">PicurvCreateSwarmPair</a>(user, 1, <span class="stringliteral">&quot;ske&quot;</span>));</div>
+<div class="line"><span class="lineno">  489</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 0, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a>));</div>
+<div class="line"><span class="lineno">  490</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 1, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a>));</div>
+<div class="line"><span class="lineno">  491</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 2, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>));</div>
+<div class="line"><span class="lineno">  492</span>    PetscCall(PetscMalloc1(size, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>));</div>
+<div class="line"><span class="lineno">  493</span>    PetscCallMPI(MPI_Allgather(&amp;my_cell_info, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  494</span>                               user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  495</span>                               PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  496</span> </div>
+<div class="line"><span class="lineno">  497</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
+<div class="line"><span class="lineno">  498</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
+<div class="line"><span class="lineno">  499</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line"><span class="lineno">  500</span>        cell_ids[0] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>;</div>
+<div class="line"><span class="lineno">  501</span>        cell_ids[1] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>;</div>
+<div class="line"><span class="lineno">  502</span>        cell_ids[2] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>;</div>
+<div class="line"><span class="lineno">  503</span>        positions[0] = 0.875;</div>
+<div class="line"><span class="lineno">  504</span>        positions[1] = 0.5;</div>
+<div class="line"><span class="lineno">  505</span>        positions[2] = 0.5;</div>
+<div class="line"><span class="lineno">  506</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  507</span>        cell_ids[0] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>;</div>
+<div class="line"><span class="lineno">  508</span>        cell_ids[1] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>;</div>
+<div class="line"><span class="lineno">  509</span>        cell_ids[2] = user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>[1].<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>;</div>
+<div class="line"><span class="lineno">  510</span>        positions[0] = 0.95;</div>
+<div class="line"><span class="lineno">  511</span>        positions[1] = 0.5;</div>
+<div class="line"><span class="lineno">  512</span>        positions[2] = 0.5;</div>
+<div class="line"><span class="lineno">  513</span>    }</div>
+<div class="line"><span class="lineno">  514</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
+<div class="line"><span class="lineno">  515</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
+<div class="line"><span class="lineno">  516</span> </div>
+<div class="line"><span class="lineno">  517</span>    PetscCall(<a class="code hl_function" href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a>(user));</div>
+<div class="line"><span class="lineno">  518</span>    PetscCall(DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nlocal));</div>
+<div class="line"><span class="lineno">  519</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>((rank == 0) ? 0 : 2, nlocal,</div>
+<div class="line"><span class="lineno">  520</span>                                   <span class="stringliteral">&quot;restart migration should move the foreign particle onto the owning rank&quot;</span>));</div>
+<div class="line"><span class="lineno">  521</span> </div>
+<div class="line"><span class="lineno">  522</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  523</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  524</span>}</div>
 <div class="ttc" id="aParticleMotion_8h_html_a71798cc8e6dc473d75f476592ab08e51"><div class="ttname"><a href="ParticleMotion_8h.html#a71798cc8e6dc473d75f476592ab08e51">MigrateRestartParticlesUsingCellID</a></div><div class="ttdeci">PetscErrorCode MigrateRestartParticlesUsingCellID(UserCtx *user)</div><div class="ttdoc">Fast-path migration for restart particles using preloaded Cell IDs.</div><div class="ttdef"><b>Definition</b> <a href="ParticleMotion_8c_source.html#l01204">ParticleMotion.c:1204</a></div></div>
-<div class="ttc" id="asetup_8h_html_a135027905841ed83f1a3ef2279d865cc"><div class="ttname"><a href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a></div><div class="ttdeci">PetscErrorCode GetOwnedCellRange(const DMDALocalInfo *info_nodes, PetscInt dim, PetscInt *xs_cell_global_out, PetscInt *xm_cell_local_out)</div><div class="ttdoc">Determines the global starting index and number of CELLS owned by the current processor in a specifie...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02939">setup.c:2939</a></div></div>
 <div class="ttc" id="atest__support_8c_html_a4fded7e050920885b9b5154681d88ca2"><div class="ttname"><a href="test__support_8c.html#a4fded7e050920885b9b5154681d88ca2">PicurvCreateSwarmPair</a></div><div class="ttdeci">PetscErrorCode PicurvCreateSwarmPair(UserCtx *user, PetscInt nlocal, const char *post_field_name)</div><div class="ttdoc">Creates matched solver and post-processing swarms for tests.</div><div class="ttdef"><b>Definition</b> <a href="test__support_8c_source.html#l00748">test_support.c:748</a></div></div>
-<div class="ttc" id="avariables_8h_html_a118b3648071bd642f8d066878ba920a7"><div class="ttname"><a href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">RankCellInfo::ys_cell</a></div><div class="ttdeci">PetscInt ys_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
 <div class="ttc" id="avariables_8h_html_a1675749ea3b2429f00405a1ee3203d18"><div class="ttname"><a href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">UserCtx::swarm</a></div><div class="ttdeci">DM swarm</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01186">variables.h:1186</a></div></div>
-<div class="ttc" id="avariables_8h_html_a19272b97c7c160d257dbe0fc8da2f2d8"><div class="ttname"><a href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">RankCellInfo::xs_cell</a></div><div class="ttdeci">PetscInt xs_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
-<div class="ttc" id="avariables_8h_html_a4b91bc588672c42d8917bf335d1a754e"><div class="ttname"><a href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">RankCellInfo::zm_cell</a></div><div class="ttdeci">PetscInt zm_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
-<div class="ttc" id="avariables_8h_html_a4d6a4d14075dd0718f49111d91c61e1d"><div class="ttname"><a href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">RankCellInfo::zs_cell</a></div><div class="ttdeci">PetscInt zs_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00231">variables.h:231</a></div></div>
-<div class="ttc" id="avariables_8h_html_a7b338865846c21925fbb6b968cdf385f"><div class="ttname"><a href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">RankCellInfo::xm_cell</a></div><div class="ttdeci">PetscInt xm_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
-<div class="ttc" id="avariables_8h_html_a7dead9b6c11ee4a34d5bb1ae46b140c9"><div class="ttname"><a href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">UserCtx::RankCellInfoMap</a></div><div class="ttdeci">RankCellInfo * RankCellInfoMap</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01187">variables.h:1187</a></div></div>
-<div class="ttc" id="avariables_8h_html_a823852c48e9bdaa32c354ae7b41f29d7"><div class="ttname"><a href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">RankCellInfo::ym_cell</a></div><div class="ttdeci">PetscInt ym_cell</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00232">variables.h:232</a></div></div>
-<div class="ttc" id="avariables_8h_html_structRankCellInfo"><div class="ttname"><a href="variables_8h.html#structRankCellInfo">RankCellInfo</a></div><div class="ttdoc">A lean struct to hold the global cell ownership range for a single MPI rank.</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00230">variables.h:230</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1095,70 +1179,70 @@ Here is the caller graph for this function:</div>
 <p>A particle that left the domain is classified once and never re-searched in later passes. </p>
 <p>Rank 0 holds one particle beyond the -Xi face and one that has moved into rank 1, so the settlement needs a second pass. The leaving particle must end EXITED after pass 1 and be skipped afterwards: re-searching it is what used to count it as lost once per pass and, on curved boundaries, migrate it between ranks until the pass limit aborted the run. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00490">490</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  491</span>{</div>
-<div class="line"><span class="lineno">  492</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
-<div class="line"><span class="lineno">  493</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
-<div class="line"><span class="lineno">  494</span>    <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> my_cell_info;</div>
-<div class="line"><span class="lineno">  495</span>    PetscMPIInt rank = 0, size = 1;</div>
-<div class="line"><span class="lineno">  496</span>    PetscInt *cell_ids = NULL, *status = NULL;</div>
-<div class="line"><span class="lineno">  497</span>    PetscReal *positions = NULL;</div>
-<div class="line"><span class="lineno">  498</span>    PetscInt nlocal = 0;</div>
-<div class="line"><span class="lineno">  499</span>    PetscInt64 local_counts[2], global_counts[2];</div>
-<div class="line"><span class="lineno">  500</span> </div>
-<div class="line"><span class="lineno">  501</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  502</span>    PetscCallMPI(MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank));</div>
-<div class="line"><span class="lineno">  503</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
-<div class="line"><span class="lineno">  504</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, size, <span class="stringliteral">&quot;settlement exit test expects exactly two MPI ranks&quot;</span>));</div>
-<div class="line"><span class="lineno">  505</span> </div>
-<div class="line"><span class="lineno">  506</span>    PetscCall(PetscMemzero(&amp;my_cell_info, <span class="keyword">sizeof</span>(my_cell_info)));</div>
-<div class="line"><span class="lineno">  507</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 4, 4));</div>
-<div class="line"><span class="lineno">  508</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a4fded7e050920885b9b5154681d88ca2">PicurvCreateSwarmPair</a>(user, (rank == 0) ? 2 : 0, <span class="stringliteral">&quot;ske&quot;</span>));</div>
-<div class="line"><span class="lineno">  509</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 0, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a>));</div>
-<div class="line"><span class="lineno">  510</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 1, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a>));</div>
-<div class="line"><span class="lineno">  511</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 2, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>));</div>
-<div class="line"><span class="lineno">  512</span>    PetscCall(PetscMalloc1(size, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>));</div>
-<div class="line"><span class="lineno">  513</span>    PetscCallMPI(MPI_Allgather(&amp;my_cell_info, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
-<div class="line"><span class="lineno">  514</span>                               user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
-<div class="line"><span class="lineno">  515</span>                               PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  516</span> </div>
-<div class="line"><span class="lineno">  517</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
-<div class="line"><span class="lineno">  518</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
-<div class="line"><span class="lineno">  519</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
-<div class="line"><span class="lineno">  520</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
-<div class="line"><span class="lineno">  521</span>        <span class="comment">/* Particle 0 left through -Xi from boundary cell (0,1,1), well inside the blocked-walk guard. */</span></div>
-<div class="line"><span class="lineno">  522</span>        cell_ids[0] = 0; cell_ids[1] = 1; cell_ids[2] = 1;</div>
-<div class="line"><span class="lineno">  523</span>        positions[0] = -0.05; positions[1] = 0.5; positions[2] = 0.5;</div>
-<div class="line"><span class="lineno">  524</span>        <span class="comment">/* Particle 1 moved from rank 0&#39;s last owned cell into rank 1&#39;s subdomain. */</span></div>
-<div class="line"><span class="lineno">  525</span>        cell_ids[3] = my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a> + my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a> - 1; cell_ids[4] = 1; cell_ids[5] = 1;</div>
-<div class="line"><span class="lineno">  526</span>        positions[3] = 0.875; positions[4] = 0.5; positions[5] = 0.5;</div>
-<div class="line"><span class="lineno">  527</span>        status[0] = <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a">NEEDS_LOCATION</a>;</div>
-<div class="line"><span class="lineno">  528</span>        status[1] = <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a">NEEDS_LOCATION</a>;</div>
-<div class="line"><span class="lineno">  529</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
-<div class="line"><span class="lineno">  530</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
-<div class="line"><span class="lineno">  531</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
-<div class="line"><span class="lineno">  532</span>    }</div>
-<div class="line"><span class="lineno">  533</span> </div>
-<div class="line"><span class="lineno">  534</span>    PetscCall(<a class="code hl_function" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a>(user, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8c248c162038dffe12e38228bcd06644">bboxlist</a>));</div>
-<div class="line"><span class="lineno">  535</span> </div>
-<div class="line"><span class="lineno">  536</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad004a4e44f6fbc15c2f92a386e0c06ac">migrationPassesLastStep</a>,</div>
-<div class="line"><span class="lineno">  537</span>                                   <span class="stringliteral">&quot;one migration and one confirming pass should settle both particles&quot;</span>));</div>
-<div class="line"><span class="lineno">  538</span>    PetscCall(DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nlocal));</div>
-<div class="line"><span class="lineno">  539</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(1, nlocal, <span class="stringliteral">&quot;each rank should hold one particle after settlement&quot;</span>));</div>
-<div class="line"><span class="lineno">  540</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
-<div class="line"><span class="lineno">  541</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>((rank == 0) ? <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581ab9f9543350f6bd6191e52158daa88884">EXITED</a> : <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a97d609accacbcc1a41e4da5ac052f253">ACTIVE_AND_LOCATED</a>, status[0],</div>
-<div class="line"><span class="lineno">  542</span>                                   <span class="stringliteral">&quot;the leaving particle should be EXITED and the migrated one located&quot;</span>));</div>
-<div class="line"><span class="lineno">  543</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
-<div class="line"><span class="lineno">  544</span> </div>
-<div class="line"><span class="lineno">  545</span>    local_counts[0] = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac632e6eba64bb40674075b91bbbb3176">searchMetrics</a>.<a class="code hl_variable" href="variables_8h.html#a68032ced215ce62f7836a55bcaff6897">searchExitedCount</a>;</div>
-<div class="line"><span class="lineno">  546</span>    local_counts[1] = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac632e6eba64bb40674075b91bbbb3176">searchMetrics</a>.<a class="code hl_variable" href="variables_8h.html#a26debd620ad355cde5bee14772c92428">searchLostCount</a>;</div>
-<div class="line"><span class="lineno">  547</span>    PetscCallMPI(MPI_Allreduce(local_counts, global_counts, 2, MPIU_INT64, MPI_SUM, PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  548</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(1, (PetscInt)global_counts[0], <span class="stringliteral">&quot;the exit should be counted once, not once per pass&quot;</span>));</div>
-<div class="line"><span class="lineno">  549</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(0, (PetscInt)global_counts[1], <span class="stringliteral">&quot;no search failed&quot;</span>));</div>
-<div class="line"><span class="lineno">  550</span> </div>
-<div class="line"><span class="lineno">  551</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  552</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  553</span>}</div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00533">533</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  534</span>{</div>
+<div class="line"><span class="lineno">  535</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  536</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
+<div class="line"><span class="lineno">  537</span>    <a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a> my_cell_info;</div>
+<div class="line"><span class="lineno">  538</span>    PetscMPIInt rank = 0, size = 1;</div>
+<div class="line"><span class="lineno">  539</span>    PetscInt *cell_ids = NULL, *status = NULL;</div>
+<div class="line"><span class="lineno">  540</span>    PetscReal *positions = NULL;</div>
+<div class="line"><span class="lineno">  541</span>    PetscInt nlocal = 0;</div>
+<div class="line"><span class="lineno">  542</span>    PetscInt64 local_counts[2], global_counts[2];</div>
+<div class="line"><span class="lineno">  543</span> </div>
+<div class="line"><span class="lineno">  544</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  545</span>    PetscCallMPI(MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank));</div>
+<div class="line"><span class="lineno">  546</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
+<div class="line"><span class="lineno">  547</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, size, <span class="stringliteral">&quot;settlement exit test expects exactly two MPI ranks&quot;</span>));</div>
+<div class="line"><span class="lineno">  548</span> </div>
+<div class="line"><span class="lineno">  549</span>    PetscCall(PetscMemzero(&amp;my_cell_info, <span class="keyword">sizeof</span>(my_cell_info)));</div>
+<div class="line"><span class="lineno">  550</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 4, 4));</div>
+<div class="line"><span class="lineno">  551</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a4fded7e050920885b9b5154681d88ca2">PicurvCreateSwarmPair</a>(user, (rank == 0) ? 2 : 0, <span class="stringliteral">&quot;ske&quot;</span>));</div>
+<div class="line"><span class="lineno">  552</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 0, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a>));</div>
+<div class="line"><span class="lineno">  553</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 1, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a118b3648071bd642f8d066878ba920a7">ys_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a823852c48e9bdaa32c354ae7b41f29d7">ym_cell</a>));</div>
+<div class="line"><span class="lineno">  554</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>, 2, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4d6a4d14075dd0718f49111d91c61e1d">zs_cell</a>, &amp;my_cell_info.<a class="code hl_variable" href="variables_8h.html#a4b91bc588672c42d8917bf335d1a754e">zm_cell</a>));</div>
+<div class="line"><span class="lineno">  555</span>    PetscCall(PetscMalloc1(size, &amp;user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>));</div>
+<div class="line"><span class="lineno">  556</span>    PetscCallMPI(MPI_Allgather(&amp;my_cell_info, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  557</span>                               user-&gt;<a class="code hl_variable" href="variables_8h.html#a7dead9b6c11ee4a34d5bb1ae46b140c9">RankCellInfoMap</a>, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="variables_8h.html#structRankCellInfo">RankCellInfo</a>), MPI_BYTE,</div>
+<div class="line"><span class="lineno">  558</span>                               PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  559</span> </div>
+<div class="line"><span class="lineno">  560</span>    <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line"><span class="lineno">  561</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
+<div class="line"><span class="lineno">  562</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
+<div class="line"><span class="lineno">  563</span>        PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
+<div class="line"><span class="lineno">  564</span>        <span class="comment">/* Particle 0 left through -Xi from boundary cell (0,1,1), well inside the blocked-walk guard. */</span></div>
+<div class="line"><span class="lineno">  565</span>        cell_ids[0] = 0; cell_ids[1] = 1; cell_ids[2] = 1;</div>
+<div class="line"><span class="lineno">  566</span>        positions[0] = -0.05; positions[1] = 0.5; positions[2] = 0.5;</div>
+<div class="line"><span class="lineno">  567</span>        <span class="comment">/* Particle 1 moved from rank 0&#39;s last owned cell into rank 1&#39;s subdomain. */</span></div>
+<div class="line"><span class="lineno">  568</span>        cell_ids[3] = my_cell_info.<a class="code hl_variable" href="variables_8h.html#a19272b97c7c160d257dbe0fc8da2f2d8">xs_cell</a> + my_cell_info.<a class="code hl_variable" href="variables_8h.html#a7b338865846c21925fbb6b968cdf385f">xm_cell</a> - 1; cell_ids[4] = 1; cell_ids[5] = 1;</div>
+<div class="line"><span class="lineno">  569</span>        positions[3] = 0.875; positions[4] = 0.5; positions[5] = 0.5;</div>
+<div class="line"><span class="lineno">  570</span>        status[0] = <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a">NEEDS_LOCATION</a>;</div>
+<div class="line"><span class="lineno">  571</span>        status[1] = <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a">NEEDS_LOCATION</a>;</div>
+<div class="line"><span class="lineno">  572</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
+<div class="line"><span class="lineno">  573</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;position&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;positions));</div>
+<div class="line"><span class="lineno">  574</span>        PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_CellID&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;cell_ids));</div>
+<div class="line"><span class="lineno">  575</span>    }</div>
+<div class="line"><span class="lineno">  576</span> </div>
+<div class="line"><span class="lineno">  577</span>    PetscCall(<a class="code hl_function" href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a>(user, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8c248c162038dffe12e38228bcd06644">bboxlist</a>));</div>
+<div class="line"><span class="lineno">  578</span> </div>
+<div class="line"><span class="lineno">  579</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(2, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ad004a4e44f6fbc15c2f92a386e0c06ac">migrationPassesLastStep</a>,</div>
+<div class="line"><span class="lineno">  580</span>                                   <span class="stringliteral">&quot;one migration and one confirming pass should settle both particles&quot;</span>));</div>
+<div class="line"><span class="lineno">  581</span>    PetscCall(DMSwarmGetLocalSize(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, &amp;nlocal));</div>
+<div class="line"><span class="lineno">  582</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(1, nlocal, <span class="stringliteral">&quot;each rank should hold one particle after settlement&quot;</span>));</div>
+<div class="line"><span class="lineno">  583</span>    PetscCall(DMSwarmGetField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
+<div class="line"><span class="lineno">  584</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>((rank == 0) ? <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581ab9f9543350f6bd6191e52158daa88884">EXITED</a> : <a class="code hl_enumvalue" href="variables_8h.html#a347829443e8a679209e21f7f04f51581a97d609accacbcc1a41e4da5ac052f253">ACTIVE_AND_LOCATED</a>, status[0],</div>
+<div class="line"><span class="lineno">  585</span>                                   <span class="stringliteral">&quot;the leaving particle should be EXITED and the migrated one located&quot;</span>));</div>
+<div class="line"><span class="lineno">  586</span>    PetscCall(DMSwarmRestoreField(user-&gt;<a class="code hl_variable" href="variables_8h.html#a1675749ea3b2429f00405a1ee3203d18">swarm</a>, <span class="stringliteral">&quot;DMSwarm_location_status&quot;</span>, NULL, NULL, (<span class="keywordtype">void</span> **)&amp;status));</div>
+<div class="line"><span class="lineno">  587</span> </div>
+<div class="line"><span class="lineno">  588</span>    local_counts[0] = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac632e6eba64bb40674075b91bbbb3176">searchMetrics</a>.<a class="code hl_variable" href="variables_8h.html#a68032ced215ce62f7836a55bcaff6897">searchExitedCount</a>;</div>
+<div class="line"><span class="lineno">  589</span>    local_counts[1] = simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac632e6eba64bb40674075b91bbbb3176">searchMetrics</a>.<a class="code hl_variable" href="variables_8h.html#a26debd620ad355cde5bee14772c92428">searchLostCount</a>;</div>
+<div class="line"><span class="lineno">  590</span>    PetscCallMPI(MPI_Allreduce(local_counts, global_counts, 2, MPIU_INT64, MPI_SUM, PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  591</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(1, (PetscInt)global_counts[0], <span class="stringliteral">&quot;the exit should be counted once, not once per pass&quot;</span>));</div>
+<div class="line"><span class="lineno">  592</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(0, (PetscInt)global_counts[1], <span class="stringliteral">&quot;no search failed&quot;</span>));</div>
+<div class="line"><span class="lineno">  593</span> </div>
+<div class="line"><span class="lineno">  594</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  595</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  596</span>}</div>
 <div class="ttc" id="aParticleMotion_8h_html_a857de73a8c91691b5c08c57ab531ddd8"><div class="ttname"><a href="ParticleMotion_8h.html#a857de73a8c91691b5c08c57ab531ddd8">LocateAllParticlesInGrid</a></div><div class="ttdeci">PetscErrorCode LocateAllParticlesInGrid(UserCtx *user, BoundingBox *bboxlist)</div><div class="ttdoc">Orchestrates the complete particle location and migration process for one timestep.</div><div class="ttdef"><b>Definition</b> <a href="ParticleMotion_8c_source.html#l01406">ParticleMotion.c:1406</a></div></div>
 <div class="ttc" id="avariables_8h_html_a26debd620ad355cde5bee14772c92428"><div class="ttname"><a href="variables_8h.html#a26debd620ad355cde5bee14772c92428">SearchMetricsState::searchLostCount</a></div><div class="ttdeci">PetscInt64 searchLostCount</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00269">variables.h:269</a></div></div>
 <div class="ttc" id="avariables_8h_html_a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a"><div class="ttname"><a href="variables_8h.html#a347829443e8a679209e21f7f04f51581a73a50b46251a0e24a0e2ed0e0082003a">NEEDS_LOCATION</a></div><div class="ttdeci">@ NEEDS_LOCATION</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00164">variables.h:164</a></div></div>
@@ -1208,56 +1292,56 @@ Here is the caller graph for this function:</div>
 <p>Spatial target domains must not depend on how ranks divide the block. </p>
 <p>The global point count is a function of layout, global dimensions, and periodicity alone. Summing the per-rank counts must therefore reproduce the same analytic totals a single rank computes, with no point counted twice at a decomposition seam and none dropped. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00562">562</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  563</span>{</div>
-<div class="line"><span class="lineno">  564</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
-<div class="line"><span class="lineno">  565</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
-<div class="line"><span class="lineno">  566</span>    <a class="code hl_struct" href="statistics__target_8h.html#structSpatialTargetPlan">SpatialTargetPlan</a> plan;</div>
-<div class="line"><span class="lineno">  567</span>    PetscInt local = 0, global = 0, rank_count = 0;</div>
-<div class="line"><span class="lineno">  568</span>    PetscMPIInt size = 0;</div>
-<div class="line"><span class="lineno">  569</span>    <span class="keyword">const</span> PetscInt n = 6;          <span class="comment">/* DMDA is n + 1 = 7 per dimension */</span></div>
-<div class="line"><span class="lineno">  570</span>    <span class="keyword">const</span> PetscInt cell = 5;       <span class="comment">/* cell-like span [1, 6) */</span></div>
-<div class="line"><span class="lineno">  571</span>    <span class="keyword">const</span> PetscInt <a class="code hl_struct" href="variables_8h.html#structnode">node</a> = 6;       <span class="comment">/* node-like nonperiodic span [0, 6) */</span></div>
-<div class="line"><span class="lineno">  572</span> </div>
-<div class="line"><span class="lineno">  573</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  574</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
-<div class="line"><span class="lineno">  575</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, n, n, n));</div>
-<div class="line"><span class="lineno">  576</span> </div>
-<div class="line"><span class="lineno">  577</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
-<div class="line"><span class="lineno">  578</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a7d259160fcb7caca22799813e09e1e62">SpatialTargetPlanLocalPointCount</a>(&amp;plan, &amp;local));</div>
-<div class="line"><span class="lineno">  579</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
-<div class="line"><span class="lineno">  580</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(cell * cell * cell, global,</div>
-<div class="line"><span class="lineno">  581</span>                                   <span class="stringliteral">&quot;cell-centered global count must be decomposition independent&quot;</span>));</div>
-<div class="line"><span class="lineno">  582</span> </div>
-<div class="line"><span class="lineno">  583</span>    <span class="comment">/* Every rank must contribute a non-negative count, and the ranks together</span></div>
-<div class="line"><span class="lineno">  584</span><span class="comment">     * must contribute the whole domain exactly once. */</span></div>
-<div class="line"><span class="lineno">  585</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(local &gt;= 0), <span class="stringliteral">&quot;local point count must be non-negative&quot;</span>));</div>
-<div class="line"><span class="lineno">  586</span>    PetscCallMPI(MPI_Allreduce(&amp;local, &amp;rank_count, 1, MPIU_INT, MPI_SUM, PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  587</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(global, rank_count,</div>
-<div class="line"><span class="lineno">  588</span>                                   <span class="stringliteral">&quot;summed local counts must equal the reduced global count&quot;</span>));</div>
-<div class="line"><span class="lineno">  589</span> </div>
-<div class="line"><span class="lineno">  590</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a10c77d672e7ea2dc9d4e945c9390274a">FIELD_ID_CSI</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
-<div class="line"><span class="lineno">  591</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
-<div class="line"><span class="lineno">  592</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(<a class="code hl_struct" href="variables_8h.html#structnode">node</a> * cell * cell, global,</div>
-<div class="line"><span class="lineno">  593</span>                                   <span class="stringliteral">&quot;I-face global count must be decomposition independent&quot;</span>));</div>
-<div class="line"><span class="lineno">  594</span> </div>
-<div class="line"><span class="lineno">  595</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642">FIELD_ID_COORDINATES</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
-<div class="line"><span class="lineno">  596</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
-<div class="line"><span class="lineno">  597</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(<a class="code hl_struct" href="variables_8h.html#structnode">node</a> * <a class="code hl_struct" href="variables_8h.html#structnode">node</a> * <a class="code hl_struct" href="variables_8h.html#structnode">node</a>, global,</div>
-<div class="line"><span class="lineno">  598</span>                                   <span class="stringliteral">&quot;node-centered global count must be decomposition independent&quot;</span>));</div>
-<div class="line"><span class="lineno">  599</span> </div>
-<div class="line"><span class="lineno">  600</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  601</span> </div>
-<div class="line"><span class="lineno">  602</span>    <span class="comment">/* Fully periodic: duplicate planes must be dropped once globally, not once per rank. */</span></div>
-<div class="line"><span class="lineno">  603</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a30acb18b44f81f5e0eda73488feb2a6e">PicurvCreateMinimalContextsWithPeriodicity</a>(&amp;simCtx, &amp;user, n, n, n,</div>
-<div class="line"><span class="lineno">  604</span>                                                         PETSC_TRUE, PETSC_TRUE, PETSC_TRUE));</div>
-<div class="line"><span class="lineno">  605</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642">FIELD_ID_COORDINATES</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
-<div class="line"><span class="lineno">  606</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
-<div class="line"><span class="lineno">  607</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(cell * cell * cell, global,</div>
-<div class="line"><span class="lineno">  608</span>                                   <span class="stringliteral">&quot;fully periodic node-centered count must drop duplicates exactly once&quot;</span>));</div>
-<div class="line"><span class="lineno">  609</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  610</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  611</span>}</div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00605">605</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  606</span>{</div>
+<div class="line"><span class="lineno">  607</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  608</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
+<div class="line"><span class="lineno">  609</span>    <a class="code hl_struct" href="statistics__target_8h.html#structSpatialTargetPlan">SpatialTargetPlan</a> plan;</div>
+<div class="line"><span class="lineno">  610</span>    PetscInt local = 0, global = 0, rank_count = 0;</div>
+<div class="line"><span class="lineno">  611</span>    PetscMPIInt size = 0;</div>
+<div class="line"><span class="lineno">  612</span>    <span class="keyword">const</span> PetscInt n = 6;          <span class="comment">/* DMDA is n + 1 = 7 per dimension */</span></div>
+<div class="line"><span class="lineno">  613</span>    <span class="keyword">const</span> PetscInt cell = 5;       <span class="comment">/* cell-like span [1, 6) */</span></div>
+<div class="line"><span class="lineno">  614</span>    <span class="keyword">const</span> PetscInt <a class="code hl_struct" href="variables_8h.html#structnode">node</a> = 6;       <span class="comment">/* node-like nonperiodic span [0, 6) */</span></div>
+<div class="line"><span class="lineno">  615</span> </div>
+<div class="line"><span class="lineno">  616</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  617</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
+<div class="line"><span class="lineno">  618</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, n, n, n));</div>
+<div class="line"><span class="lineno">  619</span> </div>
+<div class="line"><span class="lineno">  620</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
+<div class="line"><span class="lineno">  621</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a7d259160fcb7caca22799813e09e1e62">SpatialTargetPlanLocalPointCount</a>(&amp;plan, &amp;local));</div>
+<div class="line"><span class="lineno">  622</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
+<div class="line"><span class="lineno">  623</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(cell * cell * cell, global,</div>
+<div class="line"><span class="lineno">  624</span>                                   <span class="stringliteral">&quot;cell-centered global count must be decomposition independent&quot;</span>));</div>
+<div class="line"><span class="lineno">  625</span> </div>
+<div class="line"><span class="lineno">  626</span>    <span class="comment">/* Every rank must contribute a non-negative count, and the ranks together</span></div>
+<div class="line"><span class="lineno">  627</span><span class="comment">     * must contribute the whole domain exactly once. */</span></div>
+<div class="line"><span class="lineno">  628</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(local &gt;= 0), <span class="stringliteral">&quot;local point count must be non-negative&quot;</span>));</div>
+<div class="line"><span class="lineno">  629</span>    PetscCallMPI(MPI_Allreduce(&amp;local, &amp;rank_count, 1, MPIU_INT, MPI_SUM, PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  630</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(global, rank_count,</div>
+<div class="line"><span class="lineno">  631</span>                                   <span class="stringliteral">&quot;summed local counts must equal the reduced global count&quot;</span>));</div>
+<div class="line"><span class="lineno">  632</span> </div>
+<div class="line"><span class="lineno">  633</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a10c77d672e7ea2dc9d4e945c9390274a">FIELD_ID_CSI</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
+<div class="line"><span class="lineno">  634</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
+<div class="line"><span class="lineno">  635</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(<a class="code hl_struct" href="variables_8h.html#structnode">node</a> * cell * cell, global,</div>
+<div class="line"><span class="lineno">  636</span>                                   <span class="stringliteral">&quot;I-face global count must be decomposition independent&quot;</span>));</div>
+<div class="line"><span class="lineno">  637</span> </div>
+<div class="line"><span class="lineno">  638</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642">FIELD_ID_COORDINATES</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
+<div class="line"><span class="lineno">  639</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
+<div class="line"><span class="lineno">  640</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(<a class="code hl_struct" href="variables_8h.html#structnode">node</a> * <a class="code hl_struct" href="variables_8h.html#structnode">node</a> * <a class="code hl_struct" href="variables_8h.html#structnode">node</a>, global,</div>
+<div class="line"><span class="lineno">  641</span>                                   <span class="stringliteral">&quot;node-centered global count must be decomposition independent&quot;</span>));</div>
+<div class="line"><span class="lineno">  642</span> </div>
+<div class="line"><span class="lineno">  643</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  644</span> </div>
+<div class="line"><span class="lineno">  645</span>    <span class="comment">/* Fully periodic: duplicate planes must be dropped once globally, not once per rank. */</span></div>
+<div class="line"><span class="lineno">  646</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a30acb18b44f81f5e0eda73488feb2a6e">PicurvCreateMinimalContextsWithPeriodicity</a>(&amp;simCtx, &amp;user, n, n, n,</div>
+<div class="line"><span class="lineno">  647</span>                                                         PETSC_TRUE, PETSC_TRUE, PETSC_TRUE));</div>
+<div class="line"><span class="lineno">  648</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642">FIELD_ID_COORDINATES</a>, <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
+<div class="line"><span class="lineno">  649</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a87d005cab0aca4e66cd51a5a0645661f">SpatialTargetPlanGlobalPointCount</a>(&amp;plan, PETSC_COMM_WORLD, &amp;global));</div>
+<div class="line"><span class="lineno">  650</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(cell * cell * cell, global,</div>
+<div class="line"><span class="lineno">  651</span>                                   <span class="stringliteral">&quot;fully periodic node-centered count must drop duplicates exactly once&quot;</span>));</div>
+<div class="line"><span class="lineno">  652</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  653</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  654</span>}</div>
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2a10c77d672e7ea2dc9d4e945c9390274a"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a10c77d672e7ea2dc9d4e945c9390274a">FIELD_ID_CSI</a></div><div class="ttdeci">@ FIELD_ID_CSI</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00037">field_catalog.h:37</a></div></div>
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a45fb168032a6bfd58b267fa061e9b642">FIELD_ID_COORDINATES</a></div><div class="ttdeci">@ FIELD_ID_COORDINATES</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00025">field_catalog.h:25</a></div></div>
 <div class="ttc" id="astatistics__target_8h_html_a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434"><div class="ttname"><a href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a></div><div class="ttdeci">@ PICURV_STATISTICS_MASK_FLUID</div><div class="ttdef"><b>Definition</b> <a href="statistics__target_8h_source.html#l00039">statistics_target.h:38</a></div></div>
@@ -1306,127 +1390,127 @@ Here is the caller graph for this function:</div>
 <p>Statistics payloads must survive a checkpoint round trip under decomposition. </p>
 <p>The write path gathers each accumulator into natural ordering before it reaches disk, and the read path scatters it back. That pairing is where a decomposition bug would live, so this drives the whole cycle on more than one rank and requires an exact match: the format stores IEEE doubles, and natural ordering is defined to be independent of how ranks divide the block. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00622">622</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  623</span>{</div>
-<div class="line"><span class="lineno">  624</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
-<div class="line"><span class="lineno">  625</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
-<div class="line"><span class="lineno">  626</span>    <a class="code hl_struct" href="statistics__window_8h.html#structPicurvWindow">PicurvWindow</a> window;</div>
-<div class="line"><span class="lineno">  627</span>    <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvWindowStorage">PicurvWindowStorage</a> storage;</div>
-<div class="line"><span class="lineno">  628</span>    <a class="code hl_struct" href="statistics__window_8h.html#structPicurvWindowDefinition">PicurvWindowDefinition</a> definition;</div>
-<div class="line"><span class="lineno">  629</span>    Vec *reference = NULL;</div>
-<div class="line"><span class="lineno">  630</span>    <span class="keywordtype">char</span> tmpdir[PETSC_MAX_PATH_LEN];</div>
-<div class="line"><span class="lineno">  631</span>    PetscInt payload_count = 0;</div>
-<div class="line"><span class="lineno">  632</span>    PetscMPIInt size = 0;</div>
-<div class="line"><span class="lineno">  633</span> </div>
-<div class="line"><span class="lineno">  634</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  635</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
-<div class="line"><span class="lineno">  636</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(size &gt;= 2), <span class="stringliteral">&quot;unit-mpi requires at least two MPI ranks&quot;</span>));</div>
-<div class="line"><span class="lineno">  637</span> </div>
-<div class="line"><span class="lineno">  638</span>    memset(&amp;definition, 0, <span class="keyword">sizeof</span>(definition));</div>
-<div class="line"><span class="lineno">  639</span>    strncpy(definition.<a class="code hl_variable" href="statistics__window_8h.html#a6de30d7401676083ddaf37463740b68f">name</a>, <span class="stringliteral">&quot;production&quot;</span>, <a class="code hl_define" href="statistics__window_8h.html#a941bf9e9e702ab5685723ded07e8b860">PICURV_WINDOW_NAME_LENGTH</a> - 1);</div>
-<div class="line"><span class="lineno">  640</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#aff366ea4b51210605ba10041a7ecafa1">weighting</a> = <a class="code hl_enumvalue" href="statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57a396fdf5734087712d084f9a26210fa20">PICURV_WEIGHTING_PHYSICAL_TIME</a>;</div>
-<div class="line"><span class="lineno">  641</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a8d423e744bb5383f38dd93b0b69e5312">cadence_kind</a> = <a class="code hl_enumvalue" href="statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658ada23859933a896698ea08c8ad2dd281c">PICURV_CADENCE_STEP</a>;</div>
-<div class="line"><span class="lineno">  642</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a93d0754cf63a9aa498ed0c7c204461b3">step_cadence</a> = 1;</div>
-<div class="line"><span class="lineno">  643</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a522bc3b064d3183b5d8c4ec484e0b07f">field_count</a> = 2;</div>
-<div class="line"><span class="lineno">  644</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#adee8da252617e6c4faf1faad24093208">field_id</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>; definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41">want_second</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  645</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[1].<a class="code hl_variable" href="statistics__window_8h.html#adee8da252617e6c4faf1faad24093208">field_id</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2acc3835b8fe355e05d8d8e02f33ac3298">FIELD_ID_P</a>;    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[1].<a class="code hl_variable" href="statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41">want_second</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  646</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ad3ad17f2f11838a75374310b48ccd46e">covariance_count</a> = 1;</div>
-<div class="line"><span class="lineno">  647</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ab224844a4af18d8039e41bc9e60aa773">covariances</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#a4c322d7112772d94b91de6fce94d5c96">first</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>;</div>
-<div class="line"><span class="lineno">  648</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ab224844a4af18d8039e41bc9e60aa773">covariances</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#aaec35f642e7f5b73e74d6d7a24b90cb4">second</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2acc3835b8fe355e05d8d8e02f33ac3298">FIELD_ID_P</a>;</div>
-<div class="line"><span class="lineno">  649</span> </div>
-<div class="line"><span class="lineno">  650</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 6, 6, 6));</div>
-<div class="line"><span class="lineno">  651</span>    tmpdir[0] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line"><span class="lineno">  652</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) PetscCall(<a class="code hl_function" href="test__support_8c.html#a0bf5ef7b0a800ffb1e69973059c74c78">PicurvMakeTempDir</a>(tmpdir, <span class="keyword">sizeof</span>(tmpdir)));</div>
-<div class="line"><span class="lineno">  653</span>    PetscCallMPI(MPI_Bcast(tmpdir, <span class="keyword">sizeof</span>(tmpdir), MPI_CHAR, 0, PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  654</span>    PetscCall(PetscStrncpy(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>, tmpdir, <span class="keyword">sizeof</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>)));</div>
-<div class="line"><span class="lineno">  655</span>    PetscCall(PetscStrncpy(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af09e3f546ff8fa1192338e746391aa22">restart_dir</a>, tmpdir, <span class="keyword">sizeof</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af09e3f546ff8fa1192338e746391aa22">restart_dir</a>)));</div>
-<div class="line"><span class="lineno">  656</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#ae98520a4a6fd84fabdbbd460115a7b25">PicurvPopulateIdentityMetrics</a>(user));</div>
-<div class="line"><span class="lineno">  657</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#ada2db2a63cf3a9fe7ad2abf01cedc818">Nvert</a>, 0.0));</div>
-<div class="line"><span class="lineno">  658</span> </div>
-<div class="line"><span class="lineno">  659</span>    PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aab27fe6a82c31a7b78a0a754118eba92">PicurvWindowInit</a>(&amp;window, &amp;definition));</div>
-<div class="line"><span class="lineno">  660</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#a84fa26caf43ad62c04c303f8c860d476">PicurvWindowStorageCreate</a>(user, &amp;definition, &amp;storage));</div>
-<div class="line"><span class="lineno">  661</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5fa35f2c8472cad3b9089c9ef972e069">fieldStatisticsEnabled</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  662</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a08695c6f4e5d20bb7cd77c56bd788b8e">fieldStatisticsWindowCount</a> = 1;</div>
-<div class="line"><span class="lineno">  663</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8ea8d1c34535ec00ae136083560e6a7b">fieldStatisticsWindows</a> = &amp;window;</div>
-<div class="line"><span class="lineno">  664</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#abfc325677f753e781ef3d94d0ce575f6">fieldStatisticsStorage</a> = &amp;storage;</div>
-<div class="line"><span class="lineno">  665</span> </div>
-<div class="line"><span class="lineno">  666</span>    <span class="comment">/* A spatially varying field makes the assertion meaningful: a payload gathered</span></div>
-<div class="line"><span class="lineno">  667</span><span class="comment">     * or scattered through the wrong owner comes back permuted, which a uniform</span></div>
-<div class="line"><span class="lineno">  668</span><span class="comment">     * field could not reveal. */</span></div>
-<div class="line"><span class="lineno">  669</span>    <span class="keywordflow">for</span> (PetscInt s = 0; s &lt; 4; ++s) {</div>
-<div class="line"><span class="lineno">  670</span>        PetscBool accepted = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  671</span>        PetscReal weight = 0.0;</div>
-<div class="line"><span class="lineno">  672</span>        PetscReal ***p = NULL;</div>
-<div class="line"><span class="lineno">  673</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***ucat = NULL;</div>
-<div class="line"><span class="lineno">  674</span>        <span class="keyword">const</span> DMDALocalInfo info = user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>;</div>
-<div class="line"><span class="lineno">  675</span> </div>
-<div class="line"><span class="lineno">  676</span>        PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>, &amp;p));</div>
-<div class="line"><span class="lineno">  677</span>        PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>, &amp;ucat));</div>
-<div class="line"><span class="lineno">  678</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm; ++k)</div>
-<div class="line"><span class="lineno">  679</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym; ++j)</div>
-<div class="line"><span class="lineno">  680</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm; ++i) {</div>
-<div class="line"><span class="lineno">  681</span>                    <span class="keyword">const</span> PetscReal tag = (PetscReal)(100 * k + 10 * j + i);</div>
-<div class="line"><span class="lineno">  682</span> </div>
-<div class="line"><span class="lineno">  683</span>                    p[k][j][i] = tag + 0.25 * (PetscReal)s;</div>
-<div class="line"><span class="lineno">  684</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = tag;</div>
-<div class="line"><span class="lineno">  685</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = tag + 1.0 + (PetscReal)s;</div>
-<div class="line"><span class="lineno">  686</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = tag - 1.0;</div>
-<div class="line"><span class="lineno">  687</span>                }</div>
-<div class="line"><span class="lineno">  688</span>        PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>, &amp;ucat));</div>
-<div class="line"><span class="lineno">  689</span>        PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>, &amp;p));</div>
-<div class="line"><span class="lineno">  690</span> </div>
-<div class="line"><span class="lineno">  691</span>        PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aad449fd5339f1f137fe1e63141593c12">PicurvWindowOfferState</a>(&amp;window, s, 0.5 * (PetscReal)s, &amp;accepted, &amp;weight));</div>
-<div class="line"><span class="lineno">  692</span>        <span class="keywordflow">if</span> (accepted) PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ac199c3ee112b718bc76ee00854617bc6">PicurvWindowAccumulate</a>(user, &amp;definition, &amp;storage, weight));</div>
-<div class="line"><span class="lineno">  693</span>    }</div>
-<div class="line"><span class="lineno">  694</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(3, window.<a class="code hl_variable" href="statistics__window_8h.html#a3fcc714340602f90ebec8fa82b507907">sample_count</a>, <span class="stringliteral">&quot;three intervals are represented&quot;</span>));</div>
-<div class="line"><span class="lineno">  695</span> </div>
-<div class="line"><span class="lineno">  696</span>    PetscCall(<a class="code hl_function" href="io_8h.html#ae2d695dc275057d7e9a9e68bc5b65789">WriteCheckpointBundle</a>(simCtx, <span class="stringliteral">&quot;test&quot;</span>));</div>
-<div class="line"><span class="lineno">  697</span> </div>
-<div class="line"><span class="lineno">  698</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ad2fd3771616fe45d801bf190029fc4d7">PicurvWindowStoragePayloadCount</a>(&amp;storage, &amp;payload_count));</div>
-<div class="line"><span class="lineno">  699</span>    PetscCall(PetscCalloc1((<span class="keywordtype">size_t</span>)payload_count, &amp;reference));</div>
-<div class="line"><span class="lineno">  700</span>    <span class="keywordflow">for</span> (PetscInt index = 0; index &lt; payload_count; ++index) {</div>
-<div class="line"><span class="lineno">  701</span>        <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvStatisticsPayload">PicurvStatisticsPayload</a> payload;</div>
-<div class="line"><span class="lineno">  702</span> </div>
-<div class="line"><span class="lineno">  703</span>        PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#aa089d9e0159302555aebe93bc39a17bb">PicurvWindowStoragePayload</a>(user, &amp;definition, &amp;storage, index, &amp;payload));</div>
-<div class="line"><span class="lineno">  704</span>        PetscCall(VecDuplicate(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>, &amp;reference[index]));</div>
-<div class="line"><span class="lineno">  705</span>        PetscCall(VecCopy(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>, reference[index]));</div>
-<div class="line"><span class="lineno">  706</span>        PetscCall(VecZeroEntries(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>));</div>
-<div class="line"><span class="lineno">  707</span>    }</div>
-<div class="line"><span class="lineno">  708</span>    PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aab27fe6a82c31a7b78a0a754118eba92">PicurvWindowInit</a>(&amp;window, &amp;definition));</div>
-<div class="line"><span class="lineno">  709</span> </div>
-<div class="line"><span class="lineno">  710</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#afb77444c0a7d683e3e8178db08876d05">fieldStatisticsContinue</a> = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  711</span>    PetscCall(<a class="code hl_function" href="io_8h.html#aac1068f81eb67df7914c56b3ab838d2b">RestoreFieldStatisticsState</a>(simCtx, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>));</div>
-<div class="line"><span class="lineno">  712</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(3, window.<a class="code hl_variable" href="statistics__window_8h.html#a3fcc714340602f90ebec8fa82b507907">sample_count</a>, <span class="stringliteral">&quot;window bookkeeping survives on every rank&quot;</span>));</div>
-<div class="line"><span class="lineno">  713</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a21fc4571ef8b1777e6ee79cabab40c88">PicurvAssertRealNear</a>(1.5, window.<a class="code hl_variable" href="statistics__window_8h.html#a8dc307ac979a7914c5457a085f4f00df">total_weight</a>, 1.0e-12,</div>
-<div class="line"><span class="lineno">  714</span>                                   <span class="stringliteral">&quot;physical-time weights survive on every rank&quot;</span>));</div>
-<div class="line"><span class="lineno">  715</span> </div>
-<div class="line"><span class="lineno">  716</span>    <span class="keywordflow">for</span> (PetscInt index = 0; index &lt; payload_count; ++index) {</div>
-<div class="line"><span class="lineno">  717</span>        <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvStatisticsPayload">PicurvStatisticsPayload</a> payload;</div>
-<div class="line"><span class="lineno">  718</span>        PetscReal difference = 0.0;</div>
-<div class="line"><span class="lineno">  719</span>        <span class="keywordtype">char</span> context[192];</div>
-<div class="line"><span class="lineno">  720</span> </div>
-<div class="line"><span class="lineno">  721</span>        PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#aa089d9e0159302555aebe93bc39a17bb">PicurvWindowStoragePayload</a>(user, &amp;definition, &amp;storage, index, &amp;payload));</div>
-<div class="line"><span class="lineno">  722</span>        PetscCall(VecAXPY(reference[index], -1.0, payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>));</div>
-<div class="line"><span class="lineno">  723</span>        PetscCall(VecNorm(reference[index], NORM_INFINITY, &amp;difference));</div>
-<div class="line"><span class="lineno">  724</span>        PetscCall(PetscSNPrintf(context, <span class="keyword">sizeof</span>(context),</div>
-<div class="line"><span class="lineno">  725</span>                                <span class="stringliteral">&quot;payload &#39;%s&#39; round trips exactly across %d ranks&quot;</span>,</div>
-<div class="line"><span class="lineno">  726</span>                                payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#ac18a1474930c0d14b78335cf8a524f5a">name</a>, (<span class="keywordtype">int</span>)size));</div>
-<div class="line"><span class="lineno">  727</span>        PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(difference == 0.0), context));</div>
-<div class="line"><span class="lineno">  728</span>        PetscCall(VecDestroy(&amp;reference[index]));</div>
-<div class="line"><span class="lineno">  729</span>    }</div>
-<div class="line"><span class="lineno">  730</span>    PetscCall(PetscFree(reference));</div>
-<div class="line"><span class="lineno">  731</span> </div>
-<div class="line"><span class="lineno">  732</span>    PetscCallMPI(MPI_Barrier(PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  733</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) PetscCall(<a class="code hl_function" href="test__support_8c.html#afa2489af564a011a477e22a4aa9e28f4">PicurvRemoveTempDir</a>(tmpdir));</div>
-<div class="line"><span class="lineno">  734</span>    PetscCallMPI(MPI_Barrier(PETSC_COMM_WORLD));</div>
-<div class="line"><span class="lineno">  735</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5fa35f2c8472cad3b9089c9ef972e069">fieldStatisticsEnabled</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  736</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a08695c6f4e5d20bb7cd77c56bd788b8e">fieldStatisticsWindowCount</a> = 0;</div>
-<div class="line"><span class="lineno">  737</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8ea8d1c34535ec00ae136083560e6a7b">fieldStatisticsWindows</a> = NULL;</div>
-<div class="line"><span class="lineno">  738</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#abfc325677f753e781ef3d94d0ce575f6">fieldStatisticsStorage</a> = NULL;</div>
-<div class="line"><span class="lineno">  739</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ac980ccdb6d23b00c9a7492648f8f3edf">PicurvWindowStorageDestroy</a>(&amp;storage));</div>
-<div class="line"><span class="lineno">  740</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  741</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  742</span>}</div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00665">665</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  666</span>{</div>
+<div class="line"><span class="lineno">  667</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a> *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  668</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a> *user = NULL;</div>
+<div class="line"><span class="lineno">  669</span>    <a class="code hl_struct" href="statistics__window_8h.html#structPicurvWindow">PicurvWindow</a> window;</div>
+<div class="line"><span class="lineno">  670</span>    <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvWindowStorage">PicurvWindowStorage</a> storage;</div>
+<div class="line"><span class="lineno">  671</span>    <a class="code hl_struct" href="statistics__window_8h.html#structPicurvWindowDefinition">PicurvWindowDefinition</a> definition;</div>
+<div class="line"><span class="lineno">  672</span>    Vec *reference = NULL;</div>
+<div class="line"><span class="lineno">  673</span>    <span class="keywordtype">char</span> tmpdir[PETSC_MAX_PATH_LEN];</div>
+<div class="line"><span class="lineno">  674</span>    PetscInt payload_count = 0;</div>
+<div class="line"><span class="lineno">  675</span>    PetscMPIInt size = 0;</div>
+<div class="line"><span class="lineno">  676</span> </div>
+<div class="line"><span class="lineno">  677</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  678</span>    PetscCallMPI(MPI_Comm_size(PETSC_COMM_WORLD, &amp;size));</div>
+<div class="line"><span class="lineno">  679</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(size &gt;= 2), <span class="stringliteral">&quot;unit-mpi requires at least two MPI ranks&quot;</span>));</div>
+<div class="line"><span class="lineno">  680</span> </div>
+<div class="line"><span class="lineno">  681</span>    memset(&amp;definition, 0, <span class="keyword">sizeof</span>(definition));</div>
+<div class="line"><span class="lineno">  682</span>    strncpy(definition.<a class="code hl_variable" href="statistics__window_8h.html#a6de30d7401676083ddaf37463740b68f">name</a>, <span class="stringliteral">&quot;production&quot;</span>, <a class="code hl_define" href="statistics__window_8h.html#a941bf9e9e702ab5685723ded07e8b860">PICURV_WINDOW_NAME_LENGTH</a> - 1);</div>
+<div class="line"><span class="lineno">  683</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#aff366ea4b51210605ba10041a7ecafa1">weighting</a> = <a class="code hl_enumvalue" href="statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57a396fdf5734087712d084f9a26210fa20">PICURV_WEIGHTING_PHYSICAL_TIME</a>;</div>
+<div class="line"><span class="lineno">  684</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a8d423e744bb5383f38dd93b0b69e5312">cadence_kind</a> = <a class="code hl_enumvalue" href="statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658ada23859933a896698ea08c8ad2dd281c">PICURV_CADENCE_STEP</a>;</div>
+<div class="line"><span class="lineno">  685</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a93d0754cf63a9aa498ed0c7c204461b3">step_cadence</a> = 1;</div>
+<div class="line"><span class="lineno">  686</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a522bc3b064d3183b5d8c4ec484e0b07f">field_count</a> = 2;</div>
+<div class="line"><span class="lineno">  687</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#adee8da252617e6c4faf1faad24093208">field_id</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>; definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41">want_second</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  688</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[1].<a class="code hl_variable" href="statistics__window_8h.html#adee8da252617e6c4faf1faad24093208">field_id</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2acc3835b8fe355e05d8d8e02f33ac3298">FIELD_ID_P</a>;    definition.<a class="code hl_variable" href="statistics__window_8h.html#a5198276c51e0b459eca586a6c4eb9894">fields</a>[1].<a class="code hl_variable" href="statistics__window_8h.html#aae8b18f5b2544a97b96d7df88bfe7b41">want_second</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  689</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ad3ad17f2f11838a75374310b48ccd46e">covariance_count</a> = 1;</div>
+<div class="line"><span class="lineno">  690</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ab224844a4af18d8039e41bc9e60aa773">covariances</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#a4c322d7112772d94b91de6fce94d5c96">first</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a300bf0cd66155b5e487c44c6d2f5f861">FIELD_ID_UCAT</a>;</div>
+<div class="line"><span class="lineno">  691</span>    definition.<a class="code hl_variable" href="statistics__window_8h.html#ab224844a4af18d8039e41bc9e60aa773">covariances</a>[0].<a class="code hl_variable" href="statistics__window_8h.html#aaec35f642e7f5b73e74d6d7a24b90cb4">second</a> = <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2acc3835b8fe355e05d8d8e02f33ac3298">FIELD_ID_P</a>;</div>
+<div class="line"><span class="lineno">  692</span> </div>
+<div class="line"><span class="lineno">  693</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 6, 6, 6));</div>
+<div class="line"><span class="lineno">  694</span>    tmpdir[0] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><span class="lineno">  695</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) PetscCall(<a class="code hl_function" href="test__support_8c.html#a0bf5ef7b0a800ffb1e69973059c74c78">PicurvMakeTempDir</a>(tmpdir, <span class="keyword">sizeof</span>(tmpdir)));</div>
+<div class="line"><span class="lineno">  696</span>    PetscCallMPI(MPI_Bcast(tmpdir, <span class="keyword">sizeof</span>(tmpdir), MPI_CHAR, 0, PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  697</span>    PetscCall(PetscStrncpy(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>, tmpdir, <span class="keyword">sizeof</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a52b4bfae9bf1813f3280faecb20cab0d">output_dir</a>)));</div>
+<div class="line"><span class="lineno">  698</span>    PetscCall(PetscStrncpy(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af09e3f546ff8fa1192338e746391aa22">restart_dir</a>, tmpdir, <span class="keyword">sizeof</span>(simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#af09e3f546ff8fa1192338e746391aa22">restart_dir</a>)));</div>
+<div class="line"><span class="lineno">  699</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#ae98520a4a6fd84fabdbbd460115a7b25">PicurvPopulateIdentityMetrics</a>(user));</div>
+<div class="line"><span class="lineno">  700</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#ada2db2a63cf3a9fe7ad2abf01cedc818">Nvert</a>, 0.0));</div>
+<div class="line"><span class="lineno">  701</span> </div>
+<div class="line"><span class="lineno">  702</span>    PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aab27fe6a82c31a7b78a0a754118eba92">PicurvWindowInit</a>(&amp;window, &amp;definition));</div>
+<div class="line"><span class="lineno">  703</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#a84fa26caf43ad62c04c303f8c860d476">PicurvWindowStorageCreate</a>(user, &amp;definition, &amp;storage));</div>
+<div class="line"><span class="lineno">  704</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5fa35f2c8472cad3b9089c9ef972e069">fieldStatisticsEnabled</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  705</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a08695c6f4e5d20bb7cd77c56bd788b8e">fieldStatisticsWindowCount</a> = 1;</div>
+<div class="line"><span class="lineno">  706</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8ea8d1c34535ec00ae136083560e6a7b">fieldStatisticsWindows</a> = &amp;window;</div>
+<div class="line"><span class="lineno">  707</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#abfc325677f753e781ef3d94d0ce575f6">fieldStatisticsStorage</a> = &amp;storage;</div>
+<div class="line"><span class="lineno">  708</span> </div>
+<div class="line"><span class="lineno">  709</span>    <span class="comment">/* A spatially varying field makes the assertion meaningful: a payload gathered</span></div>
+<div class="line"><span class="lineno">  710</span><span class="comment">     * or scattered through the wrong owner comes back permuted, which a uniform</span></div>
+<div class="line"><span class="lineno">  711</span><span class="comment">     * field could not reveal. */</span></div>
+<div class="line"><span class="lineno">  712</span>    <span class="keywordflow">for</span> (PetscInt s = 0; s &lt; 4; ++s) {</div>
+<div class="line"><span class="lineno">  713</span>        PetscBool accepted = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  714</span>        PetscReal weight = 0.0;</div>
+<div class="line"><span class="lineno">  715</span>        PetscReal ***p = NULL;</div>
+<div class="line"><span class="lineno">  716</span>        <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> ***ucat = NULL;</div>
+<div class="line"><span class="lineno">  717</span>        <span class="keyword">const</span> DMDALocalInfo info = user-&gt;<a class="code hl_variable" href="variables_8h.html#acd99423029a666652ee1f5bf573619bc">info</a>;</div>
+<div class="line"><span class="lineno">  718</span> </div>
+<div class="line"><span class="lineno">  719</span>        PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>, &amp;p));</div>
+<div class="line"><span class="lineno">  720</span>        PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>, &amp;ucat));</div>
+<div class="line"><span class="lineno">  721</span>        <span class="keywordflow">for</span> (PetscInt k = info.zs; k &lt; info.zs + info.zm; ++k)</div>
+<div class="line"><span class="lineno">  722</span>            <span class="keywordflow">for</span> (PetscInt j = info.ys; j &lt; info.ys + info.ym; ++j)</div>
+<div class="line"><span class="lineno">  723</span>                <span class="keywordflow">for</span> (PetscInt i = info.xs; i &lt; info.xs + info.xm; ++i) {</div>
+<div class="line"><span class="lineno">  724</span>                    <span class="keyword">const</span> PetscReal tag = (PetscReal)(100 * k + 10 * j + i);</div>
+<div class="line"><span class="lineno">  725</span> </div>
+<div class="line"><span class="lineno">  726</span>                    p[k][j][i] = tag + 0.25 * (PetscReal)s;</div>
+<div class="line"><span class="lineno">  727</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = tag;</div>
+<div class="line"><span class="lineno">  728</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = tag + 1.0 + (PetscReal)s;</div>
+<div class="line"><span class="lineno">  729</span>                    ucat[k][j][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = tag - 1.0;</div>
+<div class="line"><span class="lineno">  730</span>                }</div>
+<div class="line"><span class="lineno">  731</span>        PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#aa1823d873982755996b7335f43732af4">Ucat</a>, &amp;ucat));</div>
+<div class="line"><span class="lineno">  732</span>        PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, user-&gt;<a class="code hl_variable" href="variables_8h.html#a5a73aa2bc6be44bc1ff8847cf0a1b6af">P</a>, &amp;p));</div>
+<div class="line"><span class="lineno">  733</span> </div>
+<div class="line"><span class="lineno">  734</span>        PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aad449fd5339f1f137fe1e63141593c12">PicurvWindowOfferState</a>(&amp;window, s, 0.5 * (PetscReal)s, &amp;accepted, &amp;weight));</div>
+<div class="line"><span class="lineno">  735</span>        <span class="keywordflow">if</span> (accepted) PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ac199c3ee112b718bc76ee00854617bc6">PicurvWindowAccumulate</a>(user, &amp;definition, &amp;storage, weight));</div>
+<div class="line"><span class="lineno">  736</span>    }</div>
+<div class="line"><span class="lineno">  737</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(3, window.<a class="code hl_variable" href="statistics__window_8h.html#a3fcc714340602f90ebec8fa82b507907">sample_count</a>, <span class="stringliteral">&quot;three intervals are represented&quot;</span>));</div>
+<div class="line"><span class="lineno">  738</span> </div>
+<div class="line"><span class="lineno">  739</span>    PetscCall(<a class="code hl_function" href="io_8h.html#ae2d695dc275057d7e9a9e68bc5b65789">WriteCheckpointBundle</a>(simCtx, <span class="stringliteral">&quot;test&quot;</span>));</div>
+<div class="line"><span class="lineno">  740</span> </div>
+<div class="line"><span class="lineno">  741</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ad2fd3771616fe45d801bf190029fc4d7">PicurvWindowStoragePayloadCount</a>(&amp;storage, &amp;payload_count));</div>
+<div class="line"><span class="lineno">  742</span>    PetscCall(PetscCalloc1((<span class="keywordtype">size_t</span>)payload_count, &amp;reference));</div>
+<div class="line"><span class="lineno">  743</span>    <span class="keywordflow">for</span> (PetscInt index = 0; index &lt; payload_count; ++index) {</div>
+<div class="line"><span class="lineno">  744</span>        <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvStatisticsPayload">PicurvStatisticsPayload</a> payload;</div>
+<div class="line"><span class="lineno">  745</span> </div>
+<div class="line"><span class="lineno">  746</span>        PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#aa089d9e0159302555aebe93bc39a17bb">PicurvWindowStoragePayload</a>(user, &amp;definition, &amp;storage, index, &amp;payload));</div>
+<div class="line"><span class="lineno">  747</span>        PetscCall(VecDuplicate(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>, &amp;reference[index]));</div>
+<div class="line"><span class="lineno">  748</span>        PetscCall(VecCopy(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>, reference[index]));</div>
+<div class="line"><span class="lineno">  749</span>        PetscCall(VecZeroEntries(payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>));</div>
+<div class="line"><span class="lineno">  750</span>    }</div>
+<div class="line"><span class="lineno">  751</span>    PetscCall(<a class="code hl_function" href="statistics__window_8h.html#aab27fe6a82c31a7b78a0a754118eba92">PicurvWindowInit</a>(&amp;window, &amp;definition));</div>
+<div class="line"><span class="lineno">  752</span> </div>
+<div class="line"><span class="lineno">  753</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#afb77444c0a7d683e3e8178db08876d05">fieldStatisticsContinue</a> = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  754</span>    PetscCall(<a class="code hl_function" href="io_8h.html#aac1068f81eb67df7914c56b3ab838d2b">RestoreFieldStatisticsState</a>(simCtx, simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#ac9684d6e871566d55c997416270b5b99">step</a>));</div>
+<div class="line"><span class="lineno">  755</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#adfeee0c50dd7707df53e585419e6da2c">PicurvAssertIntEqual</a>(3, window.<a class="code hl_variable" href="statistics__window_8h.html#a3fcc714340602f90ebec8fa82b507907">sample_count</a>, <span class="stringliteral">&quot;window bookkeeping survives on every rank&quot;</span>));</div>
+<div class="line"><span class="lineno">  756</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a21fc4571ef8b1777e6ee79cabab40c88">PicurvAssertRealNear</a>(1.5, window.<a class="code hl_variable" href="statistics__window_8h.html#a8dc307ac979a7914c5457a085f4f00df">total_weight</a>, 1.0e-12,</div>
+<div class="line"><span class="lineno">  757</span>                                   <span class="stringliteral">&quot;physical-time weights survive on every rank&quot;</span>));</div>
+<div class="line"><span class="lineno">  758</span> </div>
+<div class="line"><span class="lineno">  759</span>    <span class="keywordflow">for</span> (PetscInt index = 0; index &lt; payload_count; ++index) {</div>
+<div class="line"><span class="lineno">  760</span>        <a class="code hl_struct" href="statistics__accumulator_8h.html#structPicurvStatisticsPayload">PicurvStatisticsPayload</a> payload;</div>
+<div class="line"><span class="lineno">  761</span>        PetscReal difference = 0.0;</div>
+<div class="line"><span class="lineno">  762</span>        <span class="keywordtype">char</span> context[192];</div>
+<div class="line"><span class="lineno">  763</span> </div>
+<div class="line"><span class="lineno">  764</span>        PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#aa089d9e0159302555aebe93bc39a17bb">PicurvWindowStoragePayload</a>(user, &amp;definition, &amp;storage, index, &amp;payload));</div>
+<div class="line"><span class="lineno">  765</span>        PetscCall(VecAXPY(reference[index], -1.0, payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">vec</a>));</div>
+<div class="line"><span class="lineno">  766</span>        PetscCall(VecNorm(reference[index], NORM_INFINITY, &amp;difference));</div>
+<div class="line"><span class="lineno">  767</span>        PetscCall(PetscSNPrintf(context, <span class="keyword">sizeof</span>(context),</div>
+<div class="line"><span class="lineno">  768</span>                                <span class="stringliteral">&quot;payload &#39;%s&#39; round trips exactly across %d ranks&quot;</span>,</div>
+<div class="line"><span class="lineno">  769</span>                                payload.<a class="code hl_variable" href="statistics__accumulator_8h.html#ac18a1474930c0d14b78335cf8a524f5a">name</a>, (<span class="keywordtype">int</span>)size));</div>
+<div class="line"><span class="lineno">  770</span>        PetscCall(<a class="code hl_function" href="test__support_8c.html#af56b84b3c32d30203d5de7e456e45631">PicurvAssertBool</a>((PetscBool)(difference == 0.0), context));</div>
+<div class="line"><span class="lineno">  771</span>        PetscCall(VecDestroy(&amp;reference[index]));</div>
+<div class="line"><span class="lineno">  772</span>    }</div>
+<div class="line"><span class="lineno">  773</span>    PetscCall(PetscFree(reference));</div>
+<div class="line"><span class="lineno">  774</span> </div>
+<div class="line"><span class="lineno">  775</span>    PetscCallMPI(MPI_Barrier(PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  776</span>    <span class="keywordflow">if</span> (simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89">rank</a> == 0) PetscCall(<a class="code hl_function" href="test__support_8c.html#afa2489af564a011a477e22a4aa9e28f4">PicurvRemoveTempDir</a>(tmpdir));</div>
+<div class="line"><span class="lineno">  777</span>    PetscCallMPI(MPI_Barrier(PETSC_COMM_WORLD));</div>
+<div class="line"><span class="lineno">  778</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a5fa35f2c8472cad3b9089c9ef972e069">fieldStatisticsEnabled</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  779</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a08695c6f4e5d20bb7cd77c56bd788b8e">fieldStatisticsWindowCount</a> = 0;</div>
+<div class="line"><span class="lineno">  780</span>    simCtx-&gt;<a class="code hl_variable" href="variables_8h.html#a8ea8d1c34535ec00ae136083560e6a7b">fieldStatisticsWindows</a> = NULL;</div>
+<div class="line"><span class="lineno">  781</span>    user-&gt;<a class="code hl_variable" href="variables_8h.html#abfc325677f753e781ef3d94d0ce575f6">fieldStatisticsStorage</a> = NULL;</div>
+<div class="line"><span class="lineno">  782</span>    PetscCall(<a class="code hl_function" href="statistics__accumulator_8h.html#ac980ccdb6d23b00c9a7492648f8f3edf">PicurvWindowStorageDestroy</a>(&amp;storage));</div>
+<div class="line"><span class="lineno">  783</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  784</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  785</span>}</div>
 <div class="ttc" id="aio_8h_html_aac1068f81eb67df7914c56b3ab838d2b"><div class="ttname"><a href="io_8h.html#aac1068f81eb67df7914c56b3ab838d2b">RestoreFieldStatisticsState</a></div><div class="ttdeci">PetscErrorCode RestoreFieldStatisticsState(SimCtx *simCtx, PetscInt ti)</div><div class="ttdoc">Restores field-statistics window state and accumulators from a checkpoint.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l01711">io.c:1711</a></div></div>
 <div class="ttc" id="aio_8h_html_ae2d695dc275057d7e9a9e68bc5b65789"><div class="ttname"><a href="io_8h.html#ae2d695dc275057d7e9a9e68bc5b65789">WriteCheckpointBundle</a></div><div class="ttdeci">PetscErrorCode WriteCheckpointBundle(SimCtx *simCtx, const char *reason)</div><div class="ttdoc">Write and atomically publish one complete checkpoint bundle.</div><div class="ttdef"><b>Definition</b> <a href="io_8c_source.html#l02579">io.c:2579</a></div></div>
 <div class="ttc" id="astatistics__accumulator_8h_html_a6cce5e93fff32b0d731719ddafed98c1"><div class="ttname"><a href="statistics__accumulator_8h.html#a6cce5e93fff32b0d731719ddafed98c1">PicurvStatisticsPayload::vec</a></div><div class="ttdeci">Vec vec</div><div class="ttdoc">Borrowed accumulator vector; never owned by the caller.</div><div class="ttdef"><b>Definition</b> <a href="statistics__accumulator_8h_source.html#l00057">statistics_accumulator.h:57</a></div></div>
@@ -1512,78 +1596,78 @@ Here is the caller graph for this function:</div>
 <p>Tests that LES coefficient averaging does not depend on the decomposition. </p>
 <p>The averaged coefficient is a physical property of the block, so splitting the same field across more ranks must not change it. This case catches a wrong communicator, a halo entry counted as if it were owned, or a layout boundary plane included in one decomposition but not another. The reference is computed from the analytic definition over the interior index box rather than from a single-rank run, so the test does not merely compare one decomposition against itself. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00754">754</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  755</span>{</div>
-<div class="line"><span class="lineno">  756</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>      *simCtx = NULL;</div>
-<div class="line"><span class="lineno">  757</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a>     *user = NULL;</div>
-<div class="line"><span class="lineno">  758</span>    Vec          numerator, denominator, ratio;</div>
-<div class="line"><span class="lineno">  759</span>    <a class="code hl_struct" href="statistics__target_8h.html#structSpatialTargetPlan">SpatialTargetPlan</a> plan;</div>
-<div class="line"><span class="lineno">  760</span>    PetscReal ***num = NULL, ***den = NULL, ***out = NULL;</div>
-<div class="line"><span class="lineno">  761</span>    DMDALocalInfo info;</div>
-<div class="line"><span class="lineno">  762</span>    PetscInt      xs, xe, ys, ye, zs, ze;</div>
-<div class="line"><span class="lineno">  763</span>    PetscReal     sampled = 0.0;</div>
-<div class="line"><span class="lineno">  764</span>    PetscReal     numerator_total = 0.0, denominator_total = 0.0;</div>
-<div class="line"><span class="lineno">  765</span>    <span class="keyword">const</span> PetscBool all[3] = {PETSC_TRUE, PETSC_TRUE, PETSC_TRUE};</div>
-<div class="line"><span class="lineno">  766</span> </div>
-<div class="line"><span class="lineno">  767</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno">  768</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 8, 8));</div>
-<div class="line"><span class="lineno">  769</span>    PetscCall(DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;info));</div>
-<div class="line"><span class="lineno">  770</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, 0.0));</div>
-<div class="line"><span class="lineno">  771</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, 1.0));</div>
-<div class="line"><span class="lineno">  772</span> </div>
-<div class="line"><span class="lineno">  773</span>    xs = (info.xs == 0) ? 1 : info.xs;</div>
-<div class="line"><span class="lineno">  774</span>    ys = (info.ys == 0) ? 1 : info.ys;</div>
-<div class="line"><span class="lineno">  775</span>    zs = (info.zs == 0) ? 1 : info.zs;</div>
-<div class="line"><span class="lineno">  776</span>    xe = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
-<div class="line"><span class="lineno">  777</span>    ye = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
-<div class="line"><span class="lineno">  778</span>    ze = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
-<div class="line"><span class="lineno">  779</span> </div>
-<div class="line"><span class="lineno">  780</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;numerator));</div>
-<div class="line"><span class="lineno">  781</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;denominator));</div>
-<div class="line"><span class="lineno">  782</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;ratio));</div>
-<div class="line"><span class="lineno">  783</span>    PetscCall(VecSet(numerator, 0.0));</div>
-<div class="line"><span class="lineno">  784</span>    PetscCall(VecSet(denominator, 0.0));</div>
-<div class="line"><span class="lineno">  785</span>    PetscCall(VecSet(ratio, 0.0));</div>
-<div class="line"><span class="lineno">  786</span> </div>
-<div class="line"><span class="lineno">  787</span>    <span class="comment">/* Each rank writes only the cells it owns, from a closed-form function of the</span></div>
-<div class="line"><span class="lineno">  788</span><span class="comment">       global indices, so the distributed sums are exactly the serial ones below. */</span></div>
-<div class="line"><span class="lineno">  789</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, numerator, &amp;num));</div>
-<div class="line"><span class="lineno">  790</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, denominator, &amp;den));</div>
-<div class="line"><span class="lineno">  791</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k)</div>
-<div class="line"><span class="lineno">  792</span>    <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j)</div>
-<div class="line"><span class="lineno">  793</span>    <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
-<div class="line"><span class="lineno">  794</span>        num[k][j][i] = (PetscReal)(i * j + k);</div>
-<div class="line"><span class="lineno">  795</span>        den[k][j][i] = (PetscReal)(i + 1);</div>
-<div class="line"><span class="lineno">  796</span>    }</div>
-<div class="line"><span class="lineno">  797</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, numerator, &amp;num));</div>
-<div class="line"><span class="lineno">  798</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, denominator, &amp;den));</div>
-<div class="line"><span class="lineno">  799</span> </div>
-<div class="line"><span class="lineno">  800</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a9d416a8adcfca2d365353ba1feff1ca2">FIELD_ID_CS</a>,</div>
-<div class="line"><span class="lineno">  801</span>                                      <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
-<div class="line"><span class="lineno">  802</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#aad7b407b6f3d3afe8782152c726933fd">PicurvSpatialRatioAverage</a>(user, &amp;plan, numerator, denominator, NULL, all,</div>
-<div class="line"><span class="lineno">  803</span>                                        PETSC_COMM_WORLD, ratio, NULL));</div>
-<div class="line"><span class="lineno">  804</span> </div>
-<div class="line"><span class="lineno">  805</span>    <span class="keywordflow">for</span> (PetscInt k = 1; k &lt; info.mz - 1; ++k)</div>
-<div class="line"><span class="lineno">  806</span>    <span class="keywordflow">for</span> (PetscInt j = 1; j &lt; info.my - 1; ++j)</div>
-<div class="line"><span class="lineno">  807</span>    <span class="keywordflow">for</span> (PetscInt i = 1; i &lt; info.mx - 1; ++i) {</div>
-<div class="line"><span class="lineno">  808</span>        numerator_total   += (PetscReal)(i * j + k);</div>
-<div class="line"><span class="lineno">  809</span>        denominator_total += (PetscReal)(i + 1);</div>
-<div class="line"><span class="lineno">  810</span>    }</div>
-<div class="line"><span class="lineno">  811</span> </div>
-<div class="line"><span class="lineno">  812</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, ratio, &amp;out));</div>
-<div class="line"><span class="lineno">  813</span>    sampled = out[zs][ys][xs];</div>
-<div class="line"><span class="lineno">  814</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, ratio, &amp;out));</div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00797">797</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  798</span>{</div>
+<div class="line"><span class="lineno">  799</span>    <a class="code hl_struct" href="variables_8h.html#structSimCtx">SimCtx</a>      *simCtx = NULL;</div>
+<div class="line"><span class="lineno">  800</span>    <a class="code hl_struct" href="variables_8h.html#structUserCtx">UserCtx</a>     *user = NULL;</div>
+<div class="line"><span class="lineno">  801</span>    Vec          numerator, denominator, ratio;</div>
+<div class="line"><span class="lineno">  802</span>    <a class="code hl_struct" href="statistics__target_8h.html#structSpatialTargetPlan">SpatialTargetPlan</a> plan;</div>
+<div class="line"><span class="lineno">  803</span>    PetscReal ***num = NULL, ***den = NULL, ***out = NULL;</div>
+<div class="line"><span class="lineno">  804</span>    DMDALocalInfo info;</div>
+<div class="line"><span class="lineno">  805</span>    PetscInt      xs, xe, ys, ye, zs, ze;</div>
+<div class="line"><span class="lineno">  806</span>    PetscReal     sampled = 0.0;</div>
+<div class="line"><span class="lineno">  807</span>    PetscReal     numerator_total = 0.0, denominator_total = 0.0;</div>
+<div class="line"><span class="lineno">  808</span>    <span class="keyword">const</span> PetscBool all[3] = {PETSC_TRUE, PETSC_TRUE, PETSC_TRUE};</div>
+<div class="line"><span class="lineno">  809</span> </div>
+<div class="line"><span class="lineno">  810</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno">  811</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a0cf6b441f404b07c0f35cbe968cfb624">PicurvCreateMinimalContexts</a>(&amp;simCtx, &amp;user, 8, 8, 8));</div>
+<div class="line"><span class="lineno">  812</span>    PetscCall(DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, &amp;info));</div>
+<div class="line"><span class="lineno">  813</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, 0.0));</div>
+<div class="line"><span class="lineno">  814</span>    PetscCall(VecSet(user-&gt;<a class="code hl_variable" href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">lAj</a>, 1.0));</div>
 <div class="line"><span class="lineno">  815</span> </div>
-<div class="line"><span class="lineno">  816</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a21fc4571ef8b1777e6ee79cabab40c88">PicurvAssertRealNear</a>(numerator_total / denominator_total, sampled, 1.0e-10,</div>
-<div class="line"><span class="lineno">  817</span>                                   <span class="stringliteral">&quot;the globally averaged ratio must match the serial sums &quot;</span></div>
-<div class="line"><span class="lineno">  818</span>                                   <span class="stringliteral">&quot;however the block is decomposed&quot;</span>));</div>
-<div class="line"><span class="lineno">  819</span> </div>
-<div class="line"><span class="lineno">  820</span>    PetscCall(VecDestroy(&amp;numerator));</div>
-<div class="line"><span class="lineno">  821</span>    PetscCall(VecDestroy(&amp;denominator));</div>
-<div class="line"><span class="lineno">  822</span>    PetscCall(VecDestroy(&amp;ratio));</div>
-<div class="line"><span class="lineno">  823</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
-<div class="line"><span class="lineno">  824</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  825</span>}</div>
+<div class="line"><span class="lineno">  816</span>    xs = (info.xs == 0) ? 1 : info.xs;</div>
+<div class="line"><span class="lineno">  817</span>    ys = (info.ys == 0) ? 1 : info.ys;</div>
+<div class="line"><span class="lineno">  818</span>    zs = (info.zs == 0) ? 1 : info.zs;</div>
+<div class="line"><span class="lineno">  819</span>    xe = (info.xs + info.xm == info.mx) ? info.mx - 1 : info.xs + info.xm;</div>
+<div class="line"><span class="lineno">  820</span>    ye = (info.ys + info.ym == info.my) ? info.my - 1 : info.ys + info.ym;</div>
+<div class="line"><span class="lineno">  821</span>    ze = (info.zs + info.zm == info.mz) ? info.mz - 1 : info.zs + info.zm;</div>
+<div class="line"><span class="lineno">  822</span> </div>
+<div class="line"><span class="lineno">  823</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;numerator));</div>
+<div class="line"><span class="lineno">  824</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;denominator));</div>
+<div class="line"><span class="lineno">  825</span>    PetscCall(VecDuplicate(user-&gt;<a class="code hl_variable" href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">lNvert</a>, &amp;ratio));</div>
+<div class="line"><span class="lineno">  826</span>    PetscCall(VecSet(numerator, 0.0));</div>
+<div class="line"><span class="lineno">  827</span>    PetscCall(VecSet(denominator, 0.0));</div>
+<div class="line"><span class="lineno">  828</span>    PetscCall(VecSet(ratio, 0.0));</div>
+<div class="line"><span class="lineno">  829</span> </div>
+<div class="line"><span class="lineno">  830</span>    <span class="comment">/* Each rank writes only the cells it owns, from a closed-form function of the</span></div>
+<div class="line"><span class="lineno">  831</span><span class="comment">       global indices, so the distributed sums are exactly the serial ones below. */</span></div>
+<div class="line"><span class="lineno">  832</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, numerator, &amp;num));</div>
+<div class="line"><span class="lineno">  833</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, denominator, &amp;den));</div>
+<div class="line"><span class="lineno">  834</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k)</div>
+<div class="line"><span class="lineno">  835</span>    <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j)</div>
+<div class="line"><span class="lineno">  836</span>    <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
+<div class="line"><span class="lineno">  837</span>        num[k][j][i] = (PetscReal)(i * j + k);</div>
+<div class="line"><span class="lineno">  838</span>        den[k][j][i] = (PetscReal)(i + 1);</div>
+<div class="line"><span class="lineno">  839</span>    }</div>
+<div class="line"><span class="lineno">  840</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, numerator, &amp;num));</div>
+<div class="line"><span class="lineno">  841</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, denominator, &amp;den));</div>
+<div class="line"><span class="lineno">  842</span> </div>
+<div class="line"><span class="lineno">  843</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#a98b283a542e9394f15a1341a1640cfe5">SpatialTargetPlanCreate</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a9d416a8adcfca2d365353ba1feff1ca2">FIELD_ID_CS</a>,</div>
+<div class="line"><span class="lineno">  844</span>                                      <a class="code hl_enumvalue" href="statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434">PICURV_STATISTICS_MASK_FLUID</a>, &amp;plan));</div>
+<div class="line"><span class="lineno">  845</span>    PetscCall(<a class="code hl_function" href="statistics__target_8h.html#aad7b407b6f3d3afe8782152c726933fd">PicurvSpatialRatioAverage</a>(user, &amp;plan, numerator, denominator, NULL, all,</div>
+<div class="line"><span class="lineno">  846</span>                                        PETSC_COMM_WORLD, ratio, NULL));</div>
+<div class="line"><span class="lineno">  847</span> </div>
+<div class="line"><span class="lineno">  848</span>    <span class="keywordflow">for</span> (PetscInt k = 1; k &lt; info.mz - 1; ++k)</div>
+<div class="line"><span class="lineno">  849</span>    <span class="keywordflow">for</span> (PetscInt j = 1; j &lt; info.my - 1; ++j)</div>
+<div class="line"><span class="lineno">  850</span>    <span class="keywordflow">for</span> (PetscInt i = 1; i &lt; info.mx - 1; ++i) {</div>
+<div class="line"><span class="lineno">  851</span>        numerator_total   += (PetscReal)(i * j + k);</div>
+<div class="line"><span class="lineno">  852</span>        denominator_total += (PetscReal)(i + 1);</div>
+<div class="line"><span class="lineno">  853</span>    }</div>
+<div class="line"><span class="lineno">  854</span> </div>
+<div class="line"><span class="lineno">  855</span>    PetscCall(DMDAVecGetArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, ratio, &amp;out));</div>
+<div class="line"><span class="lineno">  856</span>    sampled = out[zs][ys][xs];</div>
+<div class="line"><span class="lineno">  857</span>    PetscCall(DMDAVecRestoreArray(user-&gt;<a class="code hl_variable" href="variables_8h.html#af031acb43b014d5ac788aa9003491e75">da</a>, ratio, &amp;out));</div>
+<div class="line"><span class="lineno">  858</span> </div>
+<div class="line"><span class="lineno">  859</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a21fc4571ef8b1777e6ee79cabab40c88">PicurvAssertRealNear</a>(numerator_total / denominator_total, sampled, 1.0e-10,</div>
+<div class="line"><span class="lineno">  860</span>                                   <span class="stringliteral">&quot;the globally averaged ratio must match the serial sums &quot;</span></div>
+<div class="line"><span class="lineno">  861</span>                                   <span class="stringliteral">&quot;however the block is decomposed&quot;</span>));</div>
+<div class="line"><span class="lineno">  862</span> </div>
+<div class="line"><span class="lineno">  863</span>    PetscCall(VecDestroy(&amp;numerator));</div>
+<div class="line"><span class="lineno">  864</span>    PetscCall(VecDestroy(&amp;denominator));</div>
+<div class="line"><span class="lineno">  865</span>    PetscCall(VecDestroy(&amp;ratio));</div>
+<div class="line"><span class="lineno">  866</span>    PetscCall(<a class="code hl_function" href="test__support_8c.html#a2b0d4cb91cbb751680e744afdf24f8c4">PicurvDestroyMinimalContexts</a>(&amp;simCtx, &amp;user));</div>
+<div class="line"><span class="lineno">  867</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  868</span>}</div>
 <div class="ttc" id="astatistics__target_8h_html_aad7b407b6f3d3afe8782152c726933fd"><div class="ttname"><a href="statistics__target_8h.html#aad7b407b6f3d3afe8782152c726933fd">PicurvSpatialRatioAverage</a></div><div class="ttdeci">PetscErrorCode PicurvSpatialRatioAverage(UserCtx *user, const SpatialTargetPlan *plan, Vec numerator, Vec denominator, Vec inclusion, const PetscBool average_direction[3], MPI_Comm comm, Vec ratio, PetscReal *scalar)</div><div class="ttdoc">Averages two fields over a target domain and divides the results.</div><div class="ttdef"><b>Definition</b> <a href="statistics__target_8c_source.html#l00210">statistics_target.c:210</a></div></div>
 <div class="ttc" id="avariables_8h_html_a2f213dcdaf9617bfb44e4f22857f2e56"><div class="ttname"><a href="variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56">UserCtx::lNvert</a></div><div class="ttdeci">Vec lNvert</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01130">variables.h:1130</a></div></div>
 <div class="ttc" id="avariables_8h_html_acb5123619f6844033498dbbd1f46b8d0"><div class="ttname"><a href="variables_8h.html#acb5123619f6844033498dbbd1f46b8d0">UserCtx::lAj</a></div><div class="ttdeci">Vec lAj</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01165">variables.h:1165</a></div></div>
@@ -1628,47 +1712,49 @@ Here is the caller graph for this function:</div>
 
 <p>Runs the unit-mpi PETSc test binary. </p>
 
-<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00830">830</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  831</span>{</div>
-<div class="line"><span class="lineno">  832</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno">  833</span>    <span class="keyword">const</span> <a class="code hl_struct" href="test__support_8h.html#structPicurvTestCase">PicurvTestCase</a> cases[] = {</div>
-<div class="line"><span class="lineno">  834</span>        {<span class="stringliteral">&quot;distribute-particles-collective-consistency&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#af36bbe924fcb095814055b1d46456a80">TestDistributeParticlesCollectiveConsistency</a>},</div>
-<div class="line"><span class="lineno">  835</span>        {<span class="stringliteral">&quot;bounding-box-collectives-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#af5b74b3df9ca5c1acb1c683d1bf0a594">TestBoundingBoxCollectivesMultiRank</a>},</div>
-<div class="line"><span class="lineno">  836</span>        {<span class="stringliteral">&quot;periodic-cell-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#aecb57d1cc4c1b15c7e7825680c2931ed">TestPeriodicCellFieldSynchronizationMultiRank</a>},</div>
-<div class="line"><span class="lineno">  837</span>        {<span class="stringliteral">&quot;periodic-geometry-validation-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a86e18ca28f088fa9695e4a9a9b548a47">TestPeriodicGeometryValidationMultiRank</a>},</div>
-<div class="line"><span class="lineno">  838</span>        {<span class="stringliteral">&quot;periodic-face-center-coordinates-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1e6ac01fdc2d71b32dcda3f8025c953f">TestPeriodicFaceCenterCoordinatesMultiRank</a>},</div>
-<div class="line"><span class="lineno">  839</span>        {<span class="stringliteral">&quot;periodic-face-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a61ab8bee45bb5f28d3c22dc947c3c65a">TestPeriodicFaceFieldSynchronizationMultiRank</a>},</div>
-<div class="line"><span class="lineno">  840</span>        {<span class="stringliteral">&quot;periodic-staggered-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a9309564f12d2507769fa471290ad5aa2">TestPeriodicStaggeredFieldSynchronizationMultiRank</a>},</div>
-<div class="line"><span class="lineno">  841</span>        {<span class="stringliteral">&quot;spatial-target-decomposition-independent&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1e04949869112aa0655cf02022fde45c">TestSpatialTargetIsDecompositionIndependent</a>},</div>
-<div class="line"><span class="lineno">  842</span>        {<span class="stringliteral">&quot;statistics-checkpoint-round-trip-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a87d2eee5cbd1bf860d31b552a3d44a6d">TestStatisticsCheckpointRoundTripMultiRank</a>},</div>
-<div class="line"><span class="lineno">  843</span>        {<span class="stringliteral">&quot;les-averaging-decomposition-independent&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a7526c263e066b01b688a9f242f6211d9">TestLESAveragingIsDecompositionIndependent</a>},</div>
-<div class="line"><span class="lineno">  844</span>        {<span class="stringliteral">&quot;restart-cellid-migration-moves-particle-to-owner&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a6e2883618fbf7f0ef29db18953be8145">TestRestartCellIdMigrationMovesParticleToOwner</a>},</div>
-<div class="line"><span class="lineno">  845</span>        {<span class="stringliteral">&quot;settlement-classifies-exit-once-across-passes&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1c31c26e9ce5b54d31753670433a8a4a">TestSettlementClassifiesExitOnceAcrossPasses</a>},</div>
-<div class="line"><span class="lineno">  846</span>    };</div>
-<div class="line"><span class="lineno">  847</span> </div>
-<div class="line"><span class="lineno">  848</span>    ierr = PetscInitialize(&amp;argc, &amp;argv, NULL, <span class="stringliteral">&quot;PICurv MPI-focused runtime tests&quot;</span>);</div>
-<div class="line"><span class="lineno">  849</span>    <span class="keywordflow">if</span> (ierr) {</div>
-<div class="line"><span class="lineno">  850</span>        <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
-<div class="line"><span class="lineno">  851</span>    }</div>
-<div class="line"><span class="lineno">  852</span> </div>
-<div class="line"><span class="lineno">  853</span>    ierr = <a class="code hl_function" href="test__support_8c.html#a6f1100d7660974010e7da7ee2121d16e">PicurvRunTests</a>(<span class="stringliteral">&quot;unit-mpi&quot;</span>, cases, <span class="keyword">sizeof</span>(cases) / <span class="keyword">sizeof</span>(cases[0]));</div>
-<div class="line"><span class="lineno">  854</span>    <span class="keywordflow">if</span> (ierr) {</div>
-<div class="line"><span class="lineno">  855</span>        PetscFinalize();</div>
-<div class="line"><span class="lineno">  856</span>        <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
-<div class="line"><span class="lineno">  857</span>    }</div>
-<div class="line"><span class="lineno">  858</span> </div>
-<div class="line"><span class="lineno">  859</span>    ierr = PetscFinalize();</div>
-<div class="line"><span class="lineno">  860</span>    <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
-<div class="line"><span class="lineno">  861</span>}</div>
-<div class="ttc" id="atest__mpi__kernels_8c_html_a1c31c26e9ce5b54d31753670433a8a4a"><div class="ttname"><a href="test__mpi__kernels_8c.html#a1c31c26e9ce5b54d31753670433a8a4a">TestSettlementClassifiesExitOnceAcrossPasses</a></div><div class="ttdeci">static PetscErrorCode TestSettlementClassifiesExitOnceAcrossPasses(void)</div><div class="ttdoc">A particle that left the domain is classified once and never re-searched in later passes.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00490">test_mpi_kernels.c:490</a></div></div>
-<div class="ttc" id="atest__mpi__kernels_8c_html_a1e04949869112aa0655cf02022fde45c"><div class="ttname"><a href="test__mpi__kernels_8c.html#a1e04949869112aa0655cf02022fde45c">TestSpatialTargetIsDecompositionIndependent</a></div><div class="ttdeci">static PetscErrorCode TestSpatialTargetIsDecompositionIndependent(void)</div><div class="ttdoc">Spatial target domains must not depend on how ranks divide the block.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00562">test_mpi_kernels.c:562</a></div></div>
+<p class="definition">Definition at line <a class="el" href="test__mpi__kernels_8c_source.html#l00873">873</a> of file <a class="el" href="test__mpi__kernels_8c_source.html">test_mpi_kernels.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  874</span>{</div>
+<div class="line"><span class="lineno">  875</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno">  876</span>    <span class="keyword">const</span> <a class="code hl_struct" href="test__support_8h.html#structPicurvTestCase">PicurvTestCase</a> cases[] = {</div>
+<div class="line"><span class="lineno">  877</span>        {<span class="stringliteral">&quot;distribute-particles-collective-consistency&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#af36bbe924fcb095814055b1d46456a80">TestDistributeParticlesCollectiveConsistency</a>},</div>
+<div class="line"><span class="lineno">  878</span>        {<span class="stringliteral">&quot;bounding-box-collectives-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#af5b74b3df9ca5c1acb1c683d1bf0a594">TestBoundingBoxCollectivesMultiRank</a>},</div>
+<div class="line"><span class="lineno">  879</span>        {<span class="stringliteral">&quot;periodic-cell-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#aecb57d1cc4c1b15c7e7825680c2931ed">TestPeriodicCellFieldSynchronizationMultiRank</a>},</div>
+<div class="line"><span class="lineno">  880</span>        {<span class="stringliteral">&quot;periodic-geometry-validation-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a86e18ca28f088fa9695e4a9a9b548a47">TestPeriodicGeometryValidationMultiRank</a>},</div>
+<div class="line"><span class="lineno">  881</span>        {<span class="stringliteral">&quot;periodic-face-center-coordinates-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1e6ac01fdc2d71b32dcda3f8025c953f">TestPeriodicFaceCenterCoordinatesMultiRank</a>},</div>
+<div class="line"><span class="lineno">  882</span>        {<span class="stringliteral">&quot;periodic-face-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a61ab8bee45bb5f28d3c22dc947c3c65a">TestPeriodicFaceFieldSynchronizationMultiRank</a>},</div>
+<div class="line"><span class="lineno">  883</span>        {<span class="stringliteral">&quot;periodic-staggered-field-synchronization-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a9309564f12d2507769fa471290ad5aa2">TestPeriodicStaggeredFieldSynchronizationMultiRank</a>},</div>
+<div class="line"><span class="lineno">  884</span>        {<span class="stringliteral">&quot;spatial-target-decomposition-independent&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1e04949869112aa0655cf02022fde45c">TestSpatialTargetIsDecompositionIndependent</a>},</div>
+<div class="line"><span class="lineno">  885</span>        {<span class="stringliteral">&quot;statistics-checkpoint-round-trip-multi-rank&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a87d2eee5cbd1bf860d31b552a3d44a6d">TestStatisticsCheckpointRoundTripMultiRank</a>},</div>
+<div class="line"><span class="lineno">  886</span>        {<span class="stringliteral">&quot;les-averaging-decomposition-independent&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a7526c263e066b01b688a9f242f6211d9">TestLESAveragingIsDecompositionIndependent</a>},</div>
+<div class="line"><span class="lineno">  887</span>        {<span class="stringliteral">&quot;find-owner-of-cell-matches-rank-ranges&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#ac9e4e1b0d2cdc1f333020e8c089289d5">TestFindOwnerOfCellMatchesRankRanges</a>},</div>
+<div class="line"><span class="lineno">  888</span>        {<span class="stringliteral">&quot;restart-cellid-migration-moves-particle-to-owner&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a6e2883618fbf7f0ef29db18953be8145">TestRestartCellIdMigrationMovesParticleToOwner</a>},</div>
+<div class="line"><span class="lineno">  889</span>        {<span class="stringliteral">&quot;settlement-classifies-exit-once-across-passes&quot;</span>, <a class="code hl_function" href="test__mpi__kernels_8c.html#a1c31c26e9ce5b54d31753670433a8a4a">TestSettlementClassifiesExitOnceAcrossPasses</a>},</div>
+<div class="line"><span class="lineno">  890</span>    };</div>
+<div class="line"><span class="lineno">  891</span> </div>
+<div class="line"><span class="lineno">  892</span>    ierr = PetscInitialize(&amp;argc, &amp;argv, NULL, <span class="stringliteral">&quot;PICurv MPI-focused runtime tests&quot;</span>);</div>
+<div class="line"><span class="lineno">  893</span>    <span class="keywordflow">if</span> (ierr) {</div>
+<div class="line"><span class="lineno">  894</span>        <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
+<div class="line"><span class="lineno">  895</span>    }</div>
+<div class="line"><span class="lineno">  896</span> </div>
+<div class="line"><span class="lineno">  897</span>    ierr = <a class="code hl_function" href="test__support_8c.html#a6f1100d7660974010e7da7ee2121d16e">PicurvRunTests</a>(<span class="stringliteral">&quot;unit-mpi&quot;</span>, cases, <span class="keyword">sizeof</span>(cases) / <span class="keyword">sizeof</span>(cases[0]));</div>
+<div class="line"><span class="lineno">  898</span>    <span class="keywordflow">if</span> (ierr) {</div>
+<div class="line"><span class="lineno">  899</span>        PetscFinalize();</div>
+<div class="line"><span class="lineno">  900</span>        <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
+<div class="line"><span class="lineno">  901</span>    }</div>
+<div class="line"><span class="lineno">  902</span> </div>
+<div class="line"><span class="lineno">  903</span>    ierr = PetscFinalize();</div>
+<div class="line"><span class="lineno">  904</span>    <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)ierr;</div>
+<div class="line"><span class="lineno">  905</span>}</div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_a1c31c26e9ce5b54d31753670433a8a4a"><div class="ttname"><a href="test__mpi__kernels_8c.html#a1c31c26e9ce5b54d31753670433a8a4a">TestSettlementClassifiesExitOnceAcrossPasses</a></div><div class="ttdeci">static PetscErrorCode TestSettlementClassifiesExitOnceAcrossPasses(void)</div><div class="ttdoc">A particle that left the domain is classified once and never re-searched in later passes.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00533">test_mpi_kernels.c:533</a></div></div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_a1e04949869112aa0655cf02022fde45c"><div class="ttname"><a href="test__mpi__kernels_8c.html#a1e04949869112aa0655cf02022fde45c">TestSpatialTargetIsDecompositionIndependent</a></div><div class="ttdeci">static PetscErrorCode TestSpatialTargetIsDecompositionIndependent(void)</div><div class="ttdoc">Spatial target domains must not depend on how ranks divide the block.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00605">test_mpi_kernels.c:605</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_a1e6ac01fdc2d71b32dcda3f8025c953f"><div class="ttname"><a href="test__mpi__kernels_8c.html#a1e6ac01fdc2d71b32dcda3f8025c953f">TestPeriodicFaceCenterCoordinatesMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestPeriodicFaceCenterCoordinatesMultiRank(void)</div><div class="ttdoc">Tests translated face-center ghosts when the periodic axis is partitioned.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00251">test_mpi_kernels.c:251</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_a61ab8bee45bb5f28d3c22dc947c3c65a"><div class="ttname"><a href="test__mpi__kernels_8c.html#a61ab8bee45bb5f28d3c22dc947c3c65a">TestPeriodicFaceFieldSynchronizationMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestPeriodicFaceFieldSynchronizationMultiRank(void)</div><div class="ttdoc">Tests persistent I-face synchronization across an MPI-partitioned seam.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00305">test_mpi_kernels.c:305</a></div></div>
-<div class="ttc" id="atest__mpi__kernels_8c_html_a6e2883618fbf7f0ef29db18953be8145"><div class="ttname"><a href="test__mpi__kernels_8c.html#a6e2883618fbf7f0ef29db18953be8145">TestRestartCellIdMigrationMovesParticleToOwner</a></div><div class="ttdeci">static PetscErrorCode TestRestartCellIdMigrationMovesParticleToOwner(void)</div><div class="ttdoc">Tests restart fast-path migration using preloaded cell ownership metadata.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00428">test_mpi_kernels.c:428</a></div></div>
-<div class="ttc" id="atest__mpi__kernels_8c_html_a7526c263e066b01b688a9f242f6211d9"><div class="ttname"><a href="test__mpi__kernels_8c.html#a7526c263e066b01b688a9f242f6211d9">TestLESAveragingIsDecompositionIndependent</a></div><div class="ttdeci">static PetscErrorCode TestLESAveragingIsDecompositionIndependent(void)</div><div class="ttdoc">Tests that LES coefficient averaging does not depend on the decomposition.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00754">test_mpi_kernels.c:754</a></div></div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_a6e2883618fbf7f0ef29db18953be8145"><div class="ttname"><a href="test__mpi__kernels_8c.html#a6e2883618fbf7f0ef29db18953be8145">TestRestartCellIdMigrationMovesParticleToOwner</a></div><div class="ttdeci">static PetscErrorCode TestRestartCellIdMigrationMovesParticleToOwner(void)</div><div class="ttdoc">Tests restart fast-path migration using preloaded cell ownership metadata.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00471">test_mpi_kernels.c:471</a></div></div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_a7526c263e066b01b688a9f242f6211d9"><div class="ttname"><a href="test__mpi__kernels_8c.html#a7526c263e066b01b688a9f242f6211d9">TestLESAveragingIsDecompositionIndependent</a></div><div class="ttdeci">static PetscErrorCode TestLESAveragingIsDecompositionIndependent(void)</div><div class="ttdoc">Tests that LES coefficient averaging does not depend on the decomposition.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00797">test_mpi_kernels.c:797</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_a86e18ca28f088fa9695e4a9a9b548a47"><div class="ttname"><a href="test__mpi__kernels_8c.html#a86e18ca28f088fa9695e4a9a9b548a47">TestPeriodicGeometryValidationMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestPeriodicGeometryValidationMultiRank(void)</div><div class="ttdoc">Tests periodic seam translation discovery when seam nodes are on different ranks.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00220">test_mpi_kernels.c:220</a></div></div>
-<div class="ttc" id="atest__mpi__kernels_8c_html_a87d2eee5cbd1bf860d31b552a3d44a6d"><div class="ttname"><a href="test__mpi__kernels_8c.html#a87d2eee5cbd1bf860d31b552a3d44a6d">TestStatisticsCheckpointRoundTripMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestStatisticsCheckpointRoundTripMultiRank(void)</div><div class="ttdoc">Statistics payloads must survive a checkpoint round trip under decomposition.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00622">test_mpi_kernels.c:622</a></div></div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_a87d2eee5cbd1bf860d31b552a3d44a6d"><div class="ttname"><a href="test__mpi__kernels_8c.html#a87d2eee5cbd1bf860d31b552a3d44a6d">TestStatisticsCheckpointRoundTripMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestStatisticsCheckpointRoundTripMultiRank(void)</div><div class="ttdoc">Statistics payloads must survive a checkpoint round trip under decomposition.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00665">test_mpi_kernels.c:665</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_a9309564f12d2507769fa471290ad5aa2"><div class="ttname"><a href="test__mpi__kernels_8c.html#a9309564f12d2507769fa471290ad5aa2">TestPeriodicStaggeredFieldSynchronizationMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestPeriodicStaggeredFieldSynchronizationMultiRank(void)</div><div class="ttdoc">Tests persistent Ucont synchronization across an MPI-partitioned seam.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00353">test_mpi_kernels.c:353</a></div></div>
+<div class="ttc" id="atest__mpi__kernels_8c_html_ac9e4e1b0d2cdc1f333020e8c089289d5"><div class="ttname"><a href="test__mpi__kernels_8c.html#ac9e4e1b0d2cdc1f333020e8c089289d5">TestFindOwnerOfCellMatchesRankRanges</a></div><div class="ttdeci">static PetscErrorCode TestFindOwnerOfCellMatchesRankRanges(void)</div><div class="ttdoc">The per-axis owner lookup agrees with a scan of every rank's cell ranges.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00429">test_mpi_kernels.c:429</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_aecb57d1cc4c1b15c7e7825680c2931ed"><div class="ttname"><a href="test__mpi__kernels_8c.html#aecb57d1cc4c1b15c7e7825680c2931ed">TestPeriodicCellFieldSynchronizationMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestPeriodicCellFieldSynchronizationMultiRank(void)</div><div class="ttdoc">Tests distributed synchronization of persistent cell-centered scalar fields.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00123">test_mpi_kernels.c:123</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_af36bbe924fcb095814055b1d46456a80"><div class="ttname"><a href="test__mpi__kernels_8c.html#af36bbe924fcb095814055b1d46456a80">TestDistributeParticlesCollectiveConsistency</a></div><div class="ttdeci">static PetscErrorCode TestDistributeParticlesCollectiveConsistency(void)</div><div class="ttdoc">Tests collective particle distribution consistency across MPI ranks.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00045">test_mpi_kernels.c:45</a></div></div>
 <div class="ttc" id="atest__mpi__kernels_8c_html_af5b74b3df9ca5c1acb1c683d1bf0a594"><div class="ttname"><a href="test__mpi__kernels_8c.html#af5b74b3df9ca5c1acb1c683d1bf0a594">TestBoundingBoxCollectivesMultiRank</a></div><div class="ttdeci">static PetscErrorCode TestBoundingBoxCollectivesMultiRank(void)</div><div class="ttdoc">Tests multi-rank bounding-box gather and broadcast helpers.</div><div class="ttdef"><b>Definition</b> <a href="test__mpi__kernels_8c_source.html#l00078">test_mpi_kernels.c:78</a></div></div>
