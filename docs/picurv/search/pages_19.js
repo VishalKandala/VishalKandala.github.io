@@ -48,11 +48,12 @@ var searchData=
   ['profile_45',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
   ['profile_20tool_46',['c35c008-wall-normal-profile-tool',['../md_docs_2changelog_8d_2c35c008-wall-normal-profile-tool.html',1,'']]],
   ['profile_20tools_20continuation_47',['e551d5a-profile-tools-continuation',['../md_docs_2changelog_8d_2e551d5a-profile-tools-continuation.html',1,'']]],
-  ['profiling_20rank_20reduction_48',['dbd24e7-profiling-rank-reduction',['../md_docs_2changelog_8d_2dbd24e7-profiling-rank-reduction.html',1,'']]],
-  ['projection_49',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['projection_20method_50',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['promoted_51',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
-  ['promotion_52',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
-  ['promotions_53',['fc3ae90-vv-campaign-promotions',['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'']]],
-  ['promotions_20petsc_20stamp_54',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
+  ['profiles_48',['8b4b501-statistics-ensembles-profiles',['../md_docs_2changelog_8d_28b4b501-statistics-ensembles-profiles.html',1,'']]],
+  ['profiling_20rank_20reduction_49',['dbd24e7-profiling-rank-reduction',['../md_docs_2changelog_8d_2dbd24e7-profiling-rank-reduction.html',1,'']]],
+  ['projection_50',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['projection_20method_51',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
+  ['promoted_52',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['promotion_53',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
+  ['promotions_54',['fc3ae90-vv-campaign-promotions',['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'']]],
+  ['promotions_20petsc_20stamp_55',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
 ];

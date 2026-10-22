@@ -24,13 +24,13 @@ var searchData=
   ['8_20les_20closure_20recipe_21',['8. LES Closure Recipe',['../49_Workflow_Recipes_and_Config_Cookbook.html#p49_les_recipe_sec',1,'']]],
   ['8_20limitations_22',['8. Limitations',['../24_Dual_Time_Picard_Jameson_RK.html#p24_limits_sec',1,'']]],
   ['8_20machine_20readable_20field_20layout_20metadata_23',['8. Machine-Readable Field Layout Metadata',['../20_Grid_Cell_Architecture_Guide.html#autotoc_md24',1,'']]],
-  ['8_20next_20steps_24',['8 next steps',['../13_Code_Architecture.html#p13_next_steps_sec',1,'8. Next Steps'],['../09_Monitor_Reference.html#p09_next_steps_sec',1,'8. Next Steps'],['../07_Case_Reference.html#p07_next_steps_sec',1,'8. Next Steps']]],
+  ['8_20next_20steps_24',['8 next steps',['../09_Monitor_Reference.html#p09_next_steps_sec',1,'8. Next Steps'],['../13_Code_Architecture.html#p13_next_steps_sec',1,'8. Next Steps'],['../07_Case_Reference.html#p07_next_steps_sec',1,'8. Next Steps']]],
   ['8_20outputs_20and_20analysis_25',['8. Outputs and Analysis',['../70_Case_Design_Guide.html#p70_outputs_sec',1,'']]],
   ['8_20particle_20consistency_26',['8. Particle Consistency',['../32_Analytical_Solutions.html#p32_particles_sec',1,'']]],
   ['8_20physical_20solution_20convergence_20monitoring_27',['8. Physical-solution convergence monitoring',['../08_Solver_Reference.html#p08_solution_conv_sec',1,'']]],
   ['8_20reading_20the_20diagnostics_28',['8. Reading the Diagnostics',['../72_LES_Turbulence_Closure.html#p72_diagnostics_sec',1,'']]],
   ['8_20related_20documentation_29',['8 related documentation',['../68_Glossary.html#p68_related_sec',1,'8. Related Documentation'],['../64_Documentation_Extension_Framework.html#p64_related_sec',1,'8. Related Documentation']]],
-  ['8_20related_20pages_30',['8 related pages',['../37_Sweep_Studies_Guide.html#p37_refs_sec',1,'8. Related Pages'],['../53_Search_Robustness_Metrics_Reference.html#p53_related_sec',1,'8. Related Pages'],['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages']]],
+  ['8_20related_20pages_30',['8 related pages',['../48_Grid_Generator_Guide.html#p48_related_sec',1,'8. Related Pages'],['../53_Search_Robustness_Metrics_Reference.html#p53_related_sec',1,'8. Related Pages'],['../37_Sweep_Studies_Guide.html#p37_refs_sec',1,'8. Related Pages']]],
   ['8_20remote_20layout_20and_20catalog_31',['8. Remote Layout and Catalog',['../61_Storage_Management_Guide.html#p61_remote_sec',1,'']]],
   ['8_20results_20look_20numerically_20suspicious_32',['8. Results Look Numerically Suspicious',['../67_Troubleshooting.html#p67_suspicious_sec',1,'']]],
   ['8_20run_20inspection_20and_20plotting_33',['8. Run Inspection and Plotting',['../12_Capabilities_Summary.html#p12_inspection_sec',1,'']]],
@@ -47,5 +47,7 @@ var searchData=
   ['86db89d_20technical_20communication_20skill_44',['86db89d-technical-communication-skill',['../md_docs_2changelog_8d_286db89d-technical-communication-skill.html',1,'']]],
   ['86db89d_2dtechnical_2dcommunication_2dskill_2emd_45',['86db89d-technical-communication-skill.md',['../86db89d-technical-communication-skill_8md.html',1,'']]],
   ['88cc4e0_20wall_20bounded_20spectral_20initial_20conditions_46',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]],
-  ['88cc4e0_2dwall_2dbounded_2dspectral_2dinitial_2dconditions_2emd_47',['88cc4e0-wall-bounded-spectral-initial-conditions.md',['../88cc4e0-wall-bounded-spectral-initial-conditions_8md.html',1,'']]]
+  ['88cc4e0_2dwall_2dbounded_2dspectral_2dinitial_2dconditions_2emd_47',['88cc4e0-wall-bounded-spectral-initial-conditions.md',['../88cc4e0-wall-bounded-spectral-initial-conditions_8md.html',1,'']]],
+  ['8b4b501_20statistics_20ensembles_20profiles_48',['8b4b501-statistics-ensembles-profiles',['../md_docs_2changelog_8d_28b4b501-statistics-ensembles-profiles.html',1,'']]],
+  ['8b4b501_2dstatistics_2densembles_2dprofiles_2emd_49',['8b4b501-statistics-ensembles-profiles.md',['../8b4b501-statistics-ensembles-profiles_8md.html',1,'']]]
 ];

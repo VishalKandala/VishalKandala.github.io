@@ -145,7 +145,7 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Extension   </th><th class="markdownTableHeadNone">Depends on   </th><th class="markdownTableHeadNone">Unlocks    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">profiles, regions, bins, clipping    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_reduction_sec">4. Spatial Reduction In Post-Processing</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">regions, bins, clipping    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_view_sec">3. A View Bindable To An Explicit Vector Pair</a>   </td><td class="markdownTableBodyNone">nothing   </td><td class="markdownTableBodyNone">nodal statistics output, accumulator field logging    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -169,7 +169,7 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_online_sec">15. Online Spatial Spectral Accumulation</a>   </td><td class="markdownTableBodyNone"><a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec">14. Temporal Spectra From Bounded Probe Histories</a> for the transpose   </td><td class="markdownTableBodyNone">spatial spectra without a snapshot series   </td></tr>
 </table>
-<p>Spatial reduction is listed first because it is the largest capability for the least new code: the kernel it needs is already written and tested, and it has no online counterpart to design.</p>
+<p>Spatial reduction is listed first because its homogeneous-direction form is already implemented and the remaining subsets reuse the same merge, with no online counterpart to design.</p>
 <h1><a class="anchor" id="p60_view_sec"></a>
 3. A View Bindable To An Explicit Vector Pair</h1>
 <p><b>What is missing.</b> <code>UpdateLocalGhosts</code> resolves its vectors through a field view built on compile-time <code><a class="el" href="variables_8h.html#structUserCtx" title="User-defined context containing data specific to a single computational grid level.">UserCtx</a></code> offsets recorded in the catalog, and the nodal averaging kernel maps fixed field names onto fixed members. Per-window accumulators are counted from configuration and therefore have no compile-time offset, so neither routine accepts one.</p>
@@ -178,14 +178,13 @@ M_{2,AB} = M_{2,A} + M_{2,B} + \frac{W_A W_B}{W_A + W_B}\,(\mu_B - \mu_A)^2 .
 <p><b>Why it is worth doing.</b> Two surfaces depend on it at once. Nodal statistics output stops needing a staging round trip, and accumulator vectors become addressable by the field-anatomy and min/max loggers, which today can only report window-level scalars. A statistics-specific logging path would solve half of that and add a second mechanism doing what the first already does.</p>
 <h1><a class="anchor" id="p60_reduction_sec"></a>
 4. Spatial Reduction In Post-Processing</h1>
-<p>Profiles, regions, bins, and clipping are derived from the pointwise state a window already holds, by the reduction described in <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a>. This is where the majority of the remaining scientific capability lives, and it needs no new online state.</p>
-<p>What it requires:</p>
+<p>Reduction over homogeneous directions is implemented: <code>field_statistics.homogeneous</code> merges the pointwise state of a window or recipe ensemble over the named directions and writes a profile CSV (<a class="el" href="10_Post_Processing_Reference.html#p10_profiles_sub">Profiles over homogeneous directions</a>). What remains is reduction over subsets that are not whole grid directions, which needs:</p>
 <ul>
-<li><b>A region selector in the post recipe.</b> Coordinate ranges, index ranges, a homogeneous-direction collapse such as averaging over <code>i</code> and <code>k</code> at fixed <code>j</code>, or a named region. This sits in <code>post.yml</code> because the choice is made after the run, not committed at solve time.</li>
-<li><b>A reduction driver</b> that walks the selected points and combines their accumulators through the existing weighted merge, in a pairwise or tree order rather than sequentially, so the combination stays well conditioned across a large point count. <code>PicurvWindowSpatialMean</code> is the shape to follow; it already performs the domain-wide case of exactly this reduction, and it already excludes points the mask never sampled.</li>
-<li><b>An output form for reduced results.</b> A profile is a one-dimensional table rather than a field, so it belongs in a CSV alongside the convergence history rather than in the <code>.vts</code>.</li>
+<li><b>A region selector in the post recipe.</b> Coordinate ranges, index ranges, or a named region. It sits in <code>post.yml</code> because the choice is made after the run.</li>
+<li><b>Bins and clipping.</b> Conditioning the merge on a coordinate or field value, for which <code>PicurvWindowStorageReduce</code> would take a slot assignment instead of a set of collapsed directions.</li>
 </ul>
-<p>The practical gain beyond cost is that regions are chosen <em>after</em> the solve. Because the pointwise state is checkpointed, a wake window or a wall-normal profile that nobody anticipated can be extracted from a completed run without re-solving, and revised as often as the analysis demands.</p>
+<p>The merge itself needs no change. It forms each slot's mean first and then the spread of the point means about it, two reductions over the slot, which stays well conditioned for any point count. A non-rectangular region would only change which points share a slot.</p>
+<p>The practical gain beyond cost is that regions are chosen <em>after</em> the solve. Because the pointwise state is checkpointed, a wake window that nobody anticipated can be extracted from a completed run without re-solving, and revised as often as the analysis demands.</p>
 <h1><a class="anchor" id="p60_targets_sec"></a>
 5. Online Targets For The Non-Commuting Cases</h1>
 <p>A target must be resolved online only where <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a> says the reduction cannot follow:</p>

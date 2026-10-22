@@ -103,12 +103,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ul>
 </li>
 <li class="level1"><a href="#p10_stats_sec">5. Particle Statistics Pipeline</a></li>
-<li class="level1"><a href="#p10_field_stats_sec">6. field_statistics</a></li>
+<li class="level1"><a href="#p10_field_stats_sec">6. field_statistics</a><ul><li class="level2"><a href="#p10_profiles_sub">Profiles over homogeneous directions</a></li>
+<li class="level2"><a href="#p10_ensembles_sub">Ensembles</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p10_cap_fso_sec">6.1 Field Statistics Output Entries</a><ul><li class="level2"><a href="#p10_cap_fso_mean_sub">mean</a></li>
 <li class="level2"><a href="#p10_cap_fso_reynolds_stress_sub">reynolds_stress</a></li>
 <li class="level2"><a href="#p10_cap_fso_rms_sub">rms</a></li>
 <li class="level2"><a href="#p10_cap_fso_tke_sub">tke</a></li>
 <li class="level2"><a href="#p10_cap_fso_flux_sub">flux</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#p10_cap_fse_sec">6.2 Field Statistics Ensemble Source Entries</a><ul><li class="level2"><a href="#p10_cap_fse_particles_sub">particles</a></li>
+<li class="level2"><a href="#p10_cap_fse_eulerian_sub">eulerian</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p10_stat_entries_sec">7. Particle Statistics Task Entries</a><ul><li class="level2"><a href="#p10_cap_stat_msd_sub">msd</a></li>
@@ -286,8 +293,28 @@ statistics_pipeline:
 #   # vtk writes the derived fields as one .vts per window per processed step.
 #   # csv appends one row per processed step to a per-window convergence history,
 #   # recording sample count, weight, represented time, mask coverage, and the
-#   # domain-mean TKE when the window has one.
+#   # domain-mean TKE when the window has one. With homogeneous set, csv also
+#   # writes a profile per window or ensemble per processed step.
 #   formats: ["vtk", "csv"]
+#
+#   # Directions the statistics are homogeneous along. Each profile row merges
+#   # every point of one retained slot into the moments of its pooled samples, so
+#   # [i, k] gives a profile along j. Omit for no profile.
+#   # homogeneous: ["i", "k"]
+#
+#   # Single-instant windows the recipe defines itself, derived at every processed
+#   # step. source: particles takes each cell's particles as its samples (fields
+#   # Psi and velocity, which accumulate onto Psi and Ucat); source: eulerian takes
+#   # each cell's own state, which only a profile turns into a spread. fields and
+#   # covariances are written as in monitor.yml. An ensemble has no history, so
+#   # csv for one needs homogeneous. windows may be omitted when ensembles is set.
+#   # ensembles:
+#   #   - name: "fdf"
+#   #     source: "particles"
+#   #     fields:
+#   #       - {field: "Psi", moments: ["first", "second"]}
+#   #       - {field: "velocity", moments: ["first"]}
+#   #     covariances: [["velocity", "Psi"]]
 
 # --- Turbulent Energy Spectra ---
 # Measures energy spectra from the instantaneous velocity in each committed
@@ -459,7 +486,7 @@ io:
     eulerian: "dat"
     particle: "dat"
 </pre><p><code>post.yml</code> defines postprocessing input range, processing pipelines, statistics tasks, and VTK output selection.</p>
-<p>It carries two separate statistics contracts, which are deliberately not combined. <code>statistics_pipeline</code> reduces particle trajectories; <code>field_statistics</code> derives the Eulerian field windows the solver accumulated. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD and resolved turbulence statistics answer different questions and share no state. A third block, <code>spectra</code>, measures energy spectra from the instantaneous velocity; unlike every other block here it runs in the conductor rather than in the C post-processor.</p>
+<p>It carries two separate statistics contracts, which are deliberately not combined. <code>statistics_pipeline</code> reduces particle trajectories; <code>field_statistics</code> derives the Eulerian field windows the solver accumulated, and the single-instant ensembles the recipe itself defines. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> MSD and resolved turbulence statistics answer different questions and share no state. A third block, <code>spectra</code>, measures energy spectra from the instantaneous velocity; unlike every other block here it runs in the conductor rather than in the C post-processor.</p>
 <h1><a class="anchor" id="p10_structure_sec"></a>
 1. File Structure</h1>
 <div class="fragment"><div class="line">run_control:</div>
@@ -634,6 +661,8 @@ specific_ke</h2>
 <li><code>outputs</code> -&gt; <code>field_statistics_outputs</code></li>
 <li><code>formats</code> -&gt; <code>field_statistics_formats</code></li>
 <li><code>source_step</code> -&gt; <code>field_statistics_source_step</code></li>
+<li><code>homogeneous</code> -&gt; <code>field_statistics_homogeneous</code></li>
+<li><code>ensembles[n]</code> -&gt; <code>field_statistics_ensemble_&lt;n&gt;_*</code>, the run windows' option families under the <code>ensemble</code> kind (see <a class="el" href="10_Post_Processing_Reference.html#p10_ensembles_sub">Ensembles</a>)</li>
 </ul>
 <p>The recipe <b>names</b> windows rather than redescribing them. The post-processor is launched with the run's own control file and resolves the window definitions through the same parser the solver used, so there is no second description to fall out of step with the first.</p>
 <p>Available outputs, each resolved against what the window actually accumulated:</p>
@@ -655,6 +684,41 @@ specific_ke</h2>
 <p><code>vtk</code> writes one <code>.vts</code> per window per processed step. <code>csv</code> appends one row per processed step to a per-window convergence history recording sample count, accumulated weight, represented time, mask coverage, and the domain-mean TKE. The CSV is what answers whether a window has run long enough; no single snapshot can.</p>
 <p>Because the pipeline runs once per processed step, a recipe spanning a range produces a history. Pinning <code>source_step</code> reads every processed step's output from that one bundle instead, collapsing the history to a single answer.</p>
 <p>Each window writes its own files, so a window name may not be listed twice.</p>
+<h2><a class="anchor" id="p10_profiles_sub"></a>
+Profiles over homogeneous directions</h2>
+<p><code>homogeneous</code> names the grid directions, from <code>i</code>, <code>j</code> and <code>k</code>, along which the statistics are statistically equivalent. With <code>csv</code> in <code>formats</code>, every window and ensemble then also writes <code>&lt;prefix&gt;_profile_&lt;name&gt;_&lt;step&gt;.csv</code> beside its history: one row per retained index the window sampled, holding the 0-based cell index along each retained direction, the mean cell-centre coordinates over that slot, and one column per component of every requested output.</p>
+<div class="fragment"><div class="line">field_statistics:</div>
+<div class="line">  windows: [production]</div>
+<div class="line">  homogeneous: [i, k]      # a wall-normal profile along j</div>
+<div class="line">  outputs: [mean, rms, reynolds_stress]</div>
+<div class="line">  formats: [vtk, csv]</div>
+</div><!-- fragment --><p>A slot's statistic is that of its whole sample set, not an average of point statistics. Its mean is the weighted mean of the point means, and its co-moments add, to the point co-moments, the spread of the point means about the slot mean:</p>
+<p class="formulaDsp">
+\[
+C_{ab} = \frac{\sum_p \left[ C_{ab,p} + W_p (\mu_{a,p} - \mu_a)(\mu_{b,p} - \mu_b) \right]}{\sum_p W_p},
+\]
+</p>
+<p>the merge rule of <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a>. A channel's Reynolds stress profile is therefore the full stress over the homogeneous plane. A point that never sampled the field is excluded rather than averaged in as a zero. Naming all three directions gives one row for the whole domain. A profile is computed from the same state the <code>.vts</code> is, and follows <code>global_operations.dimensionalize</code> the same way, its coordinates included.</p>
+<h2><a class="anchor" id="p10_ensembles_sub"></a>
+Ensembles</h2>
+<p>An ensemble is a window over one instant instead of over time. Its samples are either the particles each cell holds (<code>source: particles</code>) or each cell's own state (<code>source: eulerian</code>), at the step being processed. It needs no state accumulated during the solve, so the recipe defines it in full, with the same <code>fields</code> and <code>covariances</code> a monitor window uses:</p>
+<div class="fragment"><div class="line">field_statistics:</div>
+<div class="line">  ensembles:</div>
+<div class="line">    - name: fdf</div>
+<div class="line">      source: particles</div>
+<div class="line">      fields:</div>
+<div class="line">        - {field: Psi, moments: [first, second]}</div>
+<div class="line">        - {field: velocity, moments: [first]}</div>
+<div class="line">      covariances: [[velocity, Psi]]</div>
+<div class="line">    - name: resolved</div>
+<div class="line">      source: eulerian</div>
+<div class="line">      fields:</div>
+<div class="line">        - {field: Ucat, moments: [first, second]}</div>
+<div class="line">  homogeneous: [i]</div>
+<div class="line">  outputs: [mean, rms, reynolds_stress, flux]</div>
+<div class="line">  formats: [vtk, csv]</div>
+</div><!-- fragment --><p>An ensemble derives the same outputs a window does, written the same way. The <code>.vts</code> is <code>&lt;output_prefix&gt;_statistics_&lt;name&gt;_&lt;step&gt;.vts</code>, and the profile follows <a class="el" href="10_Post_Processing_Reference.html#p10_profiles_sub">Profiles over homogeneous directions</a>. It has no convergence history, so <code>csv</code> for an ensemble requires <code>homogeneous</code>. An ensemble name must differ from every window name, since both name their files.</p>
+<p>A particle field is named by its particle name and accumulated onto the Eulerian field its particle-catalog entry scatters to, which also names its outputs. <code>Psi</code> scatters to <code>Psi</code> and <code>velocity</code> to <code>Ucat</code>, so the particle velocity's outputs read <code>&lt;name&gt;_Ucat_...</code>. Only particle fields with a scatter target can be named.</p>
 <p><b>Derived statistics follow <code>global_operations.dimensionalize</code>.</b> Each carries the source field's reference scale raised to its own power: a mean and an RMS are linear in it, a Reynolds stress, a turbulent kinetic energy and a co-moment flux quadratic. Every statistics-eligible field has a catalog dimension; the time columns of the history CSV (<code>represented_time</code>, and <code>total_weight</code> under <code>physical_time</code> weighting) are reported in seconds too. See <a class="el" href="58_Field_Statistics.html#p58_derived_sec">8. Derived Quantities and Post-Processing</a>.</p>
 <h1><a class="anchor" id="p10_cap_fso_sec"></a>
 6.1 Field Statistics Output Entries</h1>
@@ -723,6 +787,40 @@ flux</h2>
 <p><b>Diagnostics.</b> Three fields per window, one per velocity component.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: the <code>Ucat</code>-<code>P</code> co-moment equals its exact value to 1.4e-18.</p>
 <p><b>Limitations.</b> A cross-moment converges more slowly than either factor's own variance, so flux is the output most likely to be under-converged in a given window.</p>
+<h1><a class="anchor" id="p10_cap_fse_sec"></a>
+6.2 Field Statistics Ensemble Source Entries</h1>
+<!-- GENERATED FILE - do not edit by hand. Family: post.field_statistics_ensemble_source.
+     Regenerate with: make docs-inventory -->
+<table class="markdownTable">
+<tr>
+<th class="markdownTableHeadNone">Value</th>
+<th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
+</tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_eulerian"><code>eulerian</code></a></td><td class="markdownTableBodyNone"><code>eulerian</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_particles"><code>particles</code></a></td><td class="markdownTableBodyNone"><code>particles</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+</table>
+<p>Both sources fill the same accumulator state a run window holds, so derivation, output and profiles are shared and only the sampling differs.</p>
+<h2><a class="anchor" id="p10_cap_fse_particles_sub"></a>
+particles</h2>
+<p><a class="anchor" id="p10_cap_fse_particles"></a> <b>Identity.</b> <code>post.yml -&gt; field_statistics.ensembles[].source</code> = <code>particles</code> -&gt; <code>field_statistics_ensemble_&lt;n&gt;_source particles</code> -&gt; <a class="el" href="statistics__accumulator_8h.html#a95b7ce1b2f113f8530dd17c3e2f5b8b9">PicurvWindowStorageFromParticles</a>.</p>
+<p><b>What it does.</b> Takes the particles each cell holds at the processed step as that cell's samples, each of unit weight, and stores their count, ensemble means, and the centred sums of every requested self-product and covariance. The means come from the same particle sum the runtime scatter uses. The centred products are then accumulated about those means in a second pass over the particles. Before anything is accumulated, each particle is moved to the rank owning its recorded cell.</p>
+<p><b>When to choose it.</b> To measure what the particles carry within a cell: the subgrid variance of the scalar a filtered-density-function model transports, or a particle-velocity flux, which no Eulerian field holds. Choose <code>eulerian</code> instead for a field the grid already holds, where a cell has one value and so no spread of its own.</p>
+<p><b>Parameters it owns.</b> None beyond the family's: <code>fields</code> names <code>Psi</code> or <code>velocity</code>, with <code>moments</code>, and <code>covariances</code> pairs them as scalar-scalar or vector-scalar.</p>
+<p><b>Interactions.</b> Needs a case with particles. Validation refuses an ensemble whose fields need a subsystem the case does not enable, and the post-processor refuses one when the run wrote no particles. The particle stage is entered for it even when no particle output is requested.</p>
+<p><b>Diagnostics.</b> An empty cell has zero weight and is skipped in profiles and left zero in the <code>.vts</code>; a cell with one particle has zero variance. Few particles per cell show as noisy variance fields, which a profile over the homogeneous directions smooths by pooling.</p>
+<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> reproduces, from three particles in a cell, the means, symmetric products and vector-scalar co-moment the streaming accumulator produces for the same samples. <code>make unit-post-compute-mpi</code> checks the profile it is written through on one and several ranks.</p>
+<p><b>Limitations.</b> Every particle carries unit weight; mass-weighted (Favre) statistics are not available. An ensemble is one cell; samples are not pooled over a neighbourhood before the profile step.</p>
+<h2><a class="anchor" id="p10_cap_fse_eulerian_sub"></a>
+eulerian</h2>
+<p><a class="anchor" id="p10_cap_fse_eulerian"></a> <b>Identity.</b> <code>post.yml -&gt; field_statistics.ensembles[].source</code> = <code>eulerian</code> -&gt; <code>field_statistics_ensemble_&lt;n&gt;_source eulerian</code> -&gt; <a class="el" href="statistics__accumulator_8h.html#ac199c3ee112b718bc76ee00854617bc6">PicurvWindowAccumulate</a>.</p>
+<p><b>What it does.</b> Applies the processed step's Eulerian state to empty storage as one accepted state of unit weight, so each cell's mean is its value and its spread is zero. Combined with <code>homogeneous</code>, the profile is the spatial mean and spatial variance of the instantaneous field over each retained slot, such as the instantaneous mean-velocity profile of a temporal mixing layer.</p>
+<p><b>When to choose it.</b> For statistics of one snapshot over homogeneous directions, where a run window would average over time instead. Without <code>homogeneous</code> its <code>.vts</code> only restates the field, so pair it with a profile. Choose <code>particles</code> for spread within a cell.</p>
+<p><b>Parameters it owns.</b> None beyond the family's: <code>fields</code> names any field a monitor window may accumulate.</p>
+<p><b>Interactions.</b> Reads fields as loaded, so a field must be one the step's checkpoint holds.</p>
+<p><b>Diagnostics.</b> A pointwise variance or RMS is identically zero; only a profile carries spread.</p>
+<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> checks the homogeneous merge against the pooled moments computed directly, and <code>make unit-post-compute-mpi</code> checks the written profile on one and several ranks.</p>
+<p><b>Limitations.</b> One instant only; a time average belongs in a run window.</p>
 <h1><a class="anchor" id="p10_stat_entries_sec"></a>
 7. Particle Statistics Task Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: statistics.task.

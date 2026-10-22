@@ -46,5 +46,6 @@ var searchData=
   ['writevtkfilefooter_43',['WriteVTKFileFooter',['../vtk__io_8c.html#a47bae5c399297c757d205e078e7bbc96',1,'vtk_io.c']]],
   ['writevtkfileheader_44',['WriteVTKFileHeader',['../vtk__io_8c.html#ab573333485c75c29fedb1b7168a78202',1,'vtk_io.c']]],
   ['writevtpxmlheader_45',['WriteVTPXMLHeader',['../vtk__io_8c.html#ab7df0bd31982b21452e05631bdae784e',1,'vtk_io.c']]],
-  ['writevtsxmlheader_46',['WriteVTSXMLHeader',['../vtk__io_8c.html#aa1aa05de126ac93886ab1ae4d8670b3f',1,'vtk_io.c']]]
+  ['writevtsxmlheader_46',['WriteVTSXMLHeader',['../vtk__io_8c.html#aa1aa05de126ac93886ab1ae4d8670b3f',1,'vtk_io.c']]],
+  ['writewindowstatistics_47',['WriteWindowStatistics',['../postprocessor_8c.html#a6342a6558b97c33da71d88a979cbdc47',1,'postprocessor.c']]]
 ];
