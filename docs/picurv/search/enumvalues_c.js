@@ -30,11 +30,14 @@ var searchData=
   ['periodic_27',['PERIODIC',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae4379d044711537d9ce3b3b58c575c58',1,'variables.h']]],
   ['picurv_5fcadence_5fstep_28',['PICURV_CADENCE_STEP',['../statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658ada23859933a896698ea08c8ad2dd281c',1,'statistics_window.h']]],
   ['picurv_5fcadence_5ftime_29',['PICURV_CADENCE_TIME',['../statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658a46af41bf5568480ec25b4ac4c7081fc3',1,'statistics_window.h']]],
-  ['picurv_5fstatistics_5fmask_5ffluid_30',['PICURV_STATISTICS_MASK_FLUID',['../statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434',1,'statistics_target.h']]],
-  ['picurv_5ftarget_5fpointwise_31',['PICURV_TARGET_POINTWISE',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39ca0c17ddf9970a81423766ec574a6574b6',1,'statistics_target.h']]],
-  ['picurv_5fweighting_5fphysical_5ftime_32',['PICURV_WEIGHTING_PHYSICAL_TIME',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57a396fdf5734087712d084f9a26210fa20',1,'statistics_window.h']]],
-  ['picurv_5fweighting_5fsample_33',['PICURV_WEIGHTING_SAMPLE',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57af2a814ca432bac7ad244d5676789bcb8',1,'statistics_window.h']]],
-  ['picurv_5fwindow_5factive_34',['PICURV_WINDOW_ACTIVE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006ad60e3ff16a868084bf1d12dc786ee913',1,'statistics_window.h']]],
-  ['picurv_5fwindow_5fcomplete_35',['PICURV_WINDOW_COMPLETE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a517c33dfff15dc9f496e9a82a607a0f3',1,'statistics_window.h']]],
-  ['picurv_5fwindow_5fpending_36',['PICURV_WINDOW_PENDING',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a2fd006842f93beebc7b529f0cc9f0870',1,'statistics_window.h']]]
+  ['picurv_5fdraw_5fspace_5fbrownian_30',['PICURV_DRAW_SPACE_BROWNIAN',['../ParticleInitialConditions_8h.html#a5b6de8c500a49cec0122964628596c17a46079d25e9b454c46a174e06fa773a0d',1,'ParticleInitialConditions.h']]],
+  ['picurv_5fdraw_5fspace_5ffield_31',['PICURV_DRAW_SPACE_FIELD',['../ParticleInitialConditions_8h.html#a5b6de8c500a49cec0122964628596c17a2424bb052c28918aac7f07a3daa271c2',1,'ParticleInitialConditions.h']]],
+  ['picurv_5fdraw_5fspace_5fnamed_5fstream_32',['PICURV_DRAW_SPACE_NAMED_STREAM',['../ParticleInitialConditions_8h.html#a5b6de8c500a49cec0122964628596c17aaa735e6cb7a04d2628a0507425b66be5',1,'ParticleInitialConditions.h']]],
+  ['picurv_5fstatistics_5fmask_5ffluid_33',['PICURV_STATISTICS_MASK_FLUID',['../statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776aa0ce42602a538f96b7f7358e80e40434',1,'statistics_target.h']]],
+  ['picurv_5ftarget_5fpointwise_34',['PICURV_TARGET_POINTWISE',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39ca0c17ddf9970a81423766ec574a6574b6',1,'statistics_target.h']]],
+  ['picurv_5fweighting_5fphysical_5ftime_35',['PICURV_WEIGHTING_PHYSICAL_TIME',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57a396fdf5734087712d084f9a26210fa20',1,'statistics_window.h']]],
+  ['picurv_5fweighting_5fsample_36',['PICURV_WEIGHTING_SAMPLE',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57af2a814ca432bac7ad244d5676789bcb8',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5factive_37',['PICURV_WINDOW_ACTIVE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006ad60e3ff16a868084bf1d12dc786ee913',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fcomplete_38',['PICURV_WINDOW_COMPLETE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a517c33dfff15dc9f496e9a82a607a0f3',1,'statistics_window.h']]],
+  ['picurv_5fwindow_5fpending_39',['PICURV_WINDOW_PENDING',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a2fd006842f93beebc7b529f0cc9f0870',1,'statistics_window.h']]]
 ];

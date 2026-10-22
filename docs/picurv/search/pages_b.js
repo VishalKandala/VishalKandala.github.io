@@ -14,7 +14,8 @@ var searchData=
   ['boundaries_20and_20driven_20flows_11',['Periodic Boundaries and Driven Flows',['../p54_geometric_periodic.html',1,'64_Documentation_Extension_Framework']]],
   ['boundary_20conditions_20guide_12',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]],
   ['bounded_20spectral_20initial_20conditions_13',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]],
-  ['build_20identity_14',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
-  ['build_20profile_15',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
-  ['by_20symptom_16',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['brownian_20draws_14',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
+  ['build_20identity_15',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
+  ['build_20profile_16',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
+  ['by_20symptom_17',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];
