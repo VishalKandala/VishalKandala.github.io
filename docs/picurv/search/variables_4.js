@@ -4,7 +4,7 @@ var searchData=
   ['d_5fii_1',['d_ii',['../variables_8h.html#a959aee3b023e1d274fb29fffb50b611d',1,'IBMInfo']]],
   ['d_5fs_2',['d_s',['../variables_8h.html#a0f29852410b26ff88af42ff0f7e537ba',1,'IBMInfo']]],
   ['d_5fss_3',['d_ss',['../variables_8h.html#a684d9086b162387634a0a87b681f40eb',1,'IBMInfo']]],
-  ['da_4',['da',['../variables_8h.html#a0bdd88241db34e141bc14d3b565cecc4',1,'IBMNodes::dA'],['../variables_8h.html#af031acb43b014d5ac788aa9003491e75',1,'UserCtx::da']]],
+  ['da_4',['da',['../variables_8h.html#af031acb43b014d5ac788aa9003491e75',1,'UserCtx::da'],['../variables_8h.html#a0bdd88241db34e141bc14d3b565cecc4',1,'IBMNodes::dA']]],
   ['da_5fprocs_5fx_5',['da_procs_x',['../variables_8h.html#ac014127a43e8978a157a8a42c2f0538d',1,'SimCtx']]],
   ['da_5fprocs_5fy_6',['da_procs_y',['../variables_8h.html#a44230884a9901af3992a1faf2eebdfb1',1,'SimCtx']]],
   ['da_5fprocs_5fz_7',['da_procs_z',['../variables_8h.html#a281d10df99cab1a563bb65203f3bd823',1,'SimCtx']]],
