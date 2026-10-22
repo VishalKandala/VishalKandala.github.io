@@ -23,7 +23,7 @@ var searchData=
   ['capability_5fcoverage_5fscope_20',['capability_coverage_scope',['../namespacecertify__documentation.html#a8a9935eec4b14fae6174e3547356e72d',1,'certify_documentation']]],
   ['capability_5fentry_21',['capability_entry',['../namespacescaffold__documentation.html#aa60113949b900584a7ffe969340b9b20',1,'scaffold_documentation']]],
   ['capability_5fmode_22',['capability_mode',['../namespacereview__packet.html#ada2cca733865e7ba2260793750ecdca0',1,'review_packet']]],
-  ['capture_5fcontinuation_5frecords_23',['capture_continuation_records',['../namespacepicurv__cli_1_1core.html#a03dfed5cb7e44d54d5b681472d419a4e',1,'picurv_cli::core']]],
+  ['capture_5fcontinuation_5frecords_23',['capture_continuation_records',['../namespacepicurv__cli_1_1core.html#adcb1f3ce6e69bb7104fbceb3a3576044',1,'picurv_cli::core']]],
   ['capturebanneroutput_24',['CaptureBannerOutput',['../test__io_8c.html#adea3dd76de7df3780d5bd47cee3e1d05',1,'test_io.c']]],
   ['captureloggingoutput_25',['CaptureLoggingOutput',['../test__logging_8c.html#a20860e24ec3c98937a8ab3e1f1867d64',1,'test_logging.c']]],
   ['cart2contra_26',['cart2contra',['../setup_8h.html#ad029c429cf3e717072a5dbac13fc59da',1,'Cart2Contra(UserCtx *user):&#160;setup.c'],['../setup_8c.html#ad029c429cf3e717072a5dbac13fc59da',1,'Cart2Contra(UserCtx *user):&#160;setup.c']]],
