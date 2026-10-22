@@ -15,5 +15,6 @@ var searchData=
   ['68_5fglossary_2emd_12',['68_Glossary.md',['../68__Glossary_8md.html',1,'']]],
   ['69_5fscientific_5fwriting_5fhandoff_2emd_13',['69_Scientific_Writing_Handoff.md',['../69__Scientific__Writing__Handoff_8md.html',1,'']]],
   ['6b11b15_2dperiodic_2ddummy_2dcentres_2emd_14',['6b11b15-periodic-dummy-centres.md',['../6b11b15-periodic-dummy-centres_8md.html',1,'']]],
-  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_15',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]]
+  ['6d6944e_2dcross_2dsection_2dsupported_2emd_15',['6d6944e-cross-section-supported.md',['../6d6944e-cross-section-supported_8md.html',1,'']]],
+  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_16',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]]
 ];
