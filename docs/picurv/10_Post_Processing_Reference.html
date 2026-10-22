@@ -795,10 +795,9 @@ flux</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_eulerian"><code>eulerian</code></a></td><td class="markdownTableBodyNone"><code>eulerian</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_particles"><code>particles</code></a></td><td class="markdownTableBodyNone"><code>particles</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_eulerian"><code>eulerian</code></a></td><td class="markdownTableBodyNone"><code>eulerian</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fse_particles"><code>particles</code></a></td><td class="markdownTableBodyNone"><code>particles</code></td></tr>
 </table>
 <p>Both sources fill the same accumulator state a run window holds, so derivation, output and profiles are shared and only the sampling differs.</p>
 <h2><a class="anchor" id="p10_cap_fse_particles_sub"></a>
@@ -809,7 +808,7 @@ particles</h2>
 <p><b>Parameters it owns.</b> None beyond the family's: <code>fields</code> names <code>Psi</code> or <code>velocity</code>, with <code>moments</code>, and <code>covariances</code> pairs them as scalar-scalar or vector-scalar.</p>
 <p><b>Interactions.</b> Needs a case with particles. Validation refuses an ensemble whose fields need a subsystem the case does not enable, and the post-processor refuses one when the run wrote no particles. The particle stage is entered for it even when no particle output is requested.</p>
 <p><b>Diagnostics.</b> An empty cell has zero weight and is skipped in profiles and left zero in the <code>.vts</code>; a cell with one particle has zero variance. Few particles per cell show as noisy variance fields, which a profile over the homogeneous directions smooths by pooling.</p>
-<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> reproduces, from three particles in a cell, the means, symmetric products and vector-scalar co-moment the streaming accumulator produces for the same samples. <code>make unit-post-compute-mpi</code> checks the profile it is written through on one and several ranks.</p>
+<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> reproduces, from three particles in a cell, the means, symmetric products and vector-scalar co-moment the streaming accumulator produces for the same samples. <code>make unit-post-compute-mpi</code> checks the profile it is written through on one and several ranks. Integration verified - <code>psi-occupied-set-statistics-2026-10-22</code>: on a 200k-tracer channel the <code>particles</code> and <code>eulerian</code> profiles of <code>Psi</code> agree in mean and to about 1% in variance, and agree between 1 and 64 ranks to 7e-13.</p>
 <p><b>Limitations.</b> Every particle carries unit weight; mass-weighted (Favre) statistics are not available. An ensemble is one cell; samples are not pooled over a neighbourhood before the profile step.</p>
 <h2><a class="anchor" id="p10_cap_fse_eulerian_sub"></a>
 eulerian</h2>
@@ -819,7 +818,7 @@ eulerian</h2>
 <p><b>Parameters it owns.</b> None beyond the family's: <code>fields</code> names any field a monitor window may accumulate.</p>
 <p><b>Interactions.</b> Reads fields as loaded, so a field must be one the step's checkpoint holds. A particle-sampled field such as <code>Psi</code> counts only the cells that held particles at that step, read from the checkpointed <code>ParticleCount</code>. An empty cell's <code>Psi</code> is a placeholder, not a value, and its pooled moments are of the occupied cells. They still differ from the <code>particles</code> source, which weights each cell by its particle count where this weights each cell once.</p>
 <p><b>Diagnostics.</b> A pointwise variance or RMS is identically zero; only a profile carries spread.</p>
-<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> checks the homogeneous merge against the pooled moments computed directly, and <code>make unit-post-compute-mpi</code> checks the written profile on one and several ranks.</p>
+<p><b>Evidence.</b> Unit verified: <code>make unit-statistics-accumulator</code> checks the homogeneous merge against the pooled moments computed directly, and <code>make unit-post-compute-mpi</code> checks the written profile on one and several ranks. Integration verified - <code>psi-occupied-set-statistics-2026-10-22</code>: on a 200k-tracer channel the <code>particles</code> and <code>eulerian</code> profiles of <code>Psi</code> agree in mean and to about 1% in variance, and agree between 1 and 64 ranks to 7e-13.</p>
 <p><b>Limitations.</b> One instant only; a time average belongs in a run window.</p>
 <h1><a class="anchor" id="p10_stat_entries_sec"></a>
 7. Particle Statistics Task Entries</h1>
