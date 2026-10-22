@@ -36,6 +36,5 @@ var searchData=
   ['state_5fa_5fx_33',['STATE_A_X',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608afba06a1b4662c7a6cf2a79c38fb25bc6',1,'test_momentum_convective_candidates.c']]],
   ['state_5fa_5fy_34',['STATE_A_Y',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608afa1aa9c602c2c838273a66c0e7252313',1,'test_momentum_convective_candidates.c']]],
   ['state_5fb_35',['STATE_B',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608a5ae62508b79893c526e0394ecb9eddde',1,'test_momentum_convective_candidates.c']]],
-  ['state_5fc_36',['STATE_C',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608ae5efcaad582ca6fd418e8bcc8363d287',1,'test_momentum_convective_candidates.c']]],
-  ['symmetry_37',['SYMMETRY',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaa18d562b4107edccb2e10090864d1c5e',1,'variables.h']]]
+  ['state_5fc_36',['STATE_C',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608ae5efcaad582ca6fd418e8bcc8363d287',1,'test_momentum_convective_candidates.c']]]
 ];

@@ -326,7 +326,7 @@ properties:
     # --- Wall-bounded spectral seed: channel (one wall pair) or duct (two). ---
     # A divergence-free perturbation (discrete curl of a seeded vector potential with a
     # wall envelope) on a flux-normalized mean. Requires a single Cartesian block with
-    # uniform periodic axes: WALL/noslip pairs on wall_axes, PERIODIC elsewhere, and
+    # uniform periodic axes: WALL pairs (noslip or free_slip) on wall_axes, PERIODIC elsewhere, and
     # only the streamwise pair driven (constant_flux or initial_flux). Velocities are
     # in physical units [m/s]. The turbulent_channel example uses this block.
     # mode: generated
@@ -616,8 +616,8 @@ models:
 # --- Geometric periodicity: set both opposite faces to PERIODIC/geometric.
 #     Periodic axes are derived from these BC pairs. The paired grid surfaces
 #     must match pointwise under one nonzero constant Cartesian translation,
-#     and the axis must contain at least four physical nodes. Periodic particle
-#     wrapping is not implemented. See examples/periodic_test/. ---
+#     and the axis must contain at least four physical nodes. Particles crossing
+#     a periodic face wrap to its pair. See examples/periodic_test/. ---
 boundary_conditions:
   - face: "-Xi"
     type: WALL
@@ -687,6 +687,9 @@ boundary_conditions:
 #
 # WALL faces:
 #   handler: noslip                     No-slip (zero velocity) wall.
+#   handler: free_slip                  Impenetrable wall without shear. Also the condition
+#                                       at a plane of symmetry: there is no separate
+#                                       symmetry type, so model one as WALL/free_slip.
 #
 # INLET faces:
 #   handler: constant_velocity          Uniform Cartesian velocity.
@@ -1275,7 +1278,7 @@ log_law</h2>
 <p><b>What it does.</b> Applies a logarithmic law-of-the-wall boundary treatment instead of resolving the viscous sublayer.</p>
 <p><b>When to choose it.</b> When the near-wall grid is too coarse to resolve the sublayer and you accept a modelled wall stress rather than a computed one.</p>
 <p><b>Parameters it owns.</b> <code>wall_function.roughness_height</code> -&gt; <code>-wall_roughness</code>.</p>
-<p><b>Interactions.</b> Configured independently of the LES closure - enabling a turbulence model does not imply a wall function, and vice versa. The wall handler itself remains <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_noslip">noslip</a>; the wall function changes how the stress is imposed, not the BC selection.</p>
+<p><b>Interactions.</b> Configured independently of the LES closure - enabling a turbulence model does not imply a wall function, and vice versa. The wall handler itself remains <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_noslip">noslip</a>; the wall function changes how the stress is imposed, not the BC selection. A <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_free_slip">free_slip</a> wall exerts no stress, so the wall function is not applied there.</p>
 <p>The correction also reaches the LES closure. <code>Contra2Cart</code> rebuilds the Cartesian field from the contravariant one at the top of each timestep and so discards the previous solve's near-wall correction; the wall model is re-applied before the subgrid strain rates are formed, so the closure and the momentum equation agree about the near-wall velocity rather than disagreeing within one timestep.</p>
 <p><b>Diagnostics.</b> The startup banner reports whether wall functions are enabled and the configured roughness height. Every timestep appends one row to <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code> - the wall-face mean, spread, minimum and maximum of the friction velocity, the mean and maximum first-cell y+, the mean wall distance, and <code>nu_wall_over_nu_mean</code> - and logs the mean friction velocity and y+ to the console.</p>
 <p>The same row is checked against the range the selected law supports: mean first-cell y+ from 30 to 300 for <code>log_law</code>, at most 300 for <code>werner</code>, and at most 1000 for <code>cabot</code>. Each step outside it logs a warning, and ten consecutive steps outside it stop the run; a step back in range resets the count, so a startup transient survives where a mis-sized first cell does not.</p>
@@ -1323,12 +1326,13 @@ cabot</h2>
 </li>
 <li><code>OUTLET</code> + <code>conservation</code></li>
 <li><code>WALL</code> + <code>noslip</code></li>
+<li><code>WALL</code> + <code>free_slip</code> (also a plane of symmetry; the former <code>symmetry</code> type is retired)</li>
 <li><code>PERIODIC</code> + <code>geometric</code></li>
 <li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>enforce_seam_flux</code>; <code>apply_trim</code> is a deprecated alias)</li>
 <li><code>PERIODIC</code> + <code>initial_flux</code> (no params; optional <code>enforce_seam_flux</code>) - target measured from the initial condition</li>
 </ul>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
-<p>Optional per-face key <code>particle_policy: reflect | remove | wrap</code> sets what a particle crossing that face becomes. The default comes from the handler: <code>noslip</code> reflects, the inlet and outlet handlers remove, the periodic handlers wrap. <code>wrap</code> is accepted on <code>PERIODIC</code> faces only, and they accept nothing else. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_ppol_sec">5. Particle Boundary Policies</a>.</p>
+<p>Optional per-face key <code>particle_policy: reflect | remove | wrap</code> sets what a particle crossing that face becomes. The default comes from the handler: both wall handlers reflect, the inlet and outlet handlers remove, the periodic handlers wrap. <code>wrap</code> is accepted on <code>PERIODIC</code> faces only, and they accept nothing else. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_ppol_sec">5. Particle Boundary Policies</a>.</p>
 <p>Generated profile example:</p>
 <div class="fragment"><div class="line">- face: &quot;-Zeta&quot;</div>
 <div class="line">  type: INLET</div>
