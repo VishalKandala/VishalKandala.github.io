@@ -127,5 +127,7 @@ var searchData=
   ['4831839_2dles_2dwall_2dfunction_2dsupported_2emd_124',['4831839-les-wall-function-supported.md',['../4831839-les-wall-function-supported_8md.html',1,'']]],
   ['48_5fgrid_5fgenerator_5fguide_2emd_125',['48_Grid_Generator_Guide.md',['../48__Grid__Generator__Guide_8md.html',1,'']]],
   ['49_5fworkflow_5frecipes_5fand_5fconfig_5fcookbook_2emd_126',['49_Workflow_Recipes_and_Config_Cookbook.md',['../49__Workflow__Recipes__and__Config__Cookbook_8md.html',1,'']]],
-  ['4a_20boundary_20event_20counters_127',['4.4a Boundary Event Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_boundary',1,'']]]
+  ['4a_20boundary_20event_20counters_127',['4.4a Boundary Event Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_boundary',1,'']]],
+  ['4a4e041_20stability_20mode_20velocity_128',['4a4e041-stability-mode-velocity',['../md_docs_2changelog_8d_24a4e041-stability-mode-velocity.html',1,'']]],
+  ['4a4e041_2dstability_2dmode_2dvelocity_2emd_129',['4a4e041-stability-mode-velocity.md',['../4a4e041-stability-mode-velocity_8md.html',1,'']]]
 ];

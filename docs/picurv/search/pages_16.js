@@ -10,13 +10,14 @@ var searchData=
   ['methods_20and_20models_20overview_7',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
   ['metrics_20reference_8',['Search Robustness Metrics Reference',['../53_Search_Robustness_Metrics_Reference.html',1,'']]],
   ['mixing_20and_20statistical_20averaging_9',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]],
-  ['model_20and_20coupling_20overview_10',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
-  ['models_20overview_11',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
-  ['modes_12',['modes',['../32_Analytical_Solutions.html',1,'Analytical Solution Modes'],['../33_Initial_Conditions.html',1,'Initial Condition Modes']]],
-  ['modular_20selector_20extension_20guide_13',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
-  ['momentum_20solver_14',['momentum solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'Dual-Time Picard Jameson RK Momentum Solver'],['../55_Newton_Krylov_Momentum_Solver.html',1,'Newton&amp;ndash;Krylov Momentum Solver']]],
-  ['momentum_20solver_20implementations_15',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['monitor_20function_20renames_16',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
-  ['monitor_20yaml_17',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['multigrid_18',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
+  ['mode_20velocity_10',['4a4e041-stability-mode-velocity',['../md_docs_2changelog_8d_24a4e041-stability-mode-velocity.html',1,'']]],
+  ['model_20and_20coupling_20overview_11',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
+  ['models_20overview_12',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
+  ['modes_13',['modes',['../32_Analytical_Solutions.html',1,'Analytical Solution Modes'],['../33_Initial_Conditions.html',1,'Initial Condition Modes']]],
+  ['modular_20selector_20extension_20guide_14',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
+  ['momentum_20solver_15',['momentum solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'Dual-Time Picard Jameson RK Momentum Solver'],['../55_Newton_Krylov_Momentum_Solver.html',1,'Newton&amp;ndash;Krylov Momentum Solver']]],
+  ['momentum_20solver_20implementations_16',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
+  ['monitor_20function_20renames_17',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
+  ['monitor_20yaml_18',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
+  ['multigrid_19',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];
