@@ -1,7 +1,8 @@
 var searchData=
 [
   ['21e90ad_20distinct_20smoothing_0',['21e90ad-distinct-smoothing',['../md_docs_2changelog_8d_221e90ad-distinct-smoothing.html',1,'']]],
-  ['2e00957_20particle_20closeout_1',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
-  ['2f1f387_20example_20config_20refresh_2',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_3',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]]
+  ['2aa7d4c_20particle_20sampled_20validity_1',['2aa7d4c-particle-sampled-validity',['../md_docs_2changelog_8d_22aa7d4c-particle-sampled-validity.html',1,'']]],
+  ['2e00957_20particle_20closeout_2',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
+  ['2f1f387_20example_20config_20refresh_3',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_4',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]]
 ];
