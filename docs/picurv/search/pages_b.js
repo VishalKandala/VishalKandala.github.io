@@ -15,7 +15,8 @@ var searchData=
   ['boundary_20conditions_20guide_12',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]],
   ['bounded_20spectral_20initial_20conditions_13',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]],
   ['brownian_20draws_14',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
-  ['build_20identity_15',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
-  ['build_20profile_16',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
-  ['by_20symptom_17',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['brownian_20measurement_15',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
+  ['build_20identity_16',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
+  ['build_20profile_17',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
+  ['by_20symptom_18',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];
