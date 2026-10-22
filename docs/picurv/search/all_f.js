@@ -201,7 +201,7 @@ var searchData=
   ['directoryvalueiswellformed_198',['DirectoryValueIsWellFormed',['../setup_8c.html#a8a7395aac1bc729479a00cb405e10c9b',1,'setup.c']]],
   ['directoryverdict_199',['DirectoryVerdict',['../setup_8c.html#a0ef1dc01e8b65e9af435ee60611d2a50',1,'setup.c']]],
   ['directucontvelocity_200',['DirectUcontVelocity',['../test__momentum__convective__candidates_8c.html#a17160ea659ed3771250a77de77ec6b48',1,'test_momentum_convective_candidates.c']]],
-  ['discard_5funused_5frun_5fdirectory_201',['discard_unused_run_directory',['../namespacepicurv__cli_1_1core.html#a4e69ff27a6125ad1fc00b7912b68ee7f',1,'picurv_cli::core']]],
+  ['discard_5funused_5frun_5fdirectory_201',['discard_unused_run_directory',['../namespacepicurv__cli_1_1core.html#a5a94734948e9fd6a2bd2c88ed32cc58e',1,'picurv_cli::core']]],
   ['discover_5flocal_5fproject_5froot_202',['discover_local_project_root',['../namespacepicurv__cli_1_1core.html#a45c0ea3d830a93e24a5eb102d390bc78',1,'picurv_cli::core']]],
   ['discrete_20method_20skeleton_203',['1. Discrete Method Skeleton',['../23_Fractional_Step_Method.html#p23_equations_sec',1,'']]],
   ['dispatch_204',['dispatch',['../31_Momentum_Solvers.html#p31_selection_sec',1,'1. Selection and Dispatch'],['../44_Boundary_Conditions_Guide.html#p44_c_pipeline_sec',1,'8. C-Side Parsing and Dispatch']]],

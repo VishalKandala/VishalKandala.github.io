@@ -56,7 +56,7 @@ var searchData=
   ['directoryhitsreservedname_53',['DirectoryHitsReservedName',['../setup_8c.html#af693ca2f7befc935f221c283f30e8042',1,'setup.c']]],
   ['directoryvalueiswellformed_54',['DirectoryValueIsWellFormed',['../setup_8c.html#a8a7395aac1bc729479a00cb405e10c9b',1,'setup.c']]],
   ['directucontvelocity_55',['DirectUcontVelocity',['../test__momentum__convective__candidates_8c.html#a17160ea659ed3771250a77de77ec6b48',1,'test_momentum_convective_candidates.c']]],
-  ['discard_5funused_5frun_5fdirectory_56',['discard_unused_run_directory',['../namespacepicurv__cli_1_1core.html#a4e69ff27a6125ad1fc00b7912b68ee7f',1,'picurv_cli::core']]],
+  ['discard_5funused_5frun_5fdirectory_56',['discard_unused_run_directory',['../namespacepicurv__cli_1_1core.html#a5a94734948e9fd6a2bd2c88ed32cc58e',1,'picurv_cli::core']]],
   ['discover_5flocal_5fproject_5froot_57',['discover_local_project_root',['../namespacepicurv__cli_1_1core.html#a45c0ea3d830a93e24a5eb102d390bc78',1,'picurv_cli::core']]],
   ['dispatch_5fcommand_58',['dispatch_command',['../namespacepicurv__cli_1_1cli.html#a41f5f5f48800b89e6c2361972ea60b3b',1,'picurv_cli::cli']]],
   ['displaybanner_59',['displaybanner',['../io_8h.html#adde32528a690c023bc98c9e56ae2f2fb',1,'DisplayBanner(SimCtx *simCtx):&#160;io.c'],['../io_8c.html#adde32528a690c023bc98c9e56ae2f2fb',1,'DisplayBanner(SimCtx *simCtx):&#160;io.c']]],

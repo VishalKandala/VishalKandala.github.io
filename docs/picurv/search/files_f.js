@@ -8,5 +8,6 @@ var searchData=
   ['eb0478d_2dnk_2dpointblock_2dsupported_2emd_5',['eb0478d-nk-pointblock-supported.md',['../eb0478d-nk-pointblock-supported_8md.html',1,'']]],
   ['ec403bc_2dresampled_2dvelocity_2emd_6',['ec403bc-resampled-velocity.md',['../ec403bc-resampled-velocity_8md.html',1,'']]],
   ['ec40f11_2dfree_2dslip_2dsupported_2emd_7',['ec40f11-free-slip-supported.md',['../ec40f11-free-slip-supported_8md.html',1,'']]],
-  ['extract_5fartifact_5ftopology_2epy_8',['extract_artifact_topology.py',['../extract__artifact__topology_8py.html',1,'']]]
+  ['ed5eaf3_2dstaging_2drefusal_2dcleanup_2emd_8',['ed5eaf3-staging-refusal-cleanup.md',['../ed5eaf3-staging-refusal-cleanup_8md.html',1,'']]],
+  ['extract_5fartifact_5ftopology_2epy_9',['extract_artifact_topology.py',['../extract__artifact__topology_8py.html',1,'']]]
 ];
