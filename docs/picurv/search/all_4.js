@@ -129,5 +129,7 @@ var searchData=
   ['49_5fworkflow_5frecipes_5fand_5fconfig_5fcookbook_2emd_126',['49_Workflow_Recipes_and_Config_Cookbook.md',['../49__Workflow__Recipes__and__Config__Cookbook_8md.html',1,'']]],
   ['4a_20boundary_20event_20counters_127',['4.4a Boundary Event Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_boundary',1,'']]],
   ['4a4e041_20stability_20mode_20velocity_128',['4a4e041-stability-mode-velocity',['../md_docs_2changelog_8d_24a4e041-stability-mode-velocity.html',1,'']]],
-  ['4a4e041_2dstability_2dmode_2dvelocity_2emd_129',['4a4e041-stability-mode-velocity.md',['../4a4e041-stability-mode-velocity_8md.html',1,'']]]
+  ['4a4e041_2dstability_2dmode_2dvelocity_2emd_129',['4a4e041-stability-mode-velocity.md',['../4a4e041-stability-mode-velocity_8md.html',1,'']]],
+  ['4dac690_20summarize_20profile_20series_130',['4dac690-summarize-profile-series',['../md_docs_2changelog_8d_24dac690-summarize-profile-series.html',1,'']]],
+  ['4dac690_2dsummarize_2dprofile_2dseries_2emd_131',['4dac690-summarize-profile-series.md',['../4dac690-summarize-profile-series_8md.html',1,'']]]
 ];

@@ -116,12 +116,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a2b77203f325325bd49c42a821873aec7" id="r_a2b77203f325325bd49c42a821873aec7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#a2b77203f325325bd49c42a821873aec7">wall_normal_profile.load_spectra_helpers</a> ()</td></tr>
 <tr class="memdesc:a2b77203f325325bd49c42a821873aec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Import the PICGRID and PETSc-Vec readers from generators/spectra.gen.  <br /></td></tr>
 <tr class="separator:a2b77203f325325bd49c42a821873aec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae09ee1861b02ddfb1c919d2bb72aadb7" id="r_ae09ee1861b02ddfb1c919d2bb72aadb7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#ae09ee1861b02ddfb1c919d2bb72aadb7">wall_normal_profile.read_window</a> (checkpoint_dir, window, block)</td></tr>
-<tr class="memdesc:ae09ee1861b02ddfb1c919d2bb72aadb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolve a statistics window by name inside one committed checkpoint bundle.  <br /></td></tr>
-<tr class="separator:ae09ee1861b02ddfb1c919d2bb72aadb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbfb3bd49450cfda262733253779a040" id="r_abbfb3bd49450cfda262733253779a040"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#abbfb3bd49450cfda262733253779a040">wall_normal_profile.homogeneous_statistics</a> (checkpoint_dir, window_name, grid_path, block, homogeneous)</td></tr>
-<tr class="memdesc:abbfb3bd49450cfda262733253779a040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduce one statistics window's velocity moments over homogeneous directions.  <br /></td></tr>
-<tr class="separator:abbfb3bd49450cfda262733253779a040"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a791446e0b8e6e7059e79242d3d2b411c" id="r_a791446e0b8e6e7059e79242d3d2b411c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#a791446e0b8e6e7059e79242d3d2b411c">wall_normal_profile.read_window</a> (checkpoint_dir, window)</td></tr>
+<tr class="memdesc:a791446e0b8e6e7059e79242d3d2b411c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a statistics window's scalars from one committed checkpoint bundle.  <br /></td></tr>
+<tr class="separator:a791446e0b8e6e7059e79242d3d2b411c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a748ab4b0c8a6073f2e84d74087b6effa" id="r_a748ab4b0c8a6073f2e84d74087b6effa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#a748ab4b0c8a6073f2e84d74087b6effa">wall_normal_profile.profile_statistics</a> (profile_csv, window_name, grid_path, block, retained)</td></tr>
+<tr class="memdesc:a748ab4b0c8a6073f2e84d74087b6effa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a window's velocity statistics merged over its homogeneous directions.  <br /></td></tr>
+<tr class="separator:a748ab4b0c8a6073f2e84d74087b6effa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e37ba5186f99b714c70959f51c01682" id="r_a0e37ba5186f99b714c70959f51c01682"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacewall__normal__profile.html#a0e37ba5186f99b714c70959f51c01682">wall_normal_profile.read_metrics_rows</a> (csv_path)</td></tr>
 <tr class="memdesc:a0e37ba5186f99b714c70959f51c01682"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rows of a runtime metrics CSV, one per time, as a continued run leaves them.  <br /></td></tr>
 <tr class="separator:a0e37ba5186f99b714c70959f51c01682"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,10 +150,8 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Reduce a field-statistics window into wall-normal profiles for DNS comparison. </p>
-<p><code>field_statistics</code> accumulates per-cell time moments and is BC-agnostic, so it works unchanged under periodic boundaries. What the postprocessor does not have is a <em>spatial</em> reduction: nothing averages a statistics field over homogeneous directions. Comparing against a channel DNS needs exactly that, so this script does the reduction outside the postprocessor, reading the window payloads directly from one committed checkpoint bundle.</p>
-<p>The window is looked up by name in the bundle's <code>checkpoint.meta</code>, which also supplies its sample count and effective time bounds; its payloads are <code>statistics/window_NNNN/block_NNNN/{Ucat_mean,Ucat_m2,weight}.dat</code>. <code>Ucat_m2</code> holds the six centred, weighted sums M2 in the order (xx, xy, xz, yy, yz, zz), so the per-cell temporal covariance is M2/W. The covariance over the homogeneous plane adds the spatial covariance of the per-cell time means: </p><pre class="fragment">&lt;u_a' u_b'&gt; = mean(M2_ab / W) + mean(U_a U_b) - mean(U_a) mean(U_b)
-</pre><p> where mean() runs over the two directions that are not wall-normal. The two walls are then folded onto one half-channel (the Reynolds shear stress changes sign under the reflection), and the result is written as a CSV of </p><pre class="fragment">y, y+, U+, u'+, v'+, w'+, -&lt;u'v'&gt;+
-</pre><p> together with the log-law and viscous-sublayer reference curves.</p>
+<p>The reduction over the homogeneous directions is the post-processor's. A recipe deriving the window with <code>field_statistics.homogeneous</code> set to the streamwise and spanwise directions and <code>outputs</code> including <code>mean</code> and <code>reynolds_stress</code> writes a profile CSV whose rows hold, per wall-normal cell, the plane mean velocity and the covariance over the plane's pooled samples, the per-cell temporal covariance plus the spread of the cell means. This script reads that profile back, folds the two walls onto one half-channel (the Reynolds shear stress changes sign under the reflection), and writes a CSV of </p><pre class="fragment">y, y+, U+, u'+, v'+, w'+, -&lt;u'v'&gt;+
+</pre><p> together with the log-law and viscous-sublayer reference curves. The window's effective time bounds come from the <code>checkpoint.meta</code> of the bundle the profile was derived from, and the wall positions from the run's grid.</p>
 <p>The friction velocity comes from one of:</p>
 <ul>
 <li><code>--body-force f</code>: u_tau = sqrt(f h), the exact mean force balance of a body-force-driven channel;</li>
@@ -162,9 +160,10 @@ Variables</h2></td></tr>
 <li><code>--u-tau</code>: a value supplied directly;</li>
 <li>otherwise sqrt(nu dU/dy) from the first cell, which is only meaningful when the first cell sits in the viscous sublayer.</li>
 </ul>
-<p>The PICGRID and PETSc-binary readers are imported from <code>generators/spectra.gen</code>, which owns the DMDA interior-extraction convention (a cell-centred payload is sized <code>(IM+1, JM+1, KM+1)</code> and the physical interior is <code>[1:KM, 1:JM, 1:IM]</code>), and the metadata parser from <code><a class="el" href="namespacepicurv__cli.html">picurv_cli</a></code>, rather than duplicated.</p>
+<p>The PICGRID reader is imported from <code>generators/spectra.gen</code> and the metadata parser from <code><a class="el" href="namespacepicurv__cli.html">picurv_cli</a></code>, rather than duplicated. The profile must be in solver units: a recipe with <code>dimensionalize</code> off, or a case with unit reference scales.</p>
 <p>Usage:</p>
 <div class="fragment"><div class="line">wall_normal_profile.py \\</div>
+<div class="line">    --profile RUN/output/analysis/statistics/RECIPE/Field_profile_stationary_50000.csv \\</div>
 <div class="line">    --checkpoint RUN/output/checkpoints/step_000000050000 --window stationary \\</div>
 <div class="line">    --grid RUN/inputs/grid/grid.run --wall-axis Eta --stream-axis Zeta \\</div>
 <div class="line">    --viscosity 5.0e-05 --wall-model-csv RUN/output/analysis/metrics/wall_model.csv \\</div>
