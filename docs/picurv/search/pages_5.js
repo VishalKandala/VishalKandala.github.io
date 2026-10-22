@@ -8,5 +8,6 @@ var searchData=
   ['57b539e_20grid_20generator_20composed_20geometries_5',['57b539e-grid-generator-composed-geometries',['../md_docs_2changelog_8d_257b539e-grid-generator-composed-geometries.html',1,'']]],
   ['57e1307_20grid_20generator_20fixes_6',['57e1307-grid-generator-fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'']]],
   ['5a8ef02_20post_20particle_20averages_7',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
-  ['5f186c4_20filter_20width_20wall_20law_20promotion_8',['5f186c4-filter-width-wall-law-promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'']]]
+  ['5c2dc4a_20reducers_20post_20stage_8',['5c2dc4a-reducers-post-stage',['../md_docs_2changelog_8d_25c2dc4a-reducers-post-stage.html',1,'']]],
+  ['5f186c4_20filter_20width_20wall_20law_20promotion_9',['5f186c4-filter-width-wall-law-promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'']]]
 ];

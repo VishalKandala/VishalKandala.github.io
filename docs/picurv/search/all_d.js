@@ -184,7 +184,7 @@ var searchData=
   ['build_5fparser_181',['build_parser',['../namespacegenerate__cli__reference.html#acd47fa1120eb32a7f6b3bfd0c1c2eadf',1,'generate_cli_reference']]],
   ['build_5fpetsc_5fdiagnostics_5fargs_182',['build_petsc_diagnostics_args',['../namespacepicurv__cli_1_1core.html#a3fd3bb472f2040495e9543be30f42901',1,'picurv_cli::core']]],
   ['build_5fpost_5fexecution_5fplan_183',['build_post_execution_plan',['../namespacepicurv__cli_1_1core.html#a7c7b87066c28f504566a0e3fd76f03e1',1,'picurv_cli::core']]],
-  ['build_5fpost_5ffinalize_5fcommand_184',['build_post_finalize_command',['../namespacepicurv__cli_1_1core.html#aa2a47028f365d3a59a93b7f6f18ac6b3',1,'picurv_cli::core']]],
+  ['build_5fpost_5ffinalize_5fcommand_184',['build_post_finalize_command',['../namespacepicurv__cli_1_1core.html#af1696cd153ccdd78a2d649398f27d1fb',1,'picurv_cli::core']]],
   ['build_5fpost_5flocked_5fcommand_185',['build_post_locked_command',['../namespacepicurv__cli_1_1core.html#a56feef09901a143a68ad6c796d11ee8f',1,'picurv_cli::core']]],
   ['build_5fpost_5frecipe_5fconfig_186',['build_post_recipe_config',['../namespacepicurv__cli_1_1core.html#ad7b0c67f087e86adbc3cb24db8709af6',1,'picurv_cli::core']]],
   ['build_5fproject_187',['build_project',['../namespacepicurv__cli_1_1core.html#a83c6c431f8eca234fcb7a74c4c927941',1,'picurv_cli::core']]],

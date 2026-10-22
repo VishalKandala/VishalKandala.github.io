@@ -1,4 +1,0 @@
-var searchData=
-[
-  ['wall_5fnormal_5fprofile_0',['wall_normal_profile',['../namespacewall__normal__profile.html',1,'']]]
-];

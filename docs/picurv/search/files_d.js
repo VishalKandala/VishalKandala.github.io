@@ -14,6 +14,5 @@ var searchData=
   ['checksum_2eh_11',['checksum.h',['../checksum_8h.html',1,'']]],
   ['cli_2epy_12',['cli.py',['../cli_8py.html',1,'']]],
   ['compatibility_2epy_13',['compatibility.py',['../compatibility_8py.html',1,'']]],
-  ['core_2epy_14',['core.py',['../core_8py.html',1,'']]],
-  ['cross_5fsection_5fprofile_2epy_15',['cross_section_profile.py',['../cross__section__profile_8py.html',1,'']]]
+  ['core_2epy_14',['core.py',['../core_8py.html',1,'']]]
 ];

@@ -43,7 +43,5 @@ var searchData=
   ['auto_5fno_5fcompression_5fbytes_40',['AUTO_NO_COMPRESSION_BYTES',['../namespacepicurv__cli_1_1storage_1_1models.html#a3dd48fea0267abd99f29daa8447a27dd',1,'picurv_cli::storage::models']]],
   ['availability_41',['availability',['../field__catalog_8h.html#a7c9e045637f7ae7312d9b324fdc88324',1,'FieldDescriptor']]],
   ['averaging_5fdirection_42',['averaging_direction',['../variables_8h.html#a745afa9d0d9049e8522b7f237bacb6c2',1,'LESConfig']]],
-  ['averaging_5fmode_43',['averaging_mode',['../variables_8h.html#abf1f073e5fa01aefbd3feb269d7bdf11',1,'LESConfig']]],
-  ['axis_5fto_5fcomponent_44',['AXIS_TO_COMPONENT',['../namespacewall__normal__profile.html#af51af6c3c00a17b52dcb7cac94638035',1,'wall_normal_profile']]],
-  ['axis_5fto_5fkji_45',['AXIS_TO_KJI',['../namespacewall__normal__profile.html#afd97379a8084e19718c0c27a28f6a676',1,'wall_normal_profile']]]
+  ['averaging_5fmode_43',['averaging_mode',['../variables_8h.html#abf1f073e5fa01aefbd3feb269d7bdf11',1,'LESConfig']]]
 ];
