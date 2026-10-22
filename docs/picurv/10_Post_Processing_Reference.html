@@ -112,6 +112,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level2"><a href="#p10_cap_fso_rms_sub">rms</a></li>
 <li class="level2"><a href="#p10_cap_fso_tke_sub">tke</a></li>
 <li class="level2"><a href="#p10_cap_fso_flux_sub">flux</a></li>
+<li class="level2"><a href="#p10_cap_fso_point_variance_sub">point_variance</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p10_cap_fse_sec">6.2 Field Statistics Ensemble Source Entries</a><ul><li class="level2"><a href="#p10_cap_fse_particles_sub">particles</a></li>
@@ -294,6 +295,9 @@ statistics_pipeline:
 #   #   rms             -&gt; per-component root mean square of the fluctuation
 #   #   tke             -&gt; turbulent kinetic energy, for vector fields
 #   #   flux            -&gt; the cross-field co-moments listed under covariances
+#   #   point_variance  -&gt; per-component variance at each point; in a profile, the
+#   #                      equal-weight mean of those point variances over the slot,
+#   #                      not the pooled variance rms describes (opt-in)
 #   outputs: ["mean", "reynolds_stress", "rms", "tke", "flux"]
 #
 #   # vtk writes the derived fields as one .vts per window per processed step.
@@ -698,7 +702,13 @@ Profiles over homogeneous directions</h2>
 C_{ab} = \frac{\sum_p \left[ C_{ab,p} + W_p (\mu_{a,p} - \mu_a)(\mu_{b,p} - \mu_b) \right]}{\sum_p W_p},
 \]
 </p>
-<p>the merge rule of <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a>. A channel's Reynolds stress profile is therefore the full stress over the homogeneous plane. A point that never sampled the field is excluded rather than averaged in as a zero. Naming all three directions gives one row for the whole domain. An output measured over the occupied states of a particle-sampled field (<a class="el" href="58_Field_Statistics.html#p58_update_sub">4.1 Per-Point State and Update</a>), such as <code>Psi</code> or a <code>Ucat</code>-<code>Psi</code> flux, is left empty in a slot no particle reached, rather than written as a zero. A profile is computed from the same state the <code>.vts</code> is, and follows <code>global_operations.dimensionalize</code> the same way, its coordinates included. The <code>profile_series</code> reducer (<a class="el" href="10_Post_Processing_Reference.html#p10_reducers_sec">9. reducers</a>) reduces each step's profile to its maximum, minimum, integral, maximum-gradient thickness and momentum thickness, for example the vorticity-thickness growth of a mixing layer from its mean-velocity profile, which <code>picurv summarize --plot profile.&lt;column&gt;.&lt;functional&gt;</code> then plots against time.</p>
+<p>the merge rule of <a class="el" href="60_Field_Statistics_Planned_Extensions.html#p60_principle_sec">1. What Must Be Online, And What Must Not</a>. A channel's Reynolds stress profile is therefore the full stress over the homogeneous plane.</p>
+<p>Two variances can be wanted from the same state, and they answer different questions. Write \(\sigma_p^2\) for the variance of point \(p\)'s own samples and \(\mu_p\) for its mean. The pooled variance above, which <code>rms</code> and <code>reynolds_stress</code> report in a profile, is \(\sum_p W_p[\sigma_p^2 + (\mu_p-\mu)^2] / \sum_p W_p\): the spread of every sample in the slot. <code>point_variance</code> reports the equal-weight mean of the point variances, \(\frac{1}{N}\sum_p \sigma_p^2\) over the \(N\) points of the slot that sampled the field, which leaves the spread of the point means out.</p>
+<ul>
+<li>In a run window, a point's samples are its states in time. Where the flow is statistically homogeneous along the averaged directions the point means agree, and the two coincide. Where they do not, as in a developing layer, the pooled variance also counts how the time mean varies along the plane.</li>
+<li>In a <code>particles</code> ensemble, a point is a cell and its samples are the particles in it, so \(\sigma_p^2\) is the cell's within-cell (subgrid) variance and \(\mu_p\) its filtered value. <code>point_variance</code> is then the plane average of the subgrid variance, the quantity a filtered-density-function study reports (the generalized subgrid variance of Colucci et al. 1998). The pooled variance adds the resolved variance of the filtered values across the plane, which in a mixing layer is usually the larger part.</li>
+</ul>
+<p>Each point counts once in <code>point_variance</code>, whatever its weight: a cell with more particles, or a point with more samples, does not count for more. A point that never sampled the field is excluded rather than averaged in as a zero. Naming all three directions gives one row for the whole domain. An output measured over the occupied states of a particle-sampled field (<a class="el" href="58_Field_Statistics.html#p58_update_sub">4.1 Per-Point State and Update</a>), such as <code>Psi</code> or a <code>Ucat</code>-<code>Psi</code> flux, is left empty in a slot no particle reached, rather than written as a zero. A profile is computed from the same state the <code>.vts</code> is, and follows <code>global_operations.dimensionalize</code> the same way, its coordinates included. The <code>profile_series</code> reducer (<a class="el" href="10_Post_Processing_Reference.html#p10_reducers_sec">9. reducers</a>) reduces each step's profile to its maximum, minimum, integral, maximum-gradient thickness and momentum thickness, for example the vorticity-thickness growth of a mixing layer from its mean-velocity profile, which <code>picurv summarize --plot profile.&lt;column&gt;.&lt;functional&gt;</code> then plots against time.</p>
 <h2><a class="anchor" id="p10_ensembles_sub"></a>
 Ensembles</h2>
 <p>An ensemble is a window over one instant instead of over time. Its samples are either the particles each cell holds (<code>source: particles</code>) or each cell's own state (<code>source: eulerian</code>), at the step being processed. It needs no state accumulated during the solve, so the recipe defines it in full, with the same <code>fields</code> and <code>covariances</code> a monitor window uses:</p>
@@ -728,14 +738,16 @@ Ensembles</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
+<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_flux"><code>flux</code></a></td><td class="markdownTableBodyNone"><code>flux</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_mean"><code>mean</code></a></td><td class="markdownTableBodyNone"><code>mean</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_reynolds_stress"><code>reynolds_stress</code></a></td><td class="markdownTableBodyNone"><code>reynolds_stress</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_rms"><code>rms</code></a></td><td class="markdownTableBodyNone"><code>rms</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_tke"><code>tke</code></a></td><td class="markdownTableBodyNone"><code>tke</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_flux"><code>flux</code></a></td><td class="markdownTableBodyNone"><code>flux</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_mean"><code>mean</code></a></td><td class="markdownTableBodyNone"><code>mean</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_point_variance"><code>point_variance</code></a></td><td class="markdownTableBodyNone"><code>point_variance</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_reynolds_stress"><code>reynolds_stress</code></a></td><td class="markdownTableBodyNone"><code>reynolds_stress</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_rms"><code>rms</code></a></td><td class="markdownTableBodyNone"><code>rms</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_tke"><code>tke</code></a></td><td class="markdownTableBodyNone"><code>tke</code></td><td class="markdownTableBodyNone">supported</td></tr>
 </table>
-<p>Every output below was checked against a known answer by <code>field-statistics-tgv3d-2026-09-21</code>: on the analytic TGV3D field, each written value equals the eight-cell average of the exact cell statistic to round-off. Written fields are node averages of cell statistics, so a nodal <code>rms</code> is the mean of the neighbouring cell RMS values, not the root of an averaged variance. None has yet been compared against a turbulent reference profile.</p>
+<p>Every output below except <code>point_variance</code> was checked against a known answer by <code>field-statistics-tgv3d-2026-09-21</code>: on the analytic TGV3D field, each written value equals the eight-cell average of the exact cell statistic to round-off. Written fields are node averages of cell statistics, so a nodal <code>rms</code> is the mean of the neighbouring cell RMS values, not the root of an averaged variance. None has yet been compared against a turbulent reference profile.</p>
 <dl class="section note"><dt>Note</dt><dd>**<code>formats</code> is a parameter, not a choice between behaviours.** <code>vtk</code> writes the derived fields listed below into the window's bundle; <code>csv</code> appends one row per processed step carrying sample count, total weight, represented time, the per-point valid-fraction range, and the mean turbulent kinetic energy. Both are written from the same accumulated state, so requesting both costs output volume rather than computation. The <code>csv</code> is the artefact that answers whether a window converged; the <code>vtk</code> is the one that shows what it converged to. <code>tests/tooling/family_census.json</code> records why this is classified as a parameter of these entries rather than as a family of its own.</dd></dl>
 <h2><a class="anchor" id="p10_cap_fso_mean_sub"></a>
 mean</h2>
@@ -787,6 +799,16 @@ flux</h2>
 <p><b>Diagnostics.</b> Three fields per window, one per velocity component.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-statistics</code>. Analytically verified - <code>field-statistics-tgv3d-2026-09-21</code>: the <code>Ucat</code>-<code>P</code> co-moment equals its exact value to 1.4e-18.</p>
 <p><b>Limitations.</b> A cross-moment converges more slowly than either factor's own variance, so flux is the output most likely to be under-converged in a given window.</p>
+<h2><a class="anchor" id="p10_cap_fso_point_variance_sub"></a>
+point_variance</h2>
+<p><a class="anchor" id="p10_cap_fso_point_variance"></a> <b>Identity.</b> <code>field_statistics.outputs: [point_variance]</code> -&gt; <code>DERIVED_POINT_VARIANCE</code> in <a class="el" href="statistics__accumulator_8h.html#a2fba3f0c5d77e7ef7e7a11cb1b991f51">PicurvWindowDerive</a>, reduced by <a class="el" href="postprocessing__kernels_8h.html#a32d990ac07918f9aae59c0810e23b072">ComputeWindowStatisticsProfile</a>.</p>
+<p><b>What it does.</b> Writes each component's variance at each point, \(\sigma_p^2 = C_{ii,p}/W_p\), named <code>&lt;window&gt;_&lt;field&gt;_point_variance</code> (with the axis appended for a vector). In the <code>.vts</code> this is the diagonal <code>reynolds_stress</code> gives. In a profile it is the equal-weight mean of those point values over the slot, not the pooled variance (<a class="el" href="10_Post_Processing_Reference.html#p10_profiles_sub">Profiles over homogeneous directions</a>).</p>
+<p><b>When to choose it.</b> When the statistic of interest lives at each point and the profile should average it, not pool its samples: the subgrid variance of a particle ensemble, or the temporal variance at each point of a flow whose mean varies along the averaged directions. Choose <code>rms</code> or <code>reynolds_stress</code> for the variance of everything in the slot, which is the turbulence statistic of a homogeneous plane.</p>
+<p><b>Parameters it owns.</b> None. It is opt-in: the default output list does not include it.</p>
+<p><b>Interactions.</b> Needs the field's second moment, like <code>rms</code>. A particle-sampled field averages over the cells that held particles. Units are the field's squared.</p>
+<p><b>Diagnostics.</b> In a slot whose point means agree it equals the square of the pooled <code>rms</code>; a pooled variance larger than it measures the spread of the point means.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post-compute-mpi</code> (<code><a class="el" href="test__post__compute__mpi_8c.html" title="Decomposition-independent regression tests for post-processing compute.">tests/c/test_post_compute_mpi.c</a></code>): on one and several ranks, a profile of two states that differ by a varying amount at each point equals the plane mean of the point variances, below the pooled variance.</p>
+<p><b>Limitations.</b> Equal weighting per point means a point that sampled once counts as much as one that sampled often, so it is noisier where sampling is sparse; the sample count in the <code>.vts</code> shows where.</p>
 <h1><a class="anchor" id="p10_cap_fse_sec"></a>
 6.2 Field Statistics Ensemble Source Entries</h1>
 <!-- GENERATED FILE - do not edit by hand. Family: post.field_statistics_ensemble_source.
