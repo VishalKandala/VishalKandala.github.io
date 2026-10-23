@@ -2947,83 +2947,83 @@ Here is the caller graph for this function:</div>
 <p>Interpolates a scalar field from corner nodes to all face centers.</p>
 <p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l02077">2077</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2083</span>{</div>
-<div class="line"><span class="lineno"> 2084</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2085</span>    DMDALocalInfo info;</div>
-<div class="line"><span class="lineno"> 2086</span> </div>
-<div class="line"><span class="lineno"> 2087</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2088</span> </div>
-<div class="line"><span class="lineno"> 2089</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2090</span> </div>
-<div class="line"><span class="lineno"> 2091</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2092</span> </div>
-<div class="line"><span class="lineno"> 2093</span>    <span class="comment">// Determine owned-cell ranges based on corner-node ownership</span></div>
-<div class="line"><span class="lineno"> 2094</span>    PetscInt xs, xm, ys, ym, zs, zm;</div>
-<div class="line"><span class="lineno"> 2095</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 0, &amp;xs, &amp;xm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2096</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 1, &amp;ys, &amp;ym); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2097</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 2, &amp;zs, &amp;zm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2098</span> </div>
-<div class="line"><span class="lineno"> 2099</span>    <span class="comment">// Global exclusive end indices for cells</span></div>
-<div class="line"><span class="lineno"> 2100</span>    PetscInt xe = xs + xm;</div>
-<div class="line"><span class="lineno"> 2101</span>    PetscInt ye = ys + ym;</div>
-<div class="line"><span class="lineno"> 2102</span>    PetscInt ze = zs + zm;</div>
-<div class="line"><span class="lineno"> 2103</span> </div>
-<div class="line"><span class="lineno"> 2104</span>    <span class="comment">// --- X‐faces: loops k=zs..ze-1, j=ys..ye-1, i=xs..xe (xm+1 faces per row) ---</span></div>
-<div class="line"><span class="lineno"> 2105</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2106</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2107</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2108</span>            PetscInt j_loc = j - ys;</div>
-<div class="line"><span class="lineno"> 2109</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt;= xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2110</span>                PetscInt i_loc = i - xs; <span class="comment">// 0..xm</span></div>
-<div class="line"><span class="lineno"> 2111</span>                <span class="comment">// Average the four corners of the Y-Z face at X = i</span></div>
-<div class="line"><span class="lineno"> 2112</span>                PetscReal sum = corner_arr[k  ][j  ][i]</div>
-<div class="line"><span class="lineno"> 2113</span>                              + corner_arr[k+1][j  ][i]</div>
-<div class="line"><span class="lineno"> 2114</span>                              + corner_arr[k  ][j+1][i]</div>
-<div class="line"><span class="lineno"> 2115</span>                              + corner_arr[k+1][j+1][i];</div>
-<div class="line"><span class="lineno"> 2116</span>                faceX_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
-<div class="line"><span class="lineno"> 2117</span>            }</div>
-<div class="line"><span class="lineno"> 2118</span>        }</div>
-<div class="line"><span class="lineno"> 2119</span>    }</div>
-<div class="line"><span class="lineno"> 2120</span> </div>
-<div class="line"><span class="lineno"> 2121</span>    <span class="comment">// --- Y‐faces: loops k=zs..ze-1, j=ys..ye (ym+1 faces), i=xs..xe-1 ---</span></div>
-<div class="line"><span class="lineno"> 2122</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2123</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2124</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt;= ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2125</span>            PetscInt j_loc = j - ys; <span class="comment">// 0..ym</span></div>
-<div class="line"><span class="lineno"> 2126</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2127</span>                PetscInt i_loc = i - xs;</div>
-<div class="line"><span class="lineno"> 2128</span>                <span class="comment">// Average the four corners of the X-Z face at Y = j</span></div>
-<div class="line"><span class="lineno"> 2129</span>                PetscReal sum = corner_arr[k  ][j][i  ]</div>
-<div class="line"><span class="lineno"> 2130</span>                              + corner_arr[k+1][j][i  ]</div>
-<div class="line"><span class="lineno"> 2131</span>                              + corner_arr[k  ][j][i+1]</div>
-<div class="line"><span class="lineno"> 2132</span>                              + corner_arr[k+1][j][i+1];</div>
-<div class="line"><span class="lineno"> 2133</span>                faceY_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
-<div class="line"><span class="lineno"> 2134</span>            }</div>
-<div class="line"><span class="lineno"> 2135</span>        }</div>
-<div class="line"><span class="lineno"> 2136</span>    }</div>
-<div class="line"><span class="lineno"> 2137</span> </div>
-<div class="line"><span class="lineno"> 2138</span>    <span class="comment">// --- Z‐faces: loops k=zs..ze (zm+1), j=ys..ye-1, i=xs..xe-1 ---</span></div>
-<div class="line"><span class="lineno"> 2139</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt;= ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2140</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2141</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2142</span>            PetscInt j_loc = j - ys;</div>
-<div class="line"><span class="lineno"> 2143</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2144</span>                PetscInt i_loc = i - xs;</div>
-<div class="line"><span class="lineno"> 2145</span>                <span class="comment">// Average the four corners of the X-Y face at Z = k</span></div>
-<div class="line"><span class="lineno"> 2146</span>                PetscReal sum = corner_arr[k][j  ][i  ]</div>
-<div class="line"><span class="lineno"> 2147</span>                              + corner_arr[k][j  ][i+1]</div>
-<div class="line"><span class="lineno"> 2148</span>                              + corner_arr[k][j+1][i  ]</div>
-<div class="line"><span class="lineno"> 2149</span>                              + corner_arr[k][j+1][i+1];</div>
-<div class="line"><span class="lineno"> 2150</span>                faceZ_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
-<div class="line"><span class="lineno"> 2151</span>            }</div>
-<div class="line"><span class="lineno"> 2152</span>        }</div>
-<div class="line"><span class="lineno"> 2153</span>    }</div>
-<div class="line"><span class="lineno"> 2154</span> </div>
-<div class="line"><span class="lineno"> 2155</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2156</span> </div>
-<div class="line"><span class="lineno"> 2157</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2158</span>}</div>
+<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l02076">2076</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2082</span>{</div>
+<div class="line"><span class="lineno"> 2083</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2084</span>    DMDALocalInfo info;</div>
+<div class="line"><span class="lineno"> 2085</span> </div>
+<div class="line"><span class="lineno"> 2086</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2087</span> </div>
+<div class="line"><span class="lineno"> 2088</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2089</span> </div>
+<div class="line"><span class="lineno"> 2090</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2091</span> </div>
+<div class="line"><span class="lineno"> 2092</span>    <span class="comment">// Determine owned-cell ranges based on corner-node ownership</span></div>
+<div class="line"><span class="lineno"> 2093</span>    PetscInt xs, xm, ys, ym, zs, zm;</div>
+<div class="line"><span class="lineno"> 2094</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 0, &amp;xs, &amp;xm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2095</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 1, &amp;ys, &amp;ym); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2096</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 2, &amp;zs, &amp;zm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2097</span> </div>
+<div class="line"><span class="lineno"> 2098</span>    <span class="comment">// Global exclusive end indices for cells</span></div>
+<div class="line"><span class="lineno"> 2099</span>    PetscInt xe = xs + xm;</div>
+<div class="line"><span class="lineno"> 2100</span>    PetscInt ye = ys + ym;</div>
+<div class="line"><span class="lineno"> 2101</span>    PetscInt ze = zs + zm;</div>
+<div class="line"><span class="lineno"> 2102</span> </div>
+<div class="line"><span class="lineno"> 2103</span>    <span class="comment">// --- X‐faces: loops k=zs..ze-1, j=ys..ye-1, i=xs..xe (xm+1 faces per row) ---</span></div>
+<div class="line"><span class="lineno"> 2104</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2105</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2106</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2107</span>            PetscInt j_loc = j - ys;</div>
+<div class="line"><span class="lineno"> 2108</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt;= xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2109</span>                PetscInt i_loc = i - xs; <span class="comment">// 0..xm</span></div>
+<div class="line"><span class="lineno"> 2110</span>                <span class="comment">// Average the four corners of the Y-Z face at X = i</span></div>
+<div class="line"><span class="lineno"> 2111</span>                PetscReal sum = corner_arr[k  ][j  ][i]</div>
+<div class="line"><span class="lineno"> 2112</span>                              + corner_arr[k+1][j  ][i]</div>
+<div class="line"><span class="lineno"> 2113</span>                              + corner_arr[k  ][j+1][i]</div>
+<div class="line"><span class="lineno"> 2114</span>                              + corner_arr[k+1][j+1][i];</div>
+<div class="line"><span class="lineno"> 2115</span>                faceX_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
+<div class="line"><span class="lineno"> 2116</span>            }</div>
+<div class="line"><span class="lineno"> 2117</span>        }</div>
+<div class="line"><span class="lineno"> 2118</span>    }</div>
+<div class="line"><span class="lineno"> 2119</span> </div>
+<div class="line"><span class="lineno"> 2120</span>    <span class="comment">// --- Y‐faces: loops k=zs..ze-1, j=ys..ye (ym+1 faces), i=xs..xe-1 ---</span></div>
+<div class="line"><span class="lineno"> 2121</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2122</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2123</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt;= ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2124</span>            PetscInt j_loc = j - ys; <span class="comment">// 0..ym</span></div>
+<div class="line"><span class="lineno"> 2125</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2126</span>                PetscInt i_loc = i - xs;</div>
+<div class="line"><span class="lineno"> 2127</span>                <span class="comment">// Average the four corners of the X-Z face at Y = j</span></div>
+<div class="line"><span class="lineno"> 2128</span>                PetscReal sum = corner_arr[k  ][j][i  ]</div>
+<div class="line"><span class="lineno"> 2129</span>                              + corner_arr[k+1][j][i  ]</div>
+<div class="line"><span class="lineno"> 2130</span>                              + corner_arr[k  ][j][i+1]</div>
+<div class="line"><span class="lineno"> 2131</span>                              + corner_arr[k+1][j][i+1];</div>
+<div class="line"><span class="lineno"> 2132</span>                faceY_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
+<div class="line"><span class="lineno"> 2133</span>            }</div>
+<div class="line"><span class="lineno"> 2134</span>        }</div>
+<div class="line"><span class="lineno"> 2135</span>    }</div>
+<div class="line"><span class="lineno"> 2136</span> </div>
+<div class="line"><span class="lineno"> 2137</span>    <span class="comment">// --- Z‐faces: loops k=zs..ze (zm+1), j=ys..ye-1, i=xs..xe-1 ---</span></div>
+<div class="line"><span class="lineno"> 2138</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt;= ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2139</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2140</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2141</span>            PetscInt j_loc = j - ys;</div>
+<div class="line"><span class="lineno"> 2142</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2143</span>                PetscInt i_loc = i - xs;</div>
+<div class="line"><span class="lineno"> 2144</span>                <span class="comment">// Average the four corners of the X-Y face at Z = k</span></div>
+<div class="line"><span class="lineno"> 2145</span>                PetscReal sum = corner_arr[k][j  ][i  ]</div>
+<div class="line"><span class="lineno"> 2146</span>                              + corner_arr[k][j  ][i+1]</div>
+<div class="line"><span class="lineno"> 2147</span>                              + corner_arr[k][j+1][i  ]</div>
+<div class="line"><span class="lineno"> 2148</span>                              + corner_arr[k][j+1][i+1];</div>
+<div class="line"><span class="lineno"> 2149</span>                faceZ_arr[k_loc][j_loc][i_loc] = sum * 0.25;</div>
+<div class="line"><span class="lineno"> 2150</span>            }</div>
+<div class="line"><span class="lineno"> 2151</span>        }</div>
+<div class="line"><span class="lineno"> 2152</span>    }</div>
+<div class="line"><span class="lineno"> 2153</span> </div>
+<div class="line"><span class="lineno"> 2154</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2155</span> </div>
+<div class="line"><span class="lineno"> 2156</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2157</span>}</div>
 <div class="ttc" id="asetup_8h_html_a135027905841ed83f1a3ef2279d865cc"><div class="ttname"><a href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a></div><div class="ttdeci">PetscErrorCode GetOwnedCellRange(const DMDALocalInfo *info_nodes, PetscInt dim, PetscInt *xs_cell_global_out, PetscInt *xm_cell_local_out)</div><div class="ttdoc">Determines the global starting index and number of CELLS owned by the current processor in a specifie...</div><div class="ttdef"><b>Definition</b> <a href="setup_8c_source.html#l02949">setup.c:2949</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -3081,106 +3081,106 @@ Here is the call graph for this function:</div>
 <p>Interpolates a vector field from corner nodes to all face centers.</p>
 <p>Local to this translation unit. </p>
 
-<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l02167">2167</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2173</span>{</div>
-<div class="line"><span class="lineno"> 2174</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2175</span>    DMDALocalInfo info;</div>
-<div class="line"><span class="lineno"> 2176</span>    PetscMPIInt rank;</div>
-<div class="line"><span class="lineno"> 2177</span> </div>
-<div class="line"><span class="lineno"> 2178</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2179</span> </div>
-<div class="line"><span class="lineno"> 2180</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2181</span> </div>
-<div class="line"><span class="lineno"> 2182</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2183</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
-<div class="line"><span class="lineno"> 2184</span>                   <span class="stringliteral">&quot;Rank %d starting InterpolateFieldFromCornerToFaceCenter_Vector.\n&quot;</span>, rank);</div>
-<div class="line"><span class="lineno"> 2185</span>    </div>
-<div class="line"><span class="lineno"> 2186</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, &amp;info); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2187</span> </div>
-<div class="line"><span class="lineno"> 2188</span>    PetscInt xs, xm, ys, ym, zs, zm;</div>
-<div class="line"><span class="lineno"> 2189</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 0, &amp;xs, &amp;xm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2190</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 1, &amp;ys, &amp;ym); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2191</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 2, &amp;zs, &amp;zm); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2192</span> </div>
-<div class="line"><span class="lineno"> 2193</span>    PetscInt xe = xs + xm;</div>
-<div class="line"><span class="lineno"> 2194</span>    PetscInt ye = ys + ym;</div>
-<div class="line"><span class="lineno"> 2195</span>    PetscInt ze = zs + zm;</div>
-<div class="line"><span class="lineno"> 2196</span> </div>
-<div class="line"><span class="lineno"> 2197</span>    <span class="comment">// X-faces</span></div>
-<div class="line"><span class="lineno"> 2198</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2199</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2200</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2201</span>            PetscInt j_loc = j - ys;</div>
-<div class="line"><span class="lineno"> 2202</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt;= xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2203</span>                PetscInt i_loc = i - xs;</div>
-<div class="line"><span class="lineno"> 2204</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
-<div class="line"><span class="lineno"> 2205</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
-<div class="line"><span class="lineno"> 2206</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><span class="lineno"> 2207</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
-<div class="line"><span class="lineno"> 2208</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><span class="lineno"> 2209</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
-<div class="line"><span class="lineno"> 2210</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><span class="lineno"> 2211</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2212</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2213</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2214</span>            }</div>
-<div class="line"><span class="lineno"> 2215</span>        }</div>
-<div class="line"><span class="lineno"> 2216</span>    }</div>
-<div class="line"><span class="lineno"> 2217</span> </div>
-<div class="line"><span class="lineno"> 2218</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
-<div class="line"><span class="lineno"> 2219</span>                   <span class="stringliteral">&quot;Rank %d x-face Interpolation complete.\n&quot;</span>, rank);</div>
-<div class="line"><span class="lineno"> 2220</span>    </div>
-<div class="line"><span class="lineno"> 2221</span>    <span class="comment">// Y-faces</span></div>
-<div class="line"><span class="lineno"> 2222</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2223</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2224</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt;= ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2225</span>            PetscInt j_loc = j - ys;</div>
-<div class="line"><span class="lineno"> 2226</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2227</span>                PetscInt i_loc = i - xs;</div>
-<div class="line"><span class="lineno"> 2228</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
-<div class="line"><span class="lineno"> 2229</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
-<div class="line"><span class="lineno"> 2230</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><span class="lineno"> 2231</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
-<div class="line"><span class="lineno"> 2232</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><span class="lineno"> 2233</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
-<div class="line"><span class="lineno"> 2234</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><span class="lineno"> 2235</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2236</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2237</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2238</span>            }</div>
-<div class="line"><span class="lineno"> 2239</span>        }</div>
-<div class="line"><span class="lineno"> 2240</span>    }</div>
-<div class="line"><span class="lineno"> 2241</span> </div>
-<div class="line"><span class="lineno"> 2242</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
-<div class="line"><span class="lineno"> 2243</span>                   <span class="stringliteral">&quot;Rank %d y-face Interpolation complete.\n&quot;</span>, rank);</div>
-<div class="line"><span class="lineno"> 2244</span>    </div>
-<div class="line"><span class="lineno"> 2245</span>    <span class="comment">// Z-faces</span></div>
-<div class="line"><span class="lineno"> 2246</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt;= ze; ++k) {</div>
-<div class="line"><span class="lineno"> 2247</span>        PetscInt k_loc = k - zs;</div>
-<div class="line"><span class="lineno"> 2248</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
-<div class="line"><span class="lineno"> 2249</span>            PetscInt j_loc = j - ys;</div>
-<div class="line"><span class="lineno"> 2250</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
-<div class="line"><span class="lineno"> 2251</span>                PetscInt i_loc = i - xs;</div>
-<div class="line"><span class="lineno"> 2252</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
-<div class="line"><span class="lineno"> 2253</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
-<div class="line"><span class="lineno"> 2254</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
-<div class="line"><span class="lineno"> 2255</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
-<div class="line"><span class="lineno"> 2256</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
-<div class="line"><span class="lineno"> 2257</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
-<div class="line"><span class="lineno"> 2258</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
-<div class="line"><span class="lineno"> 2259</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2260</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2261</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
-<div class="line"><span class="lineno"> 2262</span>            }</div>
-<div class="line"><span class="lineno"> 2263</span>        }</div>
-<div class="line"><span class="lineno"> 2264</span>    }</div>
-<div class="line"><span class="lineno"> 2265</span> </div>
-<div class="line"><span class="lineno"> 2266</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
-<div class="line"><span class="lineno"> 2267</span>                   <span class="stringliteral">&quot;Rank %d z-face Interpolation complete.\n&quot;</span>, rank);</div>
-<div class="line"><span class="lineno"> 2268</span>    </div>
-<div class="line"><span class="lineno"> 2269</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2270</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2271</span>}</div>
+<p class="definition">Definition at line <a class="el" href="interpolation_8c_source.html#l02166">2166</a> of file <a class="el" href="interpolation_8c_source.html">interpolation.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2172</span>{</div>
+<div class="line"><span class="lineno"> 2173</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2174</span>    DMDALocalInfo info;</div>
+<div class="line"><span class="lineno"> 2175</span>    PetscMPIInt rank;</div>
+<div class="line"><span class="lineno"> 2176</span> </div>
+<div class="line"><span class="lineno"> 2177</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2178</span> </div>
+<div class="line"><span class="lineno"> 2179</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2180</span> </div>
+<div class="line"><span class="lineno"> 2181</span>    ierr = MPI_Comm_rank(PETSC_COMM_WORLD, &amp;rank); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2182</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
+<div class="line"><span class="lineno"> 2183</span>                   <span class="stringliteral">&quot;Rank %d starting InterpolateFieldFromCornerToFaceCenter_Vector.\n&quot;</span>, rank);</div>
+<div class="line"><span class="lineno"> 2184</span>    </div>
+<div class="line"><span class="lineno"> 2185</span>    ierr = DMDAGetLocalInfo(user-&gt;<a class="code hl_variable" href="variables_8h.html#a69966d928601d61d4f526636f84396c5">fda</a>, &amp;info); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2186</span> </div>
+<div class="line"><span class="lineno"> 2187</span>    PetscInt xs, xm, ys, ym, zs, zm;</div>
+<div class="line"><span class="lineno"> 2188</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 0, &amp;xs, &amp;xm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2189</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 1, &amp;ys, &amp;ym); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2190</span>    ierr = <a class="code hl_function" href="setup_8h.html#a135027905841ed83f1a3ef2279d865cc">GetOwnedCellRange</a>(&amp;info, 2, &amp;zs, &amp;zm); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2191</span> </div>
+<div class="line"><span class="lineno"> 2192</span>    PetscInt xe = xs + xm;</div>
+<div class="line"><span class="lineno"> 2193</span>    PetscInt ye = ys + ym;</div>
+<div class="line"><span class="lineno"> 2194</span>    PetscInt ze = zs + zm;</div>
+<div class="line"><span class="lineno"> 2195</span> </div>
+<div class="line"><span class="lineno"> 2196</span>    <span class="comment">// X-faces</span></div>
+<div class="line"><span class="lineno"> 2197</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2198</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2199</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2200</span>            PetscInt j_loc = j - ys;</div>
+<div class="line"><span class="lineno"> 2201</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt;= xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2202</span>                PetscInt i_loc = i - xs;</div>
+<div class="line"><span class="lineno"> 2203</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
+<div class="line"><span class="lineno"> 2204</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
+<div class="line"><span class="lineno"> 2205</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><span class="lineno"> 2206</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
+<div class="line"><span class="lineno"> 2207</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><span class="lineno"> 2208</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k  ][j  ][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j  ][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
+<div class="line"><span class="lineno"> 2209</span>                      + corner_arr[k  ][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j+1][i].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><span class="lineno"> 2210</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2211</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2212</span>                faceX_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2213</span>            }</div>
+<div class="line"><span class="lineno"> 2214</span>        }</div>
+<div class="line"><span class="lineno"> 2215</span>    }</div>
+<div class="line"><span class="lineno"> 2216</span> </div>
+<div class="line"><span class="lineno"> 2217</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
+<div class="line"><span class="lineno"> 2218</span>                   <span class="stringliteral">&quot;Rank %d x-face Interpolation complete.\n&quot;</span>, rank);</div>
+<div class="line"><span class="lineno"> 2219</span>    </div>
+<div class="line"><span class="lineno"> 2220</span>    <span class="comment">// Y-faces</span></div>
+<div class="line"><span class="lineno"> 2221</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt; ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2222</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2223</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt;= ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2224</span>            PetscInt j_loc = j - ys;</div>
+<div class="line"><span class="lineno"> 2225</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2226</span>                PetscInt i_loc = i - xs;</div>
+<div class="line"><span class="lineno"> 2227</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
+<div class="line"><span class="lineno"> 2228</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
+<div class="line"><span class="lineno"> 2229</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><span class="lineno"> 2230</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
+<div class="line"><span class="lineno"> 2231</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><span class="lineno"> 2232</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k  ][j][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
+<div class="line"><span class="lineno"> 2233</span>                      + corner_arr[k  ][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k+1][j][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><span class="lineno"> 2234</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2235</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2236</span>                faceY_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2237</span>            }</div>
+<div class="line"><span class="lineno"> 2238</span>        }</div>
+<div class="line"><span class="lineno"> 2239</span>    }</div>
+<div class="line"><span class="lineno"> 2240</span> </div>
+<div class="line"><span class="lineno"> 2241</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
+<div class="line"><span class="lineno"> 2242</span>                   <span class="stringliteral">&quot;Rank %d y-face Interpolation complete.\n&quot;</span>, rank);</div>
+<div class="line"><span class="lineno"> 2243</span>    </div>
+<div class="line"><span class="lineno"> 2244</span>    <span class="comment">// Z-faces</span></div>
+<div class="line"><span class="lineno"> 2245</span>    <span class="keywordflow">for</span> (PetscInt k = zs; k &lt;= ze; ++k) {</div>
+<div class="line"><span class="lineno"> 2246</span>        PetscInt k_loc = k - zs;</div>
+<div class="line"><span class="lineno"> 2247</span>        <span class="keywordflow">for</span> (PetscInt j = ys; j &lt; ye; ++j) {</div>
+<div class="line"><span class="lineno"> 2248</span>            PetscInt j_loc = j - ys;</div>
+<div class="line"><span class="lineno"> 2249</span>            <span class="keywordflow">for</span> (PetscInt i = xs; i &lt; xe; ++i) {</div>
+<div class="line"><span class="lineno"> 2250</span>                PetscInt i_loc = i - xs;</div>
+<div class="line"><span class="lineno"> 2251</span>                <a class="code hl_struct" href="variables_8h.html#structCmpnts">Cmpnts</a> sum = {0,0,0};</div>
+<div class="line"><span class="lineno"> 2252</span>                sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a></div>
+<div class="line"><span class="lineno"> 2253</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a>;</div>
+<div class="line"><span class="lineno"> 2254</span>                sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a></div>
+<div class="line"><span class="lineno"> 2255</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a>;</div>
+<div class="line"><span class="lineno"> 2256</span>                sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = corner_arr[k][j  ][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k][j  ][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a></div>
+<div class="line"><span class="lineno"> 2257</span>                      + corner_arr[k][j+1][i  ].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> + corner_arr[k][j+1][i+1].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a>;</div>
+<div class="line"><span class="lineno"> 2258</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> = sum.<a class="code hl_variable" href="variables_8h.html#a718a09fbedf450248eaf7019a980e139">x</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2259</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> = sum.<a class="code hl_variable" href="variables_8h.html#ad032e456f7f4b32b9ac0d94be05de204">y</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2260</span>                faceZ_arr[k_loc][j_loc][i_loc].<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> = sum.<a class="code hl_variable" href="variables_8h.html#a9f0c002a2c7cde3b6ac843ab9185f4d4">z</a> * 0.25;</div>
+<div class="line"><span class="lineno"> 2261</span>            }</div>
+<div class="line"><span class="lineno"> 2262</span>        }</div>
+<div class="line"><span class="lineno"> 2263</span>    }</div>
+<div class="line"><span class="lineno"> 2264</span> </div>
+<div class="line"><span class="lineno"> 2265</span>    <a class="code hl_define" href="logging_8h.html#a2ebe7667b52c478f7ff365f296d4c8ae">LOG_ALLOW_SYNC</a>(<a class="code hl_define" href="logging_8h.html#a3de33738fd3c7e77bffbcfaefc3e7645">GLOBAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a5b76dd51db62558b1952158ba38b723f">LOG_TRACE</a>,</div>
+<div class="line"><span class="lineno"> 2266</span>                   <span class="stringliteral">&quot;Rank %d z-face Interpolation complete.\n&quot;</span>, rank);</div>
+<div class="line"><span class="lineno"> 2267</span>    </div>
+<div class="line"><span class="lineno"> 2268</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2269</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2270</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
