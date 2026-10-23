@@ -101,7 +101,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p09_logging_sec">4. logging</a></li>
 <li class="level1"><a href="#p09_startup_banner_sec">Startup banner and solver-specific output</a></li>
 <li class="level1"><a href="#p09_profiling_sec">5. profiling</a></li>
-<li class="level1"><a href="#p09_diagnostics_sec">6. diagnostics</a></li>
+<li class="level1"><a href="#p09_diagnostics_sec">6. diagnostics</a><ul><li class="level2"><a href="#p09_les_diagnostics_sub">6.1 LES coefficient log</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p09_solver_monitoring_sec">7. solver_monitoring</a></li>
 <li class="level1"><a href="#p09_next_steps_sec">8. Next Steps</a></li>
 </ul>
@@ -205,6 +207,26 @@ diagnostics:
     # flags, independent of PETSc-native diagnostics above.
     enabled: true
     file: "Runtime_Memory.log"
+
+  # Per-step LES coefficient statistics appended to output/analysis/metrics/les_coefficient.csv:
+  # the effective Cs, its spread, eddy-viscosity levels, the modelled subgrid energy, and
+  # the fractions of the domain backscattering or limited before clipping. Those last two
+  # describe a state no stored field preserves. Needs LES enabled in case.yml.
+  les:
+    # [Boolean] -&gt; -les_diagnostics
+    enabled: false
+
+    # Steps between rows.
+    # [Integer] -&gt; -les_diagnostics_cadence
+    cadence: 1
+
+    # Yoshizawa constant C_I for the reported subgrid kinetic energy,
+    # k_sgs = 2 C_I Delta^2 |S|^2. Affects the k_sgs_mean column only, never the
+    # eddy viscosity or the momentum equations. Compare it against the resolved
+    # turbulent kinetic energy from field_statistics to judge how much of the
+    # energy the grid resolves.
+    # [Number] -&gt; -les_yoshizawa_ci
+    yoshizawa_ci: 0.09
 
 # ==============================================================================
 # 4. PHYSICAL-SOLUTION MONITORING
@@ -495,7 +517,7 @@ solver_monitoring:
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
 <li>Runtime diagnostics CSVs (<code>search_metrics.csv</code>, <code>scatter_metrics.csv</code>, <code>interpolation_error.csv</code>, <code>les_coefficient.csv</code>, <code>wall_model.csv</code>, <code>driven_flow.csv</code>) are in solver units. Each row carries <code>time</code> in solver time and, as its last column, <code>physical_time</code> in seconds (<code>time * length_ref / velocity_ref</code>), so a history can be plotted in physical time without the case's scales at hand. See <a class="el" href="19_Nondimensionalization.html#p19_output_sec">5. Output</a>.</li>
 <li>Some runtime artifacts are independent of console verbosity. For particle-enabled runs, <code>&lt;run.analysis.metrics&gt;/search_metrics.csv</code> is written automatically and includes both raw search counters and derived signals such as <code>search_failure_fraction</code>, <code>search_work_index</code>, and <code>re_search_fraction</code>; allow-listing <code>LOG_SEARCH_METRICS</code> only affects the optional compact console summary.</li>
-<li>LES runs with <code>case.yml -&gt; models.physics.turbulence.les.diagnostics.enabled</code> write <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
+<li>LES runs with <code>monitor.yml -&gt; diagnostics.les.enabled</code> (<a class="el" href="09_Monitor_Reference.html#p09_les_diagnostics_sub">6.1 LES coefficient log</a>) write <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code>, one row per step or per configured cadence. It carries the effective model coefficient reported as <code>Cs</code>, its spatial spread, eddy-viscosity levels, the modelled subgrid kinetic energy, and the volume fractions that were backscattering or limited before clipping. Those values are instantaneous volume statistics, not time averages; window-averaged statistics of the same model's fields come from <code>field_statistics</code> instead. Column definitions are at <a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>, and the history is plottable without leaving the CLI: <code>picurv summarize --run-dir &lt;run&gt; --plot les.cs_effective</code>.</li>
 <li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
 <li>Runs driven by a <code>constant_flux</code> or <code>initial_flux</code> periodic handler write <code>&lt;run.analysis.metrics&gt;/driven_flow.csv</code>, one row per step, in any geometry and under either momentum solver. It carries the target and measured volumetric flux, the cross-section area and the bulk velocity they imply, the controller's correction, and <code>driving_acceleration</code> - the momentum source per unit mass along the driven axis that the step actually applied, which is zero on a step whose correction was negligible and nothing was added. In a statistically stationary flow its time average balances the mean wall stress: <code>u_tau^2 / h</code> in a channel of half-height <code>h</code>, <code>tau_w P / A</code> in a duct of wetted perimeter <code>P</code> and area <code>A</code>. That is the friction velocity a wall-modelled run's own <code>wall_model.csv</code> can be checked against, and the <code>--driven-flow-csv</code> option of the driven-channel and driven-duct profile tools uses it. Plottable as <code>picurv summarize --run-dir &lt;run&gt; --plot driven_flow.driving_acceleration</code>.</li>
 <li>Use <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b> for the exact metric definitions and formulas.</li>
@@ -590,6 +612,15 @@ Startup banner and solver-specific output</h1>
 <li><code>picurv summarize</code> reports the latest runtime memory signals when the log is present.</li>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
 </ul>
+<h2><a class="anchor" id="p09_les_diagnostics_sub"></a>
+6.1 LES coefficient log</h2>
+<div class="fragment"><div class="line">diagnostics:</div>
+<div class="line">  les:</div>
+<div class="line">    enabled: true        # -&gt; -les_diagnostics</div>
+<div class="line">    cadence: 1           # -&gt; -les_diagnostics_cadence, steps between rows</div>
+<div class="line">    yoshizawa_ci: 0.09   # -&gt; -les_yoshizawa_ci</div>
+</div><!-- fragment --><p>With LES enabled in <code>case.yml</code>, this appends one row per <code>cadence</code> steps to <code>&lt;run.analysis.metrics&gt;/les_coefficient.csv</code>: the effective coefficient as <code>Cs</code>, its spread, eddy-viscosity levels, the modelled subgrid kinetic energy <code>k_sgs = 2 C_I Delta^2 |S|^2</code>, and the fractions of the domain backscattering or limited before clipping (<a class="el" href="72_LES_Turbulence_Closure.html#p72_diagnostics_sec">8. Reading the Diagnostics</a>). <code>yoshizawa_ci</code> is the <code>C_I</code> of that reported energy only; it never enters the eddy viscosity or the momentum equations, which is why it lives with the log rather than with the model. The cadence must be a positive integer and the constant non-negative.</p>
+<p><code>case.yml -&gt; models.physics.turbulence.les.diagnostics</code> is the deprecated former location, still read with a warning; setting both is refused.</p>
 <h1><a class="anchor" id="p09_solver_monitoring_sec"></a>
 7. solver_monitoring</h1>
 <p>Human-readable solver monitor controls. PICurv maps these keys to the raw C/PETSc flags written into the generated <code>.control</code> file:</p>

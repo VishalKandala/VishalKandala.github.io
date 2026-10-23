@@ -20,7 +20,8 @@ var searchData=
   ['modular_20selector_20extension_20guide_17',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
   ['momentum_20solver_18',['momentum solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'Dual-Time Picard Jameson RK Momentum Solver'],['../55_Newton_Krylov_Momentum_Solver.html',1,'Newton&amp;ndash;Krylov Momentum Solver']]],
   ['momentum_20solver_20implementations_19',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['monitor_20function_20renames_20',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
-  ['monitor_20yaml_21',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['multigrid_22',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
+  ['monitor_20',['bcd6b9a-les-diagnostics-to-monitor',['../md_docs_2changelog_8d_2bcd6b9a-les-diagnostics-to-monitor.html',1,'']]],
+  ['monitor_20function_20renames_21',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
+  ['monitor_20yaml_22',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
+  ['multigrid_23',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];
