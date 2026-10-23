@@ -113,6 +113,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>post.yml</code>: post-processing recipe.</li>
 <li>MPI launch settings (<code>-n</code>, executable stage selection).<ul>
 <li><code>-n/--num-procs</code> sizes both solver and field postprocessor launches.</li>
+<li>optional <code>--ni/--nj/--nk</code> give the MPI decomposition (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>).</li>
 <li>optional site execution defaults can be supplied via nearest <code>.picurv-execution.yml</code>.</li>
 </ul>
 </li>
@@ -144,9 +145,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>grid.mode</code> supports: <code>file</code>, <code>programmatic_c</code>, <code>grid_gen</code>.</li>
 <li>For <code>programmatic_c</code>, per-block arrays are supported for geometry (<code>im/jm/km</code>, bounds, stretching).</li>
 <li><code>programmatic_c.im/jm/km</code> are cell counts in YAML; <code>picurv</code> converts them to node counts before writing <code>-im/-jm/-km</code>.</li>
-<li><code>grid.da_processors_x/y/z</code> optionally set the global DMDA layout for any grid mode.</li>
-<li>Legacy <code>grid.programmatic_settings.da_processors_*</code> is still accepted for compatibility.</li>
-<li><code>da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block MPI decomposition is not currently supported.</li>
+<li><code>grid.da_processors_x/y/z</code> (and legacy <code>grid.programmatic_settings.da_processors_*</code>) are deprecated: read with a warning, below <code>--ni/--nj/--nk</code> and <code>cluster.yml -&gt; execution.decomposition</code> (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>). Per-block MPI decomposition is not supported.</li>
 <li>For <code>grid_gen</code>, <code>grid.generator.config_file</code> is required today. <code>grid.gen</code> consumes cell counts and writes node counts into <code>.picgrid</code>.</li>
 <li><code>grid.generator.output_file</code>, <code>stats_file</code>, and <code>vts_file</code> are rejected: <code>picurv</code> chooses the destination for the generated grid, its <code>.vts</code> preview, and its <code>.info</code> quality report, and writes all three unconditionally into the run's own asset store.</li>
 <li>Generated initial conditions reject <code>output_file</code>, <code>summary_json</code>, and <code>spectrum_csv</code> in <code>properties.initial_conditions.params</code>, and generated or <code>field_slice</code> inlet profiles reject <code>source.output_file</code>, for the same reason.</li>
@@ -258,6 +257,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>execution.launcher</code> controls launch style (<code>srun</code>, <code>mpirun</code>, custom). A multi-word launcher string is accepted for site compatibility, but keeping the executable here and extra flags in <code>execution.launcher_args</code> is the preferred portable form.</li>
 <li><code>execution.launcher_args</code> provides site-specific launch flags and is appended after any inline tokens parsed from <code>execution.launcher</code>.</li>
 <li>when <code>execution.launcher</code> / <code>execution.launcher_args</code> are omitted, <code>picurv</code> falls back to nearest <code>.picurv-execution.yml</code> (<code>cluster_execution</code>, then <code>default_execution</code>) before using the built-in default <code>srun</code>.</li>
+<li><code>execution.decomposition: {i, j, k}</code> optionally sets the MPI decomposition of the solver and postprocessor stages; the product must be <code>nodes * ntasks_per_node</code>. When omitted, <code>picurv</code> chooses one (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>).</li>
 <li><code>execution.walltime_guard</code> optionally tunes the automatic runtime walltime estimator for generated Slurm solver jobs. When omitted, generated solver jobs still use the built-in default policy (<code>enabled: true</code>, <code>warmup_steps: 10</code>, <code>multiplier: 2.0</code>, <code>min_seconds: 60</code>, <code>estimator_alpha: 0.35</code>).</li>
 <li><code>execution.extra_sbatch</code> supports scheduler-specific pass-through flags.</li>
 <li><code>cluster.yml</code> does not currently define run naming. <code>picurv</code> derives <code>run_id</code> from <code>&lt;case_basename&gt;_&lt;timestamp&gt;</code> and uses that same run ID to name generated scheduler jobs.</li>

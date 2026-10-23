@@ -94,7 +94,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p05_init_sec">2. init: Create A New Case Directory</a></li>
 <li class="level1"><a href="#p05_build_sec">3. build: Build Project Executables</a></li>
 <li class="level1"><a href="#p05_sync_sec">3b. Source, Version, And Legacy Maintenance Commands</a></li>
-<li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a></li>
+<li class="level1"><a href="#p05_run_sec">4. run: Single-Case Workflow</a><ul><li class="level2"><a href="#p05_decomposition_ssec">4.1 MPI Decomposition</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p05_summarize_sec">5. summarize: Read-Only Run Configuration and Health Summary</a></li>
 <li class="level1"><a href="#p05_precompute_sec">5a. precompute: Generate Deterministic Artifacts</a></li>
 <li class="level1"><a href="#p05_submit_sec">5b. submit: Execute Existing Staged Artifacts</a></li>
@@ -281,7 +283,11 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ul>
 <p>MPI/local options:</p><ul>
 <li><code>-n, --num-procs</code><ul>
-<li>applies to solver and field postprocessor launch sizing.</li>
+<li>applies to solver and field postprocessor launch sizing; defaults to 1, or to the product of <code>--ni/--nj/--nk</code> when those are given.</li>
+</ul>
+</li>
+<li><code>--ni, --nj, --nk</code><ul>
+<li>optional MPI decomposition (ranks along i, j, k), given together. With <code>-n</code> as well, the product must equal it. See <a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>.</li>
 <li>PICurv strips conflicting MPI size flags from post launches and rewrites them to the requested rank count.</li>
 <li>local multi-rank runs resolve launcher overrides in this order: <code>PICURV_MPI_LAUNCHER</code>, <code>MPI_LAUNCHER</code>, nearest <code>.picurv-execution.yml</code>, nearest legacy <code>.picurv-local.yml</code>, then default <code>mpiexec</code>.</li>
 </ul>
@@ -302,6 +308,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  --monitor my_case/monitor.yml \</div>
 <div class="line">  --post my_case/post.yml</div>
 </div><!-- fragment --><p> In this command, the solver and field postprocessor both run with 8 ranks.</p>
+<h2><a class="anchor" id="p05_decomposition_ssec"></a>
+4.1 MPI Decomposition</h2>
+<p>Each stage launches on a structured split of the grid into <code>ni x nj x nk</code> ranks. The first source that sets one wins:</p>
+<ol type="1">
+<li><code>--ni/--nj/--nk</code> on the command line;</li>
+<li><code>cluster.yml</code> <code>execution.decomposition: {i, j, k}</code> in cluster mode;</li>
+<li><code>case.yml</code> <code>grid.da_processors_x/y/z</code>, deprecated and read with a warning;</li>
+<li>the automatic choice.</li>
+</ol>
+<p>The automatic choice enumerates every ordered <code>(ni, nj, nk)</code> whose product is the rank count and keeps those grid setup accepts: on the coarsest multigrid level each rank must hold at least the stencil width of points along every axis, 3 when any face is <code>PERIODIC</code> and 2 otherwise, and an axis under <code>semi_coarsening</code> is not halved. Among those it takes the one with the least grid area between ranks, summed over blocks as <code>(n_a - 1)</code> times the cell cross-section normal to axis <code>a</code>; ties go to the most even split, then to more ranks on k, then on j. A thin axis therefore stays whole when another can take the ranks: the 4 x 48 x 36-cell <code>temporal_mixing_layer</code> grid gets <code>1 x 4 x 2</code> on 8 ranks. When no layout fits, the run is refused before launch with the nearby rank counts that do fit. When the grid's size is not known before the run (a <code>grid_gen</code> script grid under <code>--dry-run</code>), PETSc chooses at runtime.</p>
+<p>A set layout passes the same check, and its product must equal the rank count.</p>
+<p>The chosen layout is printed as <code>MPI decomposition: ni x nj x nk (i x j x k) for N rank(s), from &lt;source&gt;</code> before launch. It appears in the dry-run plan as <code>decomposition</code> and <code>post_decomposition</code> and in <code>&lt;run.scheduler&gt;/submission.json</code> under each stage.</p>
+<p>The field postprocessor resolves its own layout the same way, for its own rank count. It is written into the post recipe as <code>da_processors = ni nj nk</code> and read only by the postprocessor, so a post-only run on a run directory does not inherit the solve's split. <code>--continue</code> may change the layout: it is excluded from the run's identity hash.</p>
 <p>Slurm example (generate + submit): </p><div class="fragment"><div class="line">./bin/picurv run --solve --post-process \</div>
 <div class="line">  --case my_case/case.yml \</div>
 <div class="line">  --solver my_case/solver.yml \</div>
@@ -618,7 +637,12 @@ or to protect running jobs from concurrent rebuilds.</td></tr>
 <p><b>options</b></p>
 <table class="markdownTable"><tr><th class="markdownTableHeadNone">Flag</th><th class="markdownTableHeadNone">Required</th><th class="markdownTableHeadNone">Choices</th><th class="markdownTableHeadNone">Default</th><th class="markdownTableHeadNone">Description</th></tr>
 <tr><td class="markdownTableBodyNone"><code>-h</code>, <code>--help</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">show this help message and exit</td></tr>
-<tr><td class="markdownTableBodyNone"><code>-n</code>, <code>--num-procs</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>1</code></td><td class="markdownTableBodyNone">Number of MPI processes for solver and post-processing stages.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>-n</code>, <code>--num-procs</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Number of MPI processes for solver and post-processing stages (default 1, or
+the product of --ni --nj --nk). The decomposition is chosen from the grid and
+its boundary conditions unless given.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--ni</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">MPI ranks along the grid's i axis. Give --ni, --nj and --nk together.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--nj</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">MPI ranks along the grid's j axis. Give --ni, --nj and --nk together.</td></tr>
+<tr><td class="markdownTableBodyNone"><code>--nk</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">MPI ranks along the grid's k axis. Give --ni, --nj and --nk together.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--cluster</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Path to cluster.yml for Slurm execution mode.</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--scheduler</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone">Explicit scheduler selector (currently 'slurm').</td></tr>
 <tr><td class="markdownTableBodyNone"><code>--no-submit</code></td><td class="markdownTableBodyNone">no</td><td class="markdownTableBodyNone">&#8212;</td><td class="markdownTableBodyNone"><code>False</code></td><td class="markdownTableBodyNone">Stage run artifacts without starting local execution or Slurm submission.</td></tr>
@@ -998,6 +1022,7 @@ refusing. Requires a configured storage profile.</td></tr>
 </li>
 <li>launch controls:<ul>
 <li><code>-n, --num-procs &lt;int&gt;</code> (solver and field postprocessor stages)</li>
+<li><code>--ni/--nj/--nk &lt;int&gt;</code> (MPI decomposition, given together; <a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>)</li>
 <li><code>--cluster &lt;cluster.yml&gt;</code> (enables Slurm mode)</li>
 <li><code>--scheduler &lt;name&gt;</code> (must be used with <code>--cluster</code>; must match <code>cluster.yml:scheduler.type</code>)</li>
 <li><code>--no-submit</code> (stage files and submission metadata without starting execution)</li>
@@ -1172,6 +1197,8 @@ refusing. Requires a configured storage profile.</td></tr>
 <li><code>solver_num_procs_effective</code></li>
 <li><code>post_num_procs_effective</code></li>
 <li><code>num_procs_effective</code> (currently mirrors solver count)</li>
+<li><code>decomposition</code> / <code>post_decomposition</code> (<code>layout</code> as <code>[ni, nj, nk]</code> or null when PETSc chooses, <code>source</code>, <code>summary</code>; <a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>)</li>
+<li><code>blocking</code> (reasons the run would be refused, such as a rank count no decomposition fits)</li>
 </ul>
 <p>For file-backed grid modes, <code>artifacts</code> includes the planned staged grid path (<code>&lt;run.inputs&gt;/grid/grid.run</code>). For <code>grid.mode: grid_gen</code>, it also includes the generated PICGRID path (<code>&lt;run.inputs&gt;/grid/grid.generated.picgrid</code>), its quality report (<code>&lt;run.analysis.metrics&gt;/grid.info</code>), and its <code>.vts</code> preview (<code>&lt;run.visualization&gt;/precompute/grid.vts</code>) - all three unconditionally, since <code>picurv</code> chooses the destination rather than accepting <code>stats_file</code>/<code>vts_file</code> config keys. Dry-run still does not run <code>generators/grid.gen</code> or write these files. For generated prescribed-flow profiles, <code>artifacts</code> includes the dimensional generated <code>.picslice</code>, the solver-scale staged <code>.picslice</code>, and <code>profile.info</code>.</p>
 <p>Stage entries under <code>stages.solve</code> and <code>stages.post-process</code> include:</p>

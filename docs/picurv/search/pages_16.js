@@ -23,5 +23,6 @@ var searchData=
   ['monitor_20',['bcd6b9a-les-diagnostics-to-monitor',['../md_docs_2changelog_8d_2bcd6b9a-les-diagnostics-to-monitor.html',1,'']]],
   ['monitor_20function_20renames_21',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
   ['monitor_20yaml_22',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['multigrid_23',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
+  ['mpi_20decomposition_23',['c0aaded-mpi-decomposition',['../md_docs_2changelog_8d_2c0aaded-mpi-decomposition.html',1,'']]],
+  ['multigrid_24',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];

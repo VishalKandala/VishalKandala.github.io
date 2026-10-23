@@ -357,12 +357,10 @@ grid:
   # Options: 'file', 'programmatic_c', or 'grid_gen'.
   mode: programmatic_c
 
-  # --- Optional Global DMDA Layout (applies to all grid modes) ---
-  # Edit or remove these for parallel runs. The product must equal the total
-  # MPI process count (-n) when all three are set.
-  da_processors_x: 2
-  da_processors_y: 2
-  da_processors_z: 4
+  # The MPI decomposition is not set here. `picurv run` chooses it from the grid,
+  # the multigrid levels and the boundary conditions, or takes it from
+  # `--ni/--nj/--nk` or cluster.yml `execution.decomposition`. The former keys
+  # da_processors_x/y/z are still read here, with a deprecation warning.
 
   # --- Option A: Grid from File ---
   # Use this if you have a pre-generated grid file.
@@ -827,12 +825,7 @@ boundary_conditions:
 <li>for <code>solver.yml -&gt; operation_mode.eulerian_field_source: analytical</code>, <code>TGV3D</code> supports <code>grid.mode: programmatic_c</code> (the solver assigns the [0, 2π]² × [0, 0.2π] TGV domain) and <code>grid.mode: file</code> (the given grid is kept and the field is evaluated at its cell centres, e.g. a warped <code>grid.gen box --amp-A</code> grid spanning the same domain).</li>
 <li><code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> support <code>grid.mode: programmatic_c</code> and <code>grid.mode: file</code>.</li>
 </ul>
-<p>Optional global DMDA layout hints apply to all grid modes:</p>
-<div class="fragment"><div class="line">grid:</div>
-<div class="line">  da_processors_x: 4</div>
-<div class="line">  da_processors_y: 2</div>
-<div class="line">  da_processors_z: 2</div>
-</div><!-- fragment --><p>These are scalar global values, not per-block vectors. Legacy placement under <code>grid.programmatic_settings.da_processors_*</code> is still accepted for compatibility, but the shared top-level <code>grid.da_processors_*</code> form is preferred.</p>
+<p>The MPI decomposition is not a case property: it is given with <code>--ni/--nj/--nk</code>, by <code>cluster.yml -&gt; execution.decomposition</code>, or chosen from the grid (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>). <code>grid.da_processors_x/y/z</code> (and the older <code>grid.programmatic_settings.da_processors_*</code>) are deprecated: they are still read, with a warning, below the other two sources.</p>
 <h2><a class="anchor" id="p07_grid_prog_ssec"></a>
 3.1 mode: programmatic_c</h2>
 <p><code>programmatic_settings</code> supports per-block lists for geometry arrays:</p><ul>
@@ -847,7 +840,7 @@ boundary_conditions:
 <li><code>xMins/xMaxs/yMins/yMaxs/zMins/zMaxs</code> are physical units, exactly like a <code>file</code>-mode <code>.picgrid</code>. The C runtime divides each bound by <code>properties.scaling.length_ref</code> immediately after parsing them, so the domain the solver evolves is non-dimensional regardless of which <code>grid.mode</code> produced it. See <a class="el" href="19_Nondimensionalization.html#p19_fields_sec">4. Field Index</a>.</li>
 </ul>
 <p>Important constraint:</p><ul>
-<li><code>grid.da_processors_x/y/z</code> are scalar integers only (global DMDA layout). Per-block processor decomposition is not implemented.</li>
+<li><code>grid.da_processors_x/y/z</code> are deprecated (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>); per-block processor decomposition is not implemented.</li>
 </ul>
 <h2><a class="anchor" id="p07_grid_file_ssec"></a>
 3.2 mode: file</h2>
@@ -883,7 +876,7 @@ file</h2>
 <p><a class="anchor" id="p07_cap_gridmode_file"></a> <b>Identity.</b> <code>grid.mode: file</code> with <code>grid.source_file</code> naming a <code>.picgrid</code> file.</p>
 <p><b>What it does.</b> Reads an externally produced curvilinear mesh. <code>picurv</code> validates that the file exists and stages it as <code>&lt;run.inputs&gt;/grid/grid.run</code>, so the run carries the mesh it was computed with rather than a path that may later change.</p>
 <p><b>When to choose it.</b> When the geometry came from <code>grid.gen</code>, from a mesher, or from a previous study, and you want the exact same mesh across runs. Prefer it over <code>grid_gen</code> once a mesh is settled: regenerating on every launch is a way to silently change geometry.</p>
-<p><b>Parameters it owns.</b> <code>grid.source_file</code> -&gt; the staged <code>.picgrid</code> path. Global DMDA hints <code>grid.da_processors_x/y/z</code> apply here as to every mode.</p>
+<p><b>Parameters it owns.</b> <code>grid.source_file</code> -&gt; the staged <code>.picgrid</code> path.</p>
 <p><b>Interactions.</b> Mutually exclusive with <code>programmatic_c</code> and <code>grid_gen</code>. Compatible with the <code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> analytical sources; <code>TGV3D</code> is not, because it needs the programmatic Cartesian box.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved grid source. A missing or unreadable file is a fatal <code>picurv validate</code> error naming the path, not a runtime failure.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/search_robustness</code> runs from a staged <code>.picgrid</code>. It carries the only grid file the examples still ship: <code>bent_channel</code> moved to <code>grid_gen</code> once the generator could express its geometry, which removed a duplicate of the same 2.9 MB file. Analytically verified - <code>curvilinear-gcl-2026-09-18</code>: the face-area metrics of a curvilinear file grid close to round-off in every cell; <code>eulerian-source-domain-modes-2026-09-21</code>: a curvilinear pipe loaded as a file reproduced the grid, velocity and pressure of the same run from <code>grid_gen</code> exactly after ten steps; <code>grid-generator-closure-2026-09-21</code>: every generator feature, loaded as a file grid, closes a uniform flow to round-off.</p>
@@ -894,7 +887,7 @@ programmatic_c</h2>
 <p><b>What it does.</b> Builds a structured block directly in the C runtime from cell counts, extents, and stretching ratios. No mesh file exists or is read.</p>
 <p><b>When to choose it.</b> For Cartesian boxes - channels, ducts, isotropic boxes - and for anything where the geometry is a handful of numbers you want in the case file rather than in a binary alongside it. It is also the only mode <code>TGV3D</code> accepts.</p>
 <p><b>Parameters it owns.</b> <code>grid.programmatic_settings.im/jm/km</code> (cell counts, converted to node counts before <code>-im/-jm/-km</code>), <code>xMins/xMaxs</code>, <code>yMins/yMaxs</code>, <code>zMins/zMaxs</code>, <code>rxs/rys/rzs</code>, and <code>cgrids</code> -&gt; <code>-cgrids</code> - see <a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a> for why this is not a real geometry choice.</p>
-<p><b>Interactions.</b> Mutually exclusive with <code>file</code> and <code>grid_gen</code>. Required by the <code>TGV3D</code> analytical source. Per-block lists are supported for the geometry arrays, but <code>grid.da_processors_*</code> stay scalar: per-block processor decomposition is not implemented.</p>
+<p><b>Interactions.</b> Mutually exclusive with <code>file</code> and <code>grid_gen</code>. Required by the <code>TGV3D</code> analytical source. Per-block lists are supported for the geometry arrays, but the MPI decomposition stays global: per-block processor decomposition is not implemented.</p>
 <p><b>Diagnostics.</b> The startup banner reports the resolved block extents and counts. A count/extent mismatch across per-block lists is a validation error naming the offending key.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/flat_channel</code>; integration verified - <code>make unit-grid</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: a programmatic square duct develops to the Poiseuille series at second order; <code>poisson-options-2026-09-21</code> and <code>initial-conditions-2026-09-21</code> run on it.</p>
 <p><b>Limitations.</b> Restricted to a rectangular Cartesian block - <code>cgrids</code> does not add curvilinear geometry (<a class="el" href="07_Case_Reference.html#p07_grid_prog_ssec">3.1 mode: programmatic_c</a>). Anything bent, branched, or externally meshed needs <code>file</code> or <code>grid_gen</code>.</p>
