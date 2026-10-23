@@ -60,6 +60,6 @@ var searchData=
   ['projection_20method_57',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
   ['promoted_58',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
   ['promotion_59',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
-  ['promotions_60',['promotions',['../md_docs_2changelog_8d_27a4cf6b-status-promotions.html',1,'7a4cf6b-status-promotions'],['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'fc3ae90-vv-campaign-promotions']]],
+  ['promotions_60',['promotions',['../md_docs_2changelog_8d_2367e305-promotions.html',1,'367e305-promotions'],['../md_docs_2changelog_8d_27a4cf6b-status-promotions.html',1,'7a4cf6b-status-promotions'],['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'fc3ae90-vv-campaign-promotions']]],
   ['promotions_20petsc_20stamp_61',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
 ];

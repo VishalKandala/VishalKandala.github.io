@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['da_5fprocessor_5flayout_5fproblems_0',['da_processor_layout_problems',['../namespacepicurv__cli_1_1core.html#a39c8c9e9ba844e62ad160c3b35250760',1,'picurv_cli::core']]],
+  ['da_5fprocessor_5flayout_5fproblems_0',['da_processor_layout_problems',['../namespacepicurv__cli_1_1core.html#a2d02e90ae22679d6f28b34a9766a2152',1,'picurv_cli::core']]],
   ['deallocate3darrayscalar_1',['deallocate3darrayscalar',['../setup_8h.html#af73e238fa95229094a92ac66812799f7',1,'Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny):&#160;setup.c'],['../setup_8c.html#af73e238fa95229094a92ac66812799f7',1,'Deallocate3DArrayScalar(PetscReal ***array, PetscInt nz, PetscInt ny):&#160;setup.c']]],
   ['deallocate3darrayvector_2',['deallocate3darrayvector',['../setup_8h.html#a2b52d74f346e62584fb4e91e11a850b9',1,'Deallocate3DArrayVector(Cmpnts ***array, PetscInt nz, PetscInt ny):&#160;setup.c'],['../setup_8c.html#a2b52d74f346e62584fb4e91e11a850b9',1,'Deallocate3DArrayVector(Cmpnts ***array, PetscInt nz, PetscInt ny):&#160;setup.c']]],
   ['declared_5fpages_3',['declared_pages',['../namespaceaudit__page__types.html#a0ce38f7be1a0bfd9da08e295e60ade99',1,'audit_page_types']]],

@@ -738,16 +738,15 @@ Ensembles</h2>
 <tr>
 <th class="markdownTableHeadNone">Value</th>
 <th class="markdownTableHeadNone">Maps to</th>
-<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_flux"><code>flux</code></a></td><td class="markdownTableBodyNone"><code>flux</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_mean"><code>mean</code></a></td><td class="markdownTableBodyNone"><code>mean</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_point_variance"><code>point_variance</code></a></td><td class="markdownTableBodyNone"><code>point_variance</code></td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_reynolds_stress"><code>reynolds_stress</code></a></td><td class="markdownTableBodyNone"><code>reynolds_stress</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_rms"><code>rms</code></a></td><td class="markdownTableBodyNone"><code>rms</code></td><td class="markdownTableBodyNone">supported</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_tke"><code>tke</code></a></td><td class="markdownTableBodyNone"><code>tke</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_flux"><code>flux</code></a></td><td class="markdownTableBodyNone"><code>flux</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_mean"><code>mean</code></a></td><td class="markdownTableBodyNone"><code>mean</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_point_variance"><code>point_variance</code></a></td><td class="markdownTableBodyNone"><code>point_variance</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_reynolds_stress"><code>reynolds_stress</code></a></td><td class="markdownTableBodyNone"><code>reynolds_stress</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_rms"><code>rms</code></a></td><td class="markdownTableBodyNone"><code>rms</code></td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p10_cap_fso_tke"><code>tke</code></a></td><td class="markdownTableBodyNone"><code>tke</code></td></tr>
 </table>
-<p>Every output below except <code>point_variance</code> was checked against a known answer by <code>field-statistics-tgv3d-2026-09-21</code>: on the analytic TGV3D field, each written value equals the eight-cell average of the exact cell statistic to round-off. Written fields are node averages of cell statistics, so a nodal <code>rms</code> is the mean of the neighbouring cell RMS values, not the root of an averaged variance. None has yet been compared against a turbulent reference profile.</p>
+<p>Every output below except <code>point_variance</code> was checked against a known answer by <code>field-statistics-tgv3d-2026-09-21</code>: on the analytic TGV3D field, each written value equals the eight-cell average of the exact cell statistic to round-off. <code>point_variance</code> was checked by <code>tml-point-variance-2026-10-22</code> against an exactly known particle ensemble (its entry below). Written fields are node averages of cell statistics, so a nodal <code>rms</code> is the mean of the neighbouring cell RMS values, not the root of an averaged variance. None has yet been compared against a turbulent reference profile.</p>
 <dl class="section note"><dt>Note</dt><dd>**<code>formats</code> is a parameter, not a choice between behaviours.** <code>vtk</code> writes the derived fields listed below into the window's bundle; <code>csv</code> appends one row per processed step carrying sample count, total weight, represented time, the per-point valid-fraction range, and the mean turbulent kinetic energy. Both are written from the same accumulated state, so requesting both costs output volume rather than computation. The <code>csv</code> is the artefact that answers whether a window converged; the <code>vtk</code> is the one that shows what it converged to. <code>tests/tooling/family_census.json</code> records why this is classified as a parameter of these entries rather than as a family of its own.</dd></dl>
 <h2><a class="anchor" id="p10_cap_fso_mean_sub"></a>
 mean</h2>
@@ -807,7 +806,7 @@ point_variance</h2>
 <p><b>Parameters it owns.</b> None. It is opt-in: the default output list does not include it.</p>
 <p><b>Interactions.</b> Needs the field's second moment, like <code>rms</code>. A particle-sampled field averages over the cells that held particles. Units are the field's squared.</p>
 <p><b>Diagnostics.</b> In a slot whose point means agree it equals the square of the pooled <code>rms</code>; a pooled variance larger than it measures the spread of the point means.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-post-compute-mpi</code> (<code><a class="el" href="test__post__compute__mpi_8c.html" title="Decomposition-independent regression tests for post-processing compute.">tests/c/test_post_compute_mpi.c</a></code>): on one and several ranks, a profile of two states that differ by a varying amount at each point equals the plane mean of the point variances, below the pooled variance.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-post-compute-mpi</code> (<code><a class="el" href="test__post__compute__mpi_8c.html" title="Decomposition-independent regression tests for post-processing compute.">tests/c/test_post_compute_mpi.c</a></code>): on one and several ranks, a profile of two states that differ by a varying amount at each point equals the plane mean of the point variances, below the pooled variance. Analytically verified - <code>tml-point-variance-2026-10-22</code>: in <code>temporal_mixing_layer</code> at t = 0, where each cell's particles carry a known erf profile, the profile integrates to 0.024786 against the exact plane-averaged within-cell variance 0.02477 (with the 1/n factor at 50 particles per cell), a 0.06% difference.</p>
 <p><b>Limitations.</b> Equal weighting per point means a point that sampled once counts as much as one that sampled often, so it is noisier where sampling is sparse; the sample count in the <code>.vts</code> shows where.</p>
 <h1><a class="anchor" id="p10_cap_fse_sec"></a>
 6.2 Field Statistics Ensemble Source Entries</h1>
