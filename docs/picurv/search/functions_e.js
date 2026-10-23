@@ -14,7 +14,7 @@ var searchData=
   ['parse_5finitial_5fvelocity_5fcomponents_11',['parse_initial_velocity_components',['../namespacepicurv__cli_1_1core.html#af15547198beb39b5789d82c66224a052',1,'picurv_cli::core']]],
   ['parse_5fslurm_5fjob_5fid_12',['parse_slurm_job_id',['../namespacepicurv__cli_1_1core.html#a7818ae5b93bfeafd43627a8a1fed2821',1,'picurv_cli::core']]],
   ['parse_5fslurm_5ftime_5flimit_5fto_5fseconds_13',['parse_slurm_time_limit_to_seconds',['../namespacepicurv__cli_1_1core.html#aeecce3f514d2f206c44d8f3ecccf536f',1,'picurv_cli::core']]],
-  ['parse_5fsolver_5fconfig_14',['parse_solver_config',['../namespacepicurv__cli_1_1core.html#a3ec626fe91996e6c93310cb64d4914c0',1,'picurv_cli::core']]],
+  ['parse_5fsolver_5fconfig_14',['parse_solver_config',['../namespacepicurv__cli_1_1core.html#a436b312dea4a47286802e9447f157c28',1,'picurv_cli::core']]],
   ['parse_5fxml_15',['parse_xml',['../namespacegenerate__xref__index.html#a74ad924526980b9e59848ab83536ccc6',1,'generate_xref_index']]],
   ['parseallboundaryconditions_16',['parseallboundaryconditions',['../io_8h.html#a5cc5e40cd538efc87ebd94ebdbb2a8e8',1,'ParseAllBoundaryConditions(UserCtx *user, const char *bcs_input_filename):&#160;io.c'],['../io_8c.html#a5cc5e40cd538efc87ebd94ebdbb2a8e8',1,'ParseAllBoundaryConditions(UserCtx *user, const char *bcs_input_filename):&#160;io.c']]],
   ['parseand_17',['ParseAnd',['../ParticleInitialConditions_8c.html#ae39bb4711e6c92c4f4ab2b58eb409726',1,'ParticleInitialConditions.c']]],

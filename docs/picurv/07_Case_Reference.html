@@ -105,6 +105,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p07_models_sec">4. models</a><ul><li class="level2"><a href="#p07_dim_sec">4.1 Dimensionality Entries</a></li>
 <li class="level2"><a href="#p07_cap_dim_3d_sub">3D</a></li>
 <li class="level2"><a href="#p07_cap_dim_2d_sub">2D</a></li>
+<li class="level2"><a href="#p07_scalar_transport_sec">Scalar transport parameters</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p07_les_sec">5. LES Subgrid Models</a><ul><li class="level2"><a href="#p07_cap_les_none_sub">none</a></li>
@@ -217,6 +218,9 @@ properties:
   fluid:
     density: 1000.0     # [kg/m^3]
     viscosity: 0.001    # [Pa.s or kg/(m.s)]
+    # Molecular Schmidt number of the transported scalar: its diffusivity is nu / Sc, which
+    # sets the particles' Brownian motion. A very large value (1.0e12) turns that motion off.
+    schmidt_number: 1.0 # [Positive Number, optional] -&gt; -schmidt_number (default 1.0)
 
   # --- Initial Conditions ---
   # The state of the fluid at the start of the simulation (t=0).
@@ -430,6 +434,9 @@ models:
       restart_mode: "init" # [string] -&gt; -particle_restart_mode. Options: "init", "load"
       random_seed: 12345   # [Integer, optional] -&gt; -particle_random_seed. 0..2147483647; seeds
                            # initial placement and Brownian draws (default 12345)
+      iem_constant: 2.0    # [Non-negative Number, optional] -&gt; -iem_constant. C_IEM in the IEM
+                           # mixing rate C_IEM (Gamma + Gamma_t) / Delta^2 (default 2.0); 0 switches
+                           # micromixing off, so Psi is a passive label.
       point_source:        # Required only when init_mode = "PointSource" (maps to -psrc_x/-psrc_y/-psrc_z)
         x: 0.5             # [m] Physical position, divided by length_ref like the grid bounds.
         y: 0.25            #     This one is the centre of the domain defined under grid.
@@ -607,6 +614,10 @@ models:
         # and cabot, so delete it when selecting either.
         # [Number] -&gt; -wall_roughness
         roughness_height: 1.0e-16   # [m] Physical length, divided by length_ref.
+
+      # Turbulent Schmidt number: the subgrid scalar diffusivity is nu_t / Sc_t.
+      # [Positive Number, optional] -&gt; -turb_schmidt_number (default 0.7)
+      turbulent_schmidt_number: 0.7
   
 # ==============================================================================
 # 5. BOUNDARY CONDITIONS
@@ -996,6 +1007,31 @@ grid_gen</h2>
 <p><b>Diagnostics.</b> The generated control file carries <code>-TwoD 1</code>; there is no startup banner line for it.</p>
 <p><b>Evidence.</b> Unit verified - the active-row mask cases in <code><a class="el" href="test__solver__kernels_8c.html" title="C unit tests for solver-side analytical and LES helper kernels.">tests/c/test_solver_kernels.c</a></code>, run by <code>make unit-solver</code>. Analytically verified - <code>eulerian-source-domain-modes-2026-09-21</code>: a Taylor-Green vortex in the j-k plane with a frozen i velocity ran 20 steps in 2D and in 3D; the i component moved by at most 3.1e-16 and the j and k components matched the 3D run to 2.8e-15. Integration verified - <code>make smoke</code> (TwoD under Newton Krylov): on a planar channel periodic in i, Newton Krylov and Picard agree to solver tolerance, laminar and constant-Smagorinsky LES, and the i component stays at the pressure-solve tolerance.</p>
 <p><b>Limitations.</b> Nothing checks that the i component starts at zero. The pressure projection still acts on every face, so the i component stays frozen only while the pressure field does not vary along i; a flow that develops an i pressure gradient breaks the planar assumption without warning.</p>
+<h2><a class="anchor" id="p07_scalar_transport_sec"></a>
+Scalar transport parameters</h2>
+<p>Three parameters set how a particle-carried scalar diffuses and mixes. Each sits with the part of the physics it belongs to:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  fluid:</div>
+<div class="line">    schmidt_number: 1.0              # molecular: the scalar diffusivity is nu / Sc</div>
+<div class="line">models:</div>
+<div class="line">  physics:</div>
+<div class="line">    turbulence:</div>
+<div class="line">      turbulent_schmidt_number: 0.7  # subgrid: the scalar diffusivity is nu_t / Sc_t</div>
+<div class="line">    particles:</div>
+<div class="line">      iem_constant: 2.0              # C_IEM in the IEM mixing rate</div>
+</div><!-- fragment --><p>Mappings:</p><ul>
+<li><code>properties.fluid.schmidt_number</code> -&gt; <code>-schmidt_number</code></li>
+<li><code>models.physics.turbulence.turbulent_schmidt_number</code> -&gt; <code>-turb_schmidt_number</code></li>
+<li><code>models.physics.particles.iem_constant</code> -&gt; <code>-iem_constant</code>, the constant <code>C_IEM</code> in the IEM mixing rate <code>Omega = C_IEM Gamma_eff / Delta^2</code> (<a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a>)</li>
+</ul>
+<p>Rules:</p><ul>
+<li>the Schmidt numbers must be positive; <code>iem_constant</code> must be non-negative, and both configuration validation and the runtime require it to be finite</li>
+<li>the particles' Brownian motion has diffusivity <code>nu/Sc + nu_t/Sc_t</code>; a very large <code>schmidt_number</code> (<code>1.0e12</code>) without a subgrid model turns it off, which the uniform-flow advection examples use</li>
+<li><code>iem_constant: 0</code> switches micromixing off: the particle update is skipped, so each particle's <code>Psi</code> is carried unchanged and bit-identical - a passive label</li>
+<li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code>, <code>turbulent_schmidt_number = 0.7</code>, and <code>iem_constant = 2.0</code></li>
+<li><code>iem_constant</code> changes nothing while every particle's <code>Psi</code> is equal within each cell; <code>models.physics.particles.fields</code> gives <code>Psi</code> its initial values (<a class="el" href="45_Particle_Initialization_and_Restart.html#p45_particle_values_sec">1.1 Configured Particle Values (<code>fields</code>)</a>), and the verification scalar source, which also sets <code>Psi</code>, bypasses IEM; see <a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
+<li><code>solver.yml</code> <code>scalar_transport</code> is their deprecated former location, still read with a warning (<a class="el" href="08_Solver_Reference.html#p08_scalar_transport_sec">10. scalar_transport (deprecated location)</a>); a parameter set in both files is refused</li>
+</ul>
 <h1><a class="anchor" id="p07_les_sec"></a>
 5. LES Subgrid Models</h1>
 <p>The subgrid model is chosen by <code>models.physics.turbulence.les.model</code>.</p>

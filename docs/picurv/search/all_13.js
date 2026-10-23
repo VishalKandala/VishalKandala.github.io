@@ -42,7 +42,7 @@ var searchData=
   ['hill_39',['hill',['../48_Grid_Generator_Guide.html#p48_cap_wall_hill_sub',1,'']]],
   ['hint_40',['9aebaf8-seed-cell-hint',['../md_docs_2changelog_8d_29aebaf8-seed-cell-hint.html',1,'']]],
   ['historical_41',['HISTORICAL',['../namespaceaudit__path__literals.html#a27a4a849919d10bb0c93bdff940caaf3',1,'audit_path_literals']]],
-  ['histories_42',['14. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
+  ['histories_42',['13. Temporal Spectra From Bounded Probe Histories',['../60_Field_Statistics_Planned_Extensions.html#p60_spectra_temporal_sec',1,'']]],
   ['history_20two_20logs_43',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
   ['history_5ffile_44',['history_file',['../momentum__newton__krylov_8c.html#a9874825fe312f850f31d798f30c1e9f3',1,'MomentumNewtonKrylovContext']]],
   ['hom02_20poisson_20rewrite_45',['7d08e19-hom02-poisson-rewrite',['../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html',1,'']]],

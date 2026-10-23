@@ -120,7 +120,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </li>
 <li class="level1"><a href="#p08_solution_conv_sec">8. Physical-solution convergence monitoring</a></li>
 <li class="level1"><a href="#p08_interp_sec">9. interpolation</a></li>
-<li class="level1"><a href="#p08_scalar_transport_sec">10. scalar_transport</a></li>
+<li class="level1"><a href="#p08_scalar_transport_sec">10. scalar_transport (deprecated location)</a></li>
 <li class="level1"><a href="#p08_verification_sec">11. verification</a></li>
 <li class="level1"><a href="#p08_petsc_sec">12. petsc_passthrough_options</a></li>
 <li class="level1"><a href="#p08_next_steps_sec">13. Next Steps</a></li>
@@ -189,11 +189,10 @@ operation_mode:
 # reuses the production scatter operator.
 
 # --- Scalar Transport Properties ---
-# These affect Eulerian diffusivity and particle scalar/Brownian models.
-scalar_transport:
-  schmidt_number: 1.0              # -&gt; -schmidt_number
-  turbulent_schmidt_number: 0.7    # -&gt; -turb_schmidt_number
-  iem_constant: 2.0                # -&gt; -iem_constant; C_IEM in the IEM mixing rate (default 2.0)
+# The Schmidt numbers and the IEM constant are properties of the physics, so they are set
+# in case.yml: properties.fluid.schmidt_number, models.physics.turbulence.
+# turbulent_schmidt_number and models.physics.particles.iem_constant. A scalar_transport
+# block here is still read, as a deprecated alias, with a warning.
 
 # ==============================================================================
 # 2. PRIMARY SOLVER STRATEGY &amp; TOLERANCES
@@ -835,23 +834,8 @@ cg</h3>
 <p>The <b>Trilinear</b> method (default) performs direct trilinear interpolation from the 8 nearest cell centers; on the TGV3D field it converges at order 1.97. The <b>CornerAveraged</b> method is the legacy two-stage path (center-to-corner average, then trilinear from corners); on the same field and a uniform Cartesian grid its L2 error converges at order 1.68 and its maximum error at first order, so it is not second order anywhere measured. See <a class="el" href="08_Solver_Reference.html#p08_cap_interp_corneraveraged">p08_cap_interp_corneraveraged</a>. The <b>FaceFlux</b> method builds velocity from the face fluxes so that it is divergence-free, at first-order accuracy; see <a class="el" href="08_Solver_Reference.html#p08_cap_interp_faceflux">p08_cap_interp_faceflux</a>.</p>
 <p>See <b><a class="el" href="27_Trilinear_Interpolation_and_Projection.html">Trilinear Interpolation and Particle-Grid Projection</a></b> for algorithmic details.</p>
 <h1><a class="anchor" id="p08_scalar_transport_sec"></a>
-10. scalar_transport</h1>
-<div class="fragment"><div class="line">scalar_transport:</div>
-<div class="line">  schmidt_number: 1.0</div>
-<div class="line">  turbulent_schmidt_number: 0.7</div>
-<div class="line">  iem_constant: 2.0</div>
-</div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>schmidt_number</code> -&gt; <code>-schmidt_number</code></li>
-<li><code>turbulent_schmidt_number</code> -&gt; <code>-turb_schmidt_number</code></li>
-<li><code>iem_constant</code> -&gt; <code>-iem_constant</code>, the constant <code>C_IEM</code> in the IEM mixing rate <code>Omega = C_IEM Gamma_eff / Delta^2</code> (<a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a>)</li>
-</ul>
-<p>Rules:</p><ul>
-<li>the Schmidt numbers must be positive; <code>iem_constant</code> must be non-negative, and both configuration validation and the runtime require it to be finite</li>
-<li><code>iem_constant: 0</code> switches micromixing off: the particle update is skipped, so each particle's <code>Psi</code> is carried unchanged and bit-identical - a passive label</li>
-<li>omitted values use the C runtime defaults: <code>schmidt_number = 1.0</code>, <code>turbulent_schmidt_number = 0.7</code>, and <code>iem_constant = 2.0</code></li>
-<li><code>iem_constant</code> changes nothing while every particle's <code>Psi</code> is equal within each cell; <code>models.physics.particles.fields</code> gives <code>Psi</code> its initial values (<a class="el" href="45_Particle_Initialization_and_Restart.html#p45_particle_values_sec">1.1 Configured Particle Values (<code>fields</code>)</a>), and the verification scalar source, which also sets <code>Psi</code>, bypasses IEM; see <a class="el" href="28_IEM_and_Statistical_Averaging.html#p28_iem_sec">1. IEM Mixing Update In Current Code</a></li>
-<li>use this structured block for ordinary scalar/Brownian transport tuning; reserve <code>petsc_passthrough_options</code> for flags without a YAML schema</li>
-</ul>
+10. scalar_transport (deprecated location)</h1>
+<p>The Schmidt numbers and the IEM constant describe the physics being solved, so they are set in <code>case.yml</code>: <code>properties.fluid.schmidt_number</code>, <code>models.physics.turbulence.turbulent_schmidt_number</code> and <code>models.physics.particles.iem_constant</code> (<a class="el" href="07_Case_Reference.html#p07_scalar_transport_sec">Scalar transport parameters</a>). A <code>scalar_transport</code> block in <code>solver.yml</code> is still read as a deprecated alias, with a warning naming each key's case location; setting one parameter in both files is refused.</p>
 <h1><a class="anchor" id="p08_verification_sec"></a>
 11. verification</h1>
 <div class="fragment"><div class="line">verification:</div>
