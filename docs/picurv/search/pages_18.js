@@ -13,5 +13,6 @@ var searchData=
   ['overview_10',['overview',['../22_CURVIB_Method.html',1,'CurvIB Method Overview'],['../21_Methods_Overview.html',1,'Methods and Models Overview'],['../34_Particle_Model_Overview.html',1,'Particle Model and Coupling Overview']]],
   ['own_20cell_20mean_11',['6507b4b-iem-own-cell-mean',['../md_docs_2changelog_8d_26507b4b-iem-own-cell-mean.html',1,'']]],
   ['owner_20lookup_12',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['owner_20lookup_20process_20grid_13',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]]
+  ['owner_20lookup_20process_20grid_13',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['ownership_14',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]]
 ];

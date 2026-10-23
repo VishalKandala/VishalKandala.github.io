@@ -51,7 +51,7 @@ var searchData=
   ['only_20run_20configuration_20and_20health_20summary_48',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['only_20some_20cases_20in_20a_20study_20are_20finished_49',['3.3 Only Some Cases in a Study Are Finished',['../61_Storage_Management_Guide.html#p61_mixed_study',1,'']]],
   ['onlysetup_50',['OnlySetup',['../variables_8h.html#a6bae0e92738d6c3498ac41b67ed5b7a4',1,'SimCtx']]],
-  ['op_51',['op',['../ParticleInitialConditions_8c.html#ac5f4b944b3475b6f2291269286241115',1,'ExpressionNode::op'],['../ParticleInitialConditions_8c.html#ab8c877177d456ddcf9ae116008fe7af4',1,'ExpressionInstruction::op']]],
+  ['op_51',['op',['../ParticleInitialConditions_8c.html#ab8c877177d456ddcf9ae116008fe7af4',1,'ExpressionInstruction::op'],['../ParticleInitialConditions_8c.html#ac5f4b944b3475b6f2291269286241115',1,'ExpressionNode::op']]],
   ['op_5fabs_52',['OP_ABS',['../ParticleInitialConditions_8c.html#aa8434fd79f63bc817b99a675ac73108eacfec44b158335c2e6f92f37954067794',1,'ParticleInitialConditions.c']]],
   ['op_5fadd_53',['OP_ADD',['../ParticleInitialConditions_8c.html#aa8434fd79f63bc817b99a675ac73108ea96186829480e5b34b1373288e956b1c8',1,'ParticleInitialConditions.c']]],
   ['op_5fand_54',['OP_AND',['../ParticleInitialConditions_8c.html#aa8434fd79f63bc817b99a675ac73108eae2310d00f26e94b32317ecd168fb7e18',1,'ParticleInitialConditions.c']]],
@@ -120,7 +120,7 @@ var searchData=
   ['other_20profiles_117',['9. Mixing With Other Profiles',['../07_Case_Reference.html#p07_modular_sec',1,'']]],
   ['outcome_20counters_118',['4.1 Population and Outcome Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_population',1,'']]],
   ['outcomes_119',['6. Expected Outcomes',['../43_Developer_Portal_Index.html#p43_developer_outcomes_sec',1,'']]],
-  ['outlet_120',['outlet',['../md_docs_2changelog_8d_2fafd077-search-robustness-outlet.html',1,'fafd077-search-robustness-outlet'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'OUTLET:&#160;variables.h'],['../44_Boundary_Conditions_Guide.html#p44_type_outlet_sub',1,'outlet']]],
+  ['outlet_120',['outlet',['../md_docs_2changelog_8d_2fafd077-search-robustness-outlet.html',1,'fafd077-search-robustness-outlet'],['../44_Boundary_Conditions_Guide.html#p44_type_outlet_sub',1,'outlet'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'OUTLET:&#160;variables.h']]],
   ['output_121',['output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'0c7b543-init-runs-dir-iem-raw-output'],['../md_docs_2changelog_8d_2426fc90-reducer-lineage-missing-output.html',1,'426fc90-reducer-lineage-missing-output'],['../19_Nondimensionalization.html#p19_output_sec',1,'5. Output'],['../55_Newton_Krylov_Momentum_Solver.html#p55_monitors_sec',1,'7. Monitors and Log Output'],['../61_Storage_Management_Guide.html#p61_cap_retain_raw_output_sub',1,'raw-output'],['../09_Monitor_Reference.html#p09_startup_banner_sec',1,'Startup banner and solver-specific output']]],
   ['output_20contract_122',['10. Structured Error Output Contract',['../05_The_Conductor_Script.html#p05_structured_errors_sec',1,'']]],
   ['output_20directory_20warning_123',['4b3e080-output-directory-warning',['../md_docs_2changelog_8d_24b3e080-output-directory-warning.html',1,'']]],
@@ -147,6 +147,7 @@ var searchData=
   ['owner_20and_20cannot_20outrank_20it_144',['4.3 Every Value Has an Owner, and Cannot Outrank It',['../64_Documentation_Extension_Framework.html#p64_ceiling_sub',1,'']]],
   ['owner_20lookup_145',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
   ['owner_20lookup_20process_20grid_146',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['owns_5fpreconditioning_5fmatrix_147',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
-  ['ownsstoredpoint_148',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
+  ['ownership_147',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
+  ['owns_5fpreconditioning_5fmatrix_148',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
+  ['ownsstoredpoint_149',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
 ];
