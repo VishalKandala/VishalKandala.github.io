@@ -65,9 +65,10 @@ var searchData=
   ['contracts_62',['Invariant Contracts',['../71_Invariant_Contracts.html',1,'']]],
   ['cookbook_63',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
   ['coupling_20overview_64',['Particle Model and Coupling Overview',['../34_Particle_Model_Overview.html',1,'']]],
-  ['cross_20section_20reducer_65',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
-  ['cross_20section_20supported_66',['6d6944e-cross-section-supported',['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'']]],
-  ['cs_20effective_20layout_20labels_67',['4de9c40-les-cs-effective-layout-labels',['../md_docs_2changelog_8d_24de9c40-les-cs-effective-layout-labels.html',1,'']]],
-  ['current_20mean_68',['b971bf5-iem-current-mean',['../md_docs_2changelog_8d_2b971bf5-iem-current-mean.html',1,'']]],
-  ['curvib_20method_20overview_69',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
+  ['coverage_65',['a6530c6-profiler-coverage',['../md_docs_2changelog_8d_2a6530c6-profiler-coverage.html',1,'']]],
+  ['cross_20section_20reducer_66',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
+  ['cross_20section_20supported_67',['6d6944e-cross-section-supported',['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'']]],
+  ['cs_20effective_20layout_20labels_68',['4de9c40-les-cs-effective-layout-labels',['../md_docs_2changelog_8d_24de9c40-les-cs-effective-layout-labels.html',1,'']]],
+  ['current_20mean_69',['b971bf5-iem-current-mean',['../md_docs_2changelog_8d_2b971bf5-iem-current-mean.html',1,'']]],
+  ['curvib_20method_20overview_70',['CurvIB Method Overview',['../22_CURVIB_Method.html',1,'']]]
 ];

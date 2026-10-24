@@ -90,49 +90,50 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p59_problem_sec">1. Problem to Measure</a></li>
-<li class="level1"><a href="#p59_direction_sec">2. Recorded Direction</a></li>
-<li class="level1"><a href="#p59_boundaries_sec">3. Explicit Boundaries</a></li>
-<li class="level1"><a href="#p59_plan_sec">4. Future Plan</a></li>
+<ul><li class="level1"><a href="#p59_identity_sec">1. Function Identity</a></li>
+<li class="level1"><a href="#p59_profiling_sec">2. Profiling Contract</a></li>
+<li class="level1"><a href="#p59_cost_sec">3. Measured Cost</a></li>
+<li class="level1"><a href="#p59_logging_sec">4. Still Deferred: Logging Filter</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Function_Identity_and_Observability_Specification"></a> This deferred specification records the possible optimization of function-name filtering and profiling. It is not part of the field-statistics implementation and currently has no implementation branch.</p>
-<h1><a class="anchor" id="p59_problem_sec"></a>
-1. Problem to Measure</h1>
-<p>Logging allowlists and profiling currently identify instrumented functions by name. Emitted logging is normally dominated by formatting and I/O, but filtered calls in hot loops and repeated profiler start/end name searches may have measurable cost. That cost must be benchmarked before changing the system.</p>
-<h1><a class="anchor" id="p59_direction_sec"></a>
-2. Recorded Direction</h1>
-<p>If benchmarks justify the work:</p>
+<div class="textblock"><p><a class="anchor" id="_Function_Identity_and_Observability_Specification"></a> How a C function is named and timed, and the one part of the original deferred work, the logging allowlist, that is still open.</p>
+<h1><a class="anchor" id="p59_identity_sec"></a>
+1. Function Identity</h1>
+<p>A function's name everywhere is C99's predefined <code>__func__</code>: profiling events, logging filters (<code>LOG_ALLOW</code>, <code>is_function_allowed(__func__)</code>) and PETSc's error traces (PETSc 3.20's <code>PETSC_FUNCTION_NAME</code> is <code>__func__</code>). No file defines or reads <code>__FUNCT__</code>; a hand-written name could drift from the function it labels, which is how <code>ComputeKFaceMetrics</code> was once reported as <code>ComputeJFaceMetrics</code>. Names written in <code>monitor.yml</code> (<code>logging.enabled_functions</code>, <code>profiling.timestep_output.functions</code>, <code>profiling.helpers</code>) are these function names.</p>
+<h1><a class="anchor" id="p59_profiling_sec"></a>
+2. Profiling Contract</h1>
+<p>Every function defined in <code>src/*.c</code> that is not <code>static inline</code> times itself:</p>
 <ul>
-<li>give instrumented application functions a compile-time <code>FunctionId</code> or a call-site-cached registry handle;</li>
-<li>resolve configured names once into a bitset/indexed allow table;</li>
-<li>make profiler start/end update directly indexed state;</li>
-<li>check log level before function filtering in every hot-path macro;</li>
-<li>parse profiling mode once at ingress; and</li>
-<li>retain canonical function names for YAML, diagnostics, errors, and output.</li>
+<li>it begins one timer, <code>PROFILE_FUNCTION_BEGIN</code> or <code>PROFILE_HELPER_BEGIN</code>, as its first statement after <code>PetscFunctionBeginUser</code> (an early return placed before the timer, such as a once-only guard, needs no END);</li>
+<li>every explicit <code>return</code> and <code>PetscFunctionReturn</code> after it is immediately preceded by <code>PROFILE_FUNCTION_END</code> (or its alias <code>PROFILE_HELPER_END</code>), and a body that can fall off its end ends with one. Error returns inside <code>SETERRQ</code>, <code>PetscCall</code> and <code>CHKERRQ</code> end the run and need none.</li>
 </ul>
-<p>The implementation should preserve existing logging macros, log formats, profiling files, and default behavior as far as possible. A cached handle may be less intrusive than a manually maintained enum of every C function; the benchmark/prototype phase chooses between them.</p>
-<h1><a class="anchor" id="p59_boundaries_sec"></a>
-3. Explicit Boundaries</h1>
-<p>This work does not:</p>
+<p>A missed END leaves the function's PETSc event open; its later calls are then not recorded. <code>make audit-profiling</code> (also run by <code>make check</code>) enforces both rules and the absence of <code>__FUNCT__</code>, against the declared exclusions in <code><a class="el" href="audit__profiling__coverage_8py.html">tests/tooling/audit_profiling_coverage.py</a></code>: <code>main</code>, the asynchronous signal handler, the logging filter itself (<code>get_log_level</code>, <code>is_function_allowed</code>, <code>set_allowed_functions</code>), the profiler's own functions, and two dependency-free leaf modules, <code><a class="el" href="checksum_8c.html" title="Dependency-free SHA-256 implementation used for small persistent metadata.">src/checksum.c</a></code> and <code><a class="el" href="statistics__moments_8c.html" title="Weighted centered-moment kernels for the field-statistics pipeline.">src/statistics_moments.c</a></code>, which include only <code>petscsys.h</code>.</p>
+<p>Each timer is a PETSc log event named by <code>__func__</code>, registered on the function's first call and cached at the call site. Registration waits for <code>PetscInitialize</code> and stops after <code>PetscFinalize</code>, so a function that runs outside them (argument handling in <code>main</code>) stays untimed instead of failing. There are two kinds:</p>
 <ul>
-<li>reuse <code>FieldId</code> or create one universal identity namespace;</li>
-<li>assign IDs to filenames, arbitrary configuration values, PETSc object names, DMSwarm field names, or user-defined postprocessing labels;</li>
-<li>replace boundary-condition enums/function pointers already resolved at ingress;</li>
-<li>redesign runtime physical-solution monitoring or scientific statistics; or</li>
-<li>block <a class="el" href="58_Field_Statistics.html">Field Statistics</a>.</li>
+<li><code>PROFILE_FUNCTION_BEGIN</code>, class <code>PICurv</code>: functions called a handful of times per step, solver pass or post-processing step. Always timed.</li>
+<li><code>PROFILE_HELPER_BEGIN</code>, class <code>PICurvHelper</code>: functions called per particle, per cell or in inner loops. Off unless <code>profiling.helpers</code> names them or is <code>all</code> (<a class="el" href="09_Monitor_Reference.html#p09_profiling_sec">5. profiling</a>).</li>
 </ul>
-<p>One-time string comparisons at external ingress and presentation boundaries are correct and remain.</p>
-<h1><a class="anchor" id="p59_plan_sec"></a>
-4. Future Plan</h1>
-<ol type="1">
-<li>Benchmark disabled, filtered, selected, and all-function logging/profiling on representative serial and MPI runs.</li>
-<li>Inventory call sites and macros; identify only repeated runtime lookups.</li>
-<li>Prototype cached handles and compile-time IDs without changing output.</li>
-<li>Select the simpler design that demonstrates a material improvement.</li>
-<li>Add behavior, concurrency, and overhead regressions, then update monitoring and contributor documentation.</li>
-</ol>
-<p>This work receives its own branch series only after explicit approval. </p>
+<p>The split is set by measured calls per rank per step with every helper on, over a particle run, an implicit-momentum flow run, a Newton–Krylov run and a post-processing step: at most 20 is an aggregate. A function no measured case reached starts as a helper and is promoted once a case that exercises it shows it is called rarely. A new function starts as a helper unless it is plainly once per step.</p>
+<h1><a class="anchor" id="p59_cost_sec"></a>
+3. Measured Cost</h1>
+<p>Per call, PETSc 3.20.3 built optimized (<code>--with-debugging=0</code>), one rank on Grace:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Timer   </th><th class="markdownTableHeadNone">Cost    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">empty loop iteration (reference)   </td><td class="markdownTableBodyNone">2.5 ns    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">helper, off   </td><td class="markdownTableBodyNone">3.5 ns    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">PETSc event, active   </td><td class="markdownTableBodyNone">98 ns    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">former PICurv registry timer (removed)   </td><td class="markdownTableBodyNone">54 ns   </td></tr>
+</table>
+<p>A particle step makes about 19 helper calls per particle, so the former always-on timers cost 1.4 s per step at 1.64M particles per rank (20–33% of step time); off, helpers cost a few milliseconds. <code>helpers: all</code> costs about 100 ns per call and roughly doubles a particle step, so it is for short diagnostic runs. A debug PETSc build pays about 26 ns per switched-off helper, which is visible in debug runs.</p>
+<h1><a class="anchor" id="p59_logging_sec"></a>
+4. Still Deferred: Logging Filter</h1>
+<p>Logging still filters by name: <code>LOG_ALLOW</code> checks the level first, then <code>is_function_allowed</code> compares <code>__func__</code> against the allowlist. Emitted logging is dominated by formatting and I/O, and the level check keeps filtered calls cheap at production levels, so this is unchanged. If a benchmark shows the name comparison is material at debug levels, the recorded direction is to resolve the configured names once into an indexed allow table and cache each call site's entry, as the profiler does, without changing log formats or the YAML names.</p>
+<p>This work does not reuse <code>FieldId</code> or create one universal identity namespace, assign IDs to filenames, configuration values, PETSc object names, DMSwarm field names or post-processing labels, or replace boundary-condition dispatch resolved at ingress. One-time string comparisons at external ingress and presentation boundaries are correct and remain. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

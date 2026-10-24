@@ -59,13 +59,14 @@ var searchData=
   ['profile_20series_56',['4dac690-summarize-profile-series',['../md_docs_2changelog_8d_24dac690-summarize-profile-series.html',1,'']]],
   ['profile_20tool_57',['c35c008-wall-normal-profile-tool',['../md_docs_2changelog_8d_2c35c008-wall-normal-profile-tool.html',1,'']]],
   ['profile_20tools_20continuation_58',['e551d5a-profile-tools-continuation',['../md_docs_2changelog_8d_2e551d5a-profile-tools-continuation.html',1,'']]],
-  ['profiler_20petsc_20events_59',['9f8703f-profiler-petsc-events',['../md_docs_2changelog_8d_29f8703f-profiler-petsc-events.html',1,'']]],
-  ['profiles_60',['8b4b501-statistics-ensembles-profiles',['../md_docs_2changelog_8d_28b4b501-statistics-ensembles-profiles.html',1,'']]],
-  ['profiling_20rank_20reduction_61',['dbd24e7-profiling-rank-reduction',['../md_docs_2changelog_8d_2dbd24e7-profiling-rank-reduction.html',1,'']]],
-  ['projection_62',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['projection_20method_63',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
-  ['promoted_64',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
-  ['promotion_65',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
-  ['promotions_66',['promotions',['../md_docs_2changelog_8d_2367e305-promotions.html',1,'367e305-promotions'],['../md_docs_2changelog_8d_27a4cf6b-status-promotions.html',1,'7a4cf6b-status-promotions'],['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'fc3ae90-vv-campaign-promotions']]],
-  ['promotions_20petsc_20stamp_67',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
+  ['profiler_20coverage_59',['a6530c6-profiler-coverage',['../md_docs_2changelog_8d_2a6530c6-profiler-coverage.html',1,'']]],
+  ['profiler_20petsc_20events_60',['9f8703f-profiler-petsc-events',['../md_docs_2changelog_8d_29f8703f-profiler-petsc-events.html',1,'']]],
+  ['profiles_61',['8b4b501-statistics-ensembles-profiles',['../md_docs_2changelog_8d_28b4b501-statistics-ensembles-profiles.html',1,'']]],
+  ['profiling_20rank_20reduction_62',['dbd24e7-profiling-rank-reduction',['../md_docs_2changelog_8d_2dbd24e7-profiling-rank-reduction.html',1,'']]],
+  ['projection_63',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['projection_20method_64',['Fractional-Step (Projection) Method',['../23_Fractional_Step_Method.html',1,'']]],
+  ['promoted_65',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['promotion_66',['promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'5f186c4-filter-width-wall-law-promotion'],['../md_docs_2changelog_8d_2f0097d7-storage-promotion.html',1,'f0097d7-storage-promotion']]],
+  ['promotions_67',['promotions',['../md_docs_2changelog_8d_2367e305-promotions.html',1,'367e305-promotions'],['../md_docs_2changelog_8d_27a4cf6b-status-promotions.html',1,'7a4cf6b-status-promotions'],['../md_docs_2changelog_8d_2fc3ae90-vv-campaign-promotions.html',1,'fc3ae90-vv-campaign-promotions']]],
+  ['promotions_20petsc_20stamp_68',['1bed094-cluster-promotions-petsc-stamp',['../md_docs_2changelog_8d_21bed094-cluster-promotions-petsc-stamp.html',1,'']]]
 ];

@@ -66,5 +66,6 @@ var searchData=
   ['friction_5fvelocity_5fsum_63',['friction_velocity_sum',['../variables_8h.html#a9e3fdf1442986230bed580992417694d',1,'WallModelDiagnosticsState']]],
   ['frozen_5fmomentum_5fpoint_5fblock_5fops_64',['frozen_momentum_point_block_ops',['../momentum__newton__krylov_8c.html#a0d9e162698cb6c83866f5e22a1ed77fc',1,'momentum_newton_krylov.c']]],
   ['fsi_65',['fsi',['../variables_8h.html#afff98e471314dce8cc7a2b55e536431f',1,'SimCtx']]],
-  ['fsi_5fintp_66',['fsi_intp',['../variables_8h.html#aa3a0800a8ce4055576ca6e9c34d72ff9',1,'FSInfo']]]
+  ['fsi_5fintp_66',['fsi_intp',['../variables_8h.html#aa3a0800a8ce4055576ca6e9c34d72ff9',1,'FSInfo']]],
+  ['funct_5fre_67',['FUNCT_RE',['../namespaceaudit__profiling__coverage.html#a99c3fb6f776c2331a72a29f88105b78b',1,'audit_profiling_coverage']]]
 ];

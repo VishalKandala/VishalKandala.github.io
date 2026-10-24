@@ -13,8 +13,9 @@ var searchData=
   ['audit_5finline_5fchoices_10',['audit_inline_choices',['../namespaceaudit__inline__choices.html',1,'']]],
   ['audit_5fpage_5ftypes_11',['audit_page_types',['../namespaceaudit__page__types.html',1,'']]],
   ['audit_5fpath_5fliterals_12',['audit_path_literals',['../namespaceaudit__path__literals.html',1,'']]],
-  ['audit_5fstarter_5fcontent_13',['audit_starter_content',['../namespaceaudit__starter__content.html',1,'']]],
-  ['audit_5fsubsystem_5flifecycle_14',['audit_subsystem_lifecycle',['../namespaceaudit__subsystem__lifecycle.html',1,'']]],
-  ['audit_5funits_15',['audit_units',['../namespaceaudit__units.html',1,'']]],
-  ['audit_5fuser_5ffacing_5freporting_16',['audit_user_facing_reporting',['../namespaceaudit__user__facing__reporting.html',1,'']]]
+  ['audit_5fprofiling_5fcoverage_13',['audit_profiling_coverage',['../namespaceaudit__profiling__coverage.html',1,'']]],
+  ['audit_5fstarter_5fcontent_14',['audit_starter_content',['../namespaceaudit__starter__content.html',1,'']]],
+  ['audit_5fsubsystem_5flifecycle_15',['audit_subsystem_lifecycle',['../namespaceaudit__subsystem__lifecycle.html',1,'']]],
+  ['audit_5funits_16',['audit_units',['../namespaceaudit__units.html',1,'']]],
+  ['audit_5fuser_5ffacing_5freporting_17',['audit_user_facing_reporting',['../namespaceaudit__user__facing__reporting.html',1,'']]]
 ];
