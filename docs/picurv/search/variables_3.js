@@ -85,7 +85,7 @@ var searchData=
   ['converged_82',['converged',['../test__momentum__newton__boundary__fixedpoint_8c.html#adb8b00f9714aaa5bcb33f29d7d91908b',1,'SolveResult']]],
   ['coords_83',['coords',['../variables_8h.html#aac5e5bdffa985d12e89f4d6f742a2442',1,'VTKMetaData']]],
   ['core_84',['CORE',['../namespaceaudit__units.html#a82bce64323da80aa694a3044e7675385',1,'audit_units']]],
-  ['count_85',['count',['../ParticleInitialConditions_8c.html#aed10b67300995bed5990648f0fdf03db',1,'ExpressionParser::count'],['../statistics__accumulator_8h.html#abfd331da5c41669dbd5cc2a5385bbbf2',1,'PicurvWindowStorage::count'],['../statistics__moments_8h.html#ae053aee3284db8461669185fe51d5181',1,'PicurvMomentState::count'],['../statistics__moments_8h.html#a4bf12a598780726f32b7ea11fb95451b',1,'PicurvCoMomentState::count'],['../ParticleInitialConditions_8c.html#ae1764c95c1b28907a63c1c6abbd11551',1,'ParticleFieldPlan::count']]],
+  ['count_85',['count',['../statistics__moments_8h.html#a4bf12a598780726f32b7ea11fb95451b',1,'PicurvCoMomentState::count'],['../statistics__accumulator_8h.html#abfd331da5c41669dbd5cc2a5385bbbf2',1,'PicurvWindowStorage::count'],['../statistics__moments_8h.html#ae053aee3284db8461669185fe51d5181',1,'PicurvMomentState::count'],['../ParticleInitialConditions_8c.html#aed10b67300995bed5990648f0fdf03db',1,'ExpressionParser::count'],['../ParticleInitialConditions_8c.html#ae1764c95c1b28907a63c1c6abbd11551',1,'ParticleFieldPlan::count']]],
   ['covariance_5fcount_86',['covariance_count',['../statistics__accumulator_8h.html#a20755469be37624151f3ba3b04892991',1,'PicurvWindowStorage::covariance_count'],['../statistics__window_8h.html#ad3ad17f2f11838a75374310b48ccd46e',1,'PicurvWindowDefinition::covariance_count']]],
   ['covariances_87',['covariances',['../statistics__window_8h.html#ab224844a4af18d8039e41bc9e60aa773',1,'PicurvWindowDefinition']]],
   ['cr1_88',['cr1',['../variables_8h.html#a3c1b7ac3d2b3d08224e6e95576f95991',1,'IBMInfo']]],
@@ -118,12 +118,10 @@ var searchData=
   ['current_5fpressure_5fnorm_5fsq_115',['current_pressure_norm_sq',['../logging_8c.html#a90b8066e3ad7b33527dbc902e83dc8e0',1,'SolutionConvergenceDeterministicPass2']]],
   ['current_5fpressure_5fsum_116',['current_pressure_sum',['../logging_8c.html#a12d46b9d699e17a44f9408e4a678e151',1,'SolutionConvergenceDeterministicPass1']]],
   ['current_5fspeed_5fsum_117',['current_speed_sum',['../logging_8c.html#aa35906689e2e5658ebccce51a0a5ea00',1,'SolutionConvergenceDeterministicPass1']]],
-  ['current_5fstep_5fcall_5fcount_118',['current_step_call_count',['../logging_8c.html#abaebe3fc2647f70c48f8883421c468de',1,'ProfiledFunction']]],
-  ['current_5fstep_5ftime_119',['current_step_time',['../logging_8c.html#ab8731f86c7a1ac2e7ae8bcb1bf35341b',1,'ProfiledFunction']]],
-  ['current_5fu_5fnorm_5fsq_120',['current_u_norm_sq',['../logging_8c.html#a91fea9ddaf2c0ab2403c65a850645c1b',1,'SolutionConvergenceDeterministicPass1']]],
-  ['currentsettlementpass_121',['currentSettlementPass',['../variables_8h.html#a5e5e36e3ba26094ecbe32ea513a6dfdc',1,'SearchMetricsState']]],
-  ['cv_5fye_122',['CV_ye',['../variables_8h.html#a03d777d3d310e154f385ad53f5ec168c',1,'FSInfo']]],
-  ['cv_5fys_123',['CV_ys',['../variables_8h.html#a31670fd5fc1904aaac6ced4c61a348d9',1,'FSInfo']]],
-  ['cv_5fze_124',['CV_ze',['../variables_8h.html#af8094d9eee5f0ec6bdc1e6b386ec5761',1,'FSInfo']]],
-  ['cv_5fzs_125',['CV_zs',['../variables_8h.html#a2990557269af36d6a44a4ec49d77f328',1,'FSInfo']]]
+  ['current_5fu_5fnorm_5fsq_118',['current_u_norm_sq',['../logging_8c.html#a91fea9ddaf2c0ab2403c65a850645c1b',1,'SolutionConvergenceDeterministicPass1']]],
+  ['currentsettlementpass_119',['currentSettlementPass',['../variables_8h.html#a5e5e36e3ba26094ecbe32ea513a6dfdc',1,'SearchMetricsState']]],
+  ['cv_5fye_120',['CV_ye',['../variables_8h.html#a03d777d3d310e154f385ad53f5ec168c',1,'FSInfo']]],
+  ['cv_5fys_121',['CV_ys',['../variables_8h.html#a31670fd5fc1904aaac6ced4c61a348d9',1,'FSInfo']]],
+  ['cv_5fze_122',['CV_ze',['../variables_8h.html#af8094d9eee5f0ec6bdc1e6b386ec5761',1,'FSInfo']]],
+  ['cv_5fzs_123',['CV_zs',['../variables_8h.html#a2990557269af36d6a44a4ec49d77f328',1,'FSInfo']]]
 ];

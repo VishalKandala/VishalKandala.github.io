@@ -24,6 +24,5 @@ var searchData=
   ['poissonfacemetrics_21',['PoissonFaceMetrics',['../poisson_8c.html#structPoissonFaceMetrics',1,'']]],
   ['poissontransversedifference_22',['PoissonTransverseDifference',['../poisson_8c.html#structPoissonTransverseDifference',1,'']]],
   ['postprocessparams_23',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
-  ['profiledfunction_24',['ProfiledFunction',['../logging_8c.html#structProfiledFunction',1,'']]],
-  ['profiledfunctionranks_25',['ProfiledFunctionRanks',['../logging_8c.html#structProfiledFunctionRanks',1,'']]]
+  ['profiledfunctionranks_24',['ProfiledFunctionRanks',['../logging_8c.html#structProfiledFunctionRanks',1,'']]]
 ];

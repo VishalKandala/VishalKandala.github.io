@@ -38,5 +38,7 @@ var searchData=
   ['piecewiselinearinterpolation_35',['PieceWiseLinearInterpolation',['../interpolation_8h.html#ab36f15645b4460e25ec6ace7aba17dd8',1,'interpolation.h']]],
   ['poisson_5fsolid_5fthreshold_36',['POISSON_SOLID_THRESHOLD',['../poisson_8c.html#a660aad096cd947485e4201ac58cdc38a',1,'poisson.c']]],
   ['profile_5ffunction_5fbegin_37',['PROFILE_FUNCTION_BEGIN',['../logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e',1,'logging.h']]],
-  ['profile_5ffunction_5fend_38',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]]
+  ['profile_5ffunction_5fend_38',['PROFILE_FUNCTION_END',['../logging_8h.html#a5fe7257f46131945aacf9a35e9de5874',1,'logging.h']]],
+  ['profile_5fhelper_5fbegin_39',['PROFILE_HELPER_BEGIN',['../logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd',1,'logging.h']]],
+  ['profile_5fhelper_5fend_40',['PROFILE_HELPER_END',['../logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3',1,'logging.h']]]
 ];
