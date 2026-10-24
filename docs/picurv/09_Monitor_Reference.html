@@ -337,6 +337,14 @@ io:
   # [Non-negative Integer] -&gt; -statistics_console_output_freq
   statistics_console_output_frequency: 100
 
+  # Whether the run's first state (step 0, or a restart's starting step) and its last
+  # completed state are checkpointed besides the data_output_frequency cadence. Both
+  # default to true; turning them off saves those writes in benchmarks. A run without
+  # its final checkpoint resumes (--continue) from its last cadence checkpoint.
+  # [Boolean] -&gt; -write_initial_checkpoint / -write_final_checkpoint
+  write_initial_checkpoint: true
+  write_final_checkpoint: true
+
   # --- Particle Tracking Row Subsampling ---
   # Within each particle console snapshot, print only every Nth particle row.
   # [Integer] -&gt; -logfreq
@@ -415,14 +423,19 @@ solver_monitoring:
 <div class="line">  particle_console_output_frequency: 100</div>
 <div class="line">  statistics_console_output_frequency: 100</div>
 <div class="line">  particle_log_interval: 10</div>
+<div class="line">  write_initial_checkpoint: true</div>
+<div class="line">  write_final_checkpoint: true</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>data_output_frequency</code> -&gt; <code>-tio</code></li>
 <li><code>particle_console_output_frequency</code> -&gt; <code>-particle_console_output_freq</code></li>
 <li><code>statistics_console_output_frequency</code> -&gt; <code>-statistics_console_output_freq</code></li>
 <li><code>particle_log_interval</code> -&gt; <code>-logfreq</code></li>
+<li><code>write_initial_checkpoint</code> -&gt; <code>-write_initial_checkpoint</code></li>
+<li><code>write_final_checkpoint</code> -&gt; <code>-write_final_checkpoint</code></li>
 </ul>
 <p>Semantics:</p><ul>
-<li><code>data_output_frequency</code> controls committed-checkpoint cadence. Initial and final completed states are also checkpointed, including an off-cadence final state.</li>
+<li><code>data_output_frequency</code> controls committed-checkpoint cadence. Initial and final completed states are also checkpointed, including an off-cadence final state, unless <code>write_initial_checkpoint</code> or <code>write_final_checkpoint</code> is <code>false</code>.</li>
+<li><code>write_initial_checkpoint</code> (default <code>true</code>) covers the run's first state: step 0 of a fresh run, or the starting step of a restart (<code>branch_start</code>). <code>write_final_checkpoint</code> (default <code>true</code>) covers the last completed step. Turning them off saves those writes, which dominate wall time in short large benchmarks (about 140 GB per write at 10^9 particles), at a cost: without its final checkpoint a run resumes (<code>--continue</code>) or branches from its last cadence checkpoint, and without the initial one there is no step-0 state to post-process. A run stopped early by a signal or the walltime guard still checkpoints its last good state.</li>
 <li>Checkpoint-internal <code>eulerian/</code>, <code>particles/</code>, and <code>statistics/</code> names are fixed and are not user configuration. See <a class="el" href="58_Field_Statistics.html#p58_checkpoint_sec">7. Checkpoints, Restart, and Continuation</a>.</li>
 <li><code>statistics_console_output_frequency</code> controls how often field-statistics window snapshots are printed to the main log. It defaults to <code>data_output_frequency</code>, and <code>0</code> disables the snapshot without disabling accumulation. It is reporting only: changing it cannot change any accumulated result.</li>
 <li><code>particle_console_output_frequency</code> controls how often particle snapshots are printed to the main log.</li>
