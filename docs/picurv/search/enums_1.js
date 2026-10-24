@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['candstate_0',['CandState',['../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608',1,'test_momentum_convective_candidates.c']]]
-];
+var searchData=[["candstate_0",["CandState",["../test__momentum__convective__candidates_8c.html#a94f7cc3330bb13ec0e3044b53d36c608",1,"test_momentum_convective_candidates.c"]]]];

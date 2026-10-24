@@ -1,6 +1,1 @@
-var searchData=
-[
-  ['expressioninstruction_0',['ExpressionInstruction',['../ParticleInitialConditions_8c.html#structExpressionInstruction',1,'']]],
-  ['expressionnode_1',['ExpressionNode',['../ParticleInitialConditions_8c.html#structExpressionNode',1,'']]],
-  ['expressionparser_2',['ExpressionParser',['../ParticleInitialConditions_8c.html#structExpressionParser',1,'']]]
-];
+var searchData=[["expressioninstruction_0",["ExpressionInstruction",["../ParticleInitialConditions_8c.html#structExpressionInstruction",1,""]]],["expressionnode_1",["ExpressionNode",["../ParticleInitialConditions_8c.html#structExpressionNode",1,""]]],["expressionparser_2",["ExpressionParser",["../ParticleInitialConditions_8c.html#structExpressionParser",1,""]]]];

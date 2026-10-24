@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['num_5fweights_0',['num_weights',['../interpolation_8h.html#abec558b5f0fa2eccdaa9a7efc651e93b',1,'NUM_WEIGHTS:&#160;interpolation.h'],['../interpolation_8c.html#abec558b5f0fa2eccdaa9a7efc651e93b',1,'NUM_WEIGHTS:&#160;interpolation.c']]]
-];
+var searchData=[["num_5fweights_0",["num_weights",["../interpolation_8h.html#abec558b5f0fa2eccdaa9a7efc651e93b",1,"NUM_WEIGHTS:&#160;interpolation.h"],["../interpolation_8c.html#abec558b5f0fa2eccdaa9a7efc651e93b",1,"NUM_WEIGHTS:&#160;interpolation.c"]]]];
