@@ -94,7 +94,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p01_clone_sec">2. Clone PICurv</a></li>
 <li class="level1"><a href="#p01_automated_sec">3. Automated Install (Recommended)</a></li>
 <li class="level1"><a href="#p01_install_tools_sec">4. Install Base Toolchain (Manual Path)</a></li>
-<li class="level1"><a href="#p01_petsc_sec">5. Install PETSc</a></li>
+<li class="level1"><a href="#p01_petsc_sec">5. Install PETSc</a><ul><li class="level2"><a href="#p01_petsc_index_sub">5.1 64-bit Indices For Very Large Particle Counts</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#p01_env_sec">6. Configure Environment Variables</a></li>
 <li class="level1"><a href="#p01_build_sec">7. Build with picurv</a></li>
 <li class="level1"><a href="#p01_verify_sec">8. Verify Installation</a></li>
@@ -251,7 +253,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">            --COPTFLAGS=&#39;-O3&#39; --CXXOPTFLAGS=&#39;-O3&#39; --FOPTFLAGS=&#39;-O3&#39;</div>
 <div class="line">make all</div>
 <div class="line">make check</div>
-</div><!-- fragment --><p>Official references:</p>
+</div><!-- fragment --><h2><a class="anchor" id="p01_petsc_index_sub"></a>
+5.1 64-bit Indices For Very Large Particle Counts</h2>
+<p>PETSc's default <code>PetscInt</code> is 32-bit, so one vector holds at most 2,147,483,647 entries. A particle field of three components therefore limits a run to about 7.16 x 10^8 particles; the solver refuses a larger <code>-numParticles</code> at setup and names the limit. Above it, build a second PETSc with <code>--with-64-bit-indices</code> added to the same configure options, and build PICurv against it in its own checkout. Keep the 32-bit build as the default: 64-bit indices double the size of every index array, mainly in the flow solver's sparse matrices.</p>
+<p>The width is fixed when PETSc is configured; a <code>module load</code> cannot change it. <code>picurv version</code> shows each executable's width (<code>PETSc: 3.20.3 optimized, 64-bit indices</code>), and each checkout's <code>picurv</code> drives the executables of that checkout, so a run staged by the 64-bit checkout's <code>picurv</code> restarts and post-processes with the 64-bit executables. To call it by name, place a small wrapper on <code>PATH</code>, for example <code>picurv64</code> containing <code>exec /path/to/PICurv64/bin/picurv "$@"</code>; a symlink does not work, because the launcher locates its checkout from its own path.</p>
+<p>Checkpoints are not portable between the two widths: PETSc binary files store their sizes as <code>PetscInt</code> without recording the width. <code>checkpoint.meta</code> records it, and restart and post-processing refuse a checkpoint written by the other width. Files the conductor writes for the solver (generated initial conditions) use the width of the solver it drives. A replacement generator script must accept <code>--petsc-index-bytes 8</code>, which the conductor passes only to a 64-bit solver.</p>
+<p>Official references:</p>
 <ul>
 <li><a href="https://petsc.org/release/install/">https://petsc.org/release/install/</a></li>
 <li><a href="https://petsc.org/release/docs/manual/">https://petsc.org/release/docs/manual/</a></li>
@@ -297,7 +304,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="fragment"><div class="line">picurv version</div>
 <div class="line">simulator --version</div>
 <div class="line">postprocessor --version</div>
-</div><!-- fragment --><p>All three must report the same release. Each executable's second line names the PETSc it was built against; under it <code>picurv version</code> shows the <code>libpetsc</code> this shell would load, marked when it is not that PETSc. <code>picurv version --format json</code> also reports the Git commit, dirty-tree state, active workspace, and optional workspace requirement.</p>
+</div><!-- fragment --><p>All three must report the same release. Each executable's second line names the PETSc it was built against, including its index width (<code>int32</code> or <code>int64</code>); under it <code>picurv version</code> shows the <code>libpetsc</code> this shell would load, marked when it is not that PETSc. <code>picurv version --format json</code> also reports the Git commit, dirty-tree state, active workspace, and optional workspace requirement.</p>
 <p><code>picurv version status</code> checks that agreement for you and exits non-zero if it does not hold, which is the form to use in a job script or a CI step:</p>
 <div class="fragment"><div class="line">picurv version status || echo &quot;rebuild before running&quot;</div>
 </div><!-- fragment --><p> 
