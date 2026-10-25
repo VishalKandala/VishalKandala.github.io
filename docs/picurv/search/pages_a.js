@@ -38,6 +38,7 @@ var searchData=
   ['architecture_20specifications_35',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
   ['artifact_20lifecycle_20contract_36',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
   ['artifacts_20runtime_37',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['averages_38',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
-  ['averaging_39',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['autoselect_38',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
+  ['averages_39',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
+  ['averaging_40',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];
