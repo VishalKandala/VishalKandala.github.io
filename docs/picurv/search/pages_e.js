@@ -21,7 +21,7 @@ var searchData=
   ['evidence_20matrix_18',['Capability Evidence Matrix',['../66_Evidence_Matrix.html',1,'']]],
   ['example_20catalog_19',['Example Catalog',['../65_Example_Catalog.html',1,'']]],
   ['example_20config_20refresh_20',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['exchanges_21',['79e6dc99-bc-ghost-exchanges',['../md_docs_2changelog_8d_279e6dc99-bc-ghost-exchanges.html',1,'']]],
+  ['exchanges_21',['exchanges',['../md_docs_2changelog_8d_2688f4336-bc-dead-exchanges.html',1,'688f4336-bc-dead-exchanges'],['../md_docs_2changelog_8d_279e6dc99-bc-ghost-exchanges.html',1,'79e6dc99-bc-ghost-exchanges']]],
   ['executable_20pinning_22',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
   ['execution_20map_23',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
   ['exited_20status_20settlement_24',['72ad71b-exited-status-settlement',['../md_docs_2changelog_8d_272ad71b-exited-status-settlement.html',1,'']]],
