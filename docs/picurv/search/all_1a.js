@@ -122,7 +122,7 @@ var searchData=
   ['other_20profiles_119',['9. Mixing With Other Profiles',['../07_Case_Reference.html#p07_modular_sec',1,'']]],
   ['outcome_20counters_120',['4.1 Population and Outcome Counters',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_population',1,'']]],
   ['outcomes_121',['6. Expected Outcomes',['../43_Developer_Portal_Index.html#p43_developer_outcomes_sec',1,'']]],
-  ['outlet_122',['outlet',['../md_docs_2changelog_8d_2fafd077-search-robustness-outlet.html',1,'fafd077-search-robustness-outlet'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'OUTLET:&#160;variables.h'],['../44_Boundary_Conditions_Guide.html#p44_type_outlet_sub',1,'outlet']]],
+  ['outlet_122',['outlet',['../md_docs_2changelog_8d_2fafd077-search-robustness-outlet.html',1,'fafd077-search-robustness-outlet'],['../44_Boundary_Conditions_Guide.html#p44_type_outlet_sub',1,'outlet'],['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'OUTLET:&#160;variables.h']]],
   ['output_123',['output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'0c7b543-init-runs-dir-iem-raw-output'],['../md_docs_2changelog_8d_2426fc90-reducer-lineage-missing-output.html',1,'426fc90-reducer-lineage-missing-output'],['../19_Nondimensionalization.html#p19_output_sec',1,'5. Output'],['../55_Newton_Krylov_Momentum_Solver.html#p55_monitors_sec',1,'7. Monitors and Log Output'],['../md_docs_2changelog_8d_2ad10e823-collective-vtk-output.html',1,'ad10e823-collective-vtk-output'],['../61_Storage_Management_Guide.html#p61_cap_retain_raw_output_sub',1,'raw-output'],['../09_Monitor_Reference.html#p09_startup_banner_sec',1,'Startup banner and solver-specific output']]],
   ['output_20contract_124',['10. Structured Error Output Contract',['../05_The_Conductor_Script.html#p05_structured_errors_sec',1,'']]],
   ['output_20directory_20warning_125',['4b3e080-output-directory-warning',['../md_docs_2changelog_8d_24b3e080-output-directory-warning.html',1,'']]],
@@ -146,10 +146,11 @@ var searchData=
   ['owes_143',['owes',['../69_Scientific_Writing_Handoff.html#p69_contract_sec',1,'2. What Each Page Owes'],['../63_Page_Type_Contract.html#p63_owes_sec',1,'2. What Each Type Owes']]],
   ['own_20cell_20mean_144',['6507b4b-iem-own-cell-mean',['../md_docs_2changelog_8d_26507b4b-iem-own-cell-mean.html',1,'']]],
   ['own_20concern_145',['5.1 Why Units Is Its Own Concern',['../64_Documentation_Extension_Framework.html#p64_units_sub',1,'']]],
-  ['owner_20and_20cannot_20outrank_20it_146',['4.3 Every Value Has an Owner, and Cannot Outrank It',['../64_Documentation_Extension_Framework.html#p64_ceiling_sub',1,'']]],
-  ['owner_20lookup_147',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['owner_20lookup_20process_20grid_148',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['ownership_149',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
-  ['owns_5fpreconditioning_5fmatrix_150',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
-  ['ownsstoredpoint_151',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
+  ['own_20petsc_20library_146',['5f785368-own-petsc-library',['../md_docs_2changelog_8d_25f785368-own-petsc-library.html',1,'']]],
+  ['owner_20and_20cannot_20outrank_20it_147',['4.3 Every Value Has an Owner, and Cannot Outrank It',['../64_Documentation_Extension_Framework.html#p64_ceiling_sub',1,'']]],
+  ['owner_20lookup_148',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['owner_20lookup_20process_20grid_149',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['ownership_150',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
+  ['owns_5fpreconditioning_5fmatrix_151',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
+  ['ownsstoredpoint_152',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
 ];

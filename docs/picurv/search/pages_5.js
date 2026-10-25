@@ -11,5 +11,6 @@ var searchData=
   ['5a8ef02_20post_20particle_20averages_8',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
   ['5c2dc4a_20reducers_20post_20stage_9',['5c2dc4a-reducers-post-stage',['../md_docs_2changelog_8d_25c2dc4a-reducers-post-stage.html',1,'']]],
   ['5d618c4_20nk_20monitors_20picard_10',['5d618c4-nk-monitors-picard',['../md_docs_2changelog_8d_25d618c4-nk-monitors-picard.html',1,'']]],
-  ['5f186c4_20filter_20width_20wall_20law_20promotion_11',['5f186c4-filter-width-wall-law-promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'']]]
+  ['5f186c4_20filter_20width_20wall_20law_20promotion_11',['5f186c4-filter-width-wall-law-promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'']]],
+  ['5f785368_20own_20petsc_20library_12',['5f785368-own-petsc-library',['../md_docs_2changelog_8d_25f785368-own-petsc-library.html',1,'']]]
 ];
