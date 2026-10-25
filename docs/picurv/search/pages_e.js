@@ -21,13 +21,14 @@ var searchData=
   ['evidence_20matrix_18',['Capability Evidence Matrix',['../66_Evidence_Matrix.html',1,'']]],
   ['example_20catalog_19',['Example Catalog',['../65_Example_Catalog.html',1,'']]],
   ['example_20config_20refresh_20',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['executable_20pinning_21',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
-  ['execution_20map_22',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
-  ['exited_20status_20settlement_23',['72ad71b-exited-status-settlement',['../md_docs_2changelog_8d_272ad71b-exited-status-settlement.html',1,'']]],
-  ['expressions_24',['b545e88-erf-tanh-expressions',['../md_docs_2changelog_8d_2b545e88-erf-tanh-expressions.html',1,'']]],
-  ['extensibility_20guide_25',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
-  ['extension_20framework_26',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
-  ['extension_20guide_27',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
-  ['extension_20playbook_28',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
-  ['extensions_29',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]]
+  ['exchanges_21',['79e6dc99-bc-ghost-exchanges',['../md_docs_2changelog_8d_279e6dc99-bc-ghost-exchanges.html',1,'']]],
+  ['executable_20pinning_22',['e740c1a-conductor-executable-pinning',['../md_docs_2changelog_8d_2e740c1a-conductor-executable-pinning.html',1,'']]],
+  ['execution_20map_23',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]],
+  ['exited_20status_20settlement_24',['72ad71b-exited-status-settlement',['../md_docs_2changelog_8d_272ad71b-exited-status-settlement.html',1,'']]],
+  ['expressions_25',['b545e88-erf-tanh-expressions',['../md_docs_2changelog_8d_2b545e88-erf-tanh-expressions.html',1,'']]],
+  ['extensibility_20guide_26',['Workflow Extensibility Guide',['../17_Workflow_Extensibility.html',1,'']]],
+  ['extension_20framework_27',['Documentation Extension Framework',['../64_Documentation_Extension_Framework.html',1,'']]],
+  ['extension_20guide_28',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
+  ['extension_20playbook_29',['Configuration Extension Playbook',['../16_Config_Extension_Playbook.html',1,'']]],
+  ['extensions_30',['Field Statistics Planned Extensions',['../60_Field_Statistics_Planned_Extensions.html',1,'']]]
 ];
