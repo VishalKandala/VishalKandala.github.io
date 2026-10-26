@@ -23,8 +23,9 @@ var searchData=
   ['load_20mode_20',['725f98e-solver-monitors-load-mode',['../md_docs_2changelog_8d_2725f98e-solver-monitors-load-mode.html',1,'']]],
   ['location_21',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
   ['log_22',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
-  ['logs_23',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['lookup_24',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['lookup_20process_20grid_25',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['low_20priority_20fixes_26',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
+  ['logging_23',['06a24f6c-newcomer-logging',['../md_docs_2changelog_8d_206a24f6c-newcomer-logging.html',1,'']]],
+  ['logs_24',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
+  ['lookup_25',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['lookup_20process_20grid_26',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['low_20priority_20fixes_27',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
 ];
