@@ -28,5 +28,6 @@ var searchData=
   ['build_20identity_25',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
   ['build_20profile_26',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
   ['by_20cell_27',['967b7bbd-sort-particles-by-cell',['../md_docs_2changelog_8d_2967b7bbd-sort-particles-by-cell.html',1,'']]],
-  ['by_20symptom_28',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['by_20position_28',['17ed211d-newcomers-by-position',['../md_docs_2changelog_8d_217ed211d-newcomers-by-position.html',1,'']]],
+  ['by_20symptom_29',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];
