@@ -18,7 +18,7 @@ var searchData=
   ['reference_3a_20postprocessor_20yaml_15',['Configuration Reference: Postprocessor YAML',['../10_Post_Processing_Reference.html',1,'']]],
   ['reference_3a_20solver_20yaml_16',['Configuration Reference: Solver YAML',['../08_Solver_Reference.html',1,'']]],
   ['reflection_17',['015c281-particle-wall-reflection',['../md_docs_2changelog_8d_2015c281-particle-wall-reflection.html',1,'']]],
-  ['refresh_18',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['refresh_18',['refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'2f1f387-example-config-refresh'],['../md_docs_2changelog_8d_24bf76da8-periodic-plane-refresh.html',1,'4bf76da8-periodic-plane-refresh']]],
   ['refusal_20cleanup_19',['ed5eaf3-staging-refusal-cleanup',['../md_docs_2changelog_8d_2ed5eaf3-staging-refusal-cleanup.html',1,'']]],
   ['removal_20',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
   ['removal_20promoted_21',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],

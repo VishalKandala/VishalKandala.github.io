@@ -18,6 +18,7 @@ var searchData=
   ['4a4e041_2dstability_2dmode_2dvelocity_2emd_15',['4a4e041-stability-mode-velocity.md',['../4a4e041-stability-mode-velocity_8md.html',1,'']]],
   ['4b3e080_2doutput_2ddirectory_2dwarning_2emd_16',['4b3e080-output-directory-warning.md',['../4b3e080-output-directory-warning_8md.html',1,'']]],
   ['4bd754ef_2dwidth_2dcheck_2dnames_2emd_17',['4bd754ef-width-check-names.md',['../4bd754ef-width-check-names_8md.html',1,'']]],
-  ['4dac690_2dsummarize_2dprofile_2dseries_2emd_18',['4dac690-summarize-profile-series.md',['../4dac690-summarize-profile-series_8md.html',1,'']]],
-  ['4de9c40_2dles_2dcs_2deffective_2dlayout_2dlabels_2emd_19',['4de9c40-les-cs-effective-layout-labels.md',['../4de9c40-les-cs-effective-layout-labels_8md.html',1,'']]]
+  ['4bf76da8_2dperiodic_2dplane_2drefresh_2emd_18',['4bf76da8-periodic-plane-refresh.md',['../4bf76da8-periodic-plane-refresh_8md.html',1,'']]],
+  ['4dac690_2dsummarize_2dprofile_2dseries_2emd_19',['4dac690-summarize-profile-series.md',['../4dac690-summarize-profile-series_8md.html',1,'']]],
+  ['4de9c40_2dles_2dcs_2deffective_2dlayout_2dlabels_2emd_20',['4de9c40-les-cs-effective-layout-labels.md',['../4de9c40-les-cs-effective-layout-labels_8md.html',1,'']]]
 ];
