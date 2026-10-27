@@ -8,5 +8,6 @@ var searchData=
   ['9aebaf8_2dseed_2dcell_2dhint_2emd_5',['9aebaf8-seed-cell-hint.md',['../9aebaf8-seed-cell-hint_8md.html',1,'']]],
   ['9f1a8acb_2duntimed_2dkernels_2emd_6',['9f1a8acb-untimed-kernels.md',['../9f1a8acb-untimed-kernels_8md.html',1,'']]],
   ['9f8703f_2dprofiler_2dpetsc_2devents_2emd_7',['9f8703f-profiler-petsc-events.md',['../9f8703f-profiler-petsc-events_8md.html',1,'']]],
-  ['9fc2a2c_2dface_2dplane_2dsync_2dclass_2emd_8',['9fc2a2c-face-plane-sync-class.md',['../9fc2a2c-face-plane-sync-class_8md.html',1,'']]]
+  ['9fa84097_2dpersistent_2dmomentum_2dsolvers_2emd_8',['9fa84097-persistent-momentum-solvers.md',['../9fa84097-persistent-momentum-solvers_8md.html',1,'']]],
+  ['9fc2a2c_2dface_2dplane_2dsync_2dclass_2emd_9',['9fc2a2c-face-plane-sync-class.md',['../9fc2a2c-face-plane-sync-class_8md.html',1,'']]]
 ];

@@ -24,13 +24,14 @@ var searchData=
   ['modular_20selector_20extension_20guide_21',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
   ['momentum_20solver_22',['momentum solver',['../24_Dual_Time_Picard_Jameson_RK.html',1,'Dual-Time Picard Jameson RK Momentum Solver'],['../55_Newton_Krylov_Momentum_Solver.html',1,'Newton&amp;ndash;Krylov Momentum Solver']]],
   ['momentum_20solver_20implementations_23',['Momentum Solver Implementations',['../31_Momentum_Solvers.html',1,'']]],
-  ['monitor_24',['bcd6b9a-les-diagnostics-to-monitor',['../md_docs_2changelog_8d_2bcd6b9a-les-diagnostics-to-monitor.html',1,'']]],
-  ['monitor_20function_20renames_25',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
-  ['monitor_20yaml_26',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
-  ['monitors_20load_20mode_27',['725f98e-solver-monitors-load-mode',['../md_docs_2changelog_8d_2725f98e-solver-monitors-load-mode.html',1,'']]],
-  ['monitors_20picard_28',['5d618c4-nk-monitors-picard',['../md_docs_2changelog_8d_25d618c4-nk-monitors-picard.html',1,'']]],
-  ['mpi_20decomposition_29',['c0aaded-mpi-decomposition',['../md_docs_2changelog_8d_2c0aaded-mpi-decomposition.html',1,'']]],
-  ['mpiio_30',['844e47b2-viewer-binary-mpiio',['../md_docs_2changelog_8d_2844e47b2-viewer-binary-mpiio.html',1,'']]],
-  ['mpiio_20field_20payloads_31',['59ba93df-mpiio-field-payloads',['../md_docs_2changelog_8d_259ba93df-mpiio-field-payloads.html',1,'']]],
-  ['multigrid_32',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
+  ['momentum_20solvers_24',['9fa84097-persistent-momentum-solvers',['../md_docs_2changelog_8d_29fa84097-persistent-momentum-solvers.html',1,'']]],
+  ['monitor_25',['bcd6b9a-les-diagnostics-to-monitor',['../md_docs_2changelog_8d_2bcd6b9a-les-diagnostics-to-monitor.html',1,'']]],
+  ['monitor_20function_20renames_26',['5705983-monitor-function-renames',['../md_docs_2changelog_8d_25705983-monitor-function-renames.html',1,'']]],
+  ['monitor_20yaml_27',['Configuration Reference: Monitor YAML',['../09_Monitor_Reference.html',1,'']]],
+  ['monitors_20load_20mode_28',['725f98e-solver-monitors-load-mode',['../md_docs_2changelog_8d_2725f98e-solver-monitors-load-mode.html',1,'']]],
+  ['monitors_20picard_29',['5d618c4-nk-monitors-picard',['../md_docs_2changelog_8d_25d618c4-nk-monitors-picard.html',1,'']]],
+  ['mpi_20decomposition_30',['c0aaded-mpi-decomposition',['../md_docs_2changelog_8d_2c0aaded-mpi-decomposition.html',1,'']]],
+  ['mpiio_31',['844e47b2-viewer-binary-mpiio',['../md_docs_2changelog_8d_2844e47b2-viewer-binary-mpiio.html',1,'']]],
+  ['mpiio_20field_20payloads_32',['59ba93df-mpiio-field-payloads',['../md_docs_2changelog_8d_259ba93df-mpiio-field-payloads.html',1,'']]],
+  ['multigrid_33',['Pressure-Poisson, GMRES, and Multigrid',['../25_Pressure_Poisson_GMRES_Multigrid.html',1,'']]]
 ];

@@ -8,5 +8,6 @@ var searchData=
   ['9aebaf8_20seed_20cell_20hint_5',['9aebaf8-seed-cell-hint',['../md_docs_2changelog_8d_29aebaf8-seed-cell-hint.html',1,'']]],
   ['9f1a8acb_20untimed_20kernels_6',['9f1a8acb-untimed-kernels',['../md_docs_2changelog_8d_29f1a8acb-untimed-kernels.html',1,'']]],
   ['9f8703f_20profiler_20petsc_20events_7',['9f8703f-profiler-petsc-events',['../md_docs_2changelog_8d_29f8703f-profiler-petsc-events.html',1,'']]],
-  ['9fc2a2c_20face_20plane_20sync_20class_8',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
+  ['9fa84097_20persistent_20momentum_20solvers_8',['9fa84097-persistent-momentum-solvers',['../md_docs_2changelog_8d_29fa84097-persistent-momentum-solvers.html',1,'']]],
+  ['9fc2a2c_20face_20plane_20sync_20class_9',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
 ];
