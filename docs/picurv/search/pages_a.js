@@ -39,7 +39,8 @@ var searchData=
   ['architecture_20specifications_36',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
   ['artifact_20lifecycle_20contract_37',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
   ['artifacts_20runtime_38',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['autoselect_39',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
-  ['averages_40',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
-  ['averaging_41',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['audit_20fixes_39',['609360ee-cli-audit-fixes',['../md_docs_2changelog_8d_2609360ee-cli-audit-fixes.html',1,'']]],
+  ['autoselect_40',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
+  ['averages_41',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
+  ['averaging_42',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];
