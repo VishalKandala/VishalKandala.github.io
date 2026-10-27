@@ -40,5 +40,7 @@ var searchData=
   ['0cc45021_20ghost_20update_20poisoning_37',['0cc45021-ghost-update-poisoning',['../md_docs_2changelog_8d_20cc45021-ghost-update-poisoning.html',1,'']]],
   ['0cc45021_2dghost_2dupdate_2dpoisoning_2emd_38',['0cc45021-ghost-update-poisoning.md',['../0cc45021-ghost-update-poisoning_8md.html',1,'']]],
   ['0d34592_20poisson_20rewrite_39',['0d34592-poisson-rewrite',['../md_docs_2changelog_8d_20d34592-poisson-rewrite.html',1,'']]],
-  ['0d34592_2dpoisson_2drewrite_2emd_40',['0d34592-poisson-rewrite.md',['../0d34592-poisson-rewrite_8md.html',1,'']]]
+  ['0d34592_2dpoisson_2drewrite_2emd_40',['0d34592-poisson-rewrite.md',['../0d34592-poisson-rewrite_8md.html',1,'']]],
+  ['0e4e1af0_20specialised_20face_20kernels_41',['0e4e1af0-specialised-face-kernels',['../md_docs_2changelog_8d_20e4e1af0-specialised-face-kernels.html',1,'']]],
+  ['0e4e1af0_2dspecialised_2dface_2dkernels_2emd_42',['0e4e1af0-specialised-face-kernels.md',['../0e4e1af0-specialised-face-kernels_8md.html',1,'']]]
 ];

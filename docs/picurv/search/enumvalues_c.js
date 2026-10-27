@@ -39,5 +39,9 @@ var searchData=
   ['picurv_5fweighting_5fsample_36',['PICURV_WEIGHTING_SAMPLE',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57af2a814ca432bac7ad244d5676789bcb8',1,'statistics_window.h']]],
   ['picurv_5fwindow_5factive_37',['PICURV_WINDOW_ACTIVE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006ad60e3ff16a868084bf1d12dc786ee913',1,'statistics_window.h']]],
   ['picurv_5fwindow_5fcomplete_38',['PICURV_WINDOW_COMPLETE',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a517c33dfff15dc9f496e9a82a607a0f3',1,'statistics_window.h']]],
-  ['picurv_5fwindow_5fpending_39',['PICURV_WINDOW_PENDING',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a2fd006842f93beebc7b529f0cc9f0870',1,'statistics_window.h']]]
+  ['picurv_5fwindow_5fpending_39',['PICURV_WINDOW_PENDING',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006a2fd006842f93beebc7b529f0cc9f0870',1,'statistics_window.h']]],
+  ['poisson_5ftransverse_5fcentral_40',['POISSON_TRANSVERSE_CENTRAL',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481a333b6313a3dac7cc3b42c4b33d1edcc5',1,'poisson.h']]],
+  ['poisson_5ftransverse_5flower_41',['POISSON_TRANSVERSE_LOWER',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481a8f090430c675dfa455788452db1e9b45',1,'poisson.h']]],
+  ['poisson_5ftransverse_5fnone_42',['POISSON_TRANSVERSE_NONE',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481a1530cb2ed55d328bd9c246f8c836ed6e',1,'poisson.h']]],
+  ['poisson_5ftransverse_5fupper_43',['POISSON_TRANSVERSE_UPPER',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481aed13e328a68d14fb42136ca5509a47ba',1,'poisson.h']]]
 ];

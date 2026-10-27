@@ -102,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>A function's name everywhere is C99's predefined <code>__func__</code>: profiling events, logging filters (<code>LOG_ALLOW</code>, <code>is_function_allowed(__func__)</code>) and PETSc's error traces (PETSc 3.20's <code>PETSC_FUNCTION_NAME</code> is <code>__func__</code>). No file defines or reads <code>__FUNCT__</code>; a hand-written name could drift from the function it labels, which is how <code>ComputeKFaceMetrics</code> was once reported as <code>ComputeJFaceMetrics</code>. Names written in <code>monitor.yml</code> (<code>logging.enabled_functions</code>, <code>profiling.timestep_output.functions</code>, <code>profiling.helpers</code>) are these function names.</p>
 <h1><a class="anchor" id="p59_profiling_sec"></a>
 2. Profiling Contract</h1>
-<p>Every function defined in <code>src/*.c</code> that is not <code>static inline</code> times itself:</p>
+<p>Every function defined in <code>src/*.c</code> that is not <code>static inline</code> (or <code>static PICURV_ALWAYS_INLINE</code>, the forced-inline form for per-face kernels) times itself:</p>
 <ul>
 <li>it begins one timer, <code>PROFILE_FUNCTION_BEGIN</code> or <code>PROFILE_HELPER_BEGIN</code>, as its first statement after <code>PetscFunctionBeginUser</code> (an early return placed before the timer, such as a once-only guard, needs no END);</li>
 <li>every explicit <code>return</code> and <code>PetscFunctionReturn</code> after it is immediately preceded by <code>PROFILE_FUNCTION_END</code> (or its alias <code>PROFILE_HELPER_END</code>), and a body that can fall off its end ends with one. Error returns inside <code>SETERRQ</code>, <code>PetscCall</code> and <code>CHKERRQ</code> end the run and need none.</li>

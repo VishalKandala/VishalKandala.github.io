@@ -12,5 +12,6 @@ var searchData=
   ['picurvtargetkind_9',['PicurvTargetKind',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39c',1,'statistics_target.h']]],
   ['picurvweighting_10',['PicurvWeighting',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57',1,'statistics_window.h']]],
   ['picurvwindowstate_11',['PicurvWindowState',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006',1,'statistics_window.h']]],
-  ['pmetric_12',['PMetric',['../test__momentum__convective__candidates_8c.html#af016cf8cfc124ddd84d2343bbc523190',1,'test_momentum_convective_candidates.c']]]
+  ['pmetric_12',['PMetric',['../test__momentum__convective__candidates_8c.html#af016cf8cfc124ddd84d2343bbc523190',1,'test_momentum_convective_candidates.c']]],
+  ['poissontransversekind_13',['PoissonTransverseKind',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481',1,'poisson.h']]]
 ];

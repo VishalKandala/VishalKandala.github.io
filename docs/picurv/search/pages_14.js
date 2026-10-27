@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['kernels_0',['9f1a8acb-untimed-kernels',['../md_docs_2changelog_8d_29f1a8acb-untimed-kernels.html',1,'']]],
+  ['kernels_0',['kernels',['../md_docs_2changelog_8d_20e4e1af0-specialised-face-kernels.html',1,'0e4e1af0-specialised-face-kernels'],['../md_docs_2changelog_8d_29f1a8acb-untimed-kernels.html',1,'9f1a8acb-untimed-kernels']]],
   ['keyed_20brownian_20draws_1',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
   ['keyed_20brownian_20measurement_2',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
   ['krylov_20channel_20evidence_3',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
