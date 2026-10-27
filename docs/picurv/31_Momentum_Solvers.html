@@ -168,7 +168,10 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Both momentum solvers are built on one residual implementation:</p>
 <div class="fragment"><div class="line">ComputeTotalResidual()            (src/momentumsolvers.c)</div>
 <div class="line">  └─ ComputeRHS()                 (src/rhs.c)</div>
-<div class="line">       └─ ComputeBodyForces()     → individual body forces</div>
+<div class="line">       ├─ ComputeConvection(), ComputeViscous()</div>
+<div class="line">       ├─ ComputeBodyForces()     → individual body forces</div>
+<div class="line">       └─ pressure gradient       → PoissonOperator_FaceGradientFlux() (include/poisson.h),</div>
+<div class="line">                                    the face gradient the projection also applies</div>
 </div><!-- fragment --><p>Picard reaches it once per Jameson RK stage; Newton&ndash;Krylov reaches it once per residual evaluation, including every finite-difference probe of the matrix-free Jacobian. <b>Neither calls it once per physical timestep</b>, and the ratio is not fixed: it varies with pseudo-iteration count, line-search backtracks, and Krylov iterations.</p>
 <p>That makes the shared RHS a hazardous place to keep state. Anything advanced on each call - a filter, a ramp, a moving average, an integral controller term, a relaxation counter - becomes a function of <em>how many</em> evaluations happened before it rather than of the solution. Two things break:</p>
 <ul>

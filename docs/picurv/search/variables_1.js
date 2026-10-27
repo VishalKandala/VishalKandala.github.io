@@ -6,7 +6,7 @@ var searchData=
   ['acc_3',['acc',['../variables_8h.html#a3c39b705d19eca0ae071c27b23778633',1,'FSInfo']]],
   ['activation_5fstep_4',['activation_step',['../statistics__window_8h.html#ad7bc08d422c7f21a0facb616c932be23',1,'PicurvWindow']]],
   ['active_5fcells_5',['active_cells',['../momentumsolvers_8h.html#a45b6ff9bf27ed9817be2aada199e2891',1,'MomStabilityReport']]],
-  ['aj_6',['aj',['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj'],['../poisson_8c.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../poisson_8c.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj']]],
+  ['aj_6',['aj',['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj'],['../poisson_8h.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../poisson_8h.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj']]],
   ['alias_5f1_7',['alias_1',['../field__catalog_8h.html#a0f00ee1daa91b128feb550c0f22334ed',1,'FieldDescriptor::alias_1'],['../particle__field__catalog_8h.html#a7852e6f6df6e800ccd1e59c959068a3d',1,'ParticleFieldDescriptor::alias_1']]],
   ['alias_5f2_8',['alias_2',['../field__catalog_8h.html#adb5fa6ff989c24f3b5977bab1b8e8766',1,'FieldDescriptor::alias_2'],['../particle__field__catalog_8h.html#a3b8a5b2578fa73c6fddc0da9e5ff2ade',1,'ParticleFieldDescriptor::alias_2']]],
   ['alias_5ffields_9',['ALIAS_FIELDS',['../namespaceaudit__capability__coverage.html#a355ece209f4b17f98808720c16dfd331',1,'audit_capability_coverage']]],

@@ -128,7 +128,7 @@ var searchData=
   ['method_20skeleton_125',['1. Discrete Method Skeleton',['../23_Fractional_Step_Method.html#p23_equations_sec',1,'']]],
   ['methods_20and_20models_126',['methods and models',['../Documentation_Map.html#p47_methods_axis_sec',1,'3. Numerical Methods and Models'],['../43_Developer_Portal_Index.html#p43_methods_sec',1,'3. Numerical Methods and Models']]],
   ['methods_20and_20models_20overview_127',['Methods and Models Overview',['../21_Methods_Overview.html',1,'']]],
-  ['metric_128',['metric',['../poisson_8c.html#a2dc08d2c09d6b87bf2f8e802801c7f55',1,'PoissonFaceMetrics']]],
+  ['metric_128',['metric',['../poisson_8h.html#a2dc08d2c09d6b87bf2f8e802801c7f55',1,'PoissonFaceMetrics']]],
   ['metric_20build_20pipeline_129',['2. Grid and Metric Build Pipeline',['../22_CURVIB_Method.html#p22_setup_sec',1,'']]],
   ['metric_20definitions_130',['4. Detailed Metric Definitions',['../53_Search_Robustness_Metrics_Reference.html#p53_definitions_sec',1,'']]],
   ['metric_20taxonomy_131',['2. Metric Taxonomy',['../53_Search_Robustness_Metrics_Reference.html#p53_taxonomy_sec',1,'']]],

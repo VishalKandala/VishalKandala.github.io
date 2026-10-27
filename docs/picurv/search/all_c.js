@@ -114,7 +114,7 @@ var searchData=
   ['aggregate_5fstudy_5fmetrics_111',['aggregate_study_metrics',['../namespacepicurv__cli_1_1core.html#a68e38c881e3d91bc672b7dcfe71571eb',1,'picurv_cli::core']]],
   ['aggregates_112',['4. Outputs and Aggregates',['../37_Sweep_Studies_Guide.html#p37_outputs_sec',1,'']]],
   ['aggregation_113',['7. Manual Metrics Re-Aggregation',['../37_Sweep_Studies_Guide.html#p37_reaggregate_sec',1,'']]],
-  ['aj_114',['aj',['../poisson_8c.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj'],['../poisson_8c.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj']]],
+  ['aj_114',['aj',['../poisson_8h.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj'],['../poisson_8h.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj']]],
   ['algorithm_115',['Algorithm',['../grid_8h.html#algorithm',1,'']]],
   ['algorithmic_20model_116',['2. Algorithmic Model',['../24_Dual_Time_Picard_Jameson_RK.html#p24_model_sec',1,'']]],
   ['alias_20stubs_117',['2.1 Deprecated Alias Stubs',['../64_Documentation_Extension_Framework.html#p64_alias_sub',1,'']]],

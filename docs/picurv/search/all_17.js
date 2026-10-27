@@ -179,7 +179,7 @@ var searchData=
   ['lnu_5fwall_176',['lNu_Wall',['../variables_8h.html#a18ce99c404fb603774733f0211c894f5',1,'UserCtx']]],
   ['lnvert_177',['lNvert',['../variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56',1,'UserCtx']]],
   ['lnvert_5fo_178',['lNvert_o',['../variables_8h.html#adb95ee773b807cc6ec5e19c725f72afb',1,'UserCtx']]],
-  ['lo_179',['lo',['../poisson_8c.html#ad989d592d688e3fbea424ee68e4eb42d',1,'PoissonTransverseDifference']]],
+  ['lo_179',['lo',['../poisson_8h.html#ad989d592d688e3fbea424ee68e4eb42d',1,'PoissonTransverseDifference']]],
   ['load_180',['load',['../45_Particle_Initialization_and_Restart.html#p45_cap_restart_load_sub',1,'load'],['../08_Solver_Reference.html#p08_cap_src_load_sub',1,'load']]],
   ['load_20mode_181',['725f98e-solver-monitors-load-mode',['../md_docs_2changelog_8d_2725f98e-solver-monitors-load-mode.html',1,'']]],
   ['load_5factive_5frun_5fconfiguration_182',['load_active_run_configuration',['../namespacepicurv__cli_1_1core.html#a977a469aa14cd3f63ef4d6fecf2a0607',1,'picurv_cli::core']]],

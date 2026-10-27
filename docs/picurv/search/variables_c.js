@@ -77,7 +77,7 @@ var searchData=
   ['lnu_5fwall_74',['lNu_Wall',['../variables_8h.html#a18ce99c404fb603774733f0211c894f5',1,'UserCtx']]],
   ['lnvert_75',['lNvert',['../variables_8h.html#a2f213dcdaf9617bfb44e4f22857f2e56',1,'UserCtx']]],
   ['lnvert_5fo_76',['lNvert_o',['../variables_8h.html#adb95ee773b807cc6ec5e19c725f72afb',1,'UserCtx']]],
-  ['lo_77',['lo',['../poisson_8c.html#ad989d592d688e3fbea424ee68e4eb42d',1,'PoissonTransverseDifference']]],
+  ['lo_77',['lo',['../poisson_8h.html#ad989d592d688e3fbea424ee68e4eb42d',1,'PoissonTransverseDifference']]],
   ['loc_78',['loc',['../variables_8h.html#a71cca12cd9fb0796634a7076eeb9b50b',1,'Particle']]],
   ['local_5findex_79',['local_index',['../variables_8h.html#a4381464fc6d367c0619eea12d6c28dfe',1,'MigrationInfo']]],
   ['local_5fsettings_80',['LOCAL_SETTINGS',['../namespaceaudit__agent__setup.html#a27660ad73c0dc2d49ccbad308e39ac62',1,'audit_agent_setup']]],
