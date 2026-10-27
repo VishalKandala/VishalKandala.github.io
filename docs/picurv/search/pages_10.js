@@ -19,12 +19,13 @@ var searchData=
   ['grid_20generator_20composed_20geometries_16',['57b539e-grid-generator-composed-geometries',['../md_docs_2changelog_8d_257b539e-grid-generator-composed-geometries.html',1,'']]],
   ['grid_20generator_20fixes_17',['57e1307-grid-generator-fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'']]],
   ['grid_20generator_20guide_3a_20generators_20grid_20gen_18',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
-  ['grid_20projection_19',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
-  ['grid_20search_20robustness_20',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
-  ['grids_21',['f547af6-rotated-periodic-grids',['../md_docs_2changelog_8d_2f547af6-rotated-periodic-grids.html',1,'']]],
-  ['guide_22',['guide',['../44_Boundary_Conditions_Guide.html',1,'Boundary Conditions Guide'],['../51_C_Test_Suite_Developer_Guide.html',1,'C Test Suite Developer Guide'],['../70_Case_Design_Guide.html',1,'Case Design Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../50_Modular_Selector_Extension_Guide.html',1,'Modular Selector Extension Guide'],['../45_Particle_Initialization_and_Restart.html',1,'Particle Initialization and Restart Guide'],['../61_Storage_Management_Guide.html',1,'Storage Management Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../40_Testing_and_Quality_Guide.html',1,'Testing and Validation Guide'],['../md_tests_2guide.html',1,'Tests Guide'],['../42_User_Guide_Index.html',1,'User Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
-  ['guide_20slurm_23',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['guide_20to_20visualizing_20your_20results_24',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
-  ['guide_3a_20generators_20grid_20gen_25',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
-  ['guides_26',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
+  ['grid_20info_19',['52da9c91-stored-grid-info',['../md_docs_2changelog_8d_252da9c91-stored-grid-info.html',1,'']]],
+  ['grid_20projection_20',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
+  ['grid_20search_20robustness_21',['Tutorial: Using a File-Based Grid (Search Robustness)',['../03_Tutorial_File-Based_Grid.html',1,'']]],
+  ['grids_22',['f547af6-rotated-periodic-grids',['../md_docs_2changelog_8d_2f547af6-rotated-periodic-grids.html',1,'']]],
+  ['guide_23',['guide',['../44_Boundary_Conditions_Guide.html',1,'Boundary Conditions Guide'],['../51_C_Test_Suite_Developer_Guide.html',1,'C Test Suite Developer Guide'],['../70_Case_Design_Guide.html',1,'Case Design Guide'],['../20_Grid_Cell_Architecture_Guide.html',1,'Grid, Cell, and Variable Architecture Guide'],['../50_Modular_Selector_Extension_Guide.html',1,'Modular Selector Extension Guide'],['../45_Particle_Initialization_and_Restart.html',1,'Particle Initialization and Restart Guide'],['../61_Storage_Management_Guide.html',1,'Storage Management Guide'],['../37_Sweep_Studies_Guide.html',1,'Sweep and Study Guide'],['../40_Testing_and_Quality_Guide.html',1,'Testing and Validation Guide'],['../md_tests_2guide.html',1,'Tests Guide'],['../42_User_Guide_Index.html',1,'User Guide'],['../17_Workflow_Extensibility.html',1,'Workflow Extensibility Guide']]],
+  ['guide_20slurm_24',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['guide_20to_20visualizing_20your_20results_25',['Tutorial: A Guide to Visualizing Your Results',['../04_Visualization_Tutorial.html',1,'']]],
+  ['guide_3a_20generators_20grid_20gen_26',['Grid Generator Guide: generators/grid.gen',['../48_Grid_Generator_Guide.html',1,'']]],
+  ['guides_27',['guides',['../30_Repository_Navigation.html',1,'Repository Navigation and Directory Guides'],['../11_User_How_To_Guides.html',1,'User How-To Guides']]]
 ];

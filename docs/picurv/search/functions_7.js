@@ -16,7 +16,7 @@ var searchData=
   ['germanomodeltensor_13',['germanomodeltensor',['../les_8h.html#a4cbb5cc2008450de162cae95f35603e2',1,'GermanoModelTensor(PetscReal delta, PetscReal alpha, PetscReal strain_magnitude_filtered, SymTensor strain_filtered, SymTensor strain_product_filtered):&#160;les.c'],['../les_8c.html#a4cbb5cc2008450de162cae95f35603e2',1,'GermanoModelTensor(PetscReal delta, PetscReal alpha, PetscReal strain_magnitude_filtered, SymTensor strain_filtered, SymTensor strain_product_filtered):&#160;les.c']]],
   ['get_5fcluster_5ftotal_5ftasks_14',['get_cluster_total_tasks',['../namespacepicurv__cli_1_1core.html#aefc16ae7e2e74ffa23f0b9c780697a94',1,'picurv_cli::core']]],
   ['get_5fgit_5fcommit_15',['get_git_commit',['../namespacepicurv__cli_1_1core.html#a61b0b72786d7152d34a4aea661e66f72',1,'picurv_cli::core']]],
-  ['get_5flog_5flevel_16',['get_log_level',['../logging_8h.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c'],['../logging_8c.html#a9585f583c260f40a73f2490914edc689',1,'get_log_level():&#160;logging.c']]],
+  ['get_5flog_5flevel_16',['get_log_level',['../logging_8h.html#afdfde8dc97502193827aa07d5815d499',1,'logging.h']]],
   ['get_5fmonitor_5foutput_5fdirectory_17',['get_monitor_output_directory',['../namespacepicurv__cli_1_1core.html#a0070f1cfec3aa350732c49d7182a7b12',1,'picurv_cli::core']]],
   ['get_5fpost_5ffield_5fstatistics_5fartifacts_18',['get_post_field_statistics_artifacts',['../namespacepicurv__cli_1_1core.html#a158c3142774430cf3d2f27bdea68eb81',1,'picurv_cli::core']]],
   ['get_5fpost_5finput_5fextensions_19',['get_post_input_extensions',['../namespacepicurv__cli_1_1core.html#a5c22b1894006157c9350ef5746cd73f9',1,'picurv_cli::core']]],
