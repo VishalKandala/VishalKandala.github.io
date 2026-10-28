@@ -82,5 +82,6 @@ var searchData=
   ['swarm_20removal_20promoted_79',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
   ['sweep_20and_20study_20guide_80',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
   ['symptom_81',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
-  ['sync_20class_82',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
+  ['sync_20and_20levels_82',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
+  ['sync_20class_83',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
 ];
