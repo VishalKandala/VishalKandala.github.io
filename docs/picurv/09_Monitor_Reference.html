@@ -139,12 +139,19 @@ logging:
   verbosity: WARNING
 
   # --- Function Allow-List ---
-  # For targeted debugging. If this list is empty, picurv omits the whitelist
+  # For targeted debugging of INFO-and-below diagnostics (warnings and errors print from
+  # every function regardless). If this list is empty, picurv omits the whitelist
   # file so the C runtime falls back to its built-in default allow-list.
   # Example: allow-list LOG_SEARCH_METRICS with DEBUG verbosity when you want
   # compact console summaries in addition to the always-written
   # output/analysis/metrics/search_metrics.csv artifact for particle-enabled runs.
   enabled_functions: []
+
+  # --- Particle Trace ---
+  # Up to 64 particle IDs whose every stage (seed, advect, locate, interpolate, mix,
+  # remove) prints one "[trace pid=&lt;id&gt; step=&lt;n&gt; &lt;stage&gt;]" line at any verbosity.
+  # Needs particles; empty costs nothing.
+  trace_particles: []
 
 # ==============================================================================
 # 2. PROFILING
@@ -206,7 +213,7 @@ diagnostics:
     # This custom PICurv log is emitted from the runtime through control-file
     # flags, independent of PETSc-native diagnostics above.
     enabled: true
-    file: "Runtime_Memory.log"
+    file: "Runtime_Memory.csv"
 
   # Per-step LES coefficient statistics appended to output/analysis/metrics/les_coefficient.csv:
   # the effective Cs, its spread, eddy-viscosity levels, the modelled subgrid energy, and
@@ -404,7 +411,7 @@ solver_monitoring:
 <div class="line">    mode: statistical_steady</div>
 <div class="line">    statistical_steady:</div>
 <div class="line">      window_steps: 100</div>
-</div><!-- fragment --><p>PICurv writes the normalized settings directly into the generated master <code>.control</code> file as the existing <code>-solution_convergence_*</code> options. It retains <code>&lt;run.runtime_logs&gt;/solution_convergence.log</code>, its columns, and its current observable loops. <code>enabled: false</code> disables that writer and its private history allocation. The default remains enabled <code>steady_deterministic</code> monitoring. Convergence is observed after every completed timestep; there is no user-facing cadence key.</p>
+</div><!-- fragment --><p>PICurv writes the normalized settings directly into the generated master <code>.control</code> file as the existing <code>-solution_convergence_*</code> options. It retains <code>&lt;run.runtime_logs&gt;/solution_convergence.csv</code>, its columns, and its current observable loops. <code>enabled: false</code> disables that writer and its private history allocation. The default remains enabled <code>steady_deterministic</code> monitoring. Convergence is observed after every completed timestep; there is no user-facing cadence key.</p>
 <p>Mode-specific rules:</p>
 <ul>
 <li><code>periodic_deterministic</code> requires <code>periodic_deterministic.period_steps &gt; 0</code>;</li>
@@ -440,7 +447,7 @@ solver_monitoring:
 <li>Checkpoint-internal <code>eulerian/</code>, <code>particles/</code>, and <code>statistics/</code> names are fixed and are not user configuration. See <a class="el" href="58_Field_Statistics.html#p58_checkpoint_sec">7. Checkpoints, Restart, and Continuation</a>.</li>
 <li><code>statistics_console_output_frequency</code> controls how often field-statistics window snapshots are printed to the main log. It defaults to <code>data_output_frequency</code>, and <code>0</code> disables the snapshot without disabling accumulation. It is reporting only: changing it cannot change any accumulated result.</li>
 <li><code>particle_console_output_frequency</code> controls how often particle snapshots are printed to the main log.</li>
-<li><code>particle_log_interval</code> controls row subsampling within each particle snapshot.</li>
+<li><code>particle_log_interval</code> selects the rows of each particle snapshot: the particles whose ID is a multiple of it, at most 32 per rank. Successive snapshots therefore show the same particles, which is what <code>summarize</code> compares between them, and the table stays the same size however many particles the run carries. A closing line states how many rows of how many particles were shown.</li>
 <li>If <code>particle_console_output_frequency</code> is omitted, <code>picurv</code> defaults it to <code>data_output_frequency</code>.</li>
 <li>If <code>particle_console_output_frequency</code> is <code>0</code>, periodic particle console snapshots are disabled.</li>
 </ul>
@@ -521,12 +528,26 @@ solver_monitoring:
 <div class="fragment"><div class="line">logging:</div>
 <div class="line">  verbosity: &quot;WARNING&quot;</div>
 <div class="line">  enabled_functions: []</div>
+<div class="line">  trace_particles: []        # particle IDs, at most 64</div>
 </div><!-- fragment --><ul>
-<li><code>verbosity</code> maps to environment variable <code>LOG_LEVEL</code> via <code>picurv</code> launcher.</li>
+<li><code>verbosity</code> maps to environment variable <code>LOG_LEVEL</code> via <code>picurv</code> launcher. The levels are cumulative, each including the ones before it: <code>ERROR</code>, <code>WARNING</code>, <code>INFO</code>, <code>DEBUG</code>, <code>TRACE</code>, <code>VERBOSE</code>. A <code>LOG_LEVEL</code> the runtime does not recognise warns once and runs at <code>ERROR</code>.</li>
+<li>What each level carries. <code>WARNING</code>, the production level, adds warnings to errors. <code>INFO</code> adds run-level and per-step summaries; <code>DEBUG</code>, per-call detail within a step, such as solver iterations, boundary handlers and migration passes; <code>TRACE</code>, which stages run; <code>VERBOSE</code>, one line per particle or cell per stage.</li>
 <li><code>enabled_functions</code> is serialized into <code>whitelist.run</code> only when non-empty.</li>
 <li>If <code>enabled_functions</code> is empty, <code>picurv</code> omits <code>whitelist.run</code> and the C runtime falls back to its default allow-list, which is <code>main</code> and <code>CreateSimulationContext</code> only.</li>
-<li>Console output is two-tiered by design. <b>Operator reporting</b> — the startup banner, progress, graceful-shutdown notices, and the periodic particle and statistics console snapshots — is gated by <code>verbosity</code> alone, so a run always reports what it is doing. <b>Code-level diagnostics</b> are dual-gated on <code>verbosity</code> <em>and</em> this allow list, so instrumenting one function for debugging does not drag every other function's output along with it.</li>
-<li>Raising <code>verbosity</code> therefore does not surface a function's diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
+<li>Console output is two-tiered by design. <b>Operator reporting</b> - the startup banner, progress, graceful-shutdown notices, and the periodic particle and statistics console snapshots - is gated by <code>verbosity</code> alone, so a run always reports what it is doing. <b>Code-level diagnostics</b> at <code>INFO</code> and below are dual-gated on <code>verbosity</code> <em>and</em> this allow list, so instrumenting one function for debugging does not drag every other function's output along with it. Warnings and errors print from every function whenever <code>verbosity</code> admits them, so a production run at <code>WARNING</code> sees them all.</li>
+<li>Raising <code>verbosity</code> therefore does not surface a function's <code>INFO</code>-and-below diagnostics on its own; name the function here as well. See <b><a class="el" href="11_User_How_To_Guides.html">User How-To Guides</a></b> section 3.4 for the workflow.</li>
+<li><p class="startli"><code>trace_particles</code> (<code>-picurv_trace_particles</code>) names up to 64 particle IDs to follow through a run. Every stage that handles one of them prints one line for it, on whichever rank holds it and at any <code>verbosity</code>, prefixed <code>[trace pid=&lt;id&gt; step=&lt;n&gt; &lt;stage&gt;]</code>:</p><ul>
+<li><code>seed</code>, where seeding placed it;</li>
+<li><code>advect</code>, its old and new position, velocity, diffusivity and its gradient;</li>
+<li><code>locate</code>, each walk step's cell and six face distances, every boundary event (clamp, reflection, wrap, exit, blocked walk, hand-off to another rank), and the outcome: start and final cell, steps, reflections, weights and destination rank;</li>
+<li><code>interpolate</code>, the host and dual cell, the weights, and for each field its result and the eight corner values it came from;</li>
+<li><code>mix</code>, its scalar before and after the IEM update with the cell mean, diffusivity and mixing length;</li>
+<li><code>remove</code> and <code>restart</code>, when it leaves the domain, is lost, or is migrated on a restart.</li>
+</ul>
+<p class="startli">The same lines print for every particle at <code>VERBOSE</code> when the stage's function is allow-listed; tracing selects a few particles at any level instead. With <code>trace_particles</code> empty a stage pays one compare per particle. It needs particles: validation refuses it when <code>models.physics.particles.count</code> is 0. The banner lists the traced IDs.</p>
+</li>
+<li>The progress line follows every completed step with the slowest rank's mean wall time per step, the time left at that rate, and, with particles, the run's lost-particle count. At <code>WARNING</code> and above each update is its own line, so a scheduler log keeps the history.</li>
+<li><code>solver_monitoring.poisson.pic_true_residual</code> echoes the Poisson iteration rows to the console only at <code>INFO</code> or more detail; the Poisson history file gets them at every level.</li>
 <li>An explicitly provided <code>whitelist.run</code> must contain at least one function name; an empty whitelist file is invalid.</li>
 <li><code>config/monitors/Standard_Output.yml</code> uses <code>WARNING</code> with an empty allow-list for quiet production runs; the startup banner still reports the walltime-guard status.</li>
 <li>Runtime diagnostics CSVs (<code>search_metrics.csv</code>, <code>scatter_metrics.csv</code>, <code>interpolation_error.csv</code>, <code>les_coefficient.csv</code>, <code>wall_model.csv</code>, <code>driven_flow.csv</code>) are in solver units. Each row carries <code>time</code> in solver time and a <code>physical_time</code> column in seconds (<code>time * length_ref / velocity_ref</code>), so a history can be plotted in physical time without the case's scales at hand. <code>physical_time</code> is the last column of every one of these files except <code>search_metrics.csv</code>, where the exit, reflection and wrap counters follow it. See <a class="el" href="19_Nondimensionalization.html#p19_output_sec">5. Output</a>.</li>
@@ -535,7 +556,8 @@ solver_monitoring:
 <li>Runs with <code>case.yml -&gt; models.physics.turbulence.wall_function.enabled</code> write <code>&lt;run.analysis.metrics&gt;/wall_model.csv</code>, one row per step, independently of whether LES is active. It carries the friction velocity the selected law produced - mean, RMS, and extrema over the corrected cells - together with the first-cell <code>y+</code> and wall distance those cells sit at, and the number of cells corrected. <code>y_plus_mean</code> is the column to read first: it says whether the first cell lies where the selected law is valid, and it cannot be recovered afterwards from the corrected velocity field. A step that corrects no cell writes no row and warns instead, so an empty file means no <code>WALL</code> face was reached rather than a wall with nothing happening at it. <code>nu_wall_over_nu_mean</code> is the other one to read: it is the eddy viscosity the model installs at its own wall face so the discrete viscous flux delivers the stress it computed, reported as a multiple of the molecular value. A wall-resolved run has no such face; a wall-modelled one at <code>y+ = 267</code> carries roughly 13, which is <code>y+/u+ - 1</code>. A value near zero with a large <code>y+</code> means the wall model is reporting a stress the momentum equation is not receiving. Runtime checks accompany these columns: a first-cell <code>y+</code> outside the selected law's valid range warns on every sample and stops the run after ten consecutive ones, since that is a property of the mesh and cannot be caught before the grid exists. Plottable the same way: <code>picurv summarize --run-dir &lt;run&gt; --plot wall_model.y_plus_mean</code>.</li>
 <li>Runs driven by a <code>constant_flux</code> or <code>initial_flux</code> periodic handler write <code>&lt;run.analysis.metrics&gt;/driven_flow.csv</code>, one row per step, in any geometry and under either momentum solver. It carries the target and measured volumetric flux, the cross-section area and the bulk velocity they imply, the controller's correction, and <code>driving_acceleration</code> - the momentum source per unit mass along the driven axis that the step actually applied, which is zero on a step whose correction was negligible and nothing was added. In a statistically stationary flow its time average balances the mean wall stress: <code>u_tau^2 / h</code> in a channel of half-height <code>h</code>, <code>tau_w P / A</code> in a duct of wetted perimeter <code>P</code> and area <code>A</code>. That is the friction velocity a wall-modelled run's own <code>wall_model.csv</code> can be checked against, and the <code>--driven-flow-csv</code> option of the driven-channel and driven-duct profile tools uses it. Plottable as <code>picurv summarize --run-dir &lt;run&gt; --plot driven_flow.driving_acceleration</code>.</li>
 <li>Use <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b> for the exact metric definitions and formulas.</li>
-<li>Every one of these runtime files is opened for append, not truncated, and carries its column header only once. A run continued in place therefore extends the file it already has rather than replacing it, and the seam is marked with a <code># Continuation from step N</code> comment on the first row the continuation produces. That marker is what lets a reader - and <code>picurv summarize --plot</code> - treat the segments either as one history or as separate series, instead of inferring a restart from a discontinuity in the data. A restart into a <em>new</em> run directory starts fresh files, because the log directory is new.</li>
+<li>The solver's own per-step records are CSV files in <code>&lt;run.runtime_logs&gt;</code> too, in the same shape: <code>Continuity_Metrics.csv</code> (maximum divergence and its <code>[k][j][i]</code> location, Poisson source imbalance, boundary fluxes), <code>solution_convergence.csv</code>, the momentum histories (<code>Momentum_Solver_DualTime_Picard_Jameson_RK_History_Block_&lt;b&gt;.csv</code>, or the Newton-Krylov <code>Momentum_Solver_Newton_Krylov_{History,Linear_History,Summary}_Block_&lt;b&gt;.csv</code>), <code>Poisson_Solver_Convergence_History_Block_&lt;b&gt;.csv</code> (<code>true_norm</code> and <code>relative_norm</code> are filled only when <code>pic_true_residual</code> asks for the true residual, which costs a residual evaluation per iteration), the runtime memory record below, and the final <code>ProfilingSummary_&lt;Solver|PostProcessor&gt;.csv</code>. Each starts with one header line; <code>#</code> lines are comments. <code>picurv summarize --list-tables</code> names the ones a run has and <code>--table &lt;name&gt;</code> prints them as aligned columns.</li>
+<li>Every one of these runtime files carries its column header only once and, but for a fresh run's solver histories, which start empty, is opened for append. A run continued in place therefore extends the file it already has rather than replacing it, and the seam is marked with a <code># Continuation from step N</code> comment on the first row the continuation produces. That marker is what lets a reader - and <code>picurv summarize --plot</code> - treat the segments either as one history or as separate series, instead of inferring a restart from a discontinuity in the data. A restart into a <em>new</em> run directory starts fresh files, because the log directory is new.</li>
 </ul>
 <p>Supported verbosity strings:</p><ul>
 <li><code>ERROR</code></li>
@@ -587,7 +609,7 @@ Startup banner and solver-specific output</h1>
 <li><code>timestep_output.functions</code> is required only when <code>mode: selected</code>. Names must be instrumented functions - the ones the <code>mode: all</code> file and the final summary list, such as <code>FlowSolver</code>, <code>MomentumSolver_DualTime_Picard_JamesonRK</code>, <code>PoissonSolver_Multigrid</code> and <code>ComputeRHS</code>. A name that is not instrumented records nothing; the run warns about it after the first step, and a list with no instrumented names writes no file.</li>
 <li>Names the Poisson rewrite changed are translated with a warning, in this list and in <code>logging.enabled_functions</code>: <code>PoissonSolver_MG</code> becomes <code>PoissonSolver_Multigrid</code>, <code>Projection</code> becomes <code>ProjectVelocity</code>, <code>PoissonLHSNew</code> becomes <code>AssemblePoissonOperator</code>, and <code>PoissonRHS</code> becomes <code>ComputePoissonRHS</code>. Names of functions it removed are dropped with a warning.</li>
 <li><code>timestep_output.file</code> sets the filename written under <code>&lt;run.runtime_logs&gt;/</code></li>
-<li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_*.log</code> file. For each function it lists the total time on the slowest rank and that rank, the mean over ranks, the fastest rank and its time (zero on a rank that never called it), the calls summed over ranks, and the mean time per call; rows are sorted by the slowest rank. A first section lists the PICurv functions that were timed (aggregates, and the helpers <code>helpers</code> enabled); a second, <code>PETSC EVENTS</code>, lists PETSc's own events that ran (<code>KSPSolve</code>, <code>VecScatterBegin</code>, <code>DMSwarmMigrate</code>, ...) the same way. PETSc's times are inclusive and run inside PICurv's, so the sections are not added together. The per-step file reports rank 0 only; a step's values are the change in each event's running totals over that step, and an event still open at the step's end (the time loop itself) adds its time when it ends.</li>
+<li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_&lt;Solver|PostProcessor&gt;.csv</code> file, one row per function. For each it gives the total time on the slowest rank and that rank, the mean over ranks, the fastest rank and its time (zero on a rank that never called it), the calls summed over ranks, the mean time per call, and the fewest and most calls on one rank; rows are sorted by the slowest rank within each <code>section</code>. Section <code>picurv</code> lists the PICurv functions that were timed (aggregates, and the helpers <code>helpers</code> enabled); section <code>petsc</code> lists PETSc's own events that ran (<code>KSPSolve</code>, <code>VecScatterBegin</code>, <code>DMSwarmMigrate</code>, ...) the same way. PETSc's times are inclusive and run inside PICurv's, so the sections are not added together. <code>picurv summarize --table profiling --columns function,max_time_s,calls</code> shows it. The per-step file reports rank 0 only; a step's values are the change in each event's running totals over that step, and an event still open at the step's end (the time loop itself) adds its time when it ends.</li>
 <li><code>helpers</code> lists the helper functions to time, by the names the final summary shows when they are enabled, or is <code>all</code>. Names the Poisson rewrite changed are translated as above.</li>
 </ul>
 <h1><a class="anchor" id="p09_diagnostics_sec"></a>
@@ -612,7 +634,7 @@ Startup banner and solver-specific output</h1>
 <div class="line">    options_left: null</div>
 <div class="line">  runtime_memory_log:</div>
 <div class="line">    enabled: true</div>
-<div class="line">    file: &quot;Runtime_Memory.log&quot;</div>
+<div class="line">    file: &quot;Runtime_Memory.csv&quot;</div>
 </div><!-- fragment --><p>Rules:</p><ul>
 <li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
 <li><code>info.enabled: true</code> writes PETSc initialization and runtime detail to <code>&lt;run.runtime_logs&gt;/PETSc_Info_Solver.log.&lt;rank&gt;</code> (or the matching postprocessor files); PETSc appends the emitting MPI rank. <code>info.classes</code> optionally restricts output to PETSc class names such as <code>snes</code> and <code>ksp</code>; use an empty list for all classes. This maps to PETSc <code>-info</code> during initialization. See <a href="https://petsc.org/main/manualpages/Sys/PetscInfo/">PetscInfo</a>. PETSc opens the file before a fresh run clears its log directory, so the solver reopens it once the directory exists again; on a fresh run the records written during PETSc initialization itself are therefore not in the file. <code>make smoke</code> asserts that the solve's <code>ksp</code> records are.</li>
@@ -630,8 +652,8 @@ Startup banner and solver-specific output</h1>
 <li><code>objects_dump</code> accepts <code>false</code>, <code>true</code>, or <code>all</code>.</li>
 <li><code>options_left</code> accepts <code>true</code>, <code>false</code>, or <code>null</code>; use <code>null</code> to omit the PETSc option entirely. The postprocessor reads the solver's control file, so for post runs <code>null</code> means <code>false</code>: otherwise every solver-only option would be reported as unused.</li>
 <li>PETSc diagnostics that support output files use run-local defaults under <code>&lt;run.runtime_logs&gt;/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
-<li><code>runtime_memory_log</code> writes a rank-reduced, terminal-readable log with max process/PETSc allocation signals per step.</li>
-<li><code>picurv summarize</code> reports the latest runtime memory signals when the log is present.</li>
+<li><code>runtime_memory_log</code> writes a rank-reduced CSV record, one row per step: the maximum over ranks of the process and PETSc allocation signals, and <code>step_wall_s</code>, the slowest rank's wall time for that step. Final and shutdown rows carry the reason the run ended.</li>
+<li><code>picurv summarize</code> reports the latest runtime memory signals and the step time, this step's and the run's mean, when the record is present.</li>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
 </ul>
 <h2><a class="anchor" id="p09_les_diagnostics_sub"></a>

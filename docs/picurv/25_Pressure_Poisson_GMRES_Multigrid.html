@@ -128,7 +128,7 @@ Multigrid V-cycle over the coarsened grid hierarchy</div>
 <li>solve: <a class="el" href="poisson_8h.html#ab19f665f53af7654d4a638f0e7ac4b07">PoissonSolver_Multigrid</a></li>
 </ul>
 <p>The operator and the projection evaluate the gradient flux through each face with the same stencil, including its one-sided forms beside non-periodic boundaries and solid cells, so the Laplacian the solver inverts is exactly the divergence of the gradient the projection subtracts. Non-periodic faces are homogeneous Neumann. The constant null space of that problem is removed on every level by a callback attached to each level's operator.</p>
-<p>The integral of the right-hand side is reported as <code>Poisson Source Imbalance</code> in <code>Continuity_Metrics.log</code>. It is the net volume flux into the domain carried by the momentum step's velocity before the correction, and must stay near zero for the all-Neumann equation to have a solution. It covers every boundary face, unlike that log's <code>Net Flux</code> column, which sums only the inlet and outlet faces.</p>
+<p>The integral of the right-hand side is reported as <code>Poisson Source Imbalance</code> in <code>Continuity_Metrics.csv</code>. It is the net volume flux into the domain carried by the momentum step's velocity before the correction, and must stay near zero for the all-Neumann equation to have a solution. It covers every boundary face, unlike that log's <code>Net Flux</code> column, which sums only the inlet and outlet faces.</p>
 <h1><a class="anchor" id="p25_mg_sec"></a>
 2. Multigrid/KSP Stack In Code</h1>
 <p>On its first call for a block, <a class="el" href="poisson_8h.html#ab19f665f53af7654d4a638f0e7ac4b07">PoissonSolver_Multigrid</a> does the following:</p>
@@ -238,11 +238,12 @@ Scaling</h3>
 <p><code>richardson</code> + <code>bjacobi</code> at <code>level_0</code> is a fixed linear operator and so is <em>correct</em>, but it is not an exact coarse solve. As the coarse grid grows, Richardson leaves more and more of the smooth error behind and the V-cycle stops being mesh-independent: iteration counts creep up with resolution. It is a reasonable stopgap, not a scalable answer.</p>
 <h2><a class="anchor" id="autotoc_md30"></a>
 Diagnosing tracked-vs-true residual divergence</h2>
-<p><code>DualKSPMonitor</code> (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) prints both numbers to <code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_0.log</code> when <code>monitor.yml -&gt; solver_monitoring.poisson.pic_true_residual</code> is on:</p>
+<p><code>DualKSPMonitor</code> (<code><a class="el" href="logging_8c.html">src/logging.c</a></code>) records both numbers in <code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_0.csv</code>, one row per iteration, when <code>monitor.yml -&gt; solver_monitoring.poisson.pic_true_residual</code> is on (without it the <code>true_norm</code> and <code>relative_norm</code> columns stay empty and the recomputation is not paid for):</p>
 <ul>
-<li>**<code>Unprecond Norm</code>** is PETSc's <code>rnorm</code>, carried by the Krylov recurrence. This is what the convergence test reads.</li>
-<li>**<code>True Norm</code>** is an explicit <code>KSPBuildResidual</code> recomputation of <code>b - Ax</code>.</li>
+<li>**<code>unpreconditioned_norm</code>** is PETSc's <code>rnorm</code>, carried by the Krylov recurrence. This is what the convergence test reads.</li>
+<li>**<code>true_norm</code>** is an explicit <code>KSPBuildResidual</code> recomputation of <code>b - Ax</code>, and **<code>relative_norm</code>** is it divided by the norm of <code>b</code>.</li>
 </ul>
+<p><code>picurv summarize --run-dir &lt;run&gt; --table poisson</code> prints the last rows.</p>
 <p>Under a correct configuration the two agree to many digits at every iteration. When they separate, the convergence test is passing on a fiction.</p>
 <p>Worked example. A 32x32x192 curved, wall-clustered grid at Re = 40,000 on 8 MPI ranks. Identical case and solver files; only <code>level_solvers.level_0</code> differs:</p>
 <table class="markdownTable">
@@ -261,7 +262,7 @@ Diagnosing tracked-vs-true residual divergence</h2>
 <ol type="1">
 <li>Turn on <code>pic_true_residual</code> and compare the two norms in the Poisson log.</li>
 <li>If they disagree, look at <code>level_solvers.level_0</code> first.</li>
-<li>Confirm the physical symptom in <code>&lt;run.runtime_logs&gt;/Continuity_Metrics.log</code>: a decoupled residual shows up as a max divergence orders of magnitude above the solver tolerance you asked for.</li>
+<li>Confirm the physical symptom in <code>&lt;run.runtime_logs&gt;/Continuity_Metrics.csv</code>: a decoupled residual shows up as a max divergence orders of magnitude above the solver tolerance you asked for.</li>
 <li>Re-run at a different rank count before concluding a configuration is clean.</li>
 </ol>
 <p><code>tests/smoke/run_driven_periodic_regression.sh</code> asserts this invariant at 4 and 10 ranks - two counts that previously disagreed.</p>
@@ -293,7 +294,7 @@ Multigrid depth is bounded by the MPI decomposition</h2>
 <li>Periodic cases are strictly more constrained than wall-bounded ones, because the stencil width is 3 rather than 2. A solver profile that runs for a channel can abort when reused for a fully periodic box at the same rank count.</li>
 <li><code>picurv run</code>, including <code>--dry-run</code>, applies this check before launch for file, <code>grid_gen</code> and programmatic grids. A given decomposition that fails it is refused with the largest rank count each axis can take; otherwise the automatic choice only considers layouts that pass, and refuses a rank count none fits (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>). Only a grid whose size is unknown before the run leaves the layout to PETSc, where the first evidence is the aborted job.</li>
 </ul>
-<p>Reducing <code>levels</code> is the usual fix; also delete the now-unused <code>level_solvers.level_N</code> entry for the level that no longer exists. Shallower hierarchies converge more slowly but stay usable. Measure the cost in <code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_0.log</code>: if iteration counts grow sharply, prefer lowering the rank count and restoring the deeper hierarchy.</p>
+<p>Reducing <code>levels</code> is the usual fix; also delete the now-unused <code>level_solvers.level_N</code> entry for the level that no longer exists. Shallower hierarchies converge more slowly but stay usable. Measure the cost in <code>&lt;run.runtime_logs&gt;/Poisson_Solver_Convergence_History_Block_0.csv</code>: if iteration counts grow sharply, prefer lowering the rank count and restoring the deeper hierarchy.</p>
 <h1><a class="anchor" id="p25_testing_sec"></a>
 5. Current test status</h1>
 <p><code>make unit-poisson-rhs</code> covers the module directly:</p>

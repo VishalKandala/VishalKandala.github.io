@@ -22,11 +22,13 @@ var searchData=
   ['tow_5fwn_19',['Tow_wn',['../variables_8h.html#a3f14f8ea462d3febe02e72d3e19dcc46',1,'SurfElmtInfo']]],
   ['tow_5fws_20',['Tow_ws',['../variables_8h.html#ad10a788b2dbe5b267e985bfcdccadf9e',1,'SurfElmtInfo']]],
   ['tow_5fwt_21',['Tow_wt',['../variables_8h.html#a3c3055f7293e045b33e855aac4f4390c',1,'SurfElmtInfo']]],
-  ['transitions_22',['TRANSITIONS',['../namespaceaudit__subsystem__lifecycle.html#a85c1ee9e9fa924bc9e770c5b0ab80bf0',1,'audit_subsystem_lifecycle']]],
-  ['traversalstepssum_23',['traversalStepsSum',['../variables_8h.html#a44ab71fc37ec3e066fdd6839d21e0fba',1,'SearchMetricsState']]],
-  ['turbulent_5fschmidt_5fnumber_24',['Turbulent_schmidt_number',['../variables_8h.html#a1ca58b821a5431bd0c474fccc41e85f9',1,'SimCtx']]],
-  ['twod_25',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
-  ['type_26',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition::type'],['../momentum__newton__krylov_8c.html#a58b1a6c266c94c0d39e12ee564b2ea83',1,'MomentumNewtonJacobian::type']]],
-  ['typedef_5fend_5fre_27',['TYPEDEF_END_RE',['../namespacegenerate__doxygen__fallback__indexes.html#adac8641254e10cfe2c77e196ad1041c0',1,'generate_doxygen_fallback_indexes']]],
-  ['typedef_5fstart_5fre_28',['TYPEDEF_START_RE',['../namespacegenerate__doxygen__fallback__indexes.html#a1782d19a48ed4594cce7d85ffdadd14d',1,'generate_doxygen_fallback_indexes']]]
+  ['tracepids_22',['tracePIDs',['../variables_8h.html#abf424e8a8707849ddcb5ff335a0e0ee2',1,'SimCtx']]],
+  ['transitions_23',['TRANSITIONS',['../namespaceaudit__subsystem__lifecycle.html#a85c1ee9e9fa924bc9e770c5b0ab80bf0',1,'audit_subsystem_lifecycle']]],
+  ['traversalstepssum_24',['traversalStepsSum',['../variables_8h.html#a44ab71fc37ec3e066fdd6839d21e0fba',1,'SearchMetricsState']]],
+  ['true_5fresidual_25',['true_residual',['../logging_8h.html#a1e4899583bd65931b13532260700756b',1,'DualMonitorCtx']]],
+  ['turbulent_5fschmidt_5fnumber_26',['Turbulent_schmidt_number',['../variables_8h.html#a1ca58b821a5431bd0c474fccc41e85f9',1,'SimCtx']]],
+  ['twod_27',['TwoD',['../variables_8h.html#a0e237daee9fc063a6563c731846eca76',1,'SimCtx']]],
+  ['type_28',['type',['../structBoundaryCondition.html#a2efac968d88959eb1f7ee506e40aa8c9',1,'BoundaryCondition::type'],['../momentum__newton__krylov_8c.html#a58b1a6c266c94c0d39e12ee564b2ea83',1,'MomentumNewtonJacobian::type']]],
+  ['typedef_5fend_5fre_29',['TYPEDEF_END_RE',['../namespacegenerate__doxygen__fallback__indexes.html#adac8641254e10cfe2c77e196ad1041c0',1,'generate_doxygen_fallback_indexes']]],
+  ['typedef_5fstart_5fre_30',['TYPEDEF_START_RE',['../namespacegenerate__doxygen__fallback__indexes.html#a1782d19a48ed4594cce7d85ffdadd14d',1,'generate_doxygen_fallback_indexes']]]
 ];

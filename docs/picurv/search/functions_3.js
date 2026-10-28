@@ -125,7 +125,7 @@ var searchData=
   ['computelocalboundingbox_122',['computelocalboundingbox',['../grid_8c.html#ae0c39bc7c78a15bedf9f1415ab1dded4',1,'ComputeLocalBoundingBox(UserCtx *user, BoundingBox *localBBox):&#160;grid.c'],['../grid_8h.html#ae0c39bc7c78a15bedf9f1415ab1dded4',1,'ComputeLocalBoundingBox(UserCtx *user, BoundingBox *localBBox):&#160;grid.c']]],
   ['computelocalduplicatemismatch_123',['ComputeLocalDuplicateMismatch',['../test__momentum__convective__candidates_8c.html#afed5177aa331267bffde723a41363210',1,'test_momentum_convective_candidates.c']]],
   ['computelocalouterghostmismatch_124',['ComputeLocalOuterGhostMismatch',['../test__momentum__convective__candidates_8c.html#a9a28bfab08b5beda287682a0d33b924a',1,'test_momentum_convective_candidates.c']]],
-  ['computemaxcolumnwidths_125',['ComputeMaxColumnWidths',['../logging_8c.html#adc65395a00600e3e88641101c90725bf',1,'logging.c']]],
+  ['computemaxcolumnwidths_125',['ComputeMaxColumnWidths',['../logging_8c.html#a29e5be1790ad471337dc1b33897abf02',1,'logging.c']]],
   ['computemaxdiscretedivergence_126',['ComputeMaxDiscreteDivergence',['../test__momentum__convective__candidates_8c.html#ab8960b75580a04b152f9d1a435dd7e82',1,'test_momentum_convective_candidates.c']]],
   ['computemaxgradientcontribution_127',['ComputeMaxGradientContribution',['../test__momentum__convective__candidates_8c.html#a1a986bc656e8fbe74aaf8c1322a2fbeb',1,'test_momentum_convective_candidates.c']]],
   ['computemetricnorms_128',['computemetricnorms',['../Metric_8h.html#a2a99180f2d9db426e1cf73771b795498',1,'ComputeMetricNorms(UserCtx *user):&#160;Metric.c'],['../Metric_8c.html#a2a99180f2d9db426e1cf73771b795498',1,'ComputeMetricNorms(UserCtx *user):&#160;Metric.c']]],

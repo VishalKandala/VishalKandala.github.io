@@ -7,9 +7,11 @@ var searchData=
   ['log_5farray_5felement_5fallow_4',['LOG_ARRAY_ELEMENT_ALLOW',['../logging_8h.html#a03cd462936d033329883a69fea41c04e',1,'logging.h']]],
   ['log_5farray_5fsubrange_5fallow_5',['LOG_ARRAY_SUBRANGE_ALLOW',['../logging_8h.html#af14fcfe1241ba081134b8bdc28ecd6da',1,'logging.h']]],
   ['log_5fdefault_6',['LOG_DEFAULT',['../logging_8h.html#a04a4e3338975d32dd31f0c540dd44cdc',1,'logging.h']]],
-  ['log_5floop_5fallow_7',['LOG_LOOP_ALLOW',['../logging_8h.html#a1543cd95db1569c7d901fd4b9a3a43d7',1,'logging.h']]],
-  ['log_5floop_5fallow_5fexact_8',['LOG_LOOP_ALLOW_EXACT',['../logging_8h.html#aa987297fa072943c2409f3b2cc4e31f9',1,'logging.h']]],
-  ['log_5fsync_9',['LOG_SYNC',['../logging_8h.html#a5c51f68b4c031977700cdc8d1dad38f3',1,'logging.h']]],
-  ['log_5fsync_5fdefault_10',['LOG_SYNC_DEFAULT',['../logging_8h.html#aee3604358069f7cd1cff610b4e3074d6',1,'logging.h']]],
-  ['loglaw_5fb_11',['LOGLAW_B',['../wallfunction_8c.html#a960eefd065cd2d4ce2acc798abac06cb',1,'wallfunction.c']]]
+  ['log_5flevel_5fadmits_7',['LOG_LEVEL_ADMITS',['../logging_8h.html#af956354a4b9bd196ccdef59d9e02a603',1,'logging.h']]],
+  ['log_5floop_5fallow_8',['LOG_LOOP_ALLOW',['../logging_8h.html#a1543cd95db1569c7d901fd4b9a3a43d7',1,'logging.h']]],
+  ['log_5floop_5fallow_5fexact_9',['LOG_LOOP_ALLOW_EXACT',['../logging_8h.html#aa987297fa072943c2409f3b2cc4e31f9',1,'logging.h']]],
+  ['log_5fparticle_10',['LOG_PARTICLE',['../logging_8h.html#a06e58a4abf28f5d1108496a29e436327',1,'logging.h']]],
+  ['log_5fsync_11',['LOG_SYNC',['../logging_8h.html#a5c51f68b4c031977700cdc8d1dad38f3',1,'logging.h']]],
+  ['log_5fsync_5fdefault_12',['LOG_SYNC_DEFAULT',['../logging_8h.html#aee3604358069f7cd1cff610b4e3074d6',1,'logging.h']]],
+  ['loglaw_5fb_13',['LOGLAW_B',['../wallfunction_8c.html#a960eefd065cd2d4ce2acc798abac06cb',1,'wallfunction.c']]]
 ];
