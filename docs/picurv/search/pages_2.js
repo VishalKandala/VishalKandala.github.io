@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['20197396_20search_20metrics_20test_20dir_0',['20197396-search-metrics-test-dir',['../md_docs_2changelog_8d_220197396-search-metrics-test-dir.html',1,'']]],
-  ['21e90ad_20distinct_20smoothing_1',['21e90ad-distinct-smoothing',['../md_docs_2changelog_8d_221e90ad-distinct-smoothing.html',1,'']]],
-  ['2aa7d4c_20particle_20sampled_20validity_2',['2aa7d4c-particle-sampled-validity',['../md_docs_2changelog_8d_22aa7d4c-particle-sampled-validity.html',1,'']]],
-  ['2e00957_20particle_20closeout_3',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
-  ['2f1f387_20example_20config_20refresh_4',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_5',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]]
+  ['2_0',['ab6bfff8-cli-audit-fixes-2',['../md_docs_2changelog_8d_2ab6bfff8-cli-audit-fixes-2.html',1,'']]],
+  ['20197396_20search_20metrics_20test_20dir_1',['20197396-search-metrics-test-dir',['../md_docs_2changelog_8d_220197396-search-metrics-test-dir.html',1,'']]],
+  ['21e90ad_20distinct_20smoothing_2',['21e90ad-distinct-smoothing',['../md_docs_2changelog_8d_221e90ad-distinct-smoothing.html',1,'']]],
+  ['2aa7d4c_20particle_20sampled_20validity_3',['2aa7d4c-particle-sampled-validity',['../md_docs_2changelog_8d_22aa7d4c-particle-sampled-validity.html',1,'']]],
+  ['2e00957_20particle_20closeout_4',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
+  ['2f1f387_20example_20config_20refresh_5',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_6',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]]
 ];
