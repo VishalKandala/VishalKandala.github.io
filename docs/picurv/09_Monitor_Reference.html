@@ -159,7 +159,7 @@ logging:
 # ==============================================================================
 profiling:
   # --- Per-Step Profiling Output ---
-  # Controls whether timestep-level profiling rows are written to a dedicated file.
+  # Controls whether timestep-level profiling rows are written to logs/Profiling_Timestep_Summary.csv.
   # mode:
   #   off      -&gt; no timestep profiling output
   #   selected -&gt; write only the listed functions
@@ -169,7 +169,6 @@ profiling:
     # functions:            # instrumented names, as listed by mode "all" or the final summary
     #   - FlowSolver
     #   - PoissonSolver_Multigrid
-    file: "Profiling_Timestep_Summary.csv"
 
   # --- Final Profiling Summary ---
   # Controls the end-of-run aggregated profiling summary file.
@@ -210,10 +209,9 @@ diagnostics:
     options_left: null
 
   runtime_memory_log:
-    # This custom PICurv log is emitted from the runtime through control-file
-    # flags, independent of PETSc-native diagnostics above.
+    # Per-step memory and step wall time, written to logs/Runtime_Memory.csv
+    # independently of the PETSc-native diagnostics above.
     enabled: true
-    file: "Runtime_Memory.csv"
 
   # Per-step LES coefficient statistics appended to output/analysis/metrics/les_coefficient.csv:
   # the effective Cs, its spread, eddy-viscosity levels, the modelled subgrid energy, and
@@ -589,7 +587,6 @@ Startup banner and solver-specific output</h1>
 <div class="line">    functions:</div>
 <div class="line">      - FlowSolver</div>
 <div class="line">      - PoissonSolver_Multigrid</div>
-<div class="line">    file: &quot;Profiling_Timestep_Summary.csv&quot;</div>
 <div class="line">  final_summary:</div>
 <div class="line">    enabled: true</div>
 <div class="line">  helpers: []                  # or a list of names, or &quot;all&quot;</div>
@@ -608,7 +605,7 @@ Startup banner and solver-specific output</h1>
 </li>
 <li><code>timestep_output.functions</code> is required only when <code>mode: selected</code>. Names must be instrumented functions - the ones the <code>mode: all</code> file and the final summary list, such as <code>FlowSolver</code>, <code>MomentumSolver_DualTime_Picard_JamesonRK</code>, <code>PoissonSolver_Multigrid</code> and <code>ComputeRHS</code>. A name that is not instrumented records nothing; the run warns about it after the first step, and a list with no instrumented names writes no file.</li>
 <li>Names the Poisson rewrite changed are translated with a warning, in this list and in <code>logging.enabled_functions</code>: <code>PoissonSolver_MG</code> becomes <code>PoissonSolver_Multigrid</code>, <code>Projection</code> becomes <code>ProjectVelocity</code>, <code>PoissonLHSNew</code> becomes <code>AssemblePoissonOperator</code>, and <code>PoissonRHS</code> becomes <code>ComputePoissonRHS</code>. Names of functions it removed are dropped with a warning.</li>
-<li><code>timestep_output.file</code> sets the filename written under <code>&lt;run.runtime_logs&gt;/</code></li>
+<li>Per-step rows go to <code>&lt;run.runtime_logs&gt;/Profiling_Timestep_Summary.csv</code>; the name is fixed.</li>
 <li><code>final_summary.enabled</code> controls the end-of-run <code>ProfilingSummary_&lt;Solver|PostProcessor&gt;.csv</code> file, one row per function. For each it gives the total time on the slowest rank and that rank, the mean over ranks, the fastest rank and its time (zero on a rank that never called it), the calls summed over ranks, the mean time per call, and the fewest and most calls on one rank; rows are sorted by the slowest rank within each <code>section</code>. Section <code>picurv</code> lists the PICurv functions that were timed (aggregates, and the helpers <code>helpers</code> enabled); section <code>petsc</code> lists PETSc's own events that ran (<code>KSPSolve</code>, <code>VecScatterBegin</code>, <code>DMSwarmMigrate</code>, ...) the same way. PETSc's times are inclusive and run inside PICurv's, so the sections are not added together. <code>picurv summarize --table profiling --columns function,max_time_s,calls</code> shows it. The per-step file reports rank 0 only; a step's values are the change in each event's running totals over that step, and an event still open at the step's end (the time loop itself) adds its time when it ends.</li>
 <li><code>helpers</code> lists the helper functions to time, by the names the final summary shows when they are enabled, or is <code>all</code>. Names the Poisson rewrite changed are translated as above.</li>
 </ul>
@@ -634,7 +631,6 @@ Startup banner and solver-specific output</h1>
 <div class="line">    options_left: null</div>
 <div class="line">  runtime_memory_log:</div>
 <div class="line">    enabled: true</div>
-<div class="line">    file: &quot;Runtime_Memory.csv&quot;</div>
 </div><!-- fragment --><p>Rules:</p><ul>
 <li>PETSc initialization-time diagnostics such as <code>malloc_debug</code> and <code>malloc_test</code> are passed on the executable command line, not only through the generated <code>.control</code> file.</li>
 <li><code>info.enabled: true</code> writes PETSc initialization and runtime detail to <code>&lt;run.runtime_logs&gt;/PETSc_Info_Solver.log.&lt;rank&gt;</code> (or the matching postprocessor files); PETSc appends the emitting MPI rank. <code>info.classes</code> optionally restricts output to PETSc class names such as <code>snes</code> and <code>ksp</code>; use an empty list for all classes. This maps to PETSc <code>-info</code> during initialization. See <a href="https://petsc.org/main/manualpages/Sys/PetscInfo/">PetscInfo</a>. PETSc opens the file before a fresh run clears its log directory, so the solver reopens it once the directory exists again; on a fresh run the records written during PETSc initialization itself are therefore not in the file. <code>make smoke</code> asserts that the solve's <code>ksp</code> records are.</li>
@@ -652,7 +648,7 @@ Startup banner and solver-specific output</h1>
 <li><code>objects_dump</code> accepts <code>false</code>, <code>true</code>, or <code>all</code>.</li>
 <li><code>options_left</code> accepts <code>true</code>, <code>false</code>, or <code>null</code>; use <code>null</code> to omit the PETSc option entirely. The postprocessor reads the solver's control file, so for post runs <code>null</code> means <code>false</code>: otherwise every solver-only option would be reported as unused.</li>
 <li>PETSc diagnostics that support output files use run-local defaults under <code>&lt;run.runtime_logs&gt;/</code>, with solver/postprocessor-specific filenames. Boolean-only PETSc diagnostics remain in the captured solver/post stream logs.</li>
-<li><code>runtime_memory_log</code> writes a rank-reduced CSV record, one row per step: the maximum over ranks of the process and PETSc allocation signals, and <code>step_wall_s</code>, the slowest rank's wall time for that step. Final and shutdown rows carry the reason the run ended.</li>
+<li><code>runtime_memory_log</code> writes <code>&lt;run.runtime_logs&gt;/Runtime_Memory.csv</code> (a fixed name), a rank-reduced record with one row per step: the maximum over ranks of the process and PETSc allocation signals, and <code>step_wall_s</code>, the slowest rank's wall time for that step. Final and shutdown rows carry the reason the run ended.</li>
 <li><code>picurv summarize</code> reports the latest runtime memory signals and the step time, this step's and the run's mean, when the record is present.</li>
 <li><code>picurv summarize --list-plot-series</code> exposes available plottable scalar monitor histories, and <code>--plot &lt;qualified-series&gt;</code> renders full or last-N append-order histories through standalone <code>generators/plot.gen</code>.</li>
 </ul>
