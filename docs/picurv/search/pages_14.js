@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['kernels_0',['kernels',['../md_docs_2changelog_8d_20e4e1af0-specialised-face-kernels.html',1,'0e4e1af0-specialised-face-kernels'],['../md_docs_2changelog_8d_29f1a8acb-untimed-kernels.html',1,'9f1a8acb-untimed-kernels']]],
-  ['key_1',['07dac2f1-mapping-error-key',['../md_docs_2changelog_8d_207dac2f1-mapping-error-key.html',1,'']]],
-  ['keyed_20brownian_20draws_2',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
-  ['keyed_20brownian_20measurement_3',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
-  ['krylov_20channel_20evidence_4',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
-  ['krylov_20momentum_20solver_5',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
+  ['keep_20stage_20records_0',['fedb00d6-keep-stage-records',['../md_docs_2changelog_8d_2fedb00d6-keep-stage-records.html',1,'']]],
+  ['kernels_1',['kernels',['../md_docs_2changelog_8d_20e4e1af0-specialised-face-kernels.html',1,'0e4e1af0-specialised-face-kernels'],['../md_docs_2changelog_8d_29f1a8acb-untimed-kernels.html',1,'9f1a8acb-untimed-kernels']]],
+  ['key_2',['07dac2f1-mapping-error-key',['../md_docs_2changelog_8d_207dac2f1-mapping-error-key.html',1,'']]],
+  ['keyed_20brownian_20draws_3',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
+  ['keyed_20brownian_20measurement_4',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
+  ['krylov_20channel_20evidence_5',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
+  ['krylov_20momentum_20solver_6',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
 ];

@@ -6,7 +6,7 @@ var searchData=
   ['raw_20output_3',['0c7b543-init-runs-dir-iem-raw-output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'']]],
   ['recipes_20and_20config_20cookbook_4',['Workflow Recipes and Config Cookbook',['../49_Workflow_Recipes_and_Config_Cookbook.html',1,'']]],
   ['record_5',['record',['../md_docs_2changelog_8d_207762c7-thin-wall-seeding-record.html',1,'07762c7-thin-wall-seeding-record'],['../md_docs_2changelog_8d_2768bd704-particle-scaling-record.html',1,'768bd704-particle-scaling-record']]],
-  ['records_6',['539ae42-defense-t1-records',['../md_docs_2changelog_8d_2539ae42-defense-t1-records.html',1,'']]],
+  ['records_6',['records',['../md_docs_2changelog_8d_2539ae42-defense-t1-records.html',1,'539ae42-defense-t1-records'],['../md_docs_2changelog_8d_2fedb00d6-keep-stage-records.html',1,'fedb00d6-keep-stage-records']]],
   ['reducer_7',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
   ['reducer_20lineage_20missing_20output_8',['426fc90-reducer-lineage-missing-output',['../md_docs_2changelog_8d_2426fc90-reducer-lineage-missing-output.html',1,'']]],
   ['reducers_20post_20stage_9',['5c2dc4a-reducers-post-stage',['../md_docs_2changelog_8d_25c2dc4a-reducers-post-stage.html',1,'']]],
