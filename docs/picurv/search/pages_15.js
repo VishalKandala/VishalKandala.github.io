@@ -25,10 +25,11 @@ var searchData=
   ['load_20mode_22',['725f98e-solver-monitors-load-mode',['../md_docs_2changelog_8d_2725f98e-solver-monitors-load-mode.html',1,'']]],
   ['location_23',['Walking Search for Particle Location',['../26_Walking_Search_Method.html',1,'']]],
   ['log_24',['1edd226-driven-flow-log',['../md_docs_2changelog_8d_21edd226-driven-flow-log.html',1,'']]],
-  ['logging_25',['06a24f6c-newcomer-logging',['../md_docs_2changelog_8d_206a24f6c-newcomer-logging.html',1,'']]],
-  ['logging_20sync_20and_20levels_26',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
-  ['logs_27',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['lookup_28',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['lookup_20process_20grid_29',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['low_20priority_20fixes_30',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
+  ['log_20fallback_25',['f1dfcece-table-text-log-fallback',['../md_docs_2changelog_8d_2f1dfcece-table-text-log-fallback.html',1,'']]],
+  ['logging_26',['06a24f6c-newcomer-logging',['../md_docs_2changelog_8d_206a24f6c-newcomer-logging.html',1,'']]],
+  ['logging_20sync_20and_20levels_27',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
+  ['logs_28',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
+  ['lookup_29',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['lookup_20process_20grid_30',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['low_20priority_20fixes_31',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
 ];
