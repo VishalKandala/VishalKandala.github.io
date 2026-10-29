@@ -8,5 +8,6 @@ var searchData=
   ['7888c98a_20index_20width_20autoselect_5',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
   ['79e6dc99_20bc_20ghost_20exchanges_6',['79e6dc99-bc-ghost-exchanges',['../md_docs_2changelog_8d_279e6dc99-bc-ghost-exchanges.html',1,'']]],
   ['7a4cf6b_20status_20promotions_7',['7a4cf6b-status-promotions',['../md_docs_2changelog_8d_27a4cf6b-status-promotions.html',1,'']]],
-  ['7d08e19_20hom02_20poisson_20rewrite_8',['7d08e19-hom02-poisson-rewrite',['../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html',1,'']]]
+  ['7acabbf3_20particles_20per_20cell_8',['7acabbf3-particles-per-cell',['../md_docs_2changelog_8d_27acabbf3-particles-per-cell.html',1,'']]],
+  ['7d08e19_20hom02_20poisson_20rewrite_9',['7d08e19-hom02-poisson-rewrite',['../md_docs_2changelog_8d_27d08e19-hom02-poisson-rewrite.html',1,'']]]
 ];
