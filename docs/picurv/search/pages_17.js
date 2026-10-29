@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['names_0',['names',['../md_docs_2changelog_8d_24bd754ef-width-check-names.html',1,'4bd754ef-width-check-names'],['../md_docs_2changelog_8d_260126270-fixed-record-names.html',1,'60126270-fixed-record-names']]],
+  ['names_0',['names',['../md_docs_2changelog_8d_24bd754ef-width-check-names.html',1,'4bd754ef-width-check-names'],['../md_docs_2changelog_8d_260126270-fixed-record-names.html',1,'60126270-fixed-record-names'],['../md_docs_2changelog_8d_2d0aa27f5-promote-fixed-record-names.html',1,'d0aa27f5-promote-fixed-record-names']]],
   ['names_20own_20file_1',['07619abb-version-names-own-file',['../md_docs_2changelog_8d_207619abb-version-names-own-file.html',1,'']]],
   ['navigation_20and_20directory_20guides_2',['Repository Navigation and Directory Guides',['../30_Repository_Navigation.html',1,'']]],
   ['ndash_20krylov_20momentum_20solver_3',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]],

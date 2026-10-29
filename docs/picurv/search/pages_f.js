@@ -28,7 +28,7 @@ var searchData=
   ['filter_20width_20wall_20law_20promotion_25',['5f186c4-filter-width-wall-law-promotion',['../md_docs_2changelog_8d_25f186c4-filter-width-wall-law-promotion.html',1,'']]],
   ['first_20simulation_20flat_20channel_26',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
   ['fix_27',['fix',['../md_docs_2changelog_8d_20132b69-doxygen-list-fix.html',1,'0132b69-doxygen-list-fix'],['../md_docs_2changelog_8d_26742f2e-doxygen-bold-list-fix.html',1,'6742f2e-doxygen-bold-list-fix']]],
-  ['fixed_20record_20names_28',['60126270-fixed-record-names',['../md_docs_2changelog_8d_260126270-fixed-record-names.html',1,'']]],
+  ['fixed_20record_20names_28',['fixed record names',['../md_docs_2changelog_8d_260126270-fixed-record-names.html',1,'60126270-fixed-record-names'],['../md_docs_2changelog_8d_2d0aa27f5-promote-fixed-record-names.html',1,'d0aa27f5-promote-fixed-record-names']]],
   ['fixes_29',['fixes',['../md_docs_2changelog_8d_257e1307-grid-generator-fixes.html',1,'57e1307-grid-generator-fixes'],['../md_docs_2changelog_8d_2609360ee-cli-audit-fixes.html',1,'609360ee-cli-audit-fixes'],['../39_Common_Fatal_Errors.html',1,'Common Fatal Errors and Fixes'],['../md_docs_2changelog_8d_2e6a0696-les-grid-diagnosis-fixes.html',1,'e6a0696-les-grid-diagnosis-fixes'],['../29_Maintenance_Backlog.html',1,'Maintenance Backlog and Low-Priority Fixes']]],
   ['fixes_202_30',['ab6bfff8-cli-audit-fixes-2',['../md_docs_2changelog_8d_2ab6bfff8-cli-audit-fixes-2.html',1,'']]],
   ['flat_20channel_31',['Tutorial: Your First Simulation (Flat Channel)',['../02_Tutorial_Programmatic_Grid.html',1,'']]],
