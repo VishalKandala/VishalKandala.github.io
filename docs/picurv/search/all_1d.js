@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
+  ['r_0',['r',['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['raising_20the_20accumulated_20moment_20order_2',['6. Raising The Accumulated Moment Order',['../60_Field_Statistics_Planned_Extensions.html#p60_order_extension_sec',1,'']]],
   ['ramp_3',['ramp',['../48_Grid_Generator_Guide.html#p48_cap_wall_ramp_sub',1,'']]],
@@ -95,7 +95,7 @@ var searchData=
   ['record_5fpages_92',['record_pages',['../namespacereview__packet.html#a77e1fb033f2373c7b91e68d2782eb0a2',1,'review_packet']]],
   ['record_5frun_5fpetsc_5findex_5fbytes_93',['record_run_petsc_index_bytes',['../namespacepicurv__cli_1_1core.html#a2267fc899dbcdb9c1bec0a94f45dcf69',1,'picurv_cli::core']]],
   ['recorded_5fmeasurements_94',['recorded_measurements',['../namespacereview__packet.html#a7900e487e31b569c909560a1cb90d8ec',1,'review_packet']]],
-  ['records_95',['records',['../md_docs_2changelog_8d_213463015-csv-solver-records.html',1,'13463015-csv-solver-records'],['../md_docs_2changelog_8d_2539ae42-defense-t1-records.html',1,'539ae42-defense-t1-records'],['../md_docs_2changelog_8d_2fedb00d6-keep-stage-records.html',1,'fedb00d6-keep-stage-records'],['../namespacereview__packet.html#a0ff9b0405f8d39adc346f30ba8bf1e3f',1,'review_packet.records()'],['../namespaceaudit__subsystem__lifecycle.html#a7e1f187afc571120e5ef2b499b0a85cf',1,'audit_subsystem_lifecycle.RECORDS']]],
+  ['records_95',['records',['../md_docs_2changelog_8d_213463015-csv-solver-records.html',1,'13463015-csv-solver-records'],['../md_docs_2changelog_8d_2539ae42-defense-t1-records.html',1,'539ae42-defense-t1-records'],['../md_docs_2changelog_8d_2fedb00d6-keep-stage-records.html',1,'fedb00d6-keep-stage-records'],['../namespaceaudit__subsystem__lifecycle.html#a7e1f187afc571120e5ef2b499b0a85cf',1,'audit_subsystem_lifecycle.RECORDS'],['../namespacereview__packet.html#a0ff9b0405f8d39adc346f30ba8bf1e3f',1,'review_packet.records()']]],
   ['records_20what_20it_20branched_20from_96',['5.5 A Branch Records What It Branched From',['../52_Run_Artifact_Lifecycle_Contract.html#p52_restart_lineage',1,'']]],
   ['recovering_20from_20complete_20local_20loss_97',['4.6 Recovering From Complete Local Loss',['../61_Storage_Management_Guide.html#p61_recover_workspace',1,'']]],
   ['rectangle_98',['rectangle',['../48_Grid_Generator_Guide.html#p48_cap_xsec_rectangle_sub',1,'']]],

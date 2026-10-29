@@ -5,6 +5,7 @@ var searchData=
   ['key_2',['07dac2f1-mapping-error-key',['../md_docs_2changelog_8d_207dac2f1-mapping-error-key.html',1,'']]],
   ['keyed_20brownian_20draws_3',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
   ['keyed_20brownian_20measurement_4',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
-  ['krylov_20channel_20evidence_5',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
-  ['krylov_20momentum_20solver_6',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
+  ['keyed_20seeding_5',['08df3642-stratified-keyed-seeding',['../md_docs_2changelog_8d_208df3642-stratified-keyed-seeding.html',1,'']]],
+  ['krylov_20channel_20evidence_6',['a13f165-newton-krylov-channel-evidence',['../md_docs_2changelog_8d_2a13f165-newton-krylov-channel-evidence.html',1,'']]],
+  ['krylov_20momentum_20solver_7',['Newton&amp;ndash;Krylov Momentum Solver',['../55_Newton_Krylov_Momentum_Solver.html',1,'']]]
 ];
