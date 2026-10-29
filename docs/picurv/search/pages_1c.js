@@ -83,10 +83,11 @@ var searchData=
   ['summarize_20tables_80',['cb6218fc-summarize-tables',['../md_docs_2changelog_8d_2cb6218fc-summarize-tables.html',1,'']]],
   ['summary_81',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
   ['supported_82',['supported',['../md_docs_2changelog_8d_2161cb4e-ensemble-sources-supported.html',1,'161cb4e-ensemble-sources-supported'],['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'46a0680-rans-removed-and-spectral-ics-supported'],['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'4831839-les-wall-function-supported'],['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'6d6944e-cross-section-supported'],['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'eb0478d-nk-pointblock-supported'],['../md_docs_2changelog_8d_2ec40f11-free-slip-supported.html',1,'ec40f11-free-slip-supported']]],
-  ['swarm_20batch_20removal_83',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
-  ['swarm_20removal_20promoted_84',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
-  ['sweep_20and_20study_20guide_85',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['symptom_86',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
-  ['sync_20and_20levels_87',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
-  ['sync_20class_88',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
+  ['surface_20edges_83',['85cb8f82-retire-surface-edges',['../md_docs_2changelog_8d_285cb8f82-retire-surface-edges.html',1,'']]],
+  ['swarm_20batch_20removal_84',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
+  ['swarm_20removal_20promoted_85',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['sweep_20and_20study_20guide_86',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['symptom_87',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
+  ['sync_20and_20levels_88',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
+  ['sync_20class_89',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
 ];

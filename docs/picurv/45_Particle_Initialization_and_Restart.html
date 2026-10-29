@@ -96,7 +96,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p45_entries_sec">3. Particle Initialization Mode Entries</a><ul><li class="level2"><a href="#p45_cap_surface_sub">Surface</a></li>
 <li class="level2"><a href="#p45_cap_volume_sub">Volume</a></li>
 <li class="level2"><a href="#p45_cap_pointsource_sub">PointSource</a></li>
-<li class="level2"><a href="#p45_cap_surfaceedges_sub">SurfaceEdges</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#p45_mode_behavior_sec">4. Mode Behavior in C</a></li>
@@ -120,7 +119,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  physics:</div>
 <div class="line">    particles:</div>
 <div class="line">      count: 50000</div>
-<div class="line">      init_mode: &quot;Surface&quot;            # Surface | Volume | PointSource | SurfaceEdges</div>
+<div class="line">      init_mode: &quot;Surface&quot;            # Surface | Volume | PointSource</div>
 <div class="line">      restart_mode: &quot;init&quot;            # init | load</div>
 <div class="line">      random_seed: 12345              # optional; seeds placement and Brownian draws</div>
 <div class="line">      point_source:</div>
@@ -199,14 +198,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li><code>Surface</code></li>
 <li><code>Volume</code></li>
 <li><code>PointSource</code></li>
-<li><code>SurfaceEdges</code></li>
 </ul>
 <p>Enum mapping in C (<code>ParticleInitializationType</code>):</p>
 <ul>
 <li><code>0</code>: <code>PARTICLE_INIT_SURFACE_RANDOM</code></li>
 <li><code>1</code>: <code>PARTICLE_INIT_VOLUME</code></li>
 <li><code>2</code>: <code>PARTICLE_INIT_POINT_SOURCE</code></li>
-<li><code>3</code>: <code>PARTICLE_INIT_SURFACE_EDGES</code></li>
 </ul>
 <h1><a class="anchor" id="p45_entries_sec"></a>
 3. Particle Initialization Mode Entries</h1>
@@ -219,7 +216,6 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </tr>
 <tr><td class="markdownTableBodyNone"><a href="#p45_cap_pointsource"><code>PointSource</code></a></td><td class="markdownTableBodyNone"><code>2</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p45_cap_surface"><code>Surface</code></a></td><td class="markdownTableBodyNone"><code>0</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p45_cap_surfaceedges"><code>SurfaceEdges</code></a></td><td class="markdownTableBodyNone"><code>3</code></td></tr>
 <tr><td class="markdownTableBodyNone"><a href="#p45_cap_volume"><code>Volume</code></a></td><td class="markdownTableBodyNone"><code>1</code></td></tr>
 </table>
 <h2><a class="anchor" id="p45_cap_surface_sub"></a>
@@ -231,7 +227,7 @@ Surface</h2>
 <p><b>Interactions.</b> Needs an identifiable inlet face; the startup log reports which face was chosen.</p>
 <p><b>Diagnostics.</b> "Inlet face for particle initialization identified as Face N" at startup, and the per-step particle count.</p>
 <p><b>Evidence.</b> Analytically verified - <code>particle-seeding-restart-2026-09-21</code>: 16,000 particles land on the inlet plane (within 2.5e-7 of it) and are uniform across it, Kolmogorov-Smirnov statistic 1.05 on one rank and 1.00 on two.</p>
-<p><b>Limitations.</b> Concentrates particles at one boundary, so interior statistics take time to become meaningful.</p>
+<p><b>Limitations.</b> Concentrates particles at one boundary, so interior statistics take time to become meaningful. When the inlet is split across ranks the density is not uniform: particles seeded on ranks that do not touch the inlet are all re-placed on the patch of the rank that holds the inlet centre (58% of 16,000 particles on one quarter of the inlet on a 2 x 2 x 2 layout). Within a patch a cell is chosen uniformly by index, not by area, so a graded inlet over-fills its small cells.</p>
 <h2><a class="anchor" id="p45_cap_volume_sub"></a>
 Volume</h2>
 <p><a class="anchor" id="p45_cap_volume"></a> <b>Identity.</b> <code>particles.init_mode: Volume</code> -&gt; <code>-pinit 1</code>.</p>
@@ -252,16 +248,6 @@ PointSource</h2>
 <p><b>Diagnostics.</b> The lost-particle counter is the first signal of a misplaced source.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> and <code>examples/brownian_motion</code> are built on this mode. Analytically verified - <code>particle-seeding-restart-2026-09-21</code>: every particle starts exactly at the source.</p>
 <p><b>Limitations.</b> All particles share one origin, so early statistics are highly correlated.</p>
-<h2><a class="anchor" id="p45_cap_surfaceedges_sub"></a>
-SurfaceEdges</h2>
-<p><a class="anchor" id="p45_cap_surfaceedges"></a> <b>Identity.</b> <code>particles.init_mode: SurfaceEdges</code> -&gt; <code>-pinit 3</code>.</p>
-<p><b>What it does.</b> Seeds particles along the edges of a bounding surface rather than across its face.</p>
-<p><b>When to choose it.</b> Exercising the locate-and-migrate machinery, where edges and corners are the hard cases. It is a diagnostic seeding mode more than a physical one.</p>
-<p><b>Parameters it owns.</b> The particle count.</p>
-<p><b>Interactions.</b> Edge and corner cells are exactly where the walking search is most likely to struggle, which is the point.</p>
-<p><b>Diagnostics.</b> Search metrics at <b><a class="el" href="53_Search_Robustness_Metrics_Reference.html">Search Robustness Metrics Reference</a></b>.</p>
-<p><b>Evidence.</b> Analytically verified - <code>particle-seeding-restart-2026-09-21</code>: every particle sits exactly where its deterministic lattice formula places it.</p>
-<p><b>Limitations.</b> Not a physically motivated distribution.</p>
 <h1><a class="anchor" id="p45_mode_behavior_sec"></a>
 4. Mode Behavior in C</h1>
 <p>Main setup flow:</p>
@@ -276,11 +262,6 @@ SurfaceEdges</h2>
 <li>requires an identified INLET face from BC parsing,</li>
 <li>ranks not servicing inlet place particles at inlet-center fallback (<code>CMx_c/CMy_c/CMz_c</code>) before migration,</li>
 <li><code>ReinitializeParticlesOnInletSurface</code> re-spreads particles on inlet partitions after first settlement.</li>
-</ul>
-<p><code>SurfaceEdges</code> (<code>3</code>):</p>
-<ul>
-<li>deterministic placement by particle ID on inlet-face lattice,</li>
-<li>if deterministic target is non-local after migration, code falls back to random inlet placement.</li>
 </ul>
 <p><code>Volume</code> (<code>1</code>):</p>
 <ul>
