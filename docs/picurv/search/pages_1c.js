@@ -15,7 +15,7 @@ var searchData=
   ['section_20reducer_12',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
   ['section_20supported_13',['6d6944e-cross-section-supported',['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'']]],
   ['seed_20cell_20hint_14',['9aebaf8-seed-cell-hint',['../md_docs_2changelog_8d_29aebaf8-seed-cell-hint.html',1,'']]],
-  ['seeding_15',['b25c702-volume-uniform-seeding',['../md_docs_2changelog_8d_2b25c702-volume-uniform-seeding.html',1,'']]],
+  ['seeding_15',['seeding',['../md_docs_2changelog_8d_21032985d-surface-area-seeding.html',1,'1032985d-surface-area-seeding'],['../md_docs_2changelog_8d_2b25c702-volume-uniform-seeding.html',1,'b25c702-volume-uniform-seeding']]],
   ['seeding_20record_16',['07762c7-thin-wall-seeding-record',['../md_docs_2changelog_8d_207762c7-thin-wall-seeding-record.html',1,'']]],
   ['selector_20extension_20guide_17',['Modular Selector Extension Guide',['../50_Modular_Selector_Extension_Guide.html',1,'']]],
   ['series_18',['4dac690-summarize-profile-series',['../md_docs_2changelog_8d_24dac690-summarize-profile-series.html',1,'']]],
@@ -83,11 +83,12 @@ var searchData=
   ['summarize_20tables_80',['cb6218fc-summarize-tables',['../md_docs_2changelog_8d_2cb6218fc-summarize-tables.html',1,'']]],
   ['summary_81',['Capabilities Summary',['../12_Capabilities_Summary.html',1,'']]],
   ['supported_82',['supported',['../md_docs_2changelog_8d_2161cb4e-ensemble-sources-supported.html',1,'161cb4e-ensemble-sources-supported'],['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'46a0680-rans-removed-and-spectral-ics-supported'],['../md_docs_2changelog_8d_24831839-les-wall-function-supported.html',1,'4831839-les-wall-function-supported'],['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'6d6944e-cross-section-supported'],['../md_docs_2changelog_8d_2eb0478d-nk-pointblock-supported.html',1,'eb0478d-nk-pointblock-supported'],['../md_docs_2changelog_8d_2ec40f11-free-slip-supported.html',1,'ec40f11-free-slip-supported']]],
-  ['surface_20edges_83',['85cb8f82-retire-surface-edges',['../md_docs_2changelog_8d_285cb8f82-retire-surface-edges.html',1,'']]],
-  ['swarm_20batch_20removal_84',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
-  ['swarm_20removal_20promoted_85',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
-  ['sweep_20and_20study_20guide_86',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
-  ['symptom_87',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
-  ['sync_20and_20levels_88',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
-  ['sync_20class_89',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
+  ['surface_20area_20seeding_83',['1032985d-surface-area-seeding',['../md_docs_2changelog_8d_21032985d-surface-area-seeding.html',1,'']]],
+  ['surface_20edges_84',['85cb8f82-retire-surface-edges',['../md_docs_2changelog_8d_285cb8f82-retire-surface-edges.html',1,'']]],
+  ['swarm_20batch_20removal_85',['71abdd9-swarm-batch-removal',['../md_docs_2changelog_8d_271abdd9-swarm-batch-removal.html',1,'']]],
+  ['swarm_20removal_20promoted_86',['1f58998-swarm-removal-promoted',['../md_docs_2changelog_8d_21f58998-swarm-removal-promoted.html',1,'']]],
+  ['sweep_20and_20study_20guide_87',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
+  ['symptom_88',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
+  ['sync_20and_20levels_89',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
+  ['sync_20class_90',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
 ];

@@ -41,11 +41,12 @@ var searchData=
   ['architecture_38',['Code Architecture',['../13_Code_Architecture.html',1,'']]],
   ['architecture_20guide_39',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
   ['architecture_20specifications_40',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
-  ['artifact_20lifecycle_20contract_41',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
-  ['artifacts_20runtime_42',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['audit_20fixes_43',['609360ee-cli-audit-fixes',['../md_docs_2changelog_8d_2609360ee-cli-audit-fixes.html',1,'']]],
-  ['audit_20fixes_202_44',['ab6bfff8-cli-audit-fixes-2',['../md_docs_2changelog_8d_2ab6bfff8-cli-audit-fixes-2.html',1,'']]],
-  ['autoselect_45',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
-  ['averages_46',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
-  ['averaging_47',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
+  ['area_20seeding_41',['1032985d-surface-area-seeding',['../md_docs_2changelog_8d_21032985d-surface-area-seeding.html',1,'']]],
+  ['artifact_20lifecycle_20contract_42',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
+  ['artifacts_20runtime_43',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['audit_20fixes_44',['609360ee-cli-audit-fixes',['../md_docs_2changelog_8d_2609360ee-cli-audit-fixes.html',1,'']]],
+  ['audit_20fixes_202_45',['ab6bfff8-cli-audit-fixes-2',['../md_docs_2changelog_8d_2ab6bfff8-cli-audit-fixes-2.html',1,'']]],
+  ['autoselect_46',['7888c98a-index-width-autoselect',['../md_docs_2changelog_8d_27888c98a-index-width-autoselect.html',1,'']]],
+  ['averages_47',['5a8ef02-post-particle-averages',['../md_docs_2changelog_8d_25a8ef02-post-particle-averages.html',1,'']]],
+  ['averaging_48',['IEM Mixing and Statistical Averaging',['../28_IEM_and_Statistical_Averaging.html',1,'']]]
 ];

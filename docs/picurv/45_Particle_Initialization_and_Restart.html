@@ -224,10 +224,10 @@ Surface</h2>
 <p><b>What it does.</b> Seeds particles across a bounding surface of the domain.</p>
 <p><b>When to choose it.</b> Studying what enters through a face - inlet seeding, or transport from a boundary into the interior. Choose <code>Volume</code> when you want the interior populated from the start.</p>
 <p><b>Parameters it owns.</b> The particle count; the surface is derived from the configured inlet face.</p>
-<p><b>Interactions.</b> Needs an identifiable inlet face; the startup log reports which face was chosen.</p>
+<p><b>Interactions.</b> Needs an identifiable inlet face; the startup log reports which face was chosen. <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> density is uniform per unit inlet area on any grid and rank layout: each rank seeds a share proportional to the inlet area it owns, none if it owns no part of the inlet, and within its part a face cell is chosen in proportion to its area and the point inside it is drawn uniform in area by rejection against the cell's largest area element. Particles start 1e-6 of a cell inside the domain, in the cell they were placed in.</p>
 <p><b>Diagnostics.</b> "Inlet face for particle initialization identified as Face N" at startup, and the per-step particle count.</p>
-<p><b>Evidence.</b> Analytically verified - <code>particle-seeding-restart-2026-09-21</code>: 16,000 particles land on the inlet plane (within 2.5e-7 of it) and are uniform across it, Kolmogorov-Smirnov statistic 1.05 on one rank and 1.00 on two.</p>
-<p><b>Limitations.</b> Concentrates particles at one boundary, so interior statistics take time to become meaningful. When the inlet is split across ranks the density is not uniform: particles seeded on ranks that do not touch the inlet are all re-placed on the patch of the rank that holds the inlet centre (58% of 16,000 particles on one quarter of the inlet on a 2 x 2 x 2 layout). Within a patch a cell is chosen uniformly by index, not by area, so a graded inlet over-fills its small cells.</p>
+<p><b>Evidence.</b> Analytically verified - <code>surface-seeding-area-2026-10-29</code>: 16,000 particles land on the inlet plane with unique IDs and are uniform across it at 1, 2 x 2 x 2, 4 x 1 x 1 and 1 x 1 x 8 ranks, each inlet quarter holding 0.239 to 0.257 of them and the Kolmogorov-Smirnov statistic per axis at most 1.28. On an inlet whose cell widths vary fourfold the density per tenth of the inlet stays within 6% of uniform. <code>particle-seeding-restart-2026-09-21</code> first established the on-plane placement on one and two ranks.</p>
+<p><b>Limitations.</b> Concentrates particles at one boundary, so interior statistics take time to become meaningful. The area of a curved face cell uses a 2x2 Gauss rule, exact only for planar faces. Positions, though not their distribution, depend on the rank layout.</p>
 <h2><a class="anchor" id="p45_cap_volume_sub"></a>
 Volume</h2>
 <p><a class="anchor" id="p45_cap_volume"></a> <b>Identity.</b> <code>particles.init_mode: Volume</code> -&gt; <code>-pinit 1</code>.</p>
@@ -260,13 +260,13 @@ PointSource</h2>
 <p><code>Surface</code> (<code>0</code>):</p>
 <ul>
 <li>requires an identified INLET face from BC parsing,</li>
-<li>ranks not servicing inlet place particles at inlet-center fallback (<code>CMx_c/CMy_c/CMz_c</code>) before migration,</li>
-<li><code>ReinitializeParticlesOnInletSurface</code> re-spreads particles on inlet partitions after first settlement.</li>
+<li>the global count is split across ranks in proportion to owned inlet area, by largest remainder; ranks without part of the inlet seed none,</li>
+<li>each rank draws face cells by area and points within them uniform in area, on its own part of the inlet.</li>
 </ul>
 <p><code>Volume</code> (<code>1</code>):</p>
 <ul>
-<li>the global count is split across ranks in proportion to owned cells, by largest remainder, and particle IDs are numbered contiguously across ranks,</li>
-<li>random logical coordinates inside locally owned cells,</li>
+<li>the global count is split across ranks in proportion to owned volume, by largest remainder, and particle IDs are numbered contiguously across ranks,</li>
+<li>each rank draws cells by volume and points within them uniform in volume,</li>
 <li>mapped to physical space via metric interpolation.</li>
 </ul>
 <p><code>PointSource</code> (<code>2</code>):</p>
@@ -301,9 +301,7 @@ PointSource</h2>
 5. Early-Step Settlement and Coupling</h1>
 <p>For initialized particles (<code>StartStep == 0</code> path):</p>
 <ol type="1">
-<li><code>LocateAllParticlesInGrid</code> performs location/migration.</li>
-<li>surface modes call <a class="el" href="ParticleMotion_8h.html#abb62172d12ae65122070a3674196c8e2">ReinitializeParticlesOnInletSurface</a>.</li>
-<li>statuses are reset and location pass is repeated.</li>
+<li><code>LocateAllParticlesInGrid</code> performs location/migration, starting each walk in the cell the particle was seeded in.</li>
 <li><a class="el" href="ParticleInitialConditions_8h.html#aed793e2577401bb20c60e9c5b5abe6ac">ParticleFieldPlanApply</a> sets configured <code>fields</code> values, and <a class="el" href="ParticleInitialConditions_8h.html#a2bde527a273fc6943ee0b3a9ca88ce60">ParticleFieldPlanSummarize</a> logs and records them.</li>
 <li><code>InterpolateAllFieldsToSwarm</code> assigns flow fields at particle positions.</li>
 <li>the scatter updates Eulerian particle-derived fields.</li>
