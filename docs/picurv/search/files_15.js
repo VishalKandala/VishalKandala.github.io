@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['operations_2epy_0',['operations.py',['../operations_8py.html',1,'']]]
-];
+var searchData=[["operations_2epy_0",["operations.py",["../operations_8py.html",1,""]]]];

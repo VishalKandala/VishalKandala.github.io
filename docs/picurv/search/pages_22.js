@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['zero_20compiler_20warnings_0',['1e3d547b-zero-compiler-warnings',['../md_docs_2changelog_8d_21e3d547b-zero-compiler-warnings.html',1,'']]]
-];
+var searchData=[["zero_20compiler_20warnings_0",["1e3d547b-zero-compiler-warnings",["../md_docs_2changelog_8d_21e3d547b-zero-compiler-warnings.html",1,""]]]];
