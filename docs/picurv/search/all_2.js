@@ -83,7 +83,7 @@ var searchData=
   ['2_20run_20and_20monitor_80',['1.2 Run and Monitor',['../Documentation_Map.html#p47_lifecycle_run_sec',1,'']]],
   ['2_20run_20in_202d_81',['1.2 Run in 2D',['../11_User_How_To_Guides.html#p11_twod_ssec',1,'']]],
   ['2_20run_20on_20slurm_20generate_20and_20submit_82',['3.2 Run on Slurm (Generate and Submit)',['../11_User_How_To_Guides.html#p11_cluster_run_ssec',1,'']]],
-  ['2_20run_5fcontrol_83',['2 run_control',['../10_Post_Processing_Reference.html#p10_run_control_sec',1,'2. run_control'],['../07_Case_Reference.html#p07_run_control_sec',1,'2. run_control']]],
+  ['2_20run_5fcontrol_83',['2 run_control',['../07_Case_Reference.html#p07_run_control_sec',1,'2. run_control'],['../10_Post_Processing_Reference.html#p10_run_control_sec',1,'2. run_control']]],
   ['2_20running_20a_20mixing_20case_84',['1.2 Running a Mixing Case',['../28_IEM_and_Statistical_Averaging.html#p28_running_ssec',1,'']]],
   ['2_20runtime_20execution_20order_85',['2. Runtime Execution Order',['../21_Methods_Overview.html#p21_runtime_map_sec',1,'']]],
   ['2_20settlement_20status_20model_86',['2. Settlement Status Model',['../26_Walking_Search_Method.html#p26_statuses_sec',1,'']]],
@@ -150,8 +150,10 @@ var searchData=
   ['2d0ae7ed_2dwarnings_2dreach_2dproduction_2druns_2emd_147',['2d0ae7ed-warnings-reach-production-runs.md',['../2d0ae7ed-warnings-reach-production-runs_8md.html',1,'']]],
   ['2e00957_20particle_20closeout_148',['2e00957-particle-closeout',['../md_docs_2changelog_8d_22e00957-particle-closeout.html',1,'']]],
   ['2e00957_2dparticle_2dcloseout_2emd_149',['2e00957-particle-closeout.md',['../2e00957-particle-closeout_8md.html',1,'']]],
-  ['2f1f387_20example_20config_20refresh_150',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
-  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_151',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
-  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_152',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
-  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_153',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
+  ['2e81565f_20analytical_20face_20slots_150',['2e81565f-analytical-face-slots',['../md_docs_2changelog_8d_22e81565f-analytical-face-slots.html',1,'']]],
+  ['2e81565f_2danalytical_2dface_2dslots_2emd_151',['2e81565f-analytical-face-slots.md',['../2e81565f-analytical-face-slots_8md.html',1,'']]],
+  ['2f1f387_20example_20config_20refresh_152',['2f1f387-example-config-refresh',['../md_docs_2changelog_8d_22f1f387-example-config-refresh.html',1,'']]],
+  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_153',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
+  ['2fe1c88_20pipe_20nk_20three_20grid_20evidence_154',['2fe1c88-pipe-nk-three-grid-evidence',['../md_docs_2changelog_8d_22fe1c88-pipe-nk-three-grid-evidence.html',1,'']]],
+  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_155',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
 ];

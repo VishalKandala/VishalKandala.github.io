@@ -39,12 +39,11 @@ var searchData=
   ['buildminimalwalloperatorfixture_36',['BuildMinimalWallOperatorFixture',['../test__momentum__newton__krylov_8c.html#ae8bca18bf52c859bf18067a22bfc6164',1,'test_momentum_newton_krylov.c']]],
   ['buildnewtonfixture_37',['BuildNewtonFixture',['../test__momentum__newton__krylov_8c.html#a1627b1462db2b85633e5618224d43448',1,'test_momentum_newton_krylov.c']]],
   ['buildphijacobian_38',['BuildPhiJacobian',['../test__momentum__convective__candidates_8c.html#ae9d3c680ad480131a398bc62187c99c4',1,'test_momentum_convective_candidates.c']]],
-  ['buildprescribedslots_39',['BuildPrescribedSlots',['../BC__Handlers_8c.html#adc1f0f6fa5b2b32ab6036c639ffd1191',1,'BC_Handlers.c']]],
-  ['buildrowformatstring_40',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]],
-  ['buildseedingcelltable_41',['BuildSeedingCellTable',['../ParticleSwarm_8c.html#a565c85a4f9d370d600e5f0e92696574a',1,'ParticleSwarm.c']]],
-  ['buildshearedunitcell_42',['BuildShearedUnitCell',['../test__particle__kernels_8c.html#ab727244a3de4ca0776ae4bc1efe6e02f',1,'test_particle_kernels.c']]],
-  ['buildstagejacobian_43',['BuildStageJacobian',['../test__momentum__convective__candidates_8c.html#a828425a781afbaf0bac8659f005a1600',1,'test_momentum_convective_candidates.c']]],
-  ['buildstagestates_44',['BuildStageStates',['../test__momentum__convective__candidates_8c.html#a9ec813d00c26013e51fde31b7f124821',1,'test_momentum_convective_candidates.c']]],
-  ['buildstagetangent_45',['BuildStageTangent',['../test__momentum__convective__candidates_8c.html#a5f993bc50e0319f8fc0d59246477ae0d',1,'test_momentum_convective_candidates.c']]],
-  ['buildwallmodelexclusionmask_46',['BuildWallModelExclusionMask',['../les_8c.html#af2f4a11b3aed9b5be3f93c6c6eb7f672',1,'les.c']]]
+  ['buildrowformatstring_39',['BuildRowFormatString',['../logging_8c.html#a64b10fa3837fcdfcbf13820eed2577ff',1,'logging.c']]],
+  ['buildseedingcelltable_40',['BuildSeedingCellTable',['../ParticleSwarm_8c.html#a565c85a4f9d370d600e5f0e92696574a',1,'ParticleSwarm.c']]],
+  ['buildshearedunitcell_41',['BuildShearedUnitCell',['../test__particle__kernels_8c.html#ab727244a3de4ca0776ae4bc1efe6e02f',1,'test_particle_kernels.c']]],
+  ['buildstagejacobian_42',['BuildStageJacobian',['../test__momentum__convective__candidates_8c.html#a828425a781afbaf0bac8659f005a1600',1,'test_momentum_convective_candidates.c']]],
+  ['buildstagestates_43',['BuildStageStates',['../test__momentum__convective__candidates_8c.html#a9ec813d00c26013e51fde31b7f124821',1,'test_momentum_convective_candidates.c']]],
+  ['buildstagetangent_44',['BuildStageTangent',['../test__momentum__convective__candidates_8c.html#a5f993bc50e0319f8fc0d59246477ae0d',1,'test_momentum_convective_candidates.c']]],
+  ['buildwallmodelexclusionmask_45',['BuildWallModelExclusionMask',['../les_8c.html#af2f4a11b3aed9b5be3f93c6c6eb7f672',1,'les.c']]]
 ];

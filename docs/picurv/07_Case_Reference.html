@@ -628,13 +628,19 @@ boundary_conditions:
     #   components: normal         expression: "&lt;speed into the domain&gt;"
     #   components: cartesian      expression: {u: ..., v: ..., w: ...}
     #   components: curvilinear    expression: {u_xi: ..., u_eta: ..., u_zeta: ...}
-    # Omitted components are 0; `constants:` names numbers the expressions use. A source used by
-    # several targets can be named under a top-level `sources:` mapping and given by name here.
+    # On a face it also reads r, the distance from the face's centre [m]. Omitted components are 0;
+    # `constants:` names numbers the expressions use, on top of the case's top-level `constants:` and
+    # rho and nu from properties.fluid. A source used by several targets can be named under a
+    # top-level `sources:` mapping and given by name here.
+    #
+    # constraints: {bulk_velocity: &lt;mean normal speed&gt;}, or {flow_rate: &lt;m^3/s&gt;}, each a number or
+    # an expression in t.
     #
     # Alternative: a parabola across the two bounded tangential directions, peak 1.5 m/s:
     # source: {components: normal, expression: "16*1.5*xi*(1-xi)*zeta*(1-zeta)"}
     #
-    # Or a source of data, a normal-speed profile staged as a PICSLICE; the constraints apply too.
+    # Or a source of data staged as a PICSLICE; the constraints apply too. `components` is normal,
+    # a nonnegative speed per slot (default), or cartesian, a velocity; `repeat: true` loops a recording.
     # From a precomputed PICSLICE file:
     # source:
     #   type: file
@@ -655,6 +661,9 @@ boundary_conditions:
     #   slice:
     #     face: "+Eta"
     #     orientation: opposite
+    # For a recording, in place of field_file:
+    #   field_files: {pattern: "old/step_{step:012d}/Ucat.dat", first: 1000, last: 2000, every: 10}
+    #   frame_interval: 0.05              # Seconds between those frames
 
   - face: "+Eta"
     type: OUTLET
@@ -1288,11 +1297,13 @@ cabot</h2>
 <li>file-backed: <code>source.type: file</code>, <code>source.path</code></li>
 <li>field-sliced: <code>source.type: field_slice</code>, <code>source.field_file</code>, <code>source.grid_file</code>, <code>source.slice</code></li>
 <li>field-sliced sources default to <code>generators/profile.gen</code>; optional <code>source.script</code> selects a compatible override</li>
+<li>The top-level <code>constants:</code> maps names to numbers every source may use; <code>rho</code> and <code>nu</code> come from <code>properties.fluid</code>.</li>
 <li><code>source</code> may instead name an entry of the top-level <code>sources:</code> mapping, which an initial condition can share</li>
 </ul>
 </li>
 <li><code>OUTLET</code> + <code>conservation</code></li>
 <li><code>WALL</code> + <code>noslip</code></li>
+<li><code>WALL</code> + <code>moving</code>, with a velocity <code>source</code> along the wall (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_moving">p44_cap_moving</a>)</li>
 <li><code>WALL</code> + <code>free_slip</code> (also a plane of symmetry; the former <code>symmetry</code> type is retired)</li>
 <li><code>PERIODIC</code> + <code>geometric</code></li>
 <li><code>PERIODIC</code> + <code>constant_flux</code> (<code>target_flux</code>, optional <code>enforce_seam_flux</code>; <code>apply_trim</code> is a deprecated alias)</li>
@@ -1320,7 +1331,7 @@ cabot</h2>
 <div class="line">    slice:</div>
 <div class="line">      face: &quot;+Zeta&quot;</div>
 <div class="line">      orientation: opposite</div>
-</div><!-- fragment --><p><code>field_slice</code> uses Python preprocessing to write a normal dimensional PICSLICE; the C runtime still sees only the staged <code>source_file</code>.</p>
+</div><!-- fragment --><p><code>field_slice</code> uses Python preprocessing to write a dimensional PICSLICE; the C runtime still sees only the staged <code>source_file</code>. With <code>components: cartesian</code> it keeps each slot's velocity rather than its normal speed, and <code>field_files</code> with <code>frame_interval</code> records a plane over time (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_picslice_ssec">6.1 Prescribed Inlet Profile Files</a>).</p>
 <h1><a class="anchor" id="p07_passthrough_sec"></a>
 8. solver_parameters (Advanced)</h1>
 <p>Optional escape hatch for flags not yet exposed in structured schema:</p>

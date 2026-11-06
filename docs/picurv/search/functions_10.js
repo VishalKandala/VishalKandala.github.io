@@ -25,7 +25,7 @@ var searchData=
   ['readgridgenerationinputs_22',['readgridgenerationinputs',['../io_8h.html#a7dd125436244f23eba5c6b06fdd35031',1,'ReadGridGenerationInputs(UserCtx *user):&#160;io.c'],['../io_8c.html#a7dd125436244f23eba5c6b06fdd35031',1,'ReadGridGenerationInputs(UserCtx *user):&#160;io.c']]],
   ['readlocalscalar_23',['ReadLocalScalar',['../test__les_8c.html#a9c69706d14b78f1de0cc145ab8d44472',1,'test_les.c']]],
   ['readlogheaderandrow_24',['ReadLogHeaderAndRow',['../test__logging_8c.html#ac9dc688942ab15be3cea2ed924109a7e',1,'test_logging.c']]],
-  ['readpicsliceprofile_25',['ReadPicSliceProfile',['../BC__Handlers_8c.html#a70cc39b8f502a38ddfc84ff6bfd8ff4b',1,'BC_Handlers.c']]],
+  ['readpicsliceframe_25',['ReadPicSliceFrame',['../BC__Handlers_8c.html#a951b079ab7fa033c6c95a2dad6d3a111',1,'BC_Handlers.c']]],
   ['readscalarat_26',['ReadScalarAt',['../test__statistics__accumulator_8c.html#ae0745afb7a7545abadab67fef8b22f92',1,'test_statistics_accumulator.c']]],
   ['readsimulationfields_27',['readsimulationfields',['../io_8h.html#a3a009dabc71ccfa59f196e1bc045de45',1,'ReadSimulationFields(UserCtx *user, PetscInt ti):&#160;io.c'],['../io_8c.html#a3a009dabc71ccfa59f196e1bc045de45',1,'ReadSimulationFields(UserCtx *user, PetscInt ti):&#160;io.c']]],
   ['readstagedinitialfield_28',['ReadStagedInitialField',['../initialcondition_8c.html#a6f71e64d1bdf5e1a5a379d3c4a83591a',1,'initialcondition.c']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['a_0',['A',['../variables_8h.html#a555f83bde847a6f7bde6e372ca74dd4b',1,'UserCtx']]],
+  ['a_0',['a',['../variables_8h.html#a555f83bde847a6f7bde6e372ca74dd4b',1,'UserCtx::A'],['../expression_8h.html#ad2954fa046943e08e0b9fd2192c82996',1,'PicurvSourceFaceSlots::a']]],
   ['a_5fc_1',['a_c',['../variables_8h.html#ab855d42df8eae7cb8be83f0100da67e9',1,'FSInfo']]],
   ['a_5ftot_2',['A_tot',['../variables_8h.html#ad66d4a2ad50b87f8150be135c95d2c3b',1,'FSInfo']]],
   ['acc_3',['acc',['../variables_8h.html#a3c39b705d19eca0ae071c27b23778633',1,'FSInfo']]],
@@ -8,7 +8,7 @@ var searchData=
   ['active_5fcells_5',['active_cells',['../momentumsolvers_8h.html#a45b6ff9bf27ed9817be2aada199e2891',1,'MomStabilityReport']]],
   ['aj_6',['aj',['../poisson_8h.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../poisson_8h.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj'],['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj']]],
   ['alias_5f1_7',['alias_1',['../field__catalog_8h.html#a0f00ee1daa91b128feb550c0f22334ed',1,'FieldDescriptor::alias_1'],['../particle__field__catalog_8h.html#a7852e6f6df6e800ccd1e59c959068a3d',1,'ParticleFieldDescriptor::alias_1']]],
-  ['alias_5f2_8',['alias_2',['../field__catalog_8h.html#adb5fa6ff989c24f3b5977bab1b8e8766',1,'FieldDescriptor::alias_2'],['../particle__field__catalog_8h.html#a3b8a5b2578fa73c6fddc0da9e5ff2ade',1,'ParticleFieldDescriptor::alias_2']]],
+  ['alias_5f2_8',['alias_2',['../particle__field__catalog_8h.html#a3b8a5b2578fa73c6fddc0da9e5ff2ade',1,'ParticleFieldDescriptor::alias_2'],['../field__catalog_8h.html#adb5fa6ff989c24f3b5977bab1b8e8766',1,'FieldDescriptor::alias_2']]],
   ['alias_5ffields_9',['ALIAS_FIELDS',['../namespaceaudit__capability__coverage.html#a355ece209f4b17f98808720c16dfd331',1,'audit_capability_coverage']]],
   ['aliases_5fjacobian_5foperator_10',['aliases_jacobian_operator',['../momentum__newton__krylov_8c.html#a0f388707dd86aa9b85326126c45cbdeb',1,'MomentumPreconditionerEngine']]],
   ['allow_5frandom_11',['allow_random',['../expression_8c.html#a27ff28fe2f2a9ca1fe65a2e3a99b3430',1,'ExpressionParser']]],

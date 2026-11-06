@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['b_0',['B',['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx']]],
+  ['b_0',['b',['../expression_8h.html#a8cf2aad0abcb7ae74cbfea78226b9c00',1,'PicurvSourceFaceSlots::b'],['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx::B']]],
   ['backscatter_5fvolume_1',['backscatter_volume',['../variables_8h.html#ae7db9f8d488236f81571adee716460c6',1,'LESDiagnosticsState']]],
   ['backticked_5fre_2',['BACKTICKED_RE',['../namespaceaudit__field__catalog.html#a2659557cc896225a3198ee5ca6ec020e',1,'audit_field_catalog']]],
   ['banner_5frequired_3',['BANNER_REQUIRED',['../namespaceaudit__user__facing__reporting.html#a305470ac1fada34c02a94b7fc69d4a9d',1,'audit_user_facing_reporting']]],
@@ -28,14 +28,17 @@ var searchData=
   ['boundaryclampcount_25',['boundaryClampCount',['../variables_8h.html#a3d9a093e9ab28579a523e6223a69fc9d',1,'SearchMetricsState']]],
   ['boundaryvelocitycorrection_26',['boundaryVelocityCorrection',['../variables_8h.html#a3bc2631bea904bdda9ee6618d8cc1f15',1,'SimCtx']]],
   ['bounded_27',['bounded',['../statistics__window_8h.html#abbbfbb9677ef438e4b3478f09c4a5731',1,'PicurvWindowDefinition']]],
-  ['bs_28',['bs',['../interpolation_8c.html#a885582164cf126635bf3da94565103a5',1,'CenterInterpolationTarget']]],
-  ['buffer_29',['buffer',['../checksum_8h.html#a0e753b2664a8fac25a8479718219d15b',1,'PicurvSHA256Context']]],
-  ['buffer_5fsize_30',['buffer_size',['../checksum_8h.html#ae3c53e90107269943a7b104539f0a2f8',1,'PicurvSHA256Context']]],
-  ['built_31',['built',['../BC__Handlers_8c.html#a838895d606f5e281445cb491603f4f60',1,'InletPrescribedVelocityData']]],
-  ['bulk_32',['bulk',['../expression_8h.html#a1b33f0e8f63c34ae31d8daac92ffb995',1,'PicurvVelocitySource']]],
-  ['bulk_5ftime_5fdependent_33',['bulk_time_dependent',['../expression_8h.html#a2f061c1dad4dfa8441c5427d90323e03',1,'PicurvVelocitySource']]],
-  ['bulkvelocitycorrection_34',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
-  ['bvel_5fu_35',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
-  ['bvel_5fv_36',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
-  ['bvel_5fw_37',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
+  ['bracket_28',['bracket',['../BC__Handlers_8c.html#a51703fa3d98b208dd51faf4ba6de2ca7',1,'InletPrescribedVelocityData']]],
+  ['bracket_5fframe_29',['bracket_frame',['../BC__Handlers_8c.html#a04e69f25b6b1ddfe677f004c17b6bb71',1,'InletPrescribedVelocityData']]],
+  ['bs_30',['bs',['../interpolation_8c.html#a885582164cf126635bf3da94565103a5',1,'CenterInterpolationTarget']]],
+  ['buffer_31',['buffer',['../checksum_8h.html#a0e753b2664a8fac25a8479718219d15b',1,'PicurvSHA256Context']]],
+  ['buffer_5fsize_32',['buffer_size',['../checksum_8h.html#ae3c53e90107269943a7b104539f0a2f8',1,'PicurvSHA256Context']]],
+  ['built_33',['built',['../BC__Handlers_8c.html#a838895d606f5e281445cb491603f4f60',1,'InletPrescribedVelocityData']]],
+  ['bulk_34',['bulk',['../expression_8h.html#a1b33f0e8f63c34ae31d8daac92ffb995',1,'PicurvVelocitySource']]],
+  ['bulk_5fis_5fflow_5frate_35',['bulk_is_flow_rate',['../expression_8h.html#aee6fff00ba8da59ef1a2deda46a5c65b',1,'PicurvVelocitySource']]],
+  ['bulk_5ftime_5fdependent_36',['bulk_time_dependent',['../expression_8h.html#a2f061c1dad4dfa8441c5427d90323e03',1,'PicurvVelocitySource']]],
+  ['bulkvelocitycorrection_37',['bulkVelocityCorrection',['../variables_8h.html#a595ab2d9e5cc108efaf9c2e98da7145d',1,'SimCtx']]],
+  ['bvel_5fu_38',['Bvel_u',['../variables_8h.html#ac9b6c27c030c67d3e48c217b3176f64f',1,'IBMNodes']]],
+  ['bvel_5fv_39',['Bvel_v',['../variables_8h.html#a253e535c1ae16fb8fb70e93ef374dc51',1,'IBMNodes']]],
+  ['bvel_5fw_40',['Bvel_w',['../variables_8h.html#ae1905f667c0938afad233db51f283bf7',1,'IBMNodes']]]
 ];
