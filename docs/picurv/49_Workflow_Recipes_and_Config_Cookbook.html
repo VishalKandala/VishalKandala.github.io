@@ -204,7 +204,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">    estimator_alpha: 0.35</div>
 </div><!-- fragment --><p>Keep an early signal as fallback protection for preemption/manual termination:</p>
 <div class="fragment"><div class="line">execution:</div>
-<div class="line">  extra_sbatch:</div>
+<div class="line">  sbatch_passthrough:</div>
 <div class="line">    signal: &quot;USR1@300&quot;</div>
 </div><!-- fragment --><p>For direct <code>mpirun</code> batch launches, use <code>signal: "B:USR1@300"</code> and prefer <code>exec mpirun ...</code>.</p>
 <p>Run naming note:</p>
@@ -232,21 +232,21 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Analytical zero-flow Brownian verification:</p>
 <ul>
 <li>case: <code>examples/brownian_motion/brownian_motion.yml</code></li>
-<li>solver: <code>examples/brownian_motion/Analytical-Zero.yml</code></li>
+<li>solver: <code>examples/brownian_motion/Analytical.yml</code></li>
 <li>monitor: <code>examples/brownian_motion/Standard_Output.yml</code></li>
 <li>post: <code>examples/brownian_motion/brownian_analysis.yml</code></li>
 </ul>
 <p>Analytical uniform-flow deterministic drift verification:</p>
 <ul>
 <li>case: <code>examples/drift_uniform_flow/drift_uniform_flow.yml</code></li>
-<li>solver: <code>examples/drift_uniform_flow/Analytical-UniformFlow.yml</code></li>
+<li>solver: <code>examples/drift_uniform_flow/Analytical.yml</code></li>
 <li>monitor: <code>examples/drift_uniform_flow/Standard_Output.yml</code></li>
 <li>post: <code>examples/drift_uniform_flow/uniform_flow_analysis.yml</code></li>
 </ul>
 <p>Analytical zero-flow plus verification-source diffusivity drift verification:</p>
 <ul>
 <li>case: <code>examples/drift_diffusivity_gradient/drift_diffusivity_gradient.yml</code></li>
-<li>solver: <code>examples/drift_diffusivity_gradient/Analytical-Zero-Verification-LinearDiffusivity.yml</code></li>
+<li>solver: <code>examples/drift_diffusivity_gradient/Analytical-Verification-LinearDiffusivity.yml</code></li>
 <li>monitor: <code>examples/drift_diffusivity_gradient/Standard_Output.yml</code></li>
 <li>post: <code>examples/drift_diffusivity_gradient/drift_diffusivity_gradient_analysis.yml</code></li>
 </ul>
@@ -268,10 +268,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="fragment"><div class="line">verification:</div>
 <div class="line">  sources:</div>
 <div class="line">    diffusivity:</div>
-<div class="line">      mode: &quot;analytical&quot;</div>
-<div class="line">      profile: &quot;LINEAR_X&quot;</div>
-<div class="line">      gamma0: 1.0e-3</div>
-<div class="line">      slope_x: 2.0e-4</div>
+<div class="line">      constants: {gamma0: 1.0e-3, slope: 2.0e-4}</div>
+<div class="line">      expression: &quot;gamma0 + slope*x&quot;</div>
 </div><!-- fragment --><p>Contributor note:</p>
 <ul>
 <li>new verification source injections must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
@@ -283,40 +281,19 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Minimal zero-flow startup:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: generated</div>
-<div class="line">    generator: zero</div>
+<div class="line">    source: {components: cartesian, expression: {u: 0.0, v: 0.0, w: 0.0}}</div>
 </div><!-- fragment --><p>Constant cartesian velocity (channel with explicit components):</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: generated</div>
-<div class="line">    generator: constant</div>
-<div class="line">    params:</div>
-<div class="line">      u_physical: 0.0</div>
-<div class="line">      v_physical: 0.0</div>
-<div class="line">      w_physical: 1.0</div>
-</div><!-- fragment --><p>Constant streamwise velocity for a periodic box (no INLET face):</p>
+<div class="line">    source: {components: cartesian, expression: {w: 1.0}}</div>
+</div><!-- fragment --><p>Constant streamwise velocity:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: generated</div>
-<div class="line">    generator: streamwise_constant</div>
-<div class="line">    params:</div>
-<div class="line">      velocity_physical: 1.0</div>
-<div class="line">      flow_direction: &quot;+Zeta&quot;</div>
-</div><!-- fragment --><p>Poiseuille with a clear scalar input (INLET face present — no <code>flow_direction</code> needed):</p>
+<div class="line">    source: {components: curvilinear, expression: {u_zeta: 1.0}}</div>
+</div><!-- fragment --><p>A duct's parabolic profile, peak 1.25 m/s, in the fractions along the grid lines:</p>
 <div class="fragment"><div class="line">properties:</div>
 <div class="line">  initial_conditions:</div>
-<div class="line">    mode: generated</div>
-<div class="line">    generator: poiseuille</div>
-<div class="line">    params:</div>
-<div class="line">      peak_velocity_physical: 1.25</div>
-</div><!-- fragment --><p>Poiseuille for a periodic domain (no INLET face):</p>
-<div class="fragment"><div class="line">properties:</div>
-<div class="line">  initial_conditions:</div>
-<div class="line">    mode: generated</div>
-<div class="line">    generator: poiseuille</div>
-<div class="line">    params:</div>
-<div class="line">      peak_velocity_physical: 1.25</div>
-<div class="line">      flow_direction: &quot;+Zeta&quot;</div>
+<div class="line">    source: {components: curvilinear, expression: {u_zeta: &quot;1.25*16*xi*(1-xi)*eta*(1-eta)&quot;}}</div>
 </div><!-- fragment --><p>Generated grid workflow:</p>
 <div class="fragment"><div class="line">grid:</div>
 <div class="line">  mode: grid_gen</div>
@@ -335,43 +312,46 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">  mode: file</div>
 <div class="line">  source_file: ../runs/&lt;run_id&gt;/inputs/grid/grid.generated.picgrid</div>
 </div><!-- fragment --><p>PICurv will validate and non-dimensionalize that source file into the new run's own <code>&lt;run.config&gt;/grid.run</code>.</p>
-<p>Generated square-duct Poiseuille inlet profile:</p>
+<p>Exact rectangular-duct inlet profile, at a bulk velocity the runtime holds on the actual face:</p>
+<div class="fragment"><div class="line">sources:</div>
+<div class="line">  duct_poiseuille:                        # the series of @ref p33_closed_form_ssec</div>
+<div class="line">    components: normal</div>
+<div class="line">    constants: {U: 1.0, beta: 1.0}</div>
+<div class="line">    expression: &gt;-</div>
+<div class="line">      U*sum(k, 0, 99, (-1)**k/(2*k+1)**3</div>
+<div class="line">      *(1 - (exp(abs((2*k+1)*pi*beta*(eta - 0.5)) - (2*k+1)*pi*beta/2)</div>
+<div class="line">      + exp(-abs((2*k+1)*pi*beta*(eta - 0.5)) - (2*k+1)*pi*beta/2))/(1 + exp(-(2*k+1)*pi*beta)))</div>
+<div class="line">      *cos((2*k+1)*pi*(xi - 0.5)))</div>
+<div class="line">      / sum(k, 0, 99, 2/(pi*(2*k+1)**4)*(1 - 2*tanh((2*k+1)*pi*beta/2)/((2*k+1)*pi*beta)))</div>
+<div class="line"> </div>
+<div class="line">boundary_conditions:</div>
+<div class="line">  - face: &quot;-Zeta&quot;</div>
+<div class="line">    type: INLET</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source: duct_poiseuille</div>
+<div class="line">    constraints: {bulk_velocity: 1.0}</div>
+</div><!-- fragment --><p>File-backed prescribed inlet profile:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
 <div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: generated</div>
-<div class="line">        generator: square_duct_poiseuille</div>
-<div class="line">        params:</div>
-<div class="line">          bulk_velocity: 1.0</div>
-<div class="line">          n_terms: 101</div>
-</div><!-- fragment --><p><code>picurv run --solve</code> writes the dimensional generated profile and <code>profile.info</code> under <code>&lt;run.config&gt;/</code>, stages the solver-scale <code>.picslice</code>, and writes that staged path into <code>bcs.run</code>. For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. When a target <code>PICGRID</code> is available, generated profiles are sampled at inlet face centers and normalized by geometric quad face areas; <code>profile.info</code> reports the area-weighted mean before and after normalization, total area, face-area range, discrete sampled mean, and <code>Umax/Ubulk</code>.</p>
-<p>File-backed prescribed inlet profile:</p>
-<div class="fragment"><div class="line">boundary_conditions:</div>
-<div class="line">  - face: &quot;-Zeta&quot;</div>
-<div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: file</div>
-<div class="line">        path: profiles/inlet.picslice</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source:</div>
+<div class="line">      type: file</div>
+<div class="line">      path: profiles/inlet.picslice</div>
 </div><!-- fragment --><p>For <code>64 x 64 x 1024</code> cells, a <code>-Zeta</code> or <code>+Zeta</code> profile is <code>64 x 64</code>. The first file value maps to tangential solver index <code>(j=1, i=1)</code>.</p>
 <p>Field-sliced prescribed inlet profile from an old run:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
 <div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: field_slice</div>
-<div class="line">        field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
-<div class="line">        grid_file: ../old_run/inputs/grid/grid.run</div>
-<div class="line">        source_case: ../old_run/config/case.yml</div>
-<div class="line">        slice:</div>
-<div class="line">          face: &quot;+Zeta&quot;</div>
-<div class="line">          orientation: opposite</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source:</div>
+<div class="line">      type: field_slice</div>
+<div class="line">      field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
+<div class="line">      grid_file: ../old_run/inputs/grid/grid.run</div>
+<div class="line">      source_case: ../old_run/config/case.yml</div>
+<div class="line">      slice:</div>
+<div class="line">        face: &quot;+Zeta&quot;</div>
+<div class="line">        orientation: opposite</div>
 </div><!-- fragment --><p>This extracts Cartesian <code>Ucat</code> normal speeds from the old slice, validates the old and new face normals, writes <code>*.sliced.picslice</code>, then stages it through the same file-backed C path. V1 requires matching source and target slice sizes.</p>
 <p>Precompute deterministic artifacts without launching the solver:</p>
 <div class="fragment"><div class="line">./bin/picurv precompute --case config/case.yml</div>
@@ -424,7 +404,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li>you want an analytical zero-flow validation case,</li>
 <li>you want a particle-focused test with minimal flow complexity,</li>
-<li>you want a reference for <code>ZERO_FLOW</code> analytical mode.</li>
+<li>you want a reference for a zero-velocity analytical field.</li>
 </ul>
 <h1><a class="anchor" id="p49_scatter_recipe_sec"></a>
 7. Scatter Verification Recipe</h1>
@@ -432,8 +412,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>Recommended pattern:</p>
 <ul>
 <li>keep <code>operation_mode.eulerian_field_source: analytical</code></li>
-<li>use <code>analytical_type: ZERO_FLOW</code> for pure deposition checks</li>
-<li>choose a scalar profile under <code>verification.sources.scalar</code></li>
+<li>use a zero source with <code>eulerian_field_source: analytical</code> for pure deposition checks</li>
+<li>write the scalar as an expression under <code>verification.sources.scalar</code></li>
 <li>reuse the production scatter operator rather than adding a second deposition path</li>
 <li>read the runtime metric from <code>&lt;run.analysis.metrics&gt;/scatter_metrics.csv</code></li>
 </ul>
@@ -441,7 +421,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li>when <code>verification.sources.scalar</code> is absent, ordinary production runs are unchanged</li>
 <li>only the particle <code>Psi</code> update is bypassed in verification mode</li>
-<li>carrier-flow selection remains independent, so the same scalar truth can later be paired with <code>UNIFORM_FLOW</code> or <code>TGV3D</code></li>
+<li>carrier-flow selection remains independent, so the same scalar truth can later be paired with a uniform stream or the Taylor-Green vortex</li>
 </ul>
 <p>This pathway is useful for more than one study. It enables:</p>
 <ul>

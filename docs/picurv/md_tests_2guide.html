@@ -287,7 +287,7 @@ Python Test Files (&lt;tt&gt;tests/test_*.py&lt;/tt&gt;)</h1>
 </li>
 <li><code>test_units_and_scaling.py</code><ul>
 <li>every solver-facing input records a dimension and conversion site, and the units audit (<code><a class="el" href="audit__units_8py.html" title="Enforce the physical-units rule and the published units indexes.">tests/tooling/audit_units.py</a></code>) passes against page 19's indexes</li>
-<li>each conversion at non-unit scales: <code>dt</code>, grid lengths, BC velocities and fluxes, the point source, window times, spectral provider parameters, <code>ic_gen</code> expressions, and a file initial condition staged from physical units or from another run's scales</li>
+<li>each conversion at non-unit scales: <code>dt</code>, grid lengths, BC velocities and fluxes, the point source, window times, spectral provider parameters, and a file initial condition staged from physical units or from another run's scales</li>
 <li>the validate notice names inputs whose reading changed, only at non-unit scales</li>
 </ul>
 </li>
@@ -299,6 +299,10 @@ Python Test Files (&lt;tt&gt;tests/test_*.py&lt;/tt&gt;)</h1>
 </li>
 <li><code>test_particle_fields.py</code><ul>
 <li><code>models.physics.particles.fields</code>: the settable set matches the C catalog's <code>USER_INITIALIZE</code> capability, values become quoted <code>-particle_fields_*</code> options, and validation refuses unknown fields, bad expressions, particle-free runs, and a conflicting verification scalar source</li>
+</ul>
+</li>
+<li><code>test_velocity_sources.py</code><ul>
+<li>velocity sources (<code>sources:</code>, a <code>prescribed_velocity</code> inlet, a <code>source</code> initial condition): named and inline sources resolve to one form with constants inlined, become quoted <code>-inlet_source_&lt;id&gt;_*</code> / <code>-ic_source_*</code> options with only <code>source_id</code> in the bcs row, and validation refuses unknown names, wrong frames, bad expressions and constraints a target does not take; the C side is <code>make unit-mpi</code> (<code>grid-line-fractions-follow-arc-length</code>)</li>
 </ul>
 </li>
 <li><code>test_field_catalog.py</code><ul>
@@ -402,7 +406,7 @@ Smoke Harness (&lt;tt&gt;tests/smoke/run_smoke.sh&lt;/tt&gt;)</h1>
 <ul>
 <li>longer particle-cycle runtime sequences</li>
 <li>chained restart workflows over more than one split point</li>
-<li>BC-focused runtime variants for the stable path (parabolic inlet) plus periodic constant-flux validate/dry-run coverage</li>
+<li>BC-focused runtime variants for the stable path (a pulsatile parabolic <code>prescribed_velocity</code> inlet) plus periodic constant-flux validate/dry-run coverage</li>
 <li>an extra-rank MPI particle runtime stress case</li>
 </ul>
 <p>Geometric-periodic smoke (<code>make smoke-periodic</code>) is part of the standard <code>check</code> gate:</p>
@@ -504,7 +508,7 @@ Current targeted backlog</h1>
 </ul>
 </li>
 <li>coverage follow-up:<ul>
-<li><code>2026-03-20</code> audit snapshot: <code><a class="el" href="AnalyticalSolutions_8c.html" title="Implements the analytical solution engine for initializing or driving the simulation.">src/AnalyticalSolutions.c</a></code> (<code>23.93%</code>) and <code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code> (<code>11.69%</code>) still need direct unit harnesses</li>
+<li><code>2026-03-20</code> audit snapshot: <code><a class="el" href="AnalyticalSolutions_8c.html" title="Prescribes the Eulerian fields from the case&#39;s source instead of solving for them.">src/AnalyticalSolutions.c</a></code> (<code>23.93%</code>) and <code><a class="el" href="BodyForces_8c.html">src/BodyForces.c</a></code> (<code>11.69%</code>) still need direct unit harnesses</li>
 <li><code><a class="el" href="les_8c.html" title="Implements the Large Eddy Simulation (LES) subgrid-scale closure.">src/les.c</a></code> was rewritten after the <code>2026-03-20</code> snapshot, so that figure no longer describes the file; <code><a class="el" href="test__les_8c.html" title="C unit tests for the LES subgrid-scale closure.">test_les.c</a></code> covers the kernels directly, and the assembled model path has not been re-measured</li>
 <li><code>2026-03-20</code> audit snapshot: <code><a class="el" href="poisson_8c.html" title="Pressure-Poisson projection: operator, right-hand side, multigrid solve, pressure update,...">src/poisson.c</a></code> (<code>45.66%</code>) and <code><a class="el" href="rhs_8c.html">src/rhs.c</a></code> (<code>61.95%</code>) still need deeper direct branch coverage</li>
 <li><code>2026-03-20</code> audit snapshot: <code><a class="el" href="runloop_8c.html" title="Test program for DMSwarm interpolation using the fdf-curvIB method.">src/runloop.c</a></code> (<code>64.76%</code>) still needs more runtime-orchestration branch coverage</li>

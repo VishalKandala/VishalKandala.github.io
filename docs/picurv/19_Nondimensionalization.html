@@ -158,9 +158,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>staging</code>   </td><td class="markdownTableBodyNone">a file payload is divided as it is staged under <code>&lt;run.inputs&gt;</code>   </td><td class="markdownTableBodyNone"><code>.picgrid</code> grids, <code>grid.gen</code> output, inlet-profile PICSLICEs, a <code>mode: file</code> initial condition    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>provider</code>   </td><td class="markdownTableBodyNone">a generator is handed the reference scales and writes solver units   </td><td class="markdownTableBodyNone"><code>ic_gen</code> expressions (<code>--length-ref</code>, <code>--velocity-ref</code>), the <code>resampled_velocity</code> source field (divided by <code>velocity_ref</code>)    </td></tr>
+<td class="markdownTableBodyNone"><code>provider</code>   </td><td class="markdownTableBodyNone">a generator is handed the reference scales and writes solver units   </td><td class="markdownTableBodyNone">an <code>ic_gen</code> script (<code>--length-ref</code>, <code>--velocity-ref</code>), the <code>resampled_velocity</code> source field (divided by <code>velocity_ref</code>)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>evaluator</code>   </td><td class="markdownTableBodyNone">the runtime evaluates an expression at physical coordinates and divides the value by its field's scale   </td><td class="markdownTableBodyNone">particle <code>fields</code> initial values    </td></tr>
+<td class="markdownTableBodyNone"><code>evaluator</code>   </td><td class="markdownTableBodyNone">the runtime evaluates an expression at physical coordinates and divides the value by its field's scale   </td><td class="markdownTableBodyNone">particle <code>fields</code> initial values, velocity sources (a data source on an inlet is staged instead)    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>reference</code>   </td><td class="markdownTableBodyNone">the input defines a scale   </td><td class="markdownTableBodyNone"><code>length_ref</code>, <code>velocity_ref</code>, <code>density</code>, <code>viscosity</code>, the provenance scales of a file payload    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -169,60 +169,52 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <p>The dimension and site of every input are recorded in <code>INPUT_QUANTITIES</code> (with <code>BC_PARAM_QUANTITIES</code> and <code>IC_PARAM_QUANTITIES</code> for free-form parameter mappings) in <code><a class="el" href="core_8py.html" title="A comprehensive conductor script for the PICurv simulation platform.">picurv_cli/core.py</a></code>, and every conversion takes its factor from that record.</p>
 <h1><a class="anchor" id="p19_inputs_sec"></a>
 3. Input Index</h1>
-<p>Every input that carries a physical dimension. Selectors, counts, steps, grid indices, tolerances, and dimensionless model constants are recorded as such and are not listed. <code>PAYLOAD</code> marks a file whose dimension follows its content: velocity for <code>Ucat</code>, volume flux for <code>Ucont</code>, and physical coordinates and values for <code>ic_gen</code> expressions and particle <code>fields</code>.</p>
+<p>Every input that carries a physical dimension. Selectors, counts, steps, grid indices, tolerances, and dimensionless model constants are recorded as such and are not listed. <code>PAYLOAD</code> marks a file whose dimension follows its content: velocity for <code>Ucat</code>, volume flux for <code>Ucont</code>, and physical coordinates and values for expression sources and particle <code>fields</code>.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Input   </th><th class="markdownTableHeadNone">Dimension   </th><th class="markdownTableHeadNone">Converted by   </th><th class="markdownTableHeadNone">Scale    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.source</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.target_flux</code>   </td><td class="markdownTableBodyNone">VOLUME_FLUX   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U L^2    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.v_max</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vx</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions.[].constraints</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vy</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions.[].source</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions[].params.vz</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions.[].[].constraints</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: boundary_conditions.[].[].source</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: grid.generator</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.xMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.xMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.yMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.yMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.zMaxs</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: grid.programmatic_settings.zMins</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">c   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: grid.source_file</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.base_profile (stability_mode_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">provider   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.box_length (resampled_velocity)</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.bulk_velocity (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.bulk_velocity (duct_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.config_file (ic_gen)</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">provider   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.filter.cutoff (resampled_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.filter.width (resampled_velocity)</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.noise.spectrum.k0 (stability_mode_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.noise.spectrum.k_cut (stability_mode_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.normalization.target (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.noise.spectrum.k_cut (stability_mode_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.peak_velocity_physical (poiseuille)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.normalization.target (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.perturbation_rms (channel_spectral_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -244,53 +236,33 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.spectrum.k_cut (spectral_random_velocity)</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.u_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.v_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.velocity_difference (stability_mode_velocity)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.velocity_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.constraints</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.velocity_physical (streamwise_constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.source</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: initial_conditions.params.w_physical (constant)</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.fields</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.x</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.y</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: models.physics.particles.point_source.z</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: models.physics.turbulence.wall_function.roughness_height</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: properties.fluid.density</code>   </td><td class="markdownTableBodyNone">DENSITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">rho    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: properties.fluid.viscosity</code>   </td><td class="markdownTableBodyNone">DYNAMIC_VISCOSITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">rho U L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.length_scale</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">L    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.peak_velocity_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.source_file</code>   </td><td class="markdownTableBodyNone">PAYLOAD   </td><td class="markdownTableBodyNone">staging   </td><td class="markdownTableBodyNone">by payload field    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.u_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.v_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.velocity_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.velocity_scale</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: properties.initial_conditions.w_physical</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>case.yml: properties.scaling.length_ref</code>   </td><td class="markdownTableBodyNone">LENGTH   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">L    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>case.yml: properties.scaling.velocity_ref</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: properties.scaling.velocity_ref</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">reference   </td><td class="markdownTableBodyNone">U    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>case.yml: run_control.dt_physical</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>case.yml: sources</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>monitor.yml: field_statistics.windows.[].end_time</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
 <tr class="markdownTableRowOdd">
@@ -298,23 +270,9 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>monitor.yml: field_statistics.windows.[].time_cadence</code>   </td><td class="markdownTableBodyNone">TIME   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">L/U    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.u</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.constants</code>   </td><td class="markdownTableBodyNone">DIFFUSIVITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U L    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.v</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>solver.yml: operation_mode.uniform_flow.w</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.gamma0</code>   </td><td class="markdownTableBodyNone">DIFFUSIVITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.slope_x</code>   </td><td class="markdownTableBodyNone">VELOCITY   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">U    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.kx</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.ky</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.kz</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.scalar.slope_x</code>   </td><td class="markdownTableBodyNone">WAVENUMBER   </td><td class="markdownTableBodyNone">cli   </td><td class="markdownTableBodyNone">1/L   </td></tr>
+<td class="markdownTableBodyNone"><code>solver.yml: verification.sources.diffusivity.expression</code>   </td><td class="markdownTableBodyNone">DIFFUSIVITY   </td><td class="markdownTableBodyNone">evaluator   </td><td class="markdownTableBodyNone">U L   </td></tr>
 </table>
 <h1><a class="anchor" id="p19_fields_sec"></a>
 4. Field Index</h1>
@@ -487,14 +445,14 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <ul>
 <li><b>Grids.</b> A <code>.picgrid</code>, whether supplied or written by <code>grid.gen</code>, is physical and is divided by <code>L</code> when staged; <code>programmatic_settings</code> bounds are divided by <code>L</code> in C.</li>
 <li><b>Inlet profiles.</b> A <code>file</code> or <code>generated</code> PICSLICE is a physical velocity. A <code>field_slice</code> re-samples an earlier run's solver-unit field, and names that run's case (<code>source_case</code>) or its <code>velocity_scale</code>.</li>
-<li><b>File initial conditions.</b> A <code>mode: file</code> payload is physical: <code>Ucat</code> in velocity, <code>Ucont</code> in volume flux per face. A field saved by an earlier PICurv run is in that run's solver units, so it names the case that wrote it (<code>source_case</code>), or gives <code>velocity_scale</code>, with <code>length_scale</code> too for <code>Ucont</code>; the staged payload is rescaled from those scales to this case's.</li>
-<li>**<code>ic_gen</code> expressions** are evaluated at physical coordinates and give physical values. The generator receives <code>--length-ref</code> and <code>--velocity-ref</code> and writes solver units; a custom <code>params.script</code> receives the same two options.</li>
+<li><b>File initial conditions.</b> A <code>type: file</code> payload is physical: <code>Ucat</code> in velocity, <code>Ucont</code> in volume flux per face. A field saved by an earlier PICurv run is in that run's solver units, so it names the case that wrote it (<code>source_case</code>), or gives <code>velocity_scale</code>, with <code>length_scale</code> too for <code>Ucont</code>; the staged payload is rescaled from those scales to this case's.</li>
+<li><b>Velocity sources</b> (<code>sources:</code>, a <code>source</code> initial condition, a <code>prescribed_velocity</code> inlet and its <code>bulk_velocity</code>) are evaluated by the runtime at physical coordinates and time and give velocities in m/s; each value is divided by <code>U</code> before it is stored.</li>
 <li><b><a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> <code>fields</code> expressions</b> are evaluated by the runtime at physical coordinates (<code>x y z</code> are the particle position times <code>L</code>, <code>t</code> the physical time) and give values in the field's physical units; each value is divided by the field's catalog scale before it is stored. <code>Psi</code> is dimensionless, so its values are stored as given.</li>
 <li><b>Spectral providers</b> receive their velocities and wavenumbers already converted, and work on the staged non-dimensional grid; their summaries report solver units.</li>
 </ul>
 <h1><a class="anchor" id="p19_transition_sec"></a>
 7. Inputs Once Read in Solver Units</h1>
-<p>The point source, the wall-function roughness height, <code>uniform_flow</code>, the verification source profiles, the statistics window times, the <code>ic_gen</code> expressions, the spectral provider parameters, and a <code>mode: file</code> initial-condition payload were read in solver units before this rule covered them. At unit reference scales the two readings are the same. At any other scale, <code>picurv validate</code> names each of these inputs a configuration sets, since a value written in solver units has to be converted to physical.</p>
+<p>The point source, the wall-function roughness height, the analytical uniform flow, the verification source profiles, the statistics window times, the former <code>ic_gen</code> expressions, the spectral provider parameters, and a file initial-condition payload were read in solver units before this rule covered them. At unit reference scales the two readings are the same. At any other scale, <code>picurv validate</code> names each of these inputs a configuration sets, since a value written in solver units has to be converted to physical.</p>
 <h1><a class="anchor" id="p19_extend_sec"></a>
 8. Adding an Input or a Field</h1>
 <ul>

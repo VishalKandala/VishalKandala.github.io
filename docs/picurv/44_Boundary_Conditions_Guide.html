@@ -100,9 +100,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li class="level1"><a href="#p44_supported_sec">3. Supported Handlers</a></li>
 <li class="level1"><a href="#p44_entries_sec">4. Handler Entries</a><ul><li class="level2"><a href="#p44_cap_noslip_sub">noslip</a></li>
 <li class="level2"><a href="#p44_cap_free_slip_sub">free_slip</a></li>
-<li class="level2"><a href="#p44_cap_constant_velocity_sub">constant_velocity</a></li>
-<li class="level2"><a href="#p44_cap_parabolic_sub">parabolic</a></li>
-<li class="level2"><a href="#p44_cap_prescribed_flow_sub">prescribed_flow</a></li>
+<li class="level2"><a href="#p44_cap_prescribed_velocity_sub">prescribed_velocity</a></li>
 <li class="level2"><a href="#p44_cap_conservation_sub">conservation</a></li>
 <li class="level2"><a href="#p44_cap_geometric_sub">geometric</a></li>
 <li class="level2"><a href="#p44_cap_constant_flux_sub">constant_flux</a></li>
@@ -163,13 +161,13 @@ wall</h2>
 <h2><a class="anchor" id="p44_type_inlet_sub"></a>
 inlet</h2>
 <p><a class="anchor" id="p44_type_inlet"></a> <b>Identity.</b> <code>type: inlet</code> -&gt; <code>INLET</code> -&gt; priority <code>BC_PRIORITY_INLET</code>.</p>
-<p><b>What it does.</b> Marks a face where flow enters with a prescribed condition. Legal handlers: <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_constant_velocity">constant_velocity</a>, <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_parabolic">parabolic</a>, <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_prescribed_flow">prescribed_flow</a>.</p>
+<p><b>What it does.</b> Marks a face where flow enters with a prescribed condition. Legal handler: <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_prescribed_velocity">prescribed_velocity</a>.</p>
 <p><b>When to choose it.</b> Any face where you specify what enters the domain.</p>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Highest precedence, so an inlet wins at every shared edge. A domain with an inlet needs an outlet to conserve against.</p>
 <p><b>Diagnostics.</b> Startup banner reports the resolved handler and its configured values per face.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
-<p><b>Limitations.</b> Time-varying inlet types exist in the C enum but are not exposed.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Limitations.</b> None of its own; see the handler.</p>
 <h2><a class="anchor" id="p44_type_outlet_sub"></a>
 outlet</h2>
 <p><a class="anchor" id="p44_type_outlet"></a> <b>Identity.</b> <code>type: outlet</code> -&gt; <code>OUTLET</code> -&gt; priority <code>BC_PRIORITY_OUTLET</code>.</p>
@@ -201,20 +199,18 @@ periodic</h2>
 <th class="markdownTableHeadNone">Applies to</th>
 <th class="markdownTableHeadNone">Required parameters</th>
 <th class="markdownTableHeadNone">Optional parameters</th>
+<th class="markdownTableHeadNone">Status</th>
 </tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_conservation"><code>conservation</code></a></td><td class="markdownTableBodyNone"><code>OUTLET</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_constant_flux"><code>constant_flux</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone"><code>target_flux</code></td><td class="markdownTableBodyNone"><code>apply_trim</code>, <code>enforce_seam_flux</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_constant_velocity"><code>constant_velocity</code></a></td><td class="markdownTableBodyNone"><code>INLET</code></td><td class="markdownTableBodyNone"><code>vx</code>, <code>vy</code>, <code>vz</code></td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_free_slip"><code>free_slip</code></a></td><td class="markdownTableBodyNone"><code>WALL</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_geometric"><code>geometric</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_initial_flux"><code>initial_flux</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone"><code>apply_trim</code>, <code>enforce_seam_flux</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_noslip"><code>noslip</code></a></td><td class="markdownTableBodyNone"><code>WALL</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_parabolic"><code>parabolic</code></a></td><td class="markdownTableBodyNone"><code>INLET</code></td><td class="markdownTableBodyNone"><code>v_max</code></td><td class="markdownTableBodyNone">none</td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p44_cap_prescribed_flow"><code>prescribed_flow</code></a></td><td class="markdownTableBodyNone"><code>INLET</code></td><td class="markdownTableBodyNone"><code>source</code></td><td class="markdownTableBodyNone">none</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_conservation"><code>conservation</code></a></td><td class="markdownTableBodyNone"><code>OUTLET</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_constant_flux"><code>constant_flux</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone"><code>target_flux</code></td><td class="markdownTableBodyNone"><code>apply_trim</code>, <code>enforce_seam_flux</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_free_slip"><code>free_slip</code></a></td><td class="markdownTableBodyNone"><code>WALL</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_geometric"><code>geometric</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_initial_flux"><code>initial_flux</code></a></td><td class="markdownTableBodyNone"><code>PERIODIC</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone"><code>apply_trim</code>, <code>enforce_seam_flux</code></td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_noslip"><code>noslip</code></a></td><td class="markdownTableBodyNone"><code>WALL</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">supported</td></tr>
+<tr><td class="markdownTableBodyNone"><a href="#p44_cap_prescribed_velocity"><code>prescribed_velocity</code></a></td><td class="markdownTableBodyNone"><code>INLET</code></td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone">none</td><td class="markdownTableBodyNone"><b>experimental</b></td></tr>
 </table>
 <p>Rules that apply across all handlers:</p>
 <ul>
-<li>Legacy <code>params.vector</code> and <code>params.velocity</code> are rejected; use scalar <code>vx</code>/<code>vy</code>/<code>vz</code>.</li>
 <li>Unknown parameters are rejected per handler rather than ignored.</li>
 <li>A driven handler (<code>constant_flux</code> or <code>initial_flux</code>) must be configured, with the <b>same</b> handler, on both faces of the periodic pair.</li>
 <li>Velocities and fluxes are given in physical units in YAML and non-dimensionalized before reaching C. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_nondim_sec">6. Non-Dimensionalization Before C Input</a>.</li>
@@ -242,47 +238,40 @@ free_slip</h2>
 <p><b>Diagnostics.</b> The startup banner lists the face as <code>free_slip</code>. The first-cell tangential velocity is free to be nonzero; a wall-normal velocity in the dummy cell that is not the negative of the interior one indicates the handler did not run.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> (<code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>): zero face flux, the mirrored dummy cell on all six faces, the tangential projection on a tilted face, no wall model on a free-slip face, the mirrored eddy viscosity; <code>make unit-newton-krylov</code>: a deterministic residual and a converged solve with and without the point-block preconditioner. Integration verified - <code>make smoke</code> (<code>free-slip wall is a plane of symmetry</code>): a channel half bounded by a free-slip wall equals the corresponding half of the full no-slip channel after three steps to round-off, for laminar Picard, constant-Smagorinsky LES, and Newton Krylov with the point-block preconditioner. Integration verified - <code>free-slip-symmetry-multirank-2026-10-22</code>: the same comparison on 16 ranks, with the free-slip face owned by a subset of them, agrees to 5e-12 or better after 20 steps; on the bent channel a free-slip wall carries round-off normal flux.</p>
 <p><b>Limitations.</b> No moving free-slip wall. On a curvilinear grid an edge cell is mirrored along the metric of the cell it mirrors, which is exact only where the grid is orthogonal to the wall there.</p>
-<h2><a class="anchor" id="p44_cap_constant_velocity_sub"></a>
-constant_velocity</h2>
-<p><a class="anchor" id="p44_cap_constant_velocity"></a> <b>Identity.</b> <code>handler: constant_velocity</code> on an <code>INLET</code> face -&gt; <code>BC_HANDLER_INLET_CONSTANT_VELOCITY</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a12dbd480ebdae5d4056d4554271f1125">Create_InletConstantVelocity</a>.</p>
-<p><b>What it does.</b> Imposes a uniform, time-constant normal speed across the whole inlet face. The C handler selects the component normal to the logical face (<code>vx</code>, <code>vy</code>, or <code>vz</code>) and aligns it with the local metric normal.</p>
-<p><b>When to choose it.</b> The simplest inlet, and the right one for a uniform free-stream or a plug-flow entry. Choose <code>parabolic</code> instead when you want a developed profile without supplying data, or <code>prescribed_flow</code> when you have real profile data.</p>
-<p><b>Parameters it owns.</b> <code>vx</code>, <code>vy</code>, <code>vz</code> - all three required by the shared input schema, in m/s. Only the component normal to the selected face is currently applied; the legacy <code>vector</code>/<code>velocity</code> spellings are rejected.</p>
-<p><b>Interactions.</b> Inlet has the highest boundary priority, so it wins over wall and outlet at shared edges. The outlet must be able to pass the mass this inlet introduces; pair it with <code>conservation</code>.</p>
-<p><b>Diagnostics.</b> The startup banner prints the <b>configured</b> vector for the face as <code>[vx,vy,vz]</code>. It does not report a derived or integrated flux; runtime flux reporting is separate from the banner.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: the inlet delivers bulk velocity 1.00000 and the duct develops to Poiseuille flow at order 1.87.</p>
-<p><b>Limitations.</b> Uniform in space and constant in time.</p>
-<h2><a class="anchor" id="p44_cap_parabolic_sub"></a>
-parabolic</h2>
-<p><a class="anchor" id="p44_cap_parabolic"></a> <b>Identity.</b> <code>handler: parabolic</code> on an <code>INLET</code> face -&gt; <code>BC_HANDLER_INLET_PARABOLIC</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a745d60378744dd7f44b5af7f2550b415">Create_InletParabolicProfile</a>.</p>
-<p><b>What it does.</b> Imposes an analytic parabolic profile across the inlet face, scaled so the centreline reaches <code>v_max</code> and the velocity falls to zero at the bounding walls.</p>
-<p><b>When to choose it.</b> When you want a developed-looking channel or pipe inlet without generating profile data. It is an analytic approximation, not a solution of the flow you are about to run, so it is a starting condition rather than a validated developed profile. For a genuinely developed inlet, use <code>prescribed_flow</code> with a slice from a precursor run.</p>
-<p><b>Parameters it owns.</b> <code>v_max</code> - required, in m/s, the centreline speed.</p>
-<p><b>Interactions.</b> Same inlet priority and outlet-pairing considerations as <code>constant_velocity</code>.</p>
-<p><b>Diagnostics.</b> The startup banner prints the <b>configured</b> <code>v_max</code> for the face, not an integrated flux. If the face is not bounded by walls on the axes the profile assumes, the profile will not vanish at the edges - inspect the inlet plane.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Analytically verified - <code>duct-inlet-handlers-2026-09-21</code>: the delivered bulk velocity matches the sampled product parabola on <code>n</code> cells per side, <code>v_max ((2n^2 + 1) / (3n^2))^2</code>, which tends to <code>(4/9) v_max</code>, to five digits, and the duct develops to Poiseuille flow at order 1.86. Before the 2026-09-21 fix the profile vanished at the wall-adjacent cell centres and delivered 27% and 13% too little.</p>
-<p><b>Limitations.</b> The profile is a product of logical-space parabolas, one per wall-bounded axis, not the duct solution; it is uniform along a periodic axis. On a graded or curved face it is not a physical parabola.</p>
-<h2><a class="anchor" id="p44_cap_prescribed_flow_sub"></a>
-prescribed_flow</h2>
-<p><a class="anchor" id="p44_cap_prescribed_flow"></a> <b>Identity.</b> <code>handler: prescribed_flow</code> on an <code>INLET</code> face -&gt; <code>BC_HANDLER_INLET_PROFILE_FROM_FILE</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a2030390af67a68596b773d14c1d0a4dd">Create_InletProfileFromFile</a>.</p>
-<p><b>What it does.</b> Reads a per-face velocity profile and imposes it on the inlet. The profile is supplied as a PICSLICE-format field whose dimensions must match the inlet face's cell counts.</p>
-<p><b>When to choose it.</b> When the inlet profile matters and an analytic shape will not do: matching a reference DNS inlet, carrying a developed field in from a precursor run, or driving a duct with a computed Poiseuille solution. This is the only handler that accepts external data.</p>
-<p><b>Parameters it owns.</b> <code>source</code> - required, a mapping whose <code>type</code> selects one of three acquisition routes:</p>
+<h2><a class="anchor" id="p44_cap_prescribed_velocity_sub"></a>
+prescribed_velocity</h2>
+<p><a class="anchor" id="p44_cap_prescribed_velocity"></a> <b>Identity.</b> <code>handler: prescribed_velocity</code> on an <code>INLET</code> face, with <code>source</code> and optional <code>constraints</code> on the entry -&gt; bcs parameter <code>source_id</code> and control options <code>-inlet_source_&lt;id&gt;_frame</code>, <code>-inlet_source_&lt;id&gt;_expr_&lt;c&gt;</code>, <code>-inlet_source_&lt;id&gt;_bulk_velocity</code> -&gt; <code>BC_HANDLER_INLET_PRESCRIBED_VELOCITY</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a95c0c9c6b811d57a85be42065e705f55">Create_InletPrescribedVelocity</a>.</p>
+<p><b>What it does.</b> Imposes the velocity of a source. An expression source is written in the shared expression language, in physical units, over <code>x y z</code> [m], <code>t</code> [s], the arc-length fractions <code>xi eta zeta</code> (0 at a line's negative face, 1 at its positive face, proportional to distance along the grid line) and the line lengths <code>L_xi L_eta L_zeta</code> [m]. Its values are read in one of three frames: <code>cartesian</code> (<code>u v w</code>), <code>curvilinear</code> (<code>u_xi u_eta u_zeta</code>, each the speed through the grid face normal to its axis; omitted components are zero) or <code>normal</code> (one speed into the domain). Each face slot is evaluated at its face centre, with the fractions and directions of the interior cell behind it. A source without <code>t</code> is evaluated once; with <code>t</code>, once per step at the step's end time, not on every boundary pass. A data source is a normal-speed profile staged as a PICSLICE file (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_picslice_ssec">6.1 Prescribed Inlet Profile Files</a>): read from a file, generated, or sliced from an earlier solution.</p>
+<div class="fragment"><div class="line">sources:</div>
+<div class="line">  duct_flow:</div>
+<div class="line">    components: curvilinear</div>
+<div class="line">    constants: {U: 1.0}</div>
+<div class="line">    expression: {u_zeta: &quot;36*U*xi*(1-xi)*eta*(1-eta)&quot;}</div>
+<div class="line"> </div>
+<div class="line">boundary_conditions:</div>
+<div class="line">  - face: &quot;-Zeta&quot;</div>
+<div class="line">    type: INLET</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source: duct_flow                 # or the source mapping inline</div>
+<div class="line">    constraints:</div>
+<div class="line">      bulk_velocity: &quot;U*(1 + 0.3*sin(2*pi*0.5*t))&quot;</div>
+</div><!-- fragment --><p>A uniform plug is <code>source: {components: normal, expression: 1.5}</code>; a parabola across two wall-bounded tangential directions is <code>source: {components: normal, expression: "16*1.5*xi*(1-xi)*eta*(1-eta)"}</code>, peaking at 1.5 m/s. The exact rectangular-duct and Womersley profiles, written with the series <code>sum(k, lo, hi, body)</code> and the Kelvin functions <code>ber</code>/<code>bei</code>, are in <a class="el" href="33_Initial_Conditions.html#p33_closed_form_ssec">Closed-form profiles: series and special functions</a>.</p>
+<p><b>When to choose it.</b> Every inlet. Choose an expression for any profile with a closed form and for every time-dependent profile; written in arc-length fractions it is the physical profile on a stretched or curved grid. Choose a data source for a measured profile (<code>file</code>) or a developed plane from a precursor run (<code>field_slice</code>). The exact rectangular-duct solution is an expression (<a class="el" href="33_Initial_Conditions.html#p33_closed_form_ssec">Closed-form profiles: series and special functions</a>).</p>
+<p><b>Parameters it owns.</b> <code>source</code> - required: the name of an entry of the case's top-level <code>sources:</code>, or a mapping. An expression source takes <code>expression</code> (required), <code>components</code> (default <code>cartesian</code>) and <code>constants</code> (named numbers inlined into the expressions and the constraints). A data source takes <code>type</code> and that type's keys:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone"><code>source.type</code>   </th><th class="markdownTableHeadNone">Required keys   </th><th class="markdownTableHeadNone">Optional keys   </th><th class="markdownTableHeadNone">Use when    </th></tr>
+<th class="markdownTableHeadNone"><code>type</code>   </th><th class="markdownTableHeadNone">Required keys   </th><th class="markdownTableHeadNone">Optional keys   </th><th class="markdownTableHeadNone">Use when    </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>file</code>   </td><td class="markdownTableBodyNone"><code>path</code>   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">You already have a PICSLICE profile file    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>generated</code>   </td><td class="markdownTableBodyNone"><code>generator</code>   </td><td class="markdownTableBodyNone"><code>script</code>, <code>params</code>   </td><td class="markdownTableBodyNone">A shipped generator can produce it (<code>square_duct_poiseuille</code>)    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>field_slice</code>   </td><td class="markdownTableBodyNone"><code>field_file</code>, <code>grid_file</code>, and one of <code>source_case</code> or <code>velocity_scale</code>   </td><td class="markdownTableBodyNone"><code>script</code>, <code>source_block</code>, <code>slice</code>   </td><td class="markdownTableBodyNone">You are extracting a plane from an existing solution   </td></tr>
 </table>
-<p>Unknown keys inside <code>source</code> are rejected with the allowed set named, rather than silently dropped. <code>output_file</code> is refused for both <code>generated</code> and <code>field_slice</code>: <code>picurv</code> writes generated profiles under <code>&lt;run.inputs&gt;/inlet_profiles/</code>.</p>
-<p><b>Interactions.</b> Profile dimensions are validated against the resolved grid block node counts before the run starts: a <code>-Xi</code>/<code>+Xi</code> face expects <code>(KM-1, JM-1)</code>, <code>-Eta</code>/<code>+Eta</code> expects <code>(KM-1, IM-1)</code>, and <code>-Zeta</code>/<code>+Zeta</code> expects <code>(JM-1, IM-1)</code>. A mismatch is a validation error, not a runtime surprise. <code>field_slice</code> needs either <code>source_case</code> (to inherit that case's scaling) or an explicit <code>velocity_scale</code>, because a raw field carries no units of its own.</p>
-<p><b>Diagnostics.</b> The startup banner prints the resolved <code>source_file</code> for the face. Validation reports expected versus actual profile dimensions on mismatch, and the resolved profile file is written into the run's config directory, so what was actually imposed is recoverable after the fact.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> covers the handler in <code><a class="el" href="test__boundaries_8c.html" title="C unit tests for boundary factories, inlet ownership, and face helpers.">tests/c/test_boundaries.c</a></code>. Integration verified - <code>tests/test_config_regressions.py</code> exercises all three source types and the face-dimension validation. It is offered by <code>examples/master_template</code>; no shipped runnable example currently selects it, so there is no production-exercised facet. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: a generated square-duct profile on a grid_gen grid delivered the requested flux to 1e-9 and was held downstream; <code>programmatic-inlet-flux-2026-09-18</code> measured the flux excess on <code>programmatic_c</code> grids that the 2026-09-21 fix below removed, and <code>programmatic-inlet-flux-fixed-2026-09-21</code> measured the fixed inlet delivering the requested flux to 1e-9 on uniform and stretched <code>programmatic_c</code> grids of 8 and 16 cells across. Unit verified - <code>tests/test_workspace_lifecycle.py</code> checks that a generated profile on a stretched <code>programmatic_c</code> grid is normalized on its face areas and re-identifies when the grid settings change.</p>
-<p><b>Limitations.</b> The profile is steady: the same values are reapplied on every boundary pass, with no time variation. A generated profile is sampled at the target grid's face centres and normalized by face area on every grid mode. On <code>programmatic_c</code>, which the simulator builds itself, the target is the single-block bridge grid written with the solver's own node formula, so a multi-block <code>programmatic_c</code> case with a generated profile is refused at validation. Before 2026-09-21 a <code>programmatic_c</code> profile was sampled at uniform logical points and normalized to its continuous mean, and the inlet delivered roughly <code>2/n</code> too much flux for <code>n</code> cells across - 12% at 16 cells.</p>
+<p>Unknown keys are rejected with the allowed set named. <code>output_file</code> is refused for <code>field_slice</code>: <code>picurv</code> writes sliced profiles under <code>&lt;run.inputs&gt;/inlet_profiles/</code>.</p>
+<p><code>constraints</code> - optional, applied in order: <code>scale</code> multiplies every value (for a data source the profile is multiplied as it is staged, so <code>scale</code> must be positive); <code>bulk_velocity</code> [m/s], a number or an expression in <code>t</code>, rescales the face each step it changes so the area-weighted mean normal speed equals it. A <code>sum</code> of sources is added, as in the interior (<a class="el" href="33_Initial_Conditions.html#p33_source">p33_source</a>): expressions in one frame, and at most one data term, which the expressions in the normal frame add to and <code>bulk_velocity</code> leaves as measured.</p>
+<p><b>Interactions.</b> The same named expression source can set the initial condition (<a class="el" href="33_Initial_Conditions.html#p33_source">source initial condition</a>), so the interior and the inlet agree at the first step. <code>bulk_velocity</code> sums over the whole face, a collective once per step it is recomputed. A shared shape with the time dependence only in <code>bulk_velocity</code> is evaluated once; only the rescaling runs each step. A data source's dimensions are validated against the grid before the run starts (<a class="el" href="44_Boundary_Conditions_Guide.html#p44_picslice_ssec">6.1 Prescribed Inlet Profile Files</a>), and <code>field_slice</code> needs <code>source_case</code> or <code>velocity_scale</code> because a raw field carries no units of its own. Newton-Krylov momentum accepts the inlet: the velocity is fixed within a step, so every residual evaluation sees the same boundary value.</p>
+<p><b>Diagnostics.</b> The startup banner names the face's <code>-inlet_source_&lt;id&gt;</code> options, or its staged <code>source_file</code>. A data source logs its file, dimensions and speed range when first applied. With debug logging the handler logs the target, the source mean and the factor each time it rescales. The applied flux is the inlet's entry in <code>Continuity_Metrics.csv</code> (<code>flux_in</code>). A value that is not finite stops the run naming the position and time; a source whose mean normal speed is zero cannot be rescaled and is refused.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code> covers a uniform and a parabolic source on every face, a PICSLICE file, a source in <code>t</code> evaluated once per step, and <code>bulk_velocity</code> rescaling; <code>make unit-mpi</code> (<code>grid-line-fractions-follow-arc-length</code>) checks the fractions and lengths against arc length on a stretched grid across ranks. Integration verified - <code>tests/test_velocity_sources.py</code> covers resolution, the emitted options, data-source staging and scaling, and the refusals; <code>tests/test_config_regressions.py</code> and <code>tests/test_cli_smoke.py</code> exercise the data-source types and the face-dimension validation. Production exercised in <code>examples/flat_channel</code>.</p>
+<p><b>Limitations.</b> Random draws are not available in a source. On a multi-block case the fractions run from 0 to 1 within each block. A data source is steady; only its <code>bulk_velocity</code> and any expressions added to it may vary in time.</p>
 <h2><a class="anchor" id="p44_cap_conservation_sub"></a>
 conservation</h2>
 <p><a class="anchor" id="p44_cap_conservation"></a> <b>Identity.</b> <code>handler: conservation</code> on an <code>OUTLET</code> face -&gt; <code>BC_HANDLER_OUTLET_CONSERVATION</code> -&gt; <a class="el" href="BC__Handlers_8h.html#ae2dfaf7f6a717cda068b4990fb3ccd8b">Create_OutletConservation</a>.</p>
@@ -380,20 +369,20 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 </p>
 <p>Specifically:</p>
 <ul>
-<li><code>vx/vy/vz/v_max</code> are divided by <code>properties.scaling.velocity_ref</code>,</li>
-<li><code>prescribed_flow</code> PICSLICE scalar speeds are divided by <code>properties.scaling.velocity_ref</code> while staging the solver-side <code>.picslice</code>,</li>
+<li>a data source's PICSLICE speeds are divided by <code>properties.scaling.velocity_ref</code> (and multiplied by its <code>scale</code>) while staging the solver-side <code>.picslice</code>,</li>
 <li><code>target_flux</code> is divided by <code>velocity_ref * length_ref^2</code>.</li>
 </ul>
+<p>An expression source reaches C in physical units: the runtime evaluates it at physical coordinates and time and divides the velocity by <code>velocity_ref</code>.</p>
 <h2><a class="anchor" id="p44_picslice_ssec"></a>
 6.1 Prescribed Inlet Profile Files</h2>
-<p><code>prescribed_flow</code> uses a face-scoped canonical <code>PICSLICE</code> file. It can be supplied directly with <code>source.type: file</code>, generated analytically with <code>source.type: generated</code>, or sliced from an old <code>ufield*.dat</code> with <code>source.type: field_slice</code>. The Python conductor resolves the face/grid context and delegates dimensional profile writes to <code>generators/profile.gen</code>. Generated and field-sliced sources may set optional <code>source.script</code> to a compatible case-relative or absolute override:</p>
+<p>A data source of <code>prescribed_velocity</code> uses a face-scoped canonical <code>PICSLICE</code> file. It can be supplied directly with <code>type: file</code>, or sliced from an old <code>ufield*.dat</code> with <code>type: field_slice</code>. The Python conductor resolves the face/grid context and delegates dimensional profile writes to <code>generators/profile.gen</code>. Field-sliced sources may set optional <code>script</code> to a compatible case-relative or absolute override:</p>
 <div class="fragment"><div class="line">PICSLICE</div>
 <div class="line">1</div>
 <div class="line">&lt;n1&gt; &lt;n2&gt;</div>
 <div class="line">&lt;positive_scalar_speed_0&gt;</div>
 <div class="line">&lt;positive_scalar_speed_1&gt;</div>
 <div class="line">...</div>
-</div><!-- fragment --><p>The second line is the frame count. Static prescribed profiles require <code>1</code>. Values are positive scalar speed magnitudes normal to the inlet surface, not Cartesian velocity components and not contravariant fluxes. The C handler uses the existing inlet face sign and metric conversion to populate <code>Ucont</code> and <code>Ubcs</code>.</p>
+</div><!-- fragment --><p>The second line is the frame count. Static prescribed profiles require <code>1</code>. Values are positive scalar speed magnitudes normal to the inlet surface, not Cartesian velocity components and not contravariant fluxes. The C handler uses the inlet face sign and metric conversion of a normal-frame source to populate <code>Ucont</code> and <code>Ubcs</code>.</p>
 <p>Expected dimensions follow the existing inlet face loop order:</p>
 <ul>
 <li><code>-Xi/+Xi</code>: <code>(KM - 1, JM - 1)</code>, ordered <code>(k, j)</code></li>
@@ -405,48 +394,32 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
 <div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: file</div>
-<div class="line">        path: profiles/inlet.picslice</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source:</div>
+<div class="line">      type: file</div>
+<div class="line">      path: profiles/inlet.picslice</div>
 </div><!-- fragment --><p>Each face can reference its own <code>.picslice</code>; <code>picurv</code> stages one solver-scale file per face and writes <code>source_file=...</code> into the run's <code>bcs.run</code>.</p>
-<p>Generated profiles currently support analytical square-duct Poiseuille flow:</p>
-<div class="fragment"><div class="line">boundary_conditions:</div>
-<div class="line">  - face: &quot;-Zeta&quot;</div>
-<div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: generated</div>
-<div class="line">        generator: square_duct_poiseuille</div>
-<div class="line">        # script: tools/custom_profile.py  # optional</div>
-<div class="line">        params:</div>
-<div class="line">          bulk_velocity: 1.0</div>
-<div class="line">          n_terms: 101</div>
-</div><!-- fragment --><p>The face selects the two transverse dimensions automatically:</p>
+<p>The face selects the two transverse dimensions automatically:</p>
 <ul>
 <li><code>-Xi/+Xi</code>: <code>(KM - 1, JM - 1)</code>, ordered <code>(k, j)</code></li>
 <li><code>-Eta/+Eta</code>: <code>(KM - 1, IM - 1)</code>, ordered <code>(k, i)</code></li>
 <li><code>-Zeta/+Zeta</code>: <code>(JM - 1, IM - 1)</code>, ordered <code>(j, i)</code></li>
 </ul>
-<p>For <code>grid.mode: grid_gen</code>, <code>picurv run --solve</code> generates the grid first, then reads the generated <code>PICGRID</code> header to size the profile. For <code>grid.mode: file</code>, it reads the source <code>PICGRID</code> header. Generated dimensional profiles and <code>profile.info</code> are written under <code>&lt;run.inputs&gt;/inlet_profiles/</code>, then the staged solver-scale <code>.picslice</code> is referenced from <code>bcs.run</code>.</p>
-<p>For <code>square_duct_poiseuille</code>, <code>bulk_velocity</code> is the target inlet bulk speed. <code>picurv</code> evaluates the analytical profile at the target inlet face centers and rescales it using geometric quad face areas so <code>sum(u * area) / sum(area)</code> matches <code>bulk_velocity</code>. The target is the grid file for <code>file</code>, the generated grid for <code>grid_gen</code>, and for <code>programmatic_c</code> the bridge <code>PICGRID</code> built from <code>programmatic_settings</code> with the formula the solver uses, so its stretching is honoured. <code>profile.info</code> records the normalization mode, sampling mode, area-weighted mean before and after normalization, total inlet area, face-area range, and discrete sample mean. Only <code>profile.gen</code> run by hand without <code>--target-grid</code> falls back to continuous-area normalization on uniform logical sample points, and <code>profile.info</code> then says so. The areas are geometric quad areas computed from the target grid coordinates, not the C metric face-area vectors.</p>
+<p>For <code>grid.mode: grid_gen</code>, <code>picurv run --solve</code> generates the grid first, then reads the generated <code>PICGRID</code> header to size the profile. For <code>grid.mode: file</code>, it reads the source <code>PICGRID</code> header. Sliced dimensional profiles and <code>profile.info</code> are written under <code>&lt;run.inputs&gt;/inlet_profiles/</code>, then the staged solver-scale <code>.picslice</code> is referenced from <code>bcs.run</code>.</p>
 <p>Field-sliced profiles reuse an existing Cartesian velocity field as a new inlet:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Zeta&quot;</div>
 <div class="line">    type: INLET</div>
-<div class="line">    handler: prescribed_flow</div>
-<div class="line">    params:</div>
-<div class="line">      source:</div>
-<div class="line">        type: field_slice</div>
-<div class="line">        field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
-<div class="line">        grid_file: ../old_run/inputs/grid/grid.run</div>
-<div class="line">        source_case: ../old_run/config/case.yml</div>
-<div class="line">        slice:</div>
-<div class="line">          face: &quot;+Zeta&quot;</div>
-<div class="line">          orientation: opposite</div>
-<div class="line">          normal_tolerance: 0.99</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source:</div>
+<div class="line">      type: field_slice</div>
+<div class="line">      field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
+<div class="line">      grid_file: ../old_run/inputs/grid/grid.run</div>
+<div class="line">      source_case: ../old_run/config/case.yml</div>
+<div class="line">      slice:</div>
+<div class="line">        face: &quot;+Zeta&quot;</div>
+<div class="line">        orientation: opposite</div>
+<div class="line">        normal_tolerance: 0.99</div>
 </div><!-- fragment --><p><code>field_slice</code> reads old <code>Ucat</code>, computes source and target face normals from canonical <code>PICGRID</code> geometry, projects <code>dot(Ucat, n_hat)</code> to a scalar normal speed, and writes a dimensional <code>.sliced.picslice</code>. <code>orientation: opposite</code> means the old outward normal and new inlet outward normal must oppose each other; use <code>orientation: same</code> only when both outward normals should align. The extractor fails if normal compatibility or flow sign checks fail. V1 requires exact source/target slice dimension matches and does not interpolate.</p>
 <h1><a class="anchor" id="p44_periodic_rules_sec"></a>
 7. Periodicity Consistency Rules</h1>
@@ -485,9 +458,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <ul>
 <li>wall no-slip,</li>
 <li>wall free-slip,</li>
-<li>inlet constant velocity,</li>
-<li>inlet parabolic,</li>
-<li>inlet prescribed flow from file,</li>
+<li>inlet prescribed velocity (expression or PICSLICE source),</li>
 <li>outlet conservation,</li>
 <li>periodic geometric,</li>
 <li>periodic driven constant flux,</li>
@@ -499,7 +470,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <ul>
 <li>C enums include additional BC categories and handlers (moving walls, far field, characteristic),</li>
 <li>but the current end-to-end user contract intentionally exposes the validated subset listed above.</li>
-<li><code>source.type: field_slice</code> is Python-side preprocessing only: it creates the same staged <code>source_file</code> contract used by file-backed and generated profiles.</li>
+<li>a <code>field_slice</code> data source is Python-side preprocessing only: it creates the same staged <code>source_file</code> contract used by file-backed profiles.</li>
 </ul>
 <p>If you add a new BC mode, update all three layers in one change:</p>
 <ol type="1">
@@ -509,12 +480,12 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 </ol>
 <h1><a class="anchor" id="p44_examples_sec"></a>
 10. Authoring Examples</h1>
-<p>Constant-velocity inlet + outlet conservation:</p>
+<p>Uniform inlet + outlet conservation:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">  - face: &quot;-Xi&quot;</div>
 <div class="line">    type: INLET</div>
-<div class="line">    handler: constant_velocity</div>
-<div class="line">    params: { vx: 1.5, vy: 0.0, vz: 0.0 }</div>
+<div class="line">    handler: prescribed_velocity</div>
+<div class="line">    source: {components: normal, expression: 1.5}</div>
 <div class="line">  - face: &quot;+Xi&quot;</div>
 <div class="line">    type: OUTLET</div>
 <div class="line">    handler: conservation</div>
@@ -561,7 +532,7 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 12. Related Pages</h1>
 <ul>
 <li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
-<li><b><a class="el" href="33_Initial_Conditions.html">Initial Condition Modes</a></b></li>
+<li><b><a class="el" href="33_Initial_Conditions.html">Initial Conditions</a></b></li>
 <li><b><a class="el" href="45_Particle_Initialization_and_Restart.html">Particle Initialization and Restart Guide</a></b></li>
 <li><b><a class="el" href="13_Code_Architecture.html">Code Architecture</a></b></li>
 <li><b><a class="el" href="39_Common_Fatal_Errors.html">Common Fatal Errors and Fixes</a></b></li>

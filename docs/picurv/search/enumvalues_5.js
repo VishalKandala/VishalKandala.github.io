@@ -89,12 +89,5 @@ var searchData=
   ['field_5fsync_5fj_5fface_86',['FIELD_SYNC_J_FACE',['../field__catalog_8h.html#a66c47f7f21dab44c72b5f1bf156d88a6ac443b75079c38493f4bc9dcd8d6d5d83',1,'field_catalog.h']]],
   ['field_5fsync_5fk_5fface_87',['FIELD_SYNC_K_FACE',['../field__catalog_8h.html#a66c47f7f21dab44c72b5f1bf156d88a6abe6914047f95c36753e053889b33af41',1,'field_catalog.h']]],
   ['field_5fsync_5fstandard_88',['FIELD_SYNC_STANDARD',['../field__catalog_8h.html#a66c47f7f21dab44c72b5f1bf156d88a6a008c52c8cd49c4d4287030049bf68a31',1,'field_catalog.h']]],
-  ['flow_5fdir_5fneg_5feta_89',['FLOW_DIR_NEG_ETA',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3ca23bd6b369f83a7ddb857f9d5108f3845',1,'variables.h']]],
-  ['flow_5fdir_5fneg_5fxi_90',['FLOW_DIR_NEG_XI',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3ca7824500157ef39f99a68ef0ea7f5a0a8',1,'variables.h']]],
-  ['flow_5fdir_5fneg_5fzeta_91',['FLOW_DIR_NEG_ZETA',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3ca08cbb53788f5af919a1bb5f5dcc5032c',1,'variables.h']]],
-  ['flow_5fdir_5fpos_5feta_92',['FLOW_DIR_POS_ETA',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3caf3523d8a6dc4a8bc49f56ba528b7defb',1,'variables.h']]],
-  ['flow_5fdir_5fpos_5fxi_93',['FLOW_DIR_POS_XI',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3ca7218a7a4b3d7d619b7e248ba92cc3beb',1,'variables.h']]],
-  ['flow_5fdir_5fpos_5fzeta_94',['FLOW_DIR_POS_ZETA',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3ca4be3843a56bb4374a7ac575ba0df964f',1,'variables.h']]],
-  ['flow_5fdir_5funset_95',['FLOW_DIR_UNSET',['../variables_8h.html#ab8be8588dd6cb232bc3726ac59f45e3cad0fa8aba5271be42c7bf3e0c1fcb251a',1,'variables.h']]],
-  ['front_96',['FRONT',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa76bd5ec6ea9d8a1b582d8d5e43102a02',1,'variables.h']]]
+  ['front_89',['FRONT',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294fa76bd5ec6ea9d8a1b582d8d5e43102a02',1,'variables.h']]]
 ];

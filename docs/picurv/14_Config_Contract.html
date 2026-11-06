@@ -151,13 +151,12 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>Generated initial conditions reject <code>output_file</code>, <code>summary_json</code>, and <code>spectrum_csv</code> in <code>properties.initial_conditions.params</code>, and generated or <code>field_slice</code> inlet profiles reject <code>source.output_file</code>, for the same reason.</li>
 <li><code>grid.generator.cli_args</code> is a raw token list passed through to <code>grid.gen</code>, but closed-choice values inside it (a <code>--cross-section</code> value, or the segment kinds inside <code>--wall-j-lo</code>/<code>--path</code>/<code>--transforms</code>/etc.) are checked at validation time against the same sets <code>grid.gen</code> itself enforces, so a misspelled selector fails before the run rather than partway into it. See <a class="el" href="48_Grid_Generator_Guide.html#p48_grammar_ssec">3.1 The Ordered-List Grammar</a>.</li>
 <li><code>boundary_conditions</code> is a list of six face entries.</li>
-<li><code>INLET</code> + <code>prescribed_flow</code> supports <code>source.type: file</code>, <code>source.type: generated</code>, and <code>source.type: field_slice</code>. Generated square-duct Poiseuille profiles and old-field slices are produced by Python, written under <code>&lt;run.config&gt;/</code>, summarized in <code>profile.info</code>, then converted to the existing C-side <code>source_file</code> contract.</li>
+<li><code>INLET</code> takes <code>prescribed_velocity</code>, whose <code>source</code> is an expression or data: <code>type: file</code> or <code>type: field_slice</code>, or a <code>sum</code> of expressions and at most one of those. Old-field slices are produced by Python, written under <code>&lt;run.inputs&gt;/</code>, summarized in <code>profile.info</code>, then staged into the C-side <code>source_file</code> contract. An expression source and its <code>bulk_velocity</code> reach C as quoted <code>-inlet_source_&lt;id&gt;_*</code> control options.</li>
 <li><code>solver_parameters</code> is an advanced passthrough map for raw flags not yet modeled in schema.</li>
-<li><code>properties.initial_conditions.mode</code> is <code>generated</code> or <code>file</code>.</li>
-<li>generated built-ins are <code>zero</code>, <code>constant</code>, <code>streamwise_constant</code>, and <code>poiseuille</code>; their inputs live under <code>params</code>.</li>
-<li><code>generator: ic_gen</code> requires <code>params.field</code> and <code>params.config_file</code>, defaults to <code>generators/ic.gen</code>, accepts optional <code>params.script</code>, and stages its PETSc vector output exactly like file mode. The repository generator evaluates <code>[expression]</code> configs in physical units - coordinates are the staged single-block PICGRID times <code>length_ref</code>, values are physical velocities or fluxes - and writes solver units; <code>programmatic_c</code> cases materialize this bridge grid from scalar <code>programmatic_settings</code>.</li>
-<li>generated and field-sliced <code>prescribed_flow</code> sources default to <code>generators/profile.gen</code> and accept optional <code>source.script</code>.</li>
-<li><code>mode: file</code> requires <code>field: Ucat|Ucont</code> and <code>source_file</code>. The payload is physical unless it names <code>source_case</code>, or <code>velocity_scale</code> (and <code>length_scale</code> for <code>Ucont</code>), for a field an earlier run saved in its solver units.</li>
+<li><code>properties.initial_conditions</code> takes one <code>source</code>: expressions, a generator, a file, or a <code>sum</code> of expressions and at most one of those (<a class="el" href="33_Initial_Conditions.html#p33_source">p33_source</a>), and optional <code>constraints</code>.</li>
+<li><code>generator: ic_gen</code> runs your own script: it requires <code>params.script</code>, <code>params.field</code> and <code>params.config_file</code>, and stages its PETSc vector output exactly like a file term; <code>programmatic_c</code> cases materialize its bridge grid from scalar <code>programmatic_settings</code>.</li>
+<li>field-sliced inlet data sources default to <code>generators/profile.gen</code> and accept optional <code>source.script</code>.</li>
+<li><code>type: file</code> requires <code>field: Ucat|Ucont</code> and <code>path</code>. The payload is physical unless it names <code>source_case</code>, or <code>velocity_scale</code> (and <code>length_scale</code> for <code>Ucont</code>), for a field an earlier run saved in its solver units.</li>
 <li>file-backed ICs currently support single-block cases only.</li>
 <li><code>solver.operation_mode.eulerian_field_source</code> and <code>run_control.start_step</code> determine whether <code>initial_conditions</code> has authority.</li>
 </ul>
@@ -165,10 +164,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 4. Solver Contract Highlights</h1>
 <ul>
 <li><code>operation_mode.eulerian_field_source</code> -&gt; <code>-euler_field_source</code></li>
-<li><code>operation_mode.analytical_type</code> -&gt; <code>-analytical_type</code></li>
-<li><code>operation_mode.uniform_flow.{u,v,w}</code> -&gt; <code>-analytical_uniform_u/-analytical_uniform_v/-analytical_uniform_w</code> for <code>UNIFORM_FLOW</code></li>
-<li><code>verification.sources.diffusivity.*</code> -&gt; <code>-verification_diffusivity_*</code></li>
-<li><code>verification.sources.scalar.*</code> -&gt; <code>-verification_scalar_*</code></li>
+<li><code>verification.sources.diffusivity</code> -&gt; <code>-verification_diffusivity_expr</code></li>
+<li><code>verification.sources.scalar</code> -&gt; <code>-verification_scalar_expr</code></li>
 <li><code>strategy.momentum_solver</code> -&gt; <code>-mom_solver_type</code> via normalized names.</li>
 <li>Solver-specific block support includes <code>momentum_solver.dual_time_picard_jameson_rk</code> and <code>momentum_solver.newton_krylov</code>.</li>
 <li>Deprecated <code>dual_time_picard_rk4</code> and <code>rk4_residual_noise_allowance_factor</code> spellings are accepted only as compatibility aliases and normalize to Jameson controls.</li>
@@ -201,9 +198,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <dl class="section note"><dt>Note</dt><dd>The four LES models, all four filter widths and both test-filter kernels are supported. Evidence and limits per value are at <a class="el" href="07_Case_Reference.html#p07_les_sec">5. LES Subgrid Models</a>.</dd></dl>
 <p>Analytical-mode compatibility rule:</p>
 <ul>
-<li>when <code>operation_mode.eulerian_field_source: analytical</code> is selected, <code>TGV3D</code> still requires <code>case.yml -&gt; grid.mode: programmatic_c</code>.</li>
-<li><code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> support <code>case.yml -&gt; grid.mode: programmatic_c</code> and <code>case.yml -&gt; grid.mode: file</code>.</li>
-<li><code>grid_gen</code> remains outside the current documented analytical contract.</li>
+<li>when <code>operation_mode.eulerian_field_source: analytical</code> is selected, <code>case.yml -&gt; grid.mode</code> is <code>programmatic_c</code> or <code>file</code>, and the field is the case's <code>properties.initial_conditions.source</code> (<a class="el" href="32_Analytical_Solutions.html#p32_activation_sec">1. Activation Path</a>).</li>
 </ul>
 <p>Verification-pathway rule:</p>
 <ul>
@@ -262,7 +257,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <li>when <code>execution.launcher</code> / <code>execution.launcher_args</code> are omitted, <code>picurv</code> falls back to nearest <code>.picurv-execution.yml</code> (<code>cluster_execution</code>, then <code>default_execution</code>) before using the built-in default <code>srun</code>.</li>
 <li><code>execution.decomposition: {i, j, k}</code> optionally sets the MPI decomposition of the solver and postprocessor stages; the product must be <code>nodes * ntasks_per_node</code>. When omitted, <code>picurv</code> chooses one (<a class="el" href="05_The_Conductor_Script.html#p05_decomposition_ssec">4.1 MPI Decomposition</a>).</li>
 <li><code>execution.walltime_guard</code> optionally tunes the automatic runtime walltime estimator for generated Slurm solver jobs. When omitted, generated solver jobs still use the built-in default policy (<code>enabled: true</code>, <code>warmup_steps: 10</code>, <code>multiplier: 2.0</code>, <code>min_seconds: 60</code>, <code>estimator_alpha: 0.35</code>).</li>
-<li><code>execution.extra_sbatch</code> supports scheduler-specific pass-through flags.</li>
+<li><code>execution.sbatch_passthrough</code> is a mapping of scheduler-specific flags passed to <code>#SBATCH</code>: <code>key: value</code> writes <code>--key=value</code>, <code>key: true</code> writes the bare <code>--key</code>, and <code>false</code> or <code>null</code> writes nothing.</li>
 <li><code>cluster.yml</code> does not currently define run naming. <code>picurv</code> derives <code>run_id</code> from <code>&lt;case_basename&gt;_&lt;timestamp&gt;</code> and uses that same run ID to name generated scheduler jobs.</li>
 </ul>
 <p>Optional shared runtime execution file:</p>
@@ -333,8 +328,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </ul>
 <p>Examples:</p>
 <ul>
-<li>omitting <code>properties.initial_conditions.mode</code> is rejected at the launcher level,</li>
-<li><code>generator: zero</code> requires no <code>params</code>,</li>
+<li>omitting <code>properties.initial_conditions.source</code> is rejected at the launcher level,</li>
+<li>a retired key such as <code>mode</code> or <code>generator</code> directly under <code>initial_conditions</code> is refused, naming its replacement,</li>
 <li>omitting <code>models.physics.particles.restart_mode</code> on a particle restart emits a warning that C will default to <code>load</code>.</li>
 </ul>
 <p>For worked examples and profile-composition patterns, see <b><a class="el" href="49_Workflow_Recipes_and_Config_Cookbook.html">Workflow Recipes and Config Cookbook</a></b>. For selector-specific contributor hook points, see <b><a class="el" href="50_Modular_Selector_Extension_Guide.html">Modular Selector Extension Guide</a></b>. </p>

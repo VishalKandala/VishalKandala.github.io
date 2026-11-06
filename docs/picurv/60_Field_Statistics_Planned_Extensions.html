@@ -236,7 +236,7 @@ The rules this needs</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>WALL</code> (<code>noslip</code>)   </td><td class="markdownTableBodyNone">per field class below   </td><td class="markdownTableBodyNone">mirror    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>INLET</code> (<code>constant_velocity</code>, <code>parabolic</code>, <code>prescribed_flow</code>)   </td><td class="markdownTableBodyNone">the inlet value   </td><td class="markdownTableBodyNone">mirror    </td></tr>
+<td class="markdownTableBodyNone"><code>INLET</code> (<code>prescribed_velocity</code>)   </td><td class="markdownTableBodyNone">the inlet value   </td><td class="markdownTableBodyNone">mirror    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>OUTLET</code> (<code>conservation</code>)   </td><td class="markdownTableBodyNone">zero-gradient   </td><td class="markdownTableBodyNone">zero-gradient   </td></tr>
 </table>
@@ -264,7 +264,7 @@ Two cases that must refuse rather than default</h2>
 <h2><a class="anchor" id="p60_stats_boundary_assume_sub"></a>
 The assumption underneath</h2>
 <p>"Mean at the boundary equals the boundary value" and "fluctuations vanish at a Dirichlet
-boundary" both hold <b>only if that boundary is steady over the window</b>. True for <code>noslip</code>, <code>constant_velocity</code>, and <code>parabolic</code>. Not guaranteed for <code>prescribed_flow</code>, which reads a profile that could in principle vary in time. Treating <code>prescribed_flow</code> as steady is a documented assumption rather than a checked one.</p>
+boundary" both hold <b>only if that boundary is steady over the window</b>. True for <code>noslip</code>, and for a <code>prescribed_velocity</code> inlet whose source does not use <code>t</code> and whose <code>bulk_velocity</code>, if any, is constant. False for a time-dependent inlet, whose rule would have to be the window mean of its values; the inlet knows whether it is time-dependent, so the rule can refuse that case rather than assume it steady.</p>
 <p>Note also that the rule must be applied to the <em>statistics</em> field, never copied as a value from the source field. At a wall the source's ghost is a function of the <em>instantaneous</em> interior cell, so copying it would place an instantaneous value in a mean field. The inlet is the one exception, because a steady Dirichlet value is constant in time and copying it is therefore exact.</p>
 <h2><a class="anchor" id="p60_stats_boundary_why_sub"></a>
 Why it is deferred</h2>

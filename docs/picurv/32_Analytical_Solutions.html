@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PICurv: Analytical Solution Modes</title>
+<title>PICurv: Analytical Fields</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,161 +86,66 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">Analytical Solution Modes</div></div>
+  <div class="headertitle"><div class="title">Analytical Fields</div></div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#p32_entries_sec">2. Analytical Type Entries</a><ul><li class="level2"><a href="#p32_cap_zero_flow_sub">ZERO_FLOW</a></li>
-<li class="level2"><a href="#p32_cap_uniform_flow_sub">UNIFORM_FLOW</a></li>
-<li class="level2"><a href="#p32_cap_tgv3d_sub">TGV3D</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#p32_activation_sec">3. Activation Path</a></li>
-<li class="level1"><a href="#p32_types_sec">4. Supported Types In Current Code</a></li>
-<li class="level1"><a href="#p32_tgv_sec">5. TGV3D Details</a></li>
-<li class="level1"><a href="#p32_zero_sec">6. ZERO_FLOW Details</a></li>
-<li class="level1"><a href="#p32_uniform_sec">7. UNIFORM_FLOW Details</a></li>
-<li class="level1"><a href="#p32_particles_sec">8. Particle Consistency</a></li>
-<li class="level1"><a href="#p32_extension_sec">9. Adding A New Analytical Type</a></li>
+<ul><li class="level1"><a href="#p32_activation_sec">1. Activation Path</a></li>
+<li class="level1"><a href="#p32_types_sec">2. What Can Be Prescribed</a></li>
+<li class="level1"><a href="#p32_tgv_sec">3. Taylor-Green Vortex</a></li>
+<li class="level1"><a href="#p32_particles_sec">4. Particle Consistency</a></li>
+<li class="level1"><a href="#p32_evidence_sec">5. Evidence</a></li>
+<li class="level1"><a href="#p32_extension_sec">6. Adding A Field</a></li>
 </ul>
 </div>
-<div class="textblock"><p><a class="anchor" id="_Analytical_Solutions"></a> Analytical mode bypasses the normal momentum/Poisson time advancement and directly sets Eulerian fields from closed-form expressions.</p>
-<h1><a class="anchor" id="p32_entries_sec"></a>
-2. Analytical Type Entries</h1>
-<!-- GENERATED FILE - do not edit by hand. Family: analytical.solution_type.
-     Regenerate with: make docs-inventory -->
-<table class="markdownTable">
-<tr>
-<th class="markdownTableHeadNone">Value</th>
-<th class="markdownTableHeadNone">Maps to</th>
-</tr>
-<tr><td class="markdownTableBodyNone"><a href="#p32_cap_tgv3d"><code>TGV3D</code></a></td><td class="markdownTableBodyNone"><code>TGV3D</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p32_cap_uniform_flow"><code>UNIFORM_FLOW</code></a></td><td class="markdownTableBodyNone"><code>UNIFORM_FLOW</code></td></tr>
-<tr><td class="markdownTableBodyNone"><a href="#p32_cap_zero_flow"><code>ZERO_FLOW</code></a></td><td class="markdownTableBodyNone"><code>ZERO_FLOW</code></td></tr>
-</table>
-<h2><a class="anchor" id="p32_cap_zero_flow_sub"></a>
-ZERO_FLOW</h2>
-<p><a class="anchor" id="p32_cap_zero_flow"></a> <b>Identity.</b> <code>operation_mode.analytical_type: ZERO_FLOW</code> -&gt; <code>-analytical_type ZERO_FLOW</code>.</p>
-<p><b>What it does.</b> Supplies an exactly zero velocity field.</p>
-<p><b>When to choose it.</b> Isolating a mechanism that must not depend on advection. The diffusivity-gradient and Brownian verification cases use it so that any particle motion observed is attributable to the term under test, not to the flow.</p>
-<p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> Requires <code>eulerian_field_source: analytical</code>. No flow solve runs. It zeroes <code>Ucat</code> only, so <code>interpolation.method: FaceFlux</code>, which reads the face fluxes, is refused with it.</p>
-<p><b>Diagnostics.</b> The startup banner reports the analytical mode.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/drift_diffusivity_gradient</code>. Analytically verified - <code>brownian-msd-2026-09-18</code>: a Brownian cloud in this field reproduces the Einstein relation to 0.17%, so the carrier adds no motion of its own.</p>
-<p><b>Limitations.</b> No flow, by construction.</p>
-<h2><a class="anchor" id="p32_cap_uniform_flow_sub"></a>
-UNIFORM_FLOW</h2>
-<p><a class="anchor" id="p32_cap_uniform_flow"></a> <b>Identity.</b> <code>operation_mode.analytical_type: UNIFORM_FLOW</code> -&gt; <code>-analytical_type UNIFORM_FLOW</code>, with components from the <code>analytical_uniform_*</code> options.</p>
-<p><b>What it does.</b> Supplies a spatially uniform, constant velocity field.</p>
-<p><b>When to choose it.</b> Verifying advection: a known constant velocity makes the exact particle trajectory trivially predictable, which is what turns a run into a test.</p>
-<p><b>Parameters it owns.</b> The uniform velocity components.</p>
-<p><b>Interactions.</b> Requires <code>eulerian_field_source: analytical</code>. Supported on file grids as well as programmatic ones.</p>
-<p><b>Diagnostics.</b> Startup banner; particle displacement should match velocity times elapsed time exactly.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code>. Analytically verified - <code>curvilinear-gcl-2026-09-18</code>: on a curved file grid the face fluxes it sets close to round-off in every cell; <code>uniform-drift-2026-09-18</code>: a particle cloud drifts at exactly the carrier velocity.</p>
-<p><b>Limitations.</b> Uniform only; no shear, so it exercises no velocity-gradient behaviour.</p>
-<h2><a class="anchor" id="p32_cap_tgv3d_sub"></a>
-TGV3D</h2>
-<p><a class="anchor" id="p32_cap_tgv3d"></a> <b>Identity.</b> <code>operation_mode.analytical_type: TGV3D</code> -&gt; <code>-analytical_type TGV3D</code>.</p>
-<p><b>What it does.</b> Supplies the Taylor-Green field <code>u = V0 sin x cos y cos z e^{-2 nu t}</code>, <code>v = -V0 cos x sin y cos z e^{-2 nu t}</code>, <code>w = 0</code>, with pressure decaying as <code>e^{-4 nu t}</code>. It is a prescribed kinematic field, not a solution of the Navier-Stokes equations: the <code>cos z</code> factor makes it a three-dimensional mode whose viscous decay would be <code>e^{-3 nu t}</code>, and the three-dimensional Taylor-Green flow has no closed form. What it offers is a smooth, divergence-free, exactly known field at every time.</p>
-<p><b>When to choose it.</b> Exercising a genuinely three-dimensional field with strong velocity gradients, where a uniform flow would test nothing.</p>
-<p><b>Parameters it owns.</b> None beyond the analytical selector.</p>
-<p><b>Interactions.</b> Requires <code>eulerian_field_source: analytical</code>. Unlike the two simpler modes it is not supported on the file-grid path. It sets <code>Ucat</code> only, so <code>interpolation.method: FaceFlux</code>, which reads the face fluxes, is refused with it (<a class="el" href="08_Solver_Reference.html#p08_cap_interp_faceflux">p08_cap_interp_faceflux</a>).</p>
-<p><b>Diagnostics.</b> Startup banner reports the mode.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/interpolation_test</code> uses the TGV3D field as the analytic reference for its particle interpolation-error checks. Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: the staged velocity and pressure match the formula above to 9e-16 and 8e-16 at every step.</p>
-<p><b>Limitations.</b> Not available for file-based grids. Use it as a known field for interpolation, post-processing, statistics and monitoring checks, never as a reference a flow solve should reproduce: a solver started from it will not follow it.</p>
+<div class="textblock"><p><a class="anchor" id="_Analytical_Solutions"></a> With <code>operation_mode.eulerian_field_source: analytical</code> nothing is solved. The Eulerian field is the case's <code>properties.initial_conditions.source</code>, the definition an initial condition and an inlet take (<a class="el" href="33_Initial_Conditions.html#p33_source">p33_source</a>), evaluated at each step's time.</p>
 <h1><a class="anchor" id="p32_activation_sec"></a>
-3. Activation Path</h1>
-<p>Analytical mode is selected by:</p>
+1. Activation Path</h1>
 <ul>
-<li><code>solver.yml.operation_mode.eulerian_field_source: analytical</code></li>
-<li><code>solver.yml.operation_mode.analytical_type: &lt;TYPE&gt;</code></li>
+<li><code>solver.yml -&gt; operation_mode.eulerian_field_source: analytical</code> -&gt; <code>-euler_field_source analytical</code>.</li>
+<li><code>case.yml -&gt; properties.initial_conditions.source</code> -&gt; <code>-ic_source_*</code>, as for any initial condition.</li>
+<li><a class="el" href="initialcondition_8h.html#ad0dd7d3f2528b6a7802fcd551e88ea99">InitializeEulerianState</a> and the run loop call <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a>.</li>
 </ul>
-<p>Flags generated by <code>picurv</code>:</p>
-<ul>
-<li><code>-euler_field_source "analytical"</code></li>
-<li><code>-analytical_type "..."</code></li>
-</ul>
-<p>Runtime dispatch is handled by function <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a> in analytical execution mode.</p>
-<p>Current launcher contract:</p>
-<ul>
-<li><code>TGV3D</code> should be paired with <code>case.yml -&gt; grid.mode: programmatic_c</code></li>
-<li><code>ZERO_FLOW</code> and <code>UNIFORM_FLOW</code> support <code>case.yml -&gt; grid.mode: programmatic_c</code> and <code>case.yml -&gt; grid.mode: file</code></li>
-<li><code>grid_gen</code> remains outside the current documented analytical contract</li>
-</ul>
+<p>Each evaluation sets the fluxes on every face, including the boundary faces, <code>Ubcs</code> on every boundary face, and at the cell centres <code>Ucat</code> and <code>P</code>, then finalizes the dummy cells as a solved flow is. As on a time-dependent inlet, a source that does not read <code>t</code> is evaluated once.</p>
 <h1><a class="anchor" id="p32_types_sec"></a>
-4. Supported Types In Current Code</h1>
+2. What Can Be Prescribed</h1>
+<p>Anything an expression can write, in <code>cartesian</code> or <code>curvilinear</code> components, with these limits:</p>
 <ul>
-<li><code>TGV3D</code></li>
-<li><code>ZERO_FLOW</code></li>
-<li><code>UNIFORM_FLOW</code></li>
+<li>a generator or file term is refused, because the field is re-evaluated, and so is <code>project</code>;</li>
+<li><code>grid.mode</code> is <code>programmatic_c</code> or <code>file</code>;</li>
+<li>a <code>curvilinear</code> source derives <code>Ucat</code> from its fluxes; a <code>cartesian</code> one sets it exactly at the cell centres;</li>
+<li>a <code>pressure</code> expression [Pa] sets <code>P</code>, and only an analytical field takes one. Without it <code>P</code> is zero.</li>
 </ul>
-<p>Implementation touchpoints:</p>
-<ul>
-<li>custom-geometry policy check: <a class="el" href="AnalyticalSolutions_8h.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a></li>
-<li>analytical geometry assignment: <a class="el" href="AnalyticalSolutions_8h.html#ae25959d8a54d4be970967fcec062d28f">SetAnalyticalGridInfo</a></li>
-<li>state setter dispatch: <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a></li>
-</ul>
-<h1><a class="anchor" id="p32_tgv_sec"></a>
-5. TGV3D Details</h1>
-<p>Current <code>TGV3D</code> implementation sets fields with decaying Taylor-Green style forms in non-dimensional coordinates. Representative form:</p>
-<p class="formulaDsp">
-\[
-\nu = 1/Re, \quad
-u_x \sim \sin(kx)\cos(ky)\cos(kz)e^{-2\nu k^2 t},
-\quad
-u_y \sim -\cos(kx)\sin(ky)\cos(kz)e^{-2\nu k^2 t}.
-\]
-</p>
-<p>Geometry behavior for <code>TGV3D</code> in function <a class="el" href="AnalyticalSolutions_8h.html#ae25959d8a54d4be970967fcec062d28f">SetAnalyticalGridInfo</a> follows:</p>
-<ul>
-<li>the whole domain is assigned to the single block,</li>
-<li>the analytical geometry logic assigns the domain itself; the launcher-side programmatic grid inputs primarily provide resolution (<code>im/jm/km</code>)</li>
-</ul>
-<p>That assignment applies only on a programmatic grid (<code>grid.mode: programmatic_c</code>; see <a class="el" href="AnalyticalSolutions_8h.html#aff4301f4726924aa2c59911679099ebe">AnalyticalRunUsesCustomGeometry</a>). With <code>grid.mode: file</code> the given grid is kept and the TGV3D field is evaluated at its cell and face centres, which is how a curvilinear (e.g. interior-warped) grid spanning the TGV domain is used for interpolation verification. The field assumes wavenumber 1, so the grid should span the [0, 2π]² × [0, 0.2π] box for the solution to be periodic.</p>
-<h1><a class="anchor" id="p32_zero_sec"></a>
-6. ZERO_FLOW Details</h1>
-<p><code>ZERO_FLOW</code> sets a quiescent background state while preserving the same analytical-mode control path. It is useful for controlled particle-motion or postprocessing validation scenarios.</p>
-<p>Grid behavior:</p>
-<ul>
-<li><code>ZERO_FLOW</code> uses the standard analytical grid-ingestion split,</li>
-<li>with <code>programmatic_settings</code> for <code>grid.mode: programmatic_c</code> and <code>-grid_file</code> ingestion for <code>grid.mode: file</code>,</li>
-<li>but the flow field itself is imposed analytically as zero everywhere.</li>
-</ul>
-<h1><a class="anchor" id="p32_uniform_sec"></a>
-7. UNIFORM_FLOW Details</h1>
-<p><code>UNIFORM_FLOW</code> sets a constant Eulerian velocity field everywhere in the domain while keeping pressure zero. It is intended for deterministic particle-advection verification, where cloud centre-of-mass motion should match the configured constant velocity exactly.</p>
-<p>Configuration:</p>
-<ul>
-<li><code>solver.yml -&gt; operation_mode.analytical_type: "UNIFORM_FLOW"</code></li>
-<li><code>solver.yml -&gt; operation_mode.uniform_flow.{u,v,w}</code></li>
-</ul>
-<p>Grid behavior:</p>
-<ul>
-<li><code>UNIFORM_FLOW</code> uses the standard analytical grid-ingestion split,</li>
-<li>with <code>programmatic_settings</code> for <code>grid.mode: programmatic_c</code> and <code>-grid_file</code> ingestion for <code>grid.mode: file</code>,</li>
-<li>but the analytical engine populates both Eulerian cell-center and boundary velocity data with the configured constant vector.</li>
-<li>the implementation works in curvilinear form: it sets <code>Ucont</code> (contravariant flux) using face-metric dot products and derives <code>Ucat</code> via <code>Contra2Cart</code>, ensuring correctness on non-Cartesian grids.</li>
-</ul>
-<p>Verification-only source overrides such as <code>solver.yml -&gt; verification.sources.diffusivity</code> may be paired with <code>ZERO_FLOW</code> when the analytical velocity field itself should remain quiescent. Those overrides are not general production modeling features; they exist only for otherwise-unreachable end-to-end verification scenarios.</p>
-<p>The same analytical-solutions layer now also owns verification-only scalar truth evaluation for <code>solver.yml -&gt; verification.sources.scalar</code>. That scalar path supports <code>CONSTANT</code>, <code>LINEAR_X</code>, and <code>SIN_PRODUCT</code>, writes prescribed truth onto particle <code>Psi</code>, and supplies analytical cell-center reference values for the runtime diagnostic <code>&lt;run.analysis.metrics&gt;/scatter_metrics.csv</code>. Keeping scalar truth in <code>AnalyticalSolutions</code> makes the feature reusable for future static deposition checks, moving-cloud verification under <code>UNIFORM_FLOW</code>, and coupled flow-plus-scatter diagnostics under <code>TGV3D</code> without pushing analytical logic into <code>ParticlePhysics</code>.</p>
+<p>The domain is the case's grid: no field assigns its own.</p>
+<p>Zero flow:</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    source: {components: cartesian, expression: {u: 0.0, v: 0.0, w: 0.0}}</div>
+</div><!-- fragment --><p>A uniform stream, with its speed as a constant a study can sweep (<code>case.properties.initial_conditions.source.constants.U</code>):</p>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    source: {components: cartesian, constants: {U: 0.1}, expression: {u: U}}</div>
+</div><!-- fragment --><h1><a class="anchor" id="p32_tgv_sec"></a>
+3. Taylor-Green Vortex</h1>
+<div class="fragment"><div class="line">properties:</div>
+<div class="line">  initial_conditions:</div>
+<div class="line">    source:</div>
+<div class="line">      components: cartesian</div>
+<div class="line">      constants: {nu: 0.01}</div>
+<div class="line">      expression:</div>
+<div class="line">        u: &quot;sin(x)*cos(y)*cos(z)*exp(-2*nu*t)&quot;</div>
+<div class="line">        v: &quot;-cos(x)*sin(y)*cos(z)*exp(-2*nu*t)&quot;</div>
+<div class="line">      pressure: &quot;0.25*(cos(2*x) + cos(2*y))*exp(-4*nu*t)&quot;</div>
+</div><!-- fragment --><p>with <code>L = U = rho = 1</code> and <code>nu = 1/Re</code>. <code>examples/interpolation_test</code> runs it on <code>[0, 2 pi]^2 x [0, 0.2 pi]</code>, which its grid states.</p>
 <h1><a class="anchor" id="p32_particles_sec"></a>
-8. Particle Consistency</h1>
-<p>Particle-side analytical initialization hooks exist via <a class="el" href="AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d">SetAnalyticalSolutionForParticles</a> so particle fields can remain consistent with analytical Eulerian state when desired.</p>
+4. Particle Consistency</h1>
+<p>When the source is <code>cartesian</code>, reads only <code>x y z t</code> and varies in space, the interpolated particle velocities are compared with it at the particle positions, and <code>interpolation_error.csv</code> is written. A uniform field has no interpolation error to measure, and a source in the grid-line fractions cannot be evaluated at an arbitrary point. <code>FaceFlux</code> interpolation reads the fluxes every analytical field sets.</p>
+<h1><a class="anchor" id="p32_evidence_sec"></a>
+5. Evidence</h1>
+<p>Production exercised in <code>examples/interpolation_test</code>, <code>examples/drift_uniform_flow</code>, <code>examples/drift_diffusivity_gradient</code> and <code>examples/brownian_motion</code>. Measured when these fields were selected by name, and reproduced from their sources since: the Brownian cloud of <code>brownian-msd-2026-09-18</code> in zero flow, the face fluxes on a curved file grid of <code>curvilinear-gcl-2026-09-18</code> in a uniform stream, and the staged velocity and pressure of <code>solution-monitoring-tgv3d-2026-09-18</code> for the vortex. On reduced grids over three steps, the source forms match those fields to 2.2e-16 in <code>Ucat</code>, and for the vortex exactly in <code>Ucat</code>, <code>P</code>, particle positions and velocities and the interpolation error. A vortex's <code>FaceFlux</code> interpolation and its fluxes have not been measured against an exact solution.</p>
 <h1><a class="anchor" id="p32_extension_sec"></a>
-9. Adding A New Analytical Type</h1>
-<ol type="1">
-<li>add a new branch in function <a class="el" href="AnalyticalSolutions_8h.html#a54b92a9147b61777201162a261141608">AnalyticalSolutionEngine</a> for the new type,</li>
-<li>define geometry policy in function <a class="el" href="AnalyticalSolutions_8h.html#a5978038d775b2b6333c1abe6f895f30c">AnalyticalTypeRequiresCustomGeometry</a> for that type,</li>
-<li>implement geometry setup in function <a class="el" href="AnalyticalSolutions_8h.html#ae25959d8a54d4be970967fcec062d28f">SetAnalyticalGridInfo</a> when needed,</li>
-<li>update YAML schema/docs and generated-flag mapping.</li>
-</ol>
-<p>Also update:</p>
-<ul>
-<li><b><a class="el" href="07_Case_Reference.html">Configuration Reference: Case YAML</a></b></li>
-<li><b><a class="el" href="08_Solver_Reference.html">Configuration Reference: Solver YAML</a></b></li>
-<li><b><a class="el" href="48_Grid_Generator_Guide.html">Grid Generator Guide: generators/grid.gen</a></b></li>
-<li><b><a class="el" href="40_Testing_and_Quality_Guide.html">Testing and Validation Guide</a></b> </li>
-</ul>
+6. Adding A Field</h1>
+<p>Write its expressions; no code is needed. A field an expression cannot write belongs in a generator as an initial condition, which is solved from, not prescribed. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

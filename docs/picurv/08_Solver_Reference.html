@@ -147,19 +147,10 @@ operation_mode:
   #               this is also the restart mode: the saved state is loaded, then solved on.
   # 'load':       Replay stored fields; nothing is solved. Every replayed step needs its
   #               own checkpoint in the --restart-from run (io.data_output_frequency: 1).
-  # 'analytical': Evaluate a closed-form field each step (analytical_type below).
+  # 'analytical': Nothing is solved: the field is case.yml's initial_conditions.source,
+  #               re-evaluated each step it depends on t, with an optional `pressure`.
   eulerian_field_source: "solve"  # -&gt; -euler_field_source
-  # Optional analytical solution selector used when eulerian_field_source = "analytical".
-  # Supported values today: "TGV3D", "ZERO_FLOW", "UNIFORM_FLOW".
-  # TGV3D currently requires case.yml to use grid.mode: programmatic_c.
-  # ZERO_FLOW and UNIFORM_FLOW also support file-based grid ingestion.
-  analytical_type: "TGV3D"        # -&gt; -analytical_type
-  # Parameters for analytical_type: "UNIFORM_FLOW".
-  # Uncomment this block only when analytical_type = "UNIFORM_FLOW".
-  # uniform_flow:
-  #   u: 0.0                      # [m/s] -&gt; -analytical_uniform_u (divided by velocity_ref)
-  #   v: 0.0                      # [m/s] -&gt; -analytical_uniform_v
-  #   w: 0.0                      # [m/s] -&gt; -analytical_uniform_w
+
 
 # Verification-only source overrides.
 # Use these only when ordinary end-to-end setup cannot expose the behavior you need to test.
@@ -168,21 +159,11 @@ operation_mode:
 # verification:
 #   sources:
 #     diffusivity:
-#       mode: "analytical"        # Verification-only selector; currently fixed to analytical
-#       profile: "LINEAR_X"       # Supported today: LINEAR_X
-#       gamma0: 1.0e-3             # [m^2/s] -&gt; -verification_diffusivity_gamma0
-#       slope_x: 2.0e-4            # [m/s], diffusivity per metre -&gt; -verification_diffusivity_slope_x
+#       constants: {gamma0: 1.0e-3, slope: 2.0e-4}   # [m^2/s], [m/s]
+#       expression: "gamma0 + slope*x"     # [m^2/s], over x, y, z [m] and t [s] -&gt; -verification_diffusivity_expr
 #
 #     scalar:
-#       mode: "analytical"        # Verification-only selector; currently fixed to analytical
-#       profile: "CONSTANT"       # Supported: CONSTANT, LINEAR_X, SIN_PRODUCT
-#       value: 1.0                 # CONSTANT -&gt; -verification_scalar_value
-#       # phi0: 0.0                # LINEAR_X -&gt; -verification_scalar_phi0
-#       # slope_x: 1.0             # [1/m] LINEAR_X -&gt; -verification_scalar_slope_x
-#       # amplitude: 1.0           # SIN_PRODUCT -&gt; -verification_scalar_amplitude
-#       # kx: 3.141592653589793    # [1/m] SIN_PRODUCT -&gt; -verification_scalar_kx
-#       # ky: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_ky
-#       # kz: 3.141592653589793    # SIN_PRODUCT -&gt; -verification_scalar_kz
+#       expression: "sin(pi*x)*sin(pi*y)*sin(pi*z)"  # over x, y, z [m] and t [s] -&gt; -verification_scalar_expr
 #
 # Scalar verification is intended for runtime diagnostics such as
 # output/analysis/metrics/scatter_metrics.csv. It bypasses only the particle Psi evolution path and
@@ -442,17 +423,10 @@ petsc_passthrough_options:
 1. operation_mode</h1>
 <div class="fragment"><div class="line">operation_mode:</div>
 <div class="line">  eulerian_field_source: &quot;solve&quot;</div>
-<div class="line">  analytical_type: &quot;TGV3D&quot;</div>
-<div class="line">  uniform_flow:</div>
-<div class="line">    u: 0.0</div>
-<div class="line">    v: 0.0</div>
-<div class="line">    w: 0.0</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>eulerian_field_source</code> -&gt; <code>-euler_field_source</code> (<code>solve</code>, <code>load</code>, <code>analytical</code>)</li>
-<li><code>analytical_type</code> -&gt; <code>-analytical_type</code></li>
-<li><code>uniform_flow.u/v/w</code> -&gt; <code>-analytical_uniform_u/-analytical_uniform_v/-analytical_uniform_w</code> when <code>analytical_type: "UNIFORM_FLOW"</code>; physical velocities, divided by <code>velocity_ref</code></li>
 </ul>
-<p><code>uniform_flow</code> is only valid when <code>analytical_type: "UNIFORM_FLOW"</code>.</p>
+<p>With <code>analytical</code>, the field is the case's <code>properties.initial_conditions.source</code> (<a class="el" href="32_Analytical_Solutions.html#p32_activation_sec">1. Activation Path</a>).</p>
 <h1><a class="anchor" id="p08_strategy_sec"></a>
 2. strategy</h1>
 <div class="fragment"><div class="line">strategy:</div>
@@ -577,13 +551,13 @@ load</h2>
 <p><b>Limitations.</b> No time evolution of the Eulerian state; the field is what was stored, at the cadence it was stored. A source written at a coarser cadence cannot be replayed step by step.</p>
 <h2><a class="anchor" id="p08_cap_src_analytical_sub"></a>
 analytical</h2>
-<p><a class="anchor" id="p08_cap_src_analytical"></a> <b>Identity.</b> <code>operation_mode.eulerian_field_source: analytical</code> -&gt; <code>-analytical_type</code> selects a closed-form field.</p>
+<p><a class="anchor" id="p08_cap_src_analytical"></a> <b>Identity.</b> <code>operation_mode.eulerian_field_source: analytical</code> -&gt; the case's source is the field, evaluated at each step's time.</p>
 <p><b>What it does.</b> Supplies an exact analytical velocity field instead of solving for one.</p>
 <p><b>When to choose it.</b> Verification. An exact field makes an error norm meaningful, which is why the particle verification examples use it.</p>
-<p><b>Parameters it owns.</b> The analytical mode selector and its parameters. See <b><a class="el" href="32_Analytical_Solutions.html">Analytical Solution Modes</a></b>.</p>
+<p><b>Parameters it owns.</b> The analytical mode selector and its parameters. See <b><a class="el" href="32_Analytical_Solutions.html">Analytical Fields</a></b>.</p>
 <p><b>Interactions.</b> File-grid support is limited to the non-custom analytical modes.</p>
 <p><b>Diagnostics.</b> Startup reports the selected analytical mode.</p>
-<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> runs this source; the verification examples that rely on it are catalogued in <b><a class="el" href="65_Example_Catalog.html">Example Catalog</a></b>. Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: the TGV3D velocity and pressure match the closed form to 9e-16 at every step; <code>uniform-drift-2026-09-18</code>: a cloud in <code>UNIFORM_FLOW</code> drifts at exactly the carrier velocity.</p>
+<p><b>Evidence.</b> Production exercised - <code>examples/drift_uniform_flow</code> runs this source; the verification examples that rely on it are catalogued in <b><a class="el" href="65_Example_Catalog.html">Example Catalog</a></b>. Analytically verified - <code>solution-monitoring-tgv3d-2026-09-18</code>: the TGV3D velocity and pressure match the closed form to 9e-16 at every step; <code>uniform-drift-2026-09-18</code>: a cloud in a uniform stream drifts at exactly the carrier velocity.</p>
 <p><b>Limitations.</b> Only the shipped analytical forms are available; there is no user-supplied expression path.</p>
 <h2><a class="anchor" id="p08_cap_interp_trilinear_sub"></a>
 Trilinear</h2>
@@ -611,7 +585,7 @@ FaceFlux</h2>
 <p><b>What it does.</b> Builds the particle velocity from its host cell's face fluxes <code>Ucont</code> instead of from cell-centre <code>Ucat</code>. Each contravariant flux varies linearly between the cell's two faces of its family, at the particle's in-cell weights, and is mapped to Cartesian velocity by <a class="el" href="setup_8h.html#a3238d9ac14702446906314e192703d4c">ContravariantToCartesianInCell</a>, the solve <a class="el" href="setup_8h.html#a515c9a96eb4bcac29f79e78c8882d7aa">Contra2Cart</a> uses at cell centres. The velocity is therefore divergence-free wherever the solver's fluxes are, its wall-normal component is zero on a wall face, and at a cell centre it equals <code>Ucat</code>. Diffusivity and its gradient are still interpolated with Trilinear.</p>
 <p><b>When to choose it.</b> When the particle number density must stay uniform in a non-uniform flow, as an FDF needs: trilinear velocity is slightly compressible and drifts tracers, measurably near walls. Prefer Trilinear where velocity accuracy along a face matters more than density, and on coarse near-wall grids.</p>
 <p><b>Parameters it owns.</b> None.</p>
-<p><b>Interactions.</b> Needs <code>Ucont</code> to hold the flow, so it is refused with an analytical type other than <code>UNIFORM_FLOW</code>, which set <code>Ucat</code> only. Same swarm prerequisites as the other methods.</p>
+<p><b>Interactions.</b> Reads <code>Ucont</code>, which every solved or analytical field sets. Same swarm prerequisites as the other methods.</p>
 <p><b>Diagnostics.</b> The startup banner names the method. The per-cell particle count stays statistically uniform in a solved incompressible flow; compare against Trilinear.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-runtime</code> builds fluxes from a stream function and checks that the interpolated velocity is divergence-free to round-off, is zero normal to a wall face, and equals <code>Contra2Cart</code> at the cell centre. Analytically verified - <code>faceflux-uniform-tracers-2026-10-21</code>: in a Re_tau 202 DNS channel, Trilinear builds a 3% near-wall tracer excess that does not shrink with the time step; FaceFlux keeps every wall band within 1.6 SE of uniform, and the shared <code>Contra2Cart</code> solve is bit-identical with unchanged cost.</p>
 <p><b>Limitations.</b> First-order accurate: a component varies only along its own axis inside a cell, so it is constant across the cell in the other two directions (for example the streamwise velocity does not vary in the wall-normal direction within a cell). The divergence is exactly zero only on cells whose face-area vectors do not vary along their own axis, which includes every rectilinear cell; on warped curvilinear cells a small residual remains.</p>
@@ -841,46 +815,27 @@ cg</h3>
 <div class="fragment"><div class="line">verification:</div>
 <div class="line">  sources:</div>
 <div class="line">    diffusivity:</div>
-<div class="line">      mode: &quot;analytical&quot;</div>
-<div class="line">      profile: &quot;LINEAR_X&quot;</div>
-<div class="line">      gamma0: 1.0e-3</div>
-<div class="line">      slope_x: 2.0e-4</div>
+<div class="line">      constants: {gamma0: 1.0e-3, slope: 2.0e-4}</div>
+<div class="line">      expression: &quot;gamma0 + slope*x&quot;     # [m^2/s]</div>
 <div class="line"> </div>
 <div class="line">    scalar:</div>
-<div class="line">      mode: &quot;analytical&quot;</div>
-<div class="line">      profile: &quot;CONSTANT&quot;  # or LINEAR_X, SIN_PRODUCT</div>
-<div class="line">      value: 1.0</div>
-<div class="line">      # phi0: 0.0</div>
-<div class="line">      # slope_x: 1.0</div>
-<div class="line">      # amplitude: 1.0</div>
-<div class="line">      # kx: 3.141592653589793</div>
-<div class="line">      # ky: 3.141592653589793</div>
-<div class="line">      # kz: 3.141592653589793</div>
+<div class="line">      expression: &quot;sin(pi*x)*sin(pi*y)*sin(pi*z)&quot;</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
-<li><code>verification.sources.diffusivity.mode</code> -&gt; <code>-verification_diffusivity_mode</code></li>
-<li><code>verification.sources.diffusivity.profile</code> -&gt; <code>-verification_diffusivity_profile</code></li>
-<li><code>verification.sources.diffusivity.gamma0</code> -&gt; <code>-verification_diffusivity_gamma0</code></li>
-<li><code>verification.sources.diffusivity.slope_x</code> -&gt; <code>-verification_diffusivity_slope_x</code></li>
-<li><code>verification.sources.scalar.mode</code> -&gt; <code>-verification_scalar_mode</code></li>
-<li><code>verification.sources.scalar.profile</code> -&gt; <code>-verification_scalar_profile</code></li>
-<li><code>verification.sources.scalar.value</code> -&gt; <code>-verification_scalar_value</code></li>
-<li><code>verification.sources.scalar.phi0</code> -&gt; <code>-verification_scalar_phi0</code></li>
-<li><code>verification.sources.scalar.slope_x</code> -&gt; <code>-verification_scalar_slope_x</code></li>
-<li><code>verification.sources.scalar.amplitude</code> -&gt; <code>-verification_scalar_amplitude</code></li>
-<li><code>verification.sources.scalar.kx/ky/kz</code> -&gt; <code>-verification_scalar_kx/-verification_scalar_ky/-verification_scalar_kz</code></li>
+<li><code>verification.sources.diffusivity</code> -&gt; <code>-verification_diffusivity_expr</code></li>
+<li><code>verification.sources.scalar</code> -&gt; <code>-verification_scalar_expr</code></li>
 </ul>
 <p>Units: every value is physical and is converted with the case's scales. <code>gamma0</code> is a diffusivity (divided by <code>velocity_ref length_ref</code>) and the diffusivity <code>slope_x</code> a diffusivity per length (divided by <code>velocity_ref</code>); the scalar <code>slope_x</code> and <code>kx/ky/kz</code> are per length (multiplied by <code>length_ref</code>); <code>value</code>, <code>phi0</code>, and <code>amplitude</code> are dimensionless. See <a class="el" href="19_Nondimensionalization.html#p19_inputs_sec">3. Input Index</a>.</p>
 <p>Rules:</p><ul>
 <li>this path is verification-only and should be used only when no ordinary end-to-end workflow can expose the behavior under test</li>
 <li>it is only valid with <code>operation_mode.eulerian_field_source: "analytical"</code></li>
 <li><code>verification.sources.scalar</code> prescribes particle <code>Psi</code> from analytical truth and enables the runtime diagnostic <code>&lt;run.analysis.metrics&gt;/scatter_metrics.csv</code></li>
-<li>scalar profiles currently supported are <code>CONSTANT</code>, <code>LINEAR_X</code>, and <code>SIN_PRODUCT</code></li>
+<li>each is one expression in physical <code>x y z</code> and <code>t</code>, with optional <code>constants</code>; the expression language is <a class="el" href="33_Initial_Conditions.html#p33_source">p33_source</a>'s</li>
 <li>new verification source overrides must be implemented in <code><a class="el" href="verification__sources_8h.html">include/verification_sources.h</a></code> and <code><a class="el" href="verification__sources_8c.html">src/verification_sources.c</a></code></li>
 </ul>
 <p>Evidence:</p><ul>
-<li>the diffusivity source, <code>LINEAR_X</code>, drives the gradient drift that <code>diffusivity-gradient-drift-paired-2026-09-18</code> resolved to 1.1% of <code>a t</code> with paired seeds;</li>
-<li>the scalar source's <code>CONSTANT</code> profile makes every scatter error term exactly zero, and <code>SIN_PRODUCT</code> gives relative L2 errors of 5.2%, 2.6% and 1.3% on 8, 16 and 32 cells per side, the first order a random cell average must show at fixed particles per cell (<code>scalar-scatter-verification-2026-09-21</code>, <code>examples/scatter_verification</code>);</li>
-<li>the scalar <code>LINEAR_X</code> profile has not been measured, and neither scatter threshold is gated in CI.</li>
+<li>a diffusivity linear in <code>x</code> drives the gradient drift that <code>diffusivity-gradient-drift-paired-2026-09-18</code> resolved to 1.1% of <code>a t</code> with paired seeds;</li>
+<li>a constant scalar makes every scatter error term exactly zero, and <code>sin(pi*x)*sin(pi*y)*sin(pi*z)</code> gives relative L2 errors of 5.2%, 2.6% and 1.3% on 8, 16 and 32 cells per side, the first order a random cell average must show at fixed particles per cell (<code>scalar-scatter-verification-2026-09-21</code>, <code>examples/scatter_verification</code>);</li>
+<li>a scalar linear in <code>x</code> has not been measured, and neither scatter threshold is gated in CI.</li>
 </ul>
 <h1><a class="anchor" id="p08_petsc_sec"></a>
 12. petsc_passthrough_options</h1>

@@ -6,7 +6,6 @@ var searchData=
   ['checkpointindexwidtherror_3',['CheckpointIndexWidthError',['../classpicurv__cli_1_1core_1_1CheckpointIndexWidthError.html',1,'picurv_cli::core']]],
   ['cmpnts_4',['Cmpnts',['../variables_8h.html#structCmpnts',1,'']]],
   ['cmpnts2_5',['Cmpnts2',['../variables_8h.html#structCmpnts2',1,'']]],
-  ['commandexecutionerror_6',['CommandExecutionError',['../classpicurv__cli_1_1core_1_1CommandExecutionError.html',1,'picurv_cli::core']]],
-  ['cpt2d_7',['Cpt2D',['../variables_8h.html#structCpt2D',1,'']]],
-  ['cstart_8',['Cstart',['../variables_8h.html#structCstart',1,'']]]
+  ['cpt2d_6',['Cpt2D',['../variables_8h.html#structCpt2D',1,'']]],
+  ['cstart_7',['Cstart',['../variables_8h.html#structCstart',1,'']]]
 ];
