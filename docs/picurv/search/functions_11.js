@@ -29,7 +29,7 @@ var searchData=
   ['setanalyticalsolutionforparticles_26',['setanalyticalsolutionforparticles',['../AnalyticalSolutions_8h.html#a7b03e94375708c44a9c39d9c6312b01d',1,'SetAnalyticalSolutionForParticles(Vec tempVec, SimCtx *simCtx):&#160;AnalyticalSolutions.c'],['../AnalyticalSolutions_8c.html#a7b03e94375708c44a9c39d9c6312b01d',1,'SetAnalyticalSolutionForParticles(Vec tempVec, SimCtx *simCtx):&#160;AnalyticalSolutions.c']]],
   ['setanchoredstage_27',['SetAnchoredStage',['../test__momentum__convective__candidates_8c.html#a71441b29703bef70d07c110c87257c34',1,'test_momentum_convective_candidates.c']]],
   ['setboundaryvelocityfromsource_28',['SetBoundaryVelocityFromSource',['../AnalyticalSolutions_8c.html#a413d0cc0d3bdb3bcb2a1fbc4b1de94ef',1,'AnalyticalSolutions.c']]],
-  ['setcellfieldsfromsource_29',['SetCellFieldsFromSource',['../AnalyticalSolutions_8c.html#a8caf0f0befdfded6da529394ccda4481',1,'AnalyticalSolutions.c']]],
+  ['setcellvelocityfromsource_29',['SetCellVelocityFromSource',['../AnalyticalSolutions_8c.html#a7aceb7ea03190caed2473851bce1adbd',1,'AnalyticalSolutions.c']]],
   ['setdirectucontfield_30',['SetDirectUcontField',['../test__momentum__convective__candidates_8c.html#abc5d4ee7d2b97a4c9d57c74b10e5156b',1,'test_momentum_convective_candidates.c']]],
   ['setdmdaproclayout_31',['setdmdaproclayout',['../setup_8h.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead',1,'SetDMDAProcLayout(DM dm, UserCtx *user):&#160;setup.c'],['../setup_8c.html#aacf7da4f6b65d67f5d8eafa2e5fc7ead',1,'SetDMDAProcLayout(DM dm, UserCtx *user):&#160;setup.c']]],
   ['setfinestlevelcoordinates_32',['SetFinestLevelCoordinates',['../grid_8c.html#acb950cd51656702b75ea84d6477d0d97',1,'grid.c']]],

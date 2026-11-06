@@ -32,5 +32,6 @@ var searchData=
   ['logs_29',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
   ['lookup_30',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
   ['lookup_20process_20grid_31',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['low_20priority_20fixes_32',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
+  ['loose_20ends_32',['2e888970-source-loose-ends',['../md_docs_2changelog_8d_22e888970-source-loose-ends.html',1,'']]],
+  ['low_20priority_20fixes_33',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
 ];
