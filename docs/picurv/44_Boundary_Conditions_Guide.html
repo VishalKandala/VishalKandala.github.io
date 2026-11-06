@@ -421,19 +421,26 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <li><code>-Zeta/+Zeta</code>: <code>(JM - 1, IM - 1)</code>, ordered <code>(j, i)</code></li>
 </ul>
 <p>For <code>grid.mode: grid_gen</code>, <code>picurv run --solve</code> generates the grid first, then reads the generated <code>PICGRID</code> header to size the profile. For <code>grid.mode: file</code>, it reads the source <code>PICGRID</code> header. Sliced dimensional profiles and <code>profile.info</code> are written under <code>&lt;run.inputs&gt;/inlet_profiles/</code>, then the staged solver-scale <code>.picslice</code> is referenced from <code>bcs.run</code>.</p>
-<p>A recording slices a plane of a precursor run at each of its checkpoints. <code>field_files</code> names them by a pattern of their step numbers, and <code>frame_interval</code> is the time between the frames it gives:</p>
+<p>A recording slices a plane of a precursor run at each of its checkpoints. A workspace reads only its own paths, so register the precursor's files first; <code>--mode reference</code> records where they are without copying them:</p>
+<div class="fragment"><div class="line">picurv inputs import grid &lt;precursor_run&gt;/inputs/grid/grid.run --name precursor.run --mode reference</div>
+<div class="line">for step in $(seq 10000 10 20000); do</div>
+<div class="line">  picurv inputs import reference-field \</div>
+<div class="line">    &quot;&lt;precursor_run&gt;/output/checkpoints/$(printf &#39;step_%012d&#39; &quot;$step&quot;)/eulerian/block_0000/Ucat.dat&quot; \</div>
+<div class="line">    --name &quot;$(printf &#39;Ucat_%012d.dat&#39; &quot;$step&quot;)&quot; --mode reference</div>
+<div class="line">done</div>
+</div><!-- fragment --><p><code>field_files</code> then names them by a pattern of their step numbers, and <code>frame_interval</code> is the time between the frames it gives:</p>
 <div class="fragment"><div class="line">source:</div>
 <div class="line">  type: field_slice</div>
 <div class="line">  components: cartesian</div>
 <div class="line">  repeat: true</div>
 <div class="line">  field_files:</div>
-<div class="line">    pattern: ../precursor/output/checkpoints/step_{step:012d}/eulerian/block_0000/Ucat.dat</div>
+<div class="line">    pattern: inputs/reference_fields/Ucat_{step:012d}.dat.reference.yml</div>
 <div class="line">    first: 10000</div>
 <div class="line">    last: 20000</div>
 <div class="line">    every: 10</div>
 <div class="line">  frame_interval: 0.05</div>
-<div class="line">  grid_file: ../precursor/inputs/grid/grid.run</div>
-<div class="line">  source_case: ../precursor/config/case.yml</div>
+<div class="line">  grid_file: inputs/grids/precursor.run.reference.yml</div>
+<div class="line">  velocity_scale: 1.0     # Or source_case: a copy of the precursor&#39;s case.yml in this workspace</div>
 <div class="line">  slice: {face: &quot;+Zeta&quot;, orientation: opposite}</div>
 </div><!-- fragment --><p>Field-sliced profiles reuse an existing Cartesian velocity field as a new inlet:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
@@ -442,9 +449,9 @@ Q^* = \frac{Q}{U_{ref} L_{ref}^{2}}.
 <div class="line">    handler: prescribed_velocity</div>
 <div class="line">    source:</div>
 <div class="line">      type: field_slice</div>
-<div class="line">      field_file: ../old_run/output/checkpoints/step_000000010000/eulerian/block_0000/Ucat.dat</div>
-<div class="line">      grid_file: ../old_run/inputs/grid/grid.run</div>
-<div class="line">      source_case: ../old_run/config/case.yml</div>
+<div class="line">      field_file: inputs/reference_fields/Ucat.dat.reference.yml  # picurv inputs import reference-field &lt;old_run&gt;/.../Ucat.dat --mode reference</div>
+<div class="line">      grid_file: inputs/grids/old_grid.run                       # picurv inputs import grid &lt;old_run&gt;/inputs/grid/grid.run --name old_grid.run</div>
+<div class="line">      source_case: config/old_case.yml                          # A copy of the old case.yml</div>
 <div class="line">      slice:</div>
 <div class="line">        face: &quot;+Zeta&quot;</div>
 <div class="line">        orientation: opposite</div>
