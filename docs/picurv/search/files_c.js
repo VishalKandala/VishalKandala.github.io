@@ -10,12 +10,13 @@ var searchData=
   ['b7fc26a9_2dfield_2dslice_2dimport_2emd_7',['b7fc26a9-field-slice-import.md',['../b7fc26a9-field-slice-import_8md.html',1,'']]],
   ['b90426fb_2dinlet_2dgenerated_2dretired_2emd_8',['b90426fb-inlet-generated-retired.md',['../b90426fb-inlet-generated-retired_8md.html',1,'']]],
   ['b971bf5_2diem_2dcurrent_2dmean_2emd_9',['b971bf5-iem-current-mean.md',['../b971bf5-iem-current-mean_8md.html',1,'']]],
-  ['bc_5fhandlers_2ec_10',['BC_Handlers.c',['../BC__Handlers_8c.html',1,'']]],
-  ['bc_5fhandlers_2eh_11',['BC_Handlers.h',['../BC__Handlers_8h.html',1,'']]],
-  ['bcd6b9a_2dles_2ddiagnostics_2dto_2dmonitor_2emd_12',['bcd6b9a-les-diagnostics-to-monitor.md',['../bcd6b9a-les-diagnostics-to-monitor_8md.html',1,'']]],
-  ['bdf438f_2dinlet_2dapply_2dconsolidation_2emd_13',['bdf438f-inlet-apply-consolidation.md',['../bdf438f-inlet-apply-consolidation_8md.html',1,'']]],
-  ['bodyforces_2ec_14',['BodyForces.c',['../BodyForces_8c.html',1,'']]],
-  ['bodyforces_2eh_15',['BodyForces.h',['../BodyForces_8h.html',1,'']]],
-  ['boundaries_2ec_16',['Boundaries.c',['../Boundaries_8c.html',1,'']]],
-  ['boundaries_2eh_17',['Boundaries.h',['../Boundaries_8h.html',1,'']]]
+  ['bb9d1238_2dparticle_2dfields_2dare_2dsources_2emd_10',['bb9d1238-particle-fields-are-sources.md',['../bb9d1238-particle-fields-are-sources_8md.html',1,'']]],
+  ['bc_5fhandlers_2ec_11',['BC_Handlers.c',['../BC__Handlers_8c.html',1,'']]],
+  ['bc_5fhandlers_2eh_12',['BC_Handlers.h',['../BC__Handlers_8h.html',1,'']]],
+  ['bcd6b9a_2dles_2ddiagnostics_2dto_2dmonitor_2emd_13',['bcd6b9a-les-diagnostics-to-monitor.md',['../bcd6b9a-les-diagnostics-to-monitor_8md.html',1,'']]],
+  ['bdf438f_2dinlet_2dapply_2dconsolidation_2emd_14',['bdf438f-inlet-apply-consolidation.md',['../bdf438f-inlet-apply-consolidation_8md.html',1,'']]],
+  ['bodyforces_2ec_15',['BodyForces.c',['../BodyForces_8c.html',1,'']]],
+  ['bodyforces_2eh_16',['BodyForces.h',['../BodyForces_8h.html',1,'']]],
+  ['boundaries_2ec_17',['Boundaries.c',['../Boundaries_8c.html',1,'']]],
+  ['boundaries_2eh_18',['Boundaries.h',['../Boundaries_8h.html',1,'']]]
 ];

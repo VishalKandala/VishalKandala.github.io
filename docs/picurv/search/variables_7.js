@@ -24,7 +24,7 @@ var searchData=
   ['g_5fruntime_5fshutdown_5fsignal_21',['g_runtime_shutdown_signal',['../runloop_8c.html#ad6afdf5f61116bf39b24163edda81c66',1,'runloop.c']]],
   ['gallowedfunctions_22',['gAllowedFunctions',['../logging_8c.html#a32085a5a3e923b4619032eef946fd400',1,'logging.c']]],
   ['generate_5fgrid_23',['generate_grid',['../variables_8h.html#a98a90e3a55a0a0da6e392f44ebf50dad',1,'SimCtx']]],
-  ['generated_5fdir_24',['generated_dir',['../namespacegenerate__capability__inventory.html#aae766dcb6337a41b82612400d39d2530',1,'generate_capability_inventory.GENERATED_DIR'],['../namespacegenerate__cli__reference.html#a99441937e6fb3c365d56406c97ba2789',1,'generate_cli_reference.GENERATED_DIR']]],
+  ['generated_5fdir_24',['generated_dir',['../namespacegenerate__cli__reference.html#a99441937e6fb3c365d56406c97ba2789',1,'generate_cli_reference.GENERATED_DIR'],['../namespacegenerate__capability__inventory.html#aae766dcb6337a41b82612400d39d2530',1,'generate_capability_inventory.GENERATED_DIR']]],
   ['generator_25',['GENERATOR',['../namespaceaudit__capability__coverage.html#a1e4de6507fbcbd7d58ad7876f8abea71',1,'audit_capability_coverage']]],
   ['generators_5fpath_26',['GENERATORS_PATH',['../namespacepicurv__cli_1_1core.html#ad18e1397d4cdd7b7fc12fcba154cf9fa',1,'picurv_cli::core']]],
   ['generic_5fdescription_5fre_27',['GENERIC_DESCRIPTION_RE',['../namespaceaudit__function__docs.html#a3a00bca6b1d60463a5f7fe7dfc481be7',1,'audit_function_docs']]],
@@ -51,6 +51,5 @@ var searchData=
   ['grid_5ftransform_5fkinds_48',['GRID_TRANSFORM_KINDS',['../namespacepicurv__cli_1_1core.html#a68909f2868f8a9947843093d7158f2a4',1,'picurv_cli::core']]],
   ['grid_5fwall_5fsegment_5fkinds_49',['GRID_WALL_SEGMENT_KINDS',['../namespacepicurv__cli_1_1core.html#aeb1f7890ed4a8eb01d162b22a69139a5',1,'picurv_cli::core']]],
   ['gridorientation_50',['GridOrientation',['../variables_8h.html#accf2da0245f804c37780b4653a16f9f3',1,'UserCtx']]],
-  ['gridspace_51',['GridSpace',['../variables_8h.html#a0a9771638133dcba2d6819c8ee4ea7b6',1,'UserCtx']]],
-  ['group_5flayouts_52',['GROUP_LAYOUTS',['../namespaceaudit__field__catalog.html#ac0aa985205f88dc72038601307e4c9df',1,'audit_field_catalog']]]
+  ['group_5flayouts_51',['GROUP_LAYOUTS',['../namespaceaudit__field__catalog.html#ac0aa985205f88dc72038601307e4c9df',1,'audit_field_catalog']]]
 ];

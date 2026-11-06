@@ -127,7 +127,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">        y: 0.5</div>
 <div class="line">        z: 0.5</div>
 <div class="line">      fields:                         # optional; see 1.1</div>
-<div class="line">        Psi: 0.5</div>
+<div class="line">        Psi: {expression: 0.5}</div>
 </div><!-- fragment --><p>Mapping to control flags:</p>
 <ul>
 <li><code>count</code> -&gt; <code>-numParticles</code></li>
@@ -141,34 +141,27 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <h1><a class="anchor" id="p45_particle_values_sec"></a>
 1.1 Configured Particle Values (&lt;tt&gt;fields&lt;/tt&gt;)</h1>
 <p><code>fields</code> gives particle-carried fields a value when the population is created. Only fields the particle carries from step to step can be set; every other particle field is re-derived from the Eulerian fields or from particle location, so a value given to it would not survive. Today that is <code>Psi</code>, the scalar that IEM micromixing relaxes (see <b><a class="el" href="28_IEM_and_Statistical_Averaging.html">IEM Mixing and Statistical Averaging</a></b>).</p>
-<div class="fragment"><div class="line">models:</div>
+<div class="fragment"><div class="line">sources:</div>
+<div class="line">  mixture: {expression: &quot;0.5 + 0.5*tanh((y - y0)/delta)&quot;, constants: {y0: 1.0, delta: 0.1}}</div>
+<div class="line"> </div>
+<div class="line">models:</div>
 <div class="line">  physics:</div>
 <div class="line">    particles:</div>
 <div class="line">      count: 50000</div>
 <div class="line">      init_mode: &quot;Volume&quot;</div>
 <div class="line">      fields:</div>
-<div class="line">        Psi: 0.5                                  # a number</div>
-<div class="line">        # Psi: &quot;0.5 + 0.5*sin(2*pi*xn)&quot;           # or an expression</div>
+<div class="line">        Psi: mixture                              # a name under sources:</div>
+<div class="line">        # Psi: {expression: 0.5}                  # or inline: a number</div>
+<div class="line">        # Psi: {expression: &quot;0.5 + 0.5*sin(2*pi*xi)&quot;}   # an expression</div>
 <div class="line">        # Psi:                                    # or regions over a background</div>
-<div class="line">        #   params: {r: 0.1}</div>
-<div class="line">        #   background: 0</div>
-<div class="line">        #   regions:</div>
-<div class="line">        #     - {shape: half_space, axis: x, at: 0.5, side: above, value: 1,</div>
-<div class="line">        #        edge: {profile: smoothstep, width: 0.02}}</div>
-<div class="line">        #     - {shape: ball, center: [0.5, 0.5, 0.5], radius: r, value: &quot;uniform()&quot;}</div>
-</div><!-- fragment --><p>Each value is one of:</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Form   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">number   </td><td class="markdownTableBodyNone">every particle gets it    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">expression string   </td><td class="markdownTableBodyNone">evaluated per particle    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>{params, value}</code>   </td><td class="markdownTableBodyNone">an expression that may use the named numbers in <code>params</code>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>{params, background, regions}</code>   </td><td class="markdownTableBodyNone">start from <code>background</code>; each region, in order, paints its <code>value</code> over what came before   </td></tr>
-</table>
+<div class="line">        #   constants: {R: 0.1}</div>
+<div class="line">        #   expression:</div>
+<div class="line">        #     background: 0</div>
+<div class="line">        #     regions:</div>
+<div class="line">        #       - {shape: half_space, axis: x, at: 0.5, side: above, value: 1,</div>
+<div class="line">        #          edge: {profile: smoothstep, width: 0.02}}</div>
+<div class="line">        #       - {shape: ball, center: [0.5, 0.5, 0.5], radius: R, value: &quot;uniform()&quot;}</div>
+</div><!-- fragment --><p>Each field's value is a source, as on an inlet or initial condition (<a class="el" href="33_Initial_Conditions.html#p33_source_ssec">Source: a velocity written as expressions</a>): the name of an entry of the top-level <code>sources:</code>, or a mapping of <code>expression</code> and optional <code>constants</code>, or a <code>sum</code> of sources. It is one value per particle, so it takes no <code>components</code>. An expression is a number, an expression string, or <code>{background, regions}</code>, where each region in order paints its <code>value</code> over what came before. <code>constants</code> may build on the case's top-level <code>constants:</code> and on <code>rho</code> and <code>nu</code>.</p>
 <p><b>Expressions</b> use the language of Eulerian sources (<b><a class="el" href="33_Initial_Conditions.html">Initial Conditions</a></b>): <code>+ - * / % **</code>, comparisons (chains such as <code>0.2 &lt; x &lt; 0.5</code> included), <code>and or not</code>, <code>abs sin cos tan tanh cosh sinh exp log erf sqrt floor atan2 minimum maximum where(c, a, b)</code>, the series <code>sum(k, lo, hi, body)</code>, <code>besselj(n, x) bessely(n, x) ber(x) bei(x)</code> (<a class="el" href="33_Initial_Conditions.html#p33_closed_form_ssec">Closed-form profiles: series and special functions</a>), and <code>pi</code>. A comparison or logical expression is 1 when true and 0 when false. Numbers are decimal literals. A particle expression may use:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -176,16 +169,18 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>x</code>, <code>y</code>, <code>z</code>   </td><td class="markdownTableBodyNone">particle position, physical    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>xn</code>, <code>yn</code>, <code>zn</code>   </td><td class="markdownTableBodyNone">position normalized to the domain bounding box, 0 to 1    </td></tr>
+<td class="markdownTableBodyNone"><code>t</code>   </td><td class="markdownTableBodyNone">physical time of the event that creates the particle    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>xi</code>, <code>eta</code>, <code>zeta</code>   </td><td class="markdownTableBodyNone">arc-length fractions along the grid lines through the particle's cell, at the particle    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>L_xi</code>, <code>L_eta</code>, <code>L_zeta</code>   </td><td class="markdownTableBodyNone">those lines' lengths, physical    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>pid</code>   </td><td class="markdownTableBodyNone">particle ID    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>t</code>   </td><td class="markdownTableBodyNone">physical time of the event that creates the particle    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>uniform()</code>, <code>normal()</code>   </td><td class="markdownTableBodyNone">a per-particle draw in [0, 1), or from N(0, 1)   </td></tr>
 </table>
 <p>A draw is a pure function of <code>random_seed</code>, the particle ID, and the field; it does not depend on the rank a particle lives on or the order particles are visited. Brownian increments are drawn the same way, keyed on the step instead of the field, in a key space of their own, so they never coincide with a field's draws; so are <code>Surface</code> and <code>Volume</code> seeding points (section 4). <code>uniform(k)</code> and <code>normal(k)</code> with a non-negative integer literal <code>k</code> name a stream shared across fields, so two fields can draw the same number for one particle.</p>
-<p><b>Regions</b> are <code>half_space</code> (<code>axis</code>, <code>at</code>, <code>side: above | below</code>), <code>slab</code> (<code>axis</code>, <code>from</code>, <code>to</code>), <code>box</code> (<code>min</code>, <code>max</code>), <code>ball</code> (<code>center</code>, <code>radius</code>), and <code>cylinder</code> (<code>axis</code>, <code>center</code> in the other two coordinates, <code>radius</code>), all in physical coordinates. Without <code>edge</code>, a region's boundary is sharp; <code>edge: {profile, width}</code> blends across a band of that width centred on the boundary with <code>linear</code>, <code>smoothstep</code>, or <code>cosine</code>, reaching one half on the boundary itself. Region numbers may name a <code>params</code> entry.</p>
+<p><b>Regions</b> are <code>half_space</code> (<code>axis</code>, <code>at</code>, <code>side: above | below</code>), <code>slab</code> (<code>axis</code>, <code>from</code>, <code>to</code>), <code>box</code> (<code>min</code>, <code>max</code>), <code>ball</code> (<code>center</code>, <code>radius</code>), and <code>cylinder</code> (<code>axis</code>, <code>center</code> in the other two coordinates, <code>radius</code>), all in physical coordinates. Without <code>edge</code>, a region's boundary is sharp; <code>edge: {profile, width}</code> blends across a band of that width centred on the boundary with <code>linear</code>, <code>smoothstep</code>, or <code>cosine</code>, reaching one half on the boundary itself. Region numbers may name a constant.</p>
 <p><b>When it applies.</b> A value is applied once each particle's position is final: after placement and location, and before interpolation and the first scatter, so the t=0 cell mean already reflects it. A particle restored from a checkpoint (<code>restart_mode: load</code>) keeps its saved value, and <code>fields</code> is ignored with a warning.</p>
 <p><b>Units.</b> Values are physical, in the field's units, and are divided by the field's reference scale as they are stored (<b><a class="el" href="19_Nondimensionalization.html">Units and Non-Dimensionalization</a></b>). <code>Psi</code> is dimensionless.</p>
 <p><b>Validation.</b> <code>picurv validate</code> refuses an unknown or re-derived field, an expression outside the language, a region with a missing or unknown key, <code>fields</code> without particles, and <code>fields</code> together with <code>solver.yml</code> <code>verification.sources.scalar</code>, which prescribes <code>Psi</code> at every step. It warns when a <code>PointSource</code> value has no draw, because every particle then starts at one point with one value.</p>

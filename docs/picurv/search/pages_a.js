@@ -48,7 +48,7 @@ var searchData=
   ['architecture_20guide_45',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
   ['architecture_20specifications_46',['Future Architecture Specifications',['../57_Future_Architecture_Specifications.html',1,'']]],
   ['are_20expressions_47',['a5a1a6aa-verification-fields-are-expressions',['../md_docs_2changelog_8d_2a5a1a6aa-verification-fields-are-expressions.html',1,'']]],
-  ['are_20sources_48',['9105cade-analytical-fields-are-sources',['../md_docs_2changelog_8d_29105cade-analytical-fields-are-sources.html',1,'']]],
+  ['are_20sources_48',['are sources',['../md_docs_2changelog_8d_29105cade-analytical-fields-are-sources.html',1,'9105cade-analytical-fields-are-sources'],['../md_docs_2changelog_8d_2bb9d1238-particle-fields-are-sources.html',1,'bb9d1238-particle-fields-are-sources']]],
   ['area_20seeding_49',['1032985d-surface-area-seeding',['../md_docs_2changelog_8d_21032985d-surface-area-seeding.html',1,'']]],
   ['artifact_20lifecycle_20contract_50',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
   ['artifacts_20runtime_51',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
