@@ -30,11 +30,12 @@ var searchData=
   ['boundary_20conditions_20guide_27',['Boundary Conditions Guide',['../44_Boundary_Conditions_Guide.html',1,'']]],
   ['boundary_20pass_28',['aacd40da-single-boundary-pass',['../md_docs_2changelog_8d_2aacd40da-single-boundary-pass.html',1,'']]],
   ['bounded_20spectral_20initial_20conditions_29',['88cc4e0-wall-bounded-spectral-initial-conditions',['../md_docs_2changelog_8d_288cc4e0-wall-bounded-spectral-initial-conditions.html',1,'']]],
-  ['brownian_20draws_30',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
-  ['brownian_20measurement_31',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
-  ['build_20identity_32',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
-  ['build_20profile_33',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
-  ['by_20cell_34',['967b7bbd-sort-particles-by-cell',['../md_docs_2changelog_8d_2967b7bbd-sort-particles-by-cell.html',1,'']]],
-  ['by_20position_35',['17ed211d-newcomers-by-position',['../md_docs_2changelog_8d_217ed211d-newcomers-by-position.html',1,'']]],
-  ['by_20symptom_36',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
+  ['brownian_30',['e7bcb692-inlet-brownian',['../md_docs_2changelog_8d_2e7bcb692-inlet-brownian.html',1,'']]],
+  ['brownian_20draws_31',['aaf8f6c-keyed-brownian-draws',['../md_docs_2changelog_8d_2aaf8f6c-keyed-brownian-draws.html',1,'']]],
+  ['brownian_20measurement_32',['c742144-keyed-brownian-measurement',['../md_docs_2changelog_8d_2c742144-keyed-brownian-measurement.html',1,'']]],
+  ['build_20identity_33',['d48114d-lazy-build-identity',['../md_docs_2changelog_8d_2d48114d-lazy-build-identity.html',1,'']]],
+  ['build_20profile_34',['e663906-poisson-build-profile',['../md_docs_2changelog_8d_2e663906-poisson-build-profile.html',1,'']]],
+  ['by_20cell_35',['967b7bbd-sort-particles-by-cell',['../md_docs_2changelog_8d_2967b7bbd-sort-particles-by-cell.html',1,'']]],
+  ['by_20position_36',['17ed211d-newcomers-by-position',['../md_docs_2changelog_8d_217ed211d-newcomers-by-position.html',1,'']]],
+  ['by_20symptom_37',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]]
 ];
