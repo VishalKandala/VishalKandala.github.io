@@ -1,17 +1,1 @@
-var searchData=
-[
-  ['scalingctx_0',['ScalingCtx',['../variables_8h.html#structScalingCtx',1,'']]],
-  ['seamdiagnostics_1',['SeamDiagnostics',['../test__momentum__convective__candidates_8c.html#structSeamDiagnostics',1,'']]],
-  ['searchmetricsstate_2',['SearchMetricsState',['../variables_8h.html#structSearchMetricsState',1,'']]],
-  ['seedingcelltable_3',['SeedingCellTable',['../ParticleSwarm_8c.html#structSeedingCellTable',1,'']]],
-  ['simctx_4',['SimCtx',['../variables_8h.html#structSimCtx',1,'']]],
-  ['solutionconvergencedeterministicpass1_5',['SolutionConvergenceDeterministicPass1',['../logging_8c.html#structSolutionConvergenceDeterministicPass1',1,'']]],
-  ['solutionconvergencedeterministicpass2_6',['SolutionConvergenceDeterministicPass2',['../logging_8c.html#structSolutionConvergenceDeterministicPass2',1,'']]],
-  ['solvemonitorctx_7',['SolveMonitorCtx',['../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveMonitorCtx',1,'']]],
-  ['solveresult_8',['SolveResult',['../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveResult',1,'']]],
-  ['spatialtargetplan_9',['SpatialTargetPlan',['../statistics__target_8h.html#structSpatialTargetPlan',1,'']]],
-  ['stablecflresult_10',['StableCFLResult',['../test__momentum__convective__candidates_8c.html#structStableCFLResult',1,'']]],
-  ['storageerror_11',['StorageError',['../classpicurv__cli_1_1storage_1_1models_1_1StorageError.html',1,'picurv_cli::storage::models']]],
-  ['surfelmtinfo_12',['SurfElmtInfo',['../variables_8h.html#structSurfElmtInfo',1,'']]],
-  ['symtensor_13',['SymTensor',['../variables_8h.html#structSymTensor',1,'']]]
-];
+var searchData=[["scalingctx_0",["ScalingCtx",["../variables_8h.html#structScalingCtx",1,""]]],["seamdiagnostics_1",["SeamDiagnostics",["../test__momentum__convective__candidates_8c.html#structSeamDiagnostics",1,""]]],["searchmetricsstate_2",["SearchMetricsState",["../variables_8h.html#structSearchMetricsState",1,""]]],["seedingcelltable_3",["SeedingCellTable",["../ParticleSwarm_8c.html#structSeedingCellTable",1,""]]],["simctx_4",["SimCtx",["../variables_8h.html#structSimCtx",1,""]]],["solutionconvergencedeterministicpass1_5",["SolutionConvergenceDeterministicPass1",["../logging_8c.html#structSolutionConvergenceDeterministicPass1",1,""]]],["solutionconvergencedeterministicpass2_6",["SolutionConvergenceDeterministicPass2",["../logging_8c.html#structSolutionConvergenceDeterministicPass2",1,""]]],["solvemonitorctx_7",["SolveMonitorCtx",["../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveMonitorCtx",1,""]]],["solveresult_8",["SolveResult",["../test__momentum__newton__boundary__fixedpoint_8c.html#structSolveResult",1,""]]],["spatialtargetplan_9",["SpatialTargetPlan",["../statistics__target_8h.html#structSpatialTargetPlan",1,""]]],["stablecflresult_10",["StableCFLResult",["../test__momentum__convective__candidates_8c.html#structStableCFLResult",1,""]]],["storageerror_11",["StorageError",["../classpicurv__cli_1_1storage_1_1models_1_1StorageError.html",1,"picurv_cli::storage::models"]]],["surfelmtinfo_12",["SurfElmtInfo",["../variables_8h.html#structSurfElmtInfo",1,""]]],["symtensor_13",["SymTensor",["../variables_8h.html#structSymTensor",1,""]]]];

@@ -1,7 +1,1 @@
-var searchData=
-[
-  ['lesconfig_0',['LESConfig',['../variables_8h.html#structLESConfig',1,'']]],
-  ['lesdiagnosticsstate_1',['LESDiagnosticsState',['../variables_8h.html#structLESDiagnosticsState',1,'']]],
-  ['list_2',['list',['../variables_8h.html#structlist',1,'']]],
-  ['list_5fnode_3',['list_node',['../variables_8h.html#structlist__node',1,'']]]
-];
+var searchData=[["lesconfig_0",["LESConfig",["../variables_8h.html#structLESConfig",1,""]]],["lesdiagnosticsstate_1",["LESDiagnosticsState",["../variables_8h.html#structLESDiagnosticsState",1,""]]],["list_2",["list",["../variables_8h.html#structlist",1,""]]],["list_5fnode_3",["list_node",["../variables_8h.html#structlist__node",1,""]]]];
