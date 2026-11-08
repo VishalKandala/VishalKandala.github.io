@@ -54,7 +54,7 @@ var searchData=
   ['only_20run_20configuration_20and_20health_20summary_51',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['only_20some_20cases_20in_20a_20study_20are_20finished_52',['3.3 Only Some Cases in a Study Are Finished',['../61_Storage_Management_Guide.html#p61_mixed_study',1,'']]],
   ['onlysetup_53',['OnlySetup',['../variables_8h.html#a6bae0e92738d6c3498ac41b67ed5b7a4',1,'SimCtx']]],
-  ['op_54',['op',['../expression_8c.html#ab8c877177d456ddcf9ae116008fe7af4',1,'ExpressionInstruction::op'],['../expression_8c.html#ac5f4b944b3475b6f2291269286241115',1,'ExpressionNode::op']]],
+  ['op_54',['op',['../expression_8c.html#ac5f4b944b3475b6f2291269286241115',1,'ExpressionNode::op'],['../expression_8c.html#ab8c877177d456ddcf9ae116008fe7af4',1,'ExpressionInstruction::op']]],
   ['op_5fabs_55',['OP_ABS',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108eacfec44b158335c2e6f92f37954067794',1,'expression.c']]],
   ['op_5fadd_56',['OP_ADD',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108ea96186829480e5b34b1373288e956b1c8',1,'expression.c']]],
   ['op_5fand_57',['OP_AND',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108eae2310d00f26e94b32317ecd168fb7e18',1,'expression.c']]],
@@ -172,6 +172,7 @@ var searchData=
   ['owner_20lookup_169',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
   ['owner_20lookup_20process_20grid_170',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
   ['ownership_171',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
-  ['owns_5fpreconditioning_5fmatrix_172',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
-  ['ownsstoredpoint_173',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
+  ['ownership_20note_172',['4f7700c7-ownership-note',['../md_docs_2changelog_8d_24f7700c7-ownership-note.html',1,'']]],
+  ['owns_5fpreconditioning_5fmatrix_173',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
+  ['ownsstoredpoint_174',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
 ];

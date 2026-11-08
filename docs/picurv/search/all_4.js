@@ -148,5 +148,7 @@ var searchData=
   ['4de9c40_20les_20cs_20effective_20layout_20labels_145',['4de9c40-les-cs-effective-layout-labels',['../md_docs_2changelog_8d_24de9c40-les-cs-effective-layout-labels.html',1,'']]],
   ['4de9c40_2dles_2dcs_2deffective_2dlayout_2dlabels_2emd_146',['4de9c40-les-cs-effective-layout-labels.md',['../4de9c40-les-cs-effective-layout-labels_8md.html',1,'']]],
   ['4e7ec11e_20particles_20per_20cell_147',['4e7ec11e-particles-per-cell',['../md_docs_2changelog_8d_24e7ec11e-particles-per-cell.html',1,'']]],
-  ['4e7ec11e_2dparticles_2dper_2dcell_2emd_148',['4e7ec11e-particles-per-cell.md',['../4e7ec11e-particles-per-cell_8md.html',1,'']]]
+  ['4e7ec11e_2dparticles_2dper_2dcell_2emd_148',['4e7ec11e-particles-per-cell.md',['../4e7ec11e-particles-per-cell_8md.html',1,'']]],
+  ['4f7700c7_20ownership_20note_149',['4f7700c7-ownership-note',['../md_docs_2changelog_8d_24f7700c7-ownership-note.html',1,'']]],
+  ['4f7700c7_2downership_2dnote_2emd_150',['4f7700c7-ownership-note.md',['../4f7700c7-ownership-note_8md.html',1,'']]]
 ];
