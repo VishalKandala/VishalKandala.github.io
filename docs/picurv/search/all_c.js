@@ -118,7 +118,7 @@ var searchData=
   ['aggregate_20validation_20gates_20tt_20check_20tt_115',['7. Aggregate Validation Gates (&lt;tt&gt;check*&lt;/tt&gt;)',['../40_Testing_and_Quality_Guide.html#p40_aggregate_sec',1,'']]],
   ['aggregates_116',['4. Outputs and Aggregates',['../37_Sweep_Studies_Guide.html#p37_outputs_sec',1,'']]],
   ['aggregation_117',['7. Manual Metrics Re-Aggregation',['../37_Sweep_Studies_Guide.html#p37_reaggregate_sec',1,'']]],
-  ['aj_118',['aj',['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj'],['../poisson_8h.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj'],['../poisson_8h.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj']]],
+  ['aj_118',['aj',['../poisson_8h.html#a18e906e2d6174f46002f8ad3ae8d17d4',1,'PoissonFaceMetrics::aj'],['../poisson_8h.html#a2302c91cee2b7a26e8ee634448db7952',1,'PoissonFaceGradient::aj'],['../variables_8h.html#a04b7e7d757be63c56b7b26068f24dda6',1,'UserCtx::Aj']]],
   ['algorithm_119',['Algorithm',['../grid_8h.html#algorithm',1,'']]],
   ['algorithmic_20model_120',['2. Algorithmic Model',['../24_Dual_Time_Picard_Jameson_RK.html#p24_model_sec',1,'']]],
   ['alias_20stubs_121',['2.1 Deprecated Alias Stubs',['../64_Documentation_Extension_Framework.html#p64_alias_sub',1,'']]],

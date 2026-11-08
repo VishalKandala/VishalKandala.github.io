@@ -15,11 +15,12 @@ var searchData=
   ['vel_12',['vel',['../variables_8h.html#a0dedc7a71f2bf127463d9bfd4ed41103',1,'Particle']]],
   ['velocity_13',['velocity',['../field__catalog_8h.html#a7d16e45a304b26c2852abb42308515cd',1,'FieldDimension::velocity'],['../BC__Handlers_8c.html#a0fe8aa26f2911f7159332485e9b2d983',1,'InletPrescribedVelocityData::velocity'],['../namespacepicurv__cli_1_1core.html#a101cfc49bc092f6c285923431e8dde7e',1,'picurv_cli.core.VELOCITY']]],
   ['velocity_5fsource_5fhandlers_14',['VELOCITY_SOURCE_HANDLERS',['../namespacepicurv__cli_1_1core.html#a9c92d40254cd0d855d5a468e16ada826',1,'picurv_cli::core']]],
-  ['verificationdiffusivity_15',['verificationDiffusivity',['../variables_8h.html#a83ca83c6b8018add7a16cb5d1e13e3af',1,'SimCtx']]],
-  ['verificationscalar_16',['verificationScalar',['../variables_8h.html#af575cb56343171899b04f68f37027583',1,'SimCtx']]],
-  ['verifyghostupdates_17',['verifyGhostUpdates',['../variables_8h.html#a1c351e2eca1c4dcf24e4584a35369904',1,'SimCtx']]],
-  ['version_5ffile_18',['VERSION_FILE',['../namespacepicurv__cli_1_1core.html#a81651329b2c7ba764f5bc3a04ff6ce61',1,'picurv_cli::core']]],
-  ['vertices_19',['vertices',['../variables_8h.html#af61db2c548db385ce7a20b00b55cdbab',1,'Cell']]],
-  ['volume_5fflux_20',['VOLUME_FLUX',['../namespacepicurv__cli_1_1core.html#ad41df7cc4b86511db8f3ea4cfa8787b3',1,'picurv_cli::core']]],
-  ['vreman_5fcoefficient_21',['vreman_coefficient',['../variables_8h.html#acae0ed2ea586b2e5b7eab86efdd9882d',1,'LESConfig']]]
+  ['velocity_5fsquared_15',['VELOCITY_SQUARED',['../namespacepicurv__cli_1_1core.html#aae652633cb6f5bc9ba8d55049813fc2b',1,'picurv_cli::core']]],
+  ['verificationdiffusivity_16',['verificationDiffusivity',['../variables_8h.html#a83ca83c6b8018add7a16cb5d1e13e3af',1,'SimCtx']]],
+  ['verificationscalar_17',['verificationScalar',['../variables_8h.html#af575cb56343171899b04f68f37027583',1,'SimCtx']]],
+  ['verifyghostupdates_18',['verifyGhostUpdates',['../variables_8h.html#a1c351e2eca1c4dcf24e4584a35369904',1,'SimCtx']]],
+  ['version_5ffile_19',['VERSION_FILE',['../namespacepicurv__cli_1_1core.html#a81651329b2c7ba764f5bc3a04ff6ce61',1,'picurv_cli::core']]],
+  ['vertices_20',['vertices',['../variables_8h.html#af61db2c548db385ce7a20b00b55cdbab',1,'Cell']]],
+  ['volume_5fflux_21',['VOLUME_FLUX',['../namespacepicurv__cli_1_1core.html#ad41df7cc4b86511db8f3ea4cfa8787b3',1,'picurv_cli::core']]],
+  ['vreman_5fcoefficient_22',['vreman_coefficient',['../variables_8h.html#acae0ed2ea586b2e5b7eab86efdd9882d',1,'LESConfig']]]
 ];

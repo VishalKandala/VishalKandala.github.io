@@ -636,6 +636,12 @@ boundary_conditions:
     # constraints:                    # Optional, applied in this order:
     #   scale: 1.0                    #   multiplies the source
     #   bulk_velocity: "1.5*(1 + 0.2*sin(2*pi*t))"  # face-mean normal speed [m/s], number or expression in t
+    # fluctuations:                   # Optional: synthetic turbulence by digital filtering, added after the
+    #                                 #   constraints. -&gt; -face_source_&lt;id&gt;_fluct*, -inflow_fluctuations
+    #   reynolds_stress: {uu: 0.01, vv: 0.004, ww: 0.004, uv: 0.0}  # [m^2/s^2], expressions without t;
+    #                                 #   uu vv ww uv uw vw, omitted ones 0
+    #   length_scales: [0.1, 0.1]     #   [m] along the face's tangential axes, here xi then zeta
+    #   time_scale: 0.05              #   [s]; the filter state is checkpointed
 
     # A source is expressions over x y z t [m, s] and the arc-length fractions xi eta zeta
     # (0 to 1 along each grid line) with line lengths L_xi L_eta L_zeta [m], in one frame:
@@ -1328,6 +1334,7 @@ cabot</h2>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
 <p>Optional per-face key <code>particle_policy: reflect | remove | wrap</code> sets what a particle crossing that face becomes. The default comes from the handler: both wall handlers reflect, the inlet and outlet handlers remove, the periodic handlers wrap, and an inlet with <code>particles</code> reflects. <code>wrap</code> is accepted on <code>PERIODIC</code> faces only, and they accept nothing else. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_ppol_sec">5. Particle Boundary Policies</a>.</p>
 <p>Optional key <code>particles: {particles_per_cell, fields}</code> on an <code>INLET</code> face of block 0 injects particles every step, in proportion to the flow. See <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_inject_sec">1.2 Injection at an Inlet</a>.</p>
+<p>Optional key <code>fluctuations: {reynolds_stress, length_scales, time_scale}</code> on a <code>prescribed_velocity</code> <code>INLET</code> adds synthetic turbulence by digital filtering: <code>reynolds_stress</code> maps <code>uu vv ww uv uw vw</code> to [m^2/s^2] expressions without <code>t</code>, <code>length_scales</code> is two lengths [m] along the face's tangential axes, and <code>time_scale</code> is a time [s]. Its state is checkpointed. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_cap_prescribed_velocity">p44_cap_prescribed_velocity</a>.</p>
 <p>Pulsatile expression example:</p>
 <div class="fragment"><div class="line">- face: &quot;-Zeta&quot;</div>
 <div class="line">  type: INLET</div>

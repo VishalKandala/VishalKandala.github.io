@@ -106,5 +106,6 @@ var searchData=
   ['sweep_20and_20study_20guide_103',['Sweep and Study Guide',['../37_Sweep_Studies_Guide.html',1,'']]],
   ['symptom_104',['Troubleshooting by Symptom',['../67_Troubleshooting.html',1,'']]],
   ['sync_20and_20levels_105',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
-  ['sync_20class_106',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]]
+  ['sync_20class_106',['9fc2a2c-face-plane-sync-class',['../md_docs_2changelog_8d_29fc2a2c-face-plane-sync-class.html',1,'']]],
+  ['synthetic_20inflow_107',['73431239-synthetic-inflow',['../md_docs_2changelog_8d_273431239-synthetic-inflow.html',1,'']]]
 ];
