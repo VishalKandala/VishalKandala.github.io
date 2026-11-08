@@ -313,7 +313,7 @@ var searchData=
   ['ducont_310',['dUcont',['../variables_8h.html#acd9e51c61887bb8ee092591d32c103f4',1,'UserCtx']]],
   ['duct_20campaign_202026_2010_2007_311',['10.1 Retained laminar curved-duct campaign (2026-10-07)',['../55_Newton_Krylov_Momentum_Solver.html#p55_bend_evidence_sub',1,'']]],
   ['duct_20cross_20section_20reducer_312',['f4893e9-duct-cross-section-reducer',['../md_docs_2changelog_8d_2f4893e9-duct-cross-section-reducer.html',1,'']]],
-  ['duct_5fspectral_5fvelocity_313',['duct_spectral_velocity',['../33_Initial_Conditions.html#p33_cap_gen_duct_spectral_velocity_sub',1,'']]],
+  ['ducts_313',['Spectral velocity: periodic boxes, channels and ducts',['../33_Initial_Conditions.html#p33_wall_spectral_sec',1,'']]],
   ['dummy_20cell_20fill_314',['04e341b-dummy-cell-fill',['../md_docs_2changelog_8d_204e341b-dummy-cell-fill.html',1,'']]],
   ['dummy_20centres_315',['6b11b15-periodic-dummy-centres',['../md_docs_2changelog_8d_26b11b15-periodic-dummy-centres.html',1,'']]],
   ['dv0_316',['dV0',['../variables_8h.html#ae0a8ce18aa734ae9c741821c96f70409',1,'IBMVNodes']]],

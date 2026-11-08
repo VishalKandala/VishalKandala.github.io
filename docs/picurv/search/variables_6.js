@@ -74,5 +74,6 @@ var searchData=
   ['frozen_5fmomentum_5fpoint_5fblock_5fops_71',['frozen_momentum_point_block_ops',['../momentum__newton__krylov_8c.html#a0d9e162698cb6c83866f5e22a1ed77fc',1,'momentum_newton_krylov.c']]],
   ['fsi_72',['fsi',['../variables_8h.html#afff98e471314dce8cc7a2b55e536431f',1,'SimCtx']]],
   ['fsi_5fintp_73',['fsi_intp',['../variables_8h.html#aa3a0800a8ce4055576ca6e9c34d72ff9',1,'FSInfo']]],
-  ['funct_5fre_74',['FUNCT_RE',['../namespaceaudit__profiling__coverage.html#a99c3fb6f776c2331a72a29f88105b78b',1,'audit_profiling_coverage']]]
+  ['funct_5fre_74',['FUNCT_RE',['../namespaceaudit__profiling__coverage.html#a99c3fb6f776c2331a72a29f88105b78b',1,'audit_profiling_coverage']]],
+  ['function_5farity_75',['FUNCTION_ARITY',['../namespacepicurv__cli_1_1source__expressions.html#a703ea4ae0642d9ccbbb9fe19b6845ec5',1,'picurv_cli::source_expressions']]]
 ];

@@ -7,7 +7,7 @@ var searchData=
   ['variable_20architecture_20guide_4',['Grid, Cell, and Variable Architecture Guide',['../20_Grid_Cell_Architecture_Guide.html',1,'']]],
   ['variance_5',['60c4b9a-point-variance',['../md_docs_2changelog_8d_260c4b9a-point-variance.html',1,'']]],
   ['vectors_6',['13e2fc24-pooled-residual-vectors',['../md_docs_2changelog_8d_213e2fc24-pooled-residual-vectors.html',1,'']]],
-  ['velocity_7',['velocity',['../md_docs_2changelog_8d_24a4e041-stability-mode-velocity.html',1,'4a4e041-stability-mode-velocity'],['../md_docs_2changelog_8d_2ec403bc-resampled-velocity.html',1,'ec403bc-resampled-velocity']]],
+  ['velocity_7',['velocity',['../md_docs_2changelog_8d_24a4e041-stability-mode-velocity.html',1,'4a4e041-stability-mode-velocity'],['../md_docs_2changelog_8d_2ec403bc-resampled-velocity.html',1,'ec403bc-resampled-velocity'],['../md_docs_2changelog_8d_2f9f22df4-spectral-velocity.html',1,'f9f22df4-spectral-velocity']]],
   ['velocity_20sources_8',['eaad2fc2-velocity-sources',['../md_docs_2changelog_8d_2eaad2fc2-velocity-sources.html',1,'']]],
   ['verification_20fields_20are_20expressions_9',['a5a1a6aa-verification-fields-are-expressions',['../md_docs_2changelog_8d_2a5a1a6aa-verification-fields-are-expressions.html',1,'']]],
   ['version_20names_20own_20file_10',['07619abb-version-names-own-file',['../md_docs_2changelog_8d_207619abb-version-names-own-file.html',1,'']]],
