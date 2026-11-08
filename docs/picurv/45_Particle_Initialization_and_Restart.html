@@ -119,7 +119,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="fragment"><div class="line">models:</div>
 <div class="line">  physics:</div>
 <div class="line">    particles:</div>
-<div class="line">      count: 50000</div>
+<div class="line">      particles_per_cell: 10          # Surface | Volume; a PointSource takes count instead</div>
 <div class="line">      init_mode: &quot;Surface&quot;            # Surface | Volume | PointSource</div>
 <div class="line">      restart_mode: &quot;init&quot;            # init | load</div>
 <div class="line">      random_seed: 12345              # optional; seeds placement and Brownian draws</div>
@@ -131,7 +131,8 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">        Psi: {expression: 0.5}</div>
 </div><!-- fragment --><p>Mapping to control flags:</p>
 <ul>
-<li><code>count</code> -&gt; <code>-numParticles</code></li>
+<li><code>particles_per_cell</code> -&gt; <code>-numParticles</code>, resolved by the CLI from the grid: <code>Volume</code> seeds it times the cells of block 0, <code>Surface</code> it times the face cells of the first <code>INLET</code> face in face order (<code>-Xi +Xi -Eta +Eta -Zeta +Zeta</code>), the face the solver seeds. It is a mean: the particles are spread by volume or area, so on a graded grid small cells hold fewer, and the solver logs the per-cell minimum, mean and maximum. It may be fractional; the total is rounded.</li>
+<li><code>count</code> -&gt; <code>-numParticles</code>, for <code>PointSource</code> only, which has no cells; <code>Volume</code> and <code>Surface</code> refuse it</li>
 <li><code>init_mode</code> -&gt; <code>-pinit</code></li>
 <li><code>restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
 <li><code>random_seed</code> -&gt; <code>-particle_random_seed</code> (optional; integer <code>0</code>..<code>2147483647</code>, default <code>12345</code>)</li>
@@ -148,7 +149,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line">models:</div>
 <div class="line">  physics:</div>
 <div class="line">    particles:</div>
-<div class="line">      count: 50000</div>
+<div class="line">      particles_per_cell: 10</div>
 <div class="line">      init_mode: &quot;Volume&quot;</div>
 <div class="line">      fields:</div>
 <div class="line">        Psi: mixture                              # a name under sources:</div>
@@ -190,23 +191,23 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <h1><a class="anchor" id="p45_inject_sec"></a>
 1.2 Injection at an Inlet</h1>
 <p><b>Status: experimental.</b> See the evidence below; nothing has been measured at scale.</p>
-<p>An INLET face adds particles every step when its entry carries <code>particles</code>. Nothing needs to be seeded, so <code>count: 0</code> starts a flow-through case from an empty domain, and two inlets can carry different values:</p>
+<p>An INLET face adds particles every step when its entry carries <code>particles</code>. Nothing needs to be seeded, so a case without <code>particles_per_cell</code> starts flow-through from an empty domain, and two inlets can carry different values:</p>
 <div class="fragment"><div class="line">boundary_conditions:</div>
 <div class="line">- face: -Zeta</div>
 <div class="line">  type: INLET</div>
 <div class="line">  handler: prescribed_velocity</div>
 <div class="line">  source: {components: normal, expression: &quot;6*y*(1-y)&quot;}</div>
 <div class="line">  particles:</div>
-<div class="line">    number_density: 2.0e6                # particles per m^3 of entering fluid; a number or an expression in t</div>
+<div class="line">    particles_per_cell: 10               # mean per cell the entering fluid carries; a number or an expression in t</div>
 <div class="line">    fields: {Psi: {expression: &quot;y&quot;}}     # optional; the case&#39;s particles.fields otherwise</div>
-</div><!-- fragment --><p><b>Rate.</b> Each particle stands for an equal share of fluid, so particles enter in proportion to the flow. A face cell with volume flux <code>Q</code> receives on average <code>n Q dt</code> particles per step and none where the flow leaves, which keeps the number density <code>n</code> under any velocity profile. Expect a steady population of about <code>n V</code> for a domain of volume <code>V</code>, after one flow-through time; the particles per cell follow from the grid, so small cells hold fewer. Nothing adds or removes particles to even this out, so recirculating or stagnant regions fed slowly by the inlet can run short. <code>particles_per_cell_min</code> in <code>search_metrics.csv</code> shows it.</p>
+</div><!-- fragment --><p><b>Rate.</b> Each particle stands for an equal share of fluid, so particles enter in proportion to the flow. <code>particles_per_cell</code> is a mean over the grid: with <code>N</code> cells of total volume <code>V</code> it is the number density <code>n = particles_per_cell N / V</code>, the density a <code>Volume</code> seed of the same value has. A face cell with volume flux <code>Q</code> receives on average <code>n Q dt</code> particles per step and none where the flow leaves, which keeps that density under any velocity profile. Expect a steady population of about <code>particles_per_cell N</code> after one flow-through time; on a graded grid small cells hold fewer. Nothing adds or removes particles to even this out, so recirculating or stagnant regions fed slowly by the inlet can run short. <code>particles_per_cell_min</code> in <code>search_metrics.csv</code> shows it.</p>
 <p><b>Placement.</b> Within its face cell, a particle crosses at a point drawn in proportion to the inward velocity the swarm's interpolation (<code>solver.yml</code> <code>interpolation.method</code>) gives there. The particles already in the domain move by that velocity, so the layer they leave is thick where the flow is fast and thin near a wall, and each face cell's particles refill it where it opened. With <code>FaceFlux</code> the inward velocity is uniform across a face cell and the point is uniform by area; <code>CornerAveraged</code> restages Ucat at the corners once per step for it. A particle's value is evaluated on the face, where it crossed, at the step's time, as on a seeded particle (<a class="el" href="45_Particle_Initialization_and_Restart.html#p45_particle_values_sec">1.1 Configured Particle Values (<code>fields</code>)</a>): <code>x y z t xi eta zeta L_xi L_eta L_zeta pid uniform() normal()</code>, with <code>xi eta zeta</code> from the crossing cell. It then moves in by a uniform share of its velocity times <code>dt</code>, so one step's particles do not travel as a sheet, and takes the step's Brownian displacement with the diffusivity of its cell, which keeps the density uniform up to the inlet. A face cell with flux but no inward velocity anywhere on it spreads its particles by area and moves them at the cell's mean. The search that follows the particle update locates it.</p>
 <p><b>Inlet policy.</b> An injecting inlet defaults to <code>particle_policy: reflect</code>. The inlet then fixes the total flux entering, and a particle diffusing back across it stays in the domain. With <code>remove</code> those particles are lost and the population settles below <code>n V</code>.</p>
 <p><b>Keyed draws and restart.</b> The number entering a face cell, each position, and each identity follow from the seed, the face cell's position in the grid, and the step. Nothing is stored, so a restart continues the same sequence, and the rank layout does not enter. The flow still does: a face cell's mean count follows the flux, so round-off or a restart's flow difference can change a count in the rare case the mean lies that close to the draw.</p>
 <p><b>Limits.</b> An injected ID is <code>2^40 + (step F + cell) 2^10 + k</code>, with <code>F</code> the grid's boundary face cells and <code>k</code> numbering a face cell's particles in one step. A checkpoint stores IDs as doubles, so a step is refused once an ID would pass <code>2^53</code>, and so is a step sending 1024 or more particles through one face cell. Seeding at least <code>2^40</code> particles alongside an inlet is refused. Inlets inject on block 0 only, and the statistics task <code>msd</code> is refused because it measures displacement from one release. On a 32-bit-index build <code>logging.trace_particles</code> reads IDs as 32-bit integers, so it cannot name an injected particle. An inlet's <code>fields</code> cannot be combined with <code>verification.sources.scalar</code>, which prescribes <code>Psi</code> at every step.</p>
 <p><b>Diagnostics.</b> <code>particle_injection.csv</code> under <code>&lt;run.analysis.metrics&gt;</code> records each inlet's flow rate, expected and injected particles and <code>Psi</code> added, every step. With <code>exited</code> and <code>exited_psi_sum</code> in <code>search_metrics.csv</code> these close the particle and scalar budgets.</p>
 <p><b>Evidence.</b> Unit verified: <code>make unit-mpi</code> (<code>injection-follows-flux-and-is-keyed-on-the-grid</code>) checks counts and identities against the formula at 2 and 4 ranks. Integration verified: <code>make smoke</code> (<code>S4c</code>) fills an empty domain in an analytical uniform stream and closes the particle and <code>Psi</code> budgets every step.</p>
-<p>Mapping to control flags: <code>-particle_inlet_count</code>, then per inlet <code>-particle_inlet_&lt;n&gt;_face</code>, <code>-particle_inlet_&lt;n&gt;_number_density</code> and the field options under <code>-particle_inlet_&lt;n&gt;_fields_*</code>.</p>
+<p>Mapping to control flags: <code>-particle_inlet_count</code>, then per inlet <code>-particle_inlet_&lt;n&gt;_face</code>, <code>-particle_inlet_&lt;n&gt;_particles_per_cell</code> and the field options under <code>-particle_inlet_&lt;n&gt;_fields_*</code>.</p>
 <h1><a class="anchor" id="p45_mode_values_sec"></a>
 2. Accepted &lt;tt&gt;init_mode&lt;/tt&gt; Values</h1>
 <p><code>picurv</code> accepts these exact canonical strings:</p>
@@ -239,7 +240,7 @@ Surface</h2>
 <p><a class="anchor" id="p45_cap_surface"></a> <b>Identity.</b> <code>particles.init_mode: Surface</code> -&gt; <code>-pinit 0</code> -&gt; <code>ParticleInitializationType</code>.</p>
 <p><b>What it does.</b> Seeds particles across a bounding surface of the domain.</p>
 <p><b>When to choose it.</b> Studying what enters through a face - inlet seeding, or transport from a boundary into the interior. Choose <code>Volume</code> when you want the interior populated from the start.</p>
-<p><b>Parameters it owns.</b> The particle count; the surface is derived from the configured inlet face.</p>
+<p><b>Parameters it owns.</b> <code>particles_per_cell</code>, per face cell of the inlet face; the surface is derived from the configured inlet face.</p>
 <p><b>Interactions.</b> Needs an identifiable inlet face; the startup log reports which face was chosen. Particles are stratified over the inlet area (section 4): each inlet cell holds its share of the count to within one particle, the point inside it is drawn uniform in area, and every particle ID gets the same position at any rank layout. Particles start 1e-6 of a cell inside the domain, in the cell they were placed in.</p>
 <p><b>Diagnostics.</b> "Inlet face for particle initialization identified as Face N" at startup, and the per-step particle count.</p>
 <p><b>Evidence.</b> Analytically verified - <code>stratified-seeding-layout-2026-10-29</code>: positions, cells and IDs bitwise equal by particle ID at 1, 1 x 1 x 2, 2 x 2 x 1, 4 x 1 x 1 and 2 x 2 x 2 ranks, on a uniform and a graded inlet; every inlet cell held 25 or 26 of 16,000 particles against 25.6 expected, and the Kolmogorov-Smirnov statistic per axis was at most 0.35. <code>surface-seeding-area-2026-10-29</code> established the uniform-by-area placement across rank layouts and on a graded inlet.</p>
@@ -249,7 +250,7 @@ Volume</h2>
 <p><a class="anchor" id="p45_cap_volume"></a> <b>Identity.</b> <code>particles.init_mode: Volume</code> -&gt; <code>-pinit 1</code>.</p>
 <p><b>What it does.</b> Distributes particles through the domain volume.</p>
 <p><b>When to choose it.</b> Whenever you want interior statistics immediately - dispersion, mixing, or any case where waiting for particles to arrive from a boundary wastes the run.</p>
-<p><b>Parameters it owns.</b> The particle count.</p>
+<p><b>Parameters it owns.</b> <code>particles_per_cell</code>, the mean over the grid's cells.</p>
 <p><b>Interactions.</b> <a class="el" href="variables_8h.html#structParticle" title="Defines a particle&#39;s core properties for Lagrangian tracking.">Particle</a> density is uniform per unit physical volume on any grid. Particles are stratified over the volume (section 4): each cell holds its share of the count to within one particle, the point inside it is drawn uniform in volume by rejection against the cell's largest Jacobian determinant, and every particle ID gets the same position at any rank layout.</p>
 <p><b>Diagnostics.</b> Per-step particle count and the lost-particle counter.</p>
 <p><b>Evidence.</b> Production exercised - <code>examples/scatter_verification</code> seeds this way. Analytically verified - <code>stratified-seeding-layout-2026-10-29</code>: 200,000 particles with positions, cells and IDs bitwise equal by particle ID at five rank layouts on a uniform and a graded grid, and 345,600 on the periodic temporal mixing layer at 1, 2 and 4 ranks; on the uniform grid every cell held 3 or 4 against 3.30 expected, and on the graded grid the density per tenth of x stayed within 0.6% of uniform with Kolmogorov-Smirnov statistics at most 0.29. <code>particle-seeding-restart-2026-09-21</code> first measured the uniformity and unique IDs.</p>

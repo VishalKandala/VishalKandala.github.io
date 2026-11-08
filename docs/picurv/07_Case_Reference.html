@@ -425,7 +425,11 @@ models:
                          # component is held fixed; the grid is unchanged)
 
     particles:
-      count: 0             # [Integer] -&gt; -numParticles
+      # particles_per_cell: 10  # [Positive Number, optional] Mean particles per cell seeded at t = 0:
+      #                         # Volume seeds this times the cells, spread by volume; Surface this
+      #                         # many per face cell of the first INLET face. Omit to seed none.
+      #                         # -&gt; -numParticles (resolved from the grid by the CLI)
+      # count: 1000             # [Integer] PointSource only, which has no cells: the particles at the point
       init_mode: "Surface" # [string] -&gt; -pinit. Options: "Surface", "Volume", "PointSource"
       restart_mode: "init" # [string] -&gt; -particle_restart_mode. Options: "init", "load"
       random_seed: 12345   # [Integer, optional] -&gt; -particle_random_seed. 0..2147483647; seeds
@@ -625,8 +629,10 @@ boundary_conditions:
     handler: prescribed_velocity
     source: {components: normal, expression: 1.5}  # Speed into the domain [m/s]
     # particles:                      # Optional: inject particles here every step, in proportion to the flow.
-    #   number_density: 2.0e6         #   Particles per m^3 of entering fluid, number or expression in t
-    #                                 #   -&gt; -particle_inlet_&lt;n&gt;_number_density. particle_policy defaults to reflect.
+    #   particles_per_cell: 10        #   Mean per cell of the grid the entering fluid carries, number or
+    #                                 #   expression in t; the solver converts it with the grid's cells and
+    #                                 #   volume. -&gt; -particle_inlet_&lt;n&gt;_particles_per_cell. particle_policy
+    #                                 #   defaults to reflect.
     #   fields: {Psi: {expression: "y"}}  # Values at the face; default models.physics.particles.fields
     # constraints:                    # Optional, applied in this order:
     #   scale: 1.0                    #   multiplies the source
@@ -906,7 +912,7 @@ grid_gen</h2>
 <li>the coefficient log is set in <code>monitor.yml -&gt; diagnostics.les</code> (<a class="el" href="09_Monitor_Reference.html#p09_les_diagnostics_sub">6.1 LES coefficient log</a>); <code>physics.turbulence.les.diagnostics</code> is its deprecated former location, still read with a warning</li>
 <li><code>physics.turbulence.wall_function.enabled/model</code> -&gt; <code>-wallfunction</code> (<code>1</code> log law, <code>2</code> Werner-Wengle, <code>3</code> Cabot)</li>
 <li><code>physics.turbulence.wall_function.roughness_height</code> -&gt; <code>-wall_roughness</code> (<code>log_law</code> only); a physical length, divided by <code>length_ref</code></li>
-<li><code>physics.particles.count</code> -&gt; <code>-numParticles</code></li>
+<li><code>physics.particles.particles_per_cell</code> -&gt; <code>-numParticles</code>, resolved from the grid (<code>Volume</code>: per cell; <code>Surface</code>: per face cell of the first <code>INLET</code> face); <code>physics.particles.count</code> -&gt; <code>-numParticles</code> for <code>PointSource</code> only (<a class="el" href="45_Particle_Initialization_and_Restart.html#p45_contract_sec">1. User Contract in <code>case.yml</code></a>)</li>
 <li><code>physics.particles.init_mode</code> -&gt; <code>-pinit</code> (<code>Surface</code>, <code>Volume</code>, <code>PointSource</code>)</li>
 <li><code>physics.particles.restart_mode</code> -&gt; <code>-particle_restart_mode</code></li>
 <li><code>physics.particles.random_seed</code> -&gt; <code>-particle_random_seed</code> (integer <code>0</code>..<code>2147483647</code>, default <code>12345</code>)</li>
@@ -1322,7 +1328,7 @@ cabot</h2>
 </ul>
 <p>All six faces must be explicitly provided for each block. For detailed handler semantics, validation constraints, and C dispatch path, see <b><a class="el" href="44_Boundary_Conditions_Guide.html">Boundary Conditions Guide</a></b>.</p>
 <p>Optional per-face key <code>particle_policy: reflect | remove | wrap</code> sets what a particle crossing that face becomes. The default comes from the handler: both wall handlers reflect, the inlet and outlet handlers remove, the periodic handlers wrap, and an inlet with <code>particles</code> reflects. <code>wrap</code> is accepted on <code>PERIODIC</code> faces only, and they accept nothing else. See <a class="el" href="44_Boundary_Conditions_Guide.html#p44_ppol_sec">5. Particle Boundary Policies</a>.</p>
-<p>Optional key <code>particles: {number_density, fields}</code> on an <code>INLET</code> face of block 0 injects particles every step, in proportion to the flow. See <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_inject_sec">1.2 Injection at an Inlet</a>.</p>
+<p>Optional key <code>particles: {particles_per_cell, fields}</code> on an <code>INLET</code> face of block 0 injects particles every step, in proportion to the flow. See <a class="el" href="45_Particle_Initialization_and_Restart.html#p45_inject_sec">1.2 Injection at an Inlet</a>.</p>
 <p>Pulsatile expression example:</p>
 <div class="fragment"><div class="line">- face: &quot;-Zeta&quot;</div>
 <div class="line">  type: INLET</div>
