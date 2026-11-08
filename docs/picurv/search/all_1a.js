@@ -168,9 +168,10 @@ var searchData=
   ['own_20file_165',['07619abb-version-names-own-file',['../md_docs_2changelog_8d_207619abb-version-names-own-file.html',1,'']]],
   ['own_20petsc_20library_166',['5f785368-own-petsc-library',['../md_docs_2changelog_8d_25f785368-own-petsc-library.html',1,'']]],
   ['owner_20and_20cannot_20outrank_20it_167',['4.3 Every Value Has an Owner, and Cannot Outrank It',['../64_Documentation_Extension_Framework.html#p64_ceiling_sub',1,'']]],
-  ['owner_20lookup_168',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['owner_20lookup_20process_20grid_169',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['ownership_170',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
-  ['owns_5fpreconditioning_5fmatrix_171',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
-  ['ownsstoredpoint_172',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
+  ['owner_20guess_20diagonal_168',['c978fcf6-owner-guess-diagonal',['../md_docs_2changelog_8d_2c978fcf6-owner-guess-diagonal.html',1,'']]],
+  ['owner_20lookup_169',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['owner_20lookup_20process_20grid_170',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['ownership_171',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]],
+  ['owns_5fpreconditioning_5fmatrix_172',['owns_preconditioning_matrix',['../momentum__newton__krylov_8c.html#ac1156048b3cf49a7f74429d961a1d9b4',1,'MomentumPreconditionerEngine']]],
+  ['ownsstoredpoint_173',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
 ];

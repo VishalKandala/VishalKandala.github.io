@@ -18,7 +18,8 @@ var searchData=
   ['own_20cell_20mean_15',['6507b4b-iem-own-cell-mean',['../md_docs_2changelog_8d_26507b4b-iem-own-cell-mean.html',1,'']]],
   ['own_20file_16',['07619abb-version-names-own-file',['../md_docs_2changelog_8d_207619abb-version-names-own-file.html',1,'']]],
   ['own_20petsc_20library_17',['5f785368-own-petsc-library',['../md_docs_2changelog_8d_25f785368-own-petsc-library.html',1,'']]],
-  ['owner_20lookup_18',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['owner_20lookup_20process_20grid_19',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['ownership_20',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]]
+  ['owner_20guess_20diagonal_18',['c978fcf6-owner-guess-diagonal',['../md_docs_2changelog_8d_2c978fcf6-owner-guess-diagonal.html',1,'']]],
+  ['owner_20lookup_19',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['owner_20lookup_20process_20grid_20',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['ownership_21',['41ec5da-mg-balanced-ownership',['../md_docs_2changelog_8d_241ec5da-mg-balanced-ownership.html',1,'']]]
 ];
