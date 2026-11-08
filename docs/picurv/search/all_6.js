@@ -46,7 +46,7 @@ var searchData=
   ['6_20postprocess_20an_20existing_20run_43',['6. Postprocess An Existing Run',['../52_Run_Artifact_Lifecycle_Contract.html#p52_post_sec',1,'']]],
   ['6_20raising_20the_20accumulated_20moment_20order_44',['6. Raising The Accumulated Moment Order',['../60_Field_Statistics_Planned_Extensions.html#p60_order_extension_sec',1,'']]],
   ['6_20recovering_20from_20complete_20local_20loss_45',['4.6 Recovering From Complete Local Loss',['../61_Storage_Management_Guide.html#p61_recover_workspace',1,'']]],
-  ['6_20related_20documentation_46',['6 related documentation',['../65_Example_Catalog.html#p65_related_sec',1,'6. Related Documentation'],['../63_Page_Type_Contract.html#p63_related_sec',1,'6. Related Documentation'],['../69_Scientific_Writing_Handoff.html#p69_related_sec',1,'6. Related Documentation'],['../71_Invariant_Contracts.html#p71_related_sec',1,'6. Related Documentation']]],
+  ['6_20related_20documentation_46',['6 related documentation',['../71_Invariant_Contracts.html#p71_related_sec',1,'6. Related Documentation'],['../69_Scientific_Writing_Handoff.html#p69_related_sec',1,'6. Related Documentation'],['../65_Example_Catalog.html#p65_related_sec',1,'6. Related Documentation'],['../63_Page_Type_Contract.html#p63_related_sec',1,'6. Related Documentation']]],
   ['6_20related_20pages_47',['6 related pages',['../25_Pressure_Poisson_GMRES_Multigrid.html#p25_refs_sec',1,'6. Related Pages'],['../28_IEM_and_Statistical_Averaging.html#p28_refs_sec',1,'6. Related Pages']]],
   ['6_20repository_20and_20documentation_20navigation_48',['6. Repository and Documentation Navigation',['../Documentation_Map.html#p47_repo_axis_sec',1,'']]],
   ['6_20restart_20is_20rejected_20or_20behaves_20unexpectedly_49',['6. Restart Is Rejected or Behaves Unexpectedly',['../67_Troubleshooting.html#p67_restart_sec',1,'']]],
@@ -111,5 +111,7 @@ var searchData=
   ['6d6944e_20cross_20section_20supported_108',['6d6944e-cross-section-supported',['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'']]],
   ['6d6944e_2dcross_2dsection_2dsupported_2emd_109',['6d6944e-cross-section-supported.md',['../6d6944e-cross-section-supported_8md.html',1,'']]],
   ['6e50553_20single_20checkpoint_20post_110',['6e50553-single-checkpoint-post',['../md_docs_2changelog_8d_26e50553-single-checkpoint-post.html',1,'']]],
-  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_111',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]]
+  ['6e50553_2dsingle_2dcheckpoint_2dpost_2emd_111',['6e50553-single-checkpoint-post.md',['../6e50553-single-checkpoint-post_8md.html',1,'']]],
+  ['6e85bc9c_20recording_20free_112',['6e85bc9c-recording-free',['../md_docs_2changelog_8d_26e85bc9c-recording-free.html',1,'']]],
+  ['6e85bc9c_2drecording_2dfree_2emd_113',['6e85bc9c-recording-free.md',['../6e85bc9c-recording-free_8md.html',1,'']]]
 ];

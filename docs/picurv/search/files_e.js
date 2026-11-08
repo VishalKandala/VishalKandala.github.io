@@ -8,5 +8,6 @@ var searchData=
   ['d7d108d6_2dinlets_2dand_2dmoving_2dwalls_2emd_5',['d7d108d6-inlets-and-moving-walls.md',['../d7d108d6-inlets-and-moving-walls_8md.html',1,'']]],
   ['db983d0_2dnk_2dunconverged_2dstep_2dpolicy_2emd_6',['db983d0-nk-unconverged-step-policy.md',['../db983d0-nk-unconverged-step-policy_8md.html',1,'']]],
   ['dbd24e7_2dprofiling_2drank_2dreduction_2emd_7',['dbd24e7-profiling-rank-reduction.md',['../dbd24e7-profiling-rank-reduction_8md.html',1,'']]],
-  ['dbf2a48_2ddoxygen_2dchangelog_2dleading_2dblank_2emd_8',['dbf2a48-doxygen-changelog-leading-blank.md',['../dbf2a48-doxygen-changelog-leading-blank_8md.html',1,'']]]
+  ['dbf2a48_2ddoxygen_2dchangelog_2dleading_2dblank_2emd_8',['dbf2a48-doxygen-changelog-leading-blank.md',['../dbf2a48-doxygen-changelog-leading-blank_8md.html',1,'']]],
+  ['df5a2e6d_2dnov8_2dpromotions_2emd_9',['df5a2e6d-nov8-promotions.md',['../df5a2e6d-nov8-promotions_8md.html',1,'']]]
 ];

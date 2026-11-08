@@ -15,5 +15,6 @@ var searchData=
   ['6995499_20boundary_20checkpoints_12',['6995499-boundary-checkpoints',['../md_docs_2changelog_8d_26995499-boundary-checkpoints.html',1,'']]],
   ['6b11b15_20periodic_20dummy_20centres_13',['6b11b15-periodic-dummy-centres',['../md_docs_2changelog_8d_26b11b15-periodic-dummy-centres.html',1,'']]],
   ['6d6944e_20cross_20section_20supported_14',['6d6944e-cross-section-supported',['../md_docs_2changelog_8d_26d6944e-cross-section-supported.html',1,'']]],
-  ['6e50553_20single_20checkpoint_20post_15',['6e50553-single-checkpoint-post',['../md_docs_2changelog_8d_26e50553-single-checkpoint-post.html',1,'']]]
+  ['6e50553_20single_20checkpoint_20post_15',['6e50553-single-checkpoint-post',['../md_docs_2changelog_8d_26e50553-single-checkpoint-post.html',1,'']]],
+  ['6e85bc9c_20recording_20free_16',['6e85bc9c-recording-free',['../md_docs_2changelog_8d_26e85bc9c-recording-free.html',1,'']]]
 ];
