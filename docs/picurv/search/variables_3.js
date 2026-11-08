@@ -104,7 +104,7 @@ var searchData=
   ['cs22_101',['cs22',['../variables_8h.html#a5f194810b4c6737911d4216bc51a6fdc',1,'IBMInfo']]],
   ['cs3_102',['cs3',['../variables_8h.html#ad9adfd1fb377835ce8c1edde8a7f00c7',1,'IBMInfo']]],
   ['cs33_103',['cs33',['../variables_8h.html#abfaf220ddcdd02329fe69a6941f5451c',1,'IBMInfo']]],
-  ['csi_104',['csi',['../variables_8h.html#a439159b21d7cef43314ba3334fa8383d',1,'UserCtx::Csi'],['../interpolation_8c.html#a577dced32aa1145bfd96b247ec1de366',1,'VelocityPointInterpolator::csi']]],
+  ['csi_104',['csi',['../interpolation_8c.html#a577dced32aa1145bfd96b247ec1de366',1,'VelocityPointInterpolator::csi'],['../variables_8h.html#a439159b21d7cef43314ba3334fa8383d',1,'UserCtx::Csi']]],
   ['ct1_105',['ct1',['../variables_8h.html#ab792c7aca97cad542d840baedbdda721',1,'IBMInfo']]],
   ['ct11_106',['ct11',['../variables_8h.html#a732780026644b7058b7027d80adc224b',1,'IBMInfo']]],
   ['ct2_107',['ct2',['../variables_8h.html#aa556d1dda225f888ea2b3f72b140a31c',1,'IBMInfo']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
+  ['r_0',['r',['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['random_5ffunctions_2',['RANDOM_FUNCTIONS',['../namespacepicurv__cli_1_1source__expressions.html#a49ce26bc81b95756ed21b75e06ea5cb1',1,'picurv_cli::source_expressions']]],
   ['rank_3',['rank',['../variables_8h.html#acf67d733bdeef7c11d6ae8d6e88cadb6',1,'RankNeighbors::rank'],['../variables_8h.html#a19aa807b9181b13618527d6c4eb6fa89',1,'SimCtx::rank']]],
