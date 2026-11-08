@@ -792,18 +792,22 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">  449</span>    <span class="comment">// Central differences read the neighbours across subdomain and periodic seams.</span></div>
 <div class="line"><span class="lineno">  450</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2af94ac615dfbad248777720b3723d6137">FIELD_ID_DIFFUSIVITY</a>));</div>
 <div class="line"><span class="lineno">  451</span>    PetscCall(<a class="code hl_function" href="ParticlePhysics_8c.html#a22e5f9d74c0de03c075338213a707d47">ComputeCellScalarGradient</a>(user, user-&gt;<a class="code hl_variable" href="variables_8h.html#adb0aaa592db4e6516e717d1a754d51f5">lDiffusivity</a>, NULL, user-&gt;<a class="code hl_variable" href="variables_8h.html#a637ef784f87facca3a5c449eb6239d7f">DiffusivityGradient</a>));</div>
-<div class="line"><span class="lineno">  452</span>    <span class="comment">// Particles near subdomain boundaries interpolate the gradient, so its ghosts are filled.</span></div>
-<div class="line"><span class="lineno">  453</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a76a55c808958b8451f094c3f0ce728c5">FIELD_ID_DIFFUSIVITY_GRADIENT</a>));</div>
-<div class="line"><span class="lineno">  454</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno">  455</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno">  456</span>}</div>
+<div class="line"><span class="lineno">  452</span>    <span class="comment">// A particle within half a cell of a periodic seam interpolates across it, reading the</span></div>
+<div class="line"><span class="lineno">  453</span>    <span class="comment">// periodic dummy cells, which the gradient&#39;s owned-cell loop does not write.</span></div>
+<div class="line"><span class="lineno">  454</span>    <span class="keyword">const</span> <a class="code hl_enumeration" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2">FieldId</a> periodic_fields[] = {<a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a76a55c808958b8451f094c3f0ce728c5">FIELD_ID_DIFFUSIVITY_GRADIENT</a>};</div>
+<div class="line"><span class="lineno">  455</span>    PetscCall(<a class="code hl_function" href="Boundaries_8h.html#add9fc6cd8def8b8f05887bcfb99d3ae9">SynchronizePeriodicCellFields</a>(user, 1, periodic_fields));</div>
+<div class="line"><span class="lineno">  456</span>    <span class="comment">// Particles near subdomain boundaries interpolate the gradient, so its ghosts are filled.</span></div>
+<div class="line"><span class="lineno">  457</span>    PetscCall(<a class="code hl_function" href="setup_8h.html#ac3268b7f32258fd24c02cfd44dc5f18d">UpdateLocalGhosts</a>(user, <a class="code hl_enumvalue" href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a76a55c808958b8451f094c3f0ce728c5">FIELD_ID_DIFFUSIVITY_GRADIENT</a>));</div>
+<div class="line"><span class="lineno">  458</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno">  459</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno">  460</span>}</div>
 <div class="ttc" id="afield__catalog_8h_html_afc4ae0ccc0e2062a9398de4bfb9937b2a76a55c808958b8451f094c3f0ce728c5"><div class="ttname"><a href="field__catalog_8h.html#afc4ae0ccc0e2062a9398de4bfb9937b2a76a55c808958b8451f094c3f0ce728c5">FIELD_ID_DIFFUSIVITY_GRADIENT</a></div><div class="ttdeci">@ FIELD_ID_DIFFUSIVITY_GRADIENT</div><div class="ttdef"><b>Definition</b> <a href="field__catalog_8h_source.html#l00037">field_catalog.h:37</a></div></div>
 <div class="ttc" id="avariables_8h_html_a637ef784f87facca3a5c449eb6239d7f"><div class="ttname"><a href="variables_8h.html#a637ef784f87facca3a5c449eb6239d7f">UserCtx::DiffusivityGradient</a></div><div class="ttdeci">Vec DiffusivityGradient</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01170">variables.h:1170</a></div></div>
 <div class="ttc" id="avariables_8h_html_adb0aaa592db4e6516e717d1a754d51f5"><div class="ttname"><a href="variables_8h.html#adb0aaa592db4e6516e717d1a754d51f5">UserCtx::lDiffusivity</a></div><div class="ttdeci">Vec lDiffusivity</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l01169">variables.h:1169</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="ParticlePhysics_8h_a581a696ee216d26476ab8d71b5efe332_cgraph.svg" width="100%" height="492"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="ParticlePhysics_8h_a581a696ee216d26476ab8d71b5efe332_cgraph.svg" width="100%" height="589"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
