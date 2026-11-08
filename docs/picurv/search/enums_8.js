@@ -7,13 +7,14 @@ var searchData=
   ['particleinitializationtype_4',['ParticleInitializationType',['../variables_8h.html#a32c20993421c039e494ced8f5bbf95cd',1,'variables.h']]],
   ['particlelocationstatus_5',['ParticleLocationStatus',['../variables_8h.html#a347829443e8a679209e21f7f04f51581',1,'variables.h']]],
   ['picurvcadencekind_6',['PicurvCadenceKind',['../statistics__window_8h.html#af0607b5930eaa3c851b25323ece26658',1,'statistics_window.h']]],
-  ['picurvdrawspace_7',['PicurvDrawSpace',['../expression_8h.html#a5b6de8c500a49cec0122964628596c17',1,'expression.h']]],
-  ['picurvsourceframe_8',['PicurvSourceFrame',['../expression_8h.html#af4f11775ea85d4348dd60d43743ddf19',1,'expression.h']]],
-  ['picurvsourcevariable_9',['PicurvSourceVariable',['../expression_8h.html#a811580fe2e02193f92b385b5b9fd821f',1,'expression.h']]],
-  ['picurvstatisticsmask_10',['PicurvStatisticsMask',['../statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776',1,'statistics_target.h']]],
-  ['picurvtargetkind_11',['PicurvTargetKind',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39c',1,'statistics_target.h']]],
-  ['picurvweighting_12',['PicurvWeighting',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57',1,'statistics_window.h']]],
-  ['picurvwindowstate_13',['PicurvWindowState',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006',1,'statistics_window.h']]],
-  ['pmetric_14',['PMetric',['../test__momentum__convective__candidates_8c.html#af016cf8cfc124ddd84d2343bbc523190',1,'test_momentum_convective_candidates.c']]],
-  ['poissontransversekind_15',['PoissonTransverseKind',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481',1,'poisson.h']]]
+  ['picurvcsvlifecycle_7',['PicurvCsvLifecycle',['../logging_8h.html#a1ce7ea892b2b373ca5ef5969746fd2e6',1,'logging.h']]],
+  ['picurvdrawspace_8',['PicurvDrawSpace',['../expression_8h.html#a5b6de8c500a49cec0122964628596c17',1,'expression.h']]],
+  ['picurvsourceframe_9',['PicurvSourceFrame',['../expression_8h.html#af4f11775ea85d4348dd60d43743ddf19',1,'expression.h']]],
+  ['picurvsourcevariable_10',['PicurvSourceVariable',['../expression_8h.html#a811580fe2e02193f92b385b5b9fd821f',1,'expression.h']]],
+  ['picurvstatisticsmask_11',['PicurvStatisticsMask',['../statistics__target_8h.html#a5b4f0a8f8e87bfdd8182e77b9a9dd776',1,'statistics_target.h']]],
+  ['picurvtargetkind_12',['PicurvTargetKind',['../statistics__target_8h.html#a3fb43f8ea77135bfbcd7c0e990dac39c',1,'statistics_target.h']]],
+  ['picurvweighting_13',['PicurvWeighting',['../statistics__window_8h.html#aedd68ea8ad3580b6683aada005e75e57',1,'statistics_window.h']]],
+  ['picurvwindowstate_14',['PicurvWindowState',['../statistics__window_8h.html#aa1db24458cd5204e670c15ae9fe42006',1,'statistics_window.h']]],
+  ['pmetric_15',['PMetric',['../test__momentum__convective__candidates_8c.html#af016cf8cfc124ddd84d2343bbc523190',1,'test_momentum_convective_candidates.c']]],
+  ['poissontransversekind_16',['PoissonTransverseKind',['../poisson_8h.html#a586376a48e40a724ba99f821d8e79481',1,'poisson.h']]]
 ];

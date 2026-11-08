@@ -22,7 +22,7 @@ var searchData=
   ['picurvwindowdefinition_19',['PicurvWindowDefinition',['../statistics__window_8h.html#structPicurvWindowDefinition',1,'']]],
   ['picurvwindowfieldrequest_20',['PicurvWindowFieldRequest',['../statistics__window_8h.html#structPicurvWindowFieldRequest',1,'']]],
   ['picurvwindowstorage_21',['PicurvWindowStorage',['../statistics__accumulator_8h.html#structPicurvWindowStorage',1,'']]],
-  ['poissonfacegradient_22',['PoissonFaceGradient',['../poisson_8h.html#structPoissonFaceGradient',1,'']]],
+  ['poissonfacegradient_22',['PoissonFaceGradient',['../poisson_8c.html#structPoissonFaceGradient',1,'']]],
   ['poissonfacemetrics_23',['PoissonFaceMetrics',['../poisson_8h.html#structPoissonFaceMetrics',1,'']]],
   ['poissontransversedifference_24',['PoissonTransverseDifference',['../poisson_8h.html#structPoissonTransverseDifference',1,'']]],
   ['postprocessparams_25',['PostProcessParams',['../variables_8h.html#structPostProcessParams',1,'']]],
