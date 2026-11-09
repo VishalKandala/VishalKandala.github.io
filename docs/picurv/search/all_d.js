@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['b_0',['b',['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx::B'],['../expression_8h.html#a8cf2aad0abcb7ae74cbfea78226b9c00',1,'PicurvSourceFaceSlots::b']]],
+  ['b_0',['b',['../expression_8h.html#a8cf2aad0abcb7ae74cbfea78226b9c00',1,'PicurvSourceFaceSlots::b'],['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx::B']]],
   ['b05932f_20particle_20overheads_1',['b05932f-particle-overheads',['../md_docs_2changelog_8d_2b05932f-particle-overheads.html',1,'']]],
   ['b05932f_2dparticle_2doverheads_2emd_2',['b05932f-particle-overheads.md',['../b05932f-particle-overheads_8md.html',1,'']]],
   ['b19ad1b_20changelog_20doxygen_20format_3',['b19ad1b-changelog-doxygen-format',['../md_docs_2changelog_8d_2b19ad1b-changelog-doxygen-format.html',1,'']]],

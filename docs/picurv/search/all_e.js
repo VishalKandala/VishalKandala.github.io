@@ -646,7 +646,7 @@ var searchData=
   ['cs22_643',['cs22',['../variables_8h.html#a5f194810b4c6737911d4216bc51a6fdc',1,'IBMInfo']]],
   ['cs3_644',['cs3',['../variables_8h.html#ad9adfd1fb377835ce8c1edde8a7f00c7',1,'IBMInfo']]],
   ['cs33_645',['cs33',['../variables_8h.html#abfaf220ddcdd02329fe69a6941f5451c',1,'IBMInfo']]],
-  ['csi_646',['csi',['../variables_8h.html#a439159b21d7cef43314ba3334fa8383d',1,'UserCtx::Csi'],['../interpolation_8c.html#a577dced32aa1145bfd96b247ec1de366',1,'VelocityPointInterpolator::csi']]],
+  ['csi_646',['csi',['../interpolation_8c.html#a577dced32aa1145bfd96b247ec1de366',1,'VelocityPointInterpolator::csi'],['../variables_8h.html#a439159b21d7cef43314ba3334fa8383d',1,'UserCtx::Csi']]],
   ['cstart_647',['cstart',['../variables_8h.html#aee06eec51514d3eba023f8ffd5424b2a',1,'Cstart:&#160;variables.h'],['../variables_8h.html#structCstart',1,'Cstart']]],
   ['csv_20solver_20records_648',['13463015-csv-solver-records',['../md_docs_2changelog_8d_213463015-csv-solver-records.html',1,'']]],
   ['ct1_649',['ct1',['../variables_8h.html#ab792c7aca97cad542d840baedbdda721',1,'IBMInfo']]],

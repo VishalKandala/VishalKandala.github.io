@@ -111,7 +111,7 @@ var searchData=
   ['escape_20hatches_20and_20defaults_108',['9. Escape Hatches and Defaults',['../14_Config_Contract.html#p14_passthrough_sec',1,'']]],
   ['essentials_109',['3. Study Contract Essentials',['../37_Sweep_Studies_Guide.html#p37_contract_sec',1,'']]],
   ['estimate_5fincomplete_110',['estimate_incomplete',['../momentumsolvers_8h.html#a094b093f5f97b6ad03060f7f6354757c',1,'MomStabilityReport']]],
-  ['eta_111',['eta',['../interpolation_8c.html#a568aa0ec8a069e3f19eeef75f4f93154',1,'VelocityPointInterpolator::eta'],['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx::Eta']]],
+  ['eta_111',['eta',['../variables_8h.html#a8f4b905ecaadd9a0fe0b36faa1e3aa53',1,'UserCtx::Eta'],['../interpolation_8c.html#a568aa0ec8a069e3f19eeef75f4f93154',1,'VelocityPointInterpolator::eta']]],
   ['eulerian_112',['eulerian',['../10_Post_Processing_Reference.html#p10_cap_fse_eulerian_sub',1,'']]],
   ['eulerian_20field_20initialization_20tt_20properties_20initial_5fconditions_20tt_113',['2. Eulerian Field Initialization (&lt;tt&gt;properties.initial_conditions&lt;/tt&gt;)',['../33_Initial_Conditions.html#p33_euler_sec',1,'']]],
   ['eulerian_20field_20statistics_114',['4. Relationship To Eulerian Field Statistics',['../28_IEM_and_Statistical_Averaging.html#p28_field_observations_sec',1,'']]],
