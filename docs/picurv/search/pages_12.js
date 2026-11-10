@@ -36,7 +36,7 @@ var searchData=
   ['inlets_33',['995fa2f5-particle-inlets',['../md_docs_2changelog_8d_2995fa2f5-particle-inlets.html',1,'']]],
   ['inlets_20and_20moving_20walls_34',['d7d108d6-inlets-and-moving-walls',['../md_docs_2changelog_8d_2d7d108d6-inlets-and-moving-walls.html',1,'']]],
   ['installation_35',['Installation',['../01_Installation.html',1,'']]],
-  ['interpolation_36',['837ea43-faceflux-interpolation',['../md_docs_2changelog_8d_2837ea43-faceflux-interpolation.html',1,'']]],
+  ['interpolation_36',['interpolation',['../md_docs_2changelog_8d_2837ea43-faceflux-interpolation.html',1,'837ea43-faceflux-interpolation'],['../md_docs_2changelog_8d_2960362bf-resampled-velocity-interpolation.html',1,'960362bf-resampled-velocity-interpolation']]],
   ['interpolation_20and_20particle_20grid_20projection_37',['Trilinear Interpolation and Particle-Grid Projection',['../27_Trilinear_Interpolation_and_Projection.html',1,'']]],
   ['invariant_20contracts_38',['Invariant Contracts',['../71_Invariant_Contracts.html',1,'']]]
 ];
