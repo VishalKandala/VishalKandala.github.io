@@ -32,7 +32,7 @@ var searchData=
   ['heading_5fanchor_29',['heading_anchor',['../namespaceaudit__docs__site.html#af1747788c58188f4480446d399d9974c',1,'audit_docs_site']]],
   ['health_20summary_30',['5. summarize: Read-Only Run Configuration and Health Summary',['../05_The_Conductor_Script.html#p05_summarize_sec',1,'']]],
   ['height_20field_20segment_20entries_31',['7.3 Wall Height Field Segment Entries',['../48_Grid_Generator_Guide.html#p48_cap_wall_sec',1,'']]],
-  ['helpers_32',['helpers',['../51_C_Test_Suite_Developer_Guide.html#p51_fixtures_sec',1,'5. Fixture Helpers'],['../group__scatter__module__internal.html',1,'Internal Scattering Helpers']]],
+  ['helpers_32',['helpers',['../51_C_Test_Suite_Developer_Guide.html#p51_fixtures_sec',1,'5. Fixture Helpers'],['../md_docs_2changelog_8d_2a8823e4d-uncalled-wall-helpers.html',1,'a8823e4d-uncalled-wall-helpers'],['../group__scatter__module__internal.html',1,'Internal Scattering Helpers']]],
   ['here_33',['here',['../65_Example_Catalog.html#p65_start_sec',1,'2. Start Here'],['../BodyForces_8h.html#bf_state',1,'RULE: DO NOT ADVANCE PER-TIMESTEP STATE HERE']]],
   ['hi_34',['hi',['../poisson_8h.html#a59a6e3673e6b9397bf03414545bf704f',1,'PoissonTransverseDifference']]],
   ['high_20frequency_20fatal_20messages_20runtime_20paths_35',['2. High-Frequency Fatal Messages (Runtime Paths)',['../39_Common_Fatal_Errors.html#p39_legacy_sec',1,'']]],
