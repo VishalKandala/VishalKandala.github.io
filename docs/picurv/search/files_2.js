@@ -16,9 +16,10 @@ var searchData=
   ['29_5fmaintenance_5fbacklog_2emd_13',['29_Maintenance_Backlog.md',['../29__Maintenance__Backlog_8md.html',1,'']]],
   ['2aa7d4c_2dparticle_2dsampled_2dvalidity_2emd_14',['2aa7d4c-particle-sampled-validity.md',['../2aa7d4c-particle-sampled-validity_8md.html',1,'']]],
   ['2d0ae7ed_2dwarnings_2dreach_2dproduction_2druns_2emd_15',['2d0ae7ed-warnings-reach-production-runs.md',['../2d0ae7ed-warnings-reach-production-runs_8md.html',1,'']]],
-  ['2e00957_2dparticle_2dcloseout_2emd_16',['2e00957-particle-closeout.md',['../2e00957-particle-closeout_8md.html',1,'']]],
-  ['2e81565f_2danalytical_2dface_2dslots_2emd_17',['2e81565f-analytical-face-slots.md',['../2e81565f-analytical-face-slots_8md.html',1,'']]],
-  ['2e888970_2dsource_2dloose_2dends_2emd_18',['2e888970-source-loose-ends.md',['../2e888970-source-loose-ends_8md.html',1,'']]],
-  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_19',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
-  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_20',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
+  ['2dd690dd_2dstability_2dmode_2deigen_2dgrid_2damplitude_2emd_16',['2dd690dd-stability-mode-eigen-grid-amplitude.md',['../2dd690dd-stability-mode-eigen-grid-amplitude_8md.html',1,'']]],
+  ['2e00957_2dparticle_2dcloseout_2emd_17',['2e00957-particle-closeout.md',['../2e00957-particle-closeout_8md.html',1,'']]],
+  ['2e81565f_2danalytical_2dface_2dslots_2emd_18',['2e81565f-analytical-face-slots.md',['../2e81565f-analytical-face-slots_8md.html',1,'']]],
+  ['2e888970_2dsource_2dloose_2dends_2emd_19',['2e888970-source-loose-ends.md',['../2e888970-source-loose-ends_8md.html',1,'']]],
+  ['2f1f387_2dexample_2dconfig_2drefresh_2emd_20',['2f1f387-example-config-refresh.md',['../2f1f387-example-config-refresh_8md.html',1,'']]],
+  ['2fe1c88_2dpipe_2dnk_2dthree_2dgrid_2devidence_2emd_21',['2fe1c88-pipe-nk-three-grid-evidence.md',['../2fe1c88-pipe-nk-three-grid-evidence_8md.html',1,'']]]
 ];
