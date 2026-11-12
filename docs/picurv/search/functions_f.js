@@ -204,7 +204,7 @@ var searchData=
   ['prepareperiodicquickstencilfields_201',['prepareperiodicquickstencilfields',['../Boundaries_8h.html#a0c3bfc542529cb4c1247271badb75206',1,'PreparePeriodicQuickStencilFields(UserCtx *user, Vec local_vector_field, Vec local_scalar_field):&#160;Boundaries.c'],['../Boundaries_8c.html#a0c3bfc542529cb4c1247271badb75206',1,'PreparePeriodicQuickStencilFields(UserCtx *user, Vec local_vector_field, Vec local_scalar_field):&#160;Boundaries.c']]],
   ['preparetinyruntimeconfig_202',['PrepareTinyRuntimeConfig',['../test__support_8c.html#a623a3c3e3bb53d2cd46a06dc16a40919',1,'test_support.c']]],
   ['prescribedbulkfactor_203',['PrescribedBulkFactor',['../BC__Handlers_8c.html#ace7e72e3c2e1e1fc07d30f3e2c53e733',1,'BC_Handlers.c']]],
-  ['prescribedfacesums_204',['PrescribedFaceSums',['../BC__Handlers_8c.html#a2fbac99c0bb4cff21d49e45ef63dd58c',1,'BC_Handlers.c']]],
+  ['prescribedfacesums_204',['PrescribedFaceSums',['../BC__Handlers_8c.html#a5e09289727e1c14f38b64839c1b3c9a5',1,'BC_Handlers.c']]],
   ['prescribedslot_205',['PrescribedSlot',['../BC__Handlers_8c.html#a0ccdc7a6749ea7fb58d654106be948d2',1,'BC_Handlers.c']]],
   ['prestep_5finletprescribedvelocity_206',['PreStep_InletPrescribedVelocity',['../BC__Handlers_8c.html#ae5dffa10a2dd22ad47483647b4f05fa6',1,'BC_Handlers.c']]],
   ['prestep_5foutletconservation_207',['PreStep_OutletConservation',['../BC__Handlers_8c.html#adf6bcac422f089d9b6a8b0a9052a5627',1,'BC_Handlers.c']]],

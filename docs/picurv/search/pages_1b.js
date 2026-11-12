@@ -56,9 +56,10 @@ var searchData=
   ['rule_53',['951870f-physical-units-rule',['../md_docs_2changelog_8d_2951870f-physical-units-rule.html',1,'']]],
   ['run_54',['fee23741-recording-dry-run',['../md_docs_2changelog_8d_2fee23741-recording-dry-run.html',1,'']]],
   ['run_20artifact_20lifecycle_20contract_55',['Run Artifact Lifecycle Contract',['../52_Run_Artifact_Lifecycle_Contract.html',1,'']]],
-  ['run_20guide_20slurm_56',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
-  ['runs_57',['2d0ae7ed-warnings-reach-production-runs',['../md_docs_2changelog_8d_22d0ae7ed-warnings-reach-production-runs.html',1,'']]],
-  ['runs_20dir_20iem_20raw_20output_58',['0c7b543-init-runs-dir-iem-raw-output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'']]],
-  ['runtime_59',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
-  ['runtime_20execution_20map_60',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
+  ['run_20diagnostics_56',['f3472887-run-diagnostics',['../md_docs_2changelog_8d_2f3472887-run-diagnostics.html',1,'']]],
+  ['run_20guide_20slurm_57',['Cluster Run Guide (Slurm)',['../36_Cluster_Run_Guide.html',1,'']]],
+  ['runs_58',['2d0ae7ed-warnings-reach-production-runs',['../md_docs_2changelog_8d_22d0ae7ed-warnings-reach-production-runs.html',1,'']]],
+  ['runs_20dir_20iem_20raw_20output_59',['0c7b543-init-runs-dir-iem-raw-output',['../md_docs_2changelog_8d_20c7b543-init-runs-dir-iem-raw-output.html',1,'']]],
+  ['runtime_60',['Configuration Contract (YAML -&gt; Generated Artifacts -&gt; Runtime)',['../14_Config_Contract.html',1,'']]],
+  ['runtime_20execution_20map_61',['C Runtime Execution Map',['../46_C_Runtime_Execution_Map.html',1,'']]]
 ];

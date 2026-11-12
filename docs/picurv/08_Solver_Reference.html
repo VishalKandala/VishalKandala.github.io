@@ -198,6 +198,9 @@ tolerances:
   residual_relative_tol: 1.0e-3 # Use 1.0e-2 for looser exploratory LES
   # step_tol: 0.0       # DEPRECATED -&gt; -imp_stol. Accepted but unused by every
   #                     # momentum solver.
+  # max_consecutive_unconverged_steps: 20  # [Integer] -&gt; -mom_max_unconverged_steps.
+  #                     # Stop the run once this many consecutive momentum steps are
+  #                     # committed unconverged (any momentum solver). 0 (default) never stops.
 
 # --- Advanced Momentum Solver Controls (optional) ---
 # This section exposes newer dual-time controls directly (no passthrough needed).
@@ -636,12 +639,15 @@ transient</h2>
 <div class="line">  relative_tol: 1.0e-4</div>
 <div class="line">  residual_absolute_tol: 1.0e-8   # dimensionless (see below)</div>
 <div class="line">  residual_relative_tol: 1.0e-3</div>
+<div class="line">  max_consecutive_unconverged_steps: 0   # 0: never stop (default)</div>
 </div><!-- fragment --><p>Mappings:</p><ul>
 <li><code>max_iterations</code> -&gt; <code>-mom_max_pseudo_steps</code></li>
 <li><code>relative_tol</code> -&gt; <code>-mom_rtol</code></li>
 <li><code>residual_absolute_tol</code> -&gt; <code>-mom_resid_atol</code></li>
 <li><code>residual_relative_tol</code> -&gt; <code>-mom_resid_rtol</code></li>
+<li><code>max_consecutive_unconverged_steps</code> -&gt; <code>-mom_max_unconverged_steps</code></li>
 </ul>
+<p><code>max_consecutive_unconverged_steps</code> stops the run once that many consecutive momentum steps have been committed without meeting their convergence test, under either iterative momentum solver (<a class="el" href="31_Momentum_Solvers.html#p31_nonconvergence_sec">3a. When a Momentum Solve Does Not Converge</a>). A converged step resets the count. It must be a non-negative integer; the default 0 never stops, because some configurations meet their iteration cap on every step by design. Set it on production runs, where a solve that has stopped converging otherwise spends the remaining walltime on a field that no longer advances.</p>
 <p><code>absolute_tol</code> -&gt; <code>-mom_atol</code> is <b>deprecated</b> and no longer appears in the shipped configs. It is still accepted, but the CLI warns that it takes no part in convergence while a residual tolerance is active; it survives only for the legacy update-only branch.</p>
 <p>Both residual tolerances now <b>default to enabled</b> (<code>-mom_resid_atol</code> 1e-8, <code>-mom_resid_rtol</code> 1e-3). Setting both non-positive is an explicit opt-out that selects the legacy update-only branch, which can converge falsely when <code>dtau</code> collapses; prefer not to.</p>
 <p>When either residual tolerance is positive it decides convergence: the absolute test is sufficient on its own, and the relative test is paired with <code>relative_tol</code> as a guard. <code>absolute_tol</code> then takes no part, because <code>|dU| &lt;= absolute_tol</code> is the disguised, step-size-dependent residual bound <code>|R| &lt;= absolute_tol/dtau</code>. When both residual tolerances are non-positive, the solver preserves its existing update-only convergence criterion (<code>absolute_tol</code> <b>and</b> <code>relative_tol</code>). See <a class="el" href="24_Dual_Time_Picard_Jameson_RK.html#p24_convergence_sec">3. Convergence and Adaptive Rollback</a>.</p>

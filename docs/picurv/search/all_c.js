@@ -369,7 +369,7 @@ var searchData=
   ['applyverificationscalaroverridetoparticles_366',['applyverificationscalaroverridetoparticles',['../verification__sources_8c.html#a7aafa343581c9224d0f315e2a0a84b2b',1,'ApplyVerificationScalarOverrideToParticles(UserCtx *user):&#160;verification_sources.c'],['../verification__sources_8h.html#a7aafa343581c9224d0f315e2a0a84b2b',1,'ApplyVerificationScalarOverrideToParticles(UserCtx *user):&#160;verification_sources.c']]],
   ['applyvolumeweightedboxfilter_367',['ApplyVolumeWeightedBoxFilter',['../Filter_8c.html#a47961ae1d88edd3c203481251bd60746',1,'Filter.c']]],
   ['applywallfunction_368',['applywallfunction',['../Boundaries_8c.html#a2c9bd2c8ef539f60fadf60d30a1d4fa4',1,'ApplyWallFunction(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8h.html#a2c9bd2c8ef539f60fadf60d30a1d4fa4',1,'ApplyWallFunction(UserCtx *user):&#160;Boundaries.c']]],
-  ['applywallmodelatcell_369',['ApplyWallModelAtCell',['../Boundaries_8c.html#a628beb6da8b7c96c78f8ac89d8b1daf2',1,'Boundaries.c']]],
+  ['applywallmodelatcell_369',['ApplyWallModelAtCell',['../Boundaries_8c.html#aee643a9bb2a175d7415d53ae9f55078a',1,'Boundaries.c']]],
   ['approaches_370',['1a. The Two Momentum-Solution Approaches',['../31_Momentum_Solvers.html#p31_approaches_sec',1,'']]],
   ['arc_371',['arc',['../48_Grid_Generator_Guide.html#p48_cap_path_arc_sub',1,'arc'],['../48_Grid_Generator_Guide.html#p48_cap_wall_arc_sub',1,'arc']]],
   ['architecture_372',['architecture',['../Documentation_Map.html#p47_runtime_axis_sec',1,'4. Runtime and Source Architecture'],['../13_Code_Architecture.html',1,'Code Architecture'],['../grid_8h.html#architecture',1,'Indexing Architecture']]],
