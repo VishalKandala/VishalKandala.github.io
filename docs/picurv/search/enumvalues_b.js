@@ -47,5 +47,8 @@ var searchData=
   ['op_5funiform_44',['OP_UNIFORM',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108eab3df296f249a9a2692e322ddf70b933d',1,'expression.c']]],
   ['op_5fvar_45',['OP_VAR',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108ea696613cd8e936b1990135024cd2aed06',1,'expression.c']]],
   ['op_5fwhere_46',['OP_WHERE',['../expression_8c.html#aa8434fd79f63bc817b99a675ac73108ea114244d545a48f9a2cbf0b0af9c4fae2',1,'expression.c']]],
-  ['outlet_47',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]]
+  ['outlet_47',['OUTLET',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faae1ba6a2cab8245290be27ffde2a46d18',1,'variables.h']]],
+  ['outlet_5fclip_5fdecide_48',['OUTLET_CLIP_DECIDE',['../BC__Handlers_8c.html#a62aae58d098ad0019f3a96362627d688abd6df19222e0f84243d9e3e5fda6a563',1,'BC_Handlers.c']]],
+  ['outlet_5fclip_5fmeasure_49',['OUTLET_CLIP_MEASURE',['../BC__Handlers_8c.html#a62aae58d098ad0019f3a96362627d688a2990e1648364a89f89c8d24d3a943148',1,'BC_Handlers.c']]],
+  ['outlet_5fclip_5fwrite_50',['OUTLET_CLIP_WRITE',['../BC__Handlers_8c.html#a62aae58d098ad0019f3a96362627d688aba754a3b2461afb7348fae78335bdab0',1,'BC_Handlers.c']]]
 ];

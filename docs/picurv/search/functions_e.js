@@ -4,5 +4,7 @@ var searchData=
   ['openpicslice_1',['OpenPicSlice',['../BC__Handlers_8c.html#a953fdb05cdf251f8dbabc51195ca83ae',1,'BC_Handlers.c']]],
   ['openprescribedprofile_2',['OpenPrescribedProfile',['../BC__Handlers_8c.html#a17324e446c5b91bbc5ea9defb76b34b5',1,'BC_Handlers.c']]],
   ['optional_5fmatplotlib_5fpyplot_3',['optional_matplotlib_pyplot',['../namespacepicurv__cli_1_1core.html#a5bc21e7ccdcd52e0307d945945574ca9',1,'picurv_cli::core']]],
-  ['ownsstoredpoint_4',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
+  ['outletclippass_4',['OutletClipPass',['../BC__Handlers_8c.html#ab0c32b9d33e3af9f17c76f21ac606b8c',1,'BC_Handlers.c']]],
+  ['outletconservationclip_5',['OutletConservationClip',['../BC__Handlers_8c.html#af7954e77ee641fa3b579c6153ba2f32d',1,'BC_Handlers.c']]],
+  ['ownsstoredpoint_6',['OwnsStoredPoint',['../test__momentum__newton__krylov_8c.html#a5133d10dd265eff6618e6e9d9b016ee6',1,'test_momentum_newton_krylov.c']]]
 ];

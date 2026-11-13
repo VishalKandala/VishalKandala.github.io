@@ -528,39 +528,45 @@ Here is the caller graph for this function:</div>
 <p>Configures a <a class="el" href="structBoundaryCondition.html" title="The &quot;virtual table&quot; struct for a boundary condition handler object.">BoundaryCondition</a> object for conservative outlet treatment.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="BC__Handlers_8h.html">include/BC_Handlers.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="BC__Handlers_8h.html#ae2dfaf7f6a717cda068b4990fb3ccd8b" title="Configures a BoundaryCondition object for conservative outlet treatment.">Create_OutletConservation()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l01392">1392</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1393</span>{</div>
-<div class="line"><span class="lineno"> 1394</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1395</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 1396</span>    </div>
-<div class="line"><span class="lineno"> 1397</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1398</span> </div>
-<div class="line"><span class="lineno"> 1399</span>    <span class="comment">// This handler has the highest priority to ensure it runs after</span></div>
-<div class="line"><span class="lineno"> 1400</span>    <span class="comment">// all inflow fluxes have been calculated.</span></div>
-<div class="line"><span class="lineno"> 1401</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fca3d8818172c5a3cb0abf6288a6306cb91">BC_PRIORITY_OUTLET</a>;</div>
-<div class="line"><span class="lineno"> 1402</span>    </div>
-<div class="line"><span class="lineno"> 1403</span>    <span class="comment">// Assign function pointers</span></div>
-<div class="line"><span class="lineno"> 1404</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = NULL; <span class="comment">// No initialization needed</span></div>
-<div class="line"><span class="lineno"> 1405</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#adf6bcac422f089d9b6a8b0a9052a5627">PreStep_OutletConservation</a>;</div>
-<div class="line"><span class="lineno"> 1406</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a50e461f8e985303f6df8c79d7250fc1d">Apply_OutletConservation</a>;</div>
-<div class="line"><span class="lineno"> 1407</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = <a class="code hl_function" href="BC__Handlers_8c.html#aac2b86da7b2a008392a5fe3f2baa879e">PostStep_OutletConservation</a>;</div>
-<div class="line"><span class="lineno"> 1408</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL;</div>
-<div class="line"><span class="lineno"> 1409</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4a45d26bde59f5b74865c619e04656c">needs_repeat_pass</a> = PETSC_TRUE; <span class="comment">// Reads the adjacent Ucat and the inlets&#39; flux</span></div>
-<div class="line"><span class="lineno"> 1410</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = NULL; <span class="comment">// No private data to destroy</span></div>
-<div class="line"><span class="lineno"> 1411</span>    </div>
-<div class="line"><span class="lineno"> 1412</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = NULL;</div>
-<div class="line"><span class="lineno"> 1413</span> </div>
-<div class="line"><span class="lineno"> 1414</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 1415</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1416</span>}</div>
-<div class="ttc" id="aBC__Handlers_8c_html_a50e461f8e985303f6df8c79d7250fc1d"><div class="ttname"><a href="BC__Handlers_8c.html#a50e461f8e985303f6df8c79d7250fc1d">Apply_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode Apply_OutletConservation(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">(Handler Action) Applies mass conservation correction to the outlet face.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01558">BC_Handlers.c:1558</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_aac2b86da7b2a008392a5fe3f2baa879e"><div class="ttname"><a href="BC__Handlers_8c.html#aac2b86da7b2a008392a5fe3f2baa879e">PostStep_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode PostStep_OutletConservation(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Update outlet-conservation state after a completed solver step.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01768">BC_Handlers.c:1768</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_adf6bcac422f089d9b6a8b0a9052a5627"><div class="ttname"><a href="BC__Handlers_8c.html#adf6bcac422f089d9b6a8b0a9052a5627">PreStep_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode PreStep_OutletConservation(BoundaryCondition *self, BCContext *ctx, PetscReal *local_inflow_contribution, PetscReal *local_outflow_contribution)</div><div class="ttdoc">Prepare the outlet-conservation correction before advancing the solver.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01421">BC_Handlers.c:1421</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l01414">1414</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1415</span>{</div>
+<div class="line"><span class="lineno"> 1416</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 1417</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 1418</span>    </div>
+<div class="line"><span class="lineno"> 1419</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1420</span> </div>
+<div class="line"><span class="lineno"> 1421</span>    <span class="comment">// This handler has the highest priority to ensure it runs after</span></div>
+<div class="line"><span class="lineno"> 1422</span>    <span class="comment">// all inflow fluxes have been calculated.</span></div>
+<div class="line"><span class="lineno"> 1423</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fca3d8818172c5a3cb0abf6288a6306cb91">BC_PRIORITY_OUTLET</a>;</div>
+<div class="line"><span class="lineno"> 1424</span>    </div>
+<div class="line"><span class="lineno"> 1425</span>    <span class="comment">// Assign function pointers</span></div>
+<div class="line"><span class="lineno"> 1426</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = NULL; <span class="comment">// No initialization needed</span></div>
+<div class="line"><span class="lineno"> 1427</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#adf6bcac422f089d9b6a8b0a9052a5627">PreStep_OutletConservation</a>;</div>
+<div class="line"><span class="lineno"> 1428</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a50e461f8e985303f6df8c79d7250fc1d">Apply_OutletConservation</a>;</div>
+<div class="line"><span class="lineno"> 1429</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = <a class="code hl_function" href="BC__Handlers_8c.html#aac2b86da7b2a008392a5fe3f2baa879e">PostStep_OutletConservation</a>;</div>
+<div class="line"><span class="lineno"> 1430</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL;</div>
+<div class="line"><span class="lineno"> 1431</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4a45d26bde59f5b74865c619e04656c">needs_repeat_pass</a> = PETSC_TRUE; <span class="comment">// Reads the adjacent Ucat and the inlets&#39; flux</span></div>
+<div class="line"><span class="lineno"> 1432</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#a13770376b1d2eb9e43c59ba720c2427d">Destroy_OutletConservation</a>;</div>
+<div class="line"><span class="lineno"> 1433</span> </div>
+<div class="line"><span class="lineno"> 1434</span>    <a class="code hl_struct" href="BC__Handlers_8c.html#structOutletConservationData">OutletConservationData</a> *data = NULL;</div>
+<div class="line"><span class="lineno"> 1435</span>    PetscCall(PetscNew(&amp;data));</div>
+<div class="line"><span class="lineno"> 1436</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#ac54bdb915d6092e849c7e1b7d9cfcb34">decisionStep</a> = -1;</div>
+<div class="line"><span class="lineno"> 1437</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = (<span class="keywordtype">void</span>*)data;</div>
+<div class="line"><span class="lineno"> 1438</span> </div>
+<div class="line"><span class="lineno"> 1439</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 1440</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 1441</span>}</div>
+<div class="ttc" id="aBC__Handlers_8c_html_a13770376b1d2eb9e43c59ba720c2427d"><div class="ttname"><a href="BC__Handlers_8c.html#a13770376b1d2eb9e43c59ba720c2427d">Destroy_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode Destroy_OutletConservation(BoundaryCondition *self)</div><div class="ttdoc">Release the outlet-conservation handler's clip state.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02094">BC_Handlers.c:2094</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a50e461f8e985303f6df8c79d7250fc1d"><div class="ttname"><a href="BC__Handlers_8c.html#a50e461f8e985303f6df8c79d7250fc1d">Apply_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode Apply_OutletConservation(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">(Handler Action) Applies mass conservation correction to the outlet face.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01739">BC_Handlers.c:1739</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_aac2b86da7b2a008392a5fe3f2baa879e"><div class="ttname"><a href="BC__Handlers_8c.html#aac2b86da7b2a008392a5fe3f2baa879e">PostStep_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode PostStep_OutletConservation(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Update outlet-conservation state after a completed solver step.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01958">BC_Handlers.c:1958</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_ac54bdb915d6092e849c7e1b7d9cfcb34"><div class="ttname"><a href="BC__Handlers_8c.html#ac54bdb915d6092e849c7e1b7d9cfcb34">OutletConservationData::decisionStep</a></div><div class="ttdeci">PetscInt decisionStep</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01402">BC_Handlers.c:1402</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_adf6bcac422f089d9b6a8b0a9052a5627"><div class="ttname"><a href="BC__Handlers_8c.html#adf6bcac422f089d9b6a8b0a9052a5627">PreStep_OutletConservation</a></div><div class="ttdeci">static PetscErrorCode PreStep_OutletConservation(BoundaryCondition *self, BCContext *ctx, PetscReal *local_inflow_contribution, PetscReal *local_outflow_contribution)</div><div class="ttdoc">Prepare the outlet-conservation correction before advancing the solver.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01446">BC_Handlers.c:1446</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_structOutletConservationData"><div class="ttname"><a href="BC__Handlers_8c.html#structOutletConservationData">OutletConservationData</a></div><div class="ttdoc">Per-face state of the backflow clip; see the section comment above.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l01401">BC_Handlers.c:1401</a></div></div>
 <div class="ttc" id="avariables_8h_html_acdda675837f1d1a2c7aa26b80fb0e1fca3d8818172c5a3cb0abf6288a6306cb91"><div class="ttname"><a href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fca3d8818172c5a3cb0abf6288a6306cb91">BC_PRIORITY_OUTLET</a></div><div class="ttdeci">@ BC_PRIORITY_OUTLET</div><div class="ttdef"><b>Definition</b> <a href="variables_8h_source.html#l00365">variables.h:364</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="BC__Handlers_8h_ae2dfaf7f6a717cda068b4990fb3ccd8b_cgraph.svg" width="100%" height="401"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="BC__Handlers_8h_ae2dfaf7f6a717cda068b4990fb3ccd8b_cgraph.svg" width="100%" height="521"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -598,27 +604,27 @@ Here is the caller graph for this function:</div>
 <p>Configures a <a class="el" href="structBoundaryCondition.html" title="The &quot;virtual table&quot; struct for a boundary condition handler object.">BoundaryCondition</a> object for geometric periodic coupling.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="BC__Handlers_8h.html">include/BC_Handlers.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="BC__Handlers_8h.html#a6748d2e1e348f6b94b604838af2c9b55" title="Configures a BoundaryCondition object for geometric periodic coupling.">Create_PeriodicGeometric()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l01909">1909</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1909</span>                                                              {</div>
-<div class="line"><span class="lineno"> 1910</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 1911</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 1912</span>    </div>
-<div class="line"><span class="lineno"> 1913</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1914</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a> = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcadf14c9b09a9399474fdfa97039d3f074">BC_PRIORITY_WALL</a>;</div>
-<div class="line"><span class="lineno"> 1915</span> </div>
-<div class="line"><span class="lineno"> 1916</span>    <span class="comment">// Assign function pointers</span></div>
-<div class="line"><span class="lineno"> 1917</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = NULL; <span class="comment">// No initialization needed</span></div>
-<div class="line"><span class="lineno"> 1918</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = NULL;</div>
-<div class="line"><span class="lineno"> 1919</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = NULL;</div>
-<div class="line"><span class="lineno"> 1920</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL;</div>
-<div class="line"><span class="lineno"> 1921</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL;</div>
-<div class="line"><span class="lineno"> 1922</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = NULL; <span class="comment">// No private data to destroy</span></div>
-<div class="line"><span class="lineno"> 1923</span> </div>
-<div class="line"><span class="lineno"> 1924</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = NULL;</div>
-<div class="line"><span class="lineno"> 1925</span> </div>
-<div class="line"><span class="lineno"> 1926</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 1927</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 1928</span>}</div>
+<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l02115">2115</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2115</span>                                                              {</div>
+<div class="line"><span class="lineno"> 2116</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2117</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2118</span>    </div>
+<div class="line"><span class="lineno"> 2119</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2120</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a> = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcadf14c9b09a9399474fdfa97039d3f074">BC_PRIORITY_WALL</a>;</div>
+<div class="line"><span class="lineno"> 2121</span> </div>
+<div class="line"><span class="lineno"> 2122</span>    <span class="comment">// Assign function pointers</span></div>
+<div class="line"><span class="lineno"> 2123</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = NULL; <span class="comment">// No initialization needed</span></div>
+<div class="line"><span class="lineno"> 2124</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = NULL;</div>
+<div class="line"><span class="lineno"> 2125</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = NULL;</div>
+<div class="line"><span class="lineno"> 2126</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL;</div>
+<div class="line"><span class="lineno"> 2127</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL;</div>
+<div class="line"><span class="lineno"> 2128</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = NULL; <span class="comment">// No private data to destroy</span></div>
+<div class="line"><span class="lineno"> 2129</span> </div>
+<div class="line"><span class="lineno"> 2130</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = NULL;</div>
+<div class="line"><span class="lineno"> 2131</span> </div>
+<div class="line"><span class="lineno"> 2132</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2133</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2134</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -655,55 +661,55 @@ Here is the caller graph for this function:</div>
 <p>Configures a <a class="el" href="structBoundaryCondition.html" title="The &quot;virtual table&quot; struct for a boundary condition handler object.">BoundaryCondition</a> object for periodic driven-flow forcing.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="BC__Handlers_8h.html#a91385da2fa73795886c2bf881d464e2e" title="Configures a BoundaryCondition object for periodic driven-flow forcing.">Create_PeriodicDrivenConstant()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l02072">2072</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2073</span>{</div>
-<div class="line"><span class="lineno"> 2074</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2075</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2076</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2077</span>    </div>
-<div class="line"><span class="lineno"> 2078</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2079</span> </div>
-<div class="line"><span class="lineno"> 2080</span>    <span class="comment">// --- Allocate the private data structure ---</span></div>
-<div class="line"><span class="lineno"> 2081</span>    <a class="code hl_struct" href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a> *data = NULL;</div>
-<div class="line"><span class="lineno"> 2082</span>    ierr = PetscNew(&amp;data); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2083</span>    <span class="comment">// Initialize fields to safe default values</span></div>
-<div class="line"><span class="lineno"> 2084</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">direction</a> = <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><span class="lineno"> 2085</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">targetVolumetricFlux</a> = 0.0;</div>
-<div class="line"><span class="lineno"> 2086</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">isMasterController</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno"> 2087</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">enforceSeamFlux</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno"> 2088</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">lastBulkCorrectionStep</a> = -1;</div>
-<div class="line"><span class="lineno"> 2089</span>    </div>
-<div class="line"><span class="lineno"> 2090</span>    <span class="comment">// Attach the private data to the generic handler object</span></div>
-<div class="line"><span class="lineno"> 2091</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = (<span class="keywordtype">void</span>*)data;</div>
-<div class="line"><span class="lineno"> 2092</span>    </div>
-<div class="line"><span class="lineno"> 2093</span>    <span class="comment">// --- Configure the handler&#39;s properties and methods ---</span></div>
-<div class="line"><span class="lineno"> 2094</span>    </div>
-<div class="line"><span class="lineno"> 2095</span>    <span class="comment">// Set priority: Using BC_PRIORITY_INLET ensures this handler&#39;s PreStep runs</span></div>
-<div class="line"><span class="lineno"> 2096</span>    <span class="comment">// before other handlers (like outlets) that might depend on its calculations.</span></div>
-<div class="line"><span class="lineno"> 2097</span>    <span class="comment">// It is the caller&#39;s responsibility that there are no Inlets called along with driven periodic to avoid clash.</span></div>
-<div class="line"><span class="lineno"> 2098</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcaecebb24bd2fd703c61dd44857ec5ec35">BC_PRIORITY_INLET</a>;</div>
-<div class="line"><span class="lineno"> 2099</span>    </div>
-<div class="line"><span class="lineno"> 2100</span>    <span class="comment">// Assign the function pointers to the implementations in this file.</span></div>
-<div class="line"><span class="lineno"> 2101</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = <a class="code hl_function" href="BC__Handlers_8c.html#a6709d5c218068b709b52270eeac52306">Initialize_PeriodicDrivenConstant</a>;</div>
-<div class="line"><span class="lineno"> 2102</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#adabb759677ad16e4be0527e59cccabfa">PreStep_PeriodicDrivenConstant</a>;</div>
-<div class="line"><span class="lineno"> 2103</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a>;</div>
-<div class="line"><span class="lineno"> 2104</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL; <span class="comment">// This handler has no action after the main solver step.</span></div>
-<div class="line"><span class="lineno"> 2105</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL; <span class="comment">// The boundary value is not flow-dependent (it&#39;s periodic).</span></div>
-<div class="line"><span class="lineno"> 2106</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a>;</div>
-<div class="line"><span class="lineno"> 2107</span>    </div>
-<div class="line"><span class="lineno"> 2108</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2109</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2110</span>}</div>
-<div class="ttc" id="aBC__Handlers_8c_html_a0a271f1f31ada1d740c58678cf29ade8"><div class="ttname"><a href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">DrivenFluxData::enforceSeamFlux</a></div><div class="ttdeci">PetscBool enforceSeamFlux</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02061">BC_Handlers.c:2061</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a1908ecf7971972c32f05d4588cb5dcb2"><div class="ttname"><a href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">DrivenFluxData::direction</a></div><div class="ttdeci">char direction</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02058">BC_Handlers.c:2058</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a271ffebb72cda88e5c3d6920185a0e48"><div class="ttname"><a href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">DrivenFluxData::isMasterController</a></div><div class="ttdeci">PetscBool isMasterController</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02060">BC_Handlers.c:2060</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a4cc77463b6f90431a295a7ae7fb52dfc"><div class="ttname"><a href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">DrivenFluxData::lastBulkCorrectionStep</a></div><div class="ttdeci">PetscInt lastBulkCorrectionStep</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02062">BC_Handlers.c:2062</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a5e64a66cc9fdd8b69842ab56c82dec38"><div class="ttname"><a href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Apply_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Apply the configured constant driving term to the periodic boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02272">BC_Handlers.c:2272</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a6709d5c218068b709b52270eeac52306"><div class="ttname"><a href="BC__Handlers_8c.html#a6709d5c218068b709b52270eeac52306">Initialize_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Initialize_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Initialize constant forcing data for a periodically driven boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02115">BC_Handlers.c:2115</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_a8e07ee2259f0e07d9a1d16efc7f8b861"><div class="ttname"><a href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Destroy_PeriodicDrivenConstant(BoundaryCondition *self)</div><div class="ttdoc">Release resources owned by the constant periodic-driving boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02374">BC_Handlers.c:2374</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_adabb759677ad16e4be0527e59cccabfa"><div class="ttname"><a href="BC__Handlers_8c.html#adabb759677ad16e4be0527e59cccabfa">PreStep_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode PreStep_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Prepare constant periodic-driving data before the solver step.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02187">BC_Handlers.c:2187</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_aeae407127e403c5e799ff3f14470b6ae"><div class="ttname"><a href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">DrivenFluxData::targetVolumetricFlux</a></div><div class="ttdeci">PetscReal targetVolumetricFlux</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02059">BC_Handlers.c:2059</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_structDrivenFluxData"><div class="ttname"><a href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a></div><div class="ttdoc">Private data structure shared by both periodic driven-flux handlers.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02057">BC_Handlers.c:2057</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l02278">2278</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2279</span>{</div>
+<div class="line"><span class="lineno"> 2280</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2281</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2282</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2283</span>    </div>
+<div class="line"><span class="lineno"> 2284</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2285</span> </div>
+<div class="line"><span class="lineno"> 2286</span>    <span class="comment">// --- Allocate the private data structure ---</span></div>
+<div class="line"><span class="lineno"> 2287</span>    <a class="code hl_struct" href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a> *data = NULL;</div>
+<div class="line"><span class="lineno"> 2288</span>    ierr = PetscNew(&amp;data); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2289</span>    <span class="comment">// Initialize fields to safe default values</span></div>
+<div class="line"><span class="lineno"> 2290</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">direction</a> = <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><span class="lineno"> 2291</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">targetVolumetricFlux</a> = 0.0;</div>
+<div class="line"><span class="lineno"> 2292</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">isMasterController</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno"> 2293</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">enforceSeamFlux</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno"> 2294</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">lastBulkCorrectionStep</a> = -1;</div>
+<div class="line"><span class="lineno"> 2295</span>    </div>
+<div class="line"><span class="lineno"> 2296</span>    <span class="comment">// Attach the private data to the generic handler object</span></div>
+<div class="line"><span class="lineno"> 2297</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = (<span class="keywordtype">void</span>*)data;</div>
+<div class="line"><span class="lineno"> 2298</span>    </div>
+<div class="line"><span class="lineno"> 2299</span>    <span class="comment">// --- Configure the handler&#39;s properties and methods ---</span></div>
+<div class="line"><span class="lineno"> 2300</span>    </div>
+<div class="line"><span class="lineno"> 2301</span>    <span class="comment">// Set priority: Using BC_PRIORITY_INLET ensures this handler&#39;s PreStep runs</span></div>
+<div class="line"><span class="lineno"> 2302</span>    <span class="comment">// before other handlers (like outlets) that might depend on its calculations.</span></div>
+<div class="line"><span class="lineno"> 2303</span>    <span class="comment">// It is the caller&#39;s responsibility that there are no Inlets called along with driven periodic to avoid clash.</span></div>
+<div class="line"><span class="lineno"> 2304</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcaecebb24bd2fd703c61dd44857ec5ec35">BC_PRIORITY_INLET</a>;</div>
+<div class="line"><span class="lineno"> 2305</span>    </div>
+<div class="line"><span class="lineno"> 2306</span>    <span class="comment">// Assign the function pointers to the implementations in this file.</span></div>
+<div class="line"><span class="lineno"> 2307</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = <a class="code hl_function" href="BC__Handlers_8c.html#a6709d5c218068b709b52270eeac52306">Initialize_PeriodicDrivenConstant</a>;</div>
+<div class="line"><span class="lineno"> 2308</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#adabb759677ad16e4be0527e59cccabfa">PreStep_PeriodicDrivenConstant</a>;</div>
+<div class="line"><span class="lineno"> 2309</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a>;</div>
+<div class="line"><span class="lineno"> 2310</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL; <span class="comment">// This handler has no action after the main solver step.</span></div>
+<div class="line"><span class="lineno"> 2311</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL; <span class="comment">// The boundary value is not flow-dependent (it&#39;s periodic).</span></div>
+<div class="line"><span class="lineno"> 2312</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a>;</div>
+<div class="line"><span class="lineno"> 2313</span>    </div>
+<div class="line"><span class="lineno"> 2314</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2315</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2316</span>}</div>
+<div class="ttc" id="aBC__Handlers_8c_html_a0a271f1f31ada1d740c58678cf29ade8"><div class="ttname"><a href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">DrivenFluxData::enforceSeamFlux</a></div><div class="ttdeci">PetscBool enforceSeamFlux</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02267">BC_Handlers.c:2267</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a1908ecf7971972c32f05d4588cb5dcb2"><div class="ttname"><a href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">DrivenFluxData::direction</a></div><div class="ttdeci">char direction</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02264">BC_Handlers.c:2264</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a271ffebb72cda88e5c3d6920185a0e48"><div class="ttname"><a href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">DrivenFluxData::isMasterController</a></div><div class="ttdeci">PetscBool isMasterController</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02266">BC_Handlers.c:2266</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a4cc77463b6f90431a295a7ae7fb52dfc"><div class="ttname"><a href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">DrivenFluxData::lastBulkCorrectionStep</a></div><div class="ttdeci">PetscInt lastBulkCorrectionStep</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02268">BC_Handlers.c:2268</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a5e64a66cc9fdd8b69842ab56c82dec38"><div class="ttname"><a href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Apply_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Apply the configured constant driving term to the periodic boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02478">BC_Handlers.c:2478</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a6709d5c218068b709b52270eeac52306"><div class="ttname"><a href="BC__Handlers_8c.html#a6709d5c218068b709b52270eeac52306">Initialize_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Initialize_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Initialize constant forcing data for a periodically driven boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02321">BC_Handlers.c:2321</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_a8e07ee2259f0e07d9a1d16efc7f8b861"><div class="ttname"><a href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode Destroy_PeriodicDrivenConstant(BoundaryCondition *self)</div><div class="ttdoc">Release resources owned by the constant periodic-driving boundary.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02580">BC_Handlers.c:2580</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_adabb759677ad16e4be0527e59cccabfa"><div class="ttname"><a href="BC__Handlers_8c.html#adabb759677ad16e4be0527e59cccabfa">PreStep_PeriodicDrivenConstant</a></div><div class="ttdeci">static PetscErrorCode PreStep_PeriodicDrivenConstant(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Prepare constant periodic-driving data before the solver step.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02393">BC_Handlers.c:2393</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_aeae407127e403c5e799ff3f14470b6ae"><div class="ttname"><a href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">DrivenFluxData::targetVolumetricFlux</a></div><div class="ttdeci">PetscReal targetVolumetricFlux</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02265">BC_Handlers.c:2265</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_structDrivenFluxData"><div class="ttname"><a href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a></div><div class="ttdoc">Private data structure shared by both periodic driven-flux handlers.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02263">BC_Handlers.c:2263</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -745,45 +751,45 @@ Here is the caller graph for this function:</div>
 <p>Configures a <a class="el" href="structBoundaryCondition.html" title="The &quot;virtual table&quot; struct for a boundary condition handler object.">BoundaryCondition</a> object for initial-flux periodic driving.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="BC__Handlers_8h.html#a8dcdc50153bc8e9aeb4581563757bde9" title="Configures a BoundaryCondition object for initial-flux periodic driving.">Create_PeriodicDrivenInitial()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l02420">2420</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2421</span>{</div>
-<div class="line"><span class="lineno"> 2422</span>    PetscErrorCode ierr;</div>
-<div class="line"><span class="lineno"> 2423</span>    PetscFunctionBeginUser;</div>
-<div class="line"><span class="lineno"> 2424</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
-<div class="line"><span class="lineno"> 2425</span> </div>
-<div class="line"><span class="lineno"> 2426</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2427</span> </div>
-<div class="line"><span class="lineno"> 2428</span>    <span class="comment">// --- Allocate the private data structure ---</span></div>
-<div class="line"><span class="lineno"> 2429</span>    <a class="code hl_struct" href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a> *data = NULL;</div>
-<div class="line"><span class="lineno"> 2430</span>    ierr = PetscNew(&amp;data); CHKERRQ(ierr);</div>
-<div class="line"><span class="lineno"> 2431</span>    <span class="comment">// Initialize fields to safe default values</span></div>
-<div class="line"><span class="lineno"> 2432</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">direction</a> = <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><span class="lineno"> 2433</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">targetVolumetricFlux</a> = 0.0;</div>
-<div class="line"><span class="lineno"> 2434</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">isMasterController</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno"> 2435</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">enforceSeamFlux</a> = PETSC_FALSE;</div>
-<div class="line"><span class="lineno"> 2436</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">lastBulkCorrectionStep</a> = -1;</div>
-<div class="line"><span class="lineno"> 2437</span> </div>
-<div class="line"><span class="lineno"> 2438</span>    <span class="comment">// Attach the private data to the generic handler object</span></div>
-<div class="line"><span class="lineno"> 2439</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = (<span class="keywordtype">void</span>*)data;</div>
-<div class="line"><span class="lineno"> 2440</span> </div>
-<div class="line"><span class="lineno"> 2441</span>    <span class="comment">// --- Configure the handler&#39;s properties and methods ---</span></div>
-<div class="line"><span class="lineno"> 2442</span> </div>
-<div class="line"><span class="lineno"> 2443</span>    <span class="comment">// Same priority reasoning as the constant-flux handler: PreStep must run</span></div>
-<div class="line"><span class="lineno"> 2444</span>    <span class="comment">// before any handler that depends on the controller&#39;s corrections.</span></div>
-<div class="line"><span class="lineno"> 2445</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcaecebb24bd2fd703c61dd44857ec5ec35">BC_PRIORITY_INLET</a>;</div>
-<div class="line"><span class="lineno"> 2446</span> </div>
-<div class="line"><span class="lineno"> 2447</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = <a class="code hl_function" href="BC__Handlers_8c.html#a831aa0666a5c8c77b2a1e602257f0f91">Initialize_PeriodicDrivenInitial</a>;</div>
-<div class="line"><span class="lineno"> 2448</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#ae8b6cda07b089440a72ae46ca7a525a7">PreStep_PeriodicDrivenInitial</a>;</div>
-<div class="line"><span class="lineno"> 2449</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a>;  <span class="comment">// Boundary trim is target-agnostic.</span></div>
-<div class="line"><span class="lineno"> 2450</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL; <span class="comment">// This handler has no action after the main solver step.</span></div>
-<div class="line"><span class="lineno"> 2451</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL; <span class="comment">// The boundary value is not flow-dependent (it&#39;s periodic).</span></div>
-<div class="line"><span class="lineno"> 2452</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a>; <span class="comment">// Same private data layout.</span></div>
-<div class="line"><span class="lineno"> 2453</span> </div>
-<div class="line"><span class="lineno"> 2454</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
-<div class="line"><span class="lineno"> 2455</span>    PetscFunctionReturn(0);</div>
-<div class="line"><span class="lineno"> 2456</span>}</div>
-<div class="ttc" id="aBC__Handlers_8c_html_a831aa0666a5c8c77b2a1e602257f0f91"><div class="ttname"><a href="BC__Handlers_8c.html#a831aa0666a5c8c77b2a1e602257f0f91">Initialize_PeriodicDrivenInitial</a></div><div class="ttdeci">static PetscErrorCode Initialize_PeriodicDrivenInitial(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Initialize forcing data for a periodic boundary driven to its initial flux.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02467">BC_Handlers.c:2467</a></div></div>
-<div class="ttc" id="aBC__Handlers_8c_html_ae8b6cda07b089440a72ae46ca7a525a7"><div class="ttname"><a href="BC__Handlers_8c.html#ae8b6cda07b089440a72ae46ca7a525a7">PreStep_PeriodicDrivenInitial</a></div><div class="ttdeci">static PetscErrorCode PreStep_PeriodicDrivenInitial(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Latch the initial-state flux once, then drive to it like a constant target.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02541">BC_Handlers.c:2541</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BC__Handlers_8c_source.html#l02626">2626</a> of file <a class="el" href="BC__Handlers_8c_source.html">BC_Handlers.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2627</span>{</div>
+<div class="line"><span class="lineno"> 2628</span>    PetscErrorCode ierr;</div>
+<div class="line"><span class="lineno"> 2629</span>    PetscFunctionBeginUser;</div>
+<div class="line"><span class="lineno"> 2630</span>    <a class="code hl_define" href="logging_8h.html#ace99f3e207ccb2e46e9b782f9e57732e">PROFILE_FUNCTION_BEGIN</a>;</div>
+<div class="line"><span class="lineno"> 2631</span> </div>
+<div class="line"><span class="lineno"> 2632</span>    PetscCheck(bc, PETSC_COMM_SELF, PETSC_ERR_ARG_NULL, <span class="stringliteral">&quot;BoundaryCondition is NULL&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2633</span> </div>
+<div class="line"><span class="lineno"> 2634</span>    <span class="comment">// --- Allocate the private data structure ---</span></div>
+<div class="line"><span class="lineno"> 2635</span>    <a class="code hl_struct" href="BC__Handlers_8c.html#structDrivenFluxData">DrivenFluxData</a> *data = NULL;</div>
+<div class="line"><span class="lineno"> 2636</span>    ierr = PetscNew(&amp;data); CHKERRQ(ierr);</div>
+<div class="line"><span class="lineno"> 2637</span>    <span class="comment">// Initialize fields to safe default values</span></div>
+<div class="line"><span class="lineno"> 2638</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a1908ecf7971972c32f05d4588cb5dcb2">direction</a> = <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><span class="lineno"> 2639</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#aeae407127e403c5e799ff3f14470b6ae">targetVolumetricFlux</a> = 0.0;</div>
+<div class="line"><span class="lineno"> 2640</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a271ffebb72cda88e5c3d6920185a0e48">isMasterController</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno"> 2641</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a0a271f1f31ada1d740c58678cf29ade8">enforceSeamFlux</a> = PETSC_FALSE;</div>
+<div class="line"><span class="lineno"> 2642</span>    data-&gt;<a class="code hl_variable" href="BC__Handlers_8c.html#a4cc77463b6f90431a295a7ae7fb52dfc">lastBulkCorrectionStep</a> = -1;</div>
+<div class="line"><span class="lineno"> 2643</span> </div>
+<div class="line"><span class="lineno"> 2644</span>    <span class="comment">// Attach the private data to the generic handler object</span></div>
+<div class="line"><span class="lineno"> 2645</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af6cea4ce0f648621c11f9506d15df37a">data</a> = (<span class="keywordtype">void</span>*)data;</div>
+<div class="line"><span class="lineno"> 2646</span> </div>
+<div class="line"><span class="lineno"> 2647</span>    <span class="comment">// --- Configure the handler&#39;s properties and methods ---</span></div>
+<div class="line"><span class="lineno"> 2648</span> </div>
+<div class="line"><span class="lineno"> 2649</span>    <span class="comment">// Same priority reasoning as the constant-flux handler: PreStep must run</span></div>
+<div class="line"><span class="lineno"> 2650</span>    <span class="comment">// before any handler that depends on the controller&#39;s corrections.</span></div>
+<div class="line"><span class="lineno"> 2651</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#af4e18e14e64846f5fa2827f6009b18eb">priority</a>   = <a class="code hl_enumvalue" href="variables_8h.html#acdda675837f1d1a2c7aa26b80fb0e1fcaecebb24bd2fd703c61dd44857ec5ec35">BC_PRIORITY_INLET</a>;</div>
+<div class="line"><span class="lineno"> 2652</span> </div>
+<div class="line"><span class="lineno"> 2653</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#ac676b2fb4ea64711e85eb5fc400cf7a7">Initialize</a> = <a class="code hl_function" href="BC__Handlers_8c.html#a831aa0666a5c8c77b2a1e602257f0f91">Initialize_PeriodicDrivenInitial</a>;</div>
+<div class="line"><span class="lineno"> 2654</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a29e0e2c99d3b7e6476e93d732c98643c">PreStep</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#ae8b6cda07b089440a72ae46ca7a525a7">PreStep_PeriodicDrivenInitial</a>;</div>
+<div class="line"><span class="lineno"> 2655</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aefcd34323d32f06d95a0f812f016303c">Apply</a>      = <a class="code hl_function" href="BC__Handlers_8c.html#a5e64a66cc9fdd8b69842ab56c82dec38">Apply_PeriodicDrivenConstant</a>;  <span class="comment">// Boundary trim is target-agnostic.</span></div>
+<div class="line"><span class="lineno"> 2656</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a01e03fa2aac5bb91a7a38010ce61e45c">PostStep</a>   = NULL; <span class="comment">// This handler has no action after the main solver step.</span></div>
+<div class="line"><span class="lineno"> 2657</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#aef72fac9d199da100309915f586c305f">UpdateUbcs</a> = NULL; <span class="comment">// The boundary value is not flow-dependent (it&#39;s periodic).</span></div>
+<div class="line"><span class="lineno"> 2658</span>    bc-&gt;<a class="code hl_variable" href="structBoundaryCondition.html#a56a05e35717ee31eeb47572f81505bd3">Destroy</a>    = <a class="code hl_function" href="BC__Handlers_8c.html#a8e07ee2259f0e07d9a1d16efc7f8b861">Destroy_PeriodicDrivenConstant</a>; <span class="comment">// Same private data layout.</span></div>
+<div class="line"><span class="lineno"> 2659</span> </div>
+<div class="line"><span class="lineno"> 2660</span>    <a class="code hl_define" href="logging_8h.html#a5fe7257f46131945aacf9a35e9de5874">PROFILE_FUNCTION_END</a>;</div>
+<div class="line"><span class="lineno"> 2661</span>    PetscFunctionReturn(0);</div>
+<div class="line"><span class="lineno"> 2662</span>}</div>
+<div class="ttc" id="aBC__Handlers_8c_html_a831aa0666a5c8c77b2a1e602257f0f91"><div class="ttname"><a href="BC__Handlers_8c.html#a831aa0666a5c8c77b2a1e602257f0f91">Initialize_PeriodicDrivenInitial</a></div><div class="ttdeci">static PetscErrorCode Initialize_PeriodicDrivenInitial(BoundaryCondition *self, BCContext *ctx)</div><div class="ttdoc">Initialize forcing data for a periodic boundary driven to its initial flux.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02673">BC_Handlers.c:2673</a></div></div>
+<div class="ttc" id="aBC__Handlers_8c_html_ae8b6cda07b089440a72ae46ca7a525a7"><div class="ttname"><a href="BC__Handlers_8c.html#ae8b6cda07b089440a72ae46ca7a525a7">PreStep_PeriodicDrivenInitial</a></div><div class="ttdeci">static PetscErrorCode PreStep_PeriodicDrivenInitial(BoundaryCondition *self, BCContext *ctx, PetscReal *in, PetscReal *out)</div><div class="ttdoc">Latch the initial-state flux once, then drive to it like a constant target.</div><div class="ttdef"><b>Definition</b> <a href="BC__Handlers_8c_source.html#l02747">BC_Handlers.c:2747</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

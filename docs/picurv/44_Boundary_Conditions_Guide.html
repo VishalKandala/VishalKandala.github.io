@@ -157,7 +157,7 @@ wall</h2>
 <p><b>Parameters it owns.</b> None; parameters belong to the handler.</p>
 <p><b>Interactions.</b> Wall loses to <code>inlet</code> and <code>farfield</code> at shared edges and wins over <code>outlet</code>. Wall functions are configured separately under <code>physics.turbulence.wall_function</code>.</p>
 <p><b>Diagnostics.</b> The startup banner lists the resolved type and handler per face.</p>
-<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
+<p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>, including the reversed-element clip and its per-step freeze (<code>outlet-conservation-backflow-clip</code>, <code>outlet-conservation-clip-frozen-per-step</code>). Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>.</p>
 <p><b>Limitations.</b> <code>MOVING_WALL</code> is present in the C enum and accepted by the C compatibility check, but no public handler exposes it.</p>
 <h2><a class="anchor" id="p44_type_inlet_sub"></a>
 inlet</h2>
@@ -318,12 +318,19 @@ prescribed_velocity</h2>
 conservation</h2>
 <p><a class="anchor" id="p44_cap_conservation"></a> <b>Identity.</b> <code>handler: conservation</code> on an <code>OUTLET</code> face -&gt; <code>BC_HANDLER_OUTLET_CONSERVATION</code> -&gt; <a class="el" href="BC__Handlers_8h.html#ae2dfaf7f6a717cda068b4990fb3ccd8b">Create_OutletConservation</a>.</p>
 <p><b>What it does.</b> Sets the outlet flux to whatever global mass conservation requires, given everything entering the domain. It is a consequence, not a prescription.</p>
+<p>Each outlet face element starts from a zero-gradient copy: the velocity of the cell beside it, giving flux F through the element's area A. The total of those copies rarely matches the inflow, so the handler closes the gap with one uniform velocity c, giving F + c A on every element.</p>
+<p>A uniform c can leave an element with flux into the domain. That happens when the copied flux is already reversed, or when c opposes the outflow and the element is slow. Once per time step, at the step's first boundary application, the handler checks whether F + c A would point into the domain on any element (fluxes are signed along the increasing grid index, so outward is F &gt; 0 on a <code>+</code> face and F &lt; 0 on a <code>-</code> face):</p>
+<ul>
+<li><b>No:</b> the uniform rule above runs, unchanged.</li>
+<li><b>Yes:</b> elements whose copied flux points into the domain get zero flux, and their boundary velocity loses its normal component. The other elements are multiplied by one factor, so the face still carries the total the uniform rule would have given it.</li>
+</ul>
+<p>The choice of rule and the set of zeroed elements stay fixed for the rest of the step. That keeps the momentum residual smooth inside a Newton solve. The factor is re-measured on every pass, so the total stays exact. An element that starts to reverse mid-step is caught at the next step.</p>
 <p><b>When to choose it.</b> The default and currently only outlet. Because it derives its flux rather than imposing one, it pairs with any inlet without you having to match numbers by hand.</p>
 <p><b>Parameters it owns.</b> None.</p>
 <p><b>Interactions.</b> Outlet has the lowest boundary priority, so inlet and wall win at shared edges. There must be an inlet, or a driven periodic pair, for the outlet to conserve against.</p>
-<p><b>Diagnostics.</b> The inlet/outlet flux balance is reported at startup and is the first thing to check when mass appears not to be conserved.</p>
+<p><b>Diagnostics.</b> The inlet/outlet flux balance is reported at startup and is the first thing to check when mass appears not to be conserved. A step that zeroes reversed elements logs a warning with the face, the step, the number of elements the uniform rule would have reversed, the number zeroed, and the factor. Warnings on most steps mean the flow is reversing at the outlet. Lengthen the domain downstream of the region of interest.</p>
 <p><b>Evidence.</b> Unit verified - <code>make unit-boundaries</code>. Production exercised in <code>examples/flat_channel</code>. Analytically verified - <code>duct-poiseuille-picard-2026-09-18</code>: outflow matched inflow to 1e-9 in a laminar square duct.</p>
-<p><b>Limitations.</b> <code>BC_HANDLER_OUTLET_PRESSURE</code>, a pressure-specified outlet, exists in the C enum but is not exposed, and no handler implements it; see <a class="el" href="57_Future_Architecture_Specifications.html#p57_pressure_bc_sec">6b. Pressure Boundary Conditions</a> for what adding one involves.</p>
+<p><b>Limitations.</b> Zeroing reversed elements stops inflow through the outlet. It does not make a zero-gradient outlet non-reflecting: a vortex or a slow wall layer reaching the outlet still distorts the last few cells. Inflow and outflow are compared as fluxes signed along the increasing grid index, which expresses mass conservation when the inlets sit on faces of one side (all negative or all positive) and the outlets on the other. <code>BC_HANDLER_OUTLET_PRESSURE</code>, a pressure-specified outlet, exists in the C enum but is not exposed, and no handler implements it; see <a class="el" href="57_Future_Architecture_Specifications.html#p57_pressure_bc_sec">6b. Pressure Boundary Conditions</a> for what adding one involves.</p>
 <h2><a class="anchor" id="p44_cap_geometric_sub"></a>
 geometric</h2>
 <p><a class="anchor" id="p44_cap_geometric"></a> <b>Identity.</b> <code>handler: geometric</code> on a <code>PERIODIC</code> face -&gt; <code>BC_HANDLER_PERIODIC_GEOMETRIC</code> -&gt; <a class="el" href="BC__Handlers_8h.html#a6748d2e1e348f6b94b604838af2c9b55">Create_PeriodicGeometric</a>.</p>
