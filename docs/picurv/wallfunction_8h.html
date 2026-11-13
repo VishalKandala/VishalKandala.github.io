@@ -308,12 +308,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Computes velocity from log-law for rough walls. </p>
-<p>Calculates the tangential velocity at a given wall distance using the roughness-modified log-law of the wall.</p>
-<p>APPLICABLE REGIMES:</p><ul>
-<li>Viscous sublayer (y+ &lt; 11.53): u+ = y+</li>
-<li>Log-layer (11.53 &lt; y+ &lt; 300): u+ = (1/κ) ln(E * y+)</li>
-<li>Outer layer (y+ &gt; 300): Returns -1 (invalid, wake region)</li>
+<p>Calculates the tangential velocity at a given wall distance using the roughness-modified log-law of the wall:</p><ul>
+<li>below the sublayer edge: u+ = y+</li>
+<li>above it: u+ = (1/κ) ln(E * y+) where the edge is the y+ at which the two branches meet (about 11.45 for a smooth wall; it moves with E on a rough wall).</li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd>Not called by the solver, which takes the friction velocity from the inverse <a class="el" href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9">find_utau_hydset()</a>; this forward form is the definition that inverse is tested against, and it agrees with it at every y+. Above y+ ~ 300 the flow leaves the logarithmic region; that limit is enforced on the first cell by the range check of <a class="el" href="Boundaries_8h.html#a6402d77bc3a398d6c5e3b74b4e81c4e6" title="Appends one row of near-wall statistics to &lt;run.analysis.metrics&gt;/wall_model.csv.">LogWallModelDiagnostics()</a>, not by this function.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">kinematic_viscosity</td><td>Kinematic viscosity ν </td></tr>
@@ -323,10 +322,7 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Tangential velocity u_t, or -1 if outside valid range</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The upper limit y+ &lt; 300 ensures we stay within the log-layer </dd>
-<dd>
-For y+ &gt; 300, wake effects become important and log-law is invalid</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Tangential velocity u_t</dd></dl>
 <p>Computes velocity from log-law for rough walls.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a1049418624e91520b5fc6240c4e21c4c" title="Computes velocity from log-law for rough walls.">u_hydset_roughness()</a> </dd></dl>
 
@@ -334,28 +330,25 @@ For y+ &gt; 300, wake effects become important and log-law is invalid</dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  136</span>{</div>
 <div class="line"><span class="lineno">  137</span>    <span class="comment">// Normalized wall distance</span></div>
 <div class="line"><span class="lineno">  138</span>    <span class="keywordtype">double</span> yplus = friction_velocity * wall_distance / kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  139</span>    </div>
-<div class="line"><span class="lineno">  140</span>    <span class="comment">// Threshold values for regime transitions</span></div>
-<div class="line"><span class="lineno">  141</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> loglayer_limit = 300.0;</div>
-<div class="line"><span class="lineno">  142</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> E = <a class="code hl_function" href="wallfunction_8c.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a>(friction_velocity, roughness_height, kinematic_viscosity);</div>
-<div class="line"><span class="lineno">  143</span>    </div>
-<div class="line"><span class="lineno">  144</span>    <span class="keywordtype">double</span> tangential_velocity;</div>
-<div class="line"><span class="lineno">  145</span>    </div>
-<div class="line"><span class="lineno">  146</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_function" href="wallfunction_8c.html#a293979db296a25a287574b8c432c3ada">LogLawSublayerEdge</a>(E)) {</div>
-<div class="line"><span class="lineno">  147</span>        <span class="comment">// Viscous sublayer: linear velocity profile</span></div>
-<div class="line"><span class="lineno">  148</span>        tangential_velocity = friction_velocity * yplus;</div>
-<div class="line"><span class="lineno">  149</span>    }</div>
-<div class="line"><span class="lineno">  150</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (yplus &lt;= loglayer_limit) {</div>
-<div class="line"><span class="lineno">  151</span>        <span class="comment">// Log-layer: logarithmic velocity profile with roughness correction</span></div>
-<div class="line"><span class="lineno">  152</span>        tangential_velocity = (friction_velocity / <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a>) * log(E * yplus);</div>
-<div class="line"><span class="lineno">  153</span>    }</div>
-<div class="line"><span class="lineno">  154</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  155</span>        <span class="comment">// Outside valid range (wake region or beyond)</span></div>
-<div class="line"><span class="lineno">  156</span>        tangential_velocity = -1.0;</div>
-<div class="line"><span class="lineno">  157</span>    }</div>
-<div class="line"><span class="lineno">  158</span>    </div>
-<div class="line"><span class="lineno">  159</span>    <span class="keywordflow">return</span> tangential_velocity;</div>
-<div class="line"><span class="lineno">  160</span>}</div>
+<div class="line"><span class="lineno">  139</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> E = <a class="code hl_function" href="wallfunction_8c.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a>(friction_velocity, roughness_height, kinematic_viscosity);</div>
+<div class="line"><span class="lineno">  140</span>    </div>
+<div class="line"><span class="lineno">  141</span>    <span class="keywordtype">double</span> tangential_velocity;</div>
+<div class="line"><span class="lineno">  142</span>    </div>
+<div class="line"><span class="lineno">  143</span>    <span class="comment">/* The forward form of exactly the relation find_utau_hydset() inverts, at every y+:</span></div>
+<div class="line"><span class="lineno">  144</span><span class="comment">       the logarithmic branch continues above y+ = 300 as it does in the inverse. Whether</span></div>
+<div class="line"><span class="lineno">  145</span><span class="comment">       the first cell lies where the law describes the flow is the range check in</span></div>
+<div class="line"><span class="lineno">  146</span><span class="comment">       LogWallModelDiagnostics(), not a property of the profile. */</span></div>
+<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_function" href="wallfunction_8c.html#a293979db296a25a287574b8c432c3ada">LogLawSublayerEdge</a>(E)) {</div>
+<div class="line"><span class="lineno">  148</span>        <span class="comment">// Viscous sublayer: linear velocity profile</span></div>
+<div class="line"><span class="lineno">  149</span>        tangential_velocity = friction_velocity * yplus;</div>
+<div class="line"><span class="lineno">  150</span>    }</div>
+<div class="line"><span class="lineno">  151</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  152</span>        <span class="comment">// Log-layer: logarithmic velocity profile with roughness correction</span></div>
+<div class="line"><span class="lineno">  153</span>        tangential_velocity = (friction_velocity / <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a>) * log(E * yplus);</div>
+<div class="line"><span class="lineno">  154</span>    }</div>
+<div class="line"><span class="lineno">  155</span>    </div>
+<div class="line"><span class="lineno">  156</span>    <span class="keywordflow">return</span> tangential_velocity;</div>
+<div class="line"><span class="lineno">  157</span>}</div>
 <div class="ttc" id="awallfunction_8c_html_a293979db296a25a287574b8c432c3ada"><div class="ttname"><a href="wallfunction_8c.html#a293979db296a25a287574b8c432c3ada">LogLawSublayerEdge</a></div><div class="ttdeci">static double LogLawSublayerEdge(double E)</div><div class="ttdoc">The log law's sublayer edge for a given E: the y+ where u+ = y+ meets u+ = ln(E y+)/kappa.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00115">wallfunction.c:115</a></div></div>
 <div class="ttc" id="awallfunction_8c_html_abed164adf1c16c24e6950cc6fe448936"><div class="ttname"><a href="wallfunction_8c.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a></div><div class="ttdeci">double E_coeff(double friction_velocity, double roughness_height, double kinematic_viscosity)</div><div class="ttdoc">Implementation of E_coeff().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00077">wallfunction.c:77</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -431,23 +424,23 @@ Here is the caller graph for this function:</div>
 <p>Residual function for friction velocity equation (log-law with roughness)</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#abe4b006f1cb55704fdd7534a777efd05" title="Residual function for friction velocity equation (log-law with roughness)">f_hydset()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00170">170</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  173</span>{</div>
-<div class="line"><span class="lineno">  174</span>    <span class="keywordtype">double</span> yplus = friction_velocity_guess * wall_distance / kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  175</span>    <span class="keywordtype">double</span> E = <a class="code hl_function" href="wallfunction_8c.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a>(friction_velocity_guess, roughness_height, kinematic_viscosity);</div>
-<div class="line"><span class="lineno">  176</span>    <span class="keywordtype">double</span> residual;</div>
-<div class="line"><span class="lineno">  177</span>    </div>
-<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_function" href="wallfunction_8c.html#a293979db296a25a287574b8c432c3ada">LogLawSublayerEdge</a>(E)) {</div>
-<div class="line"><span class="lineno">  179</span>        <span class="comment">// Viscous sublayer: u = u_τ * y+</span></div>
-<div class="line"><span class="lineno">  180</span>        residual = friction_velocity_guess * yplus - known_velocity;</div>
-<div class="line"><span class="lineno">  181</span>    }</div>
-<div class="line"><span class="lineno">  182</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  183</span>        <span class="comment">// Log-layer: u = (u_τ / κ) * ln(E * y+)</span></div>
-<div class="line"><span class="lineno">  184</span>        residual = friction_velocity_guess * (1.0 / <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a> * log(E * yplus)) - known_velocity;</div>
-<div class="line"><span class="lineno">  185</span>    }</div>
-<div class="line"><span class="lineno">  186</span>    </div>
-<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">return</span> residual;</div>
-<div class="line"><span class="lineno">  188</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00167">167</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  170</span>{</div>
+<div class="line"><span class="lineno">  171</span>    <span class="keywordtype">double</span> yplus = friction_velocity_guess * wall_distance / kinematic_viscosity;</div>
+<div class="line"><span class="lineno">  172</span>    <span class="keywordtype">double</span> E = <a class="code hl_function" href="wallfunction_8c.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a>(friction_velocity_guess, roughness_height, kinematic_viscosity);</div>
+<div class="line"><span class="lineno">  173</span>    <span class="keywordtype">double</span> residual;</div>
+<div class="line"><span class="lineno">  174</span>    </div>
+<div class="line"><span class="lineno">  175</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_function" href="wallfunction_8c.html#a293979db296a25a287574b8c432c3ada">LogLawSublayerEdge</a>(E)) {</div>
+<div class="line"><span class="lineno">  176</span>        <span class="comment">// Viscous sublayer: u = u_τ * y+</span></div>
+<div class="line"><span class="lineno">  177</span>        residual = friction_velocity_guess * yplus - known_velocity;</div>
+<div class="line"><span class="lineno">  178</span>    }</div>
+<div class="line"><span class="lineno">  179</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  180</span>        <span class="comment">// Log-layer: u = (u_τ / κ) * ln(E * y+)</span></div>
+<div class="line"><span class="lineno">  181</span>        residual = friction_velocity_guess * (1.0 / <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a> * log(E * yplus)) - known_velocity;</div>
+<div class="line"><span class="lineno">  182</span>    }</div>
+<div class="line"><span class="lineno">  183</span>    </div>
+<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">return</span> residual;</div>
+<div class="line"><span class="lineno">  185</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -521,19 +514,19 @@ Here is the caller graph for this function:</div>
 <p>Numerical derivative of residual function.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455" title="Numerical derivative of residual function.">df_hydset()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00196">196</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  199</span>{</div>
-<div class="line"><span class="lineno">  200</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> perturbation = 1.e-7;</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00193">193</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  196</span>{</div>
+<div class="line"><span class="lineno">  197</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> perturbation = 1.e-7;</div>
+<div class="line"><span class="lineno">  198</span>    </div>
+<div class="line"><span class="lineno">  199</span>    <span class="keywordtype">double</span> f_plus = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  200</span>                            friction_velocity_guess + perturbation, roughness_height);</div>
 <div class="line"><span class="lineno">  201</span>    </div>
-<div class="line"><span class="lineno">  202</span>    <span class="keywordtype">double</span> f_plus = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  203</span>                            friction_velocity_guess + perturbation, roughness_height);</div>
+<div class="line"><span class="lineno">  202</span>    <span class="keywordtype">double</span> f_minus = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  203</span>                             friction_velocity_guess - perturbation, roughness_height);</div>
 <div class="line"><span class="lineno">  204</span>    </div>
-<div class="line"><span class="lineno">  205</span>    <span class="keywordtype">double</span> f_minus = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  206</span>                             friction_velocity_guess - perturbation, roughness_height);</div>
-<div class="line"><span class="lineno">  207</span>    </div>
-<div class="line"><span class="lineno">  208</span>    <span class="keywordflow">return</span> (f_plus - f_minus) / (2.0 * perturbation);</div>
-<div class="line"><span class="lineno">  209</span>}</div>
-<div class="ttc" id="awallfunction_8c_html_abe4b006f1cb55704fdd7534a777efd05"><div class="ttname"><a href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a></div><div class="ttdeci">double f_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Implementation of f_hydset().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00170">wallfunction.c:170</a></div></div>
+<div class="line"><span class="lineno">  205</span>    <span class="keywordflow">return</span> (f_plus - f_minus) / (2.0 * perturbation);</div>
+<div class="line"><span class="lineno">  206</span>}</div>
+<div class="ttc" id="awallfunction_8c_html_abe4b006f1cb55704fdd7534a777efd05"><div class="ttname"><a href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a></div><div class="ttdeci">double f_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Implementation of f_hydset().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00167">wallfunction.c:167</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -611,52 +604,52 @@ Typical convergence in 3-5 iterations for good initial guess</dd></dl>
 <p>Solves for friction velocity using Newton-Raphson iteration.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9" title="Solves for friction velocity using Newton-Raphson iteration.">find_utau_hydset()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00217">217</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  220</span>{</div>
-<div class="line"><span class="lineno">  221</span>    <span class="keywordtype">double</span> friction_velocity = initial_guess;</div>
-<div class="line"><span class="lineno">  222</span>    <span class="keywordtype">double</span> friction_velocity_old = initial_guess;</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00214">214</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  217</span>{</div>
+<div class="line"><span class="lineno">  218</span>    <span class="keywordtype">double</span> friction_velocity = initial_guess;</div>
+<div class="line"><span class="lineno">  219</span>    <span class="keywordtype">double</span> friction_velocity_old = initial_guess;</div>
+<div class="line"><span class="lineno">  220</span>    </div>
+<div class="line"><span class="lineno">  221</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> max_iterations = 30;</div>
+<div class="line"><span class="lineno">  222</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> convergence_tolerance = 1.e-7;</div>
 <div class="line"><span class="lineno">  223</span>    </div>
-<div class="line"><span class="lineno">  224</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> max_iterations = 30;</div>
-<div class="line"><span class="lineno">  225</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> convergence_tolerance = 1.e-7;</div>
-<div class="line"><span class="lineno">  226</span>    </div>
-<div class="line"><span class="lineno">  227</span>    <span class="keywordtype">int</span> iteration;</div>
-<div class="line"><span class="lineno">  228</span>    <span class="keywordflow">for</span> (iteration = 0; iteration &lt; max_iterations; iteration++) {</div>
-<div class="line"><span class="lineno">  229</span>        <span class="comment">// Newton-Raphson update</span></div>
-<div class="line"><span class="lineno">  230</span>        <span class="keywordtype">double</span> residual = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  231</span>                                  friction_velocity_old, roughness_height);</div>
-<div class="line"><span class="lineno">  232</span>        <span class="keywordtype">double</span> derivative = <a class="code hl_function" href="wallfunction_8c.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  233</span>                                     friction_velocity_old, roughness_height);</div>
-<div class="line"><span class="lineno">  234</span>        <span class="keywordflow">if</span> (derivative == 0.0 || !isfinite(derivative)) <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  235</span>        </div>
-<div class="line"><span class="lineno">  236</span>        friction_velocity = friction_velocity_old - residual / derivative;</div>
-<div class="line"><span class="lineno">  237</span>        <span class="comment">/* The friction velocity is positive. The linear branch&#39;s residual u_tau^2 y/nu - U</span></div>
-<div class="line"><span class="lineno">  238</span><span class="comment">           has a mirror root at -u_tau, which an undamped step from a small guess can reach</span></div>
-<div class="line"><span class="lineno">  239</span><span class="comment">           (a rough wall made it common); halving toward the last positive iterate keeps the</span></div>
-<div class="line"><span class="lineno">  240</span><span class="comment">           iteration on the physical root. */</span></div>
-<div class="line"><span class="lineno">  241</span>        <span class="keywordflow">if</span> (!(friction_velocity &gt; 0.0)) friction_velocity = 0.5 * friction_velocity_old;</div>
-<div class="line"><span class="lineno">  242</span>        </div>
-<div class="line"><span class="lineno">  243</span>        <span class="comment">// Check convergence</span></div>
-<div class="line"><span class="lineno">  244</span>        <span class="keywordflow">if</span> (fabs(friction_velocity - friction_velocity_old) &lt; convergence_tolerance) {</div>
-<div class="line"><span class="lineno">  245</span>            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  246</span>        }</div>
-<div class="line"><span class="lineno">  247</span>        </div>
-<div class="line"><span class="lineno">  248</span>        friction_velocity_old = friction_velocity;</div>
-<div class="line"><span class="lineno">  249</span>    }</div>
-<div class="line"><span class="lineno">  250</span>    </div>
-<div class="line"><span class="lineno">  251</span>    <span class="comment">// Warn if convergence not achieved</span></div>
-<div class="line"><span class="lineno">  252</span>    <span class="keywordflow">if</span> (iteration == max_iterations) {</div>
-<div class="line"><span class="lineno">  253</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, </div>
-<div class="line"><span class="lineno">  254</span>                 <span class="stringliteral">&quot;WARNING: u_tau iteration did not converge after %d iterations. &quot;</span></div>
-<div class="line"><span class="lineno">  255</span>                 <span class="stringliteral">&quot;Final difference: %le\n&quot;</span>, </div>
-<div class="line"><span class="lineno">  256</span>                 iteration, fabs(friction_velocity - friction_velocity_old));</div>
-<div class="line"><span class="lineno">  257</span>    }</div>
-<div class="line"><span class="lineno">  258</span>    </div>
-<div class="line"><span class="lineno">  259</span>    <span class="keywordflow">return</span> friction_velocity;</div>
-<div class="line"><span class="lineno">  260</span>}</div>
+<div class="line"><span class="lineno">  224</span>    <span class="keywordtype">int</span> iteration;</div>
+<div class="line"><span class="lineno">  225</span>    <span class="keywordflow">for</span> (iteration = 0; iteration &lt; max_iterations; iteration++) {</div>
+<div class="line"><span class="lineno">  226</span>        <span class="comment">// Newton-Raphson update</span></div>
+<div class="line"><span class="lineno">  227</span>        <span class="keywordtype">double</span> residual = <a class="code hl_function" href="wallfunction_8c.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  228</span>                                  friction_velocity_old, roughness_height);</div>
+<div class="line"><span class="lineno">  229</span>        <span class="keywordtype">double</span> derivative = <a class="code hl_function" href="wallfunction_8c.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a>(kinematic_viscosity, known_velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  230</span>                                     friction_velocity_old, roughness_height);</div>
+<div class="line"><span class="lineno">  231</span>        <span class="keywordflow">if</span> (derivative == 0.0 || !isfinite(derivative)) <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  232</span>        </div>
+<div class="line"><span class="lineno">  233</span>        friction_velocity = friction_velocity_old - residual / derivative;</div>
+<div class="line"><span class="lineno">  234</span>        <span class="comment">/* The friction velocity is positive. The linear branch&#39;s residual u_tau^2 y/nu - U</span></div>
+<div class="line"><span class="lineno">  235</span><span class="comment">           has a mirror root at -u_tau, which an undamped step from a small guess can reach</span></div>
+<div class="line"><span class="lineno">  236</span><span class="comment">           (a rough wall made it common); halving toward the last positive iterate keeps the</span></div>
+<div class="line"><span class="lineno">  237</span><span class="comment">           iteration on the physical root. */</span></div>
+<div class="line"><span class="lineno">  238</span>        <span class="keywordflow">if</span> (!(friction_velocity &gt; 0.0)) friction_velocity = 0.5 * friction_velocity_old;</div>
+<div class="line"><span class="lineno">  239</span>        </div>
+<div class="line"><span class="lineno">  240</span>        <span class="comment">// Check convergence</span></div>
+<div class="line"><span class="lineno">  241</span>        <span class="keywordflow">if</span> (fabs(friction_velocity - friction_velocity_old) &lt; convergence_tolerance) {</div>
+<div class="line"><span class="lineno">  242</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  243</span>        }</div>
+<div class="line"><span class="lineno">  244</span>        </div>
+<div class="line"><span class="lineno">  245</span>        friction_velocity_old = friction_velocity;</div>
+<div class="line"><span class="lineno">  246</span>    }</div>
+<div class="line"><span class="lineno">  247</span>    </div>
+<div class="line"><span class="lineno">  248</span>    <span class="comment">// Warn if convergence not achieved</span></div>
+<div class="line"><span class="lineno">  249</span>    <span class="keywordflow">if</span> (iteration == max_iterations) {</div>
+<div class="line"><span class="lineno">  250</span>        <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a>, </div>
+<div class="line"><span class="lineno">  251</span>                 <span class="stringliteral">&quot;WARNING: u_tau iteration did not converge after %d iterations. &quot;</span></div>
+<div class="line"><span class="lineno">  252</span>                 <span class="stringliteral">&quot;Final difference: %le\n&quot;</span>, </div>
+<div class="line"><span class="lineno">  253</span>                 iteration, fabs(friction_velocity - friction_velocity_old));</div>
+<div class="line"><span class="lineno">  254</span>    }</div>
+<div class="line"><span class="lineno">  255</span>    </div>
+<div class="line"><span class="lineno">  256</span>    <span class="keywordflow">return</span> friction_velocity;</div>
+<div class="line"><span class="lineno">  257</span>}</div>
 <div class="ttc" id="alogging_8h_html_a3758dd5d300a594312c95bc393378df0"><div class="ttname"><a href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a></div><div class="ttdeci">#define LOCAL</div><div class="ttdoc">Logging scope definitions for controlling message output.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00045">logging.h:45</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4a671b0e347e0a22b0df806f246d5d11"><div class="ttname"><a href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a></div><div class="ttdeci">#define LOG_ALLOW(scope, level, fmt,...)</div><div class="ttdoc">Logging macro that checks both the log level and whether the calling function is in the allowed-funct...</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00214">logging.h:214</a></div></div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ab9f002c6ffbfd511da8090213227454e">LOG_DEBUG</a></div><div class="ttdeci">@ LOG_DEBUG</div><div class="ttdoc">Detailed debugging information.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00032">logging.h:32</a></div></div>
-<div class="ttc" id="awallfunction_8c_html_ae3c3f4e32e6c0df3a7c6ff75f49ae455"><div class="ttname"><a href="wallfunction_8c.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a></div><div class="ttdeci">double df_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Implementation of df_hydset().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00196">wallfunction.c:196</a></div></div>
+<div class="ttc" id="awallfunction_8c_html_ae3c3f4e32e6c0df3a7c6ff75f49ae455"><div class="ttname"><a href="wallfunction_8c.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a></div><div class="ttdeci">double df_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Implementation of df_hydset().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00193">wallfunction.c:193</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -706,14 +699,14 @@ Valid in the inner layer (y+ &lt; 50-100)</dd></dl>
 <p>Computes turbulent eddy viscosity ratio (ν_t / ν)</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#adc08703381597f75ccb620bf30d90ae1" title="Computes turbulent eddy viscosity ratio (ν_t / ν)">nu_t()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00270">270</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  271</span>{</div>
-<div class="line"><span class="lineno">  272</span>    <span class="comment">// van Driest damping function: [1 - exp(-y+ / A+)]²</span></div>
-<div class="line"><span class="lineno">  273</span>    <span class="keywordtype">double</span> damping_function = 1.0 - exp(-yplus / <a class="code hl_define" href="wallfunction_8c.html#a28592e5a94a96df58f7e757e363c34ef">DAMPING_COEFFICIENT</a>);</div>
-<div class="line"><span class="lineno">  274</span>    </div>
-<div class="line"><span class="lineno">  275</span>    <span class="comment">// Mixing length model: ν_t / ν = κ * y+ * D²</span></div>
-<div class="line"><span class="lineno">  276</span>    <span class="keywordflow">return</span> <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a> * yplus * damping_function * damping_function;</div>
-<div class="line"><span class="lineno">  277</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00267">267</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  268</span>{</div>
+<div class="line"><span class="lineno">  269</span>    <span class="comment">// van Driest damping function: [1 - exp(-y+ / A+)]²</span></div>
+<div class="line"><span class="lineno">  270</span>    <span class="keywordtype">double</span> damping_function = 1.0 - exp(-yplus / <a class="code hl_define" href="wallfunction_8c.html#a28592e5a94a96df58f7e757e363c34ef">DAMPING_COEFFICIENT</a>);</div>
+<div class="line"><span class="lineno">  271</span>    </div>
+<div class="line"><span class="lineno">  272</span>    <span class="comment">// Mixing length model: ν_t / ν = κ * y+ * D²</span></div>
+<div class="line"><span class="lineno">  273</span>    <span class="keywordflow">return</span> <a class="code hl_define" href="wallfunction_8c.html#acd1636d4e71f645d469c49a7ba8e18a4">KAPPA</a> * yplus * damping_function * damping_function;</div>
+<div class="line"><span class="lineno">  274</span>}</div>
 <div class="ttc" id="awallfunction_8c_html_a28592e5a94a96df58f7e757e363c34ef"><div class="ttname"><a href="wallfunction_8c.html#a28592e5a94a96df58f7e757e363c34ef">DAMPING_COEFFICIENT</a></div><div class="ttdeci">#define DAMPING_COEFFICIENT</div><div class="ttdoc">Eddy viscosity damping coefficient (van Driest damping)</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00063">wallfunction.c:63</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -782,30 +775,30 @@ Here is the caller graph for this function:</div>
 <p>Integrates eddy viscosity profile from wall to distance y.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#aac9af3f2cd77f0f840f9e399097f96cf" title="Integrates eddy viscosity profile from wall to distance y.">integrate_1()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00285">285</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  287</span>{</div>
-<div class="line"><span class="lineno">  288</span>    <span class="comment">/* Composite Simpson in s, with y = wall_distance * s^2. The integrand falls off like</span></div>
-<div class="line"><span class="lineno">  289</span><span class="comment">       1/y+ across the log layer, so uniform points in y left the near-wall rise under-sampled:</span></div>
-<div class="line"><span class="lineno">  290</span><span class="comment">       30 of them were about 33% off at y+ = 1000. Clustering them toward the wall as s^2 does</span></div>
-<div class="line"><span class="lineno">  291</span><span class="comment">       makes the mapped integrand smooth at every y+ the model is allowed to reach. */</span></div>
-<div class="line"><span class="lineno">  292</span>    <span class="keyword">const</span> <span class="keywordtype">int</span>    intervals = 128;                 <span class="comment">/* even */</span></div>
-<div class="line"><span class="lineno">  293</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> ds = 1.0 / intervals;</div>
-<div class="line"><span class="lineno">  294</span>    <span class="keywordtype">double</span>       integral_sum = 0.0;</div>
-<div class="line"><span class="lineno">  295</span> </div>
-<div class="line"><span class="lineno">  296</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;= intervals; i++) {</div>
-<div class="line"><span class="lineno">  297</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> s_value = i * ds;</div>
-<div class="line"><span class="lineno">  298</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> current_distance = wall_distance * s_value * s_value;</div>
-<div class="line"><span class="lineno">  299</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> jacobian = 2.0 * wall_distance * s_value;      <span class="comment">/* dy/ds */</span></div>
-<div class="line"><span class="lineno">  300</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> yplus = current_distance * friction_velocity / kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  301</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> denominator = (1.0 + <a class="code hl_function" href="wallfunction_8c.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a>(fabs(yplus))) * kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  302</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> integrand = ((integration_mode == 0) ? 1.0 : current_distance) / denominator * jacobian;</div>
-<div class="line"><span class="lineno">  303</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> weight = (i == 0 || i == intervals) ? 1.0 : ((i % 2) ? 4.0 : 2.0);</div>
-<div class="line"><span class="lineno">  304</span> </div>
-<div class="line"><span class="lineno">  305</span>        integral_sum += weight * integrand;</div>
-<div class="line"><span class="lineno">  306</span>    }</div>
-<div class="line"><span class="lineno">  307</span>    <span class="keywordflow">return</span> integral_sum * ds / 3.0;</div>
-<div class="line"><span class="lineno">  308</span>}</div>
-<div class="ttc" id="awallfunction_8c_html_adc08703381597f75ccb620bf30d90ae1"><div class="ttname"><a href="wallfunction_8c.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a></div><div class="ttdeci">double nu_t(double yplus)</div><div class="ttdoc">Implementation of nu_t().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00270">wallfunction.c:270</a></div></div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00282">282</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  284</span>{</div>
+<div class="line"><span class="lineno">  285</span>    <span class="comment">/* Composite Simpson in s, with y = wall_distance * s^2. The integrand falls off like</span></div>
+<div class="line"><span class="lineno">  286</span><span class="comment">       1/y+ across the log layer, so uniform points in y left the near-wall rise under-sampled:</span></div>
+<div class="line"><span class="lineno">  287</span><span class="comment">       30 of them were about 33% off at y+ = 1000. Clustering them toward the wall as s^2 does</span></div>
+<div class="line"><span class="lineno">  288</span><span class="comment">       makes the mapped integrand smooth at every y+ the model is allowed to reach. */</span></div>
+<div class="line"><span class="lineno">  289</span>    <span class="keyword">const</span> <span class="keywordtype">int</span>    intervals = 128;                 <span class="comment">/* even */</span></div>
+<div class="line"><span class="lineno">  290</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> ds = 1.0 / intervals;</div>
+<div class="line"><span class="lineno">  291</span>    <span class="keywordtype">double</span>       integral_sum = 0.0;</div>
+<div class="line"><span class="lineno">  292</span> </div>
+<div class="line"><span class="lineno">  293</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;= intervals; i++) {</div>
+<div class="line"><span class="lineno">  294</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> s_value = i * ds;</div>
+<div class="line"><span class="lineno">  295</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> current_distance = wall_distance * s_value * s_value;</div>
+<div class="line"><span class="lineno">  296</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> jacobian = 2.0 * wall_distance * s_value;      <span class="comment">/* dy/ds */</span></div>
+<div class="line"><span class="lineno">  297</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> yplus = current_distance * friction_velocity / kinematic_viscosity;</div>
+<div class="line"><span class="lineno">  298</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> denominator = (1.0 + <a class="code hl_function" href="wallfunction_8c.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a>(fabs(yplus))) * kinematic_viscosity;</div>
+<div class="line"><span class="lineno">  299</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> integrand = ((integration_mode == 0) ? 1.0 : current_distance) / denominator * jacobian;</div>
+<div class="line"><span class="lineno">  300</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> weight = (i == 0 || i == intervals) ? 1.0 : ((i % 2) ? 4.0 : 2.0);</div>
+<div class="line"><span class="lineno">  301</span> </div>
+<div class="line"><span class="lineno">  302</span>        integral_sum += weight * integrand;</div>
+<div class="line"><span class="lineno">  303</span>    }</div>
+<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">return</span> integral_sum * ds / 3.0;</div>
+<div class="line"><span class="lineno">  305</span>}</div>
+<div class="ttc" id="awallfunction_8c_html_adc08703381597f75ccb620bf30d90ae1"><div class="ttname"><a href="wallfunction_8c.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a></div><div class="ttdeci">double nu_t(double yplus)</div><div class="ttdoc">Implementation of nu_t().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00267">wallfunction.c:267</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -881,16 +874,16 @@ Here is the caller graph for this function:</div>
 <p>Computes wall shear stress with pressure gradient effects.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a2c09c649ff317b786ab655df81a5975d" title="Computes wall shear stress with pressure gradient effects.">taw()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00320">320</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  322</span>{</div>
-<div class="line"><span class="lineno">  323</span>    <span class="comment">// Compute integrated viscosity profiles</span></div>
-<div class="line"><span class="lineno">  324</span>    <span class="keywordtype">double</span> F1 = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 0);</div>
-<div class="line"><span class="lineno">  325</span>    <span class="keywordtype">double</span> Fy = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 1);</div>
-<div class="line"><span class="lineno">  326</span>    </div>
-<div class="line"><span class="lineno">  327</span>    <span class="comment">// Apply momentum balance: τ_w * F1 = u - (dp/dx) * Fy</span></div>
-<div class="line"><span class="lineno">  328</span>    <span class="keywordflow">return</span> (1.0 / F1) * (velocity - pressure_gradient_tangent * Fy);</div>
-<div class="line"><span class="lineno">  329</span>}</div>
-<div class="ttc" id="awallfunction_8c_html_aac9af3f2cd77f0f840f9e399097f96cf"><div class="ttname"><a href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a></div><div class="ttdeci">double integrate_1(double kinematic_viscosity, double wall_distance, double friction_velocity, int integration_mode)</div><div class="ttdoc">Implementation of integrate_1().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00285">wallfunction.c:285</a></div></div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00317">317</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  319</span>{</div>
+<div class="line"><span class="lineno">  320</span>    <span class="comment">// Compute integrated viscosity profiles</span></div>
+<div class="line"><span class="lineno">  321</span>    <span class="keywordtype">double</span> F1 = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 0);</div>
+<div class="line"><span class="lineno">  322</span>    <span class="keywordtype">double</span> Fy = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 1);</div>
+<div class="line"><span class="lineno">  323</span>    </div>
+<div class="line"><span class="lineno">  324</span>    <span class="comment">// Apply momentum balance: τ_w * F1 = u - (dp/dx) * Fy</span></div>
+<div class="line"><span class="lineno">  325</span>    <span class="keywordflow">return</span> (1.0 / F1) * (velocity - pressure_gradient_tangent * Fy);</div>
+<div class="line"><span class="lineno">  326</span>}</div>
+<div class="ttc" id="awallfunction_8c_html_aac9af3f2cd77f0f840f9e399097f96cf"><div class="ttname"><a href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a></div><div class="ttdeci">double integrate_1(double kinematic_viscosity, double wall_distance, double friction_velocity, int integration_mode)</div><div class="ttdoc">Implementation of integrate_1().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00282">wallfunction.c:282</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -950,6 +943,7 @@ Here is the caller graph for this function:</div>
 
 <p>Computes velocity using Cabot wall function. </p>
 <p>Reconstructs velocity from wall shear stress and pressure gradient: u = τ_w * F1 + (dp/dx) * Fy</p>
+<dl class="section note"><dt>Note</dt><dd>Not called by the solver, which takes the friction velocity from the inverse <a class="el" href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0">find_utau_Cabot()</a>; this forward form is the definition that inverse is tested against.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">kinematic_viscosity</td><td>Kinematic viscosity </td></tr>
@@ -964,13 +958,13 @@ Here is the caller graph for this function:</div>
 <p>Computes velocity using Cabot wall function.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a376fd306dd9e99d83ffd07047e038228" title="Computes velocity using Cabot wall function.">u_Cabot()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00337">337</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  340</span>{</div>
-<div class="line"><span class="lineno">  341</span>    <span class="keywordtype">double</span> F1 = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 0);</div>
-<div class="line"><span class="lineno">  342</span>    <span class="keywordtype">double</span> Fy = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 1);</div>
-<div class="line"><span class="lineno">  343</span>    </div>
-<div class="line"><span class="lineno">  344</span>    <span class="keywordflow">return</span> wall_shear_stress * F1 + pressure_gradient_tangent * Fy;</div>
-<div class="line"><span class="lineno">  345</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00334">334</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  337</span>{</div>
+<div class="line"><span class="lineno">  338</span>    <span class="keywordtype">double</span> F1 = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 0);</div>
+<div class="line"><span class="lineno">  339</span>    <span class="keywordtype">double</span> Fy = <a class="code hl_function" href="wallfunction_8c.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(kinematic_viscosity, wall_distance, friction_velocity, 1);</div>
+<div class="line"><span class="lineno">  340</span>    </div>
+<div class="line"><span class="lineno">  341</span>    <span class="keywordflow">return</span> wall_shear_stress * F1 + pressure_gradient_tangent * Fy;</div>
+<div class="line"><span class="lineno">  342</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1051,15 +1045,15 @@ Here is the caller graph for this function:</div>
 <p>Residual function for Cabot wall function.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a06c7d30325e19c4551db5ecb42485297" title="Residual function for Cabot wall function.">f_Cabot()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00351">351</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  354</span>{</div>
-<div class="line"><span class="lineno">  355</span>    (void)pressure_gradient_normal;</div>
-<div class="line"><span class="lineno">  356</span>    <span class="keywordtype">double</span> wall_shear = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, friction_velocity_guess,</div>
-<div class="line"><span class="lineno">  357</span>                           wall_distance, velocity, pressure_gradient_tangent);</div>
-<div class="line"><span class="lineno">  358</span>    </div>
-<div class="line"><span class="lineno">  359</span>    <span class="keywordflow">return</span> friction_velocity_guess - sqrt(fabs(wall_shear));</div>
-<div class="line"><span class="lineno">  360</span>}</div>
-<div class="ttc" id="awallfunction_8c_html_a2c09c649ff317b786ab655df81a5975d"><div class="ttname"><a href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a></div><div class="ttdeci">double taw(double kinematic_viscosity, double friction_velocity, double wall_distance, double velocity, double pressure_gradient_tangent)</div><div class="ttdoc">Implementation of taw().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00320">wallfunction.c:320</a></div></div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00348">348</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  351</span>{</div>
+<div class="line"><span class="lineno">  352</span>    (void)pressure_gradient_normal;</div>
+<div class="line"><span class="lineno">  353</span>    <span class="keywordtype">double</span> wall_shear = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, friction_velocity_guess,</div>
+<div class="line"><span class="lineno">  354</span>                           wall_distance, velocity, pressure_gradient_tangent);</div>
+<div class="line"><span class="lineno">  355</span>    </div>
+<div class="line"><span class="lineno">  356</span>    <span class="keywordflow">return</span> friction_velocity_guess - sqrt(fabs(wall_shear));</div>
+<div class="line"><span class="lineno">  357</span>}</div>
+<div class="ttc" id="awallfunction_8c_html_a2c09c649ff317b786ab655df81a5975d"><div class="ttname"><a href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a></div><div class="ttdeci">double taw(double kinematic_viscosity, double friction_velocity, double wall_distance, double velocity, double pressure_gradient_tangent)</div><div class="ttdoc">Implementation of taw().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00317">wallfunction.c:317</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1139,21 +1133,21 @@ Here is the caller graph for this function:</div>
 <p>Numerical derivative for Cabot wall function.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a024875fe3b3dd703c186b2f4c60b6770" title="Numerical derivative for Cabot wall function.">df_Cabot()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00368">368</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  371</span>{</div>
-<div class="line"><span class="lineno">  372</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> perturbation = 1.e-7;</div>
-<div class="line"><span class="lineno">  373</span>    </div>
-<div class="line"><span class="lineno">  374</span>    <span class="keywordtype">double</span> f_plus = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  375</span>                           friction_velocity_guess + perturbation,</div>
-<div class="line"><span class="lineno">  376</span>                           pressure_gradient_tangent, pressure_gradient_normal);</div>
-<div class="line"><span class="lineno">  377</span>    </div>
-<div class="line"><span class="lineno">  378</span>    <span class="keywordtype">double</span> f_minus = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  379</span>                            friction_velocity_guess - perturbation,</div>
-<div class="line"><span class="lineno">  380</span>                            pressure_gradient_tangent, pressure_gradient_normal);</div>
-<div class="line"><span class="lineno">  381</span>    </div>
-<div class="line"><span class="lineno">  382</span>    <span class="keywordflow">return</span> (f_plus - f_minus) / (2.0 * perturbation);</div>
-<div class="line"><span class="lineno">  383</span>}</div>
-<div class="ttc" id="awallfunction_8c_html_a06c7d30325e19c4551db5ecb42485297"><div class="ttname"><a href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a></div><div class="ttdeci">double f_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Implementation of f_Cabot().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00351">wallfunction.c:351</a></div></div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00365">365</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  368</span>{</div>
+<div class="line"><span class="lineno">  369</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> perturbation = 1.e-7;</div>
+<div class="line"><span class="lineno">  370</span>    </div>
+<div class="line"><span class="lineno">  371</span>    <span class="keywordtype">double</span> f_plus = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  372</span>                           friction_velocity_guess + perturbation,</div>
+<div class="line"><span class="lineno">  373</span>                           pressure_gradient_tangent, pressure_gradient_normal);</div>
+<div class="line"><span class="lineno">  374</span>    </div>
+<div class="line"><span class="lineno">  375</span>    <span class="keywordtype">double</span> f_minus = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  376</span>                            friction_velocity_guess - perturbation,</div>
+<div class="line"><span class="lineno">  377</span>                            pressure_gradient_tangent, pressure_gradient_normal);</div>
+<div class="line"><span class="lineno">  378</span>    </div>
+<div class="line"><span class="lineno">  379</span>    <span class="keywordflow">return</span> (f_plus - f_minus) / (2.0 * perturbation);</div>
+<div class="line"><span class="lineno">  380</span>}</div>
+<div class="ttc" id="awallfunction_8c_html_a06c7d30325e19c4551db5ecb42485297"><div class="ttname"><a href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a></div><div class="ttdeci">double f_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Implementation of f_Cabot().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00348">wallfunction.c:348</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1254,52 +1248,52 @@ Here is the caller graph for this function:</div>
 <p>Solves for friction velocity using Cabot wall function.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0" title="Solves for friction velocity using Cabot wall function.">find_utau_Cabot()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00391">391</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  395</span>{</div>
-<div class="line"><span class="lineno">  396</span>    <span class="keywordtype">double</span> current_guess = initial_guess;</div>
-<div class="line"><span class="lineno">  397</span>    <span class="keywordtype">double</span> new_guess;</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00388">388</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  392</span>{</div>
+<div class="line"><span class="lineno">  393</span>    <span class="keywordtype">double</span> current_guess = initial_guess;</div>
+<div class="line"><span class="lineno">  394</span>    <span class="keywordtype">double</span> new_guess;</div>
+<div class="line"><span class="lineno">  395</span>    </div>
+<div class="line"><span class="lineno">  396</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> max_iterations = 30;</div>
+<div class="line"><span class="lineno">  397</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> convergence_tolerance = 1.e-10;</div>
 <div class="line"><span class="lineno">  398</span>    </div>
-<div class="line"><span class="lineno">  399</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> max_iterations = 30;</div>
-<div class="line"><span class="lineno">  400</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> convergence_tolerance = 1.e-10;</div>
-<div class="line"><span class="lineno">  401</span>    </div>
-<div class="line"><span class="lineno">  402</span>    <span class="keywordtype">int</span> iteration;</div>
-<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">for</span> (iteration = 0; iteration &lt; max_iterations; iteration++) {</div>
-<div class="line"><span class="lineno">  404</span>        <span class="keywordtype">double</span> residual = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  405</span>                                 current_guess, pressure_gradient_tangent,</div>
-<div class="line"><span class="lineno">  406</span>                                 pressure_gradient_normal);</div>
-<div class="line"><span class="lineno">  407</span>        </div>
-<div class="line"><span class="lineno">  408</span>        <span class="keywordtype">double</span> derivative = <a class="code hl_function" href="wallfunction_8c.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
-<div class="line"><span class="lineno">  409</span>                                    current_guess, pressure_gradient_tangent,</div>
-<div class="line"><span class="lineno">  410</span>                                    pressure_gradient_normal);</div>
-<div class="line"><span class="lineno">  411</span>        </div>
-<div class="line"><span class="lineno">  412</span>        new_guess = fabs(current_guess - residual / derivative);</div>
-<div class="line"><span class="lineno">  413</span>        </div>
-<div class="line"><span class="lineno">  414</span>        <span class="keywordflow">if</span> (fabs(current_guess - new_guess) &lt; convergence_tolerance) {</div>
-<div class="line"><span class="lineno">  415</span>            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  416</span>        }</div>
-<div class="line"><span class="lineno">  417</span>        </div>
-<div class="line"><span class="lineno">  418</span>        current_guess = new_guess;</div>
-<div class="line"><span class="lineno">  419</span>    }</div>
-<div class="line"><span class="lineno">  420</span>    </div>
-<div class="line"><span class="lineno">  421</span>    <span class="keywordflow">if</span> (fabs(current_guess - new_guess) &gt; 1.e-5 &amp;&amp; iteration &gt;= 29) {</div>
-<div class="line"><span class="lineno">  422</span>        <span class="comment">/* Per wall cell and step, so reported only the first time on each rank. */</span></div>
-<div class="line"><span class="lineno">  423</span>        <span class="keyword">static</span> PetscBool reported = PETSC_FALSE;</div>
-<div class="line"><span class="lineno">  424</span>        <span class="keywordflow">if</span> (!reported) {</div>
-<div class="line"><span class="lineno">  425</span>            reported = PETSC_TRUE;</div>
-<div class="line"><span class="lineno">  426</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
-<div class="line"><span class="lineno">  427</span>                      <span class="stringliteral">&quot;Cabot wall-function iteration reached its limit without the requested tolerance &quot;</span></div>
-<div class="line"><span class="lineno">  428</span>                      <span class="stringliteral">&quot;(reported once per rank; later occurrences are not).\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  429</span>        }</div>
-<div class="line"><span class="lineno">  430</span>    }</div>
-<div class="line"><span class="lineno">  431</span>    </div>
-<div class="line"><span class="lineno">  432</span>    *friction_velocity = new_guess;</div>
-<div class="line"><span class="lineno">  433</span>    *wall_shear_velocity = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, new_guess, wall_distance,</div>
-<div class="line"><span class="lineno">  434</span>                              velocity, pressure_gradient_tangent);</div>
-<div class="line"><span class="lineno">  435</span>    *wall_shear_normal = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, new_guess, wall_distance,</div>
-<div class="line"><span class="lineno">  436</span>                            0.0, pressure_gradient_normal);</div>
-<div class="line"><span class="lineno">  437</span>}</div>
+<div class="line"><span class="lineno">  399</span>    <span class="keywordtype">int</span> iteration;</div>
+<div class="line"><span class="lineno">  400</span>    <span class="keywordflow">for</span> (iteration = 0; iteration &lt; max_iterations; iteration++) {</div>
+<div class="line"><span class="lineno">  401</span>        <span class="keywordtype">double</span> residual = <a class="code hl_function" href="wallfunction_8c.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  402</span>                                 current_guess, pressure_gradient_tangent,</div>
+<div class="line"><span class="lineno">  403</span>                                 pressure_gradient_normal);</div>
+<div class="line"><span class="lineno">  404</span>        </div>
+<div class="line"><span class="lineno">  405</span>        <span class="keywordtype">double</span> derivative = <a class="code hl_function" href="wallfunction_8c.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a>(kinematic_viscosity, velocity, wall_distance,</div>
+<div class="line"><span class="lineno">  406</span>                                    current_guess, pressure_gradient_tangent,</div>
+<div class="line"><span class="lineno">  407</span>                                    pressure_gradient_normal);</div>
+<div class="line"><span class="lineno">  408</span>        </div>
+<div class="line"><span class="lineno">  409</span>        new_guess = fabs(current_guess - residual / derivative);</div>
+<div class="line"><span class="lineno">  410</span>        </div>
+<div class="line"><span class="lineno">  411</span>        <span class="keywordflow">if</span> (fabs(current_guess - new_guess) &lt; convergence_tolerance) {</div>
+<div class="line"><span class="lineno">  412</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  413</span>        }</div>
+<div class="line"><span class="lineno">  414</span>        </div>
+<div class="line"><span class="lineno">  415</span>        current_guess = new_guess;</div>
+<div class="line"><span class="lineno">  416</span>    }</div>
+<div class="line"><span class="lineno">  417</span>    </div>
+<div class="line"><span class="lineno">  418</span>    <span class="keywordflow">if</span> (fabs(current_guess - new_guess) &gt; 1.e-5 &amp;&amp; iteration &gt;= 29) {</div>
+<div class="line"><span class="lineno">  419</span>        <span class="comment">/* Per wall cell and step, so reported only the first time on each rank. */</span></div>
+<div class="line"><span class="lineno">  420</span>        <span class="keyword">static</span> PetscBool reported = PETSC_FALSE;</div>
+<div class="line"><span class="lineno">  421</span>        <span class="keywordflow">if</span> (!reported) {</div>
+<div class="line"><span class="lineno">  422</span>            reported = PETSC_TRUE;</div>
+<div class="line"><span class="lineno">  423</span>            <a class="code hl_define" href="logging_8h.html#a4a671b0e347e0a22b0df806f246d5d11">LOG_ALLOW</a>(<a class="code hl_define" href="logging_8h.html#a3758dd5d300a594312c95bc393378df0">LOCAL</a>, <a class="code hl_enumvalue" href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a>,</div>
+<div class="line"><span class="lineno">  424</span>                      <span class="stringliteral">&quot;Cabot wall-function iteration reached its limit without the requested tolerance &quot;</span></div>
+<div class="line"><span class="lineno">  425</span>                      <span class="stringliteral">&quot;(reported once per rank; later occurrences are not).\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  426</span>        }</div>
+<div class="line"><span class="lineno">  427</span>    }</div>
+<div class="line"><span class="lineno">  428</span>    </div>
+<div class="line"><span class="lineno">  429</span>    *friction_velocity = new_guess;</div>
+<div class="line"><span class="lineno">  430</span>    *wall_shear_velocity = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, new_guess, wall_distance,</div>
+<div class="line"><span class="lineno">  431</span>                              velocity, pressure_gradient_tangent);</div>
+<div class="line"><span class="lineno">  432</span>    *wall_shear_normal = <a class="code hl_function" href="wallfunction_8c.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(kinematic_viscosity, new_guess, wall_distance,</div>
+<div class="line"><span class="lineno">  433</span>                            0.0, pressure_gradient_normal);</div>
+<div class="line"><span class="lineno">  434</span>}</div>
 <div class="ttc" id="alogging_8h_html_aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400"><div class="ttname"><a href="logging_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8f6fe15bfe15104da6d1b360194a5400">LOG_WARNING</a></div><div class="ttdeci">@ LOG_WARNING</div><div class="ttdoc">Non-critical issues that warrant attention.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l00030">logging.h:30</a></div></div>
-<div class="ttc" id="awallfunction_8c_html_a024875fe3b3dd703c186b2f4c60b6770"><div class="ttname"><a href="wallfunction_8c.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a></div><div class="ttdeci">double df_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Implementation of df_Cabot().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00368">wallfunction.c:368</a></div></div>
+<div class="ttc" id="awallfunction_8c_html_a024875fe3b3dd703c186b2f4c60b6770"><div class="ttname"><a href="wallfunction_8c.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a></div><div class="ttdeci">double df_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Implementation of df_Cabot().</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00365">wallfunction.c:365</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1346,7 +1340,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Computes velocity using Werner-Wengle wall function. </p>
-<p>The pointwise Werner-Wengle profile; the solver takes the friction velocity from its exact inverse, <a class="el" href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner()</a>, at the reference cell. Explicit relation: u+ = y+ below the sublayer edge (viscous sublayer) u+ = A * (y+)^B above it (power law) where A = 8.3, B = 1/7, and the edge is where the two meet, A^(7/6) = 11.8148.</p>
+<p>The pointwise Werner-Wengle profile. Not called by the solver, which takes the friction velocity from its exact inverse, <a class="el" href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner()</a>, at the reference cell; this forward form is the definition that inverse is tested against. Explicit relation: u+ = y+ below the sublayer edge (viscous sublayer) u+ = A * (y+)^B above it (power law) where A = 8.3, B = 1/7, and the edge is where the two meet, A^(7/6) = 11.8102.</p>
 <p>ADVANTAGES:</p><ul>
 <li>Explicit (no iteration required)</li>
 <li>Computationally cheap</li>
@@ -1368,29 +1362,29 @@ Here is the caller graph for this function:</div>
 <p>Computes velocity using Werner-Wengle wall function.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88" title="Computes velocity using Werner-Wengle wall function.">u_Werner()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00447">447</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  449</span>{</div>
-<div class="line"><span class="lineno">  450</span>    <span class="comment">/* The pointwise profile. ApplyWallFunction() takes the friction velocity from its exact</span></div>
-<div class="line"><span class="lineno">  451</span><span class="comment">       inverse, find_utau_Werner(), at the reference cell. */</span></div>
-<div class="line"><span class="lineno">  452</span>    <span class="keywordtype">double</span> yplus = friction_velocity * wall_distance / kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  453</span>    </div>
-<div class="line"><span class="lineno">  454</span>    <span class="comment">// Werner-Wengle constants</span></div>
-<div class="line"><span class="lineno">  455</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> power_law_coefficient = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
-<div class="line"><span class="lineno">  456</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> power_law_exponent = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
-<div class="line"><span class="lineno">  457</span>    </div>
-<div class="line"><span class="lineno">  458</span>    <span class="keywordtype">double</span> velocity;</div>
-<div class="line"><span class="lineno">  459</span>    </div>
-<div class="line"><span class="lineno">  460</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a>) {</div>
-<div class="line"><span class="lineno">  461</span>        <span class="comment">// Viscous sublayer: u+ = y+</span></div>
-<div class="line"><span class="lineno">  462</span>        velocity = yplus * friction_velocity;</div>
-<div class="line"><span class="lineno">  463</span>    }</div>
-<div class="line"><span class="lineno">  464</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  465</span>        <span class="comment">// Power-law region: u+ = A * (y+)^B</span></div>
-<div class="line"><span class="lineno">  466</span>        velocity = power_law_coefficient * pow(yplus, power_law_exponent) * friction_velocity;</div>
-<div class="line"><span class="lineno">  467</span>    }</div>
-<div class="line"><span class="lineno">  468</span>    </div>
-<div class="line"><span class="lineno">  469</span>    <span class="keywordflow">return</span> velocity;</div>
-<div class="line"><span class="lineno">  470</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00444">444</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  446</span>{</div>
+<div class="line"><span class="lineno">  447</span>    <span class="comment">/* The pointwise profile. ApplyWallFunction() takes the friction velocity from its exact</span></div>
+<div class="line"><span class="lineno">  448</span><span class="comment">       inverse, find_utau_Werner(), at the reference cell. */</span></div>
+<div class="line"><span class="lineno">  449</span>    <span class="keywordtype">double</span> yplus = friction_velocity * wall_distance / kinematic_viscosity;</div>
+<div class="line"><span class="lineno">  450</span>    </div>
+<div class="line"><span class="lineno">  451</span>    <span class="comment">// Werner-Wengle constants</span></div>
+<div class="line"><span class="lineno">  452</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> power_law_coefficient = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
+<div class="line"><span class="lineno">  453</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> power_law_exponent = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
+<div class="line"><span class="lineno">  454</span>    </div>
+<div class="line"><span class="lineno">  455</span>    <span class="keywordtype">double</span> velocity;</div>
+<div class="line"><span class="lineno">  456</span>    </div>
+<div class="line"><span class="lineno">  457</span>    <span class="keywordflow">if</span> (yplus &lt;= <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a>) {</div>
+<div class="line"><span class="lineno">  458</span>        <span class="comment">// Viscous sublayer: u+ = y+</span></div>
+<div class="line"><span class="lineno">  459</span>        velocity = yplus * friction_velocity;</div>
+<div class="line"><span class="lineno">  460</span>    }</div>
+<div class="line"><span class="lineno">  461</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  462</span>        <span class="comment">// Power-law region: u+ = A * (y+)^B</span></div>
+<div class="line"><span class="lineno">  463</span>        velocity = power_law_coefficient * pow(yplus, power_law_exponent) * friction_velocity;</div>
+<div class="line"><span class="lineno">  464</span>    }</div>
+<div class="line"><span class="lineno">  465</span>    </div>
+<div class="line"><span class="lineno">  466</span>    <span class="keywordflow">return</span> velocity;</div>
+<div class="line"><span class="lineno">  467</span>}</div>
 <div class="ttc" id="awallfunction_8c_html_aa434aeb00f54376a6fce4816e611292e"><div class="ttname"><a href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a></div><div class="ttdeci">#define WERNER_SUBLAYER_YPLUS</div><div class="ttdoc">Werner-Wengle sublayer edge: where u+ = y+ meets u+ = A (y+)^B, at A^(1/(1-B)).</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00054">wallfunction.c:54</a></div></div>
 <div class="ttc" id="awallfunction_8c_html_aabeb5050b80be409270545ad9771ddb2"><div class="ttname"><a href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a></div><div class="ttdeci">#define WERNER_A</div><div class="ttdoc">Werner-Wengle power-law coefficient A and exponent B in u+ = A (y+)^B.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00048">wallfunction.c:48</a></div></div>
 <div class="ttc" id="awallfunction_8c_html_acc3dd6729428b467fa1806075a830544"><div class="ttname"><a href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a></div><div class="ttdeci">#define WERNER_B</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00049">wallfunction.c:49</a></div></div>
@@ -1453,36 +1447,36 @@ Here is the caller graph for this function:</div>
 <p>Wall shear stress from the cell-integrated Werner-Wengle relation.</p>
 <p>Full API contract is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00479">479</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  480</span>{</div>
-<div class="line"><span class="lineno">  481</span>    <a class="code hl_define" href="logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd">PROFILE_HELPER_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  482</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
-<div class="line"><span class="lineno">  483</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
-<div class="line"><span class="lineno">  484</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> speed = fabs(velocity);</div>
-<div class="line"><span class="lineno">  485</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nu_over_y = kinematic_viscosity / wall_distance;</div>
-<div class="line"><span class="lineno">  486</span> </div>
-<div class="line"><span class="lineno">  487</span>    <span class="comment">/* The switch is written in terms of the geometry alone. Expressing it through the</span></div>
-<div class="line"><span class="lineno">  488</span><span class="comment">       friction velocity, as the iterative residual does, makes the branch depend on the</span></div>
-<div class="line"><span class="lineno">  489</span><span class="comment">       answer and forces a Newton solve the closed form does not need. */</span></div>
-<div class="line"><span class="lineno">  490</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> transition_speed = 0.5 * nu_over_y * pow(A, 2.0 / (1.0 - B));</div>
-<div class="line"><span class="lineno">  491</span> </div>
-<div class="line"><span class="lineno">  492</span>    <span class="keywordflow">if</span> (speed &lt;= transition_speed) {</div>
-<div class="line"><span class="lineno">  493</span>        <span class="comment">/* Integrating u+ = y+ across the cell leaves the factor of two that separates</span></div>
-<div class="line"><span class="lineno">  494</span><span class="comment">           this from the pointwise relation tau_w = nu u / y. */</span></div>
-<div class="line"><span class="lineno">  495</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  496</span>        <span class="keywordflow">return</span> 2.0 * kinematic_viscosity * speed / wall_distance;</div>
-<div class="line"><span class="lineno">  497</span>    }</div>
-<div class="line"><span class="lineno">  498</span> </div>
-<div class="line"><span class="lineno">  499</span>    {</div>
-<div class="line"><span class="lineno">  500</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> term1 = 0.5 * (1.0 - B) * pow(A, (1.0 + B) / (1.0 - B)) *</div>
-<div class="line"><span class="lineno">  501</span>                             pow(nu_over_y, 1.0 + B);</div>
-<div class="line"><span class="lineno">  502</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> term2 = (1.0 + B) / A * pow(nu_over_y, B) * speed;</div>
-<div class="line"><span class="lineno">  503</span> </div>
-<div class="line"><span class="lineno">  504</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  505</span>        <span class="keywordflow">return</span> pow(term1 + term2, 2.0 / (1.0 + B));</div>
-<div class="line"><span class="lineno">  506</span>    }</div>
-<div class="line"><span class="lineno">  507</span>    <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  508</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00476">476</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  477</span>{</div>
+<div class="line"><span class="lineno">  478</span>    <a class="code hl_define" href="logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd">PROFILE_HELPER_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  479</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
+<div class="line"><span class="lineno">  480</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
+<div class="line"><span class="lineno">  481</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> speed = fabs(velocity);</div>
+<div class="line"><span class="lineno">  482</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nu_over_y = kinematic_viscosity / wall_distance;</div>
+<div class="line"><span class="lineno">  483</span> </div>
+<div class="line"><span class="lineno">  484</span>    <span class="comment">/* The switch is written in terms of the geometry alone. Expressing it through the</span></div>
+<div class="line"><span class="lineno">  485</span><span class="comment">       friction velocity, as the iterative residual does, makes the branch depend on the</span></div>
+<div class="line"><span class="lineno">  486</span><span class="comment">       answer and forces a Newton solve the closed form does not need. */</span></div>
+<div class="line"><span class="lineno">  487</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> transition_speed = 0.5 * nu_over_y * pow(A, 2.0 / (1.0 - B));</div>
+<div class="line"><span class="lineno">  488</span> </div>
+<div class="line"><span class="lineno">  489</span>    <span class="keywordflow">if</span> (speed &lt;= transition_speed) {</div>
+<div class="line"><span class="lineno">  490</span>        <span class="comment">/* Integrating u+ = y+ across the cell leaves the factor of two that separates</span></div>
+<div class="line"><span class="lineno">  491</span><span class="comment">           this from the pointwise relation tau_w = nu u / y. */</span></div>
+<div class="line"><span class="lineno">  492</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  493</span>        <span class="keywordflow">return</span> 2.0 * kinematic_viscosity * speed / wall_distance;</div>
+<div class="line"><span class="lineno">  494</span>    }</div>
+<div class="line"><span class="lineno">  495</span> </div>
+<div class="line"><span class="lineno">  496</span>    {</div>
+<div class="line"><span class="lineno">  497</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> term1 = 0.5 * (1.0 - B) * pow(A, (1.0 + B) / (1.0 - B)) *</div>
+<div class="line"><span class="lineno">  498</span>                             pow(nu_over_y, 1.0 + B);</div>
+<div class="line"><span class="lineno">  499</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> term2 = (1.0 + B) / A * pow(nu_over_y, B) * speed;</div>
+<div class="line"><span class="lineno">  500</span> </div>
+<div class="line"><span class="lineno">  501</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  502</span>        <span class="keywordflow">return</span> pow(term1 + term2, 2.0 / (1.0 + B));</div>
+<div class="line"><span class="lineno">  503</span>    }</div>
+<div class="line"><span class="lineno">  504</span>    <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  505</span>}</div>
 <div class="ttc" id="alogging_8h_html_a4e34da4fe2ec2ae0161a158343a52ebd"><div class="ttname"><a href="logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd">PROFILE_HELPER_BEGIN</a></div><div class="ttdeci">#define PROFILE_HELPER_BEGIN</div><div class="ttdoc">Marks the beginning of a profiled helper: timed only when enabled by name.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l01014">logging.h:1014</a></div></div>
 <div class="ttc" id="alogging_8h_html_a4f64dc8a5be9d14bb172859fad97b8f3"><div class="ttname"><a href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a></div><div class="ttdeci">#define PROFILE_HELPER_END</div><div class="ttdoc">Alias of PROFILE_FUNCTION_END for a function that began with PROFILE_HELPER_BEGIN.</div><div class="ttdef"><b>Definition</b> <a href="logging_8h_source.html#l01033">logging.h:1033</a></div></div>
 </div><!-- fragment --><div class="dynheader">
@@ -1540,36 +1534,36 @@ Here is the caller graph for this function:</div>
 <p>Wall-parallel velocity at a distance, from the Werner-Wengle wall stress.</p>
 <p>Full API contract is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00517">517</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  519</span>{</div>
-<div class="line"><span class="lineno">  520</span>    <a class="code hl_define" href="logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd">PROFILE_HELPER_BEGIN</a>;</div>
-<div class="line"><span class="lineno">  521</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
-<div class="line"><span class="lineno">  522</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
-<div class="line"><span class="lineno">  523</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> stress = fabs(wall_shear_stress);</div>
-<div class="line"><span class="lineno">  524</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nu_over_y = kinematic_viscosity / wall_distance;</div>
-<div class="line"><span class="lineno">  525</span> </div>
-<div class="line"><span class="lineno">  526</span>    <span class="comment">/* The same threshold as taw_Werner(), carried over to the stress side. The two</span></div>
-<div class="line"><span class="lineno">  527</span><span class="comment">       branches meet here exactly, so selecting on the stress cannot land on the wrong</span></div>
-<div class="line"><span class="lineno">  528</span><span class="comment">       side of the velocity switch. */</span></div>
-<div class="line"><span class="lineno">  529</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> transition_stress = nu_over_y * nu_over_y * pow(A, 2.0 / (1.0 - B));</div>
-<div class="line"><span class="lineno">  530</span> </div>
-<div class="line"><span class="lineno">  531</span>    <span class="keywordflow">if</span> (stress &lt;= transition_stress) {</div>
-<div class="line"><span class="lineno">  532</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  533</span>        <span class="keywordflow">return</span> stress * wall_distance / (2.0 * kinematic_viscosity);</div>
-<div class="line"><span class="lineno">  534</span>    }</div>
-<div class="line"><span class="lineno">  535</span> </div>
-<div class="line"><span class="lineno">  536</span>    {</div>
-<div class="line"><span class="lineno">  537</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> offset = 0.5 * (1.0 - B) * pow(A, (1.0 + B) / (1.0 - B)) *</div>
-<div class="line"><span class="lineno">  538</span>                              pow(nu_over_y, 1.0 + B);</div>
-<div class="line"><span class="lineno">  539</span>        <span class="comment">/* Non-negative by construction above the threshold - it is zero only in the</span></div>
-<div class="line"><span class="lineno">  540</span><span class="comment">           limit of the switch - so the max guards roundoff, not a modelling case. */</span></div>
-<div class="line"><span class="lineno">  541</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> bracket = PetscMax(pow(stress, 0.5 * (1.0 + B)) - offset, 0.0);</div>
-<div class="line"><span class="lineno">  542</span> </div>
-<div class="line"><span class="lineno">  543</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  544</span>        <span class="keywordflow">return</span> A / (1.0 + B) * pow(1.0 / nu_over_y, B) * bracket;</div>
-<div class="line"><span class="lineno">  545</span>    }</div>
-<div class="line"><span class="lineno">  546</span>    <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
-<div class="line"><span class="lineno">  547</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00514">514</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  516</span>{</div>
+<div class="line"><span class="lineno">  517</span>    <a class="code hl_define" href="logging_8h.html#a4e34da4fe2ec2ae0161a158343a52ebd">PROFILE_HELPER_BEGIN</a>;</div>
+<div class="line"><span class="lineno">  518</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
+<div class="line"><span class="lineno">  519</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
+<div class="line"><span class="lineno">  520</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> stress = fabs(wall_shear_stress);</div>
+<div class="line"><span class="lineno">  521</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nu_over_y = kinematic_viscosity / wall_distance;</div>
+<div class="line"><span class="lineno">  522</span> </div>
+<div class="line"><span class="lineno">  523</span>    <span class="comment">/* The same threshold as taw_Werner(), carried over to the stress side. The two</span></div>
+<div class="line"><span class="lineno">  524</span><span class="comment">       branches meet here exactly, so selecting on the stress cannot land on the wrong</span></div>
+<div class="line"><span class="lineno">  525</span><span class="comment">       side of the velocity switch. */</span></div>
+<div class="line"><span class="lineno">  526</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> transition_stress = nu_over_y * nu_over_y * pow(A, 2.0 / (1.0 - B));</div>
+<div class="line"><span class="lineno">  527</span> </div>
+<div class="line"><span class="lineno">  528</span>    <span class="keywordflow">if</span> (stress &lt;= transition_stress) {</div>
+<div class="line"><span class="lineno">  529</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  530</span>        <span class="keywordflow">return</span> stress * wall_distance / (2.0 * kinematic_viscosity);</div>
+<div class="line"><span class="lineno">  531</span>    }</div>
+<div class="line"><span class="lineno">  532</span> </div>
+<div class="line"><span class="lineno">  533</span>    {</div>
+<div class="line"><span class="lineno">  534</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> offset = 0.5 * (1.0 - B) * pow(A, (1.0 + B) / (1.0 - B)) *</div>
+<div class="line"><span class="lineno">  535</span>                              pow(nu_over_y, 1.0 + B);</div>
+<div class="line"><span class="lineno">  536</span>        <span class="comment">/* Non-negative by construction above the threshold - it is zero only in the</span></div>
+<div class="line"><span class="lineno">  537</span><span class="comment">           limit of the switch - so the max guards roundoff, not a modelling case. */</span></div>
+<div class="line"><span class="lineno">  538</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> bracket = PetscMax(pow(stress, 0.5 * (1.0 + B)) - offset, 0.0);</div>
+<div class="line"><span class="lineno">  539</span> </div>
+<div class="line"><span class="lineno">  540</span>        <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  541</span>        <span class="keywordflow">return</span> A / (1.0 + B) * pow(1.0 / nu_over_y, B) * bracket;</div>
+<div class="line"><span class="lineno">  542</span>    }</div>
+<div class="line"><span class="lineno">  543</span>    <a class="code hl_define" href="logging_8h.html#a4f64dc8a5be9d14bb172859fad97b8f3">PROFILE_HELPER_END</a>;</div>
+<div class="line"><span class="lineno">  544</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -1617,7 +1611,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Friction velocity from a point velocity, inverting <a class="el" href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner()</a> exactly. </p>
-<p>The closed-form inverse of the pointwise Werner-Wengle profile, branch for branch, and the solver's path. Along that profile U y / nu = (y+)^2 in the sublayer, so the branch is chosen from the data alone - sublayer while U y / nu &lt;= 11.81^2 - and each branch inverts explicitly:</p>
+<p>The closed-form inverse of the pointwise Werner-Wengle profile, branch for branch, and the solver's path. Along that profile U y / nu = (y+)^2 in the sublayer, so the branch is chosen from the data alone - sublayer while U y / nu &lt;= (8.3^(7/6))^2, about 11.8102^2 - and each branch inverts explicitly:</p>
 <p>sublayer : u_tau = sqrt(nu |U| / y) power law : u_tau = ( |U| / (A (y/nu)^B) )^(1/(1+B)), A = 8.3, B = 1/7</p>
 <p>No iteration, so the residual it feeds stays smooth for a matrix-free Jacobian.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1633,23 +1627,23 @@ Here is the caller graph for this function:</div>
 <p>Friction velocity from a point velocity, inverting <a class="el" href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner()</a> exactly.</p>
 <p>Full API contract (arguments, ownership, side effects) is documented with the header declaration in <code><a class="el" href="wallfunction_8h.html">include/wallfunction.h</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f" title="Friction velocity from a point velocity, inverting u_Werner() exactly.">find_utau_Werner()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00555">555</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  557</span>{</div>
-<div class="line"><span class="lineno">  558</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
-<div class="line"><span class="lineno">  559</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
-<div class="line"><span class="lineno">  560</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> speed = fabs(velocity);</div>
-<div class="line"><span class="lineno">  561</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> y_over_nu = wall_distance / kinematic_viscosity;</div>
-<div class="line"><span class="lineno">  562</span>    (void)initial_guess;</div>
-<div class="line"><span class="lineno">  563</span> </div>
-<div class="line"><span class="lineno">  564</span>    <span class="comment">/* The exact inverse of `u_Werner()`, branch for branch. Along that profile</span></div>
-<div class="line"><span class="lineno">  565</span><span class="comment">       U y / nu = (y+)^2 in the sublayer, so the branch it was evaluated on is decided by</span></div>
-<div class="line"><span class="lineno">  566</span><span class="comment">       the data alone: the sublayer holds while U y / nu &lt;= WERNER_SUBLAYER_YPLUS^2, the</span></div>
-<div class="line"><span class="lineno">  567</span><span class="comment">       same switch `u_Werner()` applies to y+. Both branches then invert explicitly. */</span></div>
-<div class="line"><span class="lineno">  568</span>    <span class="keywordflow">if</span> (speed * y_over_nu &lt;= <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a> * <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a>) {</div>
-<div class="line"><span class="lineno">  569</span>        <span class="keywordflow">return</span> sqrt(speed / y_over_nu);                           <span class="comment">/* U = u_tau^2 y / nu */</span></div>
-<div class="line"><span class="lineno">  570</span>    }</div>
-<div class="line"><span class="lineno">  571</span>    <span class="keywordflow">return</span> pow(speed / (A * pow(y_over_nu, B)), 1.0 / (1.0 + B)); <span class="comment">/* U = A u_tau^(1+B) (y/nu)^B */</span></div>
-<div class="line"><span class="lineno">  572</span>}</div>
+<p class="definition">Definition at line <a class="el" href="wallfunction_8c_source.html#l00552">552</a> of file <a class="el" href="wallfunction_8c_source.html">wallfunction.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  554</span>{</div>
+<div class="line"><span class="lineno">  555</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> A = <a class="code hl_define" href="wallfunction_8c.html#aabeb5050b80be409270545ad9771ddb2">WERNER_A</a>;</div>
+<div class="line"><span class="lineno">  556</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> B = <a class="code hl_define" href="wallfunction_8c.html#acc3dd6729428b467fa1806075a830544">WERNER_B</a>;</div>
+<div class="line"><span class="lineno">  557</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> speed = fabs(velocity);</div>
+<div class="line"><span class="lineno">  558</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> y_over_nu = wall_distance / kinematic_viscosity;</div>
+<div class="line"><span class="lineno">  559</span>    (void)initial_guess;</div>
+<div class="line"><span class="lineno">  560</span> </div>
+<div class="line"><span class="lineno">  561</span>    <span class="comment">/* The exact inverse of `u_Werner()`, branch for branch. Along that profile</span></div>
+<div class="line"><span class="lineno">  562</span><span class="comment">       U y / nu = (y+)^2 in the sublayer, so the branch it was evaluated on is decided by</span></div>
+<div class="line"><span class="lineno">  563</span><span class="comment">       the data alone: the sublayer holds while U y / nu &lt;= WERNER_SUBLAYER_YPLUS^2, the</span></div>
+<div class="line"><span class="lineno">  564</span><span class="comment">       same switch `u_Werner()` applies to y+. Both branches then invert explicitly. */</span></div>
+<div class="line"><span class="lineno">  565</span>    <span class="keywordflow">if</span> (speed * y_over_nu &lt;= <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a> * <a class="code hl_define" href="wallfunction_8c.html#aa434aeb00f54376a6fce4816e611292e">WERNER_SUBLAYER_YPLUS</a>) {</div>
+<div class="line"><span class="lineno">  566</span>        <span class="keywordflow">return</span> sqrt(speed / y_over_nu);                           <span class="comment">/* U = u_tau^2 y / nu */</span></div>
+<div class="line"><span class="lineno">  567</span>    }</div>
+<div class="line"><span class="lineno">  568</span>    <span class="keywordflow">return</span> pow(speed / (A * pow(y_over_nu, B)), 1.0 / (1.0 + B)); <span class="comment">/* U = A u_tau^(1+B) (y/nu)^B */</span></div>
+<div class="line"><span class="lineno">  569</span>}</div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

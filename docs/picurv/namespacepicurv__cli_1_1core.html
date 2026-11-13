@@ -20215,37 +20215,39 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno"> 8297</span>    <span class="keywordflow">except</span> ValueError:</div>
 <div class="line"><span class="lineno"> 8298</span>        <span class="keywordflow">return</span>  <span class="comment"># The selector&#39;s own validation already reported this.</span></div>
 <div class="line"><span class="lineno"> 8299</span> </div>
-<div class="line"><span class="lineno"> 8300</span>    les_on = isinstance(les_cfg, dict) <span class="keywordflow">and</span> bool(les_cfg.get(<span class="stringliteral">&#39;enabled&#39;</span>, <span class="keyword">False</span>)) \</div>
-<div class="line"><span class="lineno"> 8301</span>        <span class="keywordflow">and</span> str(les_cfg.get(<span class="stringliteral">&#39;model&#39;</span>, <span class="stringliteral">&#39;dynamic_smagorinsky&#39;</span>)).strip().lower() != <span class="stringliteral">&#39;none&#39;</span></div>
-<div class="line"><span class="lineno"> 8302</span>    <span class="comment"># A wall model with nothing to sit on. The convective scheme here is QUICK, whose</span></div>
-<div class="line"><span class="lineno"> 8303</span>    <span class="comment"># dissipation is linear and upwind-biased; it is not a limiter-based scheme whose</span></div>
-<div class="line"><span class="lineno"> 8304</span>    <span class="comment"># truncation error stands in for a subgrid stress, so there is no implicit LES to</span></div>
-<div class="line"><span class="lineno"> 8305</span>    <span class="comment"># appeal to.</span></div>
-<div class="line"><span class="lineno"> 8306</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> les_on:</div>
-<div class="line"><span class="lineno"> 8307</span>        errors.append(</div>
-<div class="line"><span class="lineno"> 8308</span>            f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.wall_function is enabled with no &quot;</span></div>
-<div class="line"><span class="lineno"> 8309</span>            <span class="stringliteral">&quot;turbulence model. A wall model supplies the stress of a boundary layer it &quot;</span></div>
-<div class="line"><span class="lineno"> 8310</span>            <span class="stringliteral">&quot;does not resolve, which needs the unresolved motions modelled somewhere. &quot;</span></div>
-<div class="line"><span class="lineno"> 8311</span>            <span class="stringliteral">&quot;This solver has no implicit-LES scheme to supply that - its convection is &quot;</span></div>
-<div class="line"><span class="lineno"> 8312</span>            <span class="stringliteral">&quot;QUICK, whose numerical dissipation is not a subgrid model - so enable &quot;</span></div>
-<div class="line"><span class="lineno"> 8313</span>            <span class="stringliteral">&quot;models.physics.turbulence.les, or resolve the wall and disable the wall &quot;</span></div>
-<div class="line"><span class="lineno"> 8314</span>            <span class="stringliteral">&quot;function.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8315</span> </div>
-<div class="line"><span class="lineno"> 8316</span>    <span class="comment"># A wall law describes a turbulent boundary layer. Below transition there is no</span></div>
-<div class="line"><span class="lineno"> 8317</span>    <span class="comment"># inertial region for it to stand on, and it would impose a profile the flow does not</span></div>
-<div class="line"><span class="lineno"> 8318</span>    <span class="comment"># have. The threshold is deliberately far below any transitional value, so that it</span></div>
-<div class="line"><span class="lineno"> 8319</span>    <span class="comment"># only catches cases that are unambiguously laminar.</span></div>
-<div class="line"><span class="lineno"> 8320</span>    reynolds = _case_reynolds_number(case_cfg)</div>
-<div class="line"><span class="lineno"> 8321</span>    <span class="keywordflow">if</span> reynolds <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> reynolds &lt; 1000.0:</div>
-<div class="line"><span class="lineno"> 8322</span>        errors.append(</div>
-<div class="line"><span class="lineno"> 8323</span>            f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.wall_function is enabled at &quot;</span></div>
-<div class="line"><span class="lineno"> 8324</span>            f<span class="stringliteral">&quot;Reynolds number {reynolds:g}, which is laminar. The log law and the &quot;</span></div>
-<div class="line"><span class="lineno"> 8325</span>            <span class="stringliteral">&quot;Werner-Wengle power law both describe a turbulent boundary layer; at this &quot;</span></div>
-<div class="line"><span class="lineno"> 8326</span>            <span class="stringliteral">&quot;Reynolds number there is no inertial region for either to represent, and &quot;</span></div>
-<div class="line"><span class="lineno"> 8327</span>            <span class="stringliteral">&quot;the model would impose a profile the flow does not have. Resolve the wall &quot;</span></div>
-<div class="line"><span class="lineno"> 8328</span>            <span class="stringliteral">&quot;instead.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8329</span> </div>
-<div class="line"><span class="lineno"> 8330</span> </div>
+<div class="line"><span class="lineno"> 8300</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8301</span>        les_on = bool(resolve_les_model_code(les_cfg))</div>
+<div class="line"><span class="lineno"> 8302</span>    <span class="keywordflow">except</span> ValueError:</div>
+<div class="line"><span class="lineno"> 8303</span>        <span class="keywordflow">return</span>  <span class="comment"># The les selector&#39;s own validation already reported this.</span></div>
+<div class="line"><span class="lineno"> 8304</span>    <span class="comment"># A wall model with nothing to sit on. The convective scheme here is QUICK, whose</span></div>
+<div class="line"><span class="lineno"> 8305</span>    <span class="comment"># dissipation is linear and upwind-biased; it is not a limiter-based scheme whose</span></div>
+<div class="line"><span class="lineno"> 8306</span>    <span class="comment"># truncation error stands in for a subgrid stress, so there is no implicit LES to</span></div>
+<div class="line"><span class="lineno"> 8307</span>    <span class="comment"># appeal to.</span></div>
+<div class="line"><span class="lineno"> 8308</span>    <span class="keywordflow">if</span> <span class="keywordflow">not</span> les_on:</div>
+<div class="line"><span class="lineno"> 8309</span>        errors.append(</div>
+<div class="line"><span class="lineno"> 8310</span>            f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.wall_function is enabled with no &quot;</span></div>
+<div class="line"><span class="lineno"> 8311</span>            <span class="stringliteral">&quot;turbulence model. A wall model supplies the stress of a boundary layer it &quot;</span></div>
+<div class="line"><span class="lineno"> 8312</span>            <span class="stringliteral">&quot;does not resolve, which needs the unresolved motions modelled somewhere. &quot;</span></div>
+<div class="line"><span class="lineno"> 8313</span>            <span class="stringliteral">&quot;This solver has no implicit-LES scheme to supply that - its convection is &quot;</span></div>
+<div class="line"><span class="lineno"> 8314</span>            <span class="stringliteral">&quot;QUICK, whose numerical dissipation is not a subgrid model - so enable &quot;</span></div>
+<div class="line"><span class="lineno"> 8315</span>            <span class="stringliteral">&quot;models.physics.turbulence.les, or resolve the wall and disable the wall &quot;</span></div>
+<div class="line"><span class="lineno"> 8316</span>            <span class="stringliteral">&quot;function.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8317</span> </div>
+<div class="line"><span class="lineno"> 8318</span>    <span class="comment"># A wall law describes a turbulent boundary layer. Below transition there is no</span></div>
+<div class="line"><span class="lineno"> 8319</span>    <span class="comment"># inertial region for it to stand on, and it would impose a profile the flow does not</span></div>
+<div class="line"><span class="lineno"> 8320</span>    <span class="comment"># have. The threshold is deliberately far below any transitional value, so that it</span></div>
+<div class="line"><span class="lineno"> 8321</span>    <span class="comment"># only catches cases that are unambiguously laminar.</span></div>
+<div class="line"><span class="lineno"> 8322</span>    reynolds = _case_reynolds_number(case_cfg)</div>
+<div class="line"><span class="lineno"> 8323</span>    <span class="keywordflow">if</span> reynolds <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> reynolds &lt; 1000.0:</div>
+<div class="line"><span class="lineno"> 8324</span>        errors.append(</div>
+<div class="line"><span class="lineno"> 8325</span>            f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.wall_function is enabled at &quot;</span></div>
+<div class="line"><span class="lineno"> 8326</span>            f<span class="stringliteral">&quot;Reynolds number {reynolds:g}, which is laminar. The log law and the &quot;</span></div>
+<div class="line"><span class="lineno"> 8327</span>            <span class="stringliteral">&quot;Werner-Wengle power law both describe a turbulent boundary layer; at this &quot;</span></div>
+<div class="line"><span class="lineno"> 8328</span>            <span class="stringliteral">&quot;Reynolds number there is no inertial region for either to represent, and &quot;</span></div>
+<div class="line"><span class="lineno"> 8329</span>            <span class="stringliteral">&quot;the model would impose a profile the flow does not have. Resolve the wall &quot;</span></div>
+<div class="line"><span class="lineno"> 8330</span>            <span class="stringliteral">&quot;instead.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8331</span> </div>
+<div class="line"><span class="lineno"> 8332</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -20287,28 +20289,28 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The Reynolds number, or None when the inputs are absent or unusable. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08331">8331</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8331</span><span class="keyword">def </span>_case_reynolds_number(case_cfg: dict):</div>
-<div class="line"><span class="lineno"> 8332</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8333</span><span class="stringliteral">    @brief Reynolds number implied by a case&#39;s scaling and fluid properties.</span></div>
-<div class="line"><span class="lineno"> 8334</span><span class="stringliteral">    @param[in] case_cfg Parsed case configuration.</span></div>
-<div class="line"><span class="lineno"> 8335</span><span class="stringliteral">    @return The Reynolds number, or None when the inputs are absent or unusable.</span></div>
-<div class="line"><span class="lineno"> 8336</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8337</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8338</span>        props = case_cfg.get(<span class="stringliteral">&#39;properties&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
-<div class="line"><span class="lineno"> 8339</span>        scaling = props.get(<span class="stringliteral">&#39;scaling&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
-<div class="line"><span class="lineno"> 8340</span>        fluid = props.get(<span class="stringliteral">&#39;fluid&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
-<div class="line"><span class="lineno"> 8341</span>        density = float(fluid.get(<span class="stringliteral">&#39;density&#39;</span>))</div>
-<div class="line"><span class="lineno"> 8342</span>        viscosity = float(fluid.get(<span class="stringliteral">&#39;viscosity&#39;</span>))</div>
-<div class="line"><span class="lineno"> 8343</span>        length_ref = float(scaling.get(<span class="stringliteral">&#39;length_ref&#39;</span>))</div>
-<div class="line"><span class="lineno"> 8344</span>        velocity_ref = float(scaling.get(<span class="stringliteral">&#39;velocity_ref&#39;</span>))</div>
-<div class="line"><span class="lineno"> 8345</span>    <span class="keywordflow">except</span> (TypeError, ValueError):</div>
-<div class="line"><span class="lineno"> 8346</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8347</span>    <span class="keywordflow">if</span> viscosity &lt;= 0.0:</div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08333">8333</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8333</span><span class="keyword">def </span>_case_reynolds_number(case_cfg: dict):</div>
+<div class="line"><span class="lineno"> 8334</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8335</span><span class="stringliteral">    @brief Reynolds number implied by a case&#39;s scaling and fluid properties.</span></div>
+<div class="line"><span class="lineno"> 8336</span><span class="stringliteral">    @param[in] case_cfg Parsed case configuration.</span></div>
+<div class="line"><span class="lineno"> 8337</span><span class="stringliteral">    @return The Reynolds number, or None when the inputs are absent or unusable.</span></div>
+<div class="line"><span class="lineno"> 8338</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8339</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8340</span>        props = case_cfg.get(<span class="stringliteral">&#39;properties&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
+<div class="line"><span class="lineno"> 8341</span>        scaling = props.get(<span class="stringliteral">&#39;scaling&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
+<div class="line"><span class="lineno"> 8342</span>        fluid = props.get(<span class="stringliteral">&#39;fluid&#39;</span>, {}) <span class="keywordflow">or</span> {}</div>
+<div class="line"><span class="lineno"> 8343</span>        density = float(fluid.get(<span class="stringliteral">&#39;density&#39;</span>))</div>
+<div class="line"><span class="lineno"> 8344</span>        viscosity = float(fluid.get(<span class="stringliteral">&#39;viscosity&#39;</span>))</div>
+<div class="line"><span class="lineno"> 8345</span>        length_ref = float(scaling.get(<span class="stringliteral">&#39;length_ref&#39;</span>))</div>
+<div class="line"><span class="lineno"> 8346</span>        velocity_ref = float(scaling.get(<span class="stringliteral">&#39;velocity_ref&#39;</span>))</div>
+<div class="line"><span class="lineno"> 8347</span>    <span class="keywordflow">except</span> (TypeError, ValueError):</div>
 <div class="line"><span class="lineno"> 8348</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8349</span>    <span class="keywordflow">return</span> density * velocity_ref * length_ref / viscosity</div>
-<div class="line"><span class="lineno"> 8350</span> </div>
-<div class="line"><span class="lineno"> 8351</span> </div>
+<div class="line"><span class="lineno"> 8349</span>    <span class="keywordflow">if</span> viscosity &lt;= 0.0:</div>
+<div class="line"><span class="lineno"> 8350</span>        <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8351</span>    <span class="keywordflow">return</span> density * velocity_ref * length_ref / viscosity</div>
+<div class="line"><span class="lineno"> 8352</span> </div>
+<div class="line"><span class="lineno"> 8353</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -20374,180 +20376,180 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>None; findings are appended to <code>errors</code> and <code>warnings</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08352">8352</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8353</span>                               errors: list, warnings: list):</div>
-<div class="line"><span class="lineno"> 8354</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8355</span><span class="stringliteral">    @brief Checks the structured LES block for values the closure cannot honour.</span></div>
-<div class="line"><span class="lineno"> 8356</span><span class="stringliteral">    @param[in] case_cfg Parsed case.yml mapping, used to read declared periodicity.</span></div>
-<div class="line"><span class="lineno"> 8357</span><span class="stringliteral">    @param[in] les_cfg Parsed `models.physics.turbulence.les` mapping.</span></div>
-<div class="line"><span class="lineno"> 8358</span><span class="stringliteral">    @param[in] case_path Case file path used to prefix diagnostics.</span></div>
-<div class="line"><span class="lineno"> 8359</span><span class="stringliteral">    @param[out] errors List collecting blocking validation failures.</span></div>
-<div class="line"><span class="lineno"> 8360</span><span class="stringliteral">    @param[out] warnings List collecting advisory messages.</span></div>
-<div class="line"><span class="lineno"> 8361</span><span class="stringliteral">    @return None; findings are appended to `errors` and `warnings`.</span></div>
-<div class="line"><span class="lineno"> 8362</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8363</span>    <span class="keyword">def </span>_numeric(container, key, path, minimum=None, exclusive_minimum=None):</div>
-<div class="line"><span class="lineno"> 8364</span>        <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8365</span><span class="stringliteral">        @brief Reads one numeric key and records a range or type failure against it.</span></div>
-<div class="line"><span class="lineno"> 8366</span><span class="stringliteral">        @param[in] container Mapping holding the key.</span></div>
-<div class="line"><span class="lineno"> 8367</span><span class="stringliteral">        @param[in] key Key to read; absent keys are accepted silently.</span></div>
-<div class="line"><span class="lineno"> 8368</span><span class="stringliteral">        @param[in] path Dotted key path used in diagnostics.</span></div>
-<div class="line"><span class="lineno"> 8369</span><span class="stringliteral">        @param[in] minimum Inclusive lower bound, or None to impose none.</span></div>
-<div class="line"><span class="lineno"> 8370</span><span class="stringliteral">        @param[in] exclusive_minimum Exclusive lower bound, or None to impose none.</span></div>
-<div class="line"><span class="lineno"> 8371</span><span class="stringliteral">        @return The parsed value, or None when the key is absent or unparseable.</span></div>
-<div class="line"><span class="lineno"> 8372</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8373</span>        <span class="keywordflow">if</span> key <span class="keywordflow">not</span> <span class="keywordflow">in</span> container:</div>
-<div class="line"><span class="lineno"> 8374</span>            <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8375</span>        <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8376</span>            value = float(container[key])</div>
-<div class="line"><span class="lineno"> 8377</span>        <span class="keywordflow">except</span> (TypeError, ValueError):</div>
-<div class="line"><span class="lineno"> 8378</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be numeric.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8379</span>            <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8380</span>        <span class="keywordflow">if</span> minimum <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> value &lt; minimum:</div>
-<div class="line"><span class="lineno"> 8381</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be at least {minimum}.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8382</span>        <span class="keywordflow">if</span> exclusive_minimum <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> value &lt;= exclusive_minimum:</div>
-<div class="line"><span class="lineno"> 8383</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be greater than {exclusive_minimum}.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8384</span>        <span class="keywordflow">return</span> value</div>
-<div class="line"><span class="lineno"> 8385</span> </div>
-<div class="line"><span class="lineno"> 8386</span>    <span class="keywordflow">if</span> <span class="stringliteral">&#39;enabled&#39;</span> <span class="keywordflow">in</span> les_cfg <span class="keywordflow">and</span> <span class="keywordflow">not</span> isinstance(les_cfg[<span class="stringliteral">&#39;enabled&#39;</span>], bool):</div>
-<div class="line"><span class="lineno"> 8387</span>        errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.enabled must be true or false.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8388</span> </div>
-<div class="line"><span class="lineno"> 8389</span>    _numeric(les_cfg, <span class="stringliteral">&#39;constant_cs&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.constant_cs&quot;</span>, minimum=0.0)</div>
-<div class="line"><span class="lineno"> 8390</span>    _numeric(les_cfg, <span class="stringliteral">&#39;vreman_coefficient&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.vreman_coefficient&quot;</span>, minimum=0.0)</div>
-<div class="line"><span class="lineno"> 8391</span>    _numeric(les_cfg, <span class="stringliteral">&#39;wale_coefficient&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.wale_coefficient&quot;</span>, minimum=0.0)</div>
-<div class="line"><span class="lineno"> 8392</span> </div>
-<div class="line"><span class="lineno"> 8393</span>    <span class="keywordflow">if</span> <span class="stringliteral">&#39;dynamic_frequency&#39;</span> <span class="keywordflow">in</span> les_cfg:</div>
-<div class="line"><span class="lineno"> 8394</span>        <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8395</span>            <span class="keywordflow">if</span> int(les_cfg[<span class="stringliteral">&#39;dynamic_frequency&#39;</span>]) &lt;= 0:</div>
-<div class="line"><span class="lineno"> 8396</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.dynamic_frequency must be positive.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8397</span>        <span class="keywordflow">except</span> (TypeError, ValueError):</div>
-<div class="line"><span class="lineno"> 8398</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.dynamic_frequency must be an integer.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8399</span> </div>
-<div class="line"><span class="lineno"> 8400</span>    <span class="keywordflow">for</span> key, normalizer <span class="keywordflow">in</span> ((<span class="stringliteral">&#39;filter_width&#39;</span>, normalize_les_filter_width),):</div>
-<div class="line"><span class="lineno"> 8401</span>        <span class="keywordflow">if</span> key <span class="keywordflow">in</span> les_cfg:</div>
-<div class="line"><span class="lineno"> 8402</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8403</span>                normalizer(les_cfg[key])</div>
-<div class="line"><span class="lineno"> 8404</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno"> 8405</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8406</span> </div>
-<div class="line"><span class="lineno"> 8407</span>    periodic = _les_periodic_axes(case_cfg)</div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08354">8354</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8355</span>                               errors: list, warnings: list):</div>
+<div class="line"><span class="lineno"> 8356</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8357</span><span class="stringliteral">    @brief Checks the structured LES block for values the closure cannot honour.</span></div>
+<div class="line"><span class="lineno"> 8358</span><span class="stringliteral">    @param[in] case_cfg Parsed case.yml mapping, used to read declared periodicity.</span></div>
+<div class="line"><span class="lineno"> 8359</span><span class="stringliteral">    @param[in] les_cfg Parsed `models.physics.turbulence.les` mapping.</span></div>
+<div class="line"><span class="lineno"> 8360</span><span class="stringliteral">    @param[in] case_path Case file path used to prefix diagnostics.</span></div>
+<div class="line"><span class="lineno"> 8361</span><span class="stringliteral">    @param[out] errors List collecting blocking validation failures.</span></div>
+<div class="line"><span class="lineno"> 8362</span><span class="stringliteral">    @param[out] warnings List collecting advisory messages.</span></div>
+<div class="line"><span class="lineno"> 8363</span><span class="stringliteral">    @return None; findings are appended to `errors` and `warnings`.</span></div>
+<div class="line"><span class="lineno"> 8364</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8365</span>    <span class="keyword">def </span>_numeric(container, key, path, minimum=None, exclusive_minimum=None):</div>
+<div class="line"><span class="lineno"> 8366</span>        <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8367</span><span class="stringliteral">        @brief Reads one numeric key and records a range or type failure against it.</span></div>
+<div class="line"><span class="lineno"> 8368</span><span class="stringliteral">        @param[in] container Mapping holding the key.</span></div>
+<div class="line"><span class="lineno"> 8369</span><span class="stringliteral">        @param[in] key Key to read; absent keys are accepted silently.</span></div>
+<div class="line"><span class="lineno"> 8370</span><span class="stringliteral">        @param[in] path Dotted key path used in diagnostics.</span></div>
+<div class="line"><span class="lineno"> 8371</span><span class="stringliteral">        @param[in] minimum Inclusive lower bound, or None to impose none.</span></div>
+<div class="line"><span class="lineno"> 8372</span><span class="stringliteral">        @param[in] exclusive_minimum Exclusive lower bound, or None to impose none.</span></div>
+<div class="line"><span class="lineno"> 8373</span><span class="stringliteral">        @return The parsed value, or None when the key is absent or unparseable.</span></div>
+<div class="line"><span class="lineno"> 8374</span><span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8375</span>        <span class="keywordflow">if</span> key <span class="keywordflow">not</span> <span class="keywordflow">in</span> container:</div>
+<div class="line"><span class="lineno"> 8376</span>            <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8377</span>        <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8378</span>            value = float(container[key])</div>
+<div class="line"><span class="lineno"> 8379</span>        <span class="keywordflow">except</span> (TypeError, ValueError):</div>
+<div class="line"><span class="lineno"> 8380</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be numeric.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8381</span>            <span class="keywordflow">return</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8382</span>        <span class="keywordflow">if</span> minimum <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> value &lt; minimum:</div>
+<div class="line"><span class="lineno"> 8383</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be at least {minimum}.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8384</span>        <span class="keywordflow">if</span> exclusive_minimum <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> value &lt;= exclusive_minimum:</div>
+<div class="line"><span class="lineno"> 8385</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: {path} must be greater than {exclusive_minimum}.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8386</span>        <span class="keywordflow">return</span> value</div>
+<div class="line"><span class="lineno"> 8387</span> </div>
+<div class="line"><span class="lineno"> 8388</span>    <span class="keywordflow">if</span> <span class="stringliteral">&#39;enabled&#39;</span> <span class="keywordflow">in</span> les_cfg <span class="keywordflow">and</span> <span class="keywordflow">not</span> isinstance(les_cfg[<span class="stringliteral">&#39;enabled&#39;</span>], bool):</div>
+<div class="line"><span class="lineno"> 8389</span>        errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.enabled must be true or false.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8390</span> </div>
+<div class="line"><span class="lineno"> 8391</span>    _numeric(les_cfg, <span class="stringliteral">&#39;constant_cs&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.constant_cs&quot;</span>, minimum=0.0)</div>
+<div class="line"><span class="lineno"> 8392</span>    _numeric(les_cfg, <span class="stringliteral">&#39;vreman_coefficient&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.vreman_coefficient&quot;</span>, minimum=0.0)</div>
+<div class="line"><span class="lineno"> 8393</span>    _numeric(les_cfg, <span class="stringliteral">&#39;wale_coefficient&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.wale_coefficient&quot;</span>, minimum=0.0)</div>
+<div class="line"><span class="lineno"> 8394</span> </div>
+<div class="line"><span class="lineno"> 8395</span>    <span class="keywordflow">if</span> <span class="stringliteral">&#39;dynamic_frequency&#39;</span> <span class="keywordflow">in</span> les_cfg:</div>
+<div class="line"><span class="lineno"> 8396</span>        <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8397</span>            <span class="keywordflow">if</span> int(les_cfg[<span class="stringliteral">&#39;dynamic_frequency&#39;</span>]) &lt;= 0:</div>
+<div class="line"><span class="lineno"> 8398</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.dynamic_frequency must be positive.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8399</span>        <span class="keywordflow">except</span> (TypeError, ValueError):</div>
+<div class="line"><span class="lineno"> 8400</span>            errors.append(f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.dynamic_frequency must be an integer.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8401</span> </div>
+<div class="line"><span class="lineno"> 8402</span>    <span class="keywordflow">for</span> key, normalizer <span class="keywordflow">in</span> ((<span class="stringliteral">&#39;filter_width&#39;</span>, normalize_les_filter_width),):</div>
+<div class="line"><span class="lineno"> 8403</span>        <span class="keywordflow">if</span> key <span class="keywordflow">in</span> les_cfg:</div>
+<div class="line"><span class="lineno"> 8404</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8405</span>                normalizer(les_cfg[key])</div>
+<div class="line"><span class="lineno"> 8406</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno"> 8407</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
 <div class="line"><span class="lineno"> 8408</span> </div>
-<div class="line"><span class="lineno"> 8409</span>    test_filter = les_cfg.get(<span class="stringliteral">&#39;test_filter&#39;</span>)</div>
-<div class="line"><span class="lineno"> 8410</span>    <span class="keywordflow">if</span> test_filter <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8411</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(test_filter, dict):</div>
-<div class="line"><span class="lineno"> 8412</span>            test_filter = {<span class="stringliteral">&#39;kernel&#39;</span>: test_filter}</div>
-<div class="line"><span class="lineno"> 8413</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;kernel&#39;</span> <span class="keywordflow">in</span> test_filter:</div>
-<div class="line"><span class="lineno"> 8414</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8415</span>                kernel = normalize_les_test_filter(test_filter[<span class="stringliteral">&#39;kernel&#39;</span>])</div>
-<div class="line"><span class="lineno"> 8416</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno"> 8417</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8418</span>            <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno"> 8419</span>                <span class="comment"># The Simpson stencil collapses onto the central eta-plane, which is</span></div>
-<div class="line"><span class="lineno"> 8420</span>                <span class="comment"># only a valid average when xi and zeta are homogeneous.</span></div>
-<div class="line"><span class="lineno"> 8421</span>                <span class="keywordflow">if</span> kernel == 1 <span class="keywordflow">and</span> <span class="keywordflow">not</span> {<span class="stringliteral">&quot;i&quot;</span>, <span class="stringliteral">&quot;k&quot;</span>} &lt;= periodic:</div>
-<div class="line"><span class="lineno"> 8422</span>                    errors.append(</div>
-<div class="line"><span class="lineno"> 8423</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.test_filter.kernel &quot;</span></div>
-<div class="line"><span class="lineno"> 8424</span>                        <span class="stringliteral">&quot;&#39;simpson_ik&#39; assumes the xi and zeta directions are homogeneous, but &quot;</span></div>
-<div class="line"><span class="lineno"> 8425</span>                        <span class="stringliteral">&quot;this case does not declare both of them PERIODIC. Use &quot;</span></div>
-<div class="line"><span class="lineno"> 8426</span>                        <span class="stringliteral">&quot;&#39;volume_weighted_box&#39; instead.&quot;</span></div>
-<div class="line"><span class="lineno"> 8427</span>                    )</div>
-<div class="line"><span class="lineno"> 8428</span>        <span class="comment"># A test filter no wider than the grid filter leaves the dynamic procedure with</span></div>
-<div class="line"><span class="lineno"> 8429</span>        <span class="comment"># nothing to measure, because both terms of the model tensor coincide.</span></div>
-<div class="line"><span class="lineno"> 8430</span>        _numeric(test_filter, <span class="stringliteral">&#39;width_ratio&#39;</span>,</div>
-<div class="line"><span class="lineno"> 8431</span>                 <span class="stringliteral">&quot;models.physics.turbulence.les.test_filter.width_ratio&quot;</span>, exclusive_minimum=1.0)</div>
-<div class="line"><span class="lineno"> 8432</span> </div>
-<div class="line"><span class="lineno"> 8433</span>    averaging = les_cfg.get(<span class="stringliteral">&#39;averaging&#39;</span>)</div>
-<div class="line"><span class="lineno"> 8434</span>    <span class="keywordflow">if</span> averaging <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8435</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(averaging, dict):</div>
-<div class="line"><span class="lineno"> 8436</span>            averaging = {<span class="stringliteral">&#39;mode&#39;</span>: averaging}</div>
-<div class="line"><span class="lineno"> 8437</span>        mode = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8438</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;mode&#39;</span> <span class="keywordflow">in</span> averaging:</div>
-<div class="line"><span class="lineno"> 8439</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8440</span>                mode = normalize_les_averaging_mode(averaging[<span class="stringliteral">&#39;mode&#39;</span>])</div>
-<div class="line"><span class="lineno"> 8441</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno"> 8442</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8443</span>        directions = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8444</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;directions&#39;</span> <span class="keywordflow">in</span> averaging:</div>
-<div class="line"><span class="lineno"> 8445</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8446</span>                directions = normalize_les_averaging_directions(averaging[<span class="stringliteral">&#39;directions&#39;</span>])</div>
-<div class="line"><span class="lineno"> 8447</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno"> 8448</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8449</span>            <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno"> 8450</span>                <span class="keywordflow">if</span> <span class="keywordflow">not</span> directions:</div>
-<div class="line"><span class="lineno"> 8451</span>                    errors.append(</div>
-<div class="line"><span class="lineno"> 8452</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
-<div class="line"><span class="lineno"> 8453</span>                        <span class="stringliteral">&quot;cannot be empty; omit the key to use the periodic axes.&quot;</span></div>
-<div class="line"><span class="lineno"> 8454</span>                    )</div>
-<div class="line"><span class="lineno"> 8455</span>                <span class="keywordflow">if</span> mode <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> mode != 1:</div>
-<div class="line"><span class="lineno"> 8456</span>                    errors.append(</div>
-<div class="line"><span class="lineno"> 8457</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
-<div class="line"><span class="lineno"> 8458</span>                        <span class="stringliteral">&quot;applies only to mode &#39;homogeneous&#39;; local and global averaging choose &quot;</span></div>
-<div class="line"><span class="lineno"> 8459</span>                        <span class="stringliteral">&quot;their own directions.&quot;</span></div>
-<div class="line"><span class="lineno"> 8460</span>                    )</div>
-<div class="line"><span class="lineno"> 8461</span>                <span class="keywordflow">for</span> axis <span class="keywordflow">in</span> directions:</div>
-<div class="line"><span class="lineno"> 8462</span>                    <span class="keywordflow">if</span> axis <span class="keywordflow">not</span> <span class="keywordflow">in</span> periodic:</div>
-<div class="line"><span class="lineno"> 8463</span>                        warnings.append(</div>
-<div class="line"><span class="lineno"> 8464</span>                            f<span class="stringliteral">&quot;{case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
-<div class="line"><span class="lineno"> 8465</span>                            f<span class="stringliteral">&quot;names &#39;{axis}&#39;, which this case does not declare PERIODIC. &quot;</span></div>
-<div class="line"><span class="lineno"> 8466</span>                            <span class="stringliteral">&quot;Averaging assumes the flow is statistically homogeneous there.&quot;</span></div>
-<div class="line"><span class="lineno"> 8467</span>                        )</div>
-<div class="line"><span class="lineno"> 8468</span>        <span class="keywordflow">if</span> mode == 1 <span class="keywordflow">and</span> directions <span class="keywordflow">is</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> <span class="keywordflow">not</span> periodic:</div>
-<div class="line"><span class="lineno"> 8469</span>            errors.append(</div>
-<div class="line"><span class="lineno"> 8470</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.mode &#39;homogeneous&#39; &quot;</span></div>
-<div class="line"><span class="lineno"> 8471</span>                <span class="stringliteral">&quot;derives its directions from the periodic boundary pairs, and this case declares &quot;</span></div>
-<div class="line"><span class="lineno"> 8472</span>                <span class="stringliteral">&quot;none. Name the directions explicitly or use &#39;local&#39;.&quot;</span></div>
-<div class="line"><span class="lineno"> 8473</span>            )</div>
-<div class="line"><span class="lineno"> 8474</span> </div>
-<div class="line"><span class="lineno"> 8475</span>    clipping = les_cfg.get(<span class="stringliteral">&#39;clipping&#39;</span>)</div>
-<div class="line"><span class="lineno"> 8476</span>    <span class="keywordflow">if</span> clipping <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8477</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(clipping, dict):</div>
-<div class="line"><span class="lineno"> 8478</span>            clipping = {<span class="stringliteral">&#39;mode&#39;</span>: clipping}</div>
-<div class="line"><span class="lineno"> 8479</span>        mode = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8480</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;mode&#39;</span> <span class="keywordflow">in</span> clipping:</div>
-<div class="line"><span class="lineno"> 8481</span>            <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8482</span>                mode = normalize_les_clip_mode(clipping[<span class="stringliteral">&#39;mode&#39;</span>])</div>
-<div class="line"><span class="lineno"> 8483</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
-<div class="line"><span class="lineno"> 8484</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8485</span>        _numeric(clipping, <span class="stringliteral">&#39;max_cs&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.clipping.max_cs&quot;</span>, minimum=0.0)</div>
-<div class="line"><span class="lineno"> 8486</span>        _numeric(clipping, <span class="stringliteral">&#39;min_viscosity_ratio&#39;</span>,</div>
-<div class="line"><span class="lineno"> 8487</span>                 <span class="stringliteral">&quot;models.physics.turbulence.les.clipping.min_viscosity_ratio&quot;</span>, minimum=0.0)</div>
-<div class="line"><span class="lineno"> 8488</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;max_cs&#39;</span> <span class="keywordflow">in</span> clipping <span class="keywordflow">and</span> mode <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> mode != 0:</div>
-<div class="line"><span class="lineno"> 8489</span>            errors.append(</div>
-<div class="line"><span class="lineno"> 8490</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.clipping.max_cs applies only to &quot;</span></div>
-<div class="line"><span class="lineno"> 8491</span>                <span class="stringliteral">&quot;mode &#39;clamp&#39;; &#39;positive&#39; and &#39;signed&#39; impose no upper bound. Remove the key or &quot;</span></div>
-<div class="line"><span class="lineno"> 8492</span>                <span class="stringliteral">&quot;select mode &#39;clamp&#39;.&quot;</span></div>
-<div class="line"><span class="lineno"> 8493</span>            )</div>
-<div class="line"><span class="lineno"> 8494</span> </div>
-<div class="line"><span class="lineno"> 8495</span>    <span class="comment"># The dynamic procedure&#39;s controls have no meaning for a prescribed coefficient.</span></div>
-<div class="line"><span class="lineno"> 8496</span>    <span class="comment"># Only an explicitly named constant model triggers this: a template that documents</span></div>
-<div class="line"><span class="lineno"> 8497</span>    <span class="comment"># every key while LES is switched off should not be rejected on an inferred default.</span></div>
-<div class="line"><span class="lineno"> 8498</span>    <span class="keywordflow">try</span>:</div>
-<div class="line"><span class="lineno"> 8499</span>        model_code = normalize_les_model(les_cfg[<span class="stringliteral">&#39;model&#39;</span>]) <span class="keywordflow">if</span> <span class="stringliteral">&#39;model&#39;</span> <span class="keywordflow">in</span> les_cfg <span class="keywordflow">else</span> <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8500</span>    <span class="keywordflow">except</span> ValueError:</div>
-<div class="line"><span class="lineno"> 8501</span>        model_code = <span class="keywordtype">None</span></div>
-<div class="line"><span class="lineno"> 8502</span>    <span class="keywordflow">if</span> model_code <span class="keywordflow">in</span> LES_MODEL_OWNED_KEYS <span class="keywordflow">and</span> les_cfg.get(<span class="stringliteral">&#39;enabled&#39;</span>, <span class="keyword">True</span>):</div>
-<div class="line"><span class="lineno"> 8503</span>        <span class="comment"># Each model&#39;s own parameters are refused under any other, so a key that would be</span></div>
-<div class="line"><span class="lineno"> 8504</span>        <span class="comment"># silently ignored at runtime fails at validation instead. filter_width is shared</span></div>
-<div class="line"><span class="lineno"> 8505</span>        <span class="comment"># by every model that takes a scalar width; Vreman resolves each direction from</span></div>
-<div class="line"><span class="lineno"> 8506</span>        <span class="comment"># the cell&#39;s own edges and takes none.</span></div>
-<div class="line"><span class="lineno"> 8507</span>        model_name = LES_MODEL_NAMES[model_code]</div>
-<div class="line"><span class="lineno"> 8508</span>        <span class="keywordflow">for</span> owner, keys <span class="keywordflow">in</span> LES_MODEL_OWNED_KEYS.items():</div>
-<div class="line"><span class="lineno"> 8509</span>            <span class="keywordflow">if</span> owner == model_code:</div>
-<div class="line"><span class="lineno"> 8510</span>                <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno"> 8511</span>            <span class="keywordflow">for</span> key <span class="keywordflow">in</span> keys:</div>
-<div class="line"><span class="lineno"> 8512</span>                <span class="keywordflow">if</span> key <span class="keywordflow">in</span> les_cfg:</div>
-<div class="line"><span class="lineno"> 8513</span>                    errors.append(</div>
-<div class="line"><span class="lineno"> 8514</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.{key} configures &quot;</span></div>
-<div class="line"><span class="lineno"> 8515</span>                        f<span class="stringliteral">&quot;{LES_MODEL_KEY_OWNER_DESCRIPTIONS[owner]} and cannot be used with &quot;</span></div>
-<div class="line"><span class="lineno"> 8516</span>                        f<span class="stringliteral">&quot;model &#39;{model_name}&#39;.&quot;</span></div>
-<div class="line"><span class="lineno"> 8517</span>                    )</div>
-<div class="line"><span class="lineno"> 8518</span>        <span class="keywordflow">if</span> model_code == 3 <span class="keywordflow">and</span> <span class="stringliteral">&#39;filter_width&#39;</span> <span class="keywordflow">in</span> les_cfg:</div>
-<div class="line"><span class="lineno"> 8519</span>            errors.append(</div>
-<div class="line"><span class="lineno"> 8520</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.filter_width cannot be used with &quot;</span></div>
-<div class="line"><span class="lineno"> 8521</span>                <span class="stringliteral">&quot;model &#39;vreman&#39;, which weights each grid direction by the cell&#39;s own edge &quot;</span></div>
-<div class="line"><span class="lineno"> 8522</span>                <span class="stringliteral">&quot;rather than by one scalar width.&quot;</span></div>
-<div class="line"><span class="lineno"> 8523</span>            )</div>
-<div class="line"><span class="lineno"> 8524</span> </div>
-<div class="line"><span class="lineno"> 8525</span> </div>
+<div class="line"><span class="lineno"> 8409</span>    periodic = _les_periodic_axes(case_cfg)</div>
+<div class="line"><span class="lineno"> 8410</span> </div>
+<div class="line"><span class="lineno"> 8411</span>    test_filter = les_cfg.get(<span class="stringliteral">&#39;test_filter&#39;</span>)</div>
+<div class="line"><span class="lineno"> 8412</span>    <span class="keywordflow">if</span> test_filter <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8413</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(test_filter, dict):</div>
+<div class="line"><span class="lineno"> 8414</span>            test_filter = {<span class="stringliteral">&#39;kernel&#39;</span>: test_filter}</div>
+<div class="line"><span class="lineno"> 8415</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;kernel&#39;</span> <span class="keywordflow">in</span> test_filter:</div>
+<div class="line"><span class="lineno"> 8416</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8417</span>                kernel = normalize_les_test_filter(test_filter[<span class="stringliteral">&#39;kernel&#39;</span>])</div>
+<div class="line"><span class="lineno"> 8418</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno"> 8419</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8420</span>            <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno"> 8421</span>                <span class="comment"># The Simpson stencil collapses onto the central eta-plane, which is</span></div>
+<div class="line"><span class="lineno"> 8422</span>                <span class="comment"># only a valid average when xi and zeta are homogeneous.</span></div>
+<div class="line"><span class="lineno"> 8423</span>                <span class="keywordflow">if</span> kernel == 1 <span class="keywordflow">and</span> <span class="keywordflow">not</span> {<span class="stringliteral">&quot;i&quot;</span>, <span class="stringliteral">&quot;k&quot;</span>} &lt;= periodic:</div>
+<div class="line"><span class="lineno"> 8424</span>                    errors.append(</div>
+<div class="line"><span class="lineno"> 8425</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.test_filter.kernel &quot;</span></div>
+<div class="line"><span class="lineno"> 8426</span>                        <span class="stringliteral">&quot;&#39;simpson_ik&#39; assumes the xi and zeta directions are homogeneous, but &quot;</span></div>
+<div class="line"><span class="lineno"> 8427</span>                        <span class="stringliteral">&quot;this case does not declare both of them PERIODIC. Use &quot;</span></div>
+<div class="line"><span class="lineno"> 8428</span>                        <span class="stringliteral">&quot;&#39;volume_weighted_box&#39; instead.&quot;</span></div>
+<div class="line"><span class="lineno"> 8429</span>                    )</div>
+<div class="line"><span class="lineno"> 8430</span>        <span class="comment"># A test filter no wider than the grid filter leaves the dynamic procedure with</span></div>
+<div class="line"><span class="lineno"> 8431</span>        <span class="comment"># nothing to measure, because both terms of the model tensor coincide.</span></div>
+<div class="line"><span class="lineno"> 8432</span>        _numeric(test_filter, <span class="stringliteral">&#39;width_ratio&#39;</span>,</div>
+<div class="line"><span class="lineno"> 8433</span>                 <span class="stringliteral">&quot;models.physics.turbulence.les.test_filter.width_ratio&quot;</span>, exclusive_minimum=1.0)</div>
+<div class="line"><span class="lineno"> 8434</span> </div>
+<div class="line"><span class="lineno"> 8435</span>    averaging = les_cfg.get(<span class="stringliteral">&#39;averaging&#39;</span>)</div>
+<div class="line"><span class="lineno"> 8436</span>    <span class="keywordflow">if</span> averaging <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8437</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(averaging, dict):</div>
+<div class="line"><span class="lineno"> 8438</span>            averaging = {<span class="stringliteral">&#39;mode&#39;</span>: averaging}</div>
+<div class="line"><span class="lineno"> 8439</span>        mode = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8440</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;mode&#39;</span> <span class="keywordflow">in</span> averaging:</div>
+<div class="line"><span class="lineno"> 8441</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8442</span>                mode = normalize_les_averaging_mode(averaging[<span class="stringliteral">&#39;mode&#39;</span>])</div>
+<div class="line"><span class="lineno"> 8443</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno"> 8444</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8445</span>        directions = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8446</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;directions&#39;</span> <span class="keywordflow">in</span> averaging:</div>
+<div class="line"><span class="lineno"> 8447</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8448</span>                directions = normalize_les_averaging_directions(averaging[<span class="stringliteral">&#39;directions&#39;</span>])</div>
+<div class="line"><span class="lineno"> 8449</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno"> 8450</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8451</span>            <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno"> 8452</span>                <span class="keywordflow">if</span> <span class="keywordflow">not</span> directions:</div>
+<div class="line"><span class="lineno"> 8453</span>                    errors.append(</div>
+<div class="line"><span class="lineno"> 8454</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
+<div class="line"><span class="lineno"> 8455</span>                        <span class="stringliteral">&quot;cannot be empty; omit the key to use the periodic axes.&quot;</span></div>
+<div class="line"><span class="lineno"> 8456</span>                    )</div>
+<div class="line"><span class="lineno"> 8457</span>                <span class="keywordflow">if</span> mode <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> mode != 1:</div>
+<div class="line"><span class="lineno"> 8458</span>                    errors.append(</div>
+<div class="line"><span class="lineno"> 8459</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
+<div class="line"><span class="lineno"> 8460</span>                        <span class="stringliteral">&quot;applies only to mode &#39;homogeneous&#39;; local and global averaging choose &quot;</span></div>
+<div class="line"><span class="lineno"> 8461</span>                        <span class="stringliteral">&quot;their own directions.&quot;</span></div>
+<div class="line"><span class="lineno"> 8462</span>                    )</div>
+<div class="line"><span class="lineno"> 8463</span>                <span class="keywordflow">for</span> axis <span class="keywordflow">in</span> directions:</div>
+<div class="line"><span class="lineno"> 8464</span>                    <span class="keywordflow">if</span> axis <span class="keywordflow">not</span> <span class="keywordflow">in</span> periodic:</div>
+<div class="line"><span class="lineno"> 8465</span>                        warnings.append(</div>
+<div class="line"><span class="lineno"> 8466</span>                            f<span class="stringliteral">&quot;{case_path}: models.physics.turbulence.les.averaging.directions &quot;</span></div>
+<div class="line"><span class="lineno"> 8467</span>                            f<span class="stringliteral">&quot;names &#39;{axis}&#39;, which this case does not declare PERIODIC. &quot;</span></div>
+<div class="line"><span class="lineno"> 8468</span>                            <span class="stringliteral">&quot;Averaging assumes the flow is statistically homogeneous there.&quot;</span></div>
+<div class="line"><span class="lineno"> 8469</span>                        )</div>
+<div class="line"><span class="lineno"> 8470</span>        <span class="keywordflow">if</span> mode == 1 <span class="keywordflow">and</span> directions <span class="keywordflow">is</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> <span class="keywordflow">not</span> periodic:</div>
+<div class="line"><span class="lineno"> 8471</span>            errors.append(</div>
+<div class="line"><span class="lineno"> 8472</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.averaging.mode &#39;homogeneous&#39; &quot;</span></div>
+<div class="line"><span class="lineno"> 8473</span>                <span class="stringliteral">&quot;derives its directions from the periodic boundary pairs, and this case declares &quot;</span></div>
+<div class="line"><span class="lineno"> 8474</span>                <span class="stringliteral">&quot;none. Name the directions explicitly or use &#39;local&#39;.&quot;</span></div>
+<div class="line"><span class="lineno"> 8475</span>            )</div>
+<div class="line"><span class="lineno"> 8476</span> </div>
+<div class="line"><span class="lineno"> 8477</span>    clipping = les_cfg.get(<span class="stringliteral">&#39;clipping&#39;</span>)</div>
+<div class="line"><span class="lineno"> 8478</span>    <span class="keywordflow">if</span> clipping <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8479</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(clipping, dict):</div>
+<div class="line"><span class="lineno"> 8480</span>            clipping = {<span class="stringliteral">&#39;mode&#39;</span>: clipping}</div>
+<div class="line"><span class="lineno"> 8481</span>        mode = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8482</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;mode&#39;</span> <span class="keywordflow">in</span> clipping:</div>
+<div class="line"><span class="lineno"> 8483</span>            <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8484</span>                mode = normalize_les_clip_mode(clipping[<span class="stringliteral">&#39;mode&#39;</span>])</div>
+<div class="line"><span class="lineno"> 8485</span>            <span class="keywordflow">except</span> ValueError <span class="keyword">as</span> exc:</div>
+<div class="line"><span class="lineno"> 8486</span>                errors.append(f<span class="stringliteral">&quot;  {case_path}: {exc}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8487</span>        _numeric(clipping, <span class="stringliteral">&#39;max_cs&#39;</span>, <span class="stringliteral">&quot;models.physics.turbulence.les.clipping.max_cs&quot;</span>, minimum=0.0)</div>
+<div class="line"><span class="lineno"> 8488</span>        _numeric(clipping, <span class="stringliteral">&#39;min_viscosity_ratio&#39;</span>,</div>
+<div class="line"><span class="lineno"> 8489</span>                 <span class="stringliteral">&quot;models.physics.turbulence.les.clipping.min_viscosity_ratio&quot;</span>, minimum=0.0)</div>
+<div class="line"><span class="lineno"> 8490</span>        <span class="keywordflow">if</span> <span class="stringliteral">&#39;max_cs&#39;</span> <span class="keywordflow">in</span> clipping <span class="keywordflow">and</span> mode <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">and</span> mode != 0:</div>
+<div class="line"><span class="lineno"> 8491</span>            errors.append(</div>
+<div class="line"><span class="lineno"> 8492</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.clipping.max_cs applies only to &quot;</span></div>
+<div class="line"><span class="lineno"> 8493</span>                <span class="stringliteral">&quot;mode &#39;clamp&#39;; &#39;positive&#39; and &#39;signed&#39; impose no upper bound. Remove the key or &quot;</span></div>
+<div class="line"><span class="lineno"> 8494</span>                <span class="stringliteral">&quot;select mode &#39;clamp&#39;.&quot;</span></div>
+<div class="line"><span class="lineno"> 8495</span>            )</div>
+<div class="line"><span class="lineno"> 8496</span> </div>
+<div class="line"><span class="lineno"> 8497</span>    <span class="comment"># The dynamic procedure&#39;s controls have no meaning for a prescribed coefficient.</span></div>
+<div class="line"><span class="lineno"> 8498</span>    <span class="comment"># Only an explicitly named constant model triggers this: a template that documents</span></div>
+<div class="line"><span class="lineno"> 8499</span>    <span class="comment"># every key while LES is switched off should not be rejected on an inferred default.</span></div>
+<div class="line"><span class="lineno"> 8500</span>    <span class="keywordflow">try</span>:</div>
+<div class="line"><span class="lineno"> 8501</span>        model_code = normalize_les_model(les_cfg[<span class="stringliteral">&#39;model&#39;</span>]) <span class="keywordflow">if</span> <span class="stringliteral">&#39;model&#39;</span> <span class="keywordflow">in</span> les_cfg <span class="keywordflow">else</span> <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8502</span>    <span class="keywordflow">except</span> ValueError:</div>
+<div class="line"><span class="lineno"> 8503</span>        model_code = <span class="keywordtype">None</span></div>
+<div class="line"><span class="lineno"> 8504</span>    <span class="keywordflow">if</span> model_code <span class="keywordflow">in</span> LES_MODEL_OWNED_KEYS <span class="keywordflow">and</span> les_cfg.get(<span class="stringliteral">&#39;enabled&#39;</span>, <span class="keyword">True</span>):</div>
+<div class="line"><span class="lineno"> 8505</span>        <span class="comment"># Each model&#39;s own parameters are refused under any other, so a key that would be</span></div>
+<div class="line"><span class="lineno"> 8506</span>        <span class="comment"># silently ignored at runtime fails at validation instead. filter_width is shared</span></div>
+<div class="line"><span class="lineno"> 8507</span>        <span class="comment"># by every model that takes a scalar width; Vreman resolves each direction from</span></div>
+<div class="line"><span class="lineno"> 8508</span>        <span class="comment"># the cell&#39;s own edges and takes none.</span></div>
+<div class="line"><span class="lineno"> 8509</span>        model_name = LES_MODEL_NAMES[model_code]</div>
+<div class="line"><span class="lineno"> 8510</span>        <span class="keywordflow">for</span> owner, keys <span class="keywordflow">in</span> LES_MODEL_OWNED_KEYS.items():</div>
+<div class="line"><span class="lineno"> 8511</span>            <span class="keywordflow">if</span> owner == model_code:</div>
+<div class="line"><span class="lineno"> 8512</span>                <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno"> 8513</span>            <span class="keywordflow">for</span> key <span class="keywordflow">in</span> keys:</div>
+<div class="line"><span class="lineno"> 8514</span>                <span class="keywordflow">if</span> key <span class="keywordflow">in</span> les_cfg:</div>
+<div class="line"><span class="lineno"> 8515</span>                    errors.append(</div>
+<div class="line"><span class="lineno"> 8516</span>                        f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.{key} configures &quot;</span></div>
+<div class="line"><span class="lineno"> 8517</span>                        f<span class="stringliteral">&quot;{LES_MODEL_KEY_OWNER_DESCRIPTIONS[owner]} and cannot be used with &quot;</span></div>
+<div class="line"><span class="lineno"> 8518</span>                        f<span class="stringliteral">&quot;model &#39;{model_name}&#39;.&quot;</span></div>
+<div class="line"><span class="lineno"> 8519</span>                    )</div>
+<div class="line"><span class="lineno"> 8520</span>        <span class="keywordflow">if</span> model_code == 3 <span class="keywordflow">and</span> <span class="stringliteral">&#39;filter_width&#39;</span> <span class="keywordflow">in</span> les_cfg:</div>
+<div class="line"><span class="lineno"> 8521</span>            errors.append(</div>
+<div class="line"><span class="lineno"> 8522</span>                f<span class="stringliteral">&quot;  {case_path}: models.physics.turbulence.les.filter_width cannot be used with &quot;</span></div>
+<div class="line"><span class="lineno"> 8523</span>                <span class="stringliteral">&quot;model &#39;vreman&#39;, which weights each grid direction by the cell&#39;s own edge &quot;</span></div>
+<div class="line"><span class="lineno"> 8524</span>                <span class="stringliteral">&quot;rather than by one scalar width.&quot;</span></div>
+<div class="line"><span class="lineno"> 8525</span>            )</div>
+<div class="line"><span class="lineno"> 8526</span> </div>
+<div class="line"><span class="lineno"> 8527</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -20581,232 +20583,232 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Value returned by <code>validate_and_prepare_boundary_conditions()</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08526">8526</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8526</span><span class="keyword">def </span>validate_and_prepare_boundary_conditions(case_cfg: dict):</div>
-<div class="line"><span class="lineno"> 8527</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8528</span><span class="stringliteral">    @brief Validate BC entries against currently supported C-side handlers/types and</span></div>
-<div class="line"><span class="lineno"> 8529</span><span class="stringliteral">    @details return normalized entries ready for bcs.run generation.</span></div>
-<div class="line"><span class="lineno"> 8530</span><span class="stringliteral">    @param[in] case_cfg Argument passed to `validate_and_prepare_boundary_conditions()`.</span></div>
-<div class="line"><span class="lineno"> 8531</span><span class="stringliteral">    @return Value returned by `validate_and_prepare_boundary_conditions()`.</span></div>
-<div class="line"><span class="lineno"> 8532</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8533</span>    num_blocks = int(case_cfg.get(<span class="stringliteral">&#39;models&#39;</span>, {}).get(<span class="stringliteral">&#39;domain&#39;</span>, {}).get(<span class="stringliteral">&#39;blocks&#39;</span>, 1))</div>
-<div class="line"><span class="lineno"> 8534</span>    scales = resolve_reference_scales(case_cfg)</div>
-<div class="line"><span class="lineno"> 8535</span> </div>
-<div class="line"><span class="lineno"> 8536</span>    raw_bcs = case_cfg.get(<span class="stringliteral">&#39;boundary_conditions&#39;</span>, [])</div>
-<div class="line"><span class="lineno"> 8537</span>    all_blocks_bcs = normalize_boundary_conditions_layout(raw_bcs, num_blocks)</div>
-<div class="line"><span class="lineno"> 8538</span>    <span class="comment"># Units are recorded per layout: a list of blocks addresses an entry by block and index.</span></div>
-<div class="line"><span class="lineno"> 8539</span>    block_path = (<span class="keyword">lambda</span> bi: (bi,)) <span class="keywordflow">if</span> all_blocks_bcs <span class="keywordflow">is</span> raw_bcs <span class="keywordflow">else</span> (<span class="keyword">lambda</span> bi: ())</div>
-<div class="line"><span class="lineno"> 8540</span>    prepared_blocks = []</div>
-<div class="line"><span class="lineno"> 8541</span>    face_sources = 0</div>
-<div class="line"><span class="lineno"> 8542</span> </div>
-<div class="line"><span class="lineno"> 8543</span>    expected_faces = {<span class="stringliteral">&quot;-Xi&quot;</span>, <span class="stringliteral">&quot;+Xi&quot;</span>, <span class="stringliteral">&quot;-Eta&quot;</span>, <span class="stringliteral">&quot;+Eta&quot;</span>, <span class="stringliteral">&quot;-Zeta&quot;</span>, <span class="stringliteral">&quot;+Zeta&quot;</span>}</div>
-<div class="line"><span class="lineno"> 8544</span>    axis_pairs = [(<span class="stringliteral">&quot;-Xi&quot;</span>, <span class="stringliteral">&quot;+Xi&quot;</span>), (<span class="stringliteral">&quot;-Eta&quot;</span>, <span class="stringliteral">&quot;+Eta&quot;</span>), (<span class="stringliteral">&quot;-Zeta&quot;</span>, <span class="stringliteral">&quot;+Zeta&quot;</span>)]</div>
-<div class="line"><span class="lineno"> 8545</span> </div>
-<div class="line"><span class="lineno"> 8546</span>    <span class="keywordflow">for</span> bi, block_bcs <span class="keywordflow">in</span> enumerate(all_blocks_bcs):</div>
-<div class="line"><span class="lineno"> 8547</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(block_bcs, list):</div>
-<div class="line"><span class="lineno"> 8548</span>            <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}] must be a list of face configs.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8549</span> </div>
-<div class="line"><span class="lineno"> 8550</span>        prepared_block = []</div>
-<div class="line"><span class="lineno"> 8551</span>        seen_faces = {}</div>
-<div class="line"><span class="lineno"> 8552</span> </div>
-<div class="line"><span class="lineno"> 8553</span>        <span class="keywordflow">for</span> idx, bc <span class="keywordflow">in</span> enumerate(block_bcs):</div>
-<div class="line"><span class="lineno"> 8554</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(bc, dict):</div>
-<div class="line"><span class="lineno"> 8555</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}] must be a mapping.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8556</span> </div>
-<div class="line"><span class="lineno"> 8557</span>            <span class="keywordflow">for</span> req <span class="keywordflow">in</span> (<span class="stringliteral">&quot;face&quot;</span>, <span class="stringliteral">&quot;type&quot;</span>, <span class="stringliteral">&quot;handler&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8558</span>                <span class="keywordflow">if</span> req <span class="keywordflow">not</span> <span class="keywordflow">in</span> bc:</div>
-<div class="line"><span class="lineno"> 8559</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}] missing required key &#39;{req}&#39;.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8560</span> </div>
-<div class="line"><span class="lineno"> 8561</span>            face_raw = str(bc[<span class="stringliteral">&quot;face&quot;</span>]).strip()</div>
-<div class="line"><span class="lineno"> 8562</span>            face_key = face_raw.lower()</div>
-<div class="line"><span class="lineno"> 8563</span>            face = BC_FACE_MAP.get(face_key)</div>
-<div class="line"><span class="lineno"> 8564</span>            <span class="keywordflow">if</span> face <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8565</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8566</span>                    f<span class="stringliteral">&quot;Unsupported BC face &#39;{face_raw}&#39; at boundary_conditions[{bi}][{idx}]. &quot;</span></div>
-<div class="line"><span class="lineno"> 8567</span>                    f<span class="stringliteral">&quot;Supported: {sorted(expected_faces)}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8568</span>                )</div>
-<div class="line"><span class="lineno"> 8569</span>            <span class="keywordflow">if</span> face <span class="keywordflow">in</span> seen_faces:</div>
-<div class="line"><span class="lineno"> 8570</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;Duplicate face &#39;{face}&#39; in boundary_conditions[{bi}] (entries {seen_faces[face]} and {idx}).&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8571</span>            seen_faces[face] = idx</div>
-<div class="line"><span class="lineno"> 8572</span> </div>
-<div class="line"><span class="lineno"> 8573</span>            bc_type_raw = str(bc[<span class="stringliteral">&quot;type&quot;</span>]).strip()</div>
-<div class="line"><span class="lineno"> 8574</span>            bc_type = BC_TYPE_MAP.get(bc_type_raw.lower())</div>
-<div class="line"><span class="lineno"> 8575</span>            <span class="comment"># A symmetry plane is a free-slip wall; the separate type was retired.</span></div>
-<div class="line"><span class="lineno"> 8576</span>            <span class="keywordflow">if</span> bc_type_raw.lower() == <span class="stringliteral">&quot;symmetry&quot;</span>:</div>
-<div class="line"><span class="lineno"> 8577</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8578</span>                    f<span class="stringliteral">&quot;BC type &#39;symmetry&#39; for face {face} in block {bi} is retired: a symmetry plane &quot;</span></div>
-<div class="line"><span class="lineno"> 8579</span>                    <span class="stringliteral">&quot;is a free-slip wall, so use type &#39;wall&#39; with handler &#39;free_slip&#39;.&quot;</span></div>
-<div class="line"><span class="lineno"> 8580</span>                )</div>
-<div class="line"><span class="lineno"> 8581</span>            <span class="keywordflow">if</span> bc_type <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8582</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8583</span>                    f<span class="stringliteral">&quot;Unsupported BC type &#39;{bc_type_raw}&#39; for face {face} in block {bi}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8584</span>                    f<span class="stringliteral">&quot;Supported: {sorted(set(BC_TYPE_MAP.values()))}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8585</span>                )</div>
-<div class="line"><span class="lineno"> 8586</span> </div>
-<div class="line"><span class="lineno"> 8587</span>            handler = str(bc[<span class="stringliteral">&quot;handler&quot;</span>]).strip().lower()</div>
-<div class="line"><span class="lineno"> 8588</span>            <span class="keywordflow">if</span> handler <span class="keywordflow">in</span> _RETIRED_INLET_HANDLERS:</div>
-<div class="line"><span class="lineno"> 8589</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8590</span>                    f<span class="stringliteral">&quot;BC handler &#39;{handler}&#39; for face {face} in block {bi} is retired: use handler &quot;</span></div>
-<div class="line"><span class="lineno"> 8591</span>                    f<span class="stringliteral">&quot;&#39;prescribed_velocity&#39; with {_RETIRED_INLET_HANDLERS[handler]}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8592</span>                    <span class="stringliteral">&quot;See docs/pages/44_Boundary_Conditions_Guide.md.&quot;</span></div>
-<div class="line"><span class="lineno"> 8593</span>                )</div>
-<div class="line"><span class="lineno"> 8594</span>            handler_spec = BC_HANDLER_SPECS.get(handler)</div>
-<div class="line"><span class="lineno"> 8595</span>            <span class="keywordflow">if</span> handler_spec <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8596</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8597</span>                    f<span class="stringliteral">&quot;Unsupported BC handler &#39;{bc[&#39;handler&#39;]}&#39; for face {face} in block {bi}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8598</span>                    f<span class="stringliteral">&quot;Supported now: {sorted(BC_HANDLER_SPECS.keys())}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8599</span>                )</div>
-<div class="line"><span class="lineno"> 8600</span>            <span class="keywordflow">if</span> bc_type <span class="keywordflow">not</span> <span class="keywordflow">in</span> handler_spec[<span class="stringliteral">&quot;types&quot;</span>]:</div>
-<div class="line"><span class="lineno"> 8601</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8602</span>                    f<span class="stringliteral">&quot;Invalid BC combination on block {bi}, face {face}: type &#39;{bc_type}&#39; cannot use handler &#39;{handler}&#39;.&quot;</span></div>
-<div class="line"><span class="lineno"> 8603</span>                )</div>
-<div class="line"><span class="lineno"> 8604</span> </div>
-<div class="line"><span class="lineno"> 8605</span>            params = bc.get(<span class="stringliteral">&quot;params&quot;</span>, {})</div>
-<div class="line"><span class="lineno"> 8606</span>            <span class="keywordflow">if</span> params <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8607</span>                params = {}</div>
-<div class="line"><span class="lineno"> 8608</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(params, dict):</div>
-<div class="line"><span class="lineno"> 8609</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;&#39;params&#39; for block {bi}, face {face} must be a mapping.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8610</span> </div>
-<div class="line"><span class="lineno"> 8611</span>            required = handler_spec[<span class="stringliteral">&quot;required_params&quot;</span>]</div>
-<div class="line"><span class="lineno"> 8612</span>            optional = handler_spec[<span class="stringliteral">&quot;optional_params&quot;</span>]</div>
-<div class="line"><span class="lineno"> 8613</span>            allowed = required | optional</div>
-<div class="line"><span class="lineno"> 8614</span> </div>
-<div class="line"><span class="lineno"> 8615</span>            missing = sorted(required - set(params.keys()))</div>
-<div class="line"><span class="lineno"> 8616</span>            <span class="keywordflow">if</span> missing:</div>
-<div class="line"><span class="lineno"> 8617</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8618</span>                    f<span class="stringliteral">&quot;Missing required params for handler &#39;{handler}&#39; on block {bi}, face {face}: {missing}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8619</span>                )</div>
-<div class="line"><span class="lineno"> 8620</span>            unknown = sorted(set(params.keys()) - allowed)</div>
-<div class="line"><span class="lineno"> 8621</span>            <span class="keywordflow">if</span> unknown:</div>
-<div class="line"><span class="lineno"> 8622</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8623</span>                    f<span class="stringliteral">&quot;Unknown params for handler &#39;{handler}&#39; on block {bi}, face {face}: {unknown}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8624</span>                    f<span class="stringliteral">&quot;Allowed: {sorted(allowed)}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8625</span>                )</div>
-<div class="line"><span class="lineno"> 8626</span> </div>
-<div class="line"><span class="lineno"> 8627</span>            converted_params = {}</div>
-<div class="line"><span class="lineno"> 8628</span>            <span class="keywordflow">for</span> key, value <span class="keywordflow">in</span> params.items():</div>
-<div class="line"><span class="lineno"> 8629</span>                <span class="keywordflow">if</span> key <span class="keywordflow">in</span> _NUMERIC_BC_PARAMS:</div>
-<div class="line"><span class="lineno"> 8630</span>                    converted_params[key] = quantity_to_solver_units(</div>
-<div class="line"><span class="lineno"> 8631</span>                        value, BC_PARAM_QUANTITIES[key], scales,</div>
-<div class="line"><span class="lineno"> 8632</span>                        f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params.{key}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8633</span>                <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> _BOOL_BC_PARAMS:</div>
-<div class="line"><span class="lineno"> 8634</span>                    canonical = _DEPRECATED_BC_PARAM_ALIASES.get(key, key)</div>
-<div class="line"><span class="lineno"> 8635</span>                    <span class="keywordflow">if</span> canonical != key:</div>
-<div class="line"><span class="lineno"> 8636</span>                        <span class="keywordflow">if</span> canonical <span class="keywordflow">in</span> params:</div>
-<div class="line"><span class="lineno"> 8637</span>                            <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8638</span>                                f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params sets both &#39;{key}&#39; and its &quot;</span></div>
-<div class="line"><span class="lineno"> 8639</span>                                f<span class="stringliteral">&quot;replacement &#39;{canonical}&#39;. Use &#39;{canonical}&#39; only.&quot;</span></div>
-<div class="line"><span class="lineno"> 8640</span>                            )</div>
-<div class="line"><span class="lineno"> 8641</span>                        print(</div>
-<div class="line"><span class="lineno"> 8642</span>                            f<span class="stringliteral">&quot;[WARNING] boundary_conditions[{bi}][{idx}].params.{key} is deprecated; &quot;</span></div>
-<div class="line"><span class="lineno"> 8643</span>                            f<span class="stringliteral">&quot;use &#39;{canonical}&#39;. It enables the local seam-flux correction on the &quot;</span></div>
-<div class="line"><span class="lineno"> 8644</span>                            <span class="stringliteral">&quot;periodic boundary plane, on top of the body force that sustains the bulk &quot;</span></div>
-<div class="line"><span class="lineno"> 8645</span>                            <span class="stringliteral">&quot;flow. See docs/pages/54_Geometric_Periodic_Boundaries.md.&quot;</span>,</div>
-<div class="line"><span class="lineno"> 8646</span>                            file=sys.stderr,</div>
-<div class="line"><span class="lineno"> 8647</span>                        )</div>
-<div class="line"><span class="lineno"> 8648</span>                    converted_params[canonical] = _to_bool(</div>
-<div class="line"><span class="lineno"> 8649</span>                        value, f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params.{key}&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8650</span>                <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno"> 8651</span>                    <span class="comment"># Defensive fallback; should not happen due unknown-key gate above.</span></div>
-<div class="line"><span class="lineno"> 8652</span>                    converted_params[key] = value</div>
-<div class="line"><span class="lineno"> 8653</span> </div>
-<div class="line"><span class="lineno"> 8654</span>            <span class="comment"># An injecting inlet fixes the total flux entering, advection and diffusion together;</span></div>
-<div class="line"><span class="lineno"> 8655</span>            <span class="comment"># a particle that diffuses back across it stays in the domain, or the density falls.</span></div>
-<div class="line"><span class="lineno"> 8656</span>            default_policy = <span class="stringliteral">&quot;reflect&quot;</span> <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;particles&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">else</span> handler_spec[<span class="stringliteral">&quot;particle_policy&quot;</span>]</div>
-<div class="line"><span class="lineno"> 8657</span>            policy = str(bc.get(<span class="stringliteral">&quot;particle_policy&quot;</span>, default_policy)).strip().lower()</div>
-<div class="line"><span class="lineno"> 8658</span>            <span class="keywordflow">if</span> policy <span class="keywordflow">not</span> <span class="keywordflow">in</span> PARTICLE_BOUNDARY_POLICIES:</div>
-<div class="line"><span class="lineno"> 8659</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8660</span>                    f<span class="stringliteral">&quot;Unsupported particle_policy &#39;{bc.get(&#39;particle_policy&#39;)}&#39; for face {face} in block {bi}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8661</span>                    f<span class="stringliteral">&quot;Supported: {list(PARTICLE_BOUNDARY_POLICIES)}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8662</span>                )</div>
-<div class="line"><span class="lineno"> 8663</span>            <span class="keywordflow">if</span> (policy == <span class="stringliteral">&quot;wrap&quot;</span>) != (bc_type == <span class="stringliteral">&quot;PERIODIC&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8664</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8665</span>                    f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].particle_policy &#39;{policy}&#39; does not fit a {bc_type} face: &quot;</span></div>
-<div class="line"><span class="lineno"> 8666</span>                    <span class="stringliteral">&quot;PERIODIC faces wrap particles to the paired face, and only they can.&quot;</span></div>
-<div class="line"><span class="lineno"> 8667</span>                )</div>
-<div class="line"><span class="lineno"> 8668</span>            converted_params[<span class="stringliteral">&quot;particle_policy&quot;</span>] = policy</div>
-<div class="line"><span class="lineno"> 8669</span> </div>
-<div class="line"><span class="lineno"> 8670</span>            prepared_entry = {</div>
-<div class="line"><span class="lineno"> 8671</span>                <span class="stringliteral">&quot;face&quot;</span>: face,</div>
-<div class="line"><span class="lineno"> 8672</span>                <span class="stringliteral">&quot;type&quot;</span>: bc_type,</div>
-<div class="line"><span class="lineno"> 8673</span>                <span class="stringliteral">&quot;handler&quot;</span>: handler,</div>
-<div class="line"><span class="lineno"> 8674</span>                <span class="stringliteral">&quot;params&quot;</span>: converted_params,</div>
-<div class="line"><span class="lineno"> 8675</span>            }</div>
-<div class="line"><span class="lineno"> 8676</span>            where = f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}]&quot;</span></div>
-<div class="line"><span class="lineno"> 8677</span>            <span class="keywordflow">if</span> handler <span class="keywordflow">in</span> VELOCITY_SOURCE_HANDLERS:</div>
-<div class="line"><span class="lineno"> 8678</span>                moving = handler == <span class="stringliteral">&quot;moving&quot;</span></div>
-<div class="line"><span class="lineno"> 8679</span>                <span class="keywordflow">if</span> <span class="stringliteral">&quot;source&quot;</span> <span class="keywordflow">not</span> <span class="keywordflow">in</span> bc:</div>
-<div class="line"><span class="lineno"> 8680</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}: handler &#39;{handler}&#39; needs a &#39;source&#39;.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8681</span>                source = resolve_velocity_source(bc[<span class="stringliteral">&quot;source&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.source&quot;</span>, allow_normal=<span class="keyword">True</span>)</div>
-<div class="line"><span class="lineno"> 8682</span>                <span class="keywordflow">if</span> source.get(<span class="stringliteral">&quot;pressure&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8683</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.source: a face sets a velocity; pressure belongs to an analytical field.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8684</span>                <span class="keywordflow">if</span> moving <span class="keywordflow">and</span> (source[<span class="stringliteral">&quot;data&quot;</span>] <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">or</span> source[<span class="stringliteral">&quot;frame&quot;</span>] == <span class="stringliteral">&quot;normal&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8685</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.source: a moving wall takes expressions in the cartesian or curvilinear &quot;</span></div>
-<div class="line"><span class="lineno"> 8686</span>                                     <span class="stringliteral">&quot;frame; its velocity lies along the wall, not through it.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8687</span>                <span class="keywordflow">if</span> moving <span class="keywordflow">and</span> ((((case_cfg.get(<span class="stringliteral">&quot;models&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;physics&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;turbulence&quot;</span>) <span class="keywordflow">or</span> {})</div>
-<div class="line"><span class="lineno"> 8688</span>                               .get(<span class="stringliteral">&quot;wall_function&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;enabled&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8689</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}: the wall functions assume a wall at rest, so a moving wall &quot;</span></div>
-<div class="line"><span class="lineno"> 8690</span>                                     <span class="stringliteral">&quot;cannot be used with wall_function.enabled.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8691</span>                prepared_entry[<span class="stringliteral">&quot;source&quot;</span>] = apply_source_constraints(</div>
-<div class="line"><span class="lineno"> 8692</span>                    source, bc.get(<span class="stringliteral">&quot;constraints&quot;</span>), f<span class="stringliteral">&quot;{where}.constraints&quot;</span>,</div>
-<div class="line"><span class="lineno"> 8693</span>                    allowed={<span class="stringliteral">&quot;scale&quot;</span>} <span class="keywordflow">if</span> moving <span class="keywordflow">else</span> {<span class="stringliteral">&quot;scale&quot;</span>, <span class="stringliteral">&quot;bulk_velocity&quot;</span>, <span class="stringliteral">&quot;flow_rate&quot;</span>})</div>
-<div class="line"><span class="lineno"> 8694</span>                <span class="keywordflow">if</span> source[<span class="stringliteral">&quot;data&quot;</span>] <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8695</span>                    <span class="comment"># Staged into a PICSLICE whose path the bcs file carries; see profile_data_source().</span></div>
-<div class="line"><span class="lineno"> 8696</span>                    converted_params[<span class="stringliteral">&quot;source&quot;</span>] = source[<span class="stringliteral">&quot;data&quot;</span>]</div>
-<div class="line"><span class="lineno"> 8697</span>                converted_params[<span class="stringliteral">&quot;source_id&quot;</span>] = face_sources</div>
-<div class="line"><span class="lineno"> 8698</span>                face_sources += 1</div>
-<div class="line"><span class="lineno"> 8699</span>            <span class="keywordflow">else</span>:</div>
-<div class="line"><span class="lineno"> 8700</span>                <span class="keywordflow">for</span> key <span class="keywordflow">in</span> (<span class="stringliteral">&quot;source&quot;</span>, <span class="stringliteral">&quot;constraints&quot;</span>):</div>
-<div class="line"><span class="lineno"> 8701</span>                    <span class="keywordflow">if</span> key <span class="keywordflow">in</span> bc:</div>
-<div class="line"><span class="lineno"> 8702</span>                        <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.{key} is only read by the &#39;prescribed_velocity&#39; and &#39;moving&#39; handlers.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8703</span>            <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;fluctuations&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8704</span>                <span class="keywordflow">if</span> bc_type != <span class="stringliteral">&quot;INLET&quot;</span> <span class="keywordflow">or</span> handler != <span class="stringliteral">&quot;prescribed_velocity&quot;</span>:</div>
-<div class="line"><span class="lineno"> 8705</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.fluctuations: only a prescribed_velocity INLET adds synthetic fluctuations.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8706</span>                prepared_entry[<span class="stringliteral">&quot;fluctuations&quot;</span>] = normalize_inlet_fluctuations(</div>
-<div class="line"><span class="lineno"> 8707</span>                    bc[<span class="stringliteral">&quot;fluctuations&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.fluctuations&quot;</span>, block_path(bi))</div>
-<div class="line"><span class="lineno"> 8708</span>            <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;particles&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8709</span>                <span class="keywordflow">if</span> bc_type != <span class="stringliteral">&quot;INLET&quot;</span>:</div>
-<div class="line"><span class="lineno"> 8710</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.particles: only an INLET face injects particles.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8711</span>                <span class="keywordflow">if</span> bi != 0:</div>
-<div class="line"><span class="lineno"> 8712</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.particles: particles live on block 0.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8713</span>                prepared_entry[<span class="stringliteral">&quot;particles&quot;</span>] = normalize_inlet_particles(bc[<span class="stringliteral">&quot;particles&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.particles&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8714</span>            prepared_block.append(prepared_entry)</div>
-<div class="line"><span class="lineno"> 8715</span> </div>
-<div class="line"><span class="lineno"> 8716</span>        missing_faces = sorted(expected_faces - set(seen_faces.keys()))</div>
-<div class="line"><span class="lineno"> 8717</span>        <span class="keywordflow">if</span> missing_faces:</div>
-<div class="line"><span class="lineno"> 8718</span>            <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8719</span>                f<span class="stringliteral">&quot;boundary_conditions[{bi}] is incomplete. Missing faces: {missing_faces}. &quot;</span></div>
-<div class="line"><span class="lineno"> 8720</span>                <span class="stringliteral">&quot;Provide all six faces explicitly.&quot;</span></div>
-<div class="line"><span class="lineno"> 8721</span>            )</div>
-<div class="line"><span class="lineno"> 8722</span> </div>
-<div class="line"><span class="lineno"> 8723</span>        <span class="comment"># Pairwise periodic consistency checks.</span></div>
-<div class="line"><span class="lineno"> 8724</span>        face_map = {entry[<span class="stringliteral">&quot;face&quot;</span>]: entry <span class="keywordflow">for</span> entry <span class="keywordflow">in</span> prepared_block}</div>
-<div class="line"><span class="lineno"> 8725</span>        <span class="keywordflow">for</span> neg_face, pos_face <span class="keywordflow">in</span> axis_pairs:</div>
-<div class="line"><span class="lineno"> 8726</span>            neg = face_map[neg_face]</div>
-<div class="line"><span class="lineno"> 8727</span>            pos = face_map[pos_face]</div>
-<div class="line"><span class="lineno"> 8728</span>            neg_periodic = (neg[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PERIODIC&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8729</span>            pos_periodic = (pos[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PERIODIC&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8730</span>            <span class="keywordflow">if</span> neg_periodic != pos_periodic:</div>
-<div class="line"><span class="lineno"> 8731</span>                <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8732</span>                    f<span class="stringliteral">&quot;Inconsistent periodicity in block {bi}: {neg_face} and {pos_face} must both be PERIODIC or neither.&quot;</span></div>
-<div class="line"><span class="lineno"> 8733</span>                )</div>
-<div class="line"><span class="lineno"> 8734</span> </div>
-<div class="line"><span class="lineno"> 8735</span>            driven_handlers = {<span class="stringliteral">&quot;constant_flux&quot;</span>, <span class="stringliteral">&quot;initial_flux&quot;</span>}</div>
-<div class="line"><span class="lineno"> 8736</span>            <span class="keywordflow">if</span> (neg[<span class="stringliteral">&quot;handler&quot;</span>] <span class="keywordflow">in</span> driven_handlers) <span class="keywordflow">or</span> (pos[<span class="stringliteral">&quot;handler&quot;</span>] <span class="keywordflow">in</span> driven_handlers):</div>
-<div class="line"><span class="lineno"> 8737</span>                <span class="keywordflow">if</span> neg[<span class="stringliteral">&quot;handler&quot;</span>] != pos[<span class="stringliteral">&quot;handler&quot;</span>]:</div>
-<div class="line"><span class="lineno"> 8738</span>                    <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8739</span>                        f<span class="stringliteral">&quot;In block {bi}, driven periodic handlers on {neg_face}/{pos_face} must match exactly.&quot;</span></div>
-<div class="line"><span class="lineno"> 8740</span>                    )</div>
-<div class="line"><span class="lineno"> 8741</span>                <span class="keywordflow">if</span> <span class="keywordflow">not</span> (neg_periodic <span class="keywordflow">and</span> pos_periodic):</div>
-<div class="line"><span class="lineno"> 8742</span>                    <span class="keywordflow">raise</span> ValueError(</div>
-<div class="line"><span class="lineno"> 8743</span>                        f<span class="stringliteral">&quot;In block {bi}, driven periodic handler &#39;{neg[&#39;handler&#39;]}&#39; requires PERIODIC type on both faces.&quot;</span></div>
-<div class="line"><span class="lineno"> 8744</span>                    )</div>
-<div class="line"><span class="lineno"> 8745</span> </div>
-<div class="line"><span class="lineno"> 8746</span>        prepared_blocks.append(prepared_block)</div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08528">8528</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8528</span><span class="keyword">def </span>validate_and_prepare_boundary_conditions(case_cfg: dict):</div>
+<div class="line"><span class="lineno"> 8529</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8530</span><span class="stringliteral">    @brief Validate BC entries against currently supported C-side handlers/types and</span></div>
+<div class="line"><span class="lineno"> 8531</span><span class="stringliteral">    @details return normalized entries ready for bcs.run generation.</span></div>
+<div class="line"><span class="lineno"> 8532</span><span class="stringliteral">    @param[in] case_cfg Argument passed to `validate_and_prepare_boundary_conditions()`.</span></div>
+<div class="line"><span class="lineno"> 8533</span><span class="stringliteral">    @return Value returned by `validate_and_prepare_boundary_conditions()`.</span></div>
+<div class="line"><span class="lineno"> 8534</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8535</span>    num_blocks = int(case_cfg.get(<span class="stringliteral">&#39;models&#39;</span>, {}).get(<span class="stringliteral">&#39;domain&#39;</span>, {}).get(<span class="stringliteral">&#39;blocks&#39;</span>, 1))</div>
+<div class="line"><span class="lineno"> 8536</span>    scales = resolve_reference_scales(case_cfg)</div>
+<div class="line"><span class="lineno"> 8537</span> </div>
+<div class="line"><span class="lineno"> 8538</span>    raw_bcs = case_cfg.get(<span class="stringliteral">&#39;boundary_conditions&#39;</span>, [])</div>
+<div class="line"><span class="lineno"> 8539</span>    all_blocks_bcs = normalize_boundary_conditions_layout(raw_bcs, num_blocks)</div>
+<div class="line"><span class="lineno"> 8540</span>    <span class="comment"># Units are recorded per layout: a list of blocks addresses an entry by block and index.</span></div>
+<div class="line"><span class="lineno"> 8541</span>    block_path = (<span class="keyword">lambda</span> bi: (bi,)) <span class="keywordflow">if</span> all_blocks_bcs <span class="keywordflow">is</span> raw_bcs <span class="keywordflow">else</span> (<span class="keyword">lambda</span> bi: ())</div>
+<div class="line"><span class="lineno"> 8542</span>    prepared_blocks = []</div>
+<div class="line"><span class="lineno"> 8543</span>    face_sources = 0</div>
+<div class="line"><span class="lineno"> 8544</span> </div>
+<div class="line"><span class="lineno"> 8545</span>    expected_faces = {<span class="stringliteral">&quot;-Xi&quot;</span>, <span class="stringliteral">&quot;+Xi&quot;</span>, <span class="stringliteral">&quot;-Eta&quot;</span>, <span class="stringliteral">&quot;+Eta&quot;</span>, <span class="stringliteral">&quot;-Zeta&quot;</span>, <span class="stringliteral">&quot;+Zeta&quot;</span>}</div>
+<div class="line"><span class="lineno"> 8546</span>    axis_pairs = [(<span class="stringliteral">&quot;-Xi&quot;</span>, <span class="stringliteral">&quot;+Xi&quot;</span>), (<span class="stringliteral">&quot;-Eta&quot;</span>, <span class="stringliteral">&quot;+Eta&quot;</span>), (<span class="stringliteral">&quot;-Zeta&quot;</span>, <span class="stringliteral">&quot;+Zeta&quot;</span>)]</div>
+<div class="line"><span class="lineno"> 8547</span> </div>
+<div class="line"><span class="lineno"> 8548</span>    <span class="keywordflow">for</span> bi, block_bcs <span class="keywordflow">in</span> enumerate(all_blocks_bcs):</div>
+<div class="line"><span class="lineno"> 8549</span>        <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(block_bcs, list):</div>
+<div class="line"><span class="lineno"> 8550</span>            <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}] must be a list of face configs.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8551</span> </div>
+<div class="line"><span class="lineno"> 8552</span>        prepared_block = []</div>
+<div class="line"><span class="lineno"> 8553</span>        seen_faces = {}</div>
+<div class="line"><span class="lineno"> 8554</span> </div>
+<div class="line"><span class="lineno"> 8555</span>        <span class="keywordflow">for</span> idx, bc <span class="keywordflow">in</span> enumerate(block_bcs):</div>
+<div class="line"><span class="lineno"> 8556</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(bc, dict):</div>
+<div class="line"><span class="lineno"> 8557</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}] must be a mapping.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8558</span> </div>
+<div class="line"><span class="lineno"> 8559</span>            <span class="keywordflow">for</span> req <span class="keywordflow">in</span> (<span class="stringliteral">&quot;face&quot;</span>, <span class="stringliteral">&quot;type&quot;</span>, <span class="stringliteral">&quot;handler&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8560</span>                <span class="keywordflow">if</span> req <span class="keywordflow">not</span> <span class="keywordflow">in</span> bc:</div>
+<div class="line"><span class="lineno"> 8561</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}] missing required key &#39;{req}&#39;.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8562</span> </div>
+<div class="line"><span class="lineno"> 8563</span>            face_raw = str(bc[<span class="stringliteral">&quot;face&quot;</span>]).strip()</div>
+<div class="line"><span class="lineno"> 8564</span>            face_key = face_raw.lower()</div>
+<div class="line"><span class="lineno"> 8565</span>            face = BC_FACE_MAP.get(face_key)</div>
+<div class="line"><span class="lineno"> 8566</span>            <span class="keywordflow">if</span> face <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8567</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8568</span>                    f<span class="stringliteral">&quot;Unsupported BC face &#39;{face_raw}&#39; at boundary_conditions[{bi}][{idx}]. &quot;</span></div>
+<div class="line"><span class="lineno"> 8569</span>                    f<span class="stringliteral">&quot;Supported: {sorted(expected_faces)}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8570</span>                )</div>
+<div class="line"><span class="lineno"> 8571</span>            <span class="keywordflow">if</span> face <span class="keywordflow">in</span> seen_faces:</div>
+<div class="line"><span class="lineno"> 8572</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;Duplicate face &#39;{face}&#39; in boundary_conditions[{bi}] (entries {seen_faces[face]} and {idx}).&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8573</span>            seen_faces[face] = idx</div>
+<div class="line"><span class="lineno"> 8574</span> </div>
+<div class="line"><span class="lineno"> 8575</span>            bc_type_raw = str(bc[<span class="stringliteral">&quot;type&quot;</span>]).strip()</div>
+<div class="line"><span class="lineno"> 8576</span>            bc_type = BC_TYPE_MAP.get(bc_type_raw.lower())</div>
+<div class="line"><span class="lineno"> 8577</span>            <span class="comment"># A symmetry plane is a free-slip wall; the separate type was retired.</span></div>
+<div class="line"><span class="lineno"> 8578</span>            <span class="keywordflow">if</span> bc_type_raw.lower() == <span class="stringliteral">&quot;symmetry&quot;</span>:</div>
+<div class="line"><span class="lineno"> 8579</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8580</span>                    f<span class="stringliteral">&quot;BC type &#39;symmetry&#39; for face {face} in block {bi} is retired: a symmetry plane &quot;</span></div>
+<div class="line"><span class="lineno"> 8581</span>                    <span class="stringliteral">&quot;is a free-slip wall, so use type &#39;wall&#39; with handler &#39;free_slip&#39;.&quot;</span></div>
+<div class="line"><span class="lineno"> 8582</span>                )</div>
+<div class="line"><span class="lineno"> 8583</span>            <span class="keywordflow">if</span> bc_type <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8584</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8585</span>                    f<span class="stringliteral">&quot;Unsupported BC type &#39;{bc_type_raw}&#39; for face {face} in block {bi}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8586</span>                    f<span class="stringliteral">&quot;Supported: {sorted(set(BC_TYPE_MAP.values()))}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8587</span>                )</div>
+<div class="line"><span class="lineno"> 8588</span> </div>
+<div class="line"><span class="lineno"> 8589</span>            handler = str(bc[<span class="stringliteral">&quot;handler&quot;</span>]).strip().lower()</div>
+<div class="line"><span class="lineno"> 8590</span>            <span class="keywordflow">if</span> handler <span class="keywordflow">in</span> _RETIRED_INLET_HANDLERS:</div>
+<div class="line"><span class="lineno"> 8591</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8592</span>                    f<span class="stringliteral">&quot;BC handler &#39;{handler}&#39; for face {face} in block {bi} is retired: use handler &quot;</span></div>
+<div class="line"><span class="lineno"> 8593</span>                    f<span class="stringliteral">&quot;&#39;prescribed_velocity&#39; with {_RETIRED_INLET_HANDLERS[handler]}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8594</span>                    <span class="stringliteral">&quot;See docs/pages/44_Boundary_Conditions_Guide.md.&quot;</span></div>
+<div class="line"><span class="lineno"> 8595</span>                )</div>
+<div class="line"><span class="lineno"> 8596</span>            handler_spec = BC_HANDLER_SPECS.get(handler)</div>
+<div class="line"><span class="lineno"> 8597</span>            <span class="keywordflow">if</span> handler_spec <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8598</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8599</span>                    f<span class="stringliteral">&quot;Unsupported BC handler &#39;{bc[&#39;handler&#39;]}&#39; for face {face} in block {bi}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8600</span>                    f<span class="stringliteral">&quot;Supported now: {sorted(BC_HANDLER_SPECS.keys())}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8601</span>                )</div>
+<div class="line"><span class="lineno"> 8602</span>            <span class="keywordflow">if</span> bc_type <span class="keywordflow">not</span> <span class="keywordflow">in</span> handler_spec[<span class="stringliteral">&quot;types&quot;</span>]:</div>
+<div class="line"><span class="lineno"> 8603</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8604</span>                    f<span class="stringliteral">&quot;Invalid BC combination on block {bi}, face {face}: type &#39;{bc_type}&#39; cannot use handler &#39;{handler}&#39;.&quot;</span></div>
+<div class="line"><span class="lineno"> 8605</span>                )</div>
+<div class="line"><span class="lineno"> 8606</span> </div>
+<div class="line"><span class="lineno"> 8607</span>            params = bc.get(<span class="stringliteral">&quot;params&quot;</span>, {})</div>
+<div class="line"><span class="lineno"> 8608</span>            <span class="keywordflow">if</span> params <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8609</span>                params = {}</div>
+<div class="line"><span class="lineno"> 8610</span>            <span class="keywordflow">if</span> <span class="keywordflow">not</span> isinstance(params, dict):</div>
+<div class="line"><span class="lineno"> 8611</span>                <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;&#39;params&#39; for block {bi}, face {face} must be a mapping.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8612</span> </div>
+<div class="line"><span class="lineno"> 8613</span>            required = handler_spec[<span class="stringliteral">&quot;required_params&quot;</span>]</div>
+<div class="line"><span class="lineno"> 8614</span>            optional = handler_spec[<span class="stringliteral">&quot;optional_params&quot;</span>]</div>
+<div class="line"><span class="lineno"> 8615</span>            allowed = required | optional</div>
+<div class="line"><span class="lineno"> 8616</span> </div>
+<div class="line"><span class="lineno"> 8617</span>            missing = sorted(required - set(params.keys()))</div>
+<div class="line"><span class="lineno"> 8618</span>            <span class="keywordflow">if</span> missing:</div>
+<div class="line"><span class="lineno"> 8619</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8620</span>                    f<span class="stringliteral">&quot;Missing required params for handler &#39;{handler}&#39; on block {bi}, face {face}: {missing}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8621</span>                )</div>
+<div class="line"><span class="lineno"> 8622</span>            unknown = sorted(set(params.keys()) - allowed)</div>
+<div class="line"><span class="lineno"> 8623</span>            <span class="keywordflow">if</span> unknown:</div>
+<div class="line"><span class="lineno"> 8624</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8625</span>                    f<span class="stringliteral">&quot;Unknown params for handler &#39;{handler}&#39; on block {bi}, face {face}: {unknown}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8626</span>                    f<span class="stringliteral">&quot;Allowed: {sorted(allowed)}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8627</span>                )</div>
+<div class="line"><span class="lineno"> 8628</span> </div>
+<div class="line"><span class="lineno"> 8629</span>            converted_params = {}</div>
+<div class="line"><span class="lineno"> 8630</span>            <span class="keywordflow">for</span> key, value <span class="keywordflow">in</span> params.items():</div>
+<div class="line"><span class="lineno"> 8631</span>                <span class="keywordflow">if</span> key <span class="keywordflow">in</span> _NUMERIC_BC_PARAMS:</div>
+<div class="line"><span class="lineno"> 8632</span>                    converted_params[key] = quantity_to_solver_units(</div>
+<div class="line"><span class="lineno"> 8633</span>                        value, BC_PARAM_QUANTITIES[key], scales,</div>
+<div class="line"><span class="lineno"> 8634</span>                        f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params.{key}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8635</span>                <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> _BOOL_BC_PARAMS:</div>
+<div class="line"><span class="lineno"> 8636</span>                    canonical = _DEPRECATED_BC_PARAM_ALIASES.get(key, key)</div>
+<div class="line"><span class="lineno"> 8637</span>                    <span class="keywordflow">if</span> canonical != key:</div>
+<div class="line"><span class="lineno"> 8638</span>                        <span class="keywordflow">if</span> canonical <span class="keywordflow">in</span> params:</div>
+<div class="line"><span class="lineno"> 8639</span>                            <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8640</span>                                f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params sets both &#39;{key}&#39; and its &quot;</span></div>
+<div class="line"><span class="lineno"> 8641</span>                                f<span class="stringliteral">&quot;replacement &#39;{canonical}&#39;. Use &#39;{canonical}&#39; only.&quot;</span></div>
+<div class="line"><span class="lineno"> 8642</span>                            )</div>
+<div class="line"><span class="lineno"> 8643</span>                        print(</div>
+<div class="line"><span class="lineno"> 8644</span>                            f<span class="stringliteral">&quot;[WARNING] boundary_conditions[{bi}][{idx}].params.{key} is deprecated; &quot;</span></div>
+<div class="line"><span class="lineno"> 8645</span>                            f<span class="stringliteral">&quot;use &#39;{canonical}&#39;. It enables the local seam-flux correction on the &quot;</span></div>
+<div class="line"><span class="lineno"> 8646</span>                            <span class="stringliteral">&quot;periodic boundary plane, on top of the body force that sustains the bulk &quot;</span></div>
+<div class="line"><span class="lineno"> 8647</span>                            <span class="stringliteral">&quot;flow. See docs/pages/54_Geometric_Periodic_Boundaries.md.&quot;</span>,</div>
+<div class="line"><span class="lineno"> 8648</span>                            file=sys.stderr,</div>
+<div class="line"><span class="lineno"> 8649</span>                        )</div>
+<div class="line"><span class="lineno"> 8650</span>                    converted_params[canonical] = _to_bool(</div>
+<div class="line"><span class="lineno"> 8651</span>                        value, f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].params.{key}&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8652</span>                <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno"> 8653</span>                    <span class="comment"># Defensive fallback; should not happen due unknown-key gate above.</span></div>
+<div class="line"><span class="lineno"> 8654</span>                    converted_params[key] = value</div>
+<div class="line"><span class="lineno"> 8655</span> </div>
+<div class="line"><span class="lineno"> 8656</span>            <span class="comment"># An injecting inlet fixes the total flux entering, advection and diffusion together;</span></div>
+<div class="line"><span class="lineno"> 8657</span>            <span class="comment"># a particle that diffuses back across it stays in the domain, or the density falls.</span></div>
+<div class="line"><span class="lineno"> 8658</span>            default_policy = <span class="stringliteral">&quot;reflect&quot;</span> <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;particles&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">else</span> handler_spec[<span class="stringliteral">&quot;particle_policy&quot;</span>]</div>
+<div class="line"><span class="lineno"> 8659</span>            policy = str(bc.get(<span class="stringliteral">&quot;particle_policy&quot;</span>, default_policy)).strip().lower()</div>
+<div class="line"><span class="lineno"> 8660</span>            <span class="keywordflow">if</span> policy <span class="keywordflow">not</span> <span class="keywordflow">in</span> PARTICLE_BOUNDARY_POLICIES:</div>
+<div class="line"><span class="lineno"> 8661</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8662</span>                    f<span class="stringliteral">&quot;Unsupported particle_policy &#39;{bc.get(&#39;particle_policy&#39;)}&#39; for face {face} in block {bi}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8663</span>                    f<span class="stringliteral">&quot;Supported: {list(PARTICLE_BOUNDARY_POLICIES)}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8664</span>                )</div>
+<div class="line"><span class="lineno"> 8665</span>            <span class="keywordflow">if</span> (policy == <span class="stringliteral">&quot;wrap&quot;</span>) != (bc_type == <span class="stringliteral">&quot;PERIODIC&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8666</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8667</span>                    f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}].particle_policy &#39;{policy}&#39; does not fit a {bc_type} face: &quot;</span></div>
+<div class="line"><span class="lineno"> 8668</span>                    <span class="stringliteral">&quot;PERIODIC faces wrap particles to the paired face, and only they can.&quot;</span></div>
+<div class="line"><span class="lineno"> 8669</span>                )</div>
+<div class="line"><span class="lineno"> 8670</span>            converted_params[<span class="stringliteral">&quot;particle_policy&quot;</span>] = policy</div>
+<div class="line"><span class="lineno"> 8671</span> </div>
+<div class="line"><span class="lineno"> 8672</span>            prepared_entry = {</div>
+<div class="line"><span class="lineno"> 8673</span>                <span class="stringliteral">&quot;face&quot;</span>: face,</div>
+<div class="line"><span class="lineno"> 8674</span>                <span class="stringliteral">&quot;type&quot;</span>: bc_type,</div>
+<div class="line"><span class="lineno"> 8675</span>                <span class="stringliteral">&quot;handler&quot;</span>: handler,</div>
+<div class="line"><span class="lineno"> 8676</span>                <span class="stringliteral">&quot;params&quot;</span>: converted_params,</div>
+<div class="line"><span class="lineno"> 8677</span>            }</div>
+<div class="line"><span class="lineno"> 8678</span>            where = f<span class="stringliteral">&quot;boundary_conditions[{bi}][{idx}]&quot;</span></div>
+<div class="line"><span class="lineno"> 8679</span>            <span class="keywordflow">if</span> handler <span class="keywordflow">in</span> VELOCITY_SOURCE_HANDLERS:</div>
+<div class="line"><span class="lineno"> 8680</span>                moving = handler == <span class="stringliteral">&quot;moving&quot;</span></div>
+<div class="line"><span class="lineno"> 8681</span>                <span class="keywordflow">if</span> <span class="stringliteral">&quot;source&quot;</span> <span class="keywordflow">not</span> <span class="keywordflow">in</span> bc:</div>
+<div class="line"><span class="lineno"> 8682</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}: handler &#39;{handler}&#39; needs a &#39;source&#39;.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8683</span>                source = resolve_velocity_source(bc[<span class="stringliteral">&quot;source&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.source&quot;</span>, allow_normal=<span class="keyword">True</span>)</div>
+<div class="line"><span class="lineno"> 8684</span>                <span class="keywordflow">if</span> source.get(<span class="stringliteral">&quot;pressure&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8685</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.source: a face sets a velocity; pressure belongs to an analytical field.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8686</span>                <span class="keywordflow">if</span> moving <span class="keywordflow">and</span> (source[<span class="stringliteral">&quot;data&quot;</span>] <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span> <span class="keywordflow">or</span> source[<span class="stringliteral">&quot;frame&quot;</span>] == <span class="stringliteral">&quot;normal&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8687</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.source: a moving wall takes expressions in the cartesian or curvilinear &quot;</span></div>
+<div class="line"><span class="lineno"> 8688</span>                                     <span class="stringliteral">&quot;frame; its velocity lies along the wall, not through it.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8689</span>                <span class="keywordflow">if</span> moving <span class="keywordflow">and</span> ((((case_cfg.get(<span class="stringliteral">&quot;models&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;physics&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;turbulence&quot;</span>) <span class="keywordflow">or</span> {})</div>
+<div class="line"><span class="lineno"> 8690</span>                               .get(<span class="stringliteral">&quot;wall_function&quot;</span>) <span class="keywordflow">or</span> {}).get(<span class="stringliteral">&quot;enabled&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8691</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}: the wall functions assume a wall at rest, so a moving wall &quot;</span></div>
+<div class="line"><span class="lineno"> 8692</span>                                     <span class="stringliteral">&quot;cannot be used with wall_function.enabled.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8693</span>                prepared_entry[<span class="stringliteral">&quot;source&quot;</span>] = apply_source_constraints(</div>
+<div class="line"><span class="lineno"> 8694</span>                    source, bc.get(<span class="stringliteral">&quot;constraints&quot;</span>), f<span class="stringliteral">&quot;{where}.constraints&quot;</span>,</div>
+<div class="line"><span class="lineno"> 8695</span>                    allowed={<span class="stringliteral">&quot;scale&quot;</span>} <span class="keywordflow">if</span> moving <span class="keywordflow">else</span> {<span class="stringliteral">&quot;scale&quot;</span>, <span class="stringliteral">&quot;bulk_velocity&quot;</span>, <span class="stringliteral">&quot;flow_rate&quot;</span>})</div>
+<div class="line"><span class="lineno"> 8696</span>                <span class="keywordflow">if</span> source[<span class="stringliteral">&quot;data&quot;</span>] <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8697</span>                    <span class="comment"># Staged into a PICSLICE whose path the bcs file carries; see profile_data_source().</span></div>
+<div class="line"><span class="lineno"> 8698</span>                    converted_params[<span class="stringliteral">&quot;source&quot;</span>] = source[<span class="stringliteral">&quot;data&quot;</span>]</div>
+<div class="line"><span class="lineno"> 8699</span>                converted_params[<span class="stringliteral">&quot;source_id&quot;</span>] = face_sources</div>
+<div class="line"><span class="lineno"> 8700</span>                face_sources += 1</div>
+<div class="line"><span class="lineno"> 8701</span>            <span class="keywordflow">else</span>:</div>
+<div class="line"><span class="lineno"> 8702</span>                <span class="keywordflow">for</span> key <span class="keywordflow">in</span> (<span class="stringliteral">&quot;source&quot;</span>, <span class="stringliteral">&quot;constraints&quot;</span>):</div>
+<div class="line"><span class="lineno"> 8703</span>                    <span class="keywordflow">if</span> key <span class="keywordflow">in</span> bc:</div>
+<div class="line"><span class="lineno"> 8704</span>                        <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.{key} is only read by the &#39;prescribed_velocity&#39; and &#39;moving&#39; handlers.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8705</span>            <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;fluctuations&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8706</span>                <span class="keywordflow">if</span> bc_type != <span class="stringliteral">&quot;INLET&quot;</span> <span class="keywordflow">or</span> handler != <span class="stringliteral">&quot;prescribed_velocity&quot;</span>:</div>
+<div class="line"><span class="lineno"> 8707</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.fluctuations: only a prescribed_velocity INLET adds synthetic fluctuations.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8708</span>                prepared_entry[<span class="stringliteral">&quot;fluctuations&quot;</span>] = normalize_inlet_fluctuations(</div>
+<div class="line"><span class="lineno"> 8709</span>                    bc[<span class="stringliteral">&quot;fluctuations&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.fluctuations&quot;</span>, block_path(bi))</div>
+<div class="line"><span class="lineno"> 8710</span>            <span class="keywordflow">if</span> bc.get(<span class="stringliteral">&quot;particles&quot;</span>) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8711</span>                <span class="keywordflow">if</span> bc_type != <span class="stringliteral">&quot;INLET&quot;</span>:</div>
+<div class="line"><span class="lineno"> 8712</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.particles: only an INLET face injects particles.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8713</span>                <span class="keywordflow">if</span> bi != 0:</div>
+<div class="line"><span class="lineno"> 8714</span>                    <span class="keywordflow">raise</span> ValueError(f<span class="stringliteral">&quot;{where}.particles: particles live on block 0.&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8715</span>                prepared_entry[<span class="stringliteral">&quot;particles&quot;</span>] = normalize_inlet_particles(bc[<span class="stringliteral">&quot;particles&quot;</span>], case_cfg, f<span class="stringliteral">&quot;{where}.particles&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8716</span>            prepared_block.append(prepared_entry)</div>
+<div class="line"><span class="lineno"> 8717</span> </div>
+<div class="line"><span class="lineno"> 8718</span>        missing_faces = sorted(expected_faces - set(seen_faces.keys()))</div>
+<div class="line"><span class="lineno"> 8719</span>        <span class="keywordflow">if</span> missing_faces:</div>
+<div class="line"><span class="lineno"> 8720</span>            <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8721</span>                f<span class="stringliteral">&quot;boundary_conditions[{bi}] is incomplete. Missing faces: {missing_faces}. &quot;</span></div>
+<div class="line"><span class="lineno"> 8722</span>                <span class="stringliteral">&quot;Provide all six faces explicitly.&quot;</span></div>
+<div class="line"><span class="lineno"> 8723</span>            )</div>
+<div class="line"><span class="lineno"> 8724</span> </div>
+<div class="line"><span class="lineno"> 8725</span>        <span class="comment"># Pairwise periodic consistency checks.</span></div>
+<div class="line"><span class="lineno"> 8726</span>        face_map = {entry[<span class="stringliteral">&quot;face&quot;</span>]: entry <span class="keywordflow">for</span> entry <span class="keywordflow">in</span> prepared_block}</div>
+<div class="line"><span class="lineno"> 8727</span>        <span class="keywordflow">for</span> neg_face, pos_face <span class="keywordflow">in</span> axis_pairs:</div>
+<div class="line"><span class="lineno"> 8728</span>            neg = face_map[neg_face]</div>
+<div class="line"><span class="lineno"> 8729</span>            pos = face_map[pos_face]</div>
+<div class="line"><span class="lineno"> 8730</span>            neg_periodic = (neg[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PERIODIC&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8731</span>            pos_periodic = (pos[<span class="stringliteral">&quot;type&quot;</span>] == <span class="stringliteral">&quot;PERIODIC&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8732</span>            <span class="keywordflow">if</span> neg_periodic != pos_periodic:</div>
+<div class="line"><span class="lineno"> 8733</span>                <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8734</span>                    f<span class="stringliteral">&quot;Inconsistent periodicity in block {bi}: {neg_face} and {pos_face} must both be PERIODIC or neither.&quot;</span></div>
+<div class="line"><span class="lineno"> 8735</span>                )</div>
+<div class="line"><span class="lineno"> 8736</span> </div>
+<div class="line"><span class="lineno"> 8737</span>            driven_handlers = {<span class="stringliteral">&quot;constant_flux&quot;</span>, <span class="stringliteral">&quot;initial_flux&quot;</span>}</div>
+<div class="line"><span class="lineno"> 8738</span>            <span class="keywordflow">if</span> (neg[<span class="stringliteral">&quot;handler&quot;</span>] <span class="keywordflow">in</span> driven_handlers) <span class="keywordflow">or</span> (pos[<span class="stringliteral">&quot;handler&quot;</span>] <span class="keywordflow">in</span> driven_handlers):</div>
+<div class="line"><span class="lineno"> 8739</span>                <span class="keywordflow">if</span> neg[<span class="stringliteral">&quot;handler&quot;</span>] != pos[<span class="stringliteral">&quot;handler&quot;</span>]:</div>
+<div class="line"><span class="lineno"> 8740</span>                    <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8741</span>                        f<span class="stringliteral">&quot;In block {bi}, driven periodic handlers on {neg_face}/{pos_face} must match exactly.&quot;</span></div>
+<div class="line"><span class="lineno"> 8742</span>                    )</div>
+<div class="line"><span class="lineno"> 8743</span>                <span class="keywordflow">if</span> <span class="keywordflow">not</span> (neg_periodic <span class="keywordflow">and</span> pos_periodic):</div>
+<div class="line"><span class="lineno"> 8744</span>                    <span class="keywordflow">raise</span> ValueError(</div>
+<div class="line"><span class="lineno"> 8745</span>                        f<span class="stringliteral">&quot;In block {bi}, driven periodic handler &#39;{neg[&#39;handler&#39;]}&#39; requires PERIODIC type on both faces.&quot;</span></div>
+<div class="line"><span class="lineno"> 8746</span>                    )</div>
 <div class="line"><span class="lineno"> 8747</span> </div>
-<div class="line"><span class="lineno"> 8748</span>    <span class="keywordflow">return</span> prepared_blocks</div>
+<div class="line"><span class="lineno"> 8748</span>        prepared_blocks.append(prepared_block)</div>
 <div class="line"><span class="lineno"> 8749</span> </div>
-<div class="line"><span class="lineno"> 8750</span> </div>
+<div class="line"><span class="lineno"> 8750</span>    <span class="keywordflow">return</span> prepared_blocks</div>
+<div class="line"><span class="lineno"> 8751</span> </div>
+<div class="line"><span class="lineno"> 8752</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -20853,16 +20855,16 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Dotted YAML path. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08751">8751</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8751</span><span class="keyword">def </span>_schema_path_text(path: tuple) -&gt; str:</div>
-<div class="line"><span class="lineno"> 8752</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8753</span><span class="stringliteral">    @brief Render an internal schema path tuple as a user-facing YAML path.</span></div>
-<div class="line"><span class="lineno"> 8754</span><span class="stringliteral">    @param[in] path Internal path tuple.</span></div>
-<div class="line"><span class="lineno"> 8755</span><span class="stringliteral">    @return Dotted YAML path.</span></div>
-<div class="line"><span class="lineno"> 8756</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8757</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot;.&quot;</span>.join(part <span class="keywordflow">for</span> part <span class="keywordflow">in</span> path <span class="keywordflow">if</span> part != <span class="stringliteral">&quot;[]&quot;</span>) <span class="keywordflow">or</span> <span class="stringliteral">&quot;&lt;root&gt;&quot;</span></div>
-<div class="line"><span class="lineno"> 8758</span> </div>
-<div class="line"><span class="lineno"> 8759</span> </div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08753">8753</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8753</span><span class="keyword">def </span>_schema_path_text(path: tuple) -&gt; str:</div>
+<div class="line"><span class="lineno"> 8754</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8755</span><span class="stringliteral">    @brief Render an internal schema path tuple as a user-facing YAML path.</span></div>
+<div class="line"><span class="lineno"> 8756</span><span class="stringliteral">    @param[in] path Internal path tuple.</span></div>
+<div class="line"><span class="lineno"> 8757</span><span class="stringliteral">    @return Dotted YAML path.</span></div>
+<div class="line"><span class="lineno"> 8758</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8759</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot;.&quot;</span>.join(part <span class="keywordflow">for</span> part <span class="keywordflow">in</span> path <span class="keywordflow">if</span> part != <span class="stringliteral">&quot;[]&quot;</span>) <span class="keywordflow">or</span> <span class="stringliteral">&quot;&lt;root&gt;&quot;</span></div>
+<div class="line"><span class="lineno"> 8760</span> </div>
+<div class="line"><span class="lineno"> 8761</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -20915,25 +20917,25 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Allowed key set, None for free-form mappings, or False when path is not schema-checked. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08760">8760</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8760</span><span class="keyword">def </span>_lookup_allowed_schema_keys(schema: dict, path: tuple):</div>
-<div class="line"><span class="lineno"> 8761</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8762</span><span class="stringliteral">    @brief Return allowed keys for a path, honoring &#39;*&#39; dynamic mapping entries.</span></div>
-<div class="line"><span class="lineno"> 8763</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
-<div class="line"><span class="lineno"> 8764</span><span class="stringliteral">    @param[in] path Internal path tuple.</span></div>
-<div class="line"><span class="lineno"> 8765</span><span class="stringliteral">    @return Allowed key set, None for free-form mappings, or False when path is not schema-checked.</span></div>
-<div class="line"><span class="lineno"> 8766</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8767</span>    <span class="keywordflow">if</span> path <span class="keywordflow">in</span> schema:</div>
-<div class="line"><span class="lineno"> 8768</span>        <span class="keywordflow">return</span> schema[path]</div>
-<div class="line"><span class="lineno"> 8769</span>    <span class="keywordflow">for</span> idx, part <span class="keywordflow">in</span> enumerate(path):</div>
-<div class="line"><span class="lineno"> 8770</span>        <span class="keywordflow">if</span> part == <span class="stringliteral">&quot;[]&quot;</span>:</div>
-<div class="line"><span class="lineno"> 8771</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno"> 8772</span>        candidate = path[:idx] + (<span class="stringliteral">&quot;*&quot;</span>,) + path[idx + 1:]</div>
-<div class="line"><span class="lineno"> 8773</span>        <span class="keywordflow">if</span> candidate <span class="keywordflow">in</span> schema:</div>
-<div class="line"><span class="lineno"> 8774</span>            <span class="keywordflow">return</span> schema[candidate]</div>
-<div class="line"><span class="lineno"> 8775</span>    <span class="keywordflow">return</span> <span class="keyword">False</span></div>
-<div class="line"><span class="lineno"> 8776</span> </div>
-<div class="line"><span class="lineno"> 8777</span> </div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08762">8762</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8762</span><span class="keyword">def </span>_lookup_allowed_schema_keys(schema: dict, path: tuple):</div>
+<div class="line"><span class="lineno"> 8763</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8764</span><span class="stringliteral">    @brief Return allowed keys for a path, honoring &#39;*&#39; dynamic mapping entries.</span></div>
+<div class="line"><span class="lineno"> 8765</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
+<div class="line"><span class="lineno"> 8766</span><span class="stringliteral">    @param[in] path Internal path tuple.</span></div>
+<div class="line"><span class="lineno"> 8767</span><span class="stringliteral">    @return Allowed key set, None for free-form mappings, or False when path is not schema-checked.</span></div>
+<div class="line"><span class="lineno"> 8768</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8769</span>    <span class="keywordflow">if</span> path <span class="keywordflow">in</span> schema:</div>
+<div class="line"><span class="lineno"> 8770</span>        <span class="keywordflow">return</span> schema[path]</div>
+<div class="line"><span class="lineno"> 8771</span>    <span class="keywordflow">for</span> idx, part <span class="keywordflow">in</span> enumerate(path):</div>
+<div class="line"><span class="lineno"> 8772</span>        <span class="keywordflow">if</span> part == <span class="stringliteral">&quot;[]&quot;</span>:</div>
+<div class="line"><span class="lineno"> 8773</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno"> 8774</span>        candidate = path[:idx] + (<span class="stringliteral">&quot;*&quot;</span>,) + path[idx + 1:]</div>
+<div class="line"><span class="lineno"> 8775</span>        <span class="keywordflow">if</span> candidate <span class="keywordflow">in</span> schema:</div>
+<div class="line"><span class="lineno"> 8776</span>            <span class="keywordflow">return</span> schema[candidate]</div>
+<div class="line"><span class="lineno"> 8777</span>    <span class="keywordflow">return</span> <span class="keyword">False</span></div>
+<div class="line"><span class="lineno"> 8778</span> </div>
+<div class="line"><span class="lineno"> 8779</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -21000,35 +21002,35 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Optional hint string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08778">8778</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8778</span><span class="keyword">def </span>_schema_key_hint(schema: dict, path: tuple, key: str, allowed: set) -&gt; str:</div>
-<div class="line"><span class="lineno"> 8779</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8780</span><span class="stringliteral">    @brief Build a concise typo or hierarchy hint for an unsupported YAML key.</span></div>
-<div class="line"><span class="lineno"> 8781</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
-<div class="line"><span class="lineno"> 8782</span><span class="stringliteral">    @param[in] path Current internal YAML path tuple.</span></div>
-<div class="line"><span class="lineno"> 8783</span><span class="stringliteral">    @param[in] key Unsupported YAML key.</span></div>
-<div class="line"><span class="lineno"> 8784</span><span class="stringliteral">    @param[in] allowed Allowed keys at the current path.</span></div>
-<div class="line"><span class="lineno"> 8785</span><span class="stringliteral">    @return Optional hint string.</span></div>
-<div class="line"><span class="lineno"> 8786</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8787</span>    hints = []</div>
-<div class="line"><span class="lineno"> 8788</span>    allowed_strings = sorted(str(item) <span class="keywordflow">for</span> item <span class="keywordflow">in</span> allowed)</div>
-<div class="line"><span class="lineno"> 8789</span>    lower_matches = [item <span class="keywordflow">for</span> item <span class="keywordflow">in</span> allowed_strings <span class="keywordflow">if</span> item.lower() == key.lower()]</div>
-<div class="line"><span class="lineno"> 8790</span>    close_matches = lower_matches <span class="keywordflow">or</span> difflib.get_close_matches(key, allowed_strings, n=1, cutoff=0.80)</div>
-<div class="line"><span class="lineno"> 8791</span>    <span class="keywordflow">if</span> close_matches:</div>
-<div class="line"><span class="lineno"> 8792</span>        hints.append(f<span class="stringliteral">&quot;Did you mean &#39;{close_matches[0]}&#39;?&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8793</span> </div>
-<div class="line"><span class="lineno"> 8794</span>    valid_paths = []</div>
-<div class="line"><span class="lineno"> 8795</span>    <span class="keywordflow">for</span> schema_path, schema_allowed <span class="keywordflow">in</span> schema.items():</div>
-<div class="line"><span class="lineno"> 8796</span>        <span class="keywordflow">if</span> schema_path == path <span class="keywordflow">or</span> <span class="keywordflow">not</span> schema_allowed:</div>
-<div class="line"><span class="lineno"> 8797</span>            <span class="keywordflow">continue</span></div>
-<div class="line"><span class="lineno"> 8798</span>        <span class="keywordflow">if</span> key <span class="keywordflow">in</span> schema_allowed:</div>
-<div class="line"><span class="lineno"> 8799</span>            valid_paths.append(_schema_path_text(schema_path))</div>
-<div class="line"><span class="lineno"> 8800</span>    <span class="keywordflow">if</span> valid_paths:</div>
-<div class="line"><span class="lineno"> 8801</span>        hints.append(f<span class="stringliteral">&quot;This key is valid at: {&#39;, &#39;.join(sorted(valid_paths))}.&quot;</span>)</div>
-<div class="line"><span class="lineno"> 8802</span> </div>
-<div class="line"><span class="lineno"> 8803</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot; &quot;</span>.join(hints)</div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08780">8780</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8780</span><span class="keyword">def </span>_schema_key_hint(schema: dict, path: tuple, key: str, allowed: set) -&gt; str:</div>
+<div class="line"><span class="lineno"> 8781</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8782</span><span class="stringliteral">    @brief Build a concise typo or hierarchy hint for an unsupported YAML key.</span></div>
+<div class="line"><span class="lineno"> 8783</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
+<div class="line"><span class="lineno"> 8784</span><span class="stringliteral">    @param[in] path Current internal YAML path tuple.</span></div>
+<div class="line"><span class="lineno"> 8785</span><span class="stringliteral">    @param[in] key Unsupported YAML key.</span></div>
+<div class="line"><span class="lineno"> 8786</span><span class="stringliteral">    @param[in] allowed Allowed keys at the current path.</span></div>
+<div class="line"><span class="lineno"> 8787</span><span class="stringliteral">    @return Optional hint string.</span></div>
+<div class="line"><span class="lineno"> 8788</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8789</span>    hints = []</div>
+<div class="line"><span class="lineno"> 8790</span>    allowed_strings = sorted(str(item) <span class="keywordflow">for</span> item <span class="keywordflow">in</span> allowed)</div>
+<div class="line"><span class="lineno"> 8791</span>    lower_matches = [item <span class="keywordflow">for</span> item <span class="keywordflow">in</span> allowed_strings <span class="keywordflow">if</span> item.lower() == key.lower()]</div>
+<div class="line"><span class="lineno"> 8792</span>    close_matches = lower_matches <span class="keywordflow">or</span> difflib.get_close_matches(key, allowed_strings, n=1, cutoff=0.80)</div>
+<div class="line"><span class="lineno"> 8793</span>    <span class="keywordflow">if</span> close_matches:</div>
+<div class="line"><span class="lineno"> 8794</span>        hints.append(f<span class="stringliteral">&quot;Did you mean &#39;{close_matches[0]}&#39;?&quot;</span>)</div>
+<div class="line"><span class="lineno"> 8795</span> </div>
+<div class="line"><span class="lineno"> 8796</span>    valid_paths = []</div>
+<div class="line"><span class="lineno"> 8797</span>    <span class="keywordflow">for</span> schema_path, schema_allowed <span class="keywordflow">in</span> schema.items():</div>
+<div class="line"><span class="lineno"> 8798</span>        <span class="keywordflow">if</span> schema_path == path <span class="keywordflow">or</span> <span class="keywordflow">not</span> schema_allowed:</div>
+<div class="line"><span class="lineno"> 8799</span>            <span class="keywordflow">continue</span></div>
+<div class="line"><span class="lineno"> 8800</span>        <span class="keywordflow">if</span> key <span class="keywordflow">in</span> schema_allowed:</div>
+<div class="line"><span class="lineno"> 8801</span>            valid_paths.append(_schema_path_text(schema_path))</div>
+<div class="line"><span class="lineno"> 8802</span>    <span class="keywordflow">if</span> valid_paths:</div>
+<div class="line"><span class="lineno"> 8803</span>        hints.append(f<span class="stringliteral">&quot;This key is valid at: {&#39;, &#39;.join(sorted(valid_paths))}.&quot;</span>)</div>
 <div class="line"><span class="lineno"> 8804</span> </div>
-<div class="line"><span class="lineno"> 8805</span> </div>
+<div class="line"><span class="lineno"> 8805</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot; &quot;</span>.join(hints)</div>
+<div class="line"><span class="lineno"> 8806</span> </div>
+<div class="line"><span class="lineno"> 8807</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -21106,49 +21108,49 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08806">8806</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 8806</span><span class="keyword">def </span>_validate_yaml_schema_keys(cfg, schema: dict, file_path: str, errors: list, path: tuple = ()) -&gt; <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8807</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 8808</span><span class="stringliteral">    @brief Reject unsupported YAML keys before they can be silently ignored by staging.</span></div>
-<div class="line"><span class="lineno"> 8809</span><span class="stringliteral">    @param[in] cfg Parsed YAML node.</span></div>
-<div class="line"><span class="lineno"> 8810</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
-<div class="line"><span class="lineno"> 8811</span><span class="stringliteral">    @param[in] file_path Source file path for diagnostics.</span></div>
-<div class="line"><span class="lineno"> 8812</span><span class="stringliteral">    @param[in,out] errors Validation error accumulator.</span></div>
-<div class="line"><span class="lineno"> 8813</span><span class="stringliteral">    @param[in] path Current internal YAML path tuple.</span></div>
-<div class="line"><span class="lineno"> 8814</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8815</span>    <span class="keywordflow">if</span> isinstance(cfg, dict):</div>
-<div class="line"><span class="lineno"> 8816</span>        allowed = _lookup_allowed_schema_keys(schema, path)</div>
-<div class="line"><span class="lineno"> 8817</span>        <span class="keywordflow">if</span> allowed <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span> <span class="keywordflow">and</span> allowed <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8818</span>            unknown = sorted(str(key) <span class="keywordflow">for</span> key <span class="keywordflow">in</span> cfg.keys() <span class="keywordflow">if</span> key <span class="keywordflow">not</span> <span class="keywordflow">in</span> allowed)</div>
-<div class="line"><span class="lineno"> 8819</span>            <span class="keywordflow">for</span> key <span class="keywordflow">in</span> unknown:</div>
-<div class="line"><span class="lineno"> 8820</span>                hint = _schema_key_hint(schema, path, key, allowed)</div>
-<div class="line"><span class="lineno"> 8821</span>                hint_text = f<span class="stringliteral">&quot; {hint}&quot;</span> <span class="keywordflow">if</span> hint <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 8822</span>                errors.append(</div>
-<div class="line"><span class="lineno"> 8823</span>                    f<span class="stringliteral">&quot;  {file_path}: unsupported key at {_schema_path_text(path)}: &#39;{key}&#39;. &quot;</span></div>
-<div class="line"><span class="lineno"> 8824</span>                    f<span class="stringliteral">&quot;Allowed keys: {sorted(allowed)}.{hint_text}&quot;</span></div>
-<div class="line"><span class="lineno"> 8825</span>                )</div>
-<div class="line"><span class="lineno"> 8826</span>        <span class="keywordflow">if</span> allowed <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><span class="lineno"> 8827</span>            <span class="keywordflow">return</span></div>
-<div class="line"><span class="lineno"> 8828</span>        <span class="keywordflow">for</span> key, value <span class="keywordflow">in</span> cfg.items():</div>
-<div class="line"><span class="lineno"> 8829</span>            _validate_yaml_schema_keys(value, schema, file_path, errors, path + (key,))</div>
-<div class="line"><span class="lineno"> 8830</span>    <span class="keywordflow">elif</span> isinstance(cfg, list) <span class="keywordflow">and</span> _lookup_allowed_schema_keys(schema, path + (<span class="stringliteral">&quot;[]&quot;</span>,)) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span>:</div>
-<div class="line"><span class="lineno"> 8831</span>        <span class="keywordflow">for</span> item <span class="keywordflow">in</span> cfg:</div>
-<div class="line"><span class="lineno"> 8832</span>            _validate_yaml_schema_keys(item, schema, file_path, errors, path + (<span class="stringliteral">&quot;[]&quot;</span>,))</div>
-<div class="line"><span class="lineno"> 8833</span>    <span class="keywordflow">elif</span> (isinstance(cfg, (str, int, float, list)) <span class="keywordflow">and</span> <span class="keywordflow">not</span> isinstance(cfg, bool)</div>
-<div class="line"><span class="lineno"> 8834</span>          <span class="keywordflow">and</span> path <span class="keywordflow">and</span> path[-1] != <span class="stringliteral">&quot;[]&quot;</span> <span class="keywordflow">and</span> _lookup_allowed_schema_keys(schema, path) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span>):</div>
-<div class="line"><span class="lineno"> 8835</span>        <span class="comment"># A section given as a string, number or list would reach code that reads it as a</span></div>
-<div class="line"><span class="lineno"> 8836</span>        <span class="comment"># mapping. A boolean is left alone: several sections take true/false as shorthand</span></div>
-<div class="line"><span class="lineno"> 8837</span>        <span class="comment"># (models.physics.turbulence.les, io.paraview_series). So are list items, some of</span></div>
-<div class="line"><span class="lineno"> 8838</span>        <span class="comment"># which accept a scalar shorthand (a study metric name).</span></div>
-<div class="line"><span class="lineno"> 8839</span>        errors.append(</div>
-<div class="line"><span class="lineno"> 8840</span>            f<span class="stringliteral">&quot;  {file_path}: &#39;{_schema_path_text(path)}&#39; must be a mapping, not &quot;</span></div>
-<div class="line"><span class="lineno"> 8841</span>            f<span class="stringliteral">&quot;{type(cfg).__name__} {cfg!r}.&quot;</span></div>
-<div class="line"><span class="lineno"> 8842</span>        )</div>
-<div class="line"><span class="lineno"> 8843</span>    <span class="keywordflow">elif</span> isinstance(cfg, list):</div>
-<div class="line"><span class="lineno"> 8844</span>        <span class="keywordflow">for</span> item <span class="keywordflow">in</span> cfg:</div>
-<div class="line"><span class="lineno"> 8845</span>            _validate_yaml_schema_keys(item, schema, file_path, errors, path + (<span class="stringliteral">&quot;[]&quot;</span>,))</div>
-<div class="line"><span class="lineno"> 8846</span> </div>
-<div class="line"><span class="lineno"> 8847</span> </div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08808">8808</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 8808</span><span class="keyword">def </span>_validate_yaml_schema_keys(cfg, schema: dict, file_path: str, errors: list, path: tuple = ()) -&gt; <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8809</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 8810</span><span class="stringliteral">    @brief Reject unsupported YAML keys before they can be silently ignored by staging.</span></div>
+<div class="line"><span class="lineno"> 8811</span><span class="stringliteral">    @param[in] cfg Parsed YAML node.</span></div>
+<div class="line"><span class="lineno"> 8812</span><span class="stringliteral">    @param[in] schema Role schema mapping.</span></div>
+<div class="line"><span class="lineno"> 8813</span><span class="stringliteral">    @param[in] file_path Source file path for diagnostics.</span></div>
+<div class="line"><span class="lineno"> 8814</span><span class="stringliteral">    @param[in,out] errors Validation error accumulator.</span></div>
+<div class="line"><span class="lineno"> 8815</span><span class="stringliteral">    @param[in] path Current internal YAML path tuple.</span></div>
+<div class="line"><span class="lineno"> 8816</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8817</span>    <span class="keywordflow">if</span> isinstance(cfg, dict):</div>
+<div class="line"><span class="lineno"> 8818</span>        allowed = _lookup_allowed_schema_keys(schema, path)</div>
+<div class="line"><span class="lineno"> 8819</span>        <span class="keywordflow">if</span> allowed <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span> <span class="keywordflow">and</span> allowed <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8820</span>            unknown = sorted(str(key) <span class="keywordflow">for</span> key <span class="keywordflow">in</span> cfg.keys() <span class="keywordflow">if</span> key <span class="keywordflow">not</span> <span class="keywordflow">in</span> allowed)</div>
+<div class="line"><span class="lineno"> 8821</span>            <span class="keywordflow">for</span> key <span class="keywordflow">in</span> unknown:</div>
+<div class="line"><span class="lineno"> 8822</span>                hint = _schema_key_hint(schema, path, key, allowed)</div>
+<div class="line"><span class="lineno"> 8823</span>                hint_text = f<span class="stringliteral">&quot; {hint}&quot;</span> <span class="keywordflow">if</span> hint <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 8824</span>                errors.append(</div>
+<div class="line"><span class="lineno"> 8825</span>                    f<span class="stringliteral">&quot;  {file_path}: unsupported key at {_schema_path_text(path)}: &#39;{key}&#39;. &quot;</span></div>
+<div class="line"><span class="lineno"> 8826</span>                    f<span class="stringliteral">&quot;Allowed keys: {sorted(allowed)}.{hint_text}&quot;</span></div>
+<div class="line"><span class="lineno"> 8827</span>                )</div>
+<div class="line"><span class="lineno"> 8828</span>        <span class="keywordflow">if</span> allowed <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><span class="lineno"> 8829</span>            <span class="keywordflow">return</span></div>
+<div class="line"><span class="lineno"> 8830</span>        <span class="keywordflow">for</span> key, value <span class="keywordflow">in</span> cfg.items():</div>
+<div class="line"><span class="lineno"> 8831</span>            _validate_yaml_schema_keys(value, schema, file_path, errors, path + (key,))</div>
+<div class="line"><span class="lineno"> 8832</span>    <span class="keywordflow">elif</span> isinstance(cfg, list) <span class="keywordflow">and</span> _lookup_allowed_schema_keys(schema, path + (<span class="stringliteral">&quot;[]&quot;</span>,)) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span>:</div>
+<div class="line"><span class="lineno"> 8833</span>        <span class="keywordflow">for</span> item <span class="keywordflow">in</span> cfg:</div>
+<div class="line"><span class="lineno"> 8834</span>            _validate_yaml_schema_keys(item, schema, file_path, errors, path + (<span class="stringliteral">&quot;[]&quot;</span>,))</div>
+<div class="line"><span class="lineno"> 8835</span>    <span class="keywordflow">elif</span> (isinstance(cfg, (str, int, float, list)) <span class="keywordflow">and</span> <span class="keywordflow">not</span> isinstance(cfg, bool)</div>
+<div class="line"><span class="lineno"> 8836</span>          <span class="keywordflow">and</span> path <span class="keywordflow">and</span> path[-1] != <span class="stringliteral">&quot;[]&quot;</span> <span class="keywordflow">and</span> _lookup_allowed_schema_keys(schema, path) <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keyword">False</span>):</div>
+<div class="line"><span class="lineno"> 8837</span>        <span class="comment"># A section given as a string, number or list would reach code that reads it as a</span></div>
+<div class="line"><span class="lineno"> 8838</span>        <span class="comment"># mapping. A boolean is left alone: several sections take true/false as shorthand</span></div>
+<div class="line"><span class="lineno"> 8839</span>        <span class="comment"># (models.physics.turbulence.les, io.paraview_series). So are list items, some of</span></div>
+<div class="line"><span class="lineno"> 8840</span>        <span class="comment"># which accept a scalar shorthand (a study metric name).</span></div>
+<div class="line"><span class="lineno"> 8841</span>        errors.append(</div>
+<div class="line"><span class="lineno"> 8842</span>            f<span class="stringliteral">&quot;  {file_path}: &#39;{_schema_path_text(path)}&#39; must be a mapping, not &quot;</span></div>
+<div class="line"><span class="lineno"> 8843</span>            f<span class="stringliteral">&quot;{type(cfg).__name__} {cfg!r}.&quot;</span></div>
+<div class="line"><span class="lineno"> 8844</span>        )</div>
+<div class="line"><span class="lineno"> 8845</span>    <span class="keywordflow">elif</span> isinstance(cfg, list):</div>
+<div class="line"><span class="lineno"> 8846</span>        <span class="keywordflow">for</span> item <span class="keywordflow">in</span> cfg:</div>
+<div class="line"><span class="lineno"> 8847</span>            _validate_yaml_schema_keys(item, schema, file_path, errors, path + (<span class="stringliteral">&quot;[]&quot;</span>,))</div>
+<div class="line"><span class="lineno"> 8848</span> </div>
+<div class="line"><span class="lineno"> 8849</span> </div>
 </div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -21195,19 +21197,19 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The particle or the Eulerian statistics field table. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09085">9085</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 9085</span><span class="keyword">def </span>_ensemble_source_fields(source: str) -&gt; dict:</div>
-<div class="line"><span class="lineno"> 9086</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
-<div class="line"><span class="lineno"> 9087</span><span class="stringliteral">    @brief Return the field table an ensemble of one source names its fields from.</span></div>
-<div class="line"><span class="lineno"> 9088</span><span class="stringliteral">    @param[in] source One of `POST_STATISTICS_ENSEMBLE_SOURCES`.</span></div>
-<div class="line"><span class="lineno"> 9089</span><span class="stringliteral">    @return The particle or the Eulerian statistics field table.</span></div>
-<div class="line"><span class="lineno"> 9090</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><span class="lineno"> 9091</span>    <span class="keywordflow">return</span> STATISTICS_PARTICLE_FIELDS <span class="keywordflow">if</span> source == <span class="stringliteral">&quot;particles&quot;</span> <span class="keywordflow">else</span> STATISTICS_ELIGIBLE_FIELDS</div>
-<div class="line"><span class="lineno"> 9092</span> </div>
-<div class="line"><span class="lineno"> 9093</span> </div>
-<div class="line"><span class="lineno"> 9094</span><span class="comment">#: Moment names one field may request. Higher moments cannot be recovered from</span></div>
-<div class="line"><span class="lineno"> 9095</span><span class="comment">#: centered state after the fact, so they need their own accumulation rather than</span></div>
-<div class="line"><span class="lineno"> 9096</span><span class="comment">#: an extension of this list.</span></div>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09087">9087</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 9087</span><span class="keyword">def </span>_ensemble_source_fields(source: str) -&gt; dict:</div>
+<div class="line"><span class="lineno"> 9088</span>    <span class="stringliteral">&quot;&quot;&quot;!</span></div>
+<div class="line"><span class="lineno"> 9089</span><span class="stringliteral">    @brief Return the field table an ensemble of one source names its fields from.</span></div>
+<div class="line"><span class="lineno"> 9090</span><span class="stringliteral">    @param[in] source One of `POST_STATISTICS_ENSEMBLE_SOURCES`.</span></div>
+<div class="line"><span class="lineno"> 9091</span><span class="stringliteral">    @return The particle or the Eulerian statistics field table.</span></div>
+<div class="line"><span class="lineno"> 9092</span><span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><span class="lineno"> 9093</span>    <span class="keywordflow">return</span> STATISTICS_PARTICLE_FIELDS <span class="keywordflow">if</span> source == <span class="stringliteral">&quot;particles&quot;</span> <span class="keywordflow">else</span> STATISTICS_ELIGIBLE_FIELDS</div>
+<div class="line"><span class="lineno"> 9094</span> </div>
+<div class="line"><span class="lineno"> 9095</span> </div>
+<div class="line"><span class="lineno"> 9096</span><span class="comment">#: Moment names one field may request. Higher moments cannot be recovered from</span></div>
+<div class="line"><span class="lineno"> 9097</span><span class="comment">#: centered state after the fact, so they need their own accumulation rather than</span></div>
+<div class="line"><span class="lineno"> 9098</span><span class="comment">#: an extension of this list.</span></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -24336,7 +24338,7 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08848">8848</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08850">8850</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24360,7 +24362,7 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08922">8922</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l08924">8924</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24384,7 +24386,7 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09011">9011</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09013">9013</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24410,7 +24412,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">    9</span>    <span class="stringliteral">&quot;CS&quot;</span>: {<span class="stringliteral">&quot;components&quot;</span>: 1, <span class="stringliteral">&quot;requires&quot;</span>: <span class="stringliteral">&quot;les&quot;</span>},</div>
 <div class="line"><span class="lineno">   10</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09062">9062</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09064">9064</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24430,7 +24432,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">    3</span>    <span class="stringliteral">&quot;velocity&quot;</span>: {<span class="stringliteral">&quot;components&quot;</span>: 3, <span class="stringliteral">&quot;requires&quot;</span>: <span class="stringliteral">&quot;particles&quot;</span>, <span class="stringliteral">&quot;target&quot;</span>: <span class="stringliteral">&quot;Ucat&quot;</span>},</div>
 <div class="line"><span class="lineno">    4</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09075">9075</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09077">9077</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24446,7 +24448,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09082">9082</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09084">9084</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24462,7 +24464,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09097">9097</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09099">9099</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24478,7 +24480,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09100">9100</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09102">9102</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24502,7 +24504,7 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09103">9103</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09105">9105</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24540,7 +24542,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   13</span>    },</div>
 <div class="line"><span class="lineno">   14</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09141">9141</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09143">9143</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24579,7 +24581,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">   14</span>    (<span class="stringliteral">&quot;execution&quot;</span>,): {<span class="stringliteral">&quot;max_concurrent_array_tasks&quot;</span>},</div>
 <div class="line"><span class="lineno">   15</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09157">9157</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09159">9159</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24610,7 +24612,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">    6</span>    (<span class="stringliteral">&quot;reproducibility&quot;</span>,): {<span class="stringliteral">&quot;require_clean_release&quot;</span>, <span class="stringliteral">&quot;pin_executables&quot;</span>},</div>
 <div class="line"><span class="lineno">    7</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09174">9174</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09176">9176</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24626,7 +24628,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09192">9192</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09194">9194</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24642,7 +24644,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09193">9193</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09195">9195</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24658,7 +24660,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09194">9194</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09196">9196</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24674,7 +24676,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09195">9195</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09197">9197</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24690,7 +24692,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09196">9196</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09198">9198</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24706,7 +24708,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09197">9197</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09199">9199</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24722,7 +24724,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09198">9198</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09200">9200</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24738,7 +24740,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09199">9199</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09201">9201</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24754,7 +24756,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09200">9200</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09202">9202</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24770,7 +24772,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09201">9201</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09203">9203</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24786,7 +24788,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09202">9202</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09204">9204</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24802,7 +24804,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09212">9212</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09214">9214</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24818,7 +24820,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09214">9214</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09216">9216</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24834,7 +24836,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09215">9215</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09217">9217</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24850,7 +24852,7 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09225">9225</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09227">9227</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>
@@ -24871,7 +24873,7 @@ Here is the caller graph for this function:</div>
 <div class="line"><span class="lineno">    4</span>    <span class="stringliteral">&quot;apply_trim&quot;</span>: NOT_A_QUANTITY,</div>
 <div class="line"><span class="lineno">    5</span>}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09346">9346</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_8py_source.html#l09348">9348</a> of file <a class="el" href="core_8py_source.html">core.py</a>.</p>
 
 </div>
 </div>

@@ -146,326 +146,333 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> * @brief Computes velocity from log-law for rough walls</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment"> *</span></div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment"> * Calculates the tangential velocity at a given wall distance using</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> * the roughness-modified log-law of the wall.</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> * APPLICABLE REGIMES:</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> *   - Viscous sublayer (y+ &lt; 11.53): u+ = y+</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> *   - Log-layer (11.53 &lt; y+ &lt; 300): u+ = (1/κ) ln(E * y+)</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> *   - Outer layer (y+ &gt; 300): Returns -1 (invalid, wake region)</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity ν</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> * @param[in] wall_distance       Distance from wall y</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> * @param[in] roughness_height    Equivalent sand grain roughness ks</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> * @return    Tangential velocity u_t, or -1 if outside valid range</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * @note The upper limit y+ &lt; 300 ensures we stay within the log-layer</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> * @note For y+ &gt; 300, wake effects become important and log-law is invalid</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a1049418624e91520b5fc6240c4e21c4c">u_hydset_roughness</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>                          <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">double</span> roughness_height);</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"></span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"> * @brief Residual function for friction velocity equation (log-law with roughness)</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"> * This function computes the residual for Newton-Raphson iteration:</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> *   f(u_τ) = u_predicted(u_τ) - u_known</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> * where u_predicted comes from the log-law or linear law depending on y+.</span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> * @param[in] known_velocity      Known velocity at distance y</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"> * @param[in] friction_velocity_guess Current guess for u_τ</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment"> * @param[in] roughness_height    Wall roughness height</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * @return    Residual value (should be zero at solution)</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity, </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> friction_velocity_guess, </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                <span class="keywordtype">double</span> roughness_height);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                <span class="comment"></span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="comment"> * @brief Numerical derivative of residual function</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> * Computes df/du_τ using finite differences for Newton-Raphson iteration.</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment"> * the roughness-modified log-law of the wall:</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment"> *   - below the sublayer edge: u+ = y+</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment"> *   - above it:                u+ = (1/κ) ln(E * y+)</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="comment"> * where the edge is the y+ at which the two branches meet (about 11.45 for a smooth</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="comment"> * wall; it moves with E on a rough wall).</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment"> * @note Not called by the solver, which takes the friction velocity from the inverse</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment"> *       @ref find_utau_hydset(); this forward form is the definition that inverse is</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment"> *       tested against, and it agrees with it at every y+. Above y+ ~ 300 the flow</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment"> *       leaves the logarithmic region; that limit is enforced on the first cell by the</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment"> *       range check of LogWallModelDiagnostics(), not by this function.</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity ν</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * @param[in] wall_distance       Distance from wall y</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment"> * @param[in] roughness_height    Equivalent sand grain roughness ks</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment"> * @return    Tangential velocity u_t</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a1049418624e91520b5fc6240c4e21c4c">u_hydset_roughness</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>                          <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">double</span> roughness_height);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment"></span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment"> * @brief Residual function for friction velocity equation (log-law with roughness)</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="comment"> * This function computes the residual for Newton-Raphson iteration:</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment"> *   f(u_τ) = u_predicted(u_τ) - u_known</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment"> * where u_predicted comes from the log-law or linear law depending on y+.</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment"> * @param[in] known_velocity      Known velocity at distance y</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment"> * @param[in] friction_velocity_guess Current guess for u_τ</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment"> * @param[in] roughness_height    Wall roughness height</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment"> * @return    Residual value (should be zero at solution)</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity, </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> friction_velocity_guess, </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                <span class="keywordtype">double</span> roughness_height);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                <span class="comment"></span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="comment"> * @brief Numerical derivative of residual function</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> * @param[in] known_velocity      Known velocity</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"> * @param[in] friction_velocity_guess Current guess for u_τ</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * @param[in] roughness_height    Wall roughness</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> * @return    Derivative df/du_τ</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity,</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                 <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> friction_velocity_guess,</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                 <span class="keywordtype">double</span> roughness_height);</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                 <span class="comment"></span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="comment"> * @brief Solves for friction velocity using Newton-Raphson iteration</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * Given a known velocity at a known distance from the wall, this function</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> * iteratively solves for the friction velocity u_τ that satisfies the</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * roughness-modified log-law or linear law.</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * ALGORITHM:</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> *   Newton-Raphson: u_τ^(n+1) = u_τ^n - f(u_τ^n) / f&#39;(u_τ^n)</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> *   Convergence criterion: |u_τ^(n+1) - u_τ^n| &lt; 1e-7</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment"> * @param[in] known_velocity      Velocity at reference point</span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment"> * @param[in] wall_distance       Distance from wall to reference point</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"> * @param[in] initial_guess       Initial guess for u_τ</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment"> * @param[in] roughness_height    Wall roughness height</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> * @return    Converged friction velocity u_τ</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * @note Maximum 30 iterations; warns if convergence not achieved</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> * @note Typical convergence in 3-5 iterations for good initial guess</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9">find_utau_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity,</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                        <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> initial_guess,</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                        <span class="keywordtype">double</span> roughness_height);</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>                        <span class="comment"></span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"> * @brief Computes turbulent eddy viscosity ratio (ν_t / ν)</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> * Uses the mixing length model with van Driest damping:</span></div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="comment"> *   ν_t / ν = κ * y+ * [1 - exp(-y+ / A+)]²</span></div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment"> * where A+ ≈ 19 is the damping coefficient.</span></div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="comment"> * PHYSICAL INTERPRETATION:</span></div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment"> *   - Near wall (y+ → 0): ν_t → 0 (viscous effects dominate)</span></div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="comment"> *   - Far from wall (y+ &gt;&gt; A+): ν_t ~ κ * y+ (mixing length theory)</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment"> *   - Damping function smoothly transitions between these limits</span></div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> * @param[in] yplus Normalized wall distance y+ = y * u_τ / ν</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><span class="comment"> * @return    Eddy viscosity ratio ν_t / ν</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment"> * @note This is the standard mixing length model with van Driest damping</span></div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> * @note Valid in the inner layer (y+ &lt; 50-100)</span></div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a>(<span class="keywordtype">double</span> yplus);</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment"></span> </div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"> * @brief Integrates eddy viscosity profile from wall to distance y</span></div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment"> * Computes integrals needed for non-equilibrium wall functions:</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment"> *   If mode=0: ∫[0 to y] dy / (ν + ν_t)</span></div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment"> *   If mode=1: ∫[0 to y] y dy / (ν + ν_t)</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="comment"> * These integrals appear in the solution of the momentum equation</span></div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment"> * with pressure gradients in the near-wall region.</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="comment"> * NUMERICAL METHOD:</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="comment"> *   - Trapezoidal rule with 30 integration points</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment"> *   - Higher-order correction at endpoints for accuracy</span></div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity ν</span></div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment"> * @param[in] wall_distance       Distance from wall y</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> * @param[in] integration_mode    0 for F integral, 1 for Fy integral</span></div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="comment"> * @return    Value of the integral</span></div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment"> * @note Used in Cabot wall function for pressure gradient effects</span></div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>                   <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">int</span> integration_mode);</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="comment"></span> </div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"> * @brief Computes wall shear stress with pressure gradient effects</span></div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment"> * Solves the integrated momentum equation in the near-wall region:</span></div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment"> *   τ_w = (u - dp/dx * F_y) / F_1</span></div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"> * where F_1 and F_y are integrals of the effective viscosity profile.</span></div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * This accounts for non-equilibrium effects due to streamwise pressure gradients.</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * Computes df/du_τ using finite differences for Newton-Raphson iteration.</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment"> * @param[in] known_velocity      Known velocity</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> * @param[in] friction_velocity_guess Current guess for u_τ</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> * @param[in] roughness_height    Wall roughness</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> * @return    Derivative df/du_τ</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity,</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                 <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> friction_velocity_guess,</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                 <span class="keywordtype">double</span> roughness_height);</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                 <span class="comment"></span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * @brief Solves for friction velocity using Newton-Raphson iteration</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * Given a known velocity at a known distance from the wall, this function</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> * iteratively solves for the friction velocity u_τ that satisfies the</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment"> * roughness-modified log-law or linear law.</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> * ALGORITHM:</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment"> *   Newton-Raphson: u_τ^(n+1) = u_τ^n - f(u_τ^n) / f&#39;(u_τ^n)</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="comment"> *   Convergence criterion: |u_τ^(n+1) - u_τ^n| &lt; 1e-7</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment"> * @param[in] known_velocity      Velocity at reference point</span></div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment"> * @param[in] wall_distance       Distance from wall to reference point</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> * @param[in] initial_guess       Initial guess for u_τ</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> * @param[in] roughness_height    Wall roughness height</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> * @return    Converged friction velocity u_τ</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> * @note Maximum 30 iterations; warns if convergence not achieved</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> * @note Typical convergence in 3-5 iterations for good initial guess</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9">find_utau_hydset</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> known_velocity,</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                        <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> initial_guess,</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>                        <span class="keywordtype">double</span> roughness_height);</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>                        <span class="comment"></span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><span class="comment"> * @brief Computes turbulent eddy viscosity ratio (ν_t / ν)</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span><span class="comment"> * Uses the mixing length model with van Driest damping:</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="comment"> *   ν_t / ν = κ * y+ * [1 - exp(-y+ / A+)]²</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="comment"> * where A+ ≈ 19 is the damping coefficient.</span></div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="comment"> * PHYSICAL INTERPRETATION:</span></div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment"> *   - Near wall (y+ → 0): ν_t → 0 (viscous effects dominate)</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment"> *   - Far from wall (y+ &gt;&gt; A+): ν_t ~ κ * y+ (mixing length theory)</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> *   - Damping function smoothly transitions between these limits</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="comment"> * @param[in] yplus Normalized wall distance y+ = y * u_τ / ν</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment"> * @return    Eddy viscosity ratio ν_t / ν</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment"> * @note This is the standard mixing length model with van Driest damping</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span><span class="comment"> * @note Valid in the inner layer (y+ &lt; 50-100)</span></div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a>(<span class="keywordtype">double</span> yplus);</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span><span class="comment"></span> </div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span><span class="comment"> * @brief Integrates eddy viscosity profile from wall to distance y</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span><span class="comment"> * Computes integrals needed for non-equilibrium wall functions:</span></div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="comment"> *   If mode=0: ∫[0 to y] dy / (ν + ν_t)</span></div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span><span class="comment"> *   If mode=1: ∫[0 to y] y dy / (ν + ν_t)</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span><span class="comment"> * These integrals appear in the solution of the momentum equation</span></div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span><span class="comment"> * with pressure gradients in the near-wall region.</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="comment"> * NUMERICAL METHOD:</span></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="comment"> *   - Trapezoidal rule with 30 integration points</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="comment"> *   - Higher-order correction at endpoints for accuracy</span></div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity ν</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="comment"> * @param[in] wall_distance       Distance from wall y</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="comment"> * @param[in] integration_mode    0 for F integral, 1 for Fy integral</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="comment"> * @return    Value of the integral</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span><span class="comment"> * @note Used in Cabot wall function for pressure gradient effects</span></div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>                   <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">int</span> integration_mode);</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="comment"></span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="comment"> * @brief Computes wall shear stress with pressure gradient effects</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="comment"> * Solves the integrated momentum equation in the near-wall region:</span></div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="comment"> *   τ_w = (u - dp/dx * F_y) / F_1</span></div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="comment"> * where F_1 and F_y are integrals of the effective viscosity profile.</span></div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment"> * @param[in] velocity            Velocity at wall_distance</span></div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient dp/ds</span></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> * @return    Wall shear stress τ_w</span></div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="comment"> * @note This is more accurate than equilibrium wall functions in separated flows</span></div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> friction_velocity,</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>           <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> pressure_gradient_tangent);</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>           <span class="comment"></span></div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment"> * @brief Computes velocity using Cabot wall function</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="comment"> * Reconstructs velocity from wall shear stress and pressure gradient:</span></div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="comment"> *   u = τ_w * F1 + (dp/dx) * Fy</span></div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="comment"> * @param[in] friction_velocity   Friction velocity</span></div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="comment"> * @param[in] wall_shear_stress   Wall shear stress</span></div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment"> * @return    Velocity at wall_distance</span></div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a376fd306dd9e99d83ffd07047e038228">u_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>               <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>               <span class="keywordtype">double</span> wall_shear_stress);</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>               <span class="comment"></span></div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span><span class="comment"> * @brief Residual function for Cabot wall function</span></div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span><span class="comment"> * Computes: f(u_τ) = u_τ - sqrt(|τ_w(u_τ)|)</span></div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span><span class="comment"> * This enforces consistency between u_τ and τ_w.</span></div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="comment"> * @param[in] velocity            Velocity</span></div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="comment"> * @param[in] friction_velocity_guess Guess for u_τ</span></div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient</span></div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="comment"> * @param[in] pressure_gradient_normal Normal pressure gradient (currently unused)</span></div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="comment"> * @return    Residual value</span></div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>               <span class="keywordtype">double</span> friction_velocity_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>               <span class="keywordtype">double</span> pressure_gradient_normal);</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>               <span class="comment"></span></div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="comment"> * @brief Numerical derivative for Cabot wall function</span></div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="comment"> * @param kinematic_viscosity Fluid kinematic viscosity.</span></div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="comment"> * @param velocity Resolved tangential velocity at the wall-model point.</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span><span class="comment"> * @param wall_distance Normal distance from the wall.</span></div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="comment"> * @param friction_velocity_guess Current friction-velocity iterate.</span></div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="comment"> * @param pressure_gradient_tangent Tangential pressure-gradient contribution.</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="comment"> * @param pressure_gradient_normal Normal pressure-gradient contribution.</span></div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="comment"> * @return Derivative of the Cabot residual with respect to friction velocity.</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>                <span class="keywordtype">double</span> friction_velocity_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>                <span class="keywordtype">double</span> pressure_gradient_normal);</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>                <span class="comment"></span></div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment"> * @brief Solves for friction velocity using Cabot wall function</span></div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span><span class="comment"> * This non-equilibrium wall function accounts for pressure gradient effects,</span></div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span><span class="comment"> * making it more accurate in separated or strongly accelerating/decelerating flows.</span></div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="comment"> * @param[in]  kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="comment"> * @param[in]  velocity            Velocity at reference point</span></div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="comment"> * @param[in]  wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="comment"> * @param[in]  initial_guess       Initial guess for u_τ</span></div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="comment"> * @param[in]  pressure_gradient_tangent Tangential pressure gradient</span></div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="comment"> * @param[in]  pressure_gradient_normal Normal pressure gradient</span></div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="comment"> * @param[out] friction_velocity   Converged friction velocity</span></div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="comment"> * @param[out] wall_shear_velocity Wall shear stress for velocity</span></div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="comment"> * @param[out] wall_shear_normal   Wall shear stress for normal pressure gradient</span></div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="keywordtype">void</span> <a class="code hl_function" href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0">find_utau_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>                     <span class="keywordtype">double</span> initial_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>                     <span class="keywordtype">double</span> pressure_gradient_normal, <span class="keywordtype">double</span> *friction_velocity,</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>                     <span class="keywordtype">double</span> *wall_shear_velocity, <span class="keywordtype">double</span> *wall_shear_normal);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>                     <span class="comment"></span></div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment"> * @brief Computes velocity using Werner-Wengle wall function</span></div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="comment"> * The pointwise Werner-Wengle profile; the solver takes the friction velocity from its</span></div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span><span class="comment"> * exact inverse, @ref find_utau_Werner(), at the reference cell. Explicit relation:</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="comment"> *   u+ = y+                    below the sublayer edge (viscous sublayer)</span></div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment"> *   u+ = A * (y+)^B            above it (power law)</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="comment"> * where A = 8.3, B = 1/7, and the edge is where the two meet, A^(7/6) = 11.8148.</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="comment"> * This accounts for non-equilibrium effects due to streamwise pressure gradients.</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span><span class="comment"> * @param[in] friction_velocity   Friction velocity u_τ</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="comment"> * @param[in] velocity            Velocity at wall_distance</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient dp/ds</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="comment"> * @return    Wall shear stress τ_w</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span><span class="comment"> * @note This is more accurate than equilibrium wall functions in separated flows</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a2c09c649ff317b786ab655df81a5975d">taw</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> friction_velocity,</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>           <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> pressure_gradient_tangent);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>           <span class="comment"></span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="comment"> * @brief Computes velocity using Cabot wall function</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="comment"> * Reconstructs velocity from wall shear stress and pressure gradient:</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span><span class="comment"> *   u = τ_w * F1 + (dp/dx) * Fy</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="comment"> * @note Not called by the solver, which takes the friction velocity from the inverse</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span><span class="comment"> *       @ref find_utau_Cabot(); this forward form is the definition that inverse is</span></div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="comment"> *       tested against.</span></div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><span class="comment"> * @param[in] friction_velocity   Friction velocity</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient</span></div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span><span class="comment"> * @param[in] wall_shear_stress   Wall shear stress</span></div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="comment"> * @return    Velocity at wall_distance</span></div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a376fd306dd9e99d83ffd07047e038228">u_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>               <span class="keywordtype">double</span> friction_velocity, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>               <span class="keywordtype">double</span> wall_shear_stress);</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>               <span class="comment"></span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="comment"> * @brief Residual function for Cabot wall function</span></div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="comment"> * Computes: f(u_τ) = u_τ - sqrt(|τ_w(u_τ)|)</span></div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span><span class="comment"> * This enforces consistency between u_τ and τ_w.</span></div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span><span class="comment"> * @param[in] velocity            Velocity</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><span class="comment"> * @param[in] friction_velocity_guess Guess for u_τ</span></div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="comment"> * @param[in] pressure_gradient_tangent Tangential pressure gradient</span></div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="comment"> * @param[in] pressure_gradient_normal Normal pressure gradient (currently unused)</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="comment"> * @return    Residual value</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>               <span class="keywordtype">double</span> friction_velocity_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>               <span class="keywordtype">double</span> pressure_gradient_normal);</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>               <span class="comment"></span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><span class="comment"> * @brief Numerical derivative for Cabot wall function</span></div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span><span class="comment"> * @param kinematic_viscosity Fluid kinematic viscosity.</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="comment"> * @param velocity Resolved tangential velocity at the wall-model point.</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="comment"> * @param wall_distance Normal distance from the wall.</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="comment"> * @param friction_velocity_guess Current friction-velocity iterate.</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="comment"> * @param pressure_gradient_tangent Tangential pressure-gradient contribution.</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span><span class="comment"> * @param pressure_gradient_normal Normal pressure-gradient contribution.</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="comment"> * @return Derivative of the Cabot residual with respect to friction velocity.</span></div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>                <span class="keywordtype">double</span> friction_velocity_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>                <span class="keywordtype">double</span> pressure_gradient_normal);</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>                <span class="comment"></span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="comment"> * @brief Solves for friction velocity using Cabot wall function</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span><span class="comment"> * This non-equilibrium wall function accounts for pressure gradient effects,</span></div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="comment"> * making it more accurate in separated or strongly accelerating/decelerating flows.</span></div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span><span class="comment"> * @param[in]  kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="comment"> * @param[in]  velocity            Velocity at reference point</span></div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span><span class="comment"> * @param[in]  wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span><span class="comment"> * @param[in]  initial_guess       Initial guess for u_τ</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span><span class="comment"> * @param[in]  pressure_gradient_tangent Tangential pressure gradient</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="comment"> * @param[in]  pressure_gradient_normal Normal pressure gradient</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="comment"> * @param[out] friction_velocity   Converged friction velocity</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="comment"> * @param[out] wall_shear_velocity Wall shear stress for velocity</span></div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span><span class="comment"> * @param[out] wall_shear_normal   Wall shear stress for normal pressure gradient</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="keywordtype">void</span> <a class="code hl_function" href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0">find_utau_Cabot</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>                     <span class="keywordtype">double</span> initial_guess, <span class="keywordtype">double</span> pressure_gradient_tangent,</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>                     <span class="keywordtype">double</span> pressure_gradient_normal, <span class="keywordtype">double</span> *friction_velocity,</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>                     <span class="keywordtype">double</span> *wall_shear_velocity, <span class="keywordtype">double</span> *wall_shear_normal);</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>                     <span class="comment"></span></div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="comment"> * @brief Computes velocity using Werner-Wengle wall function</span></div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="comment"> * ADVANTAGES:</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment"> *   - Explicit (no iteration required)</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment"> *   - Computationally cheap</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="comment"> *   - Reasonable accuracy for equilibrium boundary layers</span></div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment"> * LIMITATIONS:</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="comment"> *   - Less accurate than log-law for high Reynolds numbers</span></div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="comment"> *   - No pressure gradient effects</span></div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="comment"> * @param[in] friction_velocity   Friction velocity</span></div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment"> * @return    Tangential velocity</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>                <span class="keywordtype">double</span> friction_velocity);                   </div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span> </div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment"></span> </div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="comment"> * @brief Wall shear stress from the cell-integrated Werner-Wengle relation.</span></div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="comment"> * @note Not wired into the solver. The profile is assumed to hold across a cell of height</span></div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="comment"> *       `wall_distance` and integrated, so `velocity` must be the AVERAGE over</span></div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="comment"> *       [0, wall_distance] - a finite-volume first-cell value with its full height. The</span></div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="comment"> *       wall function&#39;s reference is instead a point value at the second cell&#39;s centre;</span></div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="comment"> *       read as an average it over-predicts u_tau by about (1 + B)^(1/(1+B)), 12-14% on</span></div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment"> *       a wall-modelled channel at Re_tau ~ 1000. The solver uses the pointwise pair</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="comment"> *       @ref find_utau_Werner() / @ref u_Werner(), which is also closed form. Kept, with</span></div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="comment"> *       its inverse @ref u_Werner_explicit(), for a caller that does supply a cell average.</span></div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="comment"> *   |u| &lt;= u_m : tau_w = 2 nu |u| / y</span></div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment"> *   |u| &gt;  u_m : tau_w = [ (1-B)/2 A^((1+B)/(1-B)) (nu/y)^(1+B)</span></div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="comment"> *                          + (1+B)/A (nu/y)^B |u| ]^(2/(1+B))</span></div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> * with A = 8.3, B = 1/7, and the switch at u_m = nu/(2y) A^(2/(1-B)). That threshold</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="comment"> * depends only on the geometry and the fluid, which is what makes the inversion</span></div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="comment"> * explicit; a threshold written in terms of the friction velocity would reintroduce the</span></div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> * iteration the model exists to avoid. The two branches meet exactly at u_m.</span></div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="comment"> * Pairs with @ref u_Werner_explicit(), which inverts it. Do not pair it with</span></div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="comment"> * @ref u_Werner(), which is the pointwise profile rather than its cell integral.</span></div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity.</span></div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="comment"> * @param[in] velocity            Wall-parallel speed at `wall_distance`, sign ignored.</span></div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> * @param[in] wall_distance       Normal distance the profile is integrated over.</span></div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="comment"> * @return    Wall shear stress, equal to the square of the friction velocity.</span></div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#ad45f0d21dc2cf5b3de2e72ad322d85da">taw_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance);</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="comment"></span> </div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="comment"> * @brief Wall-parallel velocity at a distance, from the Werner-Wengle wall stress.</span></div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="comment"> * The exact inverse of @ref taw_Werner(), branch for branch, so that a stress obtained</span></div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="comment"> * from a velocity at one distance reproduces a consistent velocity at another. It is</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="comment"> * monotonically increasing in `wall_distance`, so a cell nearer the wall than the one</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="comment"> * the stress came from is always assigned the slower speed.</span></div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="comment"> * The branch is selected on the stress rather than the velocity it is about to produce,</span></div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="comment"> * using the same threshold expressed as tau_m = (nu/y)^2 A^(2/(1-B)).</span></div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity.</span></div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="comment"> * @param[in] wall_distance       Normal distance to evaluate at.</span></div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="comment"> * @param[in] wall_shear_stress   Wall shear stress from @ref taw_Werner().</span></div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="comment"> * @return    Wall-parallel speed at `wall_distance`, non-negative.</span></div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a23513ba3c7eaf60f319dbfe3e1a1aeb3">u_Werner_explicit</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>                         <span class="keywordtype">double</span> wall_shear_stress);</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span> </div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="comment"></span> </div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="comment">/**</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="comment"> * @brief Friction velocity from a point velocity, inverting @ref u_Werner() exactly.</span></div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="comment"> * The closed-form inverse of the pointwise Werner-Wengle profile, branch for branch, and</span></div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="comment"> * the solver&#39;s path. Along that profile U y / nu = (y+)^2 in the sublayer, so the branch</span></div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="comment"> * is chosen from the data alone - sublayer while U y / nu &lt;= 11.81^2 - and each branch</span></div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="comment"> * inverts explicitly:</span></div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="comment"> *   sublayer   : u_tau = sqrt(nu |U| / y)</span></div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="comment"> *   power law  : u_tau = ( |U| / (A (y/nu)^B) )^(1/(1+B)),   A = 8.3, B = 1/7</span></div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="comment"> * No iteration, so the residual it feeds stays smooth for a matrix-free Jacobian.</span></div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="comment"> * @param[in] velocity            Wall-parallel speed at the reference point, sign ignored</span></div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="comment"> * @param[in] wall_distance       Distance from the wall to that point</span></div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="comment"> * @param[in] initial_guess       Unused; kept so existing callers need no change</span></div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="comment"> * @return    Friction velocity</span></div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity,</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>                        <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> initial_guess);</div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span> </div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>                          </div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>                          </div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span> </div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span><span class="preprocessor">#endif </span><span class="comment">// WALLFUNCTION_H</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="comment"> * The pointwise Werner-Wengle profile. Not called by the solver, which takes the friction</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment"> * velocity from its exact inverse, @ref find_utau_Werner(), at the reference cell; this</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment"> * forward form is the definition that inverse is tested against. Explicit relation:</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="comment"> *   u+ = y+                    below the sublayer edge (viscous sublayer)</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="comment"> *   u+ = A * (y+)^B            above it (power law)</span></div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment"> * where A = 8.3, B = 1/7, and the edge is where the two meet, A^(7/6) = 11.8102.</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="comment"> * ADVANTAGES:</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="comment"> *   - Explicit (no iteration required)</span></div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment"> *   - Computationally cheap</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="comment"> *   - Reasonable accuracy for equilibrium boundary layers</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="comment"> * LIMITATIONS:</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment"> *   - Less accurate than log-law for high Reynolds numbers</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="comment"> *   - No pressure gradient effects</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment"> * @param[in] wall_distance       Distance from wall</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="comment"> * @param[in] friction_velocity   Friction velocity</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="comment"> * @return    Tangential velocity</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>                <span class="keywordtype">double</span> friction_velocity);                   </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span> </div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="comment"></span> </div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment"> * @brief Wall shear stress from the cell-integrated Werner-Wengle relation.</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="comment"> * @note Not wired into the solver. The profile is assumed to hold across a cell of height</span></div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment"> *       `wall_distance` and integrated, so `velocity` must be the AVERAGE over</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="comment"> *       [0, wall_distance] - a finite-volume first-cell value with its full height. The</span></div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment"> *       wall function&#39;s reference is instead a point value at the second cell&#39;s centre;</span></div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="comment"> *       read as an average it over-predicts u_tau by about (1 + B)^(1/(1+B)), 12-14% on</span></div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span><span class="comment"> *       a wall-modelled channel at Re_tau ~ 1000. The solver uses the pointwise pair</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="comment"> *       @ref find_utau_Werner() / @ref u_Werner(), which is also closed form. Kept, with</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="comment"> *       its inverse @ref u_Werner_explicit(), for a caller that does supply a cell average.</span></div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span><span class="comment"> *   |u| &lt;= u_m : tau_w = 2 nu |u| / y</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span><span class="comment"> *   |u| &gt;  u_m : tau_w = [ (1-B)/2 A^((1+B)/(1-B)) (nu/y)^(1+B)</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span><span class="comment"> *                          + (1+B)/A (nu/y)^B |u| ]^(2/(1+B))</span></div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="comment"> * with A = 8.3, B = 1/7, and the switch at u_m = nu/(2y) A^(2/(1-B)). That threshold</span></div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="comment"> * depends only on the geometry and the fluid, which is what makes the inversion</span></div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span><span class="comment"> * explicit; a threshold written in terms of the friction velocity would reintroduce the</span></div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span><span class="comment"> * iteration the model exists to avoid. The two branches meet exactly at u_m.</span></div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="comment"> * Pairs with @ref u_Werner_explicit(), which inverts it. Do not pair it with</span></div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="comment"> * @ref u_Werner(), which is the pointwise profile rather than its cell integral.</span></div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity.</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="comment"> * @param[in] velocity            Wall-parallel speed at `wall_distance`, sign ignored.</span></div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="comment"> * @param[in] wall_distance       Normal distance the profile is integrated over.</span></div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span><span class="comment"> * @return    Wall shear stress, equal to the square of the friction velocity.</span></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#ad45f0d21dc2cf5b3de2e72ad322d85da">taw_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity, <span class="keywordtype">double</span> wall_distance);</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="comment"></span> </div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="comment"> * @brief Wall-parallel velocity at a distance, from the Werner-Wengle wall stress.</span></div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span><span class="comment"> * The exact inverse of @ref taw_Werner(), branch for branch, so that a stress obtained</span></div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="comment"> * from a velocity at one distance reproduces a consistent velocity at another. It is</span></div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="comment"> * monotonically increasing in `wall_distance`, so a cell nearer the wall than the one</span></div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="comment"> * the stress came from is always assigned the slower speed.</span></div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="comment"> * The branch is selected on the stress rather than the velocity it is about to produce,</span></div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span><span class="comment"> * using the same threshold expressed as tau_m = (nu/y)^2 A^(2/(1-B)).</span></div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity.</span></div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="comment"> * @param[in] wall_distance       Normal distance to evaluate at.</span></div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="comment"> * @param[in] wall_shear_stress   Wall shear stress from @ref taw_Werner().</span></div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="comment"> * @return    Wall-parallel speed at `wall_distance`, non-negative.</span></div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#a23513ba3c7eaf60f319dbfe3e1a1aeb3">u_Werner_explicit</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> wall_distance,</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>                         <span class="keywordtype">double</span> wall_shear_stress);</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span> </div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="comment"></span> </div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="comment">/**</span></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="comment"> * @brief Friction velocity from a point velocity, inverting @ref u_Werner() exactly.</span></div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><span class="comment"> * The closed-form inverse of the pointwise Werner-Wengle profile, branch for branch, and</span></div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="comment"> * the solver&#39;s path. Along that profile U y / nu = (y+)^2 in the sublayer, so the branch</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="comment"> * is chosen from the data alone - sublayer while U y / nu &lt;= (8.3^(7/6))^2, about 11.8102^2 - and each branch</span></div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="comment"> * inverts explicitly:</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="comment"> *   sublayer   : u_tau = sqrt(nu |U| / y)</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span><span class="comment"> *   power law  : u_tau = ( |U| / (A (y/nu)^B) )^(1/(1+B)),   A = 8.3, B = 1/7</span></div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="comment"> * No iteration, so the residual it feeds stays smooth for a matrix-free Jacobian.</span></div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><span class="comment"> * @param[in] kinematic_viscosity Kinematic viscosity</span></div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="comment"> * @param[in] velocity            Wall-parallel speed at the reference point, sign ignored</span></div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="comment"> * @param[in] wall_distance       Distance from the wall to that point</span></div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="comment"> * @param[in] initial_guess       Unused; kept so existing callers need no change</span></div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span><span class="comment"> * @return    Friction velocity</span></div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span><span class="keywordtype">double</span> <a class="code hl_function" href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner</a>(<span class="keywordtype">double</span> kinematic_viscosity, <span class="keywordtype">double</span> velocity,</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>                        <span class="keywordtype">double</span> wall_distance, <span class="keywordtype">double</span> initial_guess);</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span> </div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>                          </div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>                          </div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span> </div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="preprocessor">#endif </span><span class="comment">// WALLFUNCTION_H</span></div>
 <div class="ttc" id="aBoundaries_8h_html"><div class="ttname"><a href="Boundaries_8h.html">Boundaries.h</a></div></div>
 <div class="ttc" id="aParticleMotion_8h_html"><div class="ttname"><a href="ParticleMotion_8h.html">ParticleMotion.h</a></div><div class="ttdoc">Header file for Particle Motion and migration related functions.</div></div>
 <div class="ttc" id="aParticleSwarm_8h_html"><div class="ttname"><a href="ParticleSwarm_8h.html">ParticleSwarm.h</a></div><div class="ttdoc">Header file for Particle Swarm management functions.</div></div>
@@ -475,22 +482,22 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Logging utilities and macros for PETSc-based applications.</div></div>
 <div class="ttc" id="avariables_8h_html"><div class="ttname"><a href="variables_8h.html">variables.h</a></div><div class="ttdoc">Main header file for a complex fluid dynamics solver.</div></div>
 <div class="ttc" id="awalkingsearch_8h_html"><div class="ttname"><a href="walkingsearch_8h.html">walkingsearch.h</a></div><div class="ttdoc">Header file for particle location functions using the walking search algorithm.</div></div>
-<div class="ttc" id="awallfunction_8h_html_a024875fe3b3dd703c186b2f4c60b6770"><div class="ttname"><a href="wallfunction_8h.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a></div><div class="ttdeci">double df_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Numerical derivative for Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00368">wallfunction.c:368</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a06c7d30325e19c4551db5ecb42485297"><div class="ttname"><a href="wallfunction_8h.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a></div><div class="ttdeci">double f_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Residual function for Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00351">wallfunction.c:351</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a0e80c1fed7a18eed9352d879ef829f88"><div class="ttname"><a href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner</a></div><div class="ttdeci">double u_Werner(double kinematic_viscosity, double wall_distance, double friction_velocity)</div><div class="ttdoc">Computes velocity using Werner-Wengle wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00447">wallfunction.c:447</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a024875fe3b3dd703c186b2f4c60b6770"><div class="ttname"><a href="wallfunction_8h.html#a024875fe3b3dd703c186b2f4c60b6770">df_Cabot</a></div><div class="ttdeci">double df_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Numerical derivative for Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00365">wallfunction.c:365</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a06c7d30325e19c4551db5ecb42485297"><div class="ttname"><a href="wallfunction_8h.html#a06c7d30325e19c4551db5ecb42485297">f_Cabot</a></div><div class="ttdeci">double f_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double friction_velocity_guess, double pressure_gradient_tangent, double pressure_gradient_normal)</div><div class="ttdoc">Residual function for Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00348">wallfunction.c:348</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a0e80c1fed7a18eed9352d879ef829f88"><div class="ttname"><a href="wallfunction_8h.html#a0e80c1fed7a18eed9352d879ef829f88">u_Werner</a></div><div class="ttdeci">double u_Werner(double kinematic_viscosity, double wall_distance, double friction_velocity)</div><div class="ttdoc">Computes velocity using Werner-Wengle wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00444">wallfunction.c:444</a></div></div>
 <div class="ttc" id="awallfunction_8h_html_a1049418624e91520b5fc6240c4e21c4c"><div class="ttname"><a href="wallfunction_8h.html#a1049418624e91520b5fc6240c4e21c4c">u_hydset_roughness</a></div><div class="ttdeci">double u_hydset_roughness(double kinematic_viscosity, double wall_distance, double friction_velocity, double roughness_height)</div><div class="ttdoc">Computes velocity from log-law for rough walls.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00134">wallfunction.c:134</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a23513ba3c7eaf60f319dbfe3e1a1aeb3"><div class="ttname"><a href="wallfunction_8h.html#a23513ba3c7eaf60f319dbfe3e1a1aeb3">u_Werner_explicit</a></div><div class="ttdeci">double u_Werner_explicit(double kinematic_viscosity, double wall_distance, double wall_shear_stress)</div><div class="ttdoc">Wall-parallel velocity at a distance, from the Werner-Wengle wall stress.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00517">wallfunction.c:517</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a2c09c649ff317b786ab655df81a5975d"><div class="ttname"><a href="wallfunction_8h.html#a2c09c649ff317b786ab655df81a5975d">taw</a></div><div class="ttdeci">double taw(double kinematic_viscosity, double friction_velocity, double wall_distance, double velocity, double pressure_gradient_tangent)</div><div class="ttdoc">Computes wall shear stress with pressure gradient effects.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00320">wallfunction.c:320</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a2dcecd46adb748c9c9059f3b482f3cc9"><div class="ttname"><a href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9">find_utau_hydset</a></div><div class="ttdeci">double find_utau_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double initial_guess, double roughness_height)</div><div class="ttdoc">Solves for friction velocity using Newton-Raphson iteration.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00217">wallfunction.c:217</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_a376fd306dd9e99d83ffd07047e038228"><div class="ttname"><a href="wallfunction_8h.html#a376fd306dd9e99d83ffd07047e038228">u_Cabot</a></div><div class="ttdeci">double u_Cabot(double kinematic_viscosity, double wall_distance, double friction_velocity, double pressure_gradient_tangent, double wall_shear_stress)</div><div class="ttdoc">Computes velocity using Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00337">wallfunction.c:337</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_aac13213a766827b72f8d0b9ed88407f0"><div class="ttname"><a href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0">find_utau_Cabot</a></div><div class="ttdeci">void find_utau_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double initial_guess, double pressure_gradient_tangent, double pressure_gradient_normal, double *friction_velocity, double *wall_shear_velocity, double *wall_shear_normal)</div><div class="ttdoc">Solves for friction velocity using Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00391">wallfunction.c:391</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_aac9af3f2cd77f0f840f9e399097f96cf"><div class="ttname"><a href="wallfunction_8h.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a></div><div class="ttdeci">double integrate_1(double kinematic_viscosity, double wall_distance, double friction_velocity, int integration_mode)</div><div class="ttdoc">Integrates eddy viscosity profile from wall to distance y.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00285">wallfunction.c:285</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_abe4b006f1cb55704fdd7534a777efd05"><div class="ttname"><a href="wallfunction_8h.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a></div><div class="ttdeci">double f_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Residual function for friction velocity equation (log-law with roughness)</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00170">wallfunction.c:170</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a23513ba3c7eaf60f319dbfe3e1a1aeb3"><div class="ttname"><a href="wallfunction_8h.html#a23513ba3c7eaf60f319dbfe3e1a1aeb3">u_Werner_explicit</a></div><div class="ttdeci">double u_Werner_explicit(double kinematic_viscosity, double wall_distance, double wall_shear_stress)</div><div class="ttdoc">Wall-parallel velocity at a distance, from the Werner-Wengle wall stress.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00514">wallfunction.c:514</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a2c09c649ff317b786ab655df81a5975d"><div class="ttname"><a href="wallfunction_8h.html#a2c09c649ff317b786ab655df81a5975d">taw</a></div><div class="ttdeci">double taw(double kinematic_viscosity, double friction_velocity, double wall_distance, double velocity, double pressure_gradient_tangent)</div><div class="ttdoc">Computes wall shear stress with pressure gradient effects.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00317">wallfunction.c:317</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a2dcecd46adb748c9c9059f3b482f3cc9"><div class="ttname"><a href="wallfunction_8h.html#a2dcecd46adb748c9c9059f3b482f3cc9">find_utau_hydset</a></div><div class="ttdeci">double find_utau_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double initial_guess, double roughness_height)</div><div class="ttdoc">Solves for friction velocity using Newton-Raphson iteration.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00214">wallfunction.c:214</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_a376fd306dd9e99d83ffd07047e038228"><div class="ttname"><a href="wallfunction_8h.html#a376fd306dd9e99d83ffd07047e038228">u_Cabot</a></div><div class="ttdeci">double u_Cabot(double kinematic_viscosity, double wall_distance, double friction_velocity, double pressure_gradient_tangent, double wall_shear_stress)</div><div class="ttdoc">Computes velocity using Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00334">wallfunction.c:334</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_aac13213a766827b72f8d0b9ed88407f0"><div class="ttname"><a href="wallfunction_8h.html#aac13213a766827b72f8d0b9ed88407f0">find_utau_Cabot</a></div><div class="ttdeci">void find_utau_Cabot(double kinematic_viscosity, double velocity, double wall_distance, double initial_guess, double pressure_gradient_tangent, double pressure_gradient_normal, double *friction_velocity, double *wall_shear_velocity, double *wall_shear_normal)</div><div class="ttdoc">Solves for friction velocity using Cabot wall function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00388">wallfunction.c:388</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_aac9af3f2cd77f0f840f9e399097f96cf"><div class="ttname"><a href="wallfunction_8h.html#aac9af3f2cd77f0f840f9e399097f96cf">integrate_1</a></div><div class="ttdeci">double integrate_1(double kinematic_viscosity, double wall_distance, double friction_velocity, int integration_mode)</div><div class="ttdoc">Integrates eddy viscosity profile from wall to distance y.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00282">wallfunction.c:282</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_abe4b006f1cb55704fdd7534a777efd05"><div class="ttname"><a href="wallfunction_8h.html#abe4b006f1cb55704fdd7534a777efd05">f_hydset</a></div><div class="ttdeci">double f_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Residual function for friction velocity equation (log-law with roughness)</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00167">wallfunction.c:167</a></div></div>
 <div class="ttc" id="awallfunction_8h_html_abed164adf1c16c24e6950cc6fe448936"><div class="ttname"><a href="wallfunction_8h.html#abed164adf1c16c24e6950cc6fe448936">E_coeff</a></div><div class="ttdeci">double E_coeff(double friction_velocity, double roughness_height, double kinematic_viscosity)</div><div class="ttdoc">Computes roughness-modified log-law coefficient E.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00077">wallfunction.c:77</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_ad45f0d21dc2cf5b3de2e72ad322d85da"><div class="ttname"><a href="wallfunction_8h.html#ad45f0d21dc2cf5b3de2e72ad322d85da">taw_Werner</a></div><div class="ttdeci">double taw_Werner(double kinematic_viscosity, double velocity, double wall_distance)</div><div class="ttdoc">Wall shear stress from the cell-integrated Werner-Wengle relation.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00479">wallfunction.c:479</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_adc08703381597f75ccb620bf30d90ae1"><div class="ttname"><a href="wallfunction_8h.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a></div><div class="ttdeci">double nu_t(double yplus)</div><div class="ttdoc">Computes turbulent eddy viscosity ratio (ν_t / ν)</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00270">wallfunction.c:270</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_ae3c3f4e32e6c0df3a7c6ff75f49ae455"><div class="ttname"><a href="wallfunction_8h.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a></div><div class="ttdeci">double df_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Numerical derivative of residual function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00196">wallfunction.c:196</a></div></div>
-<div class="ttc" id="awallfunction_8h_html_afeeebb2124cfe55ad0ca202caa4b0e1f"><div class="ttname"><a href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner</a></div><div class="ttdeci">double find_utau_Werner(double kinematic_viscosity, double velocity, double wall_distance, double initial_guess)</div><div class="ttdoc">Friction velocity from a point velocity, inverting u_Werner() exactly.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00555">wallfunction.c:555</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_ad45f0d21dc2cf5b3de2e72ad322d85da"><div class="ttname"><a href="wallfunction_8h.html#ad45f0d21dc2cf5b3de2e72ad322d85da">taw_Werner</a></div><div class="ttdeci">double taw_Werner(double kinematic_viscosity, double velocity, double wall_distance)</div><div class="ttdoc">Wall shear stress from the cell-integrated Werner-Wengle relation.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00476">wallfunction.c:476</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_adc08703381597f75ccb620bf30d90ae1"><div class="ttname"><a href="wallfunction_8h.html#adc08703381597f75ccb620bf30d90ae1">nu_t</a></div><div class="ttdeci">double nu_t(double yplus)</div><div class="ttdoc">Computes turbulent eddy viscosity ratio (ν_t / ν)</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00267">wallfunction.c:267</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_ae3c3f4e32e6c0df3a7c6ff75f49ae455"><div class="ttname"><a href="wallfunction_8h.html#ae3c3f4e32e6c0df3a7c6ff75f49ae455">df_hydset</a></div><div class="ttdeci">double df_hydset(double kinematic_viscosity, double known_velocity, double wall_distance, double friction_velocity_guess, double roughness_height)</div><div class="ttdoc">Numerical derivative of residual function.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00193">wallfunction.c:193</a></div></div>
+<div class="ttc" id="awallfunction_8h_html_afeeebb2124cfe55ad0ca202caa4b0e1f"><div class="ttname"><a href="wallfunction_8h.html#afeeebb2124cfe55ad0ca202caa4b0e1f">find_utau_Werner</a></div><div class="ttdeci">double find_utau_Werner(double kinematic_viscosity, double velocity, double wall_distance, double initial_guess)</div><div class="ttdoc">Friction velocity from a point velocity, inverting u_Werner() exactly.</div><div class="ttdef"><b>Definition</b> <a href="wallfunction_8c_source.html#l00552">wallfunction.c:552</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

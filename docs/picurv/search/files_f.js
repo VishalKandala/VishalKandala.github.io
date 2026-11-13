@@ -13,7 +13,8 @@ var searchData=
   ['ec403bc_2dresampled_2dvelocity_2emd_10',['ec403bc-resampled-velocity.md',['../ec403bc-resampled-velocity_8md.html',1,'']]],
   ['ec40f11_2dfree_2dslip_2dsupported_2emd_11',['ec40f11-free-slip-supported.md',['../ec40f11-free-slip-supported_8md.html',1,'']]],
   ['ed5eaf3_2dstaging_2drefusal_2dcleanup_2emd_12',['ed5eaf3-staging-refusal-cleanup.md',['../ed5eaf3-staging-refusal-cleanup_8md.html',1,'']]],
-  ['expression_2ec_13',['expression.c',['../expression_8c.html',1,'']]],
-  ['expression_2eh_14',['expression.h',['../expression_8h.html',1,'']]],
-  ['extract_5fartifact_5ftopology_2epy_15',['extract_artifact_topology.py',['../extract__artifact__topology_8py.html',1,'']]]
+  ['ef52162b_2dcase_2ddesign_2dearly_2dtiming_2emd_13',['ef52162b-case-design-early-timing.md',['../ef52162b-case-design-early-timing_8md.html',1,'']]],
+  ['expression_2ec_14',['expression.c',['../expression_8c.html',1,'']]],
+  ['expression_2eh_15',['expression.h',['../expression_8h.html',1,'']]],
+  ['extract_5fartifact_5ftopology_2epy_16',['extract_artifact_topology.py',['../extract__artifact__topology_8py.html',1,'']]]
 ];

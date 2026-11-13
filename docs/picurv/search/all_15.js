@@ -28,9 +28,10 @@ var searchData=
   ['jm_25',['JM',['../variables_8h.html#aa55a2a246e904b3569075eb4de0092a6',1,'UserCtx']]],
   ['job_20fails_20on_20a_20cluster_20but_20works_20locally_26',['7. The Job Fails on a Cluster but Works Locally',['../67_Troubleshooting.html#p67_cluster_sec',1,'']]],
   ['job_20generation_20and_20reuse_27',['7. Batch Job Generation And Reuse',['../52_Run_Artifact_Lifecycle_Contract.html#p52_cluster_sec',1,'']]],
-  ['jsc_28',['jsc',['../variables_8h.html#a5fd8588302a68eca03d086e01e8972c1',1,'UserCtx::jsc'],['../variables_8h.html#ac9199af6c5bffa86ce1ba076ee15f59a',1,'UserMG::jsc']]],
-  ['json_20plan_20schema_29',['9. Dry-Run JSON Plan Schema',['../05_The_Conductor_Script.html#p05_dry_run_schema_sec',1,'']]],
-  ['json_5fpath_30',['JSON_PATH',['../namespacegenerate__cli__reference.html#a162207bbc09cb601ce4ab9ca80aa420a',1,'generate_cli_reference']]],
-  ['junction_31',['JUNCTION',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaf450e16147ffcf97341b35890aa4056c',1,'variables.h']]],
-  ['jzet_32',['JZet',['../variables_8h.html#a733ad785db194e51ad86c1613844ba31',1,'UserCtx']]]
+  ['job_20sizing_28',['bd8ec89b-case-design-job-sizing',['../md_docs_2changelog_8d_2bd8ec89b-case-design-job-sizing.html',1,'']]],
+  ['jsc_29',['jsc',['../variables_8h.html#a5fd8588302a68eca03d086e01e8972c1',1,'UserCtx::jsc'],['../variables_8h.html#ac9199af6c5bffa86ce1ba076ee15f59a',1,'UserMG::jsc']]],
+  ['json_20plan_20schema_30',['9. Dry-Run JSON Plan Schema',['../05_The_Conductor_Script.html#p05_dry_run_schema_sec',1,'']]],
+  ['json_5fpath_31',['JSON_PATH',['../namespacegenerate__cli__reference.html#a162207bbc09cb601ce4ab9ca80aa420a',1,'generate_cli_reference']]],
+  ['junction_32',['JUNCTION',['../variables_8h.html#a0a00003814ee8095a2c39d1d5cba08faaf450e16147ffcf97341b35890aa4056c',1,'variables.h']]],
+  ['jzet_33',['JZet',['../variables_8h.html#a733ad785db194e51ad86c1613844ba31',1,'UserCtx']]]
 ];
