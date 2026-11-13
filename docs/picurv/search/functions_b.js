@@ -55,9 +55,10 @@ var searchData=
   ['loggetcolumnreal_52',['LogGetColumnReal',['../test__logging_8c.html#ad1aa93a711750b0710bc98058401387b',1,'test_logging.c']]],
   ['loggetcolumntext_53',['LogGetColumnText',['../test__logging_8c.html#a0d02a43756e92a77f54289f0b1883f95',1,'test_logging.c']]],
   ['loggingstatisticsdefinition_54',['LoggingStatisticsDefinition',['../test__logging_8c.html#a6645b1416807d576c70884ef5f089577',1,'test_logging.c']]],
-  ['loglesdiagnostics_55',['loglesdiagnostics',['../les_8h.html#ab0db57f6573fd8836b9a53c0483181a4',1,'LogLESDiagnostics(UserCtx *user):&#160;les.c'],['../les_8c.html#ab0db57f6573fd8836b9a53c0483181a4',1,'LogLESDiagnostics(UserCtx *user):&#160;les.c']]],
-  ['logprescribedflowdiagnostics_56',['logprescribedflowdiagnostics',['../BC__Handlers_8h.html#aa307f945823f026091c18a97feff9bf2',1,'LogPrescribedFlowDiagnostics(UserCtx *user):&#160;BC_Handlers.c'],['../BC__Handlers_8c.html#aa307f945823f026091c18a97feff9bf2',1,'LogPrescribedFlowDiagnostics(UserCtx *user):&#160;BC_Handlers.c']]],
-  ['logresolvedwindow_57',['LogResolvedWindow',['../statistics__config_8c.html#a7c5a4551c99abb5f5aa6eb139c4808ca',1,'statistics_config.c']]],
-  ['logwallmodeldiagnostics_58',['logwallmodeldiagnostics',['../Boundaries_8h.html#a6402d77bc3a398d6c5e3b74b4e81c4e6',1,'LogWallModelDiagnostics(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a6402d77bc3a398d6c5e3b74b4e81c4e6',1,'LogWallModelDiagnostics(UserCtx *user):&#160;Boundaries.c']]],
-  ['lower_5fvalue_59',['lower_value',['../namespacepicurv__cli_1_1source__expressions.html#a1722c1fb978bf8a6f3d035dc707ab7ad',1,'picurv_cli::source_expressions']]]
+  ['loglawsublayeredge_55',['LogLawSublayerEdge',['../wallfunction_8c.html#a293979db296a25a287574b8c432c3ada',1,'wallfunction.c']]],
+  ['loglesdiagnostics_56',['loglesdiagnostics',['../les_8h.html#ab0db57f6573fd8836b9a53c0483181a4',1,'LogLESDiagnostics(UserCtx *user):&#160;les.c'],['../les_8c.html#ab0db57f6573fd8836b9a53c0483181a4',1,'LogLESDiagnostics(UserCtx *user):&#160;les.c']]],
+  ['logprescribedflowdiagnostics_57',['logprescribedflowdiagnostics',['../BC__Handlers_8h.html#aa307f945823f026091c18a97feff9bf2',1,'LogPrescribedFlowDiagnostics(UserCtx *user):&#160;BC_Handlers.c'],['../BC__Handlers_8c.html#aa307f945823f026091c18a97feff9bf2',1,'LogPrescribedFlowDiagnostics(UserCtx *user):&#160;BC_Handlers.c']]],
+  ['logresolvedwindow_58',['LogResolvedWindow',['../statistics__config_8c.html#a7c5a4551c99abb5f5aa6eb139c4808ca',1,'statistics_config.c']]],
+  ['logwallmodeldiagnostics_59',['logwallmodeldiagnostics',['../Boundaries_8h.html#a6402d77bc3a398d6c5e3b74b4e81c4e6',1,'LogWallModelDiagnostics(UserCtx *user):&#160;Boundaries.c'],['../Boundaries_8c.html#a6402d77bc3a398d6c5e3b74b4e81c4e6',1,'LogWallModelDiagnostics(UserCtx *user):&#160;Boundaries.c']]],
+  ['lower_5fvalue_60',['lower_value',['../namespacepicurv__cli_1_1source__expressions.html#a1722c1fb978bf8a6f3d035dc707ab7ad',1,'picurv_cli::source_expressions']]]
 ];

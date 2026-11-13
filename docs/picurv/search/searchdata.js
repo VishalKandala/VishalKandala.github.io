@@ -9,7 +9,7 @@ var indexSectionsWithContent =
   6: "abcfilmnprsuvw",
   7: "bcdefilmprsvw",
   8: "abcdefijlmnoprstuvw",
-  9: "_abcdefghiklmnprstvw",
+  9: "_abcdefghiklmnprstw",
   10: "ghipst",
   11: "0123456789abcdefghijklmnopqrstuvwyz"
 };

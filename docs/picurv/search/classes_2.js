@@ -5,5 +5,6 @@ var searchData=
   ['bcs_2',['BCS',['../variables_8h.html#structBCS',1,'']]],
   ['boundarycondition_3',['BoundaryCondition',['../structBoundaryCondition.html',1,'']]],
   ['boundaryfaceconfig_4',['BoundaryFaceConfig',['../variables_8h.html#structBoundaryFaceConfig',1,'']]],
-  ['boundingbox_5',['BoundingBox',['../variables_8h.html#structBoundingBox',1,'']]]
+  ['boundaryfaceelements_5',['BoundaryFaceElements',['../variables_8h.html#structBoundaryFaceElements',1,'']]],
+  ['boundingbox_6',['BoundingBox',['../variables_8h.html#structBoundingBox',1,'']]]
 ];

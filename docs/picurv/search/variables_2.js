@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['b_0',['b',['../expression_8h.html#a8cf2aad0abcb7ae74cbfea78226b9c00',1,'PicurvSourceFaceSlots::b'],['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx::B']]],
+  ['b_0',['b',['../variables_8h.html#af206cbc0c31439b704e7b6dfdf859990',1,'BoundaryFaceElements::b'],['../variables_8h.html#afb0db0163f5987323372d58a89e3efa1',1,'UserCtx::B']]],
   ['backscatter_5fvolume_1',['backscatter_volume',['../variables_8h.html#ae7db9f8d488236f81571adee716460c6',1,'LESDiagnosticsState']]],
   ['backticked_5fre_2',['BACKTICKED_RE',['../namespaceaudit__field__catalog.html#a2659557cc896225a3198ee5ca6ec020e',1,'audit_field_catalog']]],
   ['banner_5frequired_3',['BANNER_REQUIRED',['../namespaceaudit__user__facing__reporting.html#a305470ac1fada34c02a94b7fc69d4a9d',1,'audit_user_facing_reporting']]],

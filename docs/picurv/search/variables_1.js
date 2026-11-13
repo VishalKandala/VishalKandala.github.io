@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['a_0',['a',['../expression_8h.html#ad2954fa046943e08e0b9fd2192c82996',1,'PicurvSourceFaceSlots::a'],['../variables_8h.html#a555f83bde847a6f7bde6e372ca74dd4b',1,'UserCtx::A']]],
+  ['a_0',['a',['../variables_8h.html#ae66ef3374a7c0fd870504adf4b82a2ac',1,'BoundaryFaceElements::a'],['../variables_8h.html#a555f83bde847a6f7bde6e372ca74dd4b',1,'UserCtx::A']]],
   ['a_5fc_1',['a_c',['../variables_8h.html#ab855d42df8eae7cb8be83f0100da67e9',1,'FSInfo']]],
   ['a_5ftot_2',['A_tot',['../variables_8h.html#ad66d4a2ad50b87f8150be135c95d2c3b',1,'FSInfo']]],
   ['acc_3',['acc',['../variables_8h.html#a3c39b705d19eca0ae071c27b23778633',1,'FSInfo']]],

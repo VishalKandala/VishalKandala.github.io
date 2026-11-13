@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['n_0',['n',['../ParticleSwarm_8c.html#aa6d31ea02173263056764f32994d65cd',1,'SeedingCellTable::n'],['../expression_8h.html#a5f7adbc1c966cf7982de9c786079b87b',1,'PicurvSourceFaceSlots::n'],['../test__momentum__convective__candidates_8c.html#a58446191824442f71458932e28dca3a6',1,'DofMap::n']]],
+  ['n_0',['n',['../ParticleSwarm_8c.html#aa6d31ea02173263056764f32994d65cd',1,'SeedingCellTable::n'],['../variables_8h.html#ab62c469c1c14c8163fdd0a33286b3c6d',1,'BoundaryFaceElements::n'],['../test__momentum__convective__candidates_8c.html#a58446191824442f71458932e28dca3a6',1,'DofMap::n']]],
   ['n2_1',['n2',['../test__momentum__convective__candidates_8c.html#a0ec802cf5ffedef0f4e3409cb795cc5d',1,'GlobalVecStats']]],
   ['n_5felmt_2',['n_elmt',['../variables_8h.html#a9129f89c6f806be61916a939853f333d',1,'IBMNodes::n_elmt'],['../variables_8h.html#a11f501721553b2dfb318e0350bbf3461',1,'IBMVNodes::n_elmt']]],
   ['n_5fmidp_3',['n_midp',['../variables_8h.html#ae0e64a651f864cdca956686ff2629743',1,'Cstart']]],
@@ -38,7 +38,7 @@ var searchData=
   ['nodes_35',['nodes',['../expression_8c.html#ac4547bfcde8cf4a481a457b004cee437',1,'ExpressionParser']]],
   ['non_5finherited_36',['NON_INHERITED',['../namespaceaudit__subsystem__lifecycle.html#a74bffc05556958f129db551eeb237e19',1,'audit_subsystem_lifecycle']]],
   ['non_5fselectable_5fstatuses_37',['NON_SELECTABLE_STATUSES',['../namespaceaudit__capability__coverage.html#a07a5caded9836665f429b4458def16cd',1,'audit_capability_coverage']]],
-  ['normal_38',['normal',['../expression_8h.html#a3ffad1dc5f4514fa448a4f918ae1bef8',1,'PicurvSourceFaceSlots::normal'],['../Metric_8h.html#a6b76b80e6cadfa9e425de63811fe824d',1,'FacePlaneArrays::normal'],['../variables_8h.html#a1e2e37fb7aab9ef94aff74cd492f3989',1,'FacePlane::normal']]],
+  ['normal_38',['normal',['../Metric_8h.html#a6b76b80e6cadfa9e425de63811fe824d',1,'FacePlaneArrays::normal'],['../variables_8h.html#a1e2e37fb7aab9ef94aff74cd492f3989',1,'FacePlane::normal'],['../variables_8h.html#a4c2a788e97e3d8c5b31dcd71755157e0',1,'BoundaryFaceElements::normal']]],
   ['not_5fa_5fquantity_39',['NOT_A_QUANTITY',['../namespacepicurv__cli_1_1core.html#a177ad090d9a07cb31a962cfcc97bb093',1,'picurv_cli::core']]],
   ['not_5frun_5fowned_5fprefixes_40',['NOT_RUN_OWNED_PREFIXES',['../namespaceaudit__path__literals.html#a3fe63501bae3a434cef5beb83bf89bf0',1,'audit_path_literals']]],
   ['np_41',['np',['../namespacepicurv__cli_1_1core.html#a39ca7ec3f17d711e2680089a6a2d44da',1,'picurv_cli.core.np'],['../variables_8h.html#a5eedf611da6dd4f59cc65753b777b957',1,'SimCtx::np']]],
@@ -53,15 +53,14 @@ var searchData=
   ['nt_5fz_50',['nt_z',['../variables_8h.html#af3896c0533f26f68e878788c5e9669d9',1,'IBMNodes']]],
   ['ntracepids_51',['nTracePIDs',['../variables_8h.html#a371b49a7a692dbfeabc9b349bcb8e32a',1,'SimCtx']]],
   ['nu_5ft_52',['Nu_t',['../variables_8h.html#a9458ae2fd01569ea1ea0e84106874485',1,'UserCtx']]],
-  ['nu_5fwall_53',['Nu_Wall',['../variables_8h.html#a4b28bd437fb712c1ee5b43d55fabd154',1,'UserCtx']]],
-  ['nullsp_54',['nullsp',['../variables_8h.html#a217e7d968ac372d82d28d88654ed2072',1,'UserCtx']]],
-  ['num_5fbcs_5ffiles_55',['num_bcs_files',['../variables_8h.html#ab17f6375fec794f8022ab283d28fa8a0',1,'SimCtx']]],
-  ['num_5fcomponents_56',['num_components',['../variables_8h.html#a1676e73c74586290cada1e0b922cb7fc',1,'VTKFieldInfo']]],
-  ['num_5fpoint_5fdata_5ffields_57',['num_point_data_fields',['../variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b',1,'VTKMetaData']]],
-  ['nv1_58',['nv1',['../variables_8h.html#a3e807f01c312340b7996edbab76dc61a',1,'IBMVNodes::nv1'],['../variables_8h.html#a8664e7c0bdf1777bcc7c380e2c26f2a9',1,'IBMNodes::nv1']]],
-  ['nv2_59',['nv2',['../variables_8h.html#ad207a8a40f1723caf3c919e89a8b6e7b',1,'IBMVNodes::nv2'],['../variables_8h.html#a9a0a20f44e94151a7a5136712bbf52e1',1,'IBMNodes::nv2']]],
-  ['nv3_60',['nv3',['../variables_8h.html#a7fe23c1f24c12c23bc6436d41204750b',1,'IBMVNodes::nv3'],['../variables_8h.html#a51df9a3bbf97e05f9bfed0af1b05d837',1,'IBMNodes::nv3']]],
-  ['nv4_61',['nv4',['../variables_8h.html#a7be82e91a70fac22e4b964da7ffa0ad3',1,'IBMVNodes']]],
-  ['nvert_62',['Nvert',['../variables_8h.html#ada2db2a63cf3a9fe7ad2abf01cedc818',1,'UserCtx']]],
-  ['nvert_5fo_63',['Nvert_o',['../variables_8h.html#ab7d6dffd5a35c03211c65aca209c909e',1,'UserCtx']]]
+  ['nullsp_53',['nullsp',['../variables_8h.html#a217e7d968ac372d82d28d88654ed2072',1,'UserCtx']]],
+  ['num_5fbcs_5ffiles_54',['num_bcs_files',['../variables_8h.html#ab17f6375fec794f8022ab283d28fa8a0',1,'SimCtx']]],
+  ['num_5fcomponents_55',['num_components',['../variables_8h.html#a1676e73c74586290cada1e0b922cb7fc',1,'VTKFieldInfo']]],
+  ['num_5fpoint_5fdata_5ffields_56',['num_point_data_fields',['../variables_8h.html#a2377e3556c5d9c4d9b208e8e4d66d04b',1,'VTKMetaData']]],
+  ['nv1_57',['nv1',['../variables_8h.html#a3e807f01c312340b7996edbab76dc61a',1,'IBMVNodes::nv1'],['../variables_8h.html#a8664e7c0bdf1777bcc7c380e2c26f2a9',1,'IBMNodes::nv1']]],
+  ['nv2_58',['nv2',['../variables_8h.html#ad207a8a40f1723caf3c919e89a8b6e7b',1,'IBMVNodes::nv2'],['../variables_8h.html#a9a0a20f44e94151a7a5136712bbf52e1',1,'IBMNodes::nv2']]],
+  ['nv3_59',['nv3',['../variables_8h.html#a7fe23c1f24c12c23bc6436d41204750b',1,'IBMVNodes::nv3'],['../variables_8h.html#a51df9a3bbf97e05f9bfed0af1b05d837',1,'IBMNodes::nv3']]],
+  ['nv4_60',['nv4',['../variables_8h.html#a7be82e91a70fac22e4b964da7ffa0ad3',1,'IBMVNodes']]],
+  ['nvert_61',['Nvert',['../variables_8h.html#ada2db2a63cf3a9fe7ad2abf01cedc818',1,'UserCtx']]],
+  ['nvert_5fo_62',['Nvert_o',['../variables_8h.html#ab7d6dffd5a35c03211c65aca209c909e',1,'UserCtx']]]
 ];

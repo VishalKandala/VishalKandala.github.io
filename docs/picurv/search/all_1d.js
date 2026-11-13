@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['r_0',['r',['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r'],['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R']]],
+  ['r_0',['r',['../variables_8h.html#ac68ff04231ee0e5fd575c66ffa7f8f36',1,'UserCtx::R'],['../variables_8h.html#a2a6850ae76d1fc1564104eba1828b3c4',1,'FSInfo::R'],['../variables_8h.html#acb2657798b5e7f2e1b7237bb56fcfec5',1,'SimCtx::r']]],
   ['radvec_1',['radvec',['../variables_8h.html#a23a4e72b98386d92e2916ea6e3cfafe5',1,'IBMNodes']]],
   ['raising_20the_20accumulated_20moment_20order_2',['6. Raising The Accumulated Moment Order',['../60_Field_Statistics_Planned_Extensions.html#p60_order_extension_sec',1,'']]],
   ['ramp_3',['ramp',['../48_Grid_Generator_Guide.html#p48_cap_wall_ramp_sub',1,'']]],
@@ -174,7 +174,7 @@ var searchData=
   ['remove_5fentry_171',['remove_entry',['../namespaceaudit__agent__setup.html#aec1d952c9cc39ef4cf4c7e66df0d3960',1,'audit_agent_setup']]],
   ['removed_20and_20spectral_20ics_20supported_172',['46a0680-rans-removed-and-spectral-ics-supported',['../md_docs_2changelog_8d_246a0680-rans-removed-and-spectral-ics-supported.html',1,'']]],
   ['removed_5fmonitor_5ffunctions_173',['REMOVED_MONITOR_FUNCTIONS',['../namespacepicurv__cli_1_1core.html#a3cf58743fff831c777cc744243b7b680',1,'picurv_cli::core']]],
-  ['removefacenormalcomponent_174',['RemoveFaceNormalComponent',['../BC__Handlers_8c.html#a17cf8e29918a5e57d4f60bfe7b65ecbd',1,'BC_Handlers.c']]],
+  ['removefacenormalcomponent_174',['RemoveFaceNormalComponent',['../Metric_8h.html#a17cf8e29918a5e57d4f60bfe7b65ecbd',1,'Metric.h']]],
   ['removeflaggedparticles_175',['removeflaggedparticles',['../ParticleMotion_8h.html#a4b87b0c1887f84e318f74f2a0982811e',1,'RemoveFlaggedParticles(DM swarm, PetscInt n_scan, PetscBool remove[], PetscBool scan_backward):&#160;ParticleMotion.c'],['../ParticleMotion_8c.html#a4b87b0c1887f84e318f74f2a0982811e',1,'RemoveFlaggedParticles(DM swarm, PetscInt n_scan, PetscBool remove[], PetscBool scan_backward):&#160;ParticleMotion.c']]],
   ['ren_176',['ren',['../variables_8h.html#a4897d17394963da4ac73b9856fac48c5',1,'SimCtx']]],
   ['renamed_20terms_177',['7. Deprecated and Renamed Terms',['../68_Glossary.html#p68_deprecated_sec',1,'']]],
@@ -386,7 +386,7 @@ var searchData=
   ['rhsvelocityat_383',['RHSVelocityAt',['../rhs_8c.html#aeb369ccc0dc4dae41cb4ca549485cf08',1,'rhs.c']]],
   ['rhsvelocityatbn_384',['RHSVelocityAtBN',['../rhs_8c.html#a780e7b62eb2df9c6d6d5df7bf9ab731e',1,'rhs.c']]],
   ['rhsviscousfaceflux_385',['RHSViscousFaceFlux',['../rhs_8c.html#a52897a6a1c4b85719c873b74694b97cf',1,'rhs.c']]],
-  ['rhsviscousfluxesalong_386',['RHSViscousFluxesAlong',['../rhs_8c.html#a08cf367eced8032f3a2faf7a7c3fbfae',1,'rhs.c']]],
+  ['rhsviscousfluxesalong_386',['RHSViscousFluxesAlong',['../rhs_8c.html#aef2d08f4261a349d28b764e9c9409300',1,'rhs.c']]],
   ['rhszeroinactiverows_387',['RHSZeroInactiveRows',['../rhs_8c.html#a10c70ce8fc7ae96e7c9f0950d57b878c',1,'rhs.c']]],
   ['riders_388',['c519b4c-particle-scalar-riders',['../md_docs_2changelog_8d_2c519b4c-particle-scalar-riders.html',1,'']]],
   ['right_389',['RIGHT',['../variables_8h.html#ad3fc1d97a3c41ea9d58d0ab14f75294faec8379af7490bb9eaaf579cf17876f38',1,'variables.h']]],
