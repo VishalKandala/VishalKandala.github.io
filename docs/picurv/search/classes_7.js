@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['globalvecstats_0',['GlobalVecStats',['../test__momentum__convective__candidates_8c.html#structGlobalVecStats',1,'']]]
-];
+var searchData=[["globalvecstats_0",["GlobalVecStats",["../test__momentum__convective__candidates_8c.html#structGlobalVecStats",1,""]]]];

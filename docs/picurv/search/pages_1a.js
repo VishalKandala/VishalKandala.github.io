@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['quick_20start_0',['Quick Start',['../41_Getting_Started_Index.html',1,'']]]
-];
+var searchData=[["quick_20start_0",["Quick Start",["../41_Getting_Started_Index.html",1,""]]]];

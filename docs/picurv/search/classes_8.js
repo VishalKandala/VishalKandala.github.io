@@ -1,9 +1,1 @@
-var searchData=
-[
-  ['ibminfo_0',['IBMInfo',['../variables_8h.html#structIBMInfo',1,'']]],
-  ['ibmlist_1',['IBMList',['../variables_8h.html#structIBMList',1,'']]],
-  ['ibmlistnode_2',['IBMListNode',['../variables_8h.html#structIBMListNode',1,'']]],
-  ['ibmnodes_3',['IBMNodes',['../variables_8h.html#structIBMNodes',1,'']]],
-  ['ibmvnodes_4',['IBMVNodes',['../variables_8h.html#structIBMVNodes',1,'']]],
-  ['inletprescribedvelocitydata_5',['InletPrescribedVelocityData',['../BC__Handlers_8c.html#structInletPrescribedVelocityData',1,'']]]
-];
+var searchData=[["ibminfo_0",["IBMInfo",["../variables_8h.html#structIBMInfo",1,""]]],["ibmlist_1",["IBMList",["../variables_8h.html#structIBMList",1,""]]],["ibmlistnode_2",["IBMListNode",["../variables_8h.html#structIBMListNode",1,""]]],["ibmnodes_3",["IBMNodes",["../variables_8h.html#structIBMNodes",1,""]]],["ibmvnodes_4",["IBMVNodes",["../variables_8h.html#structIBMVNodes",1,""]]],["inletprescribedvelocitydata_5",["InletPrescribedVelocityData",["../BC__Handlers_8c.html#structInletPrescribedVelocityData",1,""]]]];

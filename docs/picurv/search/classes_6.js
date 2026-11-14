@@ -1,10 +1,1 @@
-var searchData=
-[
-  ['faceplane_0',['FacePlane',['../variables_8h.html#structFacePlane',1,'']]],
-  ['faceplanearrays_1',['FacePlaneArrays',['../Metric_8h.html#structFacePlaneArrays',1,'']]],
-  ['fielddescriptor_2',['FieldDescriptor',['../field__catalog_8h.html#structFieldDescriptor',1,'']]],
-  ['fielddimension_3',['FieldDimension',['../field__catalog_8h.html#structFieldDimension',1,'']]],
-  ['fieldview_4',['FieldView',['../field__catalog_8h.html#structFieldView',1,'']]],
-  ['fpsnapshot_5',['FpSnapshot',['../test__momentum__newton__boundary__fixedpoint_8c.html#structFpSnapshot',1,'']]],
-  ['fsinfo_6',['FSInfo',['../variables_8h.html#structFSInfo',1,'']]]
-];
+var searchData=[["faceplane_0",["FacePlane",["../variables_8h.html#structFacePlane",1,""]]],["faceplanearrays_1",["FacePlaneArrays",["../Metric_8h.html#structFacePlaneArrays",1,""]]],["fielddescriptor_2",["FieldDescriptor",["../field__catalog_8h.html#structFieldDescriptor",1,""]]],["fielddimension_3",["FieldDimension",["../field__catalog_8h.html#structFieldDimension",1,""]]],["fieldview_4",["FieldView",["../field__catalog_8h.html#structFieldView",1,""]]],["fpsnapshot_5",["FpSnapshot",["../test__momentum__newton__boundary__fixedpoint_8c.html#structFpSnapshot",1,""]]],["fsinfo_6",["FSInfo",["../variables_8h.html#structFSInfo",1,""]]]];
