@@ -34,8 +34,9 @@ var searchData=
   ['logging_31',['06a24f6c-newcomer-logging',['../md_docs_2changelog_8d_206a24f6c-newcomer-logging.html',1,'']]],
   ['logging_20sync_20and_20levels_32',['31b4b2df-logging-sync-and-levels',['../md_docs_2changelog_8d_231b4b2df-logging-sync-and-levels.html',1,'']]],
   ['logs_33',['cab1626-nk-history-two-logs',['../md_docs_2changelog_8d_2cab1626-nk-history-two-logs.html',1,'']]],
-  ['lookup_34',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
-  ['lookup_20process_20grid_35',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
-  ['loose_20ends_36',['2e888970-source-loose-ends',['../md_docs_2changelog_8d_22e888970-source-loose-ends.html',1,'']]],
-  ['low_20priority_20fixes_37',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
+  ['long_20jobs_34',['bd117582-agents-long-jobs',['../md_docs_2changelog_8d_2bd117582-agents-long-jobs.html',1,'']]],
+  ['lookup_35',['1d983d2-wrap-one-handoff-owner-lookup',['../md_docs_2changelog_8d_21d983d2-wrap-one-handoff-owner-lookup.html',1,'']]],
+  ['lookup_20process_20grid_36',['a6ce850-owner-lookup-process-grid',['../md_docs_2changelog_8d_2a6ce850-owner-lookup-process-grid.html',1,'']]],
+  ['loose_20ends_37',['2e888970-source-loose-ends',['../md_docs_2changelog_8d_22e888970-source-loose-ends.html',1,'']]],
+  ['low_20priority_20fixes_38',['Maintenance Backlog and Low-Priority Fixes',['../29_Maintenance_Backlog.html',1,'']]]
 ];
