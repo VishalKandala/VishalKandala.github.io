@@ -11,5 +11,6 @@ var searchData=
   ['db983d0_2dnk_2dunconverged_2dstep_2dpolicy_2emd_8',['db983d0-nk-unconverged-step-policy.md',['../db983d0-nk-unconverged-step-policy_8md.html',1,'']]],
   ['dbd24e7_2dprofiling_2drank_2dreduction_2emd_9',['dbd24e7-profiling-rank-reduction.md',['../dbd24e7-profiling-rank-reduction_8md.html',1,'']]],
   ['dbf2a48_2ddoxygen_2dchangelog_2dleading_2dblank_2emd_10',['dbf2a48-doxygen-changelog-leading-blank.md',['../dbf2a48-doxygen-changelog-leading-blank_8md.html',1,'']]],
-  ['df5a2e6d_2dnov8_2dpromotions_2emd_11',['df5a2e6d-nov8-promotions.md',['../df5a2e6d-nov8-promotions_8md.html',1,'']]]
+  ['dc804082_2daprime_2drecord_2dcontinue_2ddocs_2emd_11',['dc804082-aprime-record-continue-docs.md',['../dc804082-aprime-record-continue-docs_8md.html',1,'']]],
+  ['df5a2e6d_2dnov8_2dpromotions_2emd_12',['df5a2e6d-nov8-promotions.md',['../df5a2e6d-nov8-promotions_8md.html',1,'']]]
 ];
