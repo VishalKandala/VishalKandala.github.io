@@ -19,5 +19,6 @@ var searchData=
   ['7a4cf6b_2dstatus_2dpromotions_2emd_16',['7a4cf6b-status-promotions.md',['../7a4cf6b-status-promotions_8md.html',1,'']]],
   ['7acabbf3_2dparticles_2dper_2dcell_2emd_17',['7acabbf3-particles-per-cell.md',['../7acabbf3-particles-per-cell_8md.html',1,'']]],
   ['7d08e19_2dhom02_2dpoisson_2drewrite_2emd_18',['7d08e19-hom02-poisson-rewrite.md',['../7d08e19-hom02-poisson-rewrite_8md.html',1,'']]],
-  ['7d174e32_2diem_2dseam_2dcounts_2emd_19',['7d174e32-iem-seam-counts.md',['../7d174e32-iem-seam-counts_8md.html',1,'']]]
+  ['7d174e32_2diem_2dseam_2dcounts_2emd_19',['7d174e32-iem-seam-counts.md',['../7d174e32-iem-seam-counts_8md.html',1,'']]],
+  ['7ff6e49f_2dci_2dpin_2dubuntu_2d2404_2emd_20',['7ff6e49f-ci-pin-ubuntu-2404.md',['../7ff6e49f-ci-pin-ubuntu-2404_8md.html',1,'']]]
 ];
