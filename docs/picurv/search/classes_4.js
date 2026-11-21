@@ -1,6 +1,1 @@
-var searchData=
-[
-  ['dofmap_0',['DofMap',['../test__momentum__convective__candidates_8c.html#structDofMap',1,'']]],
-  ['drivenfluxdata_1',['DrivenFluxData',['../BC__Handlers_8c.html#structDrivenFluxData',1,'']]],
-  ['dualmonitorctx_2',['DualMonitorCtx',['../logging_8h.html#structDualMonitorCtx',1,'']]]
-];
+var searchData=[["dofmap_0",["DofMap",["../test__momentum__convective__candidates_8c.html#structDofMap",1,""]]],["drivenfluxdata_1",["DrivenFluxData",["../BC__Handlers_8c.html#structDrivenFluxData",1,""]]],["dualmonitorctx_2",["DualMonitorCtx",["../logging_8h.html#structDualMonitorCtx",1,""]]]];

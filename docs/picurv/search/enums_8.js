@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['outletclippassmode_0',['OutletClipPassMode',['../BC__Handlers_8c.html#a62aae58d098ad0019f3a96362627d688',1,'BC_Handlers.c']]]
-];
+var searchData=[["outletclippassmode_0",["OutletClipPassMode",["../BC__Handlers_8c.html#a62aae58d098ad0019f3a96362627d688",1,"BC_Handlers.c"]]]];

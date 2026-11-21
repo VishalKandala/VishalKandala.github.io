@@ -1,4 +1,1 @@
-var searchData=
-[
-  ['node_0',['node',['../variables_8h.html#structnode',1,'']]]
-];
+var searchData=[["node_0",["node",["../variables_8h.html#structnode",1,""]]]];

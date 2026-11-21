@@ -1,6 +1,1 @@
-var searchData=
-[
-  ['mgctx_0',['MGCtx',['../variables_8h.html#ab026875e0ebe17a1230d314a22f81a3b',1,'variables.h']]],
-  ['migrationinfo_1',['MigrationInfo',['../variables_8h.html#acf4646d5bc6be3696d3cf898d91293dc',1,'variables.h']]],
-  ['momentumnewtonkrylovcontext_2',['MomentumNewtonKrylovContext',['../momentum__newton__krylov_8c.html#aec1906289d863dbdd71ac1f5975282fe',1,'momentum_newton_krylov.c']]]
-];
+var searchData=[["mgctx_0",["MGCtx",["../variables_8h.html#ab026875e0ebe17a1230d314a22f81a3b",1,"variables.h"]]],["migrationinfo_1",["MigrationInfo",["../variables_8h.html#acf4646d5bc6be3696d3cf898d91293dc",1,"variables.h"]]],["momentumnewtonkrylovcontext_2",["MomentumNewtonKrylovContext",["../momentum__newton__krylov_8c.html#aec1906289d863dbdd71ac1f5975282fe",1,"momentum_newton_krylov.c"]]]];
